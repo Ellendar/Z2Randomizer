@@ -88,6 +88,7 @@ public sealed class EastHyrule : World
 
     private const int MAP_ADDR = 0xb480;
 
+    private readonly List<Location> valleyOfDeathLocations;
 
     public EastHyrule(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
@@ -108,6 +109,16 @@ public sealed class EastHyrule : World
             .. rom.LoadLocations(RomMap.EAST_TOWN_OF_OLD_KASUTO_TILE_LOCATION, 4, terrains, Continent.EAST),
         ];
         locations.ForEach(AddLocation);
+
+        valleyOfDeathLocations = [
+            GetLocationByMem(RomMap.EAST_CAVE_VOD_PASSTHROUGH1_END_LOCATION),
+            GetLocationByMem(RomMap.EAST_CAVE_VOD_PASSTHROUGH1_START_LOCATION),
+            GetLocationByMem(RomMap.EAST_CAVE_VOD_PASSTHROUGH2_END_LOCATION),
+            GetLocationByMem(RomMap.EAST_CAVE_VOD_PASSTHROUGH2_START_LOCATION),
+            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION1),
+            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION2),
+            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION3),
+        ];
 
         //reachableAreas = new HashSet<string>();
 
@@ -767,7 +778,7 @@ public sealed class EastHyrule : World
                 bool riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.CAVE;
                 bool rockBlock = props.EastRocks && !props.EastRockIsPath;
                 PlaceHiddenLocations(props.LessImportantLocationsOption);
-                BlockCaves(props.BoulderBlockConnections, riverDevil, rockBlock, hiddenPalaceLocation, hiddenKasutoLocation);
+                BlockCaves(props.BoulderBlockConnections, riverDevil, rockBlock, [hiddenPalaceLocation, hiddenKasutoLocation, .. valleyOfDeathLocations]);
                 riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.PATH;
                 rockBlock = props.EastRocks && props.EastRockIsPath;
                 if (biome == Biome.VANILLALIKE)
@@ -1726,8 +1737,13 @@ public sealed class EastHyrule : World
         return Math.Sqrt(Math.Pow(l.Xpos - l2.Xpos, 2) + Math.Pow(l.Y - l2.Y, 2));
     }
 
+    private void BlockCaves(bool connectionsCanBeBlocked, bool riverDevilBlocks, bool rockBlock)
+    {
+        BlockCaves(connectionsCanBeBlocked, riverDevilBlocks, rockBlock, []);
+    }
+
     private void BlockCaves(bool connectionsCanBeBlocked, bool riverDevilBlocks, bool rockBlock, 
-        Location? hiddenPalaceLocation, Location? hiddenKasutoLocation)
+        IEnumerable<Location> disallowedLocations)
     {
         //Blockers are on, but there are no block types 
         if(!riverDevilBlocks && !rockBlock)
@@ -1747,8 +1763,7 @@ public sealed class EastHyrule : World
             do
             {
                 cave = Caves[RNG.Next(Caves.Count)];
-            }while(cave == hiddenKasutoLocation 
-                || cave == hiddenPalaceLocation
+            }while(disallowedLocations.Contains(cave)
                 || (firstPlacedLocation != null 
                     && int.Abs(firstPlacedLocation.Xpos - cave.Xpos) < 4 
                     && int.Abs(firstPlacedLocation.Y - cave.Y) < 4
