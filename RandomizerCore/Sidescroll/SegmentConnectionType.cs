@@ -25,6 +25,7 @@ public static class SegmentConnectionTypeExtensions
             SegmentConnectionType.BOTH_ELEVATORS => true,
             SegmentConnectionType.DROP_COLUMN => true,
             SegmentConnectionType.DROP_TO_ELEVATOR => true,
+            SegmentConnectionType.DROP_INTO => true,
             _ => false
         };
     }

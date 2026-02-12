@@ -10,10 +10,10 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
 {
     private const int MINIMUM_ROOMS_PER_FLOOR = 3;
 
-    private const double SINGLE_WALL_CHANCE = 0;
-    private const double SEGMENTED_CHANCE = .75;
-    private const double DROP_CHANCE = 0;
-    private const double REDUNDANT_ELEVATOR_CHANCE = 0;
+    private const double SINGLE_WALL_CHANCE = .3;
+    private const double SEGMENTED_CHANCE = .2;
+    private const double DROP_CHANCE = .1;
+    private const double REDUNDANT_ELEVATOR_CHANCE = .1;
 
     private TableWeightedRandom<SegmentConnectionType> SegmentConnectionOptionWeights = new([
         (SegmentConnectionType.ELEVATOR_UP, 10),
@@ -52,7 +52,7 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
             //There are more bonus rooms than floors to add them in
             layersWithBonusFloors > numberOfLayers
             //Adding bonus rooms would exceed the maximum number of rooms per floor
-            || ((layersWithBonusFloors > 0) && baseRoomsPerLayer > Convert.ToInt32(Math.Sqrt(roomCount)) + 2)
+            || ((layersWithBonusFloors > 0) && baseRoomsPerLayer == maxRoomsPerLayer)
         );
 
         //layers that have more rooms are the lower layers
