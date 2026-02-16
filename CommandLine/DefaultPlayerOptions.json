@@ -1,6 +1,6 @@
 ﻿{
   "DisableMusic": false,
-  "RandomizeMusic": true,
+  "RandomizeMusic": false,
   "MixCustomAndOriginalMusic":  false,
   "IncludeDiverseMusic": false,
   "DisableUnsafeMusic":  true,

@@ -2443,7 +2443,7 @@ FireballObjCore:
   sta Fireball_Y_HighPos,x
   ldy PlayerFacingDir          ;get player's facing direction
   tya ; Z2 needs a value set for the knockback value in $6d
-  sta $6d,x
+  sta Fireball_MovingDir,x
   dey                          ;decrement to use as offset here
   lda FireballXSpdData,y       ;set horizontal speed of fireball accordingly
   sta Fireball_X_Speed,x
@@ -2734,24 +2734,26 @@ GetProperObjOffset:
         ; Spawn new hammer
         lda #$41
         sta Fireball_State,x
-        
         lda #Sfx_Fireball          ;play fireball sound effect
         sta Square1SoundQueue
-  
+        
+        ldy PlayerFacingDir          ;get player's facing direction
         lda Player_X_Position        ;get player's horizontal position
+        clc
+        adc HammerXPosition-1,y
         sta Fireball_X_Position,x
         lda Player_PageLoc           ;get player's page location
+        adc #0
         sta Fireball_PageLoc,x
         lda Player_Y_Position        ;get player's vertical position and store
         sec
-        sbc #$10
+        sbc #$08
         sta Fireball_Y_Position,x
         lda #$01                     ;set high byte of vertical position
         sbc #0
         sta Fireball_Y_HighPos,x
-        ldy PlayerFacingDir          ;get player's facing direction
         tya ; Z2 needs a value set for the knockback value in $6d
-        sta Fireball_FacingDir,x
+        sta Fireball_MovingDir,x
         dey                          ;decrement to use as offset here
         lda HammerXVelocity,y       ;set horizontal speed of hammer
         clc
@@ -2782,6 +2784,8 @@ NotHammer2:
   
 HammerXVelocity:
   .byte $10, -$10
+HammerXPosition:
+  .byte $10, $00
 .endproc
   
 .proc MoveHammer

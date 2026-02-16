@@ -308,6 +308,7 @@ FrameCounter = $12
 ; CrouchingFlag = $17
 RESV CrouchingFlag
 Player_MovingDir = $5F
+Fireball_MovingDir = $6D
 PlayerFacingDir = $9F
 SavedJoypadBits = $F7
 ScreenLeft_PageLoc = $72a
