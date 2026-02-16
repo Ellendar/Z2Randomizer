@@ -150,7 +150,7 @@ public class Program
                     : Directory.GetCurrentDirectory();
             }
             string newFileName =  $"{outpath}/Z2_{Seed}_{Flags}.nes";
-            await File.WriteAllBytesAsync(newFileName, rom.romdata);
+            await File.WriteAllBytesAsync(newFileName, rom.romdata!);
             logger.Info($"File {newFileName} has been created!");
             if (rom.debuginfo != null)
             {
@@ -162,7 +162,7 @@ public class Program
         else
         {
             logger.Error("An exception occurred generating the rom");
-            logger.Error(rom.messages);
+            logger.Error(rom.messages!);
         }
     }
     

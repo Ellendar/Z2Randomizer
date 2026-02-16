@@ -405,10 +405,13 @@ PatchFireballHitcheck:
   jsr $E694 ; original hitbox check
   bcc @exit
     ldy $11 ; fireball or hammer
-    lda #%10000000
-    ora Fireball_State,y ; keep the hammer bit as well if its set
-    and #%11000000
-    sta Fireball_State,y
+    ; if its a hammer let it pass through
+    lda Fireball_State,y
+    and #%01000000
+    bne @exit
+      ; destroy the fireball
+      lda #%10000000
+      sta Fireball_State,y
 @exit:
   rts
 
