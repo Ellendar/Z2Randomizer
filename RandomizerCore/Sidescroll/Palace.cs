@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ public partial class Palace
     private readonly SortedDictionary<int, List<Room>> rooms;
     internal bool IsValid { get; set; } = false;
 
-    public static readonly Collectable[] SHUFFLABLE_SMALL_ITEMS = [
+    public static readonly ReadOnlyCollection<Collectable> SHUFFLABLE_SMALL_ITEMS = [
         Collectable.KEY,
         Collectable.SMALL_BAG,
         Collectable.MEDIUM_BAG,
@@ -626,15 +627,15 @@ public partial class Palace
         }
     }
 
-    public void Shorten(Random random)
+    /// Only used by Vanilla & Vanilla Shuffled generators
+    public void Shorten(Random random, int roomCount)
     {
         ValidateRoomConnections();
         int numRooms = AllRooms.Count;
 
-        int target = random.Next(numRooms / 2, (numRooms * 3) / 4) + 1;
         int rooms = numRooms;
         int tries = 0;
-        while (rooms > target && tries < 1000)
+        while (rooms > roomCount && tries < 1000)
         {
             //remove rooms without bias
             //don't remove important rooms
@@ -864,7 +865,7 @@ public partial class Palace
                 }
             }
         }
-        logger.Debug("Target: " + target + " Rooms: " + rooms);
+        logger.Debug("Target: " + roomCount + " Rooms: " + rooms);
     }
 
     public void RandomizeSmallItems(Random r, bool extraKeys)
@@ -1270,7 +1271,7 @@ public partial class Palace
         }
     }
 
-    public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla)
+    public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla, int roomCount)
     {
         //I have no idea why this was here and it breaks stuff. For future removal.
         /*
@@ -1338,6 +1339,7 @@ public partial class Palace
         {
             room.Map = room.LinkedRoom!.Map;
         }
+        Debug.Assert(currentMap - Entrance!.Map <= roomCount);
         if(currentMap > 63)
         {
             throw new Exception("Map number has exceeded maximum");

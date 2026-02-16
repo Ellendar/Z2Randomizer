@@ -23,7 +23,7 @@ public abstract class PalaceGenerator
         if (palaceNumber < 7)
         {
             //Short normal palace should always be safe regardless of which palace set is being used
-            if (props.ShortenNormalPalaces)
+            if (props.PalaceLengths[palaceNumber - 1] < 22) // may need to be adjusted
             {
                 return true;
             }
@@ -37,7 +37,7 @@ public abstract class PalaceGenerator
         else
         {
             //Short GP is ok with any 2 groups
-            if (props.ShortenGP)
+            if (props.PalaceLengths[6] < 35) // may need to be adjusted
             {
                 if(props.AllowV4Rooms && props.AllowV5_0Rooms
                     || props.AllowV5_0Rooms && props.AllowVanillaRooms

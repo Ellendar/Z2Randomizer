@@ -45,8 +45,8 @@ public static class UpstartsTournamentPreset
         //Palaces
         NormalPalaceStyle = PalaceStyle.RECONSTRUCTED,
         GpStyle = PalaceStyle.RECONSTRUCTED,
-        ShortenNormalPalaces = false,
-        ShortenGP = true,
+        NormalPalaceLength = PalaceLengthOption.FULL,
+        GpLength = PalaceLengthOption.SHORT,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
         Includev5_0Rooms = false,
