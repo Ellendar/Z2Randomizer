@@ -626,8 +626,8 @@ public class CustomTexts
             .. kingsTomb,
             .. oldkasutoHint,
             errorTextIndex2,
-            talkingBotIndexSleeping,
-            talkingAcheIndexSleeping,
+            talkingAcheIndexTalking,
+            talkingBotIndexTalking,
         ];
 
         List<int> moving =
@@ -658,6 +658,14 @@ public class CustomTexts
                 else
                 {
                     hints[textIndex] = useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
+                    if (textIndex == talkingAcheIndexTalking)
+                    {
+                        hints[talkingAcheIndexSleeping] = hints[textIndex];
+                    }
+                    else if (textIndex == talkingBotIndexTalking)
+                    {
+                        hints[talkingBotIndexSleeping] = hints[textIndex];
+                    }
                 }
             }
         }
@@ -734,13 +742,17 @@ public class CustomTexts
         foreach(Collectable hintCollectable in hintCollectables)
         {
             List<Location> possibleHintLocations = locations.Where(i => i.Collectables.Contains(hintCollectable)).ToList();
-            Location hintLocation = possibleHintLocations.Sample(r) ?? throw new ImpossibleException("Error generating hint for unplaced item");
-            Text hint = Text.GenerateHelpfulHint(locations.ToList(), hintLocation, hintCollectable, props.IncludeSpellsInShuffle);
-            int town = r.Next(9);
-            while (placedTowns.Contains(town))
+            Location hintLocation;
+            int town;
+            do
             {
+                hintLocation = possibleHintLocations.Sample(r) ?? throw new ImpossibleException("Error generating hint for unplaced item");
                 town = r.Next(9);
             }
+            //don't let hints be for items in the same town
+            while ((hintLocation.ActualTown ?? Town.INVALID).VanillaTownOrder() - 1 == town
+             || placedTowns.Contains(town));
+            Text hint = Text.GenerateHelpfulHint(locations.ToList(), hintLocation, hintCollectable, props.IncludeSpellsInShuffle);
             int index = hintIndexes[town][r.Next(hintIndexes[town].Length)];
             switch (index)
             {

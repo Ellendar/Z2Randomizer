@@ -145,8 +145,8 @@ public class FlagsTests
     [TestMethod]
     public void TestMaxRandoEncodeCycle()
     {
-        RandomizerConfiguration config = MaxRandoPreset.Preset;
-        RandomizerConfiguration config2 = new RandomizerConfiguration(MaxRandoPreset.Preset.SerializeFlags());
+        RandomizerConfiguration config = MaxRando2025Preset.Preset;
+        RandomizerConfiguration config2 = new RandomizerConfiguration(MaxRando2025Preset.Preset.SerializeFlags());
         Assert.AreEqual(config.SerializeFlags(), config2.SerializeFlags());
     }
 }

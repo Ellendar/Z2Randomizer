@@ -3,13 +3,13 @@ using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
-public static class MaxRandoPreset
+public static class MaxRando2025Preset
 {
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start
-        ShuffleStartingItems = false,
-        ShuffleStartingSpells = false,
+        ShuffleStartingItems = true,
+        ShuffleStartingSpells = true,
         MaxHeartContainers = MaxHeartsOption.RANDOM,
         StartingHeartContainersMin = 1,
         StartingHeartContainersMax = 8,
