@@ -293,6 +293,14 @@ public static class PalaceStyleExtensions
     }
 }
 
+public enum PalaceDropStyle
+{
+    ENTRANCE,
+    ANY_EXIT,
+    ANYTHING_GOES,
+    RANDOM
+}
+
 [DefaultValue(OVERWORLD)]
 public enum BossRoomsExitType
 {

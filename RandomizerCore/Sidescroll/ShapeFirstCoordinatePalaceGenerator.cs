@@ -193,6 +193,12 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
             throw new Exception("Generated palace has the incorrect number of rooms");
         }
 
+        if (palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], props.PalaceDropStyle, r))
+        {
+            palace.IsValid = false;
+            return palace;
+        }
+
         palace.AllRooms.ForEach(i => i.PalaceNumber = palaceNumber);
 
         palace.IsValid = true;

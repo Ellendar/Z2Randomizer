@@ -115,6 +115,8 @@ public class RandomizerProperties
     [NotMapped]
     public bool[] BossRoomsExitToPalace { get; set; } = new bool[7];
     public bool NoDuplicateRooms { get; set; }
+    public PalaceDropStyle PalaceDropStyle { get; set; }
+
     public bool NoDuplicateRoomsBySideview { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
     public bool AllowVanillaRooms { get; set; }

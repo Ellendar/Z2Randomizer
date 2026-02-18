@@ -14,6 +14,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 public partial class Palace
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+    private const double DROPS_CAN_LEAD_TO_BOSS_CHANCE = 0.4;
 
     //private const bool DROPS_ARE_BLOCKERS = false;
     private const byte OUTSIDE_ROOM_EXIT = 0b11111100;
@@ -64,55 +65,6 @@ public partial class Palace
     {
         CheckSpecialPaths(Entrance!);
         return !BossRoom!.IsBeforeTbird;
-    }
-
-    [Obsolete("This was redundant with HasInescapableDrop, which worked more correctly.")]
-    public bool HasDeadEnd()
-    {
-
-        List<Room> dropExits = AllRooms.Where(i => i is { HasDownExit: true, HasDrop: true }).ToList();
-        if (dropExits.Count == 0 || dropExits.Any(i => i.Down == null))
-        {
-            return false;
-        }
-        Room end = BossRoom!;
-        foreach (Room r in dropExits)
-        {
-            if(r.Down == null)
-            {
-                continue;
-            }
-            HashSet<Room> reachable = [];
-            Stack<Room> roomsToCheck = [];
-            reachable.Add(r.Down);
-            roomsToCheck.Push(r.Down);
-
-            while (roomsToCheck.Count > 0)
-            {
-                Room c = roomsToCheck.Pop();
-                if (c.Left != null && reachable.Add(c.Left))
-                {
-                    roomsToCheck.Push(c.Left);
-                }
-                if (c.Right != null && reachable.Add(c.Right))
-                {
-                    roomsToCheck.Push(c.Right);
-                }
-                if (c.Up != null && reachable.Add(c.Up))
-                {
-                    roomsToCheck.Push(c.Up);
-                }
-                if (c.Down != null && reachable.Add(c.Down))
-                {
-                    roomsToCheck.Push(c.Down);
-                }
-            }
-            if (!reachable.Contains(Entrance!) && !reachable.Contains(end))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void CheckSpecialPaths(Room r)
@@ -1046,8 +998,22 @@ public partial class Palace
         return unclearableRooms.Count == 0;
     }
 
-    public bool HasInescapableDrop(bool palacesContinueAfterBoss)
+    public bool HasDisallowedDrop(bool palacesContinueAfterBoss, PalaceDropStyle dropStyle, Random r)
     {
+        if(dropStyle == PalaceDropStyle.ANYTHING_GOES)
+        {
+            return false;
+        }
+
+        PalaceDropStyle effectiveDropStyle;
+        if (dropStyle == PalaceDropStyle.RANDOM)
+        {
+            effectiveDropStyle = r.NextDouble() < DROPS_CAN_LEAD_TO_BOSS_CHANCE ? PalaceDropStyle.ANY_EXIT : PalaceDropStyle.ENTRANCE;
+        }
+        else 
+        {
+            effectiveDropStyle = dropStyle;
+        }
         //get a list of effective drop zones in the palace
         List<Room> dropZonesToCheck = [];
         foreach (Room room in AllRooms.Where(i => i.HasDrop))
@@ -1069,8 +1035,8 @@ public partial class Palace
             while (pendingRooms.Count > 0)
             {
                 Room room = pendingRooms.Pop();
-                //if you find the entrance, remove and continue
-                if (room == Entrance || (room.IsBossRoom && !palacesContinueAfterBoss))
+                //if you find the entrance, or a boss room that does't continue, and boss drops are allowed, remove and continue
+                if (room == Entrance || (room.IsBossRoom && !palacesContinueAfterBoss && effectiveDropStyle == PalaceDropStyle.ANY_EXIT))
                 {
                     found = true;
                     break;

@@ -96,9 +96,10 @@ public class VanillaPalaceGenerator() : PalaceGenerator
             }
         }
 
-        if(!palace.AllReachable() 
-            || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) 
-            || palace.HasInescapableDrop(props.BossRoomsExitToPalace[palace.Number - 1]))
+        if (!palace.AllReachable()
+            || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
+            //Vanilla specifically just does an any exit check because this is just a safety check, it should never trip
+            || palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], PalaceDropStyle.ANY_EXIT, r))
         {
             throw new Exception("Vanilla palace (" + palaceNumber + ") was not all reachable. This should be impossible.");
         }

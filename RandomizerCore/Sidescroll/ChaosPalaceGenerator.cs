@@ -167,9 +167,9 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             unreachableRooms = palace.AllRooms.Except(reachableRooms).ToList();
         };
 
+        //Chaos palaces do not check for inescapable drops. They are inherently insane and not remotely beginner-friendly.
+
         palace.IsValid = palace.AllReachable(true);
         return palace;
     }
-
-
 }

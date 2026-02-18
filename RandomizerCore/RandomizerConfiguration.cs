@@ -246,6 +246,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool blockingRoomsInAnyPalace;
 
     [Reactive]
+    private PalaceDropStyle palaceDropStyle;
+
+    [Reactive]
     private BossRoomsExitType bossRoomsExitType;
 
     [Reactive]
@@ -1181,6 +1184,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             }
         }
         properties.BossRoomsExitToPalace[6] = false;
+        properties.PalaceDropStyle = palaceDropStyle;
 
         properties.NoDuplicateRooms = noDuplicateRoomsByEnemies;
         properties.NoDuplicateRoomsBySideview = noDuplicateRoomsByLayout;

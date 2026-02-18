@@ -235,7 +235,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 (!reachable
                  || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
                  || (palaceNumber == 7 && !palace.BossRoomMinDistance(props.DarkLinkMinDistance))
-                 || palace.HasInescapableDrop(props.BossRoomsExitToPalace[palace.Number - 1])
+                 || palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], props.PalaceDropStyle, r)
                 ) && (tries < ROOM_SHUFFLE_ATTEMPT_LIMIT)
             );
         } while (tries >= ROOM_SHUFFLE_ATTEMPT_LIMIT);
