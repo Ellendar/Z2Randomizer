@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -228,6 +229,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     private PalaceStyle gpStyle;
+
+    [Reactive]
+    private bool randomStylesAllowVanilla;
 
     [Reactive]
     private bool? includeVanillaRooms;
@@ -772,72 +776,54 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, startItemsLimit, shuffleStartingItems, properties, r);
             ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, startSpellsLimit, shuffleStartingSpells, properties, r);
 
-            if (gpStyle == PalaceStyle.RANDOM)
+            List<PalaceStyle> allowedPalaceStyles;
+            if(GpStyle.IsMetastyle())
             {
-                properties.PalaceStyles[6] = r.Next(5) switch
+                Debug.Assert(GpStyle == PalaceStyle.RANDOM);
+                allowedPalaceStyles = Enum.GetValues(typeof(PalaceStyle)).Cast<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
+                if (!randomStylesAllowVanilla)
                 {
-                    0 => PalaceStyle.VANILLA,
-                    1 => PalaceStyle.SHUFFLED,
-                    2 => PalaceStyle.RECONSTRUCTED,
-                    3 => PalaceStyle.SEQUENTIAL,
-                    4 => PalaceStyle.RANDOM_WALK,
-                    _ => throw new Exception("Invalid PalaceStyle")
-                };
-            }
-            else if (gpStyle == PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE)
-            {
-                properties.PalaceStyles[6] = r.Next(3) switch
-                {
-                    0 => PalaceStyle.RECONSTRUCTED,
-                    1 => PalaceStyle.SEQUENTIAL,
-                    2 => PalaceStyle.RANDOM_WALK,
-                    _ => throw new Exception("Invalid PalaceStyle")
-                };
+                    allowedPalaceStyles.RemoveAll(i => i.UsesVanillaRoomPool());
+                }
             }
             else
             {
-                properties.PalaceStyles[6] = gpStyle;
+                allowedPalaceStyles = [GpStyle];
             }
+            properties.PalaceStyles[6] = allowedPalaceStyles.Sample(r);
+            Debug.Assert(!properties.PalaceStyles[6].IsMetastyle());
 
-            if (normalPalaceStyle == PalaceStyle.RANDOM_ALL)
+            if (NormalPalaceStyle.IsMetastyle())
             {
-                PalaceStyle style = r.Next(5) switch
+                Debug.Assert(NormalPalaceStyle != PalaceStyle.RANDOM);
+                allowedPalaceStyles = Enum.GetValues(typeof(PalaceStyle)).Cast<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
+                if (!randomStylesAllowVanilla)
                 {
-                    0 => PalaceStyle.VANILLA,
-                    1 => PalaceStyle.SHUFFLED,
-                    2 => PalaceStyle.RECONSTRUCTED,
-                    3 => PalaceStyle.SEQUENTIAL,
-                    4 => PalaceStyle.RANDOM_WALK,
-                    _ => throw new Exception("Invalid PalaceStyle")
-                };
-                for (int i = 0; i < 6; i++)
-                {
-                    properties.PalaceStyles[i] = style;
-                }
-            }
-            else if (normalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    PalaceStyle style = r.Next(5) switch
-                    {
-                        0 => PalaceStyle.VANILLA,
-                        1 => PalaceStyle.SHUFFLED,
-                        2 => PalaceStyle.RECONSTRUCTED,
-                        3 => PalaceStyle.SEQUENTIAL,
-                        4 => PalaceStyle.RANDOM_WALK,
-                        _ => throw new Exception("Invalid PalaceStyle")
-                    };
-                    properties.PalaceStyles[i] = style;
+                    allowedPalaceStyles.RemoveAll(i => i.UsesVanillaRoomPool());
                 }
             }
             else
             {
-                for (int i = 0; i < 6; i++)
+                allowedPalaceStyles = [NormalPalaceStyle];
+            }
+            PalaceStyle singlePalaceStyle = allowedPalaceStyles.Sample(r);
+            for (int i = 0; i < 6; i++)
+            {
+                if (normalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
+                {
+                    properties.PalaceStyles[i] = allowedPalaceStyles.Sample(r);
+                }
+                else if (normalPalaceStyle == PalaceStyle.RANDOM_ALL)
+                {
+                    properties.PalaceStyles[i] = singlePalaceStyle;
+                }
+                else
                 {
                     properties.PalaceStyles[i] = normalPalaceStyle;
                 }
+                Debug.Assert(!properties.PalaceStyles[i].IsMetastyle());
             }
+
 
             properties.PalaceLengths = Palaces.RollPalaceLengths(r, properties, this);
 

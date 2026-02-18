@@ -56,6 +56,15 @@
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
                 </ComboBox>
             </Grid>
+			<CheckBox
+	            IsThreeState="False"
+	            IsChecked="{Binding Config.RandomStylesAllowVanilla}"
+	            Name="RandomStylesAllowVanillaCheckbox"
+	            Content="Random Styles Allow Vanilla" >
+				<ToolTip.Tip>
+					<TextBlock Text="{x:Static lang:Resources.RandomAllowsVanillaTooltip}"/>
+				</ToolTip.Tip>
+			</CheckBox>
             <ComboBox
                 HorizontalAlignment="Left" Margin="0, 0" Width="260" Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Minimum Path To Dark Link"

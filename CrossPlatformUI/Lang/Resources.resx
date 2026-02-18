@@ -622,6 +622,9 @@ actual terrain, instead of the original vanilla terrain.</value>
 <value>If selected, palaces will be fewer rooms. The exact way this is handled varies by palace
 style, but on average the palace is 25% to 50% fewer rooms than otherwise.</value>
 	</data>
+	<data name="RandomAllowsVanillaTooltip" xml:space="preserve">
+<value>If selected, random palace styles can include vanilla or vanilla(shuffled).</value>
+	</data>
 	<data name="MinimumPathToDarkLinkToolTip" xml:space="preserve">
 <value>If you think a short Great Palace at the end of the game is anticlimactic, this is the
 flag for you! The shortest path to Dark Link (and to finish the game) will be at least

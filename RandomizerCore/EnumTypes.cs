@@ -254,8 +254,6 @@ public enum PalaceStyle
     CHAOS,
     [Description("Random")]
     RANDOM,
-    [Description("Random (No Vanilla or Shuffle)")]
-    RANDOM_NO_VANILLA_OR_SHUFFLE,
     [Description("Random (All Same)")]
     RANDOM_ALL,
     [Description("Random (Per Palace)")]
@@ -270,6 +268,16 @@ public static class PalaceStyleExtensions
         {
             PalaceStyle.VANILLA => true,
             PalaceStyle.SHUFFLED => true,
+            _ => false
+        };
+    }
+    public static bool IsMetastyle(this PalaceStyle style)
+    {
+        return style switch
+        {
+            PalaceStyle.RANDOM => true,
+            PalaceStyle.RANDOM_ALL => true,
+            PalaceStyle.RANDOM_PER_PALACE => true,
             _ => false
         };
     }
@@ -824,7 +832,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> PalaceLengthOptionList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
-        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM && i != PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE);
+        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM);
     public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
         = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();

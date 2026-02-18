@@ -45,7 +45,8 @@ public static class MaxRandoPreset
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_PER_PALACE,
-        GpStyle = PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        GpStyle = PalaceStyle.RANDOM,
+        RandomStylesAllowVanilla = false,
         NormalPalaceLength = PalaceLengthOption.RANDOM,
         GpLength = PalaceLengthOption.RANDOM,
         IncludeVanillaRooms = true,
