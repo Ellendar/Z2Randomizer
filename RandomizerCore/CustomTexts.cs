@@ -11,6 +11,9 @@ public class CustomTexts
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    //Experimental. If people like this it may get a flag or just be always on
+    private const bool OLD_KASUTO_HINT_IS_ALWAYS_GOOD = true;
+
     private const int errorTextIndex1 = 25; // Error inside house on 1st screen in Ruto, 1st message
     private const int errorTextIndex2 = 26; // Error 2nd message
 
@@ -118,8 +121,8 @@ public class CustomTexts
         { Collectable.THUNDER_SPELL, 96 },
     };
 
-    private static readonly int[][] hintIndexes = [rauruHints, rutoHints, sariaHints, kingsTomb, midoHints, nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint
-    ];
+    private static readonly int[][] hintIndexes = [rauruHints, rutoHints, sariaHints, midoHints, 
+        nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint, kingsTomb];
 
     public static readonly string[] GENERIC_WIZARD_TEXTS =
     [
@@ -708,6 +711,10 @@ public class CustomTexts
         }
 
         int hintsCount = HELPFUL_HINTS_COUNT;
+        if(OLD_KASUTO_HINT_IS_ALWAYS_GOOD)
+        {
+            hintsCount++;
+        }
         //trying without the bonus hint now that spell shuffle has town hints.
         /*
         if(props.IncludeSwordTechsInShuffle && props.IncludeQuestItemsInShuffle)
@@ -738,16 +745,27 @@ public class CustomTexts
         }
         hintCollectables.Add(items.Where(smallItems.Contains).ToList().Sample(r));
 
-
+        bool requiredOldKasutoHintPlaced = !OLD_KASUTO_HINT_IS_ALWAYS_GOOD;
         foreach(Collectable hintCollectable in hintCollectables)
         {
             List<Location> possibleHintLocations = locations.Where(i => i.Collectables.Contains(hintCollectable)).ToList();
+
             Location hintLocation;
             int town;
             do
             {
+                //This fails if we ever have more than 1 item location in old kasuto, but that is unlikely
+                if(!hintCollectable.IsMinorItem() && !requiredOldKasutoHintPlaced)
+                {
+                    town = 7;
+                    requiredOldKasutoHintPlaced = true;
+                }
+                else
+                {
+                    town = r.Next(9);
+                }
                 hintLocation = possibleHintLocations.Sample(r) ?? throw new ImpossibleException("Error generating hint for unplaced item");
-                town = r.Next(9);
+
             }
             //don't let hints be for items in the same town
             while ((hintLocation.ActualTown ?? Town.INVALID).VanillaTownOrder() - 1 == town
