@@ -861,11 +861,25 @@ public class Hyrule
         {
             if (props.StartWithDownstab)
             {
-                shufflableItems[shufflableItems.IndexOf(Collectable.DOWNSTAB)] = minorItems.Sample(r);
+                if (!props.TownQuestLocationsAreMinorItems)
+                {
+                    shufflableItems[shufflableItems.IndexOf(Collectable.DOWNSTAB)] = minorItems.Sample(r);
+                }
+                else
+                {
+                    excessItems.Remove(Collectable.DOWNSTAB);
+                }
             }
             if (props.StartWithUpstab)
             {
-                shufflableItems[shufflableItems.IndexOf(Collectable.UPSTAB)] = minorItems.Sample(r);
+                if (!props.TownQuestLocationsAreMinorItems)
+                {
+                    shufflableItems[shufflableItems.IndexOf(Collectable.UPSTAB)] = minorItems.Sample(r);
+                }
+                else
+                {
+                    excessItems.Remove(Collectable.UPSTAB);
+                }
             }
         }
 
