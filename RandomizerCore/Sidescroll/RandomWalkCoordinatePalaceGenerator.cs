@@ -10,6 +10,8 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerator
 {
     private const float DROP_CHANCE = .06f;
+    private static readonly ItemRoomSelectionStrategy itemRoomSelectionStrategy = new ByShapeItemRoomSelectionStrategy();
+
     protected override async Task<Dictionary<Coord, RoomExitType>> GetPalaceShape(RandomizerProperties props, Palace palace, RoomPool roomPool, Random r, int roomCount)
     {
         Dictionary<Coord, RoomExitType> walkGraph = [];
@@ -150,5 +152,10 @@ public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGen
         //Debug.WriteLine(GetLayoutDebug(walkGraph, false));
 
         return await Task.FromResult(walkGraph);
+    }
+
+    protected override ItemRoomSelectionStrategy GetItemRoomSelectionStrategy()
+    {
+        return itemRoomSelectionStrategy;
     }
 }

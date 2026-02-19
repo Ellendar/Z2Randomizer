@@ -56,35 +56,23 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
                 if (palaceNumber < 7) //Not GP
                 {
-                    for (int i = 0; i < props.PalaceItemRoomCounts[palaceNumber - 1]; i++)
+                    ItemRoomSelectionStrategy itemRoomSelector = new ByEntranceDirectionItemRoomSelectionStrategy();
+                    Room[] originalItemRooms = itemRoomSelector.SelectItemRooms(palace, roomPool, props.PalaceItemRoomCounts[palaceNumber - 1], r);
+                    if (originalItemRooms == null)
                     {
-                        if (roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
-                        {
-                            throw new Exception("No item rooms for reconstructed palace");
-                        }
-                        Direction itemRoomDirection = Direction.NONE;
-                        Room? itemRoom = null;
-                        while (itemRoom == null)
-                        {
-                            itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-                            if (!roomPool.ItemRoomsByDirection.TryGetValue(itemRoomDirection, out var value))
-                            {
-                                continue;
-                            }
-                            var itemRoomCandidate = value.ToList().Sample(r);
-                            if (itemRoomCandidate == null)
-                            {
-                                palace.IsValid = false;
-                                return palace;
-                            }
-                            itemRoom = new(itemRoomCandidate);
-                        }
-
+                        palace.IsValid = false;
+                        return palace;
+                    }
+                    foreach(Room originalItemRoom in originalItemRooms)
+                    {
+                        Room itemRoom = new(originalItemRoom);
                         palace.ItemRooms.Add(itemRoom);
                         palace.AllRooms.Add(itemRoom);
 
-                        if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.ItemRoomsByDirection[itemRoomDirection], itemRoom); }
-
+                        if (duplicateProtection)
+                        {
+                            roomPool.RemoveDuplicates(props, itemRoom);
+                        }
                         if (itemRoom.LinkedRoomName != null)
                         {
                             Room segmentedItemRoom1, segmentedItemRoom2;
@@ -96,8 +84,6 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                             segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
                             palace.AllRooms.Add(segmentedItemRoom2);
                         }
-
-
                     }
 
                     if (props.BossRoomsExitToPalace[palace.Number - 1])
@@ -147,7 +133,10 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                     }
                     if (added)
                     {
-                        if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, roomToAdd); }
+                        if (duplicateProtection)
+                        {
+                            roomPool.RemoveDuplicates(props, roomToAdd);
+                        }
                         if (roomToAdd.LinkedRoom?.HasDrop ?? false)
                         {
                             roomToAdd = roomToAdd.LinkedRoom;
@@ -172,7 +161,10 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                                 bool added2 = AddRoom(palace, dropZoneRoom, props.BlockersAnywhere);
                                 if (added2)
                                 {
-                                    if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, dropZoneRoom); }
+                                    if (duplicateProtection)
+                                    {
+                                        roomPool.RemoveDuplicates(props, dropZoneRoom);
+                                    }
                                     continueDropping = dropZoneRoom.HasDrop;
                                     if (dropZoneRoom.LinkedRoomName != null)
                                     {

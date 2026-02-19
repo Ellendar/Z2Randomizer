@@ -184,6 +184,7 @@ public class Room : IJsonOnDeserialized
         // PalaceGroup = room.PalaceGroup;
         PalaceNumber = room.PalaceNumber;
         DuplicateGroup = room.DuplicateGroup;
+        coords = room.coords;
 
         Connections = room.Connections;
         HasLeftExit = room.Connections[0] < 0xFC;

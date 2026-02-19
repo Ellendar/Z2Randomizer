@@ -45,31 +45,24 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         {
             for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCounts[palaceNumber - 1]; itemRoomNumber++)
             {
-                Direction itemRoomDirection;
-                Room? itemRoom = null;
-                while (itemRoom == null)
-                {
-                    itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-                    if (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection))
-                    {
-                        continue;
-                    }
-                    itemRoom = new(roomPool.ItemRoomsByDirection[itemRoomDirection].ElementAt(r.Next(roomPool.ItemRoomsByDirection[itemRoomDirection].Count)));
-                }
-                Debug.Assert(itemRoom != null);
-                palace.ItemRooms.Add(itemRoom);
-                palace.AllRooms.Add(itemRoom);
+                ItemRoomSelectionStrategy itemRoomSelectionStrategy = new ByEntranceDirectionItemRoomSelectionStrategy();
+                Room[] itemRooms = itemRoomSelectionStrategy.SelectItemRooms(palace, roomPool, props.PalaceItemRoomCounts[palace.Number - 1], r);
+                palace.ItemRooms.AddRange(itemRooms);
+                palace.AllRooms.AddRange(itemRooms);
 
-                if (itemRoom.LinkedRoomName != null)
+                foreach(Room itemRoom in itemRooms)
                 {
-                    Room segmentedItemRoom1, segmentedItemRoom2;
-                    segmentedItemRoom1 = itemRoom;
-                    segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
-                    // segmentedItemRoom2.PalaceGroup = palaceGroup;
-                    segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
-                    segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
-                    palace.AllRooms.Add(segmentedItemRoom2);
-                    roomCount += 1;
+                    if (itemRoom.LinkedRoomName != null)
+                    {
+                        Room segmentedItemRoom1, segmentedItemRoom2;
+                        segmentedItemRoom1 = itemRoom;
+                        segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
+                        // segmentedItemRoom2.PalaceGroup = palaceGroup;
+                        segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
+                        segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
+                        palace.AllRooms.Add(segmentedItemRoom2);
+                        roomCount += 1;
+                    }
                 }
             }
         }
@@ -90,7 +83,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             int roomIndex = r.Next(roomPool.NormalRooms.Count);
             Room newRoom = new(roomPool.NormalRooms[roomIndex]);
             palace.AllRooms.Add(newRoom);
-            if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, newRoom); }
+            if (duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
         }
 
         Dictionary<Room, RoomExitType> roomExits = [];

@@ -116,7 +116,6 @@ public class Palaces
             palace.AllRooms.ForEach(i => i.PalaceNumber = currentPalace);
             palace.ValidateRoomConnections();
             palaces.Add(palace);
-            sizes[currentPalace - 1] = palace.AllRooms.Count;
         }
 
         palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.AddHardRequirement(RequirementType.REFLECT);

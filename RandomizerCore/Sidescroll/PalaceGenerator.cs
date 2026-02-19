@@ -61,27 +61,6 @@ public abstract class PalaceGenerator
         return true;
     }
 
-    protected static void RemoveDuplicatesFromPool(RandomizerProperties props, ICollection<Room> rooms, Room roomThatWasUsed)
-    {
-        if (props.NoDuplicateRoomsBySideview)
-        {
-            var sideviewBytes = roomThatWasUsed.SideView;
-            if (rooms is List<Room> list)
-            {
-                list.RemoveAll(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
-            }
-            else if (rooms is HashSet<Room> set)
-            {
-                set.RemoveWhere(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
-            }
-            else { throw new NotImplementedException(); }
-        }
-        else if (props.NoDuplicateRooms)
-        {
-            rooms.Remove(roomThatWasUsed);
-        }
-    }
-
     [Conditional("DEBUG")]
     public static void DebugCheckDuplicates(RandomizerProperties props, Palace palace)
     {

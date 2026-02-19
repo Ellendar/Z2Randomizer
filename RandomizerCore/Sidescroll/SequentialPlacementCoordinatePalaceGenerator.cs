@@ -12,6 +12,8 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
     public static int[] stallFailureCounts = [0, 0, 0, 0, 0, 0, 0];
     public static int[] specialRoomFailureCounts = [0, 0, 0, 0, 0, 0, 0];
 
+    private static readonly ItemRoomSelectionStrategy itemRoomSelectionStrategy = new RandomItemRoomSelectionStrategy();
+
     private const int STALL_LIMIT = 5000;
     static int debug = 0;
     
@@ -23,9 +25,9 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
     private int palaceNumber;
     private RoomPool? roomPool;
     
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCnt, int palaceNum)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNum)
     {
-        this.roomCount = roomCnt;
+        this.roomCount = roomCount;
         this.palaceNumber = palaceNum;
 
         debug++;
@@ -48,7 +50,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
 
         stallCount = 0;
         openJunctionsCount = 0;
-        while (roomsByCoordinate.Count + openCoords.Count < roomCount || openJunctionsCount > 0)
+        while (roomsByCoordinate.Count + openCoords.Count < this.roomCount || openJunctionsCount > 0)
         {
             //Stalled out, try again from the start
             if(openCoords.Count == 0 || stallCount++ >= STALL_LIMIT)
@@ -108,11 +110,12 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             palace.AllRooms.AddRange(newRooms);
             //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
             if (duplicateProtection)
-            { 
-                RemoveDuplicatesFromPool(props, roomPool.NormalRooms, baseRoom); 
+            {
+                roomPool.RemoveDuplicates(props, baseRoom);
             }
         }
-        //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));
+        //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
+
         //close stubs
         if (openCoords.Count > 0)
         {
@@ -219,13 +222,13 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
 
                     if (newRoom.Group != RoomGroup.STUBS)
                     {
-                        if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomsByExitType[exitType], newRoom); }
+                        if (duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
                     }
                 } while (placed == false);
             }
         }
-        //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));
-        if (roomsByCoordinate.Count > roomCount)
+        //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
+        if (roomsByCoordinate.Count > this.roomCount)
         {
             throw new ImpossibleException("Palace Room count exceeds maximum room count.");
         }
@@ -243,14 +246,14 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             return palace;
         }
 
-        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props))
+        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props, new RandomItemRoomSelectionStrategy()))
         {
             specialRoomFailureCounts[palaceNumber - 1]++;
             palace.IsValid = false;
             return palace;
         }
 
-        if (roomsByCoordinate.Count - roomsByCoordinate.Count(i => i.Value.LinkedRoomName != null && !i.Value.Enabled) != roomCount)
+        if (roomsByCoordinate.Count - roomsByCoordinate.Count(i => i.Value.LinkedRoomName != null && !i.Value.Enabled) != this.roomCount)
         {
             throw new Exception("Generated palace has the incorrect number of rooms");
         }
@@ -285,6 +288,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         Room right = roomsByCoordinate.GetValueOrDefault(new Coord(x + 1, y))!;
         foreach(Room newRoom in newRooms)
         {
+            newRoom.coords = mergedRoom.coords;
             if (newRoom.FitsWithLeft(left) > 0)
             {
                 newRoom.Left = left;
@@ -343,5 +347,10 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             }
         }
         //Debug.WriteLine("Added Room at (" + newRoom.coords.Item1 + ", " + newRoom.coords.Item2 + ")");
+    }
+
+    protected override ItemRoomSelectionStrategy GetItemRoomSelectionStrategy()
+    {
+        return itemRoomSelectionStrategy;
     }
 }

@@ -6,11 +6,13 @@ using NLog;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
-public abstract class CoordinatePalaceGenerator() : PalaceGenerator
+public abstract class CoordinatePalaceGenerator : PalaceGenerator
 {
     private static readonly RoomExitType[] PRIORITY_ROOM_SHAPES = [RoomExitType.DROP_STUB, RoomExitType.DROP_T];
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
-    protected static bool AddSpecialRoomsByReplacement(Palace palace, RoomPool roomPool, Random r, RandomizerProperties props)
+    protected abstract ItemRoomSelectionStrategy GetItemRoomSelectionStrategy();
+
+    protected static bool AddSpecialRoomsByReplacement(Palace palace, RoomPool roomPool, Random r, RandomizerProperties props, ItemRoomSelectionStrategy itemRoomSelector)
     {
         //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));
         palace.ItemRooms ??= [];
@@ -20,72 +22,19 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
         //ItemRoom
         if (palace.Number < 7)
         {
-            if (roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
+            Room[] itemRooms = itemRoomSelector.SelectItemRooms(palace, roomPool, props.PalaceItemRoomCounts[palace.Number - 1], r);
+
+            foreach(Room itemRoom in itemRooms)
             {
-                throw new Exception("No item rooms for generated palace");
-            }
-
-            int itemRoomNumber = 0;
-
-            List<RoomExitType> possibleItemRoomExitTypes = ShuffleItemRoomShapes(roomPool.ItemRoomsByShape.Keys.ToList(), r);
-
-            while (itemRoomNumber < itemRoomTotal)
-            {
-                if(possibleItemRoomExitTypes.Count == 0)
+                Room? itemRoomReplacementRoom = palace.AllRooms.FirstOrDefault(i => i.coords == itemRoom.coords);
+                if (itemRoomReplacementRoom == null)
                 {
-                    return false;
+                    throw new Exception("ItemRoomSelectionStrategy generated an item room replacement for a room that doesn't exist");
                 }
-
-                RoomExitType itemRoomExitType = possibleItemRoomExitTypes[0];
-                List<Room> itemRoomCandidates = roomPool.ItemRoomsByShape[itemRoomExitType].ToList();
-                itemRoomCandidates.FisherYatesShuffle(r);
-
-                bool itemRoomPlaced = false;
-
-                foreach (Room itemRoomCandidate in itemRoomCandidates)
-                {
-                    if (itemRoomPlaced)
-                    {
-                        break;
-                    }
-                    List<Room> itemRoomReplacementCandidates =
-                        palace.AllRooms.Where(i => i.IsNormalRoom() && i.CategorizeExits() == itemRoomExitType).ToList();
-
-                    itemRoomReplacementCandidates.FisherYatesShuffle(r);
-                    foreach (Room itemRoomReplacementRoom in itemRoomReplacementCandidates)
-                    {
-                        Room? upRoom = palace.AllRooms.FirstOrDefault(
-                            i => i.coords == itemRoomReplacementRoom.coords with { Y = itemRoomReplacementRoom.coords.Y + 1 });
-                        if (itemRoomReplacementRoom != null &&
-                            (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == itemRoomCandidate.IsDropZone))
-                        {
-                            palace.ItemRooms.Add(new(itemRoomCandidate));
-                            if (itemRoomCandidate.LinkedRoomName != null)
-                            {
-                                Room linkedRoom = roomPool.LinkedRooms[itemRoomCandidate.LinkedRoomName];
-                                Room newLinkedRoom = new();
-                                palace.ItemRooms[itemRoomNumber] = palace.ItemRooms[itemRoomNumber].Merge(linkedRoom);
-                            }
-                            palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRooms[itemRoomNumber]);
-                            itemRoomPlaced = true;
-                            itemRoomNumber++;
-                            break;
-                        }
-                    }
-                }
-                if(itemRoomPlaced)
-                {
-                    // shuffle item room shape priority if we have more item rooms to place
-                    if (itemRoomNumber < itemRoomTotal)
-                    {
-                        possibleItemRoomExitTypes = ShuffleItemRoomShapes(possibleItemRoomExitTypes, r);
-                    }
-                }
-                else
-                {
-                    possibleItemRoomExitTypes.Remove(itemRoomExitType);
-                }
-            }
+                Room newItemRoom = new(itemRoom);
+                palace.ReplaceRoom(itemRoomReplacementRoom, newItemRoom);
+                palace.ItemRooms.Add(newItemRoom);
+            } 
         }
         //Tbird Room
         else
@@ -311,12 +260,4 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
         }
     }
 
-    public static List<RoomExitType> ShuffleItemRoomShapes(List<RoomExitType> possibleItemRoomExitTypes, Random r)
-    {
-        List<RoomExitType> priorityShapes = [.. possibleItemRoomExitTypes.Where(i => PRIORITY_ROOM_SHAPES.Contains(i))];
-        List<RoomExitType> nonPriorityShapes = [.. possibleItemRoomExitTypes.Where(i => !PRIORITY_ROOM_SHAPES.Contains(i))];
-        priorityShapes.FisherYatesShuffle(r);
-        nonPriorityShapes.FisherYatesShuffle(r);
-        return [.. priorityShapes, .. nonPriorityShapes];
-    }
 }

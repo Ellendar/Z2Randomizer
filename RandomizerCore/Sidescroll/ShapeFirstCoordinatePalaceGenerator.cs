@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DynamicData;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,7 +33,10 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         List < Coord > prepopulatedCoordinates = [];
         prepopulatedCoordinates.Add(palace.AllRooms.FirstOrDefault(i => i.IsEntrance)?.coords ?? Coord.Uninitialized);
         prepopulatedCoordinates.Add(palace.AllRooms.FirstOrDefault(i => i.IsBossRoom)?.coords ?? Coord.Uninitialized);
-        prepopulatedCoordinates.Add(palace.AllRooms.FirstOrDefault(i => i.IsThunderBirdRoom)?.coords ?? Coord.Uninitialized);
+
+        //We aren't currently prepopulating thunderbird, but this should probably have some safety.
+        //Too lazy for now
+        //prepopulatedCoordinates.Add(palace.AllRooms.First(i => i.IsThunderBirdRoom).coords);
 
         //Add rooms
         roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
@@ -80,7 +84,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
                         break;
                     }
                 }
-                if (newRoom != null && duplicateProtection) { RemoveDuplicatesFromPool(props, roomCandidates!, newRoom); }
+                if (newRoom != null && duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
             }
 
             if (newRoom == null)
@@ -182,7 +186,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         }
 
 
-        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props))
+        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props, GetItemRoomSelectionStrategy()))
         {
             palace.IsValid = false;
             return palace;

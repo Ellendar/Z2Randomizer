@@ -84,7 +84,7 @@ public static class RoomExitTypeExtensions
     }
     public static RoomExitType AddDrop(this RoomExitType exitType)
     {
-        if (exitType.ContainsDrop())
+        if (exitType.ContainsDown())
         {
             throw new Exception("Can't add drop to a room that downs");
         }

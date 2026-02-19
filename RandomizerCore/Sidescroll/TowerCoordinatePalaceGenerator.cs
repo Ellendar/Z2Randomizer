@@ -8,6 +8,8 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerator
 {
+    private static readonly ItemRoomSelectionStrategy itemRoomSelectionStrategy = new RandomItemRoomSelectionStrategy();
+
     private const int MINIMUM_ROOMS_PER_FLOOR = 3;
 
     private const double SINGLE_WALL_CHANCE = .3;
@@ -324,7 +326,7 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
             }
         }
 
-        Debug.WriteLine(GetLayoutDebug(shape));
+        //Debug.WriteLine(GetLayoutDebug(shape));
         return await Task.FromResult(shape);
 
     }
@@ -392,5 +394,10 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
                 rightmostRoom.Right = leftmostRoom;
             }
         }
+    }
+
+    protected override ItemRoomSelectionStrategy GetItemRoomSelectionStrategy()
+    {
+        return itemRoomSelectionStrategy;
     }
 }

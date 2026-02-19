@@ -1246,6 +1246,7 @@ public partial class Palace
             return AllRooms.Max(i => (byte)(i.Map + 1));
         }
         */
+        int startingCurrentMap = currentMap;
         if (!AllRooms.Contains(Entrance!))
         {
             throw new Exception("Palace lost its entrance");
@@ -1306,7 +1307,8 @@ public partial class Palace
             room.Map = room.LinkedRoom!.Map;
         }
         Debug.Assert(currentMap - Entrance!.Map <= roomCount);
-        if(currentMap > 63)
+        Debug.Assert(currentMap - startingCurrentMap == roomCount);
+        if (currentMap > 63)
         {
             throw new Exception("Map number has exceeded maximum");
         }
