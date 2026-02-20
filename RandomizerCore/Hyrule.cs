@@ -2259,9 +2259,14 @@ public class Hyrule
         }
 
         rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.item_sprites.chr"));
+        //Linked fire/dash custom sprites replace fire's sprite. This lets us free up c7 for future use.
         if(props.CombineFire)
         {
             rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.linkedFire.chr"));
+        }
+        else if(props.ReplaceFireWithDash)
+        {
+            rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.dash.chr"));
         }
         rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
         rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
@@ -2766,6 +2771,11 @@ public class Hyrule
             {
                 ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i, props.StartsWithCollectable(wizardCollectables[i]) ? (byte)1 : (byte)0);
             }
+        }
+        //
+        if(props.CombineFire)
+        {
+            ROMData.Put(0x1c76, 0xFB);
         }
         //fix for rope graphical glitch
         for (int i = 0; i < 16; i++)

@@ -18,6 +18,7 @@
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
     <None Remove="Asm\ExpandedPauseMenu.s" />
+    <None Remove="Asm\Graphics\dash.chr" />
     <None Remove="Asm\Graphics\item_sprites.chr" />
     <None Remove="Asm\Graphics\linkedFire.chr" />
     <None Remove="Asm\Graphics\randomizer_text.chr" />
@@ -60,6 +61,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Asm\*.s" />
+    <EmbeddedResource Include="Asm\Graphics\dash.chr" />
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
     <EmbeddedResource Include="Asm\Graphics\linkedFire.chr" />
     <EmbeddedResource Include="Asm\Graphics\randomizer_text.chr" />

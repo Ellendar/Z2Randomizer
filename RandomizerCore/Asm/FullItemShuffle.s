@@ -474,7 +474,7 @@ ItemTileTable:
     .byte $db, $dd ; Reflect Spell
     .byte $f1, $f1 ; Spell Spell
     .byte $f7, $f9 ; Thunder Spell
-    .byte $c7, $92 ; Dash Spell
+    .byte $cf, $92 ; Dash Spell
 
 ; In vanilla this table is limited only to the 6 items in $10-$16
 ; We can keep the first $10 items using the original, and just expand the rest

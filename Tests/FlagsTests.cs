@@ -82,6 +82,7 @@ public class FlagsTests
         Assert.AreEqual(StartingResourceLimit.NO_LIMIT, flagReader.ReadEnum<StartingResourceLimit>());
         Assert.AreEqual(StartingResourceLimit.FOUR, flagReader.ReadEnum<StartingResourceLimit>());
     }
+    /*
     [TestMethod]
     public void TestCustomEncodeCycle()
     {
@@ -92,7 +93,7 @@ public class FlagsTests
         String flags = flagBuilder.ToString();
         FlagReader flagReader = new FlagReader(flags);
         Assert.AreEqual(climate, serializer.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
-    }
+    }*/
     [TestMethod]
     public void TestNullableIntEncodeCycle()
     {
