@@ -17,8 +17,9 @@
                       Content="Shuffle All Experience">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleAllExperienceToolTip}"/></ToolTip.Tip>
             </CheckBox>
-            <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}"
-                    BorderThickness="1" Padding="20 8" CornerRadius="4">
+            <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1"
+                    Margin="17 0 17 0"
+                    Padding="14 8" CornerRadius="4">
                 <UniformGrid Rows="0" Columns="1" RowSpacing="8">
                     <CheckBox
                         Name="AtkExp"
@@ -41,7 +42,7 @@
                 </UniformGrid>
             </Border>
 
-            <StackPanel Margin="0 16" HorizontalAlignment="Left">
+            <StackPanel Margin="15 16" HorizontalAlignment="Left">
                 <TextBlock>Level Cap</TextBlock>
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LevelCapToolTip}"/></ToolTip.Tip>
                 <Grid ColumnDefinitions="72,72,72" ColumnSpacing="8" HorizontalAlignment="Left" VerticalAlignment="Top">

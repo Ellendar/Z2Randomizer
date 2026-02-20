@@ -16,14 +16,12 @@ public class Location
     public bool AppearsOnMap { get; set; }
 
     public Terrain TerrainType { get; set; }
-    public int Y { get; set; }
-    public int YRaw { get => Y + 30; set => Y = value - 30; }
-    public int Xpos { get; set; }
+
     //public byte[] LocationBytes { get; set; }
     public List<Location> Children { get; set; } = [];
 
     public int MemAddress { get; set; }
-	
+
     //This is really stupidly implemented. It _should_ be a boolean, which then gets written to the appropriate bit on the
     //encounter data when it's written to the ROM. Instead, this has the value 0 if the area is not a passthrough
     //and 64 if the area is a passthrough. This shouldn't be too hard to refactor, but I am lazy right now.
@@ -33,7 +31,36 @@ public class Location
 
     public int Map { get; set; }
 
-    public (int, int) Coords
+    private IntVector2 pos = IntVector2.ZERO;
+
+    /// int vector position starting at Y=0 for the top row
+    public IntVector2 Pos
+    {
+        get => pos;
+        set { pos = value; }
+    }
+
+    /// Y position starting at Y=0 for the top row
+    public int Y
+    {
+        get => pos.Y;
+        set { Pos = new(pos.X, value); }
+    }
+    /// Y position starting at Y=30 for the top row
+    public int YRaw
+    {
+        get => Y + 30;
+        set { Y = value - 30; }
+    }
+
+    public int Xpos
+    {
+        get => pos.X;
+        set { Pos = new(value, pos.Y); }
+    }
+
+    /// X,Y position with Y starting at 30 for the top row
+    public (int, int) CoordsY30Offset
     {
         get
         {
@@ -67,7 +94,8 @@ public class Location
     /// Page you enter this location from, 0 means left. 1/2/3 will enter from the right on areas that have
     /// that many pages total or midscren on other areas.
     /// </summary>
-    public int MapPage { get; set; }
+    public int MapPageRaw { get; set; }
+    public int MapPage { get => MapPageRaw >> 6; set => MapPageRaw = value << 6; }
 
     public int ExternalWorld { get; set; }
 
@@ -84,6 +112,11 @@ public class Location
     public int Secondpartofcave { get; set; }
 
     public string Name { get; set; }
+
+    public const int CONNECTOR_BRIDGE_ID = 40;
+    public const int CONNECTOR_RAFT_ID = 41;
+    public const int CONNECTOR_CAVE1_ID = 42;
+    public const int CONNECTOR_CAVE2_ID = 43;
 
     /*
     Byte 0
@@ -176,8 +209,8 @@ public class Location
             (Continent.WEST, 68, 37, 57) => "P2_RED_JAR",
             (Continent.WEST, 0, 0, 57) => "RED_JAR_BEACH",
             (Continent.WEST, 102, 38, 57) => "EX_LIFE_BEACH",
-            (Continent.WEST, 95, 10, 42) => "DM_ENTRANCE",
-            (Continent.WEST, 96, 21, 43) => "DM_EXIT",
+            (Continent.WEST, 95, 10, CONNECTOR_CAVE1_ID) => "DM_ENTRANCE",
+            (Continent.WEST, 96, 21, CONNECTOR_CAVE2_ID) => "DM_EXIT",
             (Continent.WEST, 88, 50, 60) => "KINGS_TOMB",
             (Continent.WEST, 54, 46, 2) => "RAURU",
             (Continent.WEST, 36, 2, 5) => "RUTO",
@@ -221,7 +254,7 @@ public class Location
             (Continent.EAST, 83, 3, 25) => "DEATH_VALLEY_BATTLE_3",
             (Continent.EAST, 86, 8, 24) => "DEATH_VALLEY_BATTLE_2",
             (Continent.EAST, 99, 8, 26) => "DEATH_VALLEY_BATTLE_1",
-            (Continent.EAST, 40, 52, 40) => "MAZE_ISLAND_BRIDGE",
+            (Continent.EAST, 40, 52, CONNECTOR_BRIDGE_ID) => "MAZE_ISLAND_BRIDGE",
             (Continent.EAST, 60, 23, 14) => "NABOORU",
             (Continent.EAST, 33, 3, 17) => "DARUNIA",
             (Continent.EAST, 81, 61, 18) => "NEW_KASUTO",
@@ -277,11 +310,11 @@ public class Location
             (Continent.MAZE, 50, 46, 49) => "MAZE_ISLAND_FORCED_BATTLE_4",
             (Continent.MAZE, 46, 48, 50) => "MAZE_ISLAND_FORCED_BATTLE_5",
             (Continent.MAZE, 42, 50, 51) => "MAZE_ISLAND_FORCED_BATTLE_6",
-            (_, 67, 40, 40) => "BRIDGE",
-            (_, 77, 61, 41) => "RAFT_TILE",
-            (_, 52, 7, 41) => "RAFT_TILE",
-            (_, 37, 7, 42) => "DM_ENTRANCE_CAVE",
-            (_, 37, 23, 43) => "DM_EXIT_CAVE",
+            (_, 67, 40, CONNECTOR_BRIDGE_ID) => "BRIDGE",
+            (_, 77, 61, CONNECTOR_RAFT_ID) => "RAFT_TILE",
+            (_, 52, 7, CONNECTOR_RAFT_ID) => "RAFT_TILE",
+            (_, 37, 7, CONNECTOR_CAVE1_ID) => "DM_ENTRANCE_CAVE",
+            (_, 37, 23, CONNECTOR_CAVE2_ID) => "DM_EXIT_CAVE",
             (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
         };
 
@@ -320,7 +353,7 @@ public class Location
         appear2loweruponexit = clone.appear2loweruponexit;
         Secondpartofcave = clone.Secondpartofcave;
         Xpos = clone.Xpos;
-        MapPage = clone.MapPage;
+        MapPageRaw = clone.MapPageRaw;
         FallInHole = clone.FallInHole;
         PassThrough = clone.PassThrough;
         ForceEnterRight = clone.ForceEnterRight;
@@ -339,7 +372,7 @@ public class Location
             bytes[0] = (byte)(ExternalWorld + YRaw);
         }
         bytes[1] = (byte)(appear2loweruponexit + Secondpartofcave + Xpos);
-        bytes[2] = (byte)(MapPage + Map);
+        bytes[2] = (byte)(MapPageRaw + Map);
         bytes[3] = (byte)(FallInHole + PassThrough + ForceEnterRight + GetWorld());
         return bytes;
     }
@@ -398,5 +431,18 @@ public class Location
         }
         //Otherwise the world doesn't matter, so 0
         return 0;
+    }
+
+    /// <summary>
+    /// Zero out some bytes for this Location, which makes it an unused location in-game.
+    /// </summary>
+    public void Clear()
+    {
+        ExternalWorld = 0;
+        YRaw = 0;
+        Xpos = 0;
+        appear2loweruponexit = 0;
+        Secondpartofcave = 0;
+        CanShuffle = false;
     }
 }

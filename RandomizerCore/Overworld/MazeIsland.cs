@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Z2Randomizer.RandomizerCore.Enemy;
@@ -14,19 +15,19 @@ sealed class MazeIsland : World
     public static readonly int[] OverworldSmallEnemies = new int[] { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
     public static readonly int[] OverworldLargeEnemies = new int[] { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
 
-    private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
+    private readonly SortedDictionary<int, Terrain> terrains = new()
     {
-        { 0xA131, Terrain.ROAD },
-            { 0xA132, Terrain.ROAD },
-            { 0xA133, Terrain.ROAD },
-            { 0xA134, Terrain.BRIDGE },
-            { 0xA140, Terrain.PALACE },
-            { 0xA143, Terrain.ROAD },
-            { 0xA145, Terrain.ROAD },
-            { 0xA146, Terrain.ROAD },
-            { 0xA147, Terrain.ROAD },
-            { 0xA148, Terrain.ROAD },
-            { 0xA149, Terrain.ROAD }
+        { RomMap.MI_TRAP_TILE1, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE2, Terrain.ROAD },
+        { RomMap.MI_MAGIC_CONTAINER_DROP_TILE, Terrain.ROAD },
+        { RomMap.MI_CONNECTOR_BRIDGE_TILE, Terrain.BRIDGE },
+        { RomMap.MI_PALACE_TILE, Terrain.PALACE },
+        { RomMap.MI_CHILD_DROP_TILE, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE3, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE4, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE5, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE6, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE7, Terrain.ROAD },
     };
 
     public Location childDrop;
@@ -38,12 +39,17 @@ sealed class MazeIsland : World
 
     public MazeIsland(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
-        List<Location> locations =
+        List<Location> trapLocations = [
+            .. rom.LoadLocations(RomMap.MI_TRAP_TILE1, 2, terrains, Continent.MAZE),
+            .. rom.LoadLocations(RomMap.MI_TRAP_TILE3, 5, terrains, Continent.MAZE),
+        ];
+
+        List < Location> locations =
         [
-            .. rom.LoadLocations(0xA131, 3, terrains, Continent.MAZE),
-            .. rom.LoadLocations(0xA140, 1, terrains, Continent.MAZE),
-            .. rom.LoadLocations(0xA143, 1, terrains, Continent.MAZE),
-            .. rom.LoadLocations(0xA145, 5, terrains, Continent.MAZE),
+            .. rom.LoadLocations(RomMap.MI_MAGIC_CONTAINER_DROP_TILE, 1, terrains, Continent.MAZE),
+            .. rom.LoadLocations(RomMap.MI_PALACE_TILE, 1, terrains, Continent.MAZE),
+            .. rom.LoadLocations(RomMap.MI_CHILD_DROP_TILE, 1, terrains, Continent.MAZE),
+            .. trapLocations,
         ];
         locations.ForEach(AddLocation);
 
@@ -66,17 +72,44 @@ sealed class MazeIsland : World
             51, // MAZE_ISLAND_FORCED_BATTLE_6
         ];
 
-        childDrop = GetLocationByMem(0xA143);
-        magicContainerDrop = GetLocationByMem(0xA133);
-        locationAtPalace4 = GetLocationByMem(0xA140);
+        childDrop = GetLocationByMem(RomMap.MI_CHILD_DROP_TILE);
+        magicContainerDrop = GetLocationByMem(RomMap.MI_MAGIC_CONTAINER_DROP_TILE);
+        locationAtPalace4 = GetLocationByMem(RomMap.MI_PALACE_TILE);
         locationAtPalace4.PalaceNumber = 4;
-        MAP_ROWS = 23;
-        MAP_COLS = 23;
 
         baseAddr = 0xA10c;
+        continentId = Continent.MAZE;
         VANILLA_MAP_ADDR = 0xa65c;
 
         biome = props.MazeBiome;
+        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
+        {
+            MAP_ROWS = 75;
+            MAP_COLS = 64;
+        }
+        else
+        {
+            var meta = props.MazeSize.GetMeta();
+            MAP_COLS = meta.Height;
+            MAP_ROWS = meta.Width;
+
+            // TODO: use metadata for num caves to remove
+            var trapTilesToRemove = props.MazeSize switch
+            {
+                MazeSizeOption.LARGE => 0,
+                MazeSizeOption.MEDIUM => 1,
+                MazeSizeOption.SMALL => 2,
+                _ => throw new NotImplementedException(),
+            };
+
+            for (int i = 0; i < trapTilesToRemove; i++)
+            {
+                var j = r.Next(trapLocations.Count);
+                var removeLoc = trapLocations[j];
+                RemoveLocations([removeLoc]);
+                trapLocations.Remove(removeLoc);
+            }
+        }
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
@@ -84,8 +117,8 @@ sealed class MazeIsland : World
     {
         if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
         {
-            MAP_ROWS = 75;
-            MAP_COLS = 64;
+            Debug.Assert(MAP_ROWS == 75);
+            Debug.Assert(MAP_COLS == 64);
             map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
             if (biome == Biome.VANILLA_SHUFFLE)
             {
@@ -120,8 +153,6 @@ sealed class MazeIsland : World
         }
         else
         {
-            MAP_ROWS = 23;
-            MAP_COLS = 23;
             int bytesWritten = 2000;
             foreach (Location location in AllLocations)
             {
@@ -239,7 +270,7 @@ sealed class MazeIsland : World
                     }
                     else if (stack.Count > 0)
                     {
-                        if (cave1 != null && cave1.CanShuffle && GetLocationByCoords((curry + 30, currx)) == null)
+                        if (cave1 != null && cave1.CanShuffle && GetLocationByCoordsNoOffset((curry, currx)) == null)
                         {
                             map[curry, currx] = Terrain.CAVE;
                             cave1.Y = curry;
@@ -248,7 +279,7 @@ sealed class MazeIsland : World
                             canPlaceCave = false;
                             SealDeadEnd(curry, currx);
                         }
-                        else if (cave2 != null && cave2.CanShuffle && GetLocationByCoords((curry + 30, currx)) == null && canPlaceCave)
+                        else if (cave2 != null && cave2.CanShuffle && GetLocationByCoordsNoOffset((curry, currx)) == null && canPlaceCave)
                         {
                             map[curry, currx] = Terrain.CAVE;
                             cave2.Y = curry;
@@ -283,7 +314,7 @@ sealed class MazeIsland : World
                     {
                         for (int j = -1; j < 2; j++)
                         {
-                            if (GetLocationByCoords((palace4y + i + 30, palace4x + j)) != null)
+                            if (GetLocationByCoordsNoOffset((palace4y + i, palace4x + j)) != null)
                             {
                                 canPlace = false;
                             }
@@ -306,18 +337,21 @@ sealed class MazeIsland : World
                 int riverStartY;
                 do
                 {
-                    riverStartY = RNG.Next(10) * 2 + 1;
+                    riverStartY = RNG.Next((MAP_ROWS - 5) / 2) * 2 + 3;
                 }
                 while (riverStartY == starty);
 
-                int riverEndY = RNG.Next(10) * 2 + 1;
+                int riverEndY = RNG.Next((MAP_ROWS - 5) / 2) * 2 + 3;
                 bool openWest, openEast;
                 do
                 {
                     openWest = RNG.Next(2) == 1;
                     openEast = RNG.Next(2) == 1;
                 } while (!openWest && !openEast);
-                DrawRiver(riverStartY, 1, riverEndY, 21, openWest, openEast);
+                int riverEndX = Math.Min(MAP_COLS - 2, 21);
+                Debug.Assert(riverEndX % 2 == 1); // even number loops forever
+                Debug.Assert(riverEndY % 2 == 1);
+                DrawRiver(riverStartY, 1, riverEndY, riverEndX, openWest, openEast);
 
                 //Place raft
                 Direction raftDirection = Direction.EAST;
@@ -639,11 +673,13 @@ sealed class MazeIsland : World
                                 x = RNG.Next(19) + 2;
                                 y = RNG.Next(MAP_ROWS - 4) + 2;
                             } while (map[y, x] != Terrain.ROAD 
-                            || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN) 
-                            || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN)) 
-                            || GetLocationByCoords((y + 30, x + 1)) != null 
-                            || GetLocationByCoords((y + 30, x - 1)) != null 
-                            || GetLocationByCoords((y + 31, x)) != null || GetLocationByCoords((y + 29, x)) != null || GetLocationByCoords((y + 30, x)) != null);
+                            || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN)
+                            || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN))
+                            || GetLocationByCoordsNoOffset((y, x + 1)) != null
+                            || GetLocationByCoordsNoOffset((y, x - 1)) != null
+                            || GetLocationByCoordsNoOffset((y + 1, x)) != null
+                            || GetLocationByCoordsNoOffset((y - 1, x)) != null
+                            || GetLocationByCoordsNoOffset((y, x)) != null);
                         }
                         else
                         {
@@ -651,12 +687,12 @@ sealed class MazeIsland : World
                             {
                                 x = RNG.Next(19) + 2;
                                 y = RNG.Next(MAP_ROWS - 4) + 2;
-                            } while (map[y, x] != Terrain.ROAD 
-                                || GetLocationByCoords((y + 30, x + 1)) != null 
-                                || GetLocationByCoords((y + 30, x - 1)) != null 
-                                || GetLocationByCoords((y + 31, x)) != null 
-                                || GetLocationByCoords((y + 29, x)) != null 
-                                || GetLocationByCoords((y + 30, x)) != null);
+                            } while (map[y, x] != Terrain.ROAD
+                            || GetLocationByCoordsNoOffset((y, x + 1)) != null
+                            || GetLocationByCoordsNoOffset((y, x - 1)) != null
+                            || GetLocationByCoordsNoOffset((y + 1, x)) != null
+                            || GetLocationByCoordsNoOffset((y - 1, x)) != null
+                            || GetLocationByCoordsNoOffset((y, x)) != null);
                         }
 
                         location.Xpos = x;
@@ -670,15 +706,12 @@ sealed class MazeIsland : World
                 }
 
                 //check bytes and adjust
-                MAP_COLS = 64;
                 bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
-                MAP_COLS = 23;
                 
             }
         }
-        MAP_COLS = 64;
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
-        for (int i = 0xA10C; i < 0xA149; i++)
+        for (int i = RomMap.MI_UNUSED_INDEX0_TILE; i < RomMap.MI_TRAP_TILE7; i++)
         {
             if(!terrains.Keys.Contains(i))
             {
@@ -803,7 +836,7 @@ sealed class MazeIsland : World
                     //Move 2 tiles at a time
                     for (int i = 0; i < 2; i++)
                     {
-                        if ((fromX != toX || fromY != toY) && GetLocationByCoords((fromY, fromX)) == null)
+                        if ((fromX != toX || fromY != toY) && GetLocationByCoordsNoOffset((fromY, fromX)) == null)
                         {
                             if (map[fromY, fromX] == Terrain.MOUNTAIN)
                             {
@@ -842,7 +875,7 @@ sealed class MazeIsland : World
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        if ((fromX != toX || fromY != (toY)) && GetLocationByCoords((fromY, fromX)) == null)
+                        if ((fromX != toX || fromY != (toY)) && GetLocationByCoordsNoOffset((fromY, fromX)) == null)
                         {
                             if (map[fromY, fromX] == Terrain.MOUNTAIN)
                             {

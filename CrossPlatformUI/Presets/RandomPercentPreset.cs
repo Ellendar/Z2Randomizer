@@ -34,13 +34,15 @@ public static class RandomPercentPreset
         HidePalace = null,
         HideKasuto = null,
         ShuffleWhichLocationIsHidden = null,
-        ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
-
-        Climate = Climates.Classic,
         WestBiome = Biome.RANDOM,
         EastBiome = Biome.RANDOM,
         MazeBiome = Biome.VANILLALIKE,
         DmBiome = Biome.RANDOM,
+        WestClimate = ClimateEnum.RANDOM,
+        EastClimate = ClimateEnum.RANDOM,
+        DmClimate = ClimateEnum.RANDOM,
+        MazeClimate = ClimateEnum.RANDOM,
+        ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
         VanillaShuffleUsesActualTerrain = true,
 
         //Palaces

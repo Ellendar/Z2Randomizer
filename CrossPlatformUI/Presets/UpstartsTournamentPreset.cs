@@ -36,11 +36,14 @@ public static class UpstartsTournamentPreset
         ShuffleWhichLocationIsHidden = true,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
-        Climate = Climates.Classic,
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
         DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        WestClimate = ClimateEnum.CLASSIC,
+        EastClimate = ClimateEnum.CLASSIC,
+        DmClimate = ClimateEnum.CLASSIC,
+        MazeClimate = ClimateEnum.CLASSIC,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RECONSTRUCTED,

@@ -398,18 +398,6 @@ static class BiomeExtensions
         };
     }
 
-    public static bool IsMazeBiome(this Biome biome)
-    {
-        return biome switch
-        {
-            Biome.VANILLA => true,
-            Biome.VANILLA_SHUFFLE => true,
-            Biome.VANILLALIKE => true,
-            Biome.RANDOM => true,
-            _ => false
-        };
-    }
-
     public static bool IsDMBiome(this Biome biome)
     {
         return biome switch
@@ -427,6 +415,82 @@ static class BiomeExtensions
             _ => false
         };
     }
+
+    public static bool IsMazeBiome(this Biome biome)
+    {
+        return biome switch
+        {
+            Biome.VANILLA => true,
+            Biome.VANILLA_SHUFFLE => true,
+            Biome.VANILLALIKE => true,
+            Biome.RANDOM => true,
+            _ => false
+        };
+    }
+}
+
+[DefaultValue(CLASSIC)]
+public enum ClimateEnum
+{
+    [Description("Classic")]
+    CLASSIC,
+    [Description("Vanilla-Weighted")]
+    VANILLA_WEIGHTED_WEST,
+    [Description("Vanilla-Weighted")]
+    VANILLA_WEIGHTED_EAST,
+    [Description("Chaos")]
+    CHAOS,
+    [Description("Wetlands")]
+    WETLANDS,
+    [Description("Great Lakes")]
+    GREAT_LAKES,
+    [Description("Scrubland")]
+    SCRUBLAND,
+    [Description("Random")]
+    RANDOM
+}
+
+static class ClimateExtensions
+{
+    public static bool IsWestClimate(this ClimateEnum climate)
+    {
+        return climate switch
+        {
+            ClimateEnum.VANILLA_WEIGHTED_WEST => true,
+            ClimateEnum.VANILLA_WEIGHTED_EAST => false,
+            _ => true,
+        };
+    }
+
+    public static bool IsEastClimate(this ClimateEnum climate)
+    {
+        return climate switch
+        {
+            ClimateEnum.VANILLA_WEIGHTED_WEST => false,
+            ClimateEnum.VANILLA_WEIGHTED_EAST => true,
+            _ => true,
+        };
+    }
+
+    public static bool IsDmClimate(this ClimateEnum climate)
+    {
+        return climate switch
+        {
+            ClimateEnum.VANILLA_WEIGHTED_WEST => false,
+            ClimateEnum.VANILLA_WEIGHTED_EAST => false,
+            _ => true,
+        };
+    }
+
+    public static bool IsMazeClimate(this ClimateEnum climate)
+    {
+        return climate switch
+        {
+            ClimateEnum.VANILLA_WEIGHTED_WEST => false,
+            ClimateEnum.VANILLA_WEIGHTED_EAST => false,
+            _ => true,
+        };
+    }
 }
 
 [DefaultValue(NORMAL)]
@@ -438,6 +502,65 @@ public enum ContinentConnectionType
     TRANSPORTATION_SHUFFLE,
     [Description("Anything Goes")]
     ANYTHING_GOES
+}
+
+[AttributeUsage(AttributeTargets.Field)]
+public class OverworldSizeMetaAttribute : Attribute
+{
+    public int Width { get; init; }
+    public int Height { get; init; }
+}
+[DefaultValue(LARGE)]
+public enum OverworldSizeOption
+{
+    [Description("Large (75x60)"), OverworldSizeMeta(Width = 75, Height = 60)]
+    LARGE,
+    [Description("Medium (52x52)"), OverworldSizeMeta(Width = 52, Height = 52)]
+    MEDIUM,
+    [Description("Small (44x44)"), OverworldSizeMeta(Width = 44, Height = 44)]
+    SMALL,
+}
+[DefaultValue(LARGE)]
+public enum DmSizeOption
+{
+    [Description("Large  (64x45 ~37 caves)"), OverworldSizeMeta(Width = 64, Height = 45)]
+    LARGE,
+    [Description("Medium (40x40 ~27 caves)"), OverworldSizeMeta(Width = 52, Height = 52)]
+    MEDIUM,
+    [Description("Small  (34x34 ~17 caves)"), OverworldSizeMeta(Width = 34, Height = 34)]
+    SMALL,
+    [Description("Tiny   (26x26  ~9 caves)"), OverworldSizeMeta(Width = 26, Height = 26)]
+    TINY,
+}
+[DefaultValue(LARGE)]
+public enum MazeSizeOption
+{
+    [Description("Large  (23x23)"), OverworldSizeMeta(Width = 23, Height = 23)]
+    LARGE,
+    [Description("Medium (19x19)"), OverworldSizeMeta(Width = 19, Height = 19)]
+    MEDIUM,
+    [Description("Small  (15x15)"), OverworldSizeMeta(Width = 15, Height = 15)]
+    SMALL,
+}
+public static class OverworldSizeExtensions
+{
+    public static OverworldSizeMetaAttribute GetMeta(this OverworldSizeOption size)
+    {
+        var member = typeof(OverworldSizeOption).GetMember(size.ToString()).FirstOrDefault();
+        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
+    }
+
+    public static OverworldSizeMetaAttribute GetMeta(this DmSizeOption size)
+    {
+        var member = typeof(DmSizeOption).GetMember(size.ToString()).FirstOrDefault();
+        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
+    }
+
+    public static OverworldSizeMetaAttribute GetMeta(this MazeSizeOption size)
+    {
+        var member = typeof(MazeSizeOption).GetMember(size.ToString()).FirstOrDefault();
+        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
+    }
 }
 
 [DefaultValue(NO_LIMIT)]
@@ -847,9 +970,16 @@ public static class Enums
 
     public static IEnumerable<EnumDescription> WestBiomeList { get; } = ToDescriptions<Biome>(i => i.IsWestBiome());
     public static IEnumerable<EnumDescription> EastBiomeList { get; } = ToDescriptions<Biome>(i => i.IsEastBiome());
-    public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
     public static IEnumerable<EnumDescription> DMBiomeList { get; } = ToDescriptions<Biome>(i => i.IsDMBiome());
+    public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
+    public static IEnumerable<EnumDescription> WestClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsWestClimate());
+    public static IEnumerable<EnumDescription> EastClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsEastClimate());
+    public static IEnumerable<EnumDescription> DmClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsDmClimate());
+    public static IEnumerable<EnumDescription> MazeClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsMazeClimate());
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
+    public static IEnumerable<EnumDescription> OverworldSizeList { get; } = ToDescriptions<OverworldSizeOption>();
+    public static IEnumerable<EnumDescription> DmSizeList { get; } = ToDescriptions<DmSizeOption>();
+    public static IEnumerable<EnumDescription> MazeSizeList { get; } = ToDescriptions<MazeSizeOption>();
     public static IEnumerable<EnumDescription> LessImportantLocationsOptionList { get; } = ToDescriptions<LessImportantLocationsOption>();
 
     public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions<EncounterRate>();

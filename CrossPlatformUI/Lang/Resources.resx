@@ -506,7 +506,9 @@ Remember to use the flute again on the way out.</value>
 that the entrance of a cave will point to where the other side of the cave is. For
 example, if you enter a cave going north, you know that when you exit the other side of
 the cave you will be directly north of where you went in. The distance between cave exits
-is also restricted, such that you can often see the exit before entering the cave.</value>
+is also restricted, such that you can often see the exit before entering the cave.
+
+It is not recommended to disable this.</value>
 	</data>
 	<data name="AllowConnectionCavestoBeBlockedToolTip" xml:space="preserve">
 <value>If selected, caves that connect from one part of the continent to another or between
@@ -557,6 +559,11 @@ Which location is hidden beneath may change if Shuffle Which Locations Are Hidde
 <value>If enabled, what is hidden under Three-Eyed Rock and the New Kasuto forest tile can be any
 random location in the east.</value>
 	</data>
+	<data name="OverworldSizeToolTip" xml:space="preserve">
+<value>Set the size of a continent. With smaller sizes, some non-item tiles may be removed.
+
+Note: The cave count does not include continent connector caves.</value>
+	</data>
 	<data name="WestContinentBiomeToolTip" xml:space="preserve">
 <value>See the Wiki for a description of what each biome does.</value>
 	</data>
@@ -577,6 +584,9 @@ be generated.
 Classic:
 Each terrain type will appear at equal size / frequency. Just like older versions of the
 randomizer.
+
+Vanilla-Weighted:
+Each terrain type will appear at the frequency they appear in the vanilla continent.
 
 Chaos:
 The number of seed terrain tiles is massively increased, resulting in a more chaotic
@@ -613,7 +623,9 @@ are:
 	</data>
 	<data name="VanillaShuffleShowsActualTerrainToolTip" xml:space="preserve">
 <value>If a shuffled vanilla map is used, this option will make the shuffled locations show their
-actual terrain, instead of the original vanilla terrain.</value>
+actual terrain, instead of the original vanilla terrain.
+
+It is not recommended to disable this.</value>
 	</data>
 	<data name="NormalPalaceStyleToolTip" xml:space="preserve">
 <value>Sets the palace generator for palaces 1 through 6. See the Wiki for more details.</value>

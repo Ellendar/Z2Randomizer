@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using SD.Tools.BCLExtensions.CollectionsRelated;
@@ -9,49 +10,48 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 
 sealed class DeathMountain : World
 {
-
     private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
         {
-            { 0x610C, Terrain.CAVE },
-            { 0x610D, Terrain.CAVE },
-            { 0x610E, Terrain.CAVE },
-            { 0x610F, Terrain.CAVE },
-            { 0x6110, Terrain.CAVE },
-            { 0x6111, Terrain.CAVE },
-            { 0x6112, Terrain.CAVE },
-            { 0x6113, Terrain.CAVE },
-            { 0x6114, Terrain.CAVE },
-            { 0x6115, Terrain.CAVE },
-            { 0x6116, Terrain.CAVE },
-            { 0x6117, Terrain.CAVE },
-            { 0x6118, Terrain.CAVE },
-            { 0x6119, Terrain.CAVE },
-            { 0x611A, Terrain.CAVE },
-            { 0x611B, Terrain.CAVE },
-            { 0x611C, Terrain.CAVE },
-            { 0x611D, Terrain.CAVE },
-            { 0x611E, Terrain.CAVE },
-            { 0x611F, Terrain.CAVE },
-            { 0x6120, Terrain.CAVE },
-            { 0x6121, Terrain.CAVE },
-            { 0x6122, Terrain.CAVE },
-            { 0x6123, Terrain.CAVE },
-            { 0x6124, Terrain.CAVE },
-            { 0x6125, Terrain.CAVE },
-            { 0x6126, Terrain.CAVE },
-            { 0x6127, Terrain.CAVE },
-            { 0x6128, Terrain.CAVE },
-            { 0x6129, Terrain.CAVE },
-            { 0x612A, Terrain.CAVE },
-            { 0x612B, Terrain.CAVE },
-            { 0x612C, Terrain.CAVE },
-            { 0x612D, Terrain.CAVE },
-            { 0x612E, Terrain.CAVE },
-            { 0x612F, Terrain.CAVE },
-            { 0x6130, Terrain.CAVE },
-            { 0x6136, Terrain.CAVE },
-            { 0x6137, Terrain.CAVE },
-            { 0x6144, Terrain.CAVE }
+            { RomMap.DM_CAVE1A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE1B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE2A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE2B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE3A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE3B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE5A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE5B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE6A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE6B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE7A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE7B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE8A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE8B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE9A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE9B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE10A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE10B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE11A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE11B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE12A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE12B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE13A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE13B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE14A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE14B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_HAMMER_CAVE_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY1A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY1B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY1C_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY1D_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY2A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY2B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY2C_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY2D_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CONTINENT_CONNECTOR1_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CONTINENT_CONNECTOR2_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_SPEC_ROCK_TILE_LOCATION, Terrain.CAVE }
     };
 
     public Dictionary<Location, List<Location>> connectionsDM;
@@ -60,61 +60,63 @@ sealed class DeathMountain : World
 
     private const int MAP_ADDR = 0x7a00;
 
+    int[][] duplicateSideviewCaves;
+
     public DeathMountain(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
         List<Location> locations =
         [
-            .. rom.LoadLocations(0x610C, 37, terrains, Continent.DM),
-            //loadLocations(0x6136, 2, terrains, continent.dm);
-            .. rom.LoadLocations(0x6144, 1, terrains, Continent.DM),
+            .. rom.LoadLocations(RomMap.DM_CAVE1A_TILE_LOCATION, 37, terrains, Continent.DM),
+            // loadLocations(RomMap.DM_CONTINENT_CONNECTOR1_TILE_LOCATION, 2, terrains, Continent.DM);
+            .. rom.LoadLocations(RomMap.DM_SPEC_ROCK_TILE_LOCATION, 1, terrains, Continent.DM),
         ];
         locations.ForEach(AddLocation);
 
         isHorizontal = props.DmIsHorizontal;
-        hammerCave = GetLocationByMem(0x6128);
-        specRock = GetLocationByMem(0x6144);
+        hammerCave = GetLocationByMem(RomMap.DM_HAMMER_CAVE_TILE_LOCATION);
+        specRock = GetLocationByMem(RomMap.DM_SPEC_ROCK_TILE_LOCATION);
 
         //reachableAreas = new HashSet<string>();
         connectionsDM = new Dictionary<Location, List<Location>>
         {
-            { GetLocationByMem(0x610C), new List<Location>() { GetLocationByMem(0x610D) } },
-            { GetLocationByMem(0x610D), new List<Location>() { GetLocationByMem(0x610C) } },
-            { GetLocationByMem(0x610E), new List<Location>() { GetLocationByMem(0x610F) } },
-            { GetLocationByMem(0x610F), new List<Location>() { GetLocationByMem(0x610E) } },
-            { GetLocationByMem(0x6110), new List<Location>() { GetLocationByMem(0x6111) } },
-            { GetLocationByMem(0x6111), new List<Location>() { GetLocationByMem(0x6110) } },
-            { GetLocationByMem(0x6112), new List<Location>() { GetLocationByMem(0x6113) } },
-            { GetLocationByMem(0x6113), new List<Location>() { GetLocationByMem(0x6112) } },
-            { GetLocationByMem(0x6114), new List<Location>() { GetLocationByMem(0x6115) } },
-            { GetLocationByMem(0x6115), new List<Location>() { GetLocationByMem(0x6114) } },
-            { GetLocationByMem(0x6116), new List<Location>() { GetLocationByMem(0x6117) } },
-            { GetLocationByMem(0x6117), new List<Location>() { GetLocationByMem(0x6116) } },
-            { GetLocationByMem(0x6118), new List<Location>() { GetLocationByMem(0x6119) } },
-            { GetLocationByMem(0x6119), new List<Location>() { GetLocationByMem(0x6118) } },
-            { GetLocationByMem(0x611A), new List<Location>() { GetLocationByMem(0x611B) } },
-            { GetLocationByMem(0x611B), new List<Location>() { GetLocationByMem(0x611A) } },
-            { GetLocationByMem(0x611C), new List<Location>() { GetLocationByMem(0x611D) } },
-            { GetLocationByMem(0x611D), new List<Location>() { GetLocationByMem(0x611C) } },
-            { GetLocationByMem(0x611E), new List<Location>() { GetLocationByMem(0x611F) } },
-            { GetLocationByMem(0x611F), new List<Location>() { GetLocationByMem(0x611E) } },
-            { GetLocationByMem(0x6120), new List<Location>() { GetLocationByMem(0x6121) } },
-            { GetLocationByMem(0x6121), new List<Location>() { GetLocationByMem(0x6120) } },
-            { GetLocationByMem(0x6122), new List<Location>() { GetLocationByMem(0x6123) } },
-            { GetLocationByMem(0x6123), new List<Location>() { GetLocationByMem(0x6122) } },
-            { GetLocationByMem(0x6124), new List<Location>() { GetLocationByMem(0x6125) } },
-            { GetLocationByMem(0x6125), new List<Location>() { GetLocationByMem(0x6124) } },
-            { GetLocationByMem(0x6126), new List<Location>() { GetLocationByMem(0x6127) } },
-            { GetLocationByMem(0x6127), new List<Location>() { GetLocationByMem(0x6126) } },
+            { GetLocationByMem(RomMap.DM_CAVE1A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE1B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE1B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE1A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE2A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE2B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE2B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE2A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE3A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE3B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE3B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE3A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE5A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE5B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE5B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE5A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE6A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE6B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE6B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE6A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE7A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE7B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE7B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE7A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE8A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE8B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE8B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE8A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE9A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE9B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE9B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE9A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE10A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE10B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE10B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE10A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE11A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE11B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE11B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE11A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE12A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE12B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE12B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE12A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE13A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE13B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE13B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE13A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE14A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE14B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE14B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE14A_TILE_LOCATION) } },
 
-            { GetLocationByMem(0x6129), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x612C) } },
-            { GetLocationByMem(0x612A), new List<Location>() { GetLocationByMem(0x6129), GetLocationByMem(0x612B), GetLocationByMem(0x612C) } },
-            { GetLocationByMem(0x612B), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x6129), GetLocationByMem(0x612C) } },
-            { GetLocationByMem(0x612C), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x6129) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY1A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY1B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY1B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY1A_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY1C_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY1B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1A_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY1D_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY1B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1A_TILE_LOCATION) } },
 
-            { GetLocationByMem(0x612D), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x6130) } },
-            { GetLocationByMem(0x612E), new List<Location>() { GetLocationByMem(0x612D), GetLocationByMem(0x612F), GetLocationByMem(0x6130) } },
-            { GetLocationByMem(0x612F), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612D), GetLocationByMem(0x6130) } },
-            { GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) } }
+            { GetLocationByMem(RomMap.DM_CAVE4WAY2A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY2B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY2B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY2A_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY2C_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY2B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2A_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY2D_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY2B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2A_TILE_LOCATION) } }
         };
 
         sideviewPtrTable = 0x6010;
@@ -140,11 +142,18 @@ sealed class DeathMountain : World
             22, 23, 24, 25,         // Caves with elevators
             26,                     // Spectacle Rock
         ];
+        // Re-used DM cave sideviews
+        duplicateSideviewCaves = [
+            [1, 12],
+            [4, 13],
+            [5, 8],
+            [6, 10],
+            [7, 14],
+            // [23, 24], // top part of 4-way
+        ];
 
-        MAP_ROWS = 45;
-        MAP_COLS = 64;
-
-        baseAddr = 0x610C;
+        baseAddr = RomMap.DM_CAVE1A_TILE_LOCATION;
+        continentId = Continent.DM;
         VANILLA_MAP_ADDR = 0x665c;
 
         biome = props.DmBiome switch
@@ -152,14 +161,85 @@ sealed class DeathMountain : World
             Biome.DRY_CANYON => Biome.CANYON,
             _ => props.DmBiome
         };
+        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
+        {
+            MAP_COLS = 64;
+            MAP_ROWS = 75;
+        }
+        else
+        {
+            var meta = props.DmSize.GetMeta();
+            MAP_COLS = meta.Height;
+            MAP_ROWS = meta.Width;
+
+            if (biome == Biome.CALDERA) // Caldera won't work with less
+            {
+                MAP_ROWS = Math.Max(MAP_ROWS, 35);
+                MAP_COLS = Math.Max(MAP_COLS, 35);
+            }
+
+            // TODO: use metadata for num caves to remove
+            int connectorPairsToRemove = props.DmSize switch
+            {
+                DmSizeOption.LARGE => 0,
+                DmSizeOption.MEDIUM => 0,
+                DmSizeOption.SMALL => 9,
+                DmSizeOption.TINY => 13,
+                _ => throw new NotImplementedException(),
+            };
+
+            int removedCavePairs = 0;
+            if (props.DmSize != DmSizeOption.LARGE)
+            {
+                // remove duplicate (by sideview) caves
+                foreach (int[] dupeMaps in duplicateSideviewCaves)
+                {
+                    int keepIndex = r.Next(dupeMaps.Length);
+                    for (int index = 0; index < dupeMaps.Length; index++)
+                    {
+                        if (index != keepIndex)
+                        {
+                            var map = dupeMaps[index];
+                            Location entrance = connectionsDM.Keys.FirstOrDefault(loc => loc.Map == map)!;
+                            Debug.Assert(entrance != null);
+                            List<Location> otherSideEntrance = connectionsDM[entrance];
+                            Debug.Assert(otherSideEntrance.Count == 1);
+                            RemoveLocationsDM([entrance, .. otherSideEntrance]);
+                            removedCavePairs++;
+                        }
+                    }
+                }
+            }
+
+            int maxElevatorConnectorsToRemove = 1;
+            int elevatorConnectorsRemoved = 0;
+            for (; removedCavePairs < connectorPairsToRemove; removedCavePairs++)
+            {
+                KeyValuePair<Location, List<Location>> removeLocPair;
+                do
+                {
+                    var j = r.Next(connectionsDM.Count);
+                    removeLocPair = connectionsDM.ElementAt(j);
+                } while (removeLocPair.Value.Count > 1 && elevatorConnectorsRemoved++ >= maxElevatorConnectorsToRemove);
+                RemoveLocationsDM([removeLocPair.Key, .. removeLocPair.Value]);
+            }
+        }
 
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
 
-        climate = props.Climate.Clone();
-
+        climate = Climates.Create(props.DmClimate);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         SetVanillaCollectables(props.ReplaceFireWithDash);
+    }
+
+    private void RemoveLocationsDM(ICollection<Location> locations)
+    {
+        RemoveLocations(locations);
+        foreach (var loc in locations)
+        {
+            connectionsDM.Remove(loc);
+        }
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
@@ -178,8 +258,8 @@ sealed class DeathMountain : World
         }
         if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
         {
-            MAP_ROWS = 75;
-            MAP_COLS = 64;
+            Debug.Assert(MAP_ROWS == 75);
+            Debug.Assert(MAP_COLS == 64);
             map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
             if (biome == Biome.VANILLA_SHUFFLE)
             {
@@ -215,9 +295,10 @@ sealed class DeathMountain : World
                 Terrain riverT = Terrain.MOUNTAIN;
                 if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA && biome != Biome.ISLANDS)
                 {
+                    int colsBeforeWater = Math.Min(MAP_COLS, 29);
                     for (int i = 0; i < MAP_ROWS; i++)
                     {
-                        for (int j = 0; j < 29; j++)
+                        for (int j = 0; j < colsBeforeWater; j++)
                         {
                             map[i, j] = Terrain.NONE;
                         }
@@ -385,24 +466,19 @@ sealed class DeathMountain : World
                 }
 
                 Direction raftDirection = DirectionExtensions.RandomCardinal(RNG);
-                if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
+                if (biome == Biome.CANYON || biome == Biome.DRY_CANYON || biome == Biome.CALDERA)
                 {
                     raftDirection = props.DmIsHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
                 }
                 if (raft != null)
                 {
-                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA)
-                    {
-                        MAP_COLS = 29;
-                    }
                     DrawOcean(raftDirection, props.CanWalkOnWaterWithBoots);
-                    MAP_COLS = 64;
                 }
 
                 Direction bridgeDirection;
                 do
                 {
-                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON)
+                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA)
                     {
                         bridgeDirection = DirectionExtensions.RandomCardinal(RNG);
                     }
@@ -413,12 +489,7 @@ sealed class DeathMountain : World
                 } while (bridgeDirection == raftDirection);
                 if (bridge != null)
                 {
-                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA)
-                    {
-                        MAP_COLS = 29;
-                    }
                     DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
-                    MAP_COLS = 64;
                 }
                 int x = 0;
                 int y = 0;
@@ -432,259 +503,24 @@ sealed class DeathMountain : World
                             x = RNG.Next(MAP_COLS - 2) + 1;
                             y = RNG.Next(MAP_ROWS - 2) + 1;
                             tries++;
-                        } while ((map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
-                        if (tries >= 100)
-                        {
-                            return false;
-                        }
+                            if (++tries >= 100)
+                            {
+                                logger.LogDebug($"Could not find empty 3x3 spot for location {location.Name}");
+                                return false;
+                            }
+                        } while (!AllTerrainIn3x3Equals(x, y, Terrain.NONE));
 
                         map[y, x] = location.TerrainType;
                         location.Xpos = x;
                         location.Y = y;
                         if (location.TerrainType == Terrain.CAVE)
                         {
-
-                            Direction direction = (Direction)RNG.Next(4);
-
-                            //Terrain s = walkableTerrains[RNG.Next(walkableTerrains.Count)];
-                            Terrain s = climate.GetRandomTerrain(RNG, walkableTerrains);
-                            if (biome == Biome.VANILLALIKE)
+                            var f = TerraformCaveExpansion(props, ref x, ref y, location);
+                            if (!f)
                             {
-                                s = Terrain.ROAD;
+                                logger.LogDebug($"TerraformCaveExpansion failed for {location.Name}");
+                                return false;
                             }
-                            if (props.SaneCaves && connectionsDM.ContainsKey(location))
-                            {
-                                if ((location.MapPage == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
-                                {
-                                    if (direction == Direction.NORTH)
-                                    {
-                                        direction = Direction.SOUTH;
-                                    }
-
-                                    if (direction == Direction.WEST)
-                                    {
-                                        direction = Direction.EAST;
-                                    }
-                                }
-                                else
-                                {
-                                    if (direction == Direction.SOUTH)
-                                    {
-                                        direction = Direction.NORTH;
-                                    }
-
-                                    if (direction == Direction.EAST)
-                                    {
-                                        direction = Direction.WEST;
-                                    }
-                                }
-                                map[y, x] = Terrain.NONE;
-
-                                tries = 0;
-                                do
-                                {
-                                    x = RNG.Next(MAP_COLS - 2) + 1;
-                                    y = RNG.Next(MAP_ROWS - 2) + 1;
-                                    tries++;
-                                } while ((x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
-                                if (tries >= 100)
-                                {
-                                    return false;
-                                }
-
-                                while ((direction == Direction.NORTH && y < 15) || (direction == Direction.EAST && x > MAP_COLS - 15) || (direction == Direction.SOUTH && y > MAP_ROWS - 15) || (direction == Direction.WEST && x < 15))
-                                {
-                                    direction = (Direction)RNG.Next(4);
-                                }
-                                if (connectionsDM[location].Count == 1)
-                                {
-                                    int otherx = 0;
-                                    int othery = 0;
-                                    tries = 0;
-                                    bool crossing = true;
-                                    do
-                                    {
-                                        int range = 7;
-                                        int offset = 3;
-                                        if (biome == Biome.ISLANDS)
-                                        {
-                                            range = 7;
-                                            offset = 5;
-                                        }
-                                        crossing = true;
-                                        if (direction == Direction.NORTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y - (RNG.Next(range) + offset);
-                                        }
-                                        else if (direction == Direction.EAST)
-                                        {
-                                            otherx = x + (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        else if (direction == Direction.SOUTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y + (RNG.Next(range) + offset);
-                                        }
-                                        else //west
-                                        {
-                                            otherx = x - (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        tries++;
-
-                                        if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-                                    } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE);
-                                    if (tries >= 100)
-                                    {
-                                        return false;
-                                    }
-
-                                    List<Location> l2 = connectionsDM[location];
-                                    location.CanShuffle = false;
-                                    location.Xpos = x;
-                                    location.Y = y;
-                                    l2[0].CanShuffle = false;
-                                    l2[0].Xpos = otherx;
-                                    l2[0].Y = othery;
-                                    PlaceCave(x, y, direction, s);
-                                    PlaceCave(otherx, othery, direction.Reverse(), s);
-                                }
-                                else //4-way caves
-                                {
-                                    int otherx = 0;
-                                    int othery = 0;
-                                    tries = 0;
-                                    bool crossing = true;
-                                    do
-                                    {
-                                        int range = 7;
-                                        int offset = 3;
-                                        if (biome == Biome.ISLANDS)
-                                        {
-                                            range = 7;
-                                            offset = 5;
-                                        }
-                                        crossing = true;
-                                        if (direction == Direction.NORTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y - (RNG.Next(range) + offset);
-                                        }
-                                        else if (direction == Direction.EAST)
-                                        {
-                                            otherx = x + (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        else if (direction == Direction.SOUTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y + (RNG.Next(range) + offset);
-                                        }
-                                        else //west
-                                        {
-                                            otherx = x - (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        tries++;
-
-                                        if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-                                    } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE); if (tries >= 100)
-                                    {
-                                        return false;
-                                    }
-
-                                    List<Location> caveExits = connectionsDM[location];
-                                    location.CanShuffle = false;
-                                    location.Xpos = x;
-                                    location.Y = y;
-                                    caveExits[0].CanShuffle = false;
-                                    caveExits[0].Xpos = otherx;
-                                    caveExits[0].Y = othery;
-                                    PlaceCave(x, y, direction, s);
-                                    PlaceCave(otherx, othery, direction.Reverse(), s);
-                                    int newx = 0;
-                                    int newy = 0;
-                                    tries = 0;
-                                    do
-                                    {
-                                        newx = x + RNG.Next(7) - 3;
-                                        newy = y + RNG.Next(7) - 3;
-                                        tries++;
-                                    } while (newx > 2 && newx < MAP_COLS - 2 && newy > 2 && newy < MAP_ROWS - 2 && (map[newy, newx] != Terrain.NONE || map[newy - 1, newx] != Terrain.NONE || map[newy + 1, newx] != Terrain.NONE || map[newy + 1, newx + 1] != Terrain.NONE || map[newy, newx + 1] != Terrain.NONE || map[newy - 1, newx + 1] != Terrain.NONE || map[newy + 1, newx - 1] != Terrain.NONE || map[newy, newx - 1] != Terrain.NONE || map[newy - 1, newx - 1] != Terrain.NONE) && tries < 100);
-                                    if (tries >= 100)
-                                    {
-                                        return false;
-                                    }
-                                    caveExits[1].Xpos = newx;
-                                    caveExits[1].Y = newy;
-                                    caveExits[1].CanShuffle = false;
-                                    PlaceCave(newx, newy, direction, s);
-                                    y = newy;
-                                    x = newx;
-
-                                    tries = 0;
-                                    do
-                                    {
-                                        int range = 7;
-                                        int offset = 3;
-                                        if (biome == Biome.ISLANDS)
-                                        {
-                                            range = 7;
-                                            offset = 5;
-                                        }
-                                        crossing = true;
-
-                                        if (direction == Direction.NORTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y - (RNG.Next(range) + offset);
-                                        }
-                                        else if (direction == Direction.EAST)
-                                        {
-                                            otherx = x + (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        else if (direction == Direction.SOUTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y + (RNG.Next(range) + offset);
-                                        }
-                                        else //west
-                                        {
-                                            otherx = x - (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        tries++;
-
-                                        if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-                                    } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE); if (tries >= 100)
-                                    {
-                                        return false;
-                                    }
-
-                                    location.CanShuffle = false;
-                                    caveExits[2].CanShuffle = false;
-                                    caveExits[2].Xpos = otherx;
-                                    caveExits[2].Y = othery;
-                                    PlaceCave(otherx, othery, direction.Reverse(), s);
-                                }
-                            }
-                            else
-                            {
-                                PlaceCave(x, y, direction, s);
-                            }
-                            
                         }
                     }
                 }
@@ -695,7 +531,7 @@ sealed class DeathMountain : World
                 }
                 randomTerrainFilter.Add(Terrain.ROAD);
                 //Debug.WriteLine(GetMapDebug());
-                Climate growthClimate = climate.Clone();
+                Climate growthClimate = climate.CloneWithInvertedDistances();
                 float dmOpennessFactor = biome switch
                 {
                     Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),
@@ -704,6 +540,7 @@ sealed class DeathMountain : World
                 growthClimate.ApplyDeathMountainSafety(randomTerrainFilter, dmOpennessFactor);
                 if (!GrowTerrain(growthClimate))
                 {
+                    logger.LogDebug("GrowTerrain failed");
                     return false;
                 }
                 //Debug.WriteLine(GetMapDebug());
@@ -712,34 +549,27 @@ sealed class DeathMountain : World
                     bool f = MakeCaldera(props.CanWalkOnWaterWithBoots);
                     if (!f)
                     {
+                        logger.LogDebug("MakeCaldera failed");
                         return false;
                     }
                 }
                 walkableTerrains.Add(Terrain.ROAD);
                 if (raft != null)
                 {
-                    if (biome != Biome.CALDERA && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                    {
-                        MAP_COLS = 29;
-                    }
-                    bool r = DrawRaft(false, raftDirection);
-                    MAP_COLS = 64;
+                    bool r = DrawRaft(raftDirection);
                     if (!r)
                     {
+                        logger.LogDebug("DrawRaft failed");
                         return false;
                     }
                 }
 
                 if (bridge != null)
                 {
-                    if (biome != Biome.CALDERA && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                    {
-                        MAP_COLS = 29;
-                    }
-                    bool b = DrawRaft(true, bridgeDirection);
-                    MAP_COLS = 64;
+                    bool b = DrawBridge(bridgeDirection);
                     if (!b)
                     {
+                        logger.LogDebug("DrawBridge failed");
                         return false;
                     }
                 }
@@ -763,6 +593,7 @@ sealed class DeathMountain : World
 
                 if (!ValidateCaves())
                 {
+                    logger.LogDebug("ValidateCaves failed");
                     return false;
                 }
 
@@ -772,6 +603,7 @@ sealed class DeathMountain : World
         }
         if(!ValidateBasicRouting())
         {
+            logger.LogDebug("ValidateBasicRouting failed");
             return false;
         }
 
@@ -787,7 +619,7 @@ sealed class DeathMountain : World
             }
         }
 
-        for (int i = 0x610C; i < 0x614B; i++)
+        for (int i = RomMap.DM_CAVE1A_TILE_LOCATION; i < 0x614B; i++)
         {
             if (!terrains.Keys.Contains(i))
             {
@@ -796,6 +628,250 @@ sealed class DeathMountain : World
         }
         return true;
     }
+
+    private bool TerraformCaveExpansion(RandomizerProperties props, ref int x, ref int y, Location location)
+    {
+        Direction direction = (Direction)RNG.Next(4);
+
+        Terrain s = biome == Biome.VANILLALIKE ? Terrain.ROAD : climate.GetRandomTerrain(RNG, walkableTerrains);
+        int tries;
+
+        if (props.SaneCaves && connectionsDM.ContainsKey(location))
+        {
+            if ((location.MapPage == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
+            {
+                if (direction == Direction.NORTH)
+                {
+                    direction = Direction.SOUTH;
+                }
+
+                if (direction == Direction.WEST)
+                {
+                    direction = Direction.EAST;
+                }
+            }
+            else
+            {
+                if (direction == Direction.SOUTH)
+                {
+                    direction = Direction.NORTH;
+                }
+
+                if (direction == Direction.EAST)
+                {
+                    direction = Direction.WEST;
+                }
+            }
+            map[y, x] = Terrain.NONE;
+
+            tries = 0;
+            do
+            {
+                x = RNG.Next(MAP_COLS - 2) + 1;
+                y = RNG.Next(MAP_ROWS - 2) + 1;
+                if (++tries >= 100)
+                {
+                    return false;
+                }
+            } while (x < 5 || x > MAP_COLS - 5
+                  || y < 5 || y > MAP_ROWS - 5
+                  || !AllTerrainIn3x3Equals(x, y, Terrain.NONE));
+
+            int minDistX = Math.Min(MAP_COLS / 2 - 1, 15);
+            int minDistY = Math.Min(MAP_ROWS / 2 - 1, 15);
+
+            while ((direction == Direction.NORTH && y < minDistY)
+                || (direction == Direction.EAST && x > MAP_COLS - minDistX)
+                || (direction == Direction.SOUTH && y > MAP_ROWS - minDistY)
+                || (direction == Direction.WEST && x < minDistX))
+            {
+                direction = (Direction)RNG.Next(4);
+            }
+            if (connectionsDM[location].Count == 1)
+            {
+                int otherx = 0;
+                int othery = 0;
+                tries = 0;
+                do
+                {
+                    int range = 7;
+                    int offset = 3;
+                    if (biome == Biome.ISLANDS)
+                    {
+                        range = 7;
+                        offset = 5;
+                    }
+                    if (direction == Direction.NORTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y - (RNG.Next(range) + offset);
+                    }
+                    else if (direction == Direction.EAST)
+                    {
+                        otherx = x + (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    else if (direction == Direction.SOUTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y + (RNG.Next(range) + offset);
+                    }
+                    else //west
+                    {
+                        otherx = x - (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    if (++tries >= 100)
+                    {
+                        return false;
+                    }
+                } while (otherx <= 1 || otherx >= MAP_COLS - 1
+                      || othery <= 1 || othery >= MAP_ROWS - 1
+                      || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
+
+                List<Location> l2 = connectionsDM[location];
+                var location2 = l2[0];
+                location.CanShuffle = false;
+                location.Xpos = x;
+                location.Y = y;
+                location2.CanShuffle = false;
+                location2.Xpos = otherx;
+                location2.Y = othery;
+                PlaceCave(x, y, direction, s);
+                PlaceCave(otherx, othery, direction.Reverse(), s);
+                AlignCavePositionsLeftToRight(direction, location, location2);
+            }
+            else //4-way caves
+            {
+                int otherx = 0;
+                int othery = 0;
+                tries = 0;
+                do
+                {
+                    int range = 7;
+                    int offset = 3;
+                    if (biome == Biome.ISLANDS)
+                    {
+                        range = 7;
+                        offset = 5;
+                    }
+                    if (direction == Direction.NORTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y - (RNG.Next(range) + offset);
+                    }
+                    else if (direction == Direction.EAST)
+                    {
+                        otherx = x + (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    else if (direction == Direction.SOUTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y + (RNG.Next(range) + offset);
+                    }
+                    else //west
+                    {
+                        otherx = x - (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    if (++tries >= 100)
+                    {
+                        return false;
+                    }
+                } while (otherx <= 1 || otherx >= MAP_COLS - 1
+                      || othery <= 1 || othery >= MAP_ROWS - 1
+                      || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
+
+                List<Location> caveExits = connectionsDM[location];
+                var location2 = caveExits[0];
+                var location3 = caveExits[1];
+                var location4 = caveExits[2];
+                location.CanShuffle = false;
+                location.Xpos = x;
+                location.Y = y;
+                location2.CanShuffle = false;
+                location2.Xpos = otherx;
+                location2.Y = othery;
+                PlaceCave(x, y, direction, s);
+                PlaceCave(otherx, othery, direction.Reverse(), s);
+                AlignCavePositionsLeftToRight(direction, location, location2);
+
+                int newx = 0;
+                int newy = 0;
+                tries = 0;
+                do
+                {
+                    newx = x + RNG.Next(7) - 3;
+                    newy = y + RNG.Next(7) - 3;
+                    if (++tries >= 100)
+                    {
+                        return false;
+                    }
+                } while (newx > 2 && newx < MAP_COLS - 2
+                      && newy > 2 && newy < MAP_ROWS - 2
+                      && !AllTerrainIn3x3Equals(newx, newy, Terrain.NONE));
+
+                location3.CanShuffle = false;
+                location3.Xpos = newx;
+                location3.Y = newy;
+                PlaceCave(newx, newy, direction, s);
+
+                y = newy;
+                x = newx;
+                tries = 0;
+                do
+                {
+                    int range = 7;
+                    int offset = 3;
+                    if (biome == Biome.ISLANDS)
+                    {
+                        range = 7;
+                        offset = 5;
+                    }
+
+                    if (direction == Direction.NORTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y - (RNG.Next(range) + offset);
+                    }
+                    else if (direction == Direction.EAST)
+                    {
+                        otherx = x + (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    else if (direction == Direction.SOUTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y + (RNG.Next(range) + offset);
+                    }
+                    else //west
+                    {
+                        otherx = x - (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    if (++tries >= 100)
+                    {
+                        return false;
+                    }
+                } while (otherx <= 1 || otherx >= MAP_COLS - 1
+                      || othery <= 1 || othery >= MAP_ROWS - 1
+                      || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
+
+                location4.CanShuffle = false;
+                location4.Xpos = otherx;
+                location4.Y = othery;
+                PlaceCave(otherx, othery, direction.Reverse(), s);
+                AlignCavePositionsLeftToRight(direction, location3, location4);
+            }
+        }
+        else
+        {
+            PlaceCave(x, y, direction, s);
+        }
+        return true;
+    }
+
     private bool MakeCaldera(bool canWalkOnWaterWithBoots)
     {
         Terrain water = Terrain.WATER;
@@ -803,42 +879,62 @@ sealed class DeathMountain : World
         {
             water = Terrain.WALKABLEWATER;
         }
-        int centerx, centery;
+        int mapCenterX = MAP_COLS / 2; // 32
+        int mapCenterY = MAP_ROWS / 2; // 22
+        int calderaCenterX, calderaCenterY;
 
+        int tries = 0;
         bool placeable;
         do
         {
             if (isHorizontal)
             {
-                centerx = RNG.Next(27, 37);
-                centery = RNG.Next(17, 27);
+                int minX = mapCenterX - 5;
+                int maxX = mapCenterX + 5;
+                calderaCenterX = RNG.Next(minX, maxX);
+                int minY = Math.Max(7, mapCenterY - 5);
+                int maxY = Math.Min(mapCenterY + 5, MAP_ROWS - 8);
+                calderaCenterY = RNG.Next(minY, maxY);
             }
             else
             {
-                centerx = RNG.Next(21, 41);
-                centery = RNG.Next(17, 27);
+                int minX = Math.Max(7, mapCenterX - 11);
+                int maxX = Math.Min(mapCenterX + 9, MAP_COLS - 8);
+                calderaCenterX = RNG.Next(minX, maxX);
+                int minY = mapCenterY - 5;
+                int maxY = mapCenterY + 5;
+                calderaCenterY = RNG.Next(minY, maxY);
             }
             placeable = true;
-            for (int i = centery - 7; i < centery + 8; i++)
+            for (int i = calderaCenterY - 7; i < calderaCenterY + 8; i++)
             {
-                for (int j = centerx - 7; j < centerx + 8; j++)
+                for (int j = calderaCenterX - 7; j < calderaCenterX + 8; j++)
                 {
                     if (map[i, j] != Terrain.MOUNTAIN)
                     {
                         placeable = false;
+                        break; // end inner for
                     }
                 }
+                if (!placeable)
+                {
+                    break; // end outer for
+                }
+            }
+            if (++tries == 1000)
+            {
+                return false;
             }
         } while (!placeable);
 
-        int startx = centerx - 5;
-        int starty = centery;
+        int startx = calderaCenterX - 5;
+        int starty = calderaCenterY;
         int deltax = 1;
         int deltay = 0;
         if (!isHorizontal)
         {
-            startx = centerx;
-            starty = centery - 5;
+            startx = calderaCenterX;
+            starty = calderaCenterY - 5;
             deltax = 0;
             deltay = 1;
         }
@@ -985,51 +1081,39 @@ sealed class DeathMountain : World
             starty += deltay;
         }
 
-        Location cave1l, cave1r, cave2l, cave2r;
+        // caves have already been shuffled by being placed on the map.
+        // pick the closest ones to the caldera center to minimize having
+        // overlap errors.
+        var validCaves = connectionsDM
+            .Where(kvp => kvp.Value.Count == 1)
+            .OrderBy(kvp => DistanceSquared(kvp.Key, calderaCenterX, calderaCenterY))
+            .ToList();
+        var first = validCaves[0];
+        var second = validCaves.First(kvp => kvp.Key != first.Key && kvp.Key != first.Value[0]);
+        Location cave1l = first.Key;
+        Location cave1r = first.Value[0];
+        Location cave2l = second.Key;
+        Location cave2r = second.Value[0];
 
-        do
-        {
-            int cavenum1 = RNG.Next(connectionsDM.Keys.Count);
-            cave1l = connectionsDM.Keys.ToList()[cavenum1];
-            cave1r = connectionsDM[cave1l][0];
-        } while (connectionsDM[cave1l].Count != 1 || connectionsDM[cave1r].Count != 1);
-
-        do
-        {
-            int cavenum1 = RNG.Next(connectionsDM.Keys.Count);
-            cave2l = connectionsDM.Keys.ToList()[cavenum1];
-            cave2r = connectionsDM[cave2l][0];
-        } while (connectionsDM[cave2l].Count != 1 || cave1l == cave2l || cave1l == cave2r);
         cave1l.CanShuffle = false;
         cave1r.CanShuffle = false;
         cave2l.CanShuffle = false;
         cave2r.CanShuffle = false;
         map[cave1l.Y, cave1l.Xpos] = Terrain.MOUNTAIN;
         map[cave2l.Y, cave2l.Xpos] = Terrain.MOUNTAIN;
-
         map[cave1r.Y, cave1r.Xpos] = Terrain.MOUNTAIN;
-
         map[cave2r.Y, cave2r.Xpos] = Terrain.MOUNTAIN;
 
-
-        int caveType = RNG.Next(2);
+        int caveDirection = RNG.Next(2);
         if (isHorizontal)
         {
-            bool f = HorizontalCave(caveType, centerx, centery, cave1l, cave1r);
+            bool f = HorizontalCave(caveDirection, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if (!f)
             {
                 return false;
             }
-
-            if (caveType == 0)
-            {
-                caveType = 1;
-            }
-            else
-            {
-                caveType = 0;
-            }
-            f = HorizontalCave(caveType, centerx, centery, cave2l, cave2r);
+            caveDirection = 1 - caveDirection;
+            f = HorizontalCave(caveDirection, calderaCenterX, calderaCenterY, cave2l, cave2r);
             if (!f)
             {
                 return false;
@@ -1037,20 +1121,13 @@ sealed class DeathMountain : World
         }
         else
         {
-            bool f = VerticalCave(caveType, centerx, centery, cave1l, cave1r);
+            bool f = VerticalCave(caveDirection, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if (!f)
             {
                 return false;
             }
-            if (caveType == 0)
-            {
-                caveType = 1;
-            }
-            else
-            {
-                caveType = 0;
-            }
-            f = VerticalCave(caveType, centerx, centery, cave2l, cave2r);
+            caveDirection = 1 - caveDirection;
+            f = VerticalCave(caveDirection, calderaCenterX, calderaCenterY, cave2l, cave2r);
             if (!f)
             {
                 return false;

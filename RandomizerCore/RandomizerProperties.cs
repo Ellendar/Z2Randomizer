@@ -76,17 +76,23 @@ public class RandomizerProperties
     public bool TownSwap { get; set; }
     public EncounterRate EncounterRates { get; set; }
     public ContinentConnectionType ContinentConnections { get; set; }
+    public OverworldSizeOption WestSize { get; set; }
+    public OverworldSizeOption EastSize { get; set; }
+    public DmSizeOption DmSize { get; set; }
+    public MazeSizeOption MazeSize { get; set; }
     public bool BoulderBlockConnections { get; set; }
     public Biome WestBiome { get; set; }
     public Biome EastBiome { get; set; }
-    public Biome MazeBiome { get; set; }
     public Biome DmBiome { get; set; }
+    public Biome MazeBiome { get; set; }
     public bool DmIsHorizontal { get; set; }
     public bool WestIsHorizontal { get; set; }
     public bool EastIsHorizontal { get; set; }
     public bool EastRockIsPath { get; set; }
 #pragma warning disable CS8618
-    public Climate Climate { get; set; }
+    public ClimateEnum WestClimate { get; set; }
+    public ClimateEnum EastClimate { get; set; }
+    public ClimateEnum DmClimate { get; set; }
 #pragma warning restore CS8618 
     public bool VanillaShuffleUsesActualTerrain { get; set; }
     public bool ShuffleHidden { get; set; }

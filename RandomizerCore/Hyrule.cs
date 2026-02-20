@@ -41,6 +41,9 @@ public class Hyrule
     //This controls how many times
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
+    //This controls how many times
+    private const int TERRAIN_GENERATION_ATTEMPT_LIMIT = 50000;
+
     //private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -1819,7 +1822,13 @@ public class Hyrule
                 timestamp = DateTime.Now;
                 if (!westHyrule.AllReached)
                 {
-                    while (!westHyrule.Terraform(props, ROMData)) { totalWestGenerationAttempts++; }
+                    while (!westHyrule.Terraform(props, ROMData))
+                    { 
+                        if (++totalWestGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
+                        {
+                            throw new Exception("Failed to generate West Continent");
+                        }
+                    }
                     totalWestGenerationAttempts++;
                 }
                 westHyrule.ResetVisitabilityState();
@@ -1831,7 +1840,13 @@ public class Hyrule
                 timestamp = DateTime.Now;
                 if (!deathMountain.AllReached)
                 {
-                    while (!deathMountain.Terraform(props, ROMData)) { totalDeathMountainGenerationAttempts++; }
+                    while (!deathMountain.Terraform(props, ROMData))
+                    { 
+                        if (++totalDeathMountainGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
+                        {
+                            throw new Exception("Failed to generate Death Mountain");
+                        }
+                    }
                     totalDeathMountainGenerationAttempts++;
                 }
                 deathMountain.ResetVisitabilityState();
@@ -1843,7 +1858,13 @@ public class Hyrule
                 timestamp = DateTime.Now;
                 if (!eastHyrule.AllReached)
                 {
-                    while (!eastHyrule.Terraform(props, ROMData)) { totalEastGenerationAttempts++; }
+                    while (!eastHyrule.Terraform(props, ROMData))
+                    { 
+                        if (++totalEastGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
+                        {
+                            throw new Exception("Failed to generate East Continent");
+                        }
+                    }
                     totalEastGenerationAttempts++;
                 }
                 eastHyrule.ResetVisitabilityState();
@@ -1855,7 +1876,13 @@ public class Hyrule
                 timestamp = DateTime.Now;
                 if (!mazeIsland.AllReached)
                 {
-                    while (!mazeIsland.Terraform(props, ROMData)) { totalMazeIslandGenerationAttempts++; }
+                    while (!mazeIsland.Terraform(props, ROMData))
+                    {
+                        if (++totalMazeIslandGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
+                        {
+                            throw new Exception("Failed to generate Maze Island");
+                        }
+                    }
                     totalMazeIslandGenerationAttempts++;
                 }
                 mazeIsland.ResetVisitabilityState();
@@ -1953,6 +1980,7 @@ public class Hyrule
         }
     }
 
+    /// <param name="type">1 = raft, 2 = bridge, 3 = cave1, 4/other = cave2</param>
     private void SetTransportation(int w1, int w2, int type)
     {
         Location l1, l2;
@@ -2418,6 +2446,10 @@ public class Hyrule
                 ROMData.Put(location.MemAddress + overworldXOff, locationBytes[1]);
                 ROMData.Put(location.MemAddress + overworldMapOff, locationBytes[2]);
                 ROMData.Put(location.MemAddress + overworldWorldOff, locationBytes[3]);
+            }
+            foreach (Location location in world.RemovedLocations)
+            {
+                ROMData.Put(location.MemAddress, 0x00);
             }
             ROMData.RemoveUnusedConnectors(world);
         }

@@ -37,12 +37,16 @@ public static class HardmodePreset
         HidePalace = null,
         HideKasuto = null,
         ShuffleWhichLocationIsHidden = false,
-        ContinentConnectionType = ContinentConnectionType.TRANSPORTATION_SHUFFLE,
-        Climate = Climates.Classic,
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
         DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        WestClimate = ClimateEnum.VANILLA_WEIGHTED_WEST,
+        EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
+        DmClimate = ClimateEnum.CLASSIC,
+        MazeClimate = ClimateEnum.CLASSIC,
+
+        ContinentConnectionType = ContinentConnectionType.TRANSPORTATION_SHUFFLE,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
