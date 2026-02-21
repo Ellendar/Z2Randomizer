@@ -112,7 +112,7 @@ PalaceNumber = $056c
 RegionNumber = $0706
 WorldNumber = $0707
 
-SideViewInit = $8CE1
+NewSideviewInit = $8cec
 ClearNametables = $d266
 JumpEngine = $d385
 

@@ -1903,7 +1903,7 @@ CheckToOverwriteChrBank:
 @NotHorsehead:
         dex
         bne @loop
-    jmp SideViewInit
+    jmp NewSideviewInit
 
 .reloc
 OverwriteSpriteCHRBank:
