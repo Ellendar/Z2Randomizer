@@ -94,11 +94,14 @@ public class Hyrule
     //public Dictionary<Location, String> section;
     private int accessibleMagicContainers;
     private int accessibleHeartContainers;
+    /*
     private int startHearts;
     private int startMagicContainers = 4; //Not for long maybe
     private int maxHearts;
     private int maxMagicContainers = 8; //Probably true for much longer
     private int heartContainersInItemPool;
+    */
+
 
     //private Character character;
 
@@ -667,7 +670,8 @@ public class Hyrule
             SwapUpAndDownstab();
         }
 
-        heartContainersInItemPool = maxHearts - startHearts;
+        int heartContainersInItemPool = props.MaxHearts - props.StartHearts;
+        int magicContainersInItemPool = props.MaxMagicContainers - props.StartMagicContainers;
 
         foreach (Collectable item in ItemGet.Keys.ToList())
         {
@@ -701,6 +705,21 @@ public class Hyrule
                 {
                     shufflableItems[remove] = minorItems[r.Next(minorItems.Count)];
                     heartContainersToRemove--;
+                }
+            }
+        }
+
+        //Replace any unused magic containers with small items
+        if (magicContainersInItemPool < 4)
+        {
+            int magicContainersToRemove = 4 - magicContainersInItemPool;
+            while (magicContainersToRemove > 0)
+            {
+                int remove = r.Next(shufflableItems.Count);
+                if (shufflableItems[remove] == Collectable.MAGIC_CONTAINER)
+                {
+                    shufflableItems[remove] = minorItems[r.Next(minorItems.Count)];
+                    magicContainersToRemove--;
                 }
             }
         }
@@ -806,6 +825,11 @@ public class Hyrule
         for (int i = 4; i < heartContainersInItemPool; i++)
         {
             excessItems.Add(Collectable.HEART_CONTAINER);
+        }
+
+        for (int i = 4; i < magicContainersInItemPool; i++)
+        {
+            excessItems.Add(Collectable.MAGIC_CONTAINER);
         }
 
         int extraPalaceItemCount = props.PalaceItemRoomCounts.Select(c => Math.Max(c - 1, 0)).Sum();
@@ -954,7 +978,7 @@ public class Hyrule
             }
         }
 
-        //Assigning unshuffled locations can make the number of heart containers wrong, so re-adjust them
+        //Assigning unshuffled locations can make the number of containers wrong, so re-adjust them
         List<Location> heartContainerLocations = itemLocs.Where(i => i.Collectables.Contains(Collectable.HEART_CONTAINER)).ToList();
         int heartContainerCount = itemLocs.SelectMany(i => i.Collectables).Count(i => i == Collectable.HEART_CONTAINER);
         while(heartContainerCount > heartContainersInItemPool)
@@ -982,6 +1006,39 @@ public class Hyrule
             {
                 location.Collectables[index] = Collectable.HEART_CONTAINER;
                 heartContainerCount++;
+                if (!location.Collectables.Any(i => i.IsMinorItem()))
+                {
+                    minorItemLocations.Remove(location);
+                }
+            }
+        }
+        List<Location> magicContainerLocations = itemLocs.Where(i => i.Collectables.Contains(Collectable.MAGIC_CONTAINER)).ToList();
+        int magicContainerCount = itemLocs.SelectMany(i => i.Collectables).Count(i => i == Collectable.MAGIC_CONTAINER);
+        while (magicContainerCount > magicContainersInItemPool)
+        {
+            Location location = magicContainerLocations.Sample(r)!;
+            int index = r.Next(location.Collectables.Count);
+            if (location.Collectables[index] == Collectable.MAGIC_CONTAINER)
+            {
+                location.Collectables[index] = minorItems.Sample(r);
+                magicContainerCount--;
+                if (!location.Collectables.Any(i => i == Collectable.MAGIC_CONTAINER))
+                {
+                    magicContainerLocations.Remove(location);
+                }
+            }
+        }
+
+        while (magicContainerCount < magicContainersInItemPool)
+        {
+            List<Location> minorItemLocations = itemLocs.Where(i => i.Collectables.Any(j => j.IsMinorItem())).ToList();
+
+            Location location = minorItemLocations.Sample(r)!;
+            int index = r.Next(location.Collectables.Count);
+            if (location.Collectables[index].IsMinorItem())
+            {
+                location.Collectables[index] = Collectable.MAGIC_CONTAINER;
+                magicContainerCount++;
                 if (!location.Collectables.Any(i => i.IsMinorItem()))
                 {
                     minorItemLocations.Remove(location);
@@ -1033,7 +1090,6 @@ public class Hyrule
                 }
             }
         }
-
     }
 
     private void DoShuffle(List<Collectable> itemsToShuffle, List<Location> itemShuffleLocations)
@@ -1237,7 +1293,7 @@ public class Hyrule
         {
             previousReachableLocationsCount = reachableLocationsCount;
             previousGettableItemsCount = gettableItemsCount;
-            gettableItemsCount = UpdateItemGets();
+            gettableItemsCount = UpdateItemGets(props);
             List<RequirementType> requireables = GetRequireables(props);
             westHyrule.UpdateVisit(requireables);
             deathMountain.UpdateVisit(requireables);
@@ -1266,7 +1322,7 @@ public class Hyrule
                     worlds.ForEach(i => i.VisitCave2());
                 }
             }
-            gettableItemsCount = UpdateItemGets();
+            gettableItemsCount = UpdateItemGets(props);
 
             //This 2nd pass is weird and may not need to exist, eventually I should run some stats on whether it helps or not
             requireables = GetRequireables(props);
@@ -1275,7 +1331,7 @@ public class Hyrule
             eastHyrule.UpdateVisit(requireables);
             mazeIsland.UpdateVisit(requireables);
 
-            gettableItemsCount = UpdateItemGets();
+            gettableItemsCount = UpdateItemGets(props);
 
             reachableLocationsCount = 0;
             dm = 0;
@@ -1311,19 +1367,19 @@ public class Hyrule
                 return false;
             }
         }
-        if (accessibleMagicContainers != 8)
+        if (accessibleMagicContainers != props.MaxMagicContainers)
         {
             magicContainerReachableFailures++;
-            PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
-        if (accessibleHeartContainers < maxHearts)
+        if (accessibleHeartContainers < props.MaxHearts)
         {
             heartContainerReachableFailures++;
-            PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
-        if(accessibleHeartContainers > maxHearts)
+        if(accessibleHeartContainers > props.MaxHearts)
         {
             throw new Exception("More hearts found than should exist in the seed.");
         }
@@ -1421,11 +1477,11 @@ public class Hyrule
     /// 
     /// </summary>
     /// <returns>Whether any items were marked accessable</returns>
-    private int UpdateItemGets()
+    private int UpdateItemGets(RandomizerProperties props)
     {
         List<RequirementType> requireables;
-        accessibleMagicContainers = 4;
-        accessibleHeartContainers = startHearts;
+        accessibleMagicContainers = props.StartMagicContainers;
+        accessibleHeartContainers = props.StartHearts;
         Location newKasuto = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO);
         List<Collectable> gottenItems = [], lastIterationGottenItems = [];
         List<Location> locations = AllLocationsForReal().ToList();
@@ -1435,8 +1491,8 @@ public class Hyrule
         //Just iterate until we find as many items as possible
         do
         {
-            accessibleHeartContainers = startHearts + heartContainerGetLocations.Count;
-            accessibleMagicContainers = startMagicContainers + magicContainerGetLocations.Count;
+            accessibleHeartContainers = props.StartHearts + heartContainerGetLocations.Count;
+            accessibleMagicContainers = props.StartMagicContainers + magicContainerGetLocations.Count;
             requireables = GetRequireables(props);
             gottenItems = [];
             foreach (Location location in AllLocationsForReal())
@@ -1482,8 +1538,8 @@ public class Hyrule
             lastIterationGottenItems = new(gottenItems);
         } while (!stalled);
 
-        accessibleHeartContainers = startHearts + heartContainerGetLocations.Count;
-        accessibleMagicContainers = startMagicContainers + magicContainerGetLocations.Count;  
+        accessibleHeartContainers = props.StartHearts + heartContainerGetLocations.Count;
+        accessibleMagicContainers = props.StartMagicContainers + magicContainerGetLocations.Count;  
         return gottenItems.Count;
     }
 
@@ -1503,6 +1559,18 @@ public class Hyrule
             }
         }
 
+        if (accessibleMagicContainers >= 1)
+        {
+            requireables.Add(RequirementType.ONE_CONTAINER);
+        }
+        if (accessibleMagicContainers >= 2)
+        {
+            requireables.Add(RequirementType.TWO_CONTAINERS);
+        }
+        if (accessibleMagicContainers >= 3)
+        {
+            requireables.Add(RequirementType.THREE_CONTAINERS);
+        }
         if (accessibleMagicContainers >= 4)
         {
             requireables.Add(RequirementType.FOUR_CONTAINERS);
@@ -2195,7 +2263,7 @@ public class Hyrule
     {
 
         rom.Put(0x17AF3, (byte)props.StartAtk);
-        rom.Put(0x17AF4, (byte)props.StartMag);
+        rom.Put(0x17AF4, (byte)props.StartingMagicLevel);
         rom.Put(0x17AF5, (byte)props.StartLifeLvl);
 
         if (props.SpellEnemy)
@@ -2357,11 +2425,9 @@ public class Hyrule
 
         rom.Put(0x17B10, (byte)props.StartGems);
 
-        startHearts = props.StartHearts;
-        rom.Put(0x17B00, (byte)startHearts);
 
-        maxHearts = props.MaxHearts;
-        heartContainersInItemPool = maxHearts - startHearts;
+        rom.Put(0x17B00, (byte)props.StartHearts);
+        rom.Put(0x17AFF, (byte)props.StartMagicContainers);
 
         rom.Put(0x1C369, (byte)props.StartLives);
 

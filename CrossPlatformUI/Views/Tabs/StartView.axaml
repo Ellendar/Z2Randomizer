@@ -41,6 +41,15 @@
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.StartingItemLimitToolTip}"/></ToolTip.Tip>
             </ComboBox>
+			<ComboBox
+	            assists:ComboBoxAssist.Label="Random Flag Rate" Theme="{StaticResource MaterialOutlineComboBox}"
+	            ItemsSource="{Binding Source={x:Static rc:Enums.IndeterminateOptionRateList}}"
+	            SelectedItem="{Binding Config.IndeterminateOptionRate, Converter={x:Static ui:Util.EnumConvert}}"
+            >
+				<ToolTip.Tip>
+					<TextBlock Text="{x:Static lang:Resources.RandomFlagRateToolTip}"/>
+				</ToolTip.Tip>
+			</ComboBox>
         </StackPanel>
         <StackPanel Grid.Column="1">
             <CheckBox
@@ -93,6 +102,24 @@
                               SelectedItem="{Binding Config.MaxHeartContainers, Converter={x:Static ui:Util.EnumConvert}}" />
                 </Grid>
             </StackPanel>
+			<StackPanel Margin="26 16" HorizontalAlignment="Left">
+				<TextBlock>Magic Containers</TextBlock>
+				<ToolTip.Tip>
+					<TextBlock Text="{x:Static lang:Resources.MagicContainersToolTip}"/>
+				</ToolTip.Tip>
+				<Grid ColumnDefinitions="72,72,144" ColumnSpacing="8" HorizontalAlignment="Left" VerticalAlignment="Top">
+					<NumericUpDown Grid.Column="0"
+                                   Height="72"
+                                   Value="{Binding Config.StartingMagicContainersMin}"
+                                   FormatString="N0" ParsingNumberStyle="Integer"
+                                   ClipValueToMinMax="True" Minimum="0" Maximum="{Binding Config.StartingMagicContainersMax}" assists:TextFieldAssist.Hints="Start Min"/>
+					<NumericUpDown Grid.Column="1"
+                                   Height="72"
+                                   Value="{Binding Config.StartingMagicContainersMax}"
+                                   FormatString="N0" ParsingNumberStyle="Integer"
+                                   ClipValueToMinMax="True" Minimum="{Binding Config.StartingMagicContainersMin}" Maximum="8" assists:TextFieldAssist.Hints="Start Max"/>
+				</Grid>
+			</StackPanel>
             <Separator/>
             <StackPanel Margin="26 16" HorizontalAlignment="Left">
                 <TextBlock>Starting Levels</TextBlock>
@@ -129,13 +156,6 @@
                 SelectedItem="{Binding Config.StartingLives, Converter={x:Static ui:Util.EnumConvert}}"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.StartingLivesToolTip}"/></ToolTip.Tip>
-            </ComboBox>
-            <ComboBox
-                assists:ComboBoxAssist.Label="Random Flag Rate" Theme="{StaticResource MaterialOutlineComboBox}"
-                ItemsSource="{Binding Source={x:Static rc:Enums.IndeterminateOptionRateList}}"
-                SelectedItem="{Binding Config.IndeterminateOptionRate, Converter={x:Static ui:Util.EnumConvert}}"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RandomFlagRateToolTip}"/></ToolTip.Tip>
             </ComboBox>
         </StackPanel>
     </Grid>

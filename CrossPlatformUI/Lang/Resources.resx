@@ -861,7 +861,17 @@ Adjusts the total number of heart containers available:
   • If the total exceeds the starting count by more than 4, minor items in the item
     shuffle will be replaced with heart containers until the total is met.
     ◦ If needed, the &quot;Include P-Bag Caves in Item Shuffle&quot; setting will be overriden to
-      make room.</value>
+      make room.
+</value>
+	</data>
+	<data name="MagicContainersToolTip" xml:space="preserve">
+<value>Start Min / Max:
+Options: 0-8
+
+Adjust the minimum and maximum starting magic containers. The actual starting number will be
+randomly selected between these values (inclusive).
+
+</value>
 	</data>
 	<data name="StartingLevelsToolTip" xml:space="preserve">
 <value>Select Link&apos;s starting Attack / Magic / Life levels.</value>

@@ -55,13 +55,15 @@ public class RandomizerProperties
     //Other starting attributes
     public int StartHearts { get; set; }
     public int MaxHearts { get; set; }
+    public int StartMagicContainers { get; set; }
+    public int MaxMagicContainers { get; set; }
     public bool StartWithUpstab { get; set; }
     public bool StartWithDownstab { get; set; }
     public int StartLives { get; set; }
     public bool PermanentBeam { get; set; }
     public bool UseCommunityText { get; set; }
     public int StartAtk { get; set; }
-    public int StartMag { get; set; }
+    public int StartingMagicLevel { get; set; }
     public int StartLifeLvl { get; set; }
     public bool SwapUpAndDownStab { get; set; }
 
@@ -342,6 +344,7 @@ public class RandomizerProperties
 
         //more or less than 4 containers in the seed adds/removes minor items
         minorItemCount -= MaxHearts - StartHearts - 4;
+        minorItemCount -= MaxMagicContainers - StartMagicContainers - 4;
 
         //palace items other than 1 adjusts the count
         minorItemCount += PalaceItemRoomCounts.Select(c => c - 1).Sum();

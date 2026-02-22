@@ -132,6 +132,16 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private int? startingHeartContainersMax;
 
     [Reactive]
+    [Limit(8)]
+    [Minimum(0)]
+    private int? startingMagicContainersMin;
+
+    [Reactive]
+    [Limit(8)]
+    [Minimum(0)]
+    private int? startingMagicContainersMax;
+
+    [Reactive]
     private MaxHeartsOption maxHeartContainers;
 
     [Reactive]
@@ -656,8 +666,10 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         startingLifeLevel = 1;
 
         maxHeartContainers = MaxHeartsOption.EIGHT;
-        startingHeartContainersMin = 8;
-        startingHeartContainersMax = 8;
+        startingHeartContainersMin = 4;
+        startingHeartContainersMax = 4;
+        startingMagicContainersMin = 4;
+        startingMagicContainersMax = 4;
 
         attackLevelCap = 8;
         magicLevelCap = 8;
@@ -902,6 +914,28 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 properties.MaxHearts = Math.Min(properties.StartHearts + additionalHearts, 8);
             }
             properties.MaxHearts = Math.Max(properties.MaxHearts, properties.StartHearts);
+
+            int startMagicsMin, startMagicsMax;
+            if (startingMagicContainersMin == null)
+            {
+                startMagicsMin = r.Next(1, 9);
+            }
+            else
+            {
+                startMagicsMin = (int)startingMagicContainersMin;
+            }
+            if (startingMagicContainersMax == null)
+            {
+                startMagicsMax = r.Next(startMagicsMin, 9);
+            }
+            else
+            {
+                startMagicsMax = (int)startingMagicContainersMax;
+            }
+            properties.StartMagicContainers = r.Next(startMagicsMin, startMagicsMax + 1);
+
+            //Not settable yet
+            properties.MaxMagicContainers = 8;
         } while (!properties.HasEnoughSpaceToAllocateItems());
 
         //Handle Fire
@@ -987,7 +1021,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.PermanentBeam = permanentBeamSword;
         properties.UseCommunityText = useCommunityText;
         properties.StartAtk = startingAttackLevel;
-        properties.StartMag = startingMagicLevel;
+        properties.StartingMagicLevel = startingMagicLevel;
         properties.StartLifeLvl = startingLifeLevel;
 
         //Overworld
@@ -1755,7 +1789,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             };
         }
 
-        int containerReplacementSmallItemsCount = maxHeartContainers switch
+        int heartContainerReplacementSmallItemsCount = maxHeartContainers switch
         {
             MaxHeartsOption.EIGHT => 4 - (8 - (startingHeartContainersMax ?? 8)),
             MaxHeartsOption.SEVEN => 4 - (7 - (startingHeartContainersMax ?? 8)),
@@ -1773,7 +1807,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             _ => throw new Exception("Unrecognized Max Hearts in CountPossibleMinorItems")
         };
 
-        count += containerReplacementSmallItemsCount;
+        count += heartContainerReplacementSmallItemsCount;
+
+        count += 4 - (8 - (startingMagicContainersMax ?? 8));
 
         return count;
     }

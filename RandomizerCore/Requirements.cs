@@ -12,6 +12,15 @@ namespace Z2Randomizer.RandomizerCore;
 public class Requirements
 {
     public static readonly Requirements NONE = new();
+
+    private static readonly Dictionary<RequirementType, RequirementType[]> ImplicitRequirements = new()
+    {
+        {RequirementType.JUMP, [RequirementType.TWO_CONTAINERS] },
+        {RequirementType.FAIRY, [RequirementType.FOUR_CONTAINERS] },
+        {RequirementType.REFLECT, [RequirementType.FOUR_CONTAINERS] },
+        {RequirementType.SPELL, [RequirementType.FOUR_CONTAINERS] },
+    };
+
     public RequirementType[] IndividualRequirements { get; private set; }
     public RequirementType[][] CompositeRequirements { get; private set; }
 
@@ -82,9 +91,12 @@ public class Requirements
         return Serialize();
     }
 
-    public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables)
+    public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables, bool enforceImplicitRequirements = true)
     {
-
+        if(IndividualRequirements.Length + CompositeRequirements.Length == 0)
+        {
+            return true;
+        }
         var individualRequirementsSatisfied = false;
         var requirementTypes = requireables as RequirementType[] ?? requireables.ToArray();
         foreach (var requirement in IndividualRequirements)
@@ -92,19 +104,49 @@ public class Requirements
             if (requirementTypes.Contains(requirement))
             {
                 individualRequirementsSatisfied = true;
-                break;
+                if (enforceImplicitRequirements && ImplicitRequirements.ContainsKey(requirement))
+                { 
+                    foreach(RequirementType implicitRequirement in ImplicitRequirements[requirement])
+                    {
+                        if(!requirementTypes.Contains(implicitRequirement))
+                        {
+                            individualRequirementsSatisfied = false;
+                            continue;
+                        }
+                    }
+                }
+                if (individualRequirementsSatisfied)
+                {
+                    break;
+                }
             }
         }
 
-        if(IndividualRequirements.Length > 0 && !individualRequirementsSatisfied)
+        bool compositeRequirementSatisfied = false;
+        foreach (RequirementType[] compositeRequirement in CompositeRequirements)
         {
-            return false;
+            if(compositeRequirement.All(i => requireables.Contains(i)))
+            {
+                compositeRequirementSatisfied = true;
+            }
+            if(enforceImplicitRequirements)
+            {
+                foreach(RequirementType component in compositeRequirement)
+                {
+                    if (ImplicitRequirements.TryGetValue(component, out RequirementType[]? implicitRequirements) 
+                        && implicitRequirements.Any(i => !requireables.Contains(i)))
+                    {
+                        compositeRequirementSatisfied = false;
+                        break;
+                    }
+                }
+            }
+            if(compositeRequirementSatisfied == true)
+            {
+                break;
+            }
         }
-
-        var compositeRequirementSatisfied = 
-            CompositeRequirements.Length == 0 || CompositeRequirements.Any(compositeRequirement =>
-            compositeRequirement.All(i => requirementTypes.Contains(i)));
-        return (IndividualRequirements.Length > 0 && individualRequirementsSatisfied) || compositeRequirementSatisfied;
+        return individualRequirementsSatisfied || compositeRequirementSatisfied;
     }
 
     public Requirements WithHardRequirement(RequirementType requirement)
