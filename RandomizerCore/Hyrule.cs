@@ -2271,6 +2271,11 @@ public class Hyrule
         rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
         rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
         rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        // remove leftmost pixels on the life L symbol to align it better
+        byte[] modifiedLifeBarChar = [0x7e, 0x5e, 0x5e, 0x5e, 0x5e, 0x42, 0x7e, 0x00];
+        for (int i = 0; i < 13; i++) {
+            ROMData.Put(ROM.ChrRomOffset + 0x2000 * i + 0x1f78, modifiedLifeBarChar);
+        }
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
@@ -2701,7 +2706,7 @@ public class Hyrule
         // Add marker for linked fire. Do this before old spell name shuffle so this gets shuffled in there too
         if (props.CombineFire)
         {
-            ROMData.Put(0x1c72, [..ROM.StringToZ2Bytes("FIRE..."), 0xF7]);
+            ROMData.Put(0x1c72, [..ROM.StringToZ2Bytes("FIRE"), 0xF7]);
         }
 
         // Use the vanilla spell order for the spells if the wizards aren't guaranteed to have a spell
