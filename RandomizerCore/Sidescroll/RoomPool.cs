@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -18,12 +17,11 @@ public class RoomPool
     public Room VanillaBossRoom { get; set; }
     public Dictionary<string, Room> LinkedRooms { get; } = [];
     public Dictionary<Direction, TableWeightedRandom<Room>> ItemRoomsByDirection { get; set; } = [];
-    public MultiValueDictionary<RoomExitType, Room> ItemRoomsByShape { get; set; } = [];
+    /// keeping this private so callers do not access the keys in non-deterministic ways
+    private Dictionary<RoomExitType, List<Room>> ItemRoomsByShape { get; set; } = [];
     public Dictionary<RoomExitType, Room> DefaultStubsByDirection { get; set; } = [];
     public Room DefaultUpEntrance { get; }
     public Room DefaultDownBossRoom { get; }
-
-    private PalaceRooms palaceRooms;
 
 #pragma warning disable CS8618 
     protected RoomPool() { }
@@ -33,7 +31,6 @@ public class RoomPool
 
     public RoomPool(RoomPool target)
     {
-        palaceRooms = target.palaceRooms;
         NormalRooms.AddRange(target.NormalRooms);
         Entrances.AddRange(target.Entrances);
         BossRooms.AddRange(target.BossRooms);
@@ -42,17 +39,18 @@ public class RoomPool
         VanillaBossRoom = target.VanillaBossRoom;
         DefaultUpEntrance = target.DefaultUpEntrance;
         DefaultDownBossRoom = target.DefaultDownBossRoom;
-        foreach (var room in target.LinkedRooms)
+        foreach (var pair in target.LinkedRooms)
         {
-            LinkedRooms.Add(room.Key, room.Value);
+            LinkedRooms.Add(pair.Key, pair.Value);
         }
-        foreach (var key in target.ItemRoomsByDirection.Keys)
+        foreach (var direction in target.ItemRoomsByDirection.Keys)
         {
-            ItemRoomsByDirection[key] = target.ItemRoomsByDirection[key];
+            ItemRoomsByDirection[direction] = target.ItemRoomsByDirection[direction];
         }
-        foreach (var key in target.ItemRoomsByShape.Keys)
+        foreach (var shape in target.ItemRoomsByShape.Keys)
         {
-            ItemRoomsByShape.AddRange(key, target.ItemRoomsByShape[key]);
+            var ls = target.ItemRoomsByShape[shape];
+            ItemRoomsByShape[shape] = ls.ToList();
         }
         foreach (var key in target.DefaultStubsByDirection.Keys)
         {
@@ -62,7 +60,6 @@ public class RoomPool
 
     public RoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
-        this.palaceRooms = palaceRooms;
         Dictionary<Direction, Dictionary<Room, int>> roomDirectionWeightsByDirection = [];
         roomDirectionWeightsByDirection.Add(Direction.NORTH, []);
         roomDirectionWeightsByDirection.Add(Direction.SOUTH, []);
@@ -94,9 +91,12 @@ public class RoomPool
                     roomDirectionWeightsByDirection[direction].Add(room, 5 - weights.Count(i => i));
                 }
             }
-            foreach(RoomExitType itemRoomExitType in palaceRooms.ItemRooms(RoomGroup.VANILLA).Select(i => i.CategorizeExits()).Distinct())
+            foreach(var shape in palaceRooms.ItemRooms(RoomGroup.VANILLA).Select(i => i.CategorizeExits()).Distinct())
             {
-                ItemRoomsByShape.AddRange(itemRoomExitType, palaceRooms.ItemRoomsByShape(RoomGroup.VANILLA, itemRoomExitType));
+                var newRooms = palaceRooms.ItemRoomsByShape(RoomGroup.VANILLA, shape);
+                var ls = ItemRoomsByShape.GetValueOrDefault(shape, []);
+                ls.AddRange(newRooms);
+                ItemRoomsByShape[shape] = ls;
             }
         }
 
@@ -122,6 +122,13 @@ public class RoomPool
                     roomDirectionWeightsByDirection[direction].Add(room, 5 - weights.Count(i => i));
                 }
             }
+            foreach (var shape in palaceRooms.ItemRooms(RoomGroup.V4_0).Select(i => i.CategorizeExits()).Distinct())
+            {
+                var newRooms = palaceRooms.ItemRoomsByShape(RoomGroup.V4_0, shape);
+                var ls = ItemRoomsByShape.GetValueOrDefault(shape, []);
+                ls.AddRange(newRooms);
+                ItemRoomsByShape[shape] = ls;
+            }
         }
 
         if (props.AllowV5_0Rooms)
@@ -146,9 +153,12 @@ public class RoomPool
                     roomDirectionWeightsByDirection[direction].Add(room, 5 - weights.Count(i => i));
                 }
             }
-            foreach (RoomExitType itemRoomExitType in palaceRooms.ItemRooms(RoomGroup.V5_0).Select(i => i.CategorizeExits()).Distinct())
+            foreach (var shape in palaceRooms.ItemRooms(RoomGroup.V5_0).Select(i => i.CategorizeExits()).Distinct())
             {
-                ItemRoomsByShape.AddRange(itemRoomExitType, palaceRooms.ItemRoomsByShape(RoomGroup.V5_0, itemRoomExitType));
+                var newRooms = palaceRooms.ItemRoomsByShape(RoomGroup.V5_0, shape);
+                var ls = ItemRoomsByShape.GetValueOrDefault(shape, []);
+                ls.AddRange(newRooms);
+                ItemRoomsByShape[shape] = ls;
             }
         }
         else
@@ -167,9 +177,9 @@ public class RoomPool
         }
 
         List<(RoomExitType, Room)> linkedRoomShapes = [];
-        foreach(KeyValuePair<RoomExitType, HashSet<Room>> entry in ItemRoomsByShape)
+        foreach (var pair in ItemRoomsByShape)
         {
-            foreach(Room room in entry.Value)
+            foreach(Room room in pair.Value)
             {
                 if(room.LinkedRoomName != null)
                 {
@@ -178,12 +188,13 @@ public class RoomPool
                 }
             }
         }
-        foreach((RoomExitType, Room) linkedRoom in linkedRoomShapes)
+        foreach((RoomExitType shape, Room room) in linkedRoomShapes)
         {
-            ItemRoomsByShape[linkedRoom.Item2.CategorizeExits()].Remove(linkedRoom.Item2);
-            ItemRoomsByShape.Add(linkedRoom.Item1, linkedRoom.Item2);
+            ItemRoomsByShape[room.CategorizeExits()].Remove(room);
+            var ls = ItemRoomsByShape.GetValueOrDefault(shape, []);
+            ls.Add(room);
+            ItemRoomsByShape[shape] = ls;
         }
-
 
         //If we're using a room set that has no entraces, we still need to have something, so add the vanilla entrances.
         if (Entrances.Count == 0)
@@ -256,7 +267,31 @@ public class RoomPool
         {
             RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
             RemoveRooms(room => !room.IsTraversable(allowedBlockers));
+            foreach (var key in ItemRoomsByDirection.Keys)
+            {
+                Dictionary<Room, int> updatedWeights = [];
+                foreach (Room room in ItemRoomsByDirection[key].Keys())
+                {
+                    if (room.IsTraversable(allowedBlockers))
+                    {
+                        updatedWeights.Add(room, ItemRoomsByDirection[key].Weight(room));
+                    }
+                }
+                ItemRoomsByDirection[key] = new TableWeightedRandom<Room>(updatedWeights);
+            }
         }
+    }
+
+    public IEnumerable<RoomExitType> GetItemRoomShapes()
+    {
+        var keys = ItemRoomsByShape.Keys;
+        // workaround for our map type not having a deterministic order
+        return RoomExitTypeExtensions.ALL.Where(keys.Contains);
+    }
+
+    public List<Room> GetItemRoomsForShape(RoomExitType itemRoomExitType)
+    {
+        return ItemRoomsByShape[itemRoomExitType];
     }
 
     public void RemoveDuplicates(RandomizerProperties props, Room roomThatWasUsed)
@@ -321,7 +356,7 @@ public class RoomPool
 
         foreach (var key in ItemRoomsByShape.Keys)
         {
-            ItemRoomsByShape[key].RemoveWhere(room => RoomMatchesIncludingLinked(room, removalCondition));
+            ItemRoomsByShape[key].RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
         }
     }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -39,6 +40,8 @@ public enum RoomExitType
 
 public static class RoomExitTypeExtensions
 {
+    public static RoomExitType[] ALL = Enum.GetValues(typeof(RoomExitType)).Cast<RoomExitType>().ToArray();
+
     public const int LEFT = 0b00010000;
     public const int DOWN = 0b00001000;
     public const int DROP = 0b00000100;
