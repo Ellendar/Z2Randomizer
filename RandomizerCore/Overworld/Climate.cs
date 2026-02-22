@@ -55,7 +55,7 @@ public class Climate
 
     public void DisallowTerrain(Terrain terrain)
     {
-        weightedSampler = weightedSampler.Remove(terrain);
+        weightedSampler = weightedSampler.Subtract(terrain);
     }
 
     public Climate Clone()

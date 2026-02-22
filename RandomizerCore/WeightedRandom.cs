@@ -10,7 +10,7 @@ public interface IWeightedSampler<T>
 {
     T Next(Random r);
     IEnumerable<T> Keys();
-    IWeightedSampler<T> Remove(T t);
+    IWeightedSampler<T> Subtract(T t);
     int Weight(T t);
     IWeightedSampler<T> Clone();
 }
@@ -77,7 +77,7 @@ public class TableWeightedRandom<T> : IWeightedSampler<T>
 
     /// Note: This returns a new copy of the class. This is pretty slow,
     /// but also needing this should be avoided in the first place.
-    public IWeightedSampler<T> Remove(T t)
+    public IWeightedSampler<T> Subtract(T t)
     {
         if (!_weights.ContainsKey(t))
         {
@@ -168,7 +168,7 @@ public class LinearWeightedRandom<T> : IWeightedSampler<T>
         return _values;
     }
 
-    public IWeightedSampler<T> Remove(T t)
+    public IWeightedSampler<T> Subtract(T t)
     {
         int i = 0;
         int length = _values.Length;
