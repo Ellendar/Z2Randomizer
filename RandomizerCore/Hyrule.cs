@@ -2235,6 +2235,11 @@ public class Hyrule
         rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
         rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
         rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        // remove leftmost pixels on the life L symbol to align it better
+        byte[] modifiedLifeBarChar = [0x7e, 0x5e, 0x5e, 0x5e, 0x5e, 0x42, 0x7e, 0x00];
+        for (int i = 0; i < 13; i++) {
+            ROMData.Put(ROM.ChrRomOffset + 0x2000 * i + 0x1f78, modifiedLifeBarChar);
+        }
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
@@ -2657,10 +2662,16 @@ public class Hyrule
         int spellNameBase = 0x1c3a, effectBase = 0x00e58, spellCostBase = 0xd8b, functionBase = 0xdcb;
 
         int[,] magLevels = new int[8, 8];
-        int[,] magNames = new int[8, 7];
+        int[,] magNames = new int[8, 8];
         int[] magEffects = new int[16];
         int[] magFunction = new int[8];
         //ROMData.UpdateWizardText(WizardCollectables);
+
+        // Add marker for linked fire. Do this before old spell name shuffle so this gets shuffled in there too
+        if (props.CombineFire)
+        {
+            ROMData.Put(0x1c72, [..ROM.StringToZ2Bytes("FIRE"), 0xF7]);
+        }
 
         // Use the vanilla spell order for the spells if the wizards aren't guaranteed to have a spell
         // This was overwhelmingly the favorite in the community vote;
@@ -2701,7 +2712,7 @@ public class Hyrule
                     magLevels[i, j] = ROMData.GetByte(spellCostBase + (wizardCollectables[i].VanillaSpellOrder() * 8 + j));
                 }
 
-                for (int j = 0; j < 7; j++)
+                for (int j = 0; j < 8; j++)
                 {
                     magNames[i, j] = ROMData.GetByte(spellNameBase + (wizardCollectables[i].VanillaSpellOrder() * 0xe + j));
                 }
@@ -2725,7 +2736,7 @@ public class Hyrule
                     ROMData.Put(spellCostBase + (i * 8) + j, (byte)magLevels[i, j]);
                 }
 
-                for (int j = 0; j < 7; j++)
+                for (int j = 0; j < 8; j++)
                 {
                     ROMData.Put(spellNameBase + (i * 0xe) + j, (byte)magNames[i, j]);
                 }
@@ -2735,11 +2746,6 @@ public class Hyrule
             {
                 ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i, props.StartsWithCollectable(wizardCollectables[i]) ? (byte)1 : (byte)0);
             }
-        }
-        //
-        if(props.CombineFire)
-        {
-            ROMData.Put(0x1c76, 0xFB);
         }
         //fix for rope graphical glitch
         for (int i = 0; i < 16; i++)
