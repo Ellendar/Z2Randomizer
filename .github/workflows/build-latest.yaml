@@ -5,6 +5,7 @@ on:
     branches:
     - main
     - testing
+    - '5.1'
 
 env:
   # I'm not a fan of the telemetry as-is, but this also suppresses some lines in the build log.
