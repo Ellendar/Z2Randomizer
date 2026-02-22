@@ -23,8 +23,6 @@ public class RoomPool
     public Room DefaultUpEntrance { get; }
     public Room DefaultDownBossRoom { get; }
 
-    private PalaceRooms palaceRooms;
-
 #pragma warning disable CS8618 
     protected RoomPool() { }
 #pragma warning restore CS8618 
@@ -33,7 +31,6 @@ public class RoomPool
 
     public RoomPool(RoomPool target)
     {
-        palaceRooms = target.palaceRooms;
         NormalRooms.AddRange(target.NormalRooms);
         Entrances.AddRange(target.Entrances);
         BossRooms.AddRange(target.BossRooms);
@@ -63,7 +60,6 @@ public class RoomPool
 
     public RoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
-        this.palaceRooms = palaceRooms;
         Dictionary<Direction, Dictionary<Room, int>> roomDirectionWeightsByDirection = [];
         roomDirectionWeightsByDirection.Add(Direction.NORTH, []);
         roomDirectionWeightsByDirection.Add(Direction.SOUTH, []);
@@ -271,6 +267,18 @@ public class RoomPool
         {
             RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
             RemoveRooms(room => !room.IsTraversable(allowedBlockers));
+            foreach (var key in ItemRoomsByDirection.Keys)
+            {
+                Dictionary<Room, int> updatedWeights = [];
+                foreach (Room room in ItemRoomsByDirection[key].Keys())
+                {
+                    if (room.IsTraversable(allowedBlockers))
+                    {
+                        updatedWeights.Add(room, ItemRoomsByDirection[key].Weight(room));
+                    }
+                }
+                ItemRoomsByDirection[key] = new TableWeightedRandom<Room>(updatedWeights);
+            }
         }
     }
 
