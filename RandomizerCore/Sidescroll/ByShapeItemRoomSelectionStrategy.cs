@@ -12,7 +12,8 @@ internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy
 
     public override Room[] SelectItemRooms(Palace palace, RoomPool roomPool, int itemRoomCount, Random r)
     {
-        List<RoomExitType> possibleItemRoomExitTypes = ShuffleItemRoomShapes(roomPool.ItemRoomsByShape.Keys.ToList(), r);
+        var shapesInPool = roomPool.GetItemRoomShapes();
+        List<RoomExitType> possibleItemRoomExitTypes = ShuffleItemRoomShapes(shapesInPool, r);
         List<Room> itemRooms = [];
         List<Coord> replacedCoords = [];
         int itemRoomNumber = 0;
@@ -20,7 +21,7 @@ internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy
         while (itemRoomNumber < itemRoomCount)
         {
             RoomExitType itemRoomExitType = possibleItemRoomExitTypes[0];
-            List<Room> itemRoomCandidates = roomPool.ItemRoomsByShape[itemRoomExitType].ToList();
+            List<Room> itemRoomCandidates = roomPool.GetItemRoomsForShape(itemRoomExitType).ToList();
             itemRoomCandidates.FisherYatesShuffle(r);
 
             bool itemRoomPlaced = false;
@@ -73,7 +74,7 @@ internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy
         }
         return [];
     }
-    private static List<RoomExitType> ShuffleItemRoomShapes(List<RoomExitType> possibleItemRoomExitTypes, Random r)
+    private static List<RoomExitType> ShuffleItemRoomShapes(IEnumerable<RoomExitType> possibleItemRoomExitTypes, Random r)
     {
         List<RoomExitType> priorityShapes = [.. possibleItemRoomExitTypes.Where(i => PRIORITY_ROOM_SHAPES.Contains(i))];
         List<RoomExitType> nonPriorityShapes = [.. possibleItemRoomExitTypes.Where(i => !PRIORITY_ROOM_SHAPES.Contains(i))];
