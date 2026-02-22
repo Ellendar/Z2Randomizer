@@ -74,15 +74,14 @@ public class Location
         }
     }
 
-    public bool NeedJump { get; set; }
-
-    public bool NeedHammer { get; set; }
-    public bool NeedBoots { get; set; }
-    public bool NeedFairy { get; set; }
-
-    public bool NeedRecorder { get; set; }
-
-    public bool NeedBagu { get; set; }
+    //List of requirements to access this location. Required before the other requirements are evaluated,
+    //and to pass through the location on the map, even if the collectable is not gettable.
+    public Requirements AccessRequirements;
+    //Requirements to get the thing(s) here. For palaces, this does not (yet) consider the layout of the palace or the rooms in it
+    //only the general "need fairy or key" requirements for palaces generally
+    public Requirements CollectableRequirements;
+    //If this location is a connector, these are the requirements for the other side of the connection to be reached
+    public Requirements ConnectionRequirements;
 
     //This does 2 things and should only do 1. It both tracks whether the location is a location that should be possible to shuffle,
     //and tracks whether this location has actually been shuffled already. This persistence doesn't always get reset properly,
@@ -172,6 +171,9 @@ public class Location
         Continent = continent;
         VanillaContinent = continent;
         ConnectedContinent = null;
+        AccessRequirements = Requirements.NONE;
+        CollectableRequirements = Requirements.NONE;
+        ConnectionRequirements = Requirements.NONE;
 
         //Shoutouts to thetruekingofspace for datamining this
         Name = (Continent, YRaw, Xpos, Map) switch
@@ -363,7 +365,7 @@ public class Location
     public byte[] GetLocationBytes()
     {
         byte[] bytes = new byte[4];
-        if (NeedHammer || NeedRecorder)
+        if(AccessRequirements.HasHardRequirement(RequirementType.HAMMER) || AccessRequirements.HasHardRequirement(RequirementType.FLUTE))
         {
             bytes[0] = 0;
         }

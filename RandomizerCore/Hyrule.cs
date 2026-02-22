@@ -93,11 +93,12 @@ public class Hyrule
     //public SortedDictionary<String, List<Location>> areasByLocation;
     //public Dictionary<Location, String> section;
     private int accessibleMagicContainers;
-    private int heartContainers;
+    private int accessibleHeartContainers;
     private int startHearts;
+    private int startMagicContainers = 4; //Not for long maybe
     private int maxHearts;
+    private int maxMagicContainers = 8; //Probably true for much longer
     private int heartContainersInItemPool;
-    private int kasutoJars;
 
     //private Character character;
 
@@ -117,7 +118,7 @@ public class Hyrule
 
     //DEBUG/STATS
 #pragma warning disable CS0414 // Field is assigned but its value is never used
-    private static int DEBUG_THRESHOLD = 200;
+    private static int DEBUG_THRESHOLD = 1;
 #pragma warning restore CS0414 // Field is assigned but its value is never used
     public DateTime startTime = DateTime.Now;
     // public DateTime startRandomizeStartingValuesTimestamp;
@@ -268,15 +269,6 @@ public class Hyrule
             // Make a copy of the vanilla data to prevent seed bleed
             ROMData = new ROM(vanillaRomData.ToArray(), true);
 
-            if (props.RandomizeNewKasutoBasementRequirement)
-            {
-                kasutoJars = r.Next(5, 8);
-            }
-            else
-            {
-                kasutoJars = 7;
-            }
-
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
             HashSet<int> freeBanks = [];
@@ -327,7 +319,7 @@ public class Hyrule
                 assembler.Add(sideviewModule);
             }
 
-            ROMData.WriteKasutoJarAmount(kasutoJars);
+            ROMData.WriteKasutoJarAmount(props.NewKasutoBasementRequirement);
             ROMData.DoHackyFixes();
             ROMData.AdjustGpProjectileDamage();
 
@@ -1245,10 +1237,12 @@ public class Hyrule
         {
             previousReachableLocationsCount = reachableLocationsCount;
             previousGettableItemsCount = gettableItemsCount;
-            westHyrule.UpdateVisit(itemGet);
-            deathMountain.UpdateVisit(itemGet);
-            eastHyrule.UpdateVisit(itemGet);
-            mazeIsland.UpdateVisit(itemGet);
+            gettableItemsCount = UpdateItemGets();
+            List<RequirementType> requireables = GetRequireables(props);
+            westHyrule.UpdateVisit(requireables);
+            deathMountain.UpdateVisit(requireables);
+            eastHyrule.UpdateVisit(requireables);
+            mazeIsland.UpdateVisit(requireables);
 
             foreach (World world in worlds)
             {
@@ -1275,10 +1269,11 @@ public class Hyrule
             gettableItemsCount = UpdateItemGets();
 
             //This 2nd pass is weird and may not need to exist, eventually I should run some stats on whether it helps or not
-            westHyrule.UpdateVisit(itemGet);
-            deathMountain.UpdateVisit(itemGet);
-            eastHyrule.UpdateVisit(itemGet);
-            mazeIsland.UpdateVisit(itemGet);
+            requireables = GetRequireables(props);
+            westHyrule.UpdateVisit(requireables);
+            deathMountain.UpdateVisit(requireables);
+            eastHyrule.UpdateVisit(requireables);
+            mazeIsland.UpdateVisit(requireables);
 
             gettableItemsCount = UpdateItemGets();
 
@@ -1308,6 +1303,7 @@ public class Hyrule
                 {
                     Debug.WriteLine("Failed on collectables");
                     PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+                    //Debug.WriteLine(GenerateSpoiler());
                     //Debug.WriteLine(westHyrule.GetMapDebug());
                     return false;
                 }
@@ -1318,16 +1314,16 @@ public class Hyrule
         if (accessibleMagicContainers != 8)
         {
             magicContainerReachableFailures++;
-            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+            PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
-        if (heartContainers < maxHearts)
+        if (accessibleHeartContainers < maxHearts)
         {
             heartContainerReachableFailures++;
-            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+            PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
-        if(heartContainers > maxHearts)
+        if(accessibleHeartContainers > maxHearts)
         {
             throw new Exception("More hearts found than should exist in the seed.");
         }
@@ -1427,113 +1423,77 @@ public class Hyrule
     /// <returns>Whether any items were marked accessable</returns>
     private int UpdateItemGets()
     {
-        //TODO: Remove all the needX flags and replace them with a set of requirements.
-
-        Location[] delayedEvaluationLocations = [eastHyrule.townAtNabooru, eastHyrule.townAtDarunia,
-            eastHyrule.townAtNewKasuto, eastHyrule.townAtOldKasuto, eastHyrule.newKasutoBasement];
-        List<RequirementType> requireables = GetRequireables();
+        List<RequirementType> requireables;
         accessibleMagicContainers = 4;
-        heartContainers = startHearts;
+        accessibleHeartContainers = startHearts;
         Location newKasuto = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO);
-        List<Collectable> gottenItems = [];
+        List<Collectable> gottenItems = [], lastIterationGottenItems = [];
         List<Location> locations = AllLocationsForReal().ToList();
-        foreach (Location location in AllLocationsForReal())
+        List<Location> heartContainerGetLocations = [], magicContainerGetLocations = [];
+        bool stalled = false;
+        //No more delayed evaluation because too many locations could give you containers or require containers.
+        //Just iterate until we find as many items as possible
+        do
         {
-            foreach (Collectable collectable in location.Collectables)
+            accessibleHeartContainers = startHearts + heartContainerGetLocations.Count;
+            accessibleMagicContainers = startMagicContainers + magicContainerGetLocations.Count;
+            requireables = GetRequireables(props);
+            gottenItems = [];
+            foreach (Location location in AllLocationsForReal())
             {
-                if (collectable.IsInternalUse() || delayedEvaluationLocations.Contains(location))
+                foreach (Collectable collectable in location.Collectables)
                 {
-                    continue;
-                }
-                bool canGet;
-                //Location is a palace
-                if (location.PalaceNumber != null && location.PalaceNumber < 7)
-                {
-                    Palace palace = palaces[(int)location.PalaceNumber - 1];
-                    canGet = CanGet(location)
-                        //All palaces inherently required fairy spell or magic key
-                        && (ItemGet[Collectable.FAIRY_SPELL] || ItemGet[Collectable.MAGIC_KEY])
-                        && palace.GetGettableItems(requireables).Contains(collectable);
-                }
-                else if (location == eastHyrule.spellTower)
-                {
-                    canGet = CanGet(location) && ItemGet[Collectable.SPELL_SPELL];
-                }
-                //Location is a town
-                else if (location.ActualTown != null
-                    && Towns.townSpellAndItemRequirements.ContainsKey(location.ActualTown ?? Town.INVALID))
-                {
-                    canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);
-                }
-                else if (!delayedEvaluationLocations.Contains(location))
-                {
-                    //TODO: Remove all the needX flags and replace them with a set of requirements.
-                    canGet = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedRecorder || ItemGet[Collectable.FLUTE]);
-                }
-                else
-                {
-                    break;
-                }
-
-                ItemGet[collectable] = canGet;
-                if (canGet)
-                {
-                    gottenItems.Add(collectable);
-                }
-
-                if (canGet && collectable == Collectable.HEART_CONTAINER)
-                {
-                    heartContainers++;
-                }
-                if (canGet && collectable == Collectable.MAGIC_CONTAINER)
-                {
-                    accessibleMagicContainers++;
-                }
-            }
-        }
-
-        //Special case for locations that could be dependent on the number of magic containers
-        foreach (Location location in delayedEvaluationLocations)
-        {
-            bool canGet;
-            if (location.ActualTown != null && Towns.townSpellAndItemRequirements.ContainsKey((Town)location.ActualTown))
-            {
-                canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);
-            }
-            else if (location == eastHyrule.newKasutoBasement)
-            {
-                canGet = CanGet(newKasuto) && accessibleMagicContainers >= kasutoJars;
-            }
-            else throw new Exception("Unrecognized delayed evaluation ItemGet location");
-
-            if (canGet)
-            {
-                foreach (Collectable item in location.Collectables)
-                {
-                    ItemGet[item] = true;
-                    gottenItems.Add(item);
-                    if (canGet && item == Collectable.HEART_CONTAINER)
+                    if (collectable.IsInternalUse())
                     {
-                        heartContainers++;
+                        continue;
                     }
-                    if (canGet && item == Collectable.MAGIC_CONTAINER)
+                    bool canGet;
+                    //Location is a palace
+                    if (location.PalaceNumber != null && location.PalaceNumber < 7)
                     {
-                        accessibleMagicContainers++;
+                        Palace palace = palaces[(int)location.PalaceNumber - 1];
+                        canGet = CanGet(location)
+                            //All palaces inherently require fairy spell or magic key
+                            && location.CollectableRequirements.AreSatisfiedBy(requireables)
+                            && palace.GetGettableItems(requireables).Contains(collectable);
+                    }
+                    else
+                    {
+                        canGet = CanGet(location) && location.CollectableRequirements.AreSatisfiedBy(requireables);
+                    }
+
+                    ItemGet[collectable] = canGet;
+                    if (canGet)
+                    {
+                        gottenItems.Add(collectable);
+                    }
+
+                    if (canGet && collectable == Collectable.HEART_CONTAINER && !heartContainerGetLocations.Contains(location))
+                    {
+                        heartContainerGetLocations.Add(location);
+                    }
+                    if (canGet && collectable == Collectable.MAGIC_CONTAINER && !magicContainerGetLocations.Contains(location))
+                    {
+                        magicContainerGetLocations.Add(location);
                     }
                 }
             }
-        }
+            stalled = lastIterationGottenItems.SequenceEqual(gottenItems);
+            lastIterationGottenItems = new(gottenItems);
+        } while (!stalled);
 
+        accessibleHeartContainers = startHearts + heartContainerGetLocations.Count;
+        accessibleMagicContainers = startMagicContainers + magicContainerGetLocations.Count;  
         return gottenItems.Count;
     }
 
-    public List<RequirementType> GetRequireables()
+    public List<RequirementType> GetRequireables(RandomizerProperties props)
     {
         List<RequirementType> requireables = new();
 
         foreach(Collectable item in ItemGet.Keys)
         {
-            if (ItemGet[item] && item.AsRequirement() != null)
+            if (item.AsRequirement() != null && (ItemGet[item] || props.StartsWithCollectable(item)))
             {
                 RequirementType? reqirement = item.AsRequirement();
                 if(reqirement != null)
@@ -1542,20 +1502,24 @@ public class Hyrule
                 }
             }
         }
-        
-        if (accessibleMagicContainers >= 5 || props.DisableMagicRecs)
+
+        if (accessibleMagicContainers >= 4)
+        {
+            requireables.Add(RequirementType.FOUR_CONTAINERS);
+        }
+        if (accessibleMagicContainers >= 5)
         {
             requireables.Add(RequirementType.FIVE_CONTAINERS);
         }
-        if (accessibleMagicContainers >= 6 || props.DisableMagicRecs)
+        if (accessibleMagicContainers >= 6)
         {
             requireables.Add(RequirementType.SIX_CONTAINERS);
         }
-        if (accessibleMagicContainers >= 7 || props.DisableMagicRecs)
+        if (accessibleMagicContainers >= 7)
         {
             requireables.Add(RequirementType.SEVEN_CONTAINERS);
         }
-        if (accessibleMagicContainers == 8 || props.DisableMagicRecs)
+        if (accessibleMagicContainers == 8)
         {
             requireables.Add(RequirementType.EIGHT_CONTAINERS);
         }

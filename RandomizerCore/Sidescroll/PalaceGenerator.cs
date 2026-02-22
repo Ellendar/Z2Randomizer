@@ -69,6 +69,7 @@ public abstract class PalaceGenerator
             case PalaceStyle.VANILLA:
             case PalaceStyle.SHUFFLED:
             case PalaceStyle.TOWER:
+            case PalaceStyle.SEQUENTIAL:
             case PalaceStyle.RANDOM_WALK: // not implemented
                 return;
         }

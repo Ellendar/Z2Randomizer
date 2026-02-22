@@ -12,6 +12,7 @@ public enum RequirementType
     GLOVE, 
     REFLECT, 
     SPELL, 
+    FOUR_CONTAINERS,
     FIVE_CONTAINERS, 
     SIX_CONTAINERS, 
     SEVEN_CONTAINERS, 
@@ -20,5 +21,9 @@ public enum RequirementType
     MEDICINE, 
     CHILD,
     MIRROR,
-    WATER
+    WATER,
+    BOOTS,
+    FLUTE,
+    HAMMER,
+    BAGU_LETTER
 }

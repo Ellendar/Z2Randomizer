@@ -118,7 +118,7 @@ public class Palaces
             palaces.Add(palace);
         }
 
-        palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.AddHardRequirement(RequirementType.REFLECT);
+        palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.WithHardRequirement(RequirementType.REFLECT);
         foreach (Room room in palaces.SelectMany(i => i.ItemRooms).Where(i => i.Collectable == null))
         {
             room.Collectable = Collectable.LARGE_BAG;

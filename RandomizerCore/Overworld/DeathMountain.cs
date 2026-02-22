@@ -54,6 +54,8 @@ sealed class DeathMountain : World
             { RomMap.DM_SPEC_ROCK_TILE_LOCATION, Terrain.CAVE }
     };
 
+    //Other connections are all 1:1 but DM has 4-way connectors.
+    //Eventually this should go away and connections should just be a one-to-many
     public Dictionary<Location, List<Location>> connectionsDM;
     public Location hammerCave;
     public Location specRock;
@@ -1140,21 +1142,24 @@ sealed class DeathMountain : World
     /// <summary>
     /// Updates the visitation matrix and location reachability 
     /// </summary>
-    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
+    public override void UpdateVisit(List<RequirementType> requireables)
     {
-        UpdateReachable(itemGet);
+        UpdateReachable(requireables);
 
         foreach (Location location in AllLocations)
         {
-            if (visitation[location.Y, location.Xpos])
+            if (location.Y > 0 && visitation[location.Y, location.Xpos])
             {
-                location.Reachable = true;
-                if (connectionsDM.Keys.Contains(location))
+                if (location.AccessRequirements.AreSatisfiedBy(requireables))
                 {
-                    foreach(Location l3 in connectionsDM[location])
-                    { 
-                        l3.Reachable = true;
-                        visitation[l3.Y, l3.Xpos] = true;
+                    location.Reachable = true;
+                    if (connectionsDM.ContainsKey(location) && location.ConnectionRequirements.AreSatisfiedBy(requireables))
+                    {
+                        foreach (Location connectedLocation in connectionsDM[location])
+                        {
+                            connectedLocation.Reachable = true;
+                            visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
+                        }
                     }
                 }
             }

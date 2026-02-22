@@ -174,7 +174,7 @@ public class RandomizerProperties
     public bool RandomizeSmallItems { get; set; }
     public bool ExtraKeys { get; set; }
     public bool AllowImportantItemDuplicates { get; set; }
-    public bool RandomizeNewKasutoBasementRequirement { get; set; }
+    public int NewKasutoBasementRequirement { get; set; }
     //Include PBag caves in item shuffle
     public bool PbagItemShuffle { get; set; }
     public bool StartWithSpellItems { get; set; }

@@ -1287,7 +1287,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         //ShufflePalaceItems and MixOverworldPalaceItems moved up so they can be calculated before item room counts
         properties.RandomizeSmallItems = shuffleSmallItems;
         properties.ExtraKeys = palacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
-        properties.RandomizeNewKasutoBasementRequirement = randomizeNewKasutoJarRequirements;
+        properties.NewKasutoBasementRequirement = randomizeNewKasutoJarRequirements ? r.Next(5,8) : 7;
         properties.AllowImportantItemDuplicates = allowImportantItemDuplicates;
         properties.PbagItemShuffle = includePBagCavesInItemShuffle ?? GetIndeterminateFlagValue(r);
         properties.StartWithSpellItems = removeSpellItems ?? GetIndeterminateFlagValue(r);

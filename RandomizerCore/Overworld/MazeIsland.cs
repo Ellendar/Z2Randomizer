@@ -912,7 +912,7 @@ sealed class MazeIsland : World
             map[toY, toX] = openEast ? Terrain.WALKABLEWATER : Terrain.MOUNTAIN;
         }
     }
-    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
+    public override void UpdateVisit(List<RequirementType> requireables)
     {
         bool changed = true;
         while (changed)
@@ -924,7 +924,7 @@ sealed class MazeIsland : World
                 {
                     if (!visitation[i, j]
                     && (
-                        (map[i, j] == Terrain.WALKABLEWATER && itemGet[Collectable.BOOTS])
+                        (map[i, j] == Terrain.WALKABLEWATER && requireables.Contains(RequirementType.BOOTS))
                         || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE
                         || map[i, j] == Terrain.BRIDGE
                         || map[i, j] == Terrain.CAVE

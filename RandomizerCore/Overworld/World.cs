@@ -53,6 +53,8 @@ public abstract class World
 
     private const int MINIMUM_BRIDGE_LENGTH = 2;
 
+    protected readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new Requirements([RequirementType.FAIRY, RequirementType.KEY]);
+
     private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
     {
         { Biome.ISLANDS, 10 },
@@ -298,7 +300,7 @@ public abstract class World
                     && location.CanShuffle
                     && !unimportantLocs.Contains(location)
                     && location.PassThrough == 0)
-                || location.NeedHammer)
+                || location.AccessRequirements.HasHardRequirement(RequirementType.HAMMER))
             {
                 int x, y;
                 //Place the location in a spot that is not adjacent to any other location
@@ -1688,7 +1690,7 @@ public abstract class World
         return true;
     }
   
-    protected void UpdateReachable(Dictionary<Collectable, bool> itemGet)
+    protected void UpdateReachable(List<RequirementType> requireables)
     {
 
         List<Location> starts = GetPathingStarts();
@@ -1707,7 +1709,7 @@ public abstract class World
         {
             if (start.Y >= 0 && start.Xpos >= 0)
             {
-                UpdateReachable(ref covered, start.Y, start.Xpos, itemGet);
+                UpdateReachable(ref covered, start.Y, start.Xpos, requireables);
             }
         }
 
@@ -1720,7 +1722,7 @@ public abstract class World
     }
 
     //This signature has gotten out of control, consider a refactor
-    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, Dictionary<Collectable, bool> itemGet)
+    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, List<RequirementType> requireables)
     {
         Stack<(int, int)> to_visit = new();
         // push the initial coord to the visitation stack
@@ -1747,22 +1749,10 @@ public abstract class World
                     || terrain == Terrain.PALACE
                     || terrain == Terrain.TOWN
                     || walkableTerrains.Contains(terrain)
-                    || (terrain == Terrain.WALKABLEWATER && itemGet[Collectable.BOOTS])
-                    || (terrain == Terrain.ROCK && itemGet[Collectable.HAMMER])
-                    || (terrain == Terrain.RIVER_DEVIL && itemGet[Collectable.FLUTE]))
-
-                    //East desert jump blocker
-                    && !(
-                        location != null
-                        && location.NeedJump
-                        && (!itemGet[Collectable.JUMP_SPELL] && !itemGet[Collectable.FAIRY_SPELL])
-                    )
-                    //Fairy cave is traversable
-                    && !(
-                        location != null
-                        && location.NeedFairy 
-                        && !itemGet[Collectable.FAIRY_SPELL]
-                    )
+                    || (terrain == Terrain.WALKABLEWATER && requireables.Contains(RequirementType.BOOTS))
+                    || (terrain == Terrain.ROCK && requireables.Contains(RequirementType.HAMMER))
+                    || (terrain == Terrain.RIVER_DEVIL && requireables.Contains(RequirementType.FLUTE)))
+                    && (location == null || location!.AccessRequirements.AreSatisfiedBy(requireables))
                 )
                 {
                     visitation[y, x] = true;
@@ -3061,7 +3051,7 @@ public abstract class World
         }
     }
 
-    public abstract void UpdateVisit(Dictionary<Collectable, bool> itemGet);
+    public abstract void UpdateVisit(List<RequirementType> requireables);
 
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 

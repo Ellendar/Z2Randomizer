@@ -79,9 +79,6 @@ public sealed class EastHyrule : World
     public Location pbagCave1;
     public Location pbagCave2;
     private bool canyonShort;
-    //I'm not sure precisely what these are supposed to track, but they're never initialized so apparently nothing
-    //private Location vodcave1;
-    //private Location vodcave2;
     public Location hiddenPalaceLocation;
     public Location hiddenKasutoLocation;
     public (int, int) hiddenPalaceCoords;
@@ -155,37 +152,48 @@ public sealed class EastHyrule : World
         connections.Add(GetLocationByMem(RomMap.EAST_CAVE_VOD_PASSTHROUGH1_END_LOCATION), GetLocationByMem(RomMap.EAST_CAVE_VOD_PASSTHROUGH1_START_LOCATION));
         connections.Add(GetLocationByMem(RomMap.EAST_CAVE_VOD_PASSTHROUGH1_START_LOCATION), GetLocationByMem(RomMap.EAST_CAVE_VOD_PASSTHROUGH1_END_LOCATION));
 
-        locationAtPalace6 = GetLocationByMem(RomMap.EAST_PALACE6_TILE_LOCATION);
-        locationAtPalace6.PalaceNumber = 6;
-        townAtDarunia = GetLocationByMem(RomMap.EAST_TOWN_OF_DARUNIA_TILE_LOCATION);
+        //Palaces
         locationAtPalace5 = GetLocationByMem(RomMap.EAST_PALACE5_TILE_LOCATION);
         locationAtPalace5.PalaceNumber = 5;
+        locationAtPalace5.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
 
+        locationAtPalace6 = GetLocationByMem(RomMap.EAST_PALACE6_TILE_LOCATION);
+        locationAtPalace6.PalaceNumber = 6;
+        locationAtPalace5.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
+
+        locationAtGP = GetLocationByMem(RomMap.EAST_GREAT_PALACE_TILE_LOCATION);
+        locationAtGP.PalaceNumber = 7;
+        locationAtGP.VanillaCollectable = Collectable.DO_NOT_USE;
+        locationAtGP.Collectables = [];
+
+        //Towns
         townAtNabooru = GetLocationByMem(RomMap.EAST_TOWN_OF_NABOORU_TILE_LOCATION);
         townAtNabooru.VanillaCollectable = props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL;
         townAtNabooru.Collectables = props.ReplaceFireWithDash ? [Collectable.DASH_SPELL] : [Collectable.FIRE_SPELL];
+        townAtNabooru.CollectableRequirements = props.DisableMagicRecs ?
+            new Requirements([RequirementType.WATER])
+            : new Requirements([], [[RequirementType.WATER, RequirementType.FIVE_CONTAINERS]]);
+
         townAtDarunia = GetLocationByMem(RomMap.EAST_TOWN_OF_DARUNIA_TILE_LOCATION);
         townAtDarunia.VanillaCollectable = Collectable.REFLECT_SPELL;
         townAtDarunia.Collectables = [Collectable.REFLECT_SPELL];
+        townAtDarunia.CollectableRequirements = props.DisableMagicRecs ?
+            new Requirements([RequirementType.CHILD])
+            : new Requirements([], [[RequirementType.CHILD, RequirementType.SIX_CONTAINERS]]);
 
         townAtNewKasuto = GetLocationByMem(RomMap.EAST_TOWN_OF_NEW_KASUTO_TILE_LOCATION);
         townAtNewKasuto.VanillaCollectable = Collectable.SPELL_SPELL;
         townAtNewKasuto.Collectables = [Collectable.SPELL_SPELL];
+        townAtNewKasuto.CollectableRequirements = props.DisableMagicRecs ? Requirements.NONE : new Requirements([RequirementType.SEVEN_CONTAINERS]);
 
         townAtOldKasuto = GetLocationByMem(RomMap.EAST_TOWN_OF_OLD_KASUTO_TILE_LOCATION);
         townAtOldKasuto.VanillaCollectable = Collectable.THUNDER_SPELL;
         townAtOldKasuto.Collectables = [Collectable.THUNDER_SPELL];
+        townAtOldKasuto.CollectableRequirements = props.DisableMagicRecs ? Requirements.NONE : new Requirements([RequirementType.EIGHT_CONTAINERS]);
 
         waterTile = GetLocationByMem(RomMap.EAST_WATER_TILE_LOCATION);
-        waterTile.NeedBoots = true;
+        waterTile.AccessRequirements = new Requirements([RequirementType.BOOTS]);
         desertTile = GetLocationByMem(RomMap.EAST_DESERT_TILE_LOCATION);
-
-        Debug.Assert(locationAtPalace5 != null); // checking if this can be removed
-        if (locationAtPalace5 == null)
-        {
-            locationAtPalace5 = GetLocationByMem(0x8657);
-            locationAtPalace5.PalaceNumber = 5;
-        }
 
         hiddenPalaceCoords = (0, 0);
 
@@ -229,10 +237,6 @@ public sealed class EastHyrule : World
             62,             // DEATH_VALLEY_RED_JAR
         ];
 
-        locationAtGP = GetLocationByMem(RomMap.EAST_GREAT_PALACE_TILE_LOCATION);
-        locationAtGP.PalaceNumber = 7;
-        locationAtGP.VanillaCollectable = Collectable.DO_NOT_USE;
-        locationAtGP.Collectables = [];
         pbagCave1 = GetLocationByMem(RomMap.EAST_CAVE_PBAG1_LOCATION);
         pbagCave2 = GetLocationByMem(RomMap.EAST_CAVE_PBAG2_LOCATION);
         VANILLA_MAP_ADDR = 0x9056;
@@ -241,6 +245,7 @@ public sealed class EastHyrule : World
         spellTower = new Location(townAtNewKasuto);
         spellTower.VanillaCollectable = Collectable.MAGIC_KEY;
         spellTower.Collectables = [Collectable.MAGIC_KEY];
+        spellTower.CollectableRequirements = new Requirements([RequirementType.SPELL]);
         spellTower.Name = "Spell Tower";
         spellTower.CanShuffle = false;
         spellTower.ActualTown = null;
@@ -250,6 +255,13 @@ public sealed class EastHyrule : World
         newKasutoBasement = new Location(townAtNewKasuto);
         newKasutoBasement.VanillaCollectable = Collectable.MAGIC_CONTAINER;
         newKasutoBasement.Collectables = [Collectable.MAGIC_CONTAINER];
+        newKasutoBasement.CollectableRequirements = props.NewKasutoBasementRequirement switch
+        {
+            5 => new Requirements([RequirementType.FIVE_CONTAINERS]),
+            6 => new Requirements([RequirementType.SIX_CONTAINERS]),
+            7 => new Requirements([RequirementType.SEVEN_CONTAINERS]),
+            _ => throw new Exception($"Unsupported New Kasuto basement container count: {props.NewKasutoBasementRequirement}")
+        };
         newKasutoBasement.Name = "Granny's basement";
         newKasutoBasement.CanShuffle = false;
         newKasutoBasement.ActualTown = null;
@@ -268,6 +280,7 @@ public sealed class EastHyrule : World
         daruniaRoof = new Location(townAtDarunia);
         daruniaRoof.VanillaCollectable = Collectable.UPSTAB;
         daruniaRoof.Collectables = [Collectable.UPSTAB];
+        daruniaRoof.CollectableRequirements = new Requirements([RequirementType.FAIRY, RequirementType.JUMP]);
         daruniaRoof.Name = "Darunia Roof";
         daruniaRoof.ActualTown = Town.DARUNIA_ROOF;
         daruniaRoof.CanShuffle = false;
@@ -373,8 +386,7 @@ public sealed class EastHyrule : World
         foreach (Location location in AllLocations)
         {
             location.CanShuffle = true;
-            location.NeedHammer = false;
-            location.NeedRecorder = false;
+            location.AccessRequirements = location.AccessRequirements.Without([RequirementType.HAMMER, RequirementType.FLUTE]);
             if (location != raft && location != bridge && location != cave1 && location != cave2)
             {
                 location.TerrainType = terrains[location.MemAddress];
@@ -474,20 +486,20 @@ public sealed class EastHyrule : World
 
                 if (desert.PassThrough != 0)
                 {
-                    desert.NeedJump = true;
+                    desert.AccessRequirements = desert.AccessRequirements.WithHardRequirement(RequirementType.JUMP);
                 }
                 else
                 {
-                    desert.NeedJump = false;
+                    desert.AccessRequirements = desert.AccessRequirements.Without(RequirementType.JUMP);
                 }
 
                 if (swamp.PassThrough != 0)
                 {
-                    swamp.NeedFairy = true;
+                    swamp.AccessRequirements = swamp.AccessRequirements.WithHardRequirement(RequirementType.FAIRY);
                 }
                 else
                 {
-                    swamp.NeedFairy = false;
+                    swamp.AccessRequirements = swamp.AccessRequirements.Without(RequirementType.FAIRY);
                 }
 
             }
@@ -535,8 +547,7 @@ public sealed class EastHyrule : World
                 foreach (Location location in AllLocations)
                 {
                     location.CanShuffle = true;
-                    location.NeedHammer = false;
-                    location.NeedRecorder = false;
+                    location.AccessRequirements = location.AccessRequirements.Without([RequirementType.HAMMER, RequirementType.FLUTE]);
                     if (location != raft && location != bridge && location != cave1 && location != cave2)
                     {
                         location.TerrainType = terrains[location.MemAddress];
@@ -913,15 +924,15 @@ public sealed class EastHyrule : World
         {
             rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCoords, hiddenPalaceLocation,
                 townAtNewKasuto, spellTower, props.VanillaShuffleUsesActualTerrain);
-            hiddenPalaceLocation.NeedRecorder = true;
-            hiddenPalaceLocation.Children.ForEach(i => i.NeedRecorder = true);
+            hiddenPalaceLocation.AccessRequirements = hiddenPalaceLocation.AccessRequirements.WithHardRequirement(RequirementType.FLUTE);
+            hiddenPalaceLocation.Children.ForEach(i => i.AccessRequirements = i.AccessRequirements.WithHardRequirement(RequirementType.FLUTE));
         }
         if (props.HiddenKasuto)
         {
             rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome,
                 baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
-            hiddenKasutoLocation.NeedHammer = true;
-            hiddenKasutoLocation.Children.ForEach(i => i.NeedHammer = true);
+            hiddenKasutoLocation.AccessRequirements = hiddenPalaceLocation.AccessRequirements.WithHardRequirement(RequirementType.HAMMER);
+            hiddenKasutoLocation.Children.ForEach(i => i.AccessRequirements = i.AccessRequirements.WithHardRequirement(RequirementType.HAMMER));
         }
 
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Y, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
@@ -1627,7 +1638,7 @@ public sealed class EastHyrule : World
             hiddenKasutoLocation = townAtNewKasuto;
         }
         hiddenKasutoLocation.TerrainType = Terrain.FOREST;
-        hiddenKasutoLocation.NeedHammer = true;
+        hiddenKasutoLocation.AccessRequirements = hiddenKasutoLocation.AccessRequirements.WithHardRequirement(RequirementType.HAMMER);
         unimportantLocs.Remove(hiddenKasutoLocation);
         //hkLoc.CanShuffle = false;
         //map[hkLoc.Y, hkLoc.Xpos] = terrain.forest;
@@ -1736,40 +1747,22 @@ public sealed class EastHyrule : World
         }
     }
 
-    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
+    public override void UpdateVisit(List<RequirementType> requireables)
     {
-        UpdateReachable(itemGet);
+        UpdateReachable(requireables);
 
         foreach (Location location in AllLocations)
         {
             if (location.Y > 0 && visitation[location.Y, location.Xpos])
             {
-                if ((!location.NeedRecorder || (location.NeedRecorder && itemGet[Collectable.FLUTE]))
-                    && (!location.NeedHammer || (location.NeedHammer && itemGet[Collectable.HAMMER]))
-                    && (!location.NeedBoots || (location.NeedBoots && itemGet[Collectable.BOOTS])))
+                if(location.AccessRequirements.AreSatisfiedBy(requireables))
                 {
                     location.Reachable = true;
-                    if (connections.ContainsKey(location))
+                    if (connections.ContainsKey(location) && location.ConnectionRequirements.AreSatisfiedBy(requireables))
                     {
                         Location connectedLocation = connections[location];
-
-                        if (location.NeedFairy && itemGet[Collectable.FAIRY_SPELL])
-                        {
-                            connectedLocation.Reachable = true;
-                            visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
-                        }
-
-                        if (location.NeedJump && (itemGet[Collectable.JUMP_SPELL] || itemGet[Collectable.FAIRY_SPELL]))
-                        {
-                            connectedLocation.Reachable = true;
-                            visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
-                        }
-
-                        if (!location.NeedFairy && !location.NeedBagu && !location.NeedJump)
-                        {
-                            connectedLocation.Reachable = true;
-                            visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
-                        }
+                        connectedLocation.Reachable = true;
+                        visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
                     }
                 }
             }

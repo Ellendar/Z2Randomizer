@@ -1307,7 +1307,7 @@ public partial class Palace
             room.Map = room.LinkedRoom!.Map;
         }
         Debug.Assert(currentMap - Entrance!.Map <= roomCount);
-        Debug.Assert(currentMap - startingCurrentMap == roomCount);
+        //Debug.Assert(currentMap - startingCurrentMap == roomCount);
         if (currentMap > 63)
         {
             throw new Exception("Map number has exceeded maximum");

@@ -35,7 +35,6 @@ public sealed class WestHyrule : World
     public Location pbagCave;
 	
     private Location jumpCave;
-    private Location heartCave;
     private Location fairyCave;
 
     private Location parapaCave1;
@@ -121,47 +120,60 @@ public sealed class WestHyrule : World
         loadedLocations.ForEach(AddLocation);
 
         northPalace = GetLocationByMem(RomMap.WEST_NORTH_PALACE_TILE_LOCATION); //0x462f
-        jumpCave = GetLocationByMem(RomMap.WEST_CAVE_JUMP_NORTH_TILE_LOCATION); //0x463b
-        jumpCave.NeedJump = true;
         medicineCave = GetLocationByMem(RomMap.WEST_CAVE_MEDICINE_TILE_LOCATION); //0x463e
-        heartCave = GetLocationByMem(RomMap.WEST_CAVE_HEART_CONTAINER_TILE_LOCATION); //0x463f
-        fairyCave = GetLocationByMem(RomMap.WEST_FAIRY_CAVE_DROP_TILE_LOCATION); //0x4640
-        fairyCave.NeedFairy = true;
         bagu = GetLocationByMem(RomMap.WEST_BAGU_HOUSE_TILE_LOCATION); //0x4661
         bagu.ActualTown = Town.BAGU;
         bagu.Collectables = [Collectable.BAGUS_NOTE];
-
-        locationAtRauru = GetLocationByMem(RomMap.WEST_TOWN_RAURO_TILE_LOCATION);
-        locationAtRauru.Collectables = [Collectable.SHIELD_SPELL];
-        locationAtRuto = GetLocationByMem(RomMap.WEST_TOWN_RUTO_TILE_LOCATION); //0x465e
-        locationAtRuto.Collectables = [Collectable.JUMP_SPELL];
-        locationAtSariaNorth = GetLocationByMem(RomMap.WEST_TOWN_SARIA_NORTH_TILE_LOCATION); //0x00004660
-        locationAtSariaSouth = GetLocationByMem(RomMap.WEST_TOWN_SARIA_SOUTH_TILE_LOCATION); //0x0000465f
-        locationAtSariaNorth.NeedBagu = true;
-        locationAtSariaSouth.NeedBagu = true;
-        locationAtSariaNorth.Collectables = [Collectable.LIFE_SPELL];
-        locationAtMido = GetLocationByMem(RomMap.WEST_TOWN_MIDO_TILE_LOCATION); //0x00004662
-        locationAtMido.Collectables = [Collectable.FAIRY_SPELL];
-
         trophyCave = GetLocationByMem(RomMap.WEST_CAVE_TROPHY_TILE_LOCATION); //0x00004630
-        //raft = GetLocationByMem(0x4658);
-
-        locationAtPalace1 = GetLocationByMem(RomMap.WEST_PALACE1_TILE_LOCATION);
-        locationAtPalace1.PalaceNumber = 1;
-        locationAtPalace2 = GetLocationByMem(RomMap.WEST_PALACE2_TILE_LOCATION);
-        locationAtPalace2.PalaceNumber = 2;
-        locationAtPalace3 = GetLocationByMem(RomMap.WEST_PALACE3_TILE_LOCATION);
-        locationAtPalace3.PalaceNumber = 3;
-
         magicContainerCave = GetLocationByMem(RomMap.WEST_CAVE_MAGIC_CONTAINER_TILE_LOCATION);
         grassTile = GetLocationByMem(RomMap.WEST_GRASS_TILE_LOCATION);
-        heartContainerCave = GetLocationByMem(RomMap.WEST_CAVE_HEART_CONTAINER_TILE_LOCATION);
+        heartContainerCave = GetLocationByMem(RomMap.WEST_CAVE_HEART_CONTAINER_TILE_LOCATION); //0x463f
         pbagCave = GetLocationByMem(RomMap.WEST_CAVE_PBAG_TILE_LOCATION);
+
+        //Towns
+        locationAtRauru = GetLocationByMem(RomMap.WEST_TOWN_RAURO_TILE_LOCATION);
+        locationAtRauru.Collectables = [Collectable.SHIELD_SPELL];
+
+        locationAtRuto = GetLocationByMem(RomMap.WEST_TOWN_RUTO_TILE_LOCATION); //0x465e
+        locationAtRuto.Collectables = [Collectable.JUMP_SPELL];
+        locationAtRuto.CollectableRequirements = new Requirements([RequirementType.TROPHY]);
+
+        locationAtSariaNorth = GetLocationByMem(RomMap.WEST_TOWN_SARIA_NORTH_TILE_LOCATION); //0x00004660
+        locationAtSariaNorth.Collectables = [Collectable.LIFE_SPELL];
+        locationAtSariaNorth.ConnectionRequirements = new Requirements([RequirementType.FAIRY, RequirementType.BAGU_LETTER], [[RequirementType.JUMP, RequirementType.DASH]]);
+        locationAtSariaNorth.CollectableRequirements = new Requirements([RequirementType.MIRROR]);
+
+        locationAtSariaSouth = GetLocationByMem(RomMap.WEST_TOWN_SARIA_SOUTH_TILE_LOCATION); //0x0000465f
+        locationAtSariaSouth.ConnectionRequirements = locationAtSariaNorth.ConnectionRequirements;
+
+        locationAtMido = GetLocationByMem(RomMap.WEST_TOWN_MIDO_TILE_LOCATION); //0x00004662
+        locationAtMido.Collectables = [Collectable.FAIRY_SPELL];
+        locationAtMido.CollectableRequirements = new Requirements([RequirementType.MEDICINE]);
+
+        //Palaces
+        locationAtPalace1 = GetLocationByMem(RomMap.WEST_PALACE1_TILE_LOCATION);
+        locationAtPalace1.PalaceNumber = 1;
+        locationAtPalace1.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
+        locationAtPalace2 = GetLocationByMem(RomMap.WEST_PALACE2_TILE_LOCATION);
+        locationAtPalace2.PalaceNumber = 2;
+        locationAtPalace2.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
+        locationAtPalace3 = GetLocationByMem(RomMap.WEST_PALACE3_TILE_LOCATION);
+        locationAtPalace3.PalaceNumber = 3;
+        locationAtPalace3.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
+
+        //Connectors
+        fairyCave = GetLocationByMem(RomMap.WEST_FAIRY_CAVE_DROP_TILE_LOCATION); //0x4640
+        fairyCave.ConnectionRequirements = new Requirements([RequirementType.FAIRY]);
+        jumpCave = GetLocationByMem(RomMap.WEST_CAVE_JUMP_NORTH_TILE_LOCATION); //0x463b
+        jumpCave.AccessRequirements = new Requirements([RequirementType.JUMP, RequirementType.FAIRY]);
 
         parapaCave1 = GetLocationByMem(RomMap.WEST_CAVE_PARAPA_NORTH_TILE_LOCATION); //0x4639
         parapaCave2 = GetLocationByMem(RomMap.WEST_CAVE_PARAPA_SOUTH_TILE_LOCATION); //0x463a
+
+        //These are the "high sides" so they don't have connection requirements to get to the other side
         jumpCave2 = GetLocationByMem(RomMap.WEST_CAVE_JUMP_SOUTH_TILE_LOCATION); //0x463c
         fairyCave2 = GetLocationByMem(RomMap.WEST_FAIRY_CAVE_EXIT_TILE_LOCATION); //0x4641
+
         bridge1 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_WEST_LOCATION); //0x4644
         bridge2 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_EAST_LOCATION); //0x4645
 
@@ -176,6 +188,7 @@ public sealed class WestHyrule : World
 
         midoChurch = new Location(locationAtMido);
         midoChurch.Collectables = [Collectable.DOWNSTAB];
+        midoChurch.CollectableRequirements = new Requirements([RequirementType.JUMP, RequirementType.FAIRY]);
         midoChurch.ActualTown = Town.MIDO_CHURCH;
         midoChurch.Name = "Mido Church";
         midoChurch.CanShuffle = false;
@@ -1389,69 +1402,26 @@ public sealed class WestHyrule : World
     }
 
 
-    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
+    public override void UpdateVisit(List<RequirementType> requireables)
     {
         visitation[northPalace.Y, northPalace.Xpos] = true;
-        UpdateReachable(itemGet);
+        UpdateReachable(requireables);
 
         foreach (Location location in AllLocations)
         {
-            if (location.Y > 0)
+            if (location.Y > 0 && visitation[location.Y, location.Xpos])
             {
-                if (visitation[location.Y, location.Xpos])
+                if (location.AccessRequirements.AreSatisfiedBy(requireables))
                 {
                     location.Reachable = true;
-                    if (connections.Keys.Contains(location))
+                    if (connections.ContainsKey(location) && location.ConnectionRequirements.AreSatisfiedBy(requireables))
                     {
-                        Location l2 = connections[location];
-                        if (
-                            location.NeedBagu 
-                            && (itemGet[Collectable.BAGUS_NOTE]
-                                || itemGet[Collectable.FAIRY_SPELL]
-                                || (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL])))
-                        {
-                            l2.Reachable = true;
-                            visitation[l2.Y, l2.Xpos] = true;
-                        }
-
-                        if (location.NeedFairy && itemGet[Collectable.FAIRY_SPELL])
-                        {
-                            l2.Reachable = true;
-                            visitation[l2.Y, l2.Xpos] = true;
-                        }
-
-                        if (location.NeedJump && (itemGet[Collectable.JUMP_SPELL] || itemGet[Collectable.FAIRY_SPELL]))
-                        {
-                            l2.Reachable = true;
-                            visitation[l2.Y, l2.Xpos] = true;
-                        }
-
-                        if (!location.NeedFairy && !location.NeedBagu && !location.NeedJump)
-                        {
-                            l2.Reachable = true;
-                            visitation[l2.Y, l2.Xpos] = true;
-                        }
+                        Location connectedLocation = connections[location];
+                        connectedLocation.Reachable = true;
+                        visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
                     }
                 }
             }
-        }
-        Location actualSariaNorth = AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH);
-        Location actualSariaSouth = AllLocations.First(i => i.ActualTown == Town.SARIA_SOUTH);
-        if(actualSariaNorth.Reachable && 
-            (itemGet[Collectable.FAIRY_SPELL] ||
-            itemGet[Collectable.BAGUS_NOTE] ||
-            (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
-        )    
-        {
-            actualSariaSouth.Reachable = true;
-        }
-        if (actualSariaSouth.Reachable &&
-            (itemGet[Collectable.FAIRY_SPELL] ||
-            itemGet[Collectable.BAGUS_NOTE] ||
-            (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
-)
-        {
-            actualSariaNorth.Reachable = true;
         }
     }
 
