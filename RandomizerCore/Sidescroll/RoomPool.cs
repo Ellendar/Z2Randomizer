@@ -29,6 +29,8 @@ public class RoomPool
     protected RoomPool() { }
 #pragma warning restore CS8618 
 
+    protected static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
+
     public RoomPool(RoomPool target)
     {
         palaceRooms = target.palaceRooms;
@@ -253,20 +255,7 @@ public class RoomPool
         if (!props.BlockersAnywhere)
         {
             RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
-            NormalRooms.RemoveAll(room => !room.IsTraversable(allowedBlockers));
-            NormalRooms.RemoveAll(room => room.LinkedRoomName != null && !LinkedRooms[room.LinkedRoomName].IsTraversable(allowedBlockers));
-            foreach (var key in ItemRoomsByDirection.Keys)
-            {
-                Dictionary<Room, int> updatedWeights = [];
-                foreach(Room room in ItemRoomsByDirection[key].Keys())
-                {
-                    if(room.IsTraversable(allowedBlockers))
-                    {
-                        updatedWeights.Add(room, ItemRoomsByDirection[key].Weight(room));
-                    }
-                }
-                ItemRoomsByDirection[key] = new TableWeightedRandom<Room>(updatedWeights);
-            }
+            RemoveRooms(room => !room.IsTraversable(allowedBlockers));
         }
     }
 
@@ -274,19 +263,8 @@ public class RoomPool
     {
         if (props.NoDuplicateRoomsBySideview)
         {
-            /*
             var sideviewBytes = roomThatWasUsed.SideView;
-            if (rooms is List<Room> list)
-            {
-                list.RemoveAll(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
-            }
-            else if (rooms is HashSet<Room> set)
-            {
-                set.RemoveWhere(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
-            }
-            else { throw new NotImplementedException(); }
-            */
-            RemoveRooms(room => room.SideView == roomThatWasUsed.SideView);
+            RemoveRooms(room => byteArrayEqualityComparer.Equals(room.SideView, sideviewBytes));
         }
         else if (props.NoDuplicateRooms)
         {
@@ -303,34 +281,66 @@ public class RoomPool
         ItemRooms.Remove(room);
         foreach(Direction direction in ItemRoomsByDirection.Keys)
         {
-            ItemRoomsByDirection[direction].Remove(room);
+            var originalTable = ItemRoomsByDirection[direction];
+            var newTable = (TableWeightedRandom<Room>)originalTable.Subtract(room);
+            if (newTable != originalTable)
+            {
+                ItemRoomsByDirection[direction] = newTable;
+            }
         }
         foreach (var key in ItemRoomsByShape.Keys)
         {
             ItemRoomsByShape[key].Remove(room);
         }
     }
+
     public void RemoveRooms(Predicate<Room> removalCondition)
     {
-        NormalRooms.RemoveAll(removalCondition);
-        Entrances.RemoveAll(removalCondition);
-        BossRooms.RemoveAll(removalCondition);
-        TbirdRooms.RemoveAll(removalCondition);
-        ItemRooms.RemoveAll(removalCondition);
+        NormalRooms.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
+        Entrances.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
+        BossRooms.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
+        TbirdRooms.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
+        ItemRooms.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
         foreach (Direction direction in ItemRoomsByDirection.Keys)
         {
-            foreach(Room room in ItemRoomsByDirection[direction].Keys())
+            var originalTable = ItemRoomsByDirection[direction];
+            var newTable = originalTable;
+            var keysCopy = newTable.Keys().ToList();
+            foreach (Room room in keysCopy)
             {
-                if(removalCondition(room))
+                if (RoomMatchesIncludingLinked(room, removalCondition))
                 {
-                    ItemRoomsByDirection[direction].Remove(room);
+                    newTable = (TableWeightedRandom<Room>)newTable.Subtract(room);
                 }
             }
+            if (newTable != originalTable)
+            {
+                ItemRoomsByDirection[direction] = newTable;
+            }
         }
+
         foreach (var key in ItemRoomsByShape.Keys)
         {
-            ItemRoomsByShape[key].RemoveWhere(removalCondition);
+            ItemRoomsByShape[key].RemoveWhere(room => RoomMatchesIncludingLinked(room, removalCondition));
         }
+    }
+
+    private bool RoomMatchesIncludingLinked(Room room, Predicate<Room> match)
+    {
+        if (match(room)) { return true; }
+
+        if (room.LinkedRoomName != null)
+        {
+            if (LinkedRooms.TryGetValue(room.LinkedRoomName, out var linked))
+            {
+                return match(linked);
+            }
+            else
+            {
+                throw new Exception($"Linked room \"{room.LinkedRoomName}\" is references but is not in LinkedRooms pool.");
+            }
+        }
+        return false;
     }
 
     public Dictionary<RoomExitType, List<Room>> CategorizeNormalRoomExits(bool linkRooms = false)
