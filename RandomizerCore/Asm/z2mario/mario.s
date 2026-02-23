@@ -2386,29 +2386,39 @@ ProcFireball_Bubble:
   beq ProcFireballs          ;branch if not pressed
   and PreviousA_B_Buttons
   bne ProcFireballs          ;if button pressed in previous frame, branch
-  lda FireballCounter        ;load fireball counter
-  and #%00000001             ;get LSB and use as offset for buffer
-  tax
-  lda Fireball_State,x       ;load fireball state
-  bne ProcFireballs          ;if not inactive, branch
+
+  lda JustThrownHammer
+  bne ProcFireballs
+;  lda FireballCounter        ;load fireball counter
+;  and #%00000001             ;get LSB and use as offset for buffer
+;  tax
+;  lda Fireball_State,x       ;load fireball state
+;  bne ProcFireballs          ;if not inactive, branch
   ldy Player_Y_HighPos       ;if player too high or too low, branch
   dey
   bne ProcFireballs
+
   lda CrouchingFlag          ;if player crouching, branch
   bne ProcFireballs
-  lda Player_State           ;if player's state = climbing, branch
-  cmp #$03
-  beq ProcFireballs
-  lda #Sfx_Fireball          ;play fireball sound effect
-  sta Square1SoundQueue
-  lda #$02                   ;load state
-  sta Fireball_State,x
-  ldy PlayerAnimTimerSet     ;copy animation frame timer setting
-  sty FireballThrowingTimer  ;into fireball throwing timer
-  dey
-  sty PlayerAnimTimer        ;decrement and store in player's animation timer
-  inc FireballCounter        ;increment fireball counter
-
+;  lda Player_State           ;if player's state = climbing, branch
+;  cmp #$03
+;  beq ProcFireballs
+      ldx #0        ;load fireball counter
+      ; Check to see if we have an open fireball spot to put the hammer in
+      lda Fireball_State,x       ;load fireball state
+      beq SpawnFireball          ;if not inactive, branch
+      inx
+      lda Fireball_State,x       ;load fireball state
+      bne ProcFireballs          ;if not inactive, branch
+SpawnFireball:
+        lda #Sfx_Fireball          ;play fireball sound effect
+        sta Square1SoundQueue
+        lda #$02                   ;load state
+        sta Fireball_State,x
+        ldy PlayerAnimTimerSet     ;copy animation frame timer setting
+        sty FireballThrowingTimer  ;into fireball throwing timer
+        dey
+        sty PlayerAnimTimer        ;decrement and store in player's animation timer
 ProcFireballs:
   ldx #$00
   jsr FireballObjCore  ;process first fireball object
@@ -2681,10 +2691,10 @@ DrawExplosion_Fireball:
   ;fallthrough
   tay                         ;use whatever's in A for offset
   ; prevent rotation of the fireball from bleeding into the explosion
-;  lda #0
-;  sta Fireball_SprAttrib,x
-  ; lda ExplosionTiles,y        ;get tile number using offset
-  ; sta R0
+  lda #1
+  sta Fireball_SprAttrib,x
+  lda ExplosionTiles,y        ;get tile number using offset
+  sta FireballMetasprite,x
   rts
   ; jsr GetFBOAMOffset
   ; ldx R0
@@ -2721,16 +2731,24 @@ GetProperObjOffset:
     and #B_Button              ;check if b button just pressed
     and PreviousA_B_Buttons
     bne UpdateHammers          ;if button pressed in previous frame, branch
-      lda FireballCounter        ;load fireball counter
-      and #%00000001             ;get LSB and use as offset for buffer
-      tax
-      ; Check to see if we have an open fireball spot to put the hammer in
-      lda Fireball_State,x       ;load fireball state
-      bne UpdateHammers          ;if not inactive, branch
       ldy Player_Y_HighPos       ;if player too high or too low, branch
       dey
       bne UpdateHammers
-        inc FireballCounter        ;increment fireball counter
+
+      ldx #0
+      ; Check to see if we have an open fireball spot to put the hammer in
+      lda Fireball_State,x       ;load fireball state
+      beq SpawnHammer          ;if not inactive, branch
+      inx
+      lda Fireball_State,x       ;load fireball state
+      bne UpdateHammers          ;if not inactive, branch
+SpawnHammer:
+        inc JustThrownHammer
+        ; make mario use the throw animation frame
+        ldy PlayerAnimTimerSet     ;copy animation frame timer setting
+        sty FireballThrowingTimer  ;into fireball throwing timer
+        dey
+        sty PlayerAnimTimer        ;decrement and store in player's animation timer
         ; Spawn new hammer
         lda #$41
         sta Fireball_State,x

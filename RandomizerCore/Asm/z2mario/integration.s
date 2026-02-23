@@ -11,6 +11,9 @@
 ; Remove unused code after we gutted link's movement
 FREE "PRG0" [$92BF, $962D)
 
+; Clear out the old flame / sword projectile code
+FREE "PRG0" [$9815, $9925)
+
 ; .segment "PRG0"
 ; .org (($10ea - $10) .mod $4000) + $8000
 ; .byte $17
@@ -120,6 +123,10 @@ PatchLinkDrawRoutine:
   beq @skipplayer
     ldy #0
     jsr DrawMetasprite
+    lda $070f ; nonzero if shield is cast
+    beq +
+      jsr DrawShieldSprite
+    +
     ; Update the player bank if the metasprite has changed
 .import PlayerBankTable
     ldy ObjectMetasprite
@@ -147,6 +154,64 @@ PatchLinkDrawRoutine:
   pla
   pla
   rts
+
+.reloc
+ShieldSpriteXOffset:
+  .byte 24 ; Overlaps with Y offset table to save a byte
+ShieldSpriteYOffset:
+  .byte 0, 16
+.reloc
+.proc DrawShieldSprite
+.import MetaspriteTableLeftLo, MetaspriteTableLeftHi, MetaspriteTableRightLo, MetaspriteTableRightHi
+.import MetaspriteRenderLoop, METASPRITE_MARIO_SHIELD
+Ptr = R0
+; OrigOffset = R2
+Atr = R3
+Xlo = R4
+Xhi = R5
+Ylo = R6
+Yhi = R7
+  lda PlayerFacingDir
+  lsr
+  tay
+  lda MetaspriteTableLeftLo + METASPRITE_MARIO_SHIELD
+  sta Ptr
+  lda MetaspriteTableLeftHi + METASPRITE_MARIO_SHIELD
+  sta Ptr+1
+  lda Player_X_Position
+  sec
+  sbc ScreenLeft_X_Pos
+  sta Xlo
+  lda SprObject_PageLoc
+  sbc ScreenLeft_PageLoc
+  sta Xhi
+  lda Xlo
+  clc
+  adc ShieldSpriteXOffset,y
+  sta Xlo
+  lda #0
+  adc Xhi
+  sta Xhi
+  lda Player_Y_HighPos
+  sta Yhi
+  lda $17 ; If crouching $17 == 0
+  eor #1  ; so set it to 1 if its not
+  ora PlayerSize ; Or if we are small
+  tax ; then we want to move the shield Y pos down 16
+  lda SprObject_Y_Position
+  clc
+  adc ShieldSpriteYOffset,x
+  sta Ylo
+  ; use the facing dir as the HFlip bit
+  cpy #1
+  bcc FacingRight
+    lda #1
+    .byte $2c ; bit ABS to skip two bytes
+FacingRight:
+  lda #%01000001
+  sta Atr
+  jmp MetaspriteRenderLoop
+.endproc
 
 .org $88AF
   jmp OverworldLateInit
@@ -313,7 +378,8 @@ LinkGainedHPOrMagic:
   jsr PatchLinkMain
 .reloc
 PatchLinkMain:
-  ldx #$00  
+  ldx #$00
+  stx JustThrownHammer ; Clear the just thrown hammer flag
   stx $14
   lda $de   ; check if we can move
   beq @notfrozen
@@ -402,7 +468,17 @@ SetPlayerDownstabbingHitbox:
 .segment "PRG7"
 .reloc
 PatchFireballHitcheck:
-  jsr $E694 ; original hitbox check
+  ldy $11 ; fireball or hammer
+  ; if its a hammer let it pass through
+  lda Fireball_State,y
+  and #%01000000
+  beq @IsFireball
+    ; Is Hammer
+    jsr $e67e ; original hitbox check for swords (skipping past sword cooldown check)
+    jmp @AfterCheck
+@IsFireball:
+  jsr $E694 ; original hitbox check for projectiles
+@AfterCheck:
   bcc @exit
     ldy $11 ; fireball or hammer
     ; if its a hammer let it pass through
@@ -414,6 +490,17 @@ PatchFireballHitcheck:
       sta Fireball_State,y
 @exit:
   rts
+
+; Skip over stopping the projectile
+.org $E646
+  jmp *+3
+
+; This location is called when a projectile hits an enemy thats immune to projectil
+.org $e6e6 ; Exploding the sword beam (and stopping its movement)
+  rts ; we can just skip this part since we don't care.
+  ; If it was a hammer we want it to pass through. If it was a fireball, it'll die in
+  ; the patch check above
+FREE_UNTIL $e6f3
 
 ; .org $E558
 ;   rts ; disable link shield maybe?
@@ -814,3 +901,61 @@ DrawMapMario:
   sta Sprite_X_Position+12
 
   rts
+
+.segment "PRG7"
+.org $d29c
+  jsr ClearExtraRAMOnScreenTransition
+.reloc
+ClearExtraRAMOnScreenTransition:
+  ; original patched code
+  lda #0
+  tax
+  ; also clear custom projectile state
+  sta Fireball_State+0
+  sta Fireball_State+1
+  rts
+
+; Give mario a shield hitbox only if he has cast shield
+.org LoadPlayerShieldCollisionBox
+  jsr CheckIfShieldIsCast
+.reloc
+CheckIfShieldIsCast:
+  ldy $070F ; non zero if shield is cast
+  beq @ShieldNotCast
+    ; shield is cast so perform regular check
+    ldy PlayerFacingDir
+    dey
+    rts
+@ShieldNotCast:
+  ; give the shield an impossibly small hitbox in the corner of the screen
+  ldy #0
+  sty $00
+  sty $01
+  sty $02
+  sty $03
+  ; double return to skip the original shield code
+  pla
+  pla
+  rts
+.org $e97e ; In the middle of Link hitbox loading fun
+  jsr CheckIfPlayerSmall
+  nop
+.org $e9e8 ; In the middle of the shield hitbox loading func
+  jsr CheckIfPlayerSmall
+  nop
+.reloc
+CheckIfPlayerSmall:
+  sta R2
+  lda $17 ; If crouching $17 == 0
+  eor #1 ; flip it after so that its checking if tall mario
+  ora PlayerSize ; Or if we are small
+  eor #1 ; flip it again
+  tay ; then we want to move the shield Y pos down 16
+  rts
+
+; Update links crouching hitbox to match mario's small size
+.org $e971
+  .byte $10 ; small Y offset
+  .byte $00 ; big Y offset
+  .byte $0f ; small Y length
+  .byte $1d ; big Y length

@@ -128,6 +128,8 @@ MulHiReg = $5206
 NewSideviewInit = $8cec
 ClearNametables = $d266
 JumpEngine = $d385
+LoadPlayerShieldCollisionBox = $e9d8
+ObjectCollisionCheck = $e9f9
 
 ; These are new variables that use free memory
 Z2Noise_SfxLenCounter = $07f5
@@ -177,7 +179,7 @@ RESV mapMarioPrevDirection
 ;;;
 ; MARIO related values that are not directly mapped to vanilla z2 object values
 
-RESV FireballCounter
+RESV JustThrownHammer
 ; RESV ObjectOffset
 ObjectOffset = $10
 RESV FBall_OffscreenBits

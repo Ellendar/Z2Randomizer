@@ -68,6 +68,7 @@
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
     <EmbeddedResource Include="Asm\Graphics\linkedFire.chr" />
     <EmbeddedResource Include="Asm\Graphics\randomizer_text.chr" />
+    <EmbeddedResource Include="Asm\z2mario\fireball_explosion.chr" />
     <EmbeddedResource Include="Asm\ram.inc" />
     <EmbeddedResource Include="Asm\z2r.inc" />
     <EmbeddedResource Include="Asm\z2rndft.ips" />
@@ -85,5 +86,6 @@
     <EmbeddedResource Include="Asm\z2mario\mario.s" />
     <None Remove="Asm\z2mario\sprites_mario_hammer.chr" />
     <EmbeddedResource Include="Asm\z2mario\sprites_mario_hammer.chr" />
+    <None Remove="Asm\Graphics\fireball_explosion.chr" />
   </ItemGroup>
 </Project>
