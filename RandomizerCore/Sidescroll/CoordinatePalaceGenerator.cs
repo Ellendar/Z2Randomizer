@@ -103,7 +103,6 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
                         (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == bossRoomCandidate.IsDropZone))
                     {
                         palace.BossRoom = new(bossRoomCandidate);
-                        palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
                         if (palace.Number < 7 && props.BossRoomsExitToPalace[palace.Number - 1])
                         {
                             palace.BossRoom.HasRightExit = true;

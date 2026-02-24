@@ -193,47 +193,6 @@ public enum FireOption
     RANDOM
 }
 
-/*
-[DefaultValue(VANILLA)]
-public enum NormalPalaceStyle
-{
-    [Description("Vanilla")]
-    VANILLA,
-    [Description("Shuffled")]
-    SHUFFLED,
-    [Description("Reconstructed")]
-    RECONSTRUCTED,
-    [Description("Sequential")]
-    SEQUENTIAL,
-    [Description("Condensed")]
-    CONDENSED,
-    [Description("Chaos")]
-    CHAOS,
-    [Description("Random All")]
-    RANDOM_ALL,
-    [Description("Random Per Palace")]
-    RANDOM_PER_PALACE
-}
-
-[DefaultValue(VANILLA)]
-public enum GPStyle
-{
-    [Description("Vanilla")]
-    VANILLA,
-    [Description("Shuffled")]
-    SHUFFLED,
-    [Description("Reconstructed")]
-    RECONSTRUCTED,
-    [Description("Sequential")]
-    SEQUENTIAL,
-    [Description("Condensed")]
-    CONDENSED,
-    [Description("Chaos")]
-    CHAOS,
-    [Description("Random")]
-    RANDOM
-}
-*/
 
 [DefaultValue(VANILLA)]
 public enum PalaceStyle

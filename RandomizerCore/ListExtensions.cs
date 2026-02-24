@@ -33,4 +33,16 @@ internal static class ListExtensions
     {
         return RNG.GetItems(list.ToArray(), count).ToList();
     }
+
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+    public static KeyValuePair<K, V>? Sample<K, V>(this Dictionary<K,V> dictionary, Random RNG)
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+    {
+        if(dictionary.Count == 0)
+        {
+            return default;
+        }
+        K key = dictionary.Keys.ElementAt(RNG.Next(dictionary.Keys.Count));
+        return new KeyValuePair<K, V>(key, dictionary[key]);
+    }
 }

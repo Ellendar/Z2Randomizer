@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SD.Tools.Algorithmia.GeneralDataStructures;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,6 +7,7 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 
 public class Climate
 {
+    private const float EXCESSIVELY_LARGE = 1000f; 
     public float[] DistanceCoefficients { get; }
     public string Name { get; init; }
     public int SeedTerrainCount { get; set; }
@@ -15,10 +17,17 @@ public class Climate
     {
         Name = name;
         // Precompute distance coefficients into a inverse list
-        DistanceCoefficients = new float[(int)Terrain.NONE];
-        foreach (var pair in distanceCoefficients)
+        DistanceCoefficients = new float[Enum.GetValues<Terrain>().Length];
+        for(int i = 0; i < DistanceCoefficients.Length; i++)
         {
-            DistanceCoefficients[(int)pair.Key] = pair.Value;
+            if(distanceCoefficients.TryGetValue((Terrain)i, out float coefficient))
+            {
+                DistanceCoefficients[i] = coefficient;
+            }
+            else
+            {
+                DistanceCoefficients[i] = EXCESSIVELY_LARGE;
+            }
         }
         weightedSampler = terrainWeights;
         SeedTerrainCount = seedTerrainCount;
@@ -74,7 +83,7 @@ public class Climate
         return new(Name,
             new Dictionary<Terrain, float>(DistanceCoefficients
                 .Select((value, index) => new { value, index })
-                .ToDictionary(pair => (Terrain)pair.index, pair => 1f / pair.value)),
+                .ToDictionary(pair => (Terrain)pair.index, pair => pair.value == EXCESSIVELY_LARGE ? EXCESSIVELY_LARGE : 1f / pair.value)),
             weightedSampler.Clone(),
             SeedTerrainCount);
     }

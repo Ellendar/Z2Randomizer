@@ -93,6 +93,7 @@ public class Palaces
             {
                 palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace);
             } while (!palace.IsValid);
+            palace.BossRoom!.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
             PalaceGenerator.DebugCheckDuplicates(props, palace);
             if (props.UsePalaceItemRoomCountIndicator && currentPalace != 7)
             {

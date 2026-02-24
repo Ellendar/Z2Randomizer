@@ -19,7 +19,9 @@ public enum Terrain
     WALKABLEWATER = 13,
     ROCK = 14,
     RIVER_DEVIL = 15,
-    NONE = 16
+    NONE = 16,
+    PREPLACED_WATER = 17,
+    PREPLACED_WATER_WALKABLE = 18,
 }
 
 static class TerrainExtensions
@@ -42,10 +44,34 @@ static class TerrainExtensions
             Terrain.MOUNTAIN => false,
             Terrain.WATER => false,
             Terrain.WALKABLEWATER => true,
+            Terrain.PREPLACED_WATER_WALKABLE => true,
             Terrain.ROCK => true,
             Terrain.RIVER_DEVIL => true,
             Terrain.NONE => false,
             _ => throw new ImpossibleException("Unrecognized Terrain")
+        };
+    }
+
+    public static byte RomValue(this Terrain terrain)
+    {
+        return terrain switch
+        { 
+            Terrain.PREPLACED_WATER => 12,
+            Terrain.PREPLACED_WATER_WALKABLE => 13,
+            Terrain.NONE => 15,
+            _ => (byte)terrain
+        };
+    }
+
+    public static bool IsWater(this Terrain terrain)
+    {
+        return terrain switch
+        {
+            Terrain.WATER => true,
+            Terrain.WALKABLEWATER => true,
+            Terrain.PREPLACED_WATER => true,
+            Terrain.PREPLACED_WATER_WALKABLE => true,
+            _ => false
         };
     }
 }

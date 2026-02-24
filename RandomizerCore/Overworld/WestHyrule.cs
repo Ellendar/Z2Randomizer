@@ -257,8 +257,8 @@ public sealed class WestHyrule : World
         continentId = Continent.WEST;
         VANILLA_MAP_ADDR = 0x506C;
 
-        walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN };
+        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
+        randomTerrainFilter = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN];
         if (props.LessImportantLocationsOption != LessImportantLocationsOption.ISOLATE)
         {
             unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_FOREST_TILE_AT_START_LOCATION));
@@ -427,7 +427,8 @@ public sealed class WestHyrule : World
         }
         else //Not vanilla
         {
-            Terrain fillerWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
+            Terrain normalWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
+            Terrain preplacedWater = props.CanWalkOnWaterWithBoots ? Terrain.PREPLACED_WATER_WALKABLE : Terrain.PREPLACED_WATER;
 
             int bytesWritten = 2000;
 
@@ -462,26 +463,26 @@ public sealed class WestHyrule : World
                 switch(biome)
                 {
                     case Biome.ISLANDS:
-                        riverTerrain = fillerWater;
+                        riverTerrain = preplacedWater;
 
                         //Fill the edges with water
                         for (int i = 0; i < MAP_COLS; i++)
                         {
-                            map[0, i] = fillerWater;
-                            map[MAP_ROWS - 1, i] = fillerWater;
+                            map[0, i] = preplacedWater;
+                            map[MAP_ROWS - 1, i] = preplacedWater;
                         }
                         for (int i = 0; i < MAP_ROWS; i++)
                         {
-                            map[i, 0] = fillerWater;
-                            map[i, MAP_COLS - 1] = fillerWater;
+                            map[i, 0] = preplacedWater;
+                            map[i, MAP_COLS - 1] = preplacedWater;
                         }
 
 
                         //Stripe 1-3 rows/columns with water to establish rough island borders
                         int cols = RNG.Next(2, 4);
                         int rows = RNG.Next(2, 4);
-                        List<int> pickedC = new List<int>();
-                        List<int> pickedR = new List<int>();
+                        List<int> pickedC = [];
+                        List<int> pickedR = [];
 
                         while (cols > 0)
                         {
@@ -492,7 +493,7 @@ public sealed class WestHyrule : World
                                 {
                                     if (map[i, col] == Terrain.NONE)
                                     {
-                                        map[i, col] = fillerWater;
+                                        map[i, col] = preplacedWater;
                                     }
                                 }
                                 pickedC.Add(col);
@@ -508,7 +509,7 @@ public sealed class WestHyrule : World
                                 {
                                     if (map[row, i] == Terrain.NONE)
                                     {
-                                        map[row, i] = fillerWater;
+                                        map[row, i] = preplacedWater;
                                     }
                                 }
                                 pickedR.Add(row);
@@ -517,13 +518,16 @@ public sealed class WestHyrule : World
                         }
                         locationAtSariaSouth.CanShuffle = false;
                         locationAtSariaNorth.CanShuffle = false;
-                        walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
+                        //Islands specifically seeds preplaced water instead of normally expandable water to make wetlands less insane
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, 
+                            Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, preplacedWater };
+                        
                         break;
 
                     case Biome.CANYON:
                     case Biome.DRY_CANYON:
-                        riverTerrain = fillerWater;
+                        riverTerrain = preplacedWater;
                         if (biome == Biome.DRY_CANYON)
                         {
                             riverTerrain = Terrain.DESERT;
@@ -532,8 +536,8 @@ public sealed class WestHyrule : World
                             bridge2.CanShuffle = false;
                             bridge2.YRaw = 0;
                         }
-                        walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN };
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN];
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
 
                         DrawCanyon(riverTerrain);
                         walkableTerrains.Remove(Terrain.MOUNTAIN);
@@ -542,13 +546,13 @@ public sealed class WestHyrule : World
                     case Biome.CALDERA:
                         DrawCenterMountain();
                         locationAtPalace3.CanShuffle = false;
-                        walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
                         break;
 
                     case Biome.MOUNTAINOUS:
-                        walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
 
                         riverTerrain = Terrain.MOUNTAIN;
                         for (int i = 0; i < MAP_COLS; i++)
@@ -566,8 +570,8 @@ public sealed class WestHyrule : World
 
                         cols = RNG.Next(2, 4);
                         rows = RNG.Next(2, 4);
-                        pickedC = new List<int>();
-                        pickedR = new List<int>();
+                        pickedC = [];
+                        pickedR = [];
 
                         while (cols > 0)
                         {
@@ -606,8 +610,8 @@ public sealed class WestHyrule : World
                         locationAtSariaNorth.CanShuffle = false;
                         break;
                     default:
-                        walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
                         //drawRoad();
                         DrawMountains();
                         //drawBridge();
@@ -626,7 +630,7 @@ public sealed class WestHyrule : World
                 }
                 if (raft != null)
                 {
-                    DrawOcean(raftDirection, props.CanWalkOnWaterWithBoots);
+                    DrawOcean(raftDirection, preplacedWater);
                 }
 
 
@@ -644,12 +648,12 @@ public sealed class WestHyrule : World
                 } while (bridgeDirection == raftDirection);
                 if (bridge != null)
                 {
-                    DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
+                    DrawOcean(bridgeDirection, preplacedWater);
                 }
 
                 if (biome == Biome.CALDERA)
                 {
-                    bool g = MakeCaldera(props.CanWalkOnWaterWithBoots, props.SaneCaves);
+                    bool g = MakeCaldera(normalWater, props.SaneCaves);
                     if (!g)
                     {
                         failedOnMakeCaldera++;
@@ -677,6 +681,7 @@ public sealed class WestHyrule : World
                     return false;
                 }
 
+                Debug.WriteLine(GetMapDebug());
                 if (!GrowTerrain(climate))
                 {
                     return false;
@@ -708,9 +713,7 @@ public sealed class WestHyrule : World
 
                 if (biome == Biome.CALDERA)
                 {
-                    //debug++;
-                    //Debug.WriteLine(debug);
-                    bool f = ConnectIslands(1, true, fillerWater, false, false, false, false, props.CanWalkOnWaterWithBoots, biome,
+                    bool f = ConnectIslands(1, true, preplacedWater, false, false, false, false, props.CanWalkOnWaterWithBoots, biome,
                         calderaCenterX - CALDERA_DEAD_ZONE_X, calderaCenterX + CALDERA_DEAD_ZONE_X, 
                         calderaCenterY - CALDERA_DEAD_ZONE_Y, calderaCenterY + CALDERA_DEAD_ZONE_Y);
                     if (!f)
@@ -757,7 +760,7 @@ public sealed class WestHyrule : World
                 }
                 if (biome == Biome.VANILLALIKE)
                 {
-                    riverTerrain = fillerWater;
+                    riverTerrain = preplacedWater;
                     //2 bridges over the mountains
                     ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, false, props.CanWalkOnWaterWithBoots, biome);
                     //4 bridges including saria and the double bridge across arbitrary water
@@ -872,14 +875,8 @@ public sealed class WestHyrule : World
         }
         return true;
     }
-    private bool MakeCaldera(bool canWalkOnWaterWithBoots, bool useSaneCaves)
+    private bool MakeCaldera(Terrain water, bool useSaneCaves)
     {
-        Terrain water = Terrain.WATER;
-        if(canWalkOnWaterWithBoots)
-        {
-            water = Terrain.WALKABLEWATER;
-        }
-
         int mapCenterX = MAP_COLS / 2; // 32
         int mapCenterY = MAP_ROWS / 2; // 37
         int tries = 0;
@@ -1502,8 +1499,8 @@ public sealed class WestHyrule : World
 
     public override IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto)
     {
-        HashSet<Location> requiredLocations = new()
-        {
+        HashSet<Location> requiredLocations =
+        [
             northPalace,
             locationAtRauru,
             locationAtMido,
@@ -1522,7 +1519,7 @@ public sealed class WestHyrule : World
             locationAtPalace1,
             locationAtPalace2,
             locationAtPalace3,
-        };
+        ];
 
         foreach (Location location in connections.Keys)
         {

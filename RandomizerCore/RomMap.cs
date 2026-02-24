@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.RandomizerCore;
 

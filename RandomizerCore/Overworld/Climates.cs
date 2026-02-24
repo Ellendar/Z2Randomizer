@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Z2Randomizer.RandomizerCore;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 public static class Climates
@@ -15,6 +16,8 @@ public static class Climates
             { Terrain.GRAVE, 1 },
             { Terrain.LAVA, 1 },
             { Terrain.WALKABLEWATER, 1 },
+            { Terrain.PREPLACED_WATER_WALKABLE, 1 },
+            { Terrain.PREPLACED_WATER, 1 },
             { Terrain.WATER, 1 },
             { Terrain.MOUNTAIN, 1 },
             { Terrain.ROAD, 1 }
@@ -45,6 +48,8 @@ public static class Climates
             { Terrain.GRAVE, 1 },
             { Terrain.LAVA, 1 },
             { Terrain.WALKABLEWATER, 1 },
+            { Terrain.PREPLACED_WATER_WALKABLE, 1 },
+            { Terrain.PREPLACED_WATER, 1 },
             { Terrain.WATER, 1 },
             { Terrain.MOUNTAIN, 1 },
             { Terrain.ROAD, 1 }
@@ -75,6 +80,8 @@ public static class Climates
             { Terrain.GRAVE, 1 },
             { Terrain.LAVA, 1 },
             { Terrain.WALKABLEWATER, 1 },
+            { Terrain.PREPLACED_WATER_WALKABLE, 1 },
+            { Terrain.PREPLACED_WATER, 1 },
             { Terrain.WATER, 1 },
             { Terrain.MOUNTAIN, 1 },
             { Terrain.ROAD, 1 }
@@ -106,6 +113,8 @@ public static class Climates
             { Terrain.GRAVE, 1 },
             { Terrain.LAVA, 1 },
             { Terrain.WALKABLEWATER, 1 },
+            { Terrain.PREPLACED_WATER_WALKABLE, 1 },
+            { Terrain.PREPLACED_WATER, 1 },
             { Terrain.WATER, 1 },
             { Terrain.MOUNTAIN, 1 },
             { Terrain.ROAD, .2f }
@@ -123,7 +132,7 @@ public static class Climates
             ( Terrain.MOUNTAIN, 5 ),
             ( Terrain.ROAD, 5 ),
         ]),
-        220
+        300
     );
 
     private static readonly Climate WETLANDS = new(
@@ -138,6 +147,8 @@ public static class Climates
             { Terrain.GRAVE, 1 },
             { Terrain.LAVA, 1 },
             { Terrain.WALKABLEWATER, 1 },
+            { Terrain.PREPLACED_WATER_WALKABLE, 1 },
+            { Terrain.PREPLACED_WATER, 1 },
             { Terrain.WATER, 1 },
             { Terrain.MOUNTAIN, 1 },
             { Terrain.ROAD, 1 }
@@ -170,6 +181,8 @@ public static class Climates
             { Terrain.GRAVE, .35f },
             { Terrain.LAVA, .5f },
             { Terrain.WALKABLEWATER, .5f },
+            { Terrain.PREPLACED_WATER_WALKABLE, 1 },
+            { Terrain.PREPLACED_WATER, 1 },
             { Terrain.WATER, .25f },
             { Terrain.MOUNTAIN, 1 },
             { Terrain.ROAD, 1 }
@@ -202,6 +215,8 @@ public static class Climates
             { Terrain.GRAVE, 1 },
             { Terrain.LAVA, 1 },
             { Terrain.WALKABLEWATER, 5 },
+            { Terrain.PREPLACED_WATER_WALKABLE, 1.5f },
+            { Terrain.PREPLACED_WATER, 1.5f },
             { Terrain.WATER, 5 },
             { Terrain.MOUNTAIN, .75f },
             { Terrain.ROAD, 1 }
@@ -227,7 +242,7 @@ public static class Climates
         switch (climate)
         {
             case ClimateEnum.CLASSIC:
-                return CLASSIC.Clone();
+                return CLASSIC.CloneWithInvertedDistances();
             case ClimateEnum.VANILLA_WEIGHTED_WEST:
                 return VANILLA_WEIGHTED_WEST.Clone();
             case ClimateEnum.VANILLA_WEIGHTED_EAST:

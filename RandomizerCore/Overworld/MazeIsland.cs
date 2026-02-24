@@ -9,11 +9,11 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 
 sealed class MazeIsland : World
 {
-    public static readonly int[] OverworldEnemies = new int[] { 03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
-    public static readonly int[] OverworldFlyingEnemies = new int[] { 0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15 };
-    public static readonly int[] OverworldGenerators = new int[] { 0x0B, 0x0F, 0x17 };
-    public static readonly int[] OverworldSmallEnemies = new int[] { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
-    public static readonly int[] OverworldLargeEnemies = new int[] { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+    public static readonly int[] OverworldEnemies = [03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
+    public static readonly int[] OverworldFlyingEnemies = [0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15];
+    public static readonly int[] OverworldGenerators = [0x0B, 0x0F, 0x17];
+    public static readonly int[] OverworldSmallEnemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x16];
+    public static readonly int[] OverworldLargeEnemies = [0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
 
     private readonly SortedDictionary<int, Terrain> terrains = new()
     {

@@ -76,11 +76,13 @@ public class Spoiler
                 case Terrain.GRASS:
                 case Terrain.SWAMP:
                 case Terrain.WALKABLEWATER:
+                case Terrain.PREPLACED_WATER_WALKABLE:
                 case Terrain.ROAD:
                 case Terrain.LAVA:
                     // repeat 8x8 tile 4 times into a 16x16 tile
                     tileBitmap = LoadChrFillPattern(rom, chrAddr, 1, 1, 2, 2, palette);
                     break;
+                case Terrain.PREPLACED_WATER:
                 case Terrain.WATER:
                     palette = [.. palette[..3], 0x11]; // distinguish between walkable and unwalkable water
                     tileBitmap = LoadChrFillPattern(rom, chrAddr, 1, 1, 2, 2, palette);

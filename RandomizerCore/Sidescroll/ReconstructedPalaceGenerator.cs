@@ -48,7 +48,6 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 palace.AllRooms.Add(palace.Entrance);
 
                 palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);
-                palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
                 palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
                 // palace.BossRoom.PalaceGroup = palaceGroup;
                 palace.AllRooms.Add(palace.BossRoom);

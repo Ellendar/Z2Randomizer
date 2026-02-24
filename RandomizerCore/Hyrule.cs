@@ -505,13 +505,17 @@ public class Hyrule
 
             UpdateRom();
 
-            //0 -> W to avoid 0/O confusion
+            //0 -> W to avoid 0/O confusion, also 6/G so 6 -> X (these are not hypothetical, they have already caused confusion)
             byte[] z2Hash = ConvertHash(hash);
             for(int i = 0; i < z2Hash.Length; i++)
             {
                 if(z2Hash[i] == 0xD0)
                 {
                     z2Hash[i] = 0xF0;
+                }
+                if (z2Hash[i] == 0xD6)
+                {
+                    z2Hash[i] = 0xF1;
                 }
             }
             //(0xD0), 0x36);

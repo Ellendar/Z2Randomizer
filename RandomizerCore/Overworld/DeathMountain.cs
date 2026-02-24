@@ -246,13 +246,14 @@ sealed class DeathMountain : World
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
     {
-        Terrain water = Terrain.WATER;
+        Terrain effectiveWater = Terrain.WATER, preplacedWater = Terrain.PREPLACED_WATER;
         if (props.CanWalkOnWaterWithBoots)
         {
-            water = Terrain.WALKABLEWATER;
+            effectiveWater = Terrain.WALKABLEWATER;
+            preplacedWater = Terrain.PREPLACED_WATER_WALKABLE;
         }
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
-        randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+        randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, effectiveWater };
 
         foreach (Location location in AllLocations)
         {
@@ -306,7 +307,7 @@ sealed class DeathMountain : World
                         }
                         for (int j = 29; j < MAP_COLS; j++)
                         {
-                            map[i, j] = water;
+                            map[i, j] = preplacedWater;
                         }
                     }
                 }
@@ -323,23 +324,23 @@ sealed class DeathMountain : World
 
                 if (biome == Biome.ISLANDS)
                 {
-                    riverT = water;
+                    riverT = preplacedWater;
                     for (int i = 0; i < MAP_COLS; i++)
                     {
-                        map[0, i] = water;
-                        map[MAP_ROWS - 1, i] = water;
+                        map[0, i] = preplacedWater;
+                        map[MAP_ROWS - 1, i] = preplacedWater;
                     }
 
                     for (int i = 0; i < MAP_ROWS; i++)
                     {
-                        map[i, 0] = water;
-                        map[i, MAP_COLS - 1] = water;
+                        map[i, 0] = preplacedWater;
+                        map[i, MAP_COLS - 1] = preplacedWater;
                     }
 
                     int cols = RNG.Next(2, 4);
                     int rows = RNG.Next(2, 4);
-                    List<int> pickedC = new List<int>();
-                    List<int> pickedR = new List<int>();
+                    List<int> pickedC = [];
+                    List<int> pickedR = [];
 
                     while (cols > 0)
                     {
@@ -350,7 +351,7 @@ sealed class DeathMountain : World
                             {
                                 if (map[i, col] == Terrain.NONE)
                                 {
-                                    map[i, col] = water;
+                                    map[i, col] = preplacedWater;
                                 }
                             }
                             pickedC.Add(col);
@@ -367,9 +368,9 @@ sealed class DeathMountain : World
                             {
                                 if (map[row, i] == Terrain.NONE)
                                 {
-                                    map[row, i] = water;
+                                    map[row, i] = preplacedWater;
                                 }
-                                else if (map[row, i] == water)
+                                else if (map[row, i] == preplacedWater)
                                 {
                                     int adjust = RNG.Next(-3, 4);
                                     while (row + adjust < 1 || row + adjust > MAP_ROWS - 2)
@@ -389,7 +390,8 @@ sealed class DeathMountain : World
                 }
                 else if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
-                    riverT = water;
+                    //TODO: ??? Maybe not ???
+                    riverT = preplacedWater;
 
                     walkableTerrains.Clear();
                     walkableTerrains.Add(Terrain.GRASS);
@@ -474,7 +476,7 @@ sealed class DeathMountain : World
                 }
                 if (raft != null)
                 {
-                    DrawOcean(raftDirection, props.CanWalkOnWaterWithBoots);
+                    DrawOcean(raftDirection, preplacedWater);
                 }
 
                 Direction bridgeDirection;
@@ -491,7 +493,7 @@ sealed class DeathMountain : World
                 } while (bridgeDirection == raftDirection);
                 if (bridge != null)
                 {
-                    DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
+                    DrawOcean(bridgeDirection, preplacedWater);
                 }
                 int x = 0;
                 int y = 0;
@@ -533,7 +535,8 @@ sealed class DeathMountain : World
                 }
                 randomTerrainFilter.Add(Terrain.ROAD);
                 //Debug.WriteLine(GetMapDebug());
-                Climate growthClimate = climate.CloneWithInvertedDistances();
+                //XXX: Was this a double inversion
+                Climate growthClimate = climate.Clone();
                 float dmOpennessFactor = biome switch
                 {
                     Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),

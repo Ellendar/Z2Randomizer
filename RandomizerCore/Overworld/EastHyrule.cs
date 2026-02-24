@@ -536,7 +536,8 @@ public sealed class EastHyrule : World
         }
         else //Not vanilla / vanillaShuffle
         {
-            Terrain fillerWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
+            Terrain normalWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
+            Terrain preplacedWater = props.CanWalkOnWaterWithBoots ? Terrain.PREPLACED_WATER_WALKABLE : Terrain.PREPLACED_WATER;
 
             int bytesWritten = 2000;
             locationAtGP.CanShuffle = false;
@@ -581,17 +582,17 @@ public sealed class EastHyrule : World
 
                 if (biome == Biome.ISLANDS)
                 {
-                    riverTerrain = fillerWater;
+                    riverTerrain = preplacedWater;
                     for (int i = 0; i < MAP_COLS; i++)
                     {
-                        map[0, i] = fillerWater;
-                        map[MAP_ROWS - 1, i] = fillerWater;
+                        map[0, i] = preplacedWater;
+                        map[MAP_ROWS - 1, i] = preplacedWater;
                     }
 
                     for (int i = 0; i < MAP_ROWS; i++)
                     {
-                        map[i, 0] = fillerWater;
-                        map[i, MAP_COLS - 1] = fillerWater;
+                        map[i, 0] = preplacedWater;
+                        map[i, MAP_COLS - 1] = preplacedWater;
                     }
                     MakeValleyOfDeath();
                     int cols = RNG.Next(2, 4);
@@ -608,7 +609,7 @@ public sealed class EastHyrule : World
                             {
                                 if (map[i, col] == Terrain.NONE)
                                 {
-                                    map[i, col] = fillerWater;
+                                    map[i, col] = preplacedWater;
                                 }
                             }
                             pickedC.Add(col);
@@ -625,7 +626,7 @@ public sealed class EastHyrule : World
                             {
                                 if (map[row, i] == Terrain.NONE)
                                 {
-                                    map[row, i] = fillerWater;
+                                    map[row, i] = preplacedWater;
                                 }
                             }
                             pickedR.Add(row);
@@ -633,22 +634,19 @@ public sealed class EastHyrule : World
                         }
                     }
                     walkableTerrains = [Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
-                    randomTerrainFilter = [Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater];
-
-
-
+                    randomTerrainFilter = [Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater];
 
                 }
                 else if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
-                    riverTerrain = fillerWater;
+                    riverTerrain = preplacedWater;
                     if (biome == Biome.DRY_CANYON)
                     {
                         riverTerrain = Terrain.DESERT;
                     }
                     //riverT = terrain.lava;
                     walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN];
-                    randomTerrainFilter = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater];
+                    randomTerrainFilter = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater];
 
 
                     DrawCanyon(riverTerrain);
@@ -663,7 +661,7 @@ public sealed class EastHyrule : World
                     DrawCenterMountain();
 
                     walkableTerrains = new List<Terrain>() { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
 
 
                 }
@@ -721,13 +719,13 @@ public sealed class EastHyrule : World
                             rows--;
                         }
                     }
-                    walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                    walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
+                    randomTerrainFilter = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater];
                 }
                 else
                 {
-                    walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                    walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
+                    randomTerrainFilter = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater];
                     MakeValleyOfDeath();
 
 
@@ -765,7 +763,7 @@ public sealed class EastHyrule : World
                 }
                 if (raft != null)
                 {
-                    DrawOcean(raftDirection, props.CanWalkOnWaterWithBoots);
+                    DrawOcean(raftDirection, preplacedWater);
                 }
 
 
@@ -788,7 +786,7 @@ public sealed class EastHyrule : World
 
                 if (bridge != null)
                 {
-                    DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
+                    DrawOcean(bridgeDirection, preplacedWater);
                 }
 
                 if (props.HiddenKasuto)
@@ -817,6 +815,7 @@ public sealed class EastHyrule : World
                 {
                     return false;
                 }
+                //Debug.WriteLine(GetMapDebug());
                 randomTerrainFilter.Remove(Terrain.LAVA);
                 if (raft != null)
                 {
@@ -846,7 +845,7 @@ public sealed class EastHyrule : World
                 {
                     ConnectIslands(4, false, Terrain.MOUNTAIN, false, false, false, true, props.CanWalkOnWaterWithBoots, biome);
 
-                    ConnectIslands(3, false, fillerWater, riverDevilBlocksPath, rockBlock, false, false, props.CanWalkOnWaterWithBoots, biome);
+                    ConnectIslands(3, false, preplacedWater, riverDevilBlocksPath, rockBlock, false, false, props.CanWalkOnWaterWithBoots, biome);
 
                 }
                 if (biome == Biome.ISLANDS)
@@ -1594,24 +1593,6 @@ public sealed class EastHyrule : World
             cavePlaced = false;
         }
 
-        /*
-        //Safety to ensure you can't enter a DM passthrough from the wrong direction, ending up in a mountain
-        foreach (Location passthroughLocation in passthroughLocations)
-        {
-            if(passthroughLocation.YRaw == 0 || passthroughLocation.Xpos == 0)
-            {
-                continue;
-            }
-            foreach(Direction direction in DirectionExtensions.CARDINAL_DIRECTIONS)
-            {
-                if (map[passthroughLocation.Y + direction.DeltaY(), passthroughLocation.Xpos + direction.DeltaX()] == Terrain.MOUNTAIN
-                    && map[passthroughLocation.Y - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] != Terrain.MOUNTAIN)
-                {
-                    map[passthroughLocation.Y - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] = Terrain.MOUNTAIN;
-                }
-            }
-        }
-        */
         return true;
     }
 
