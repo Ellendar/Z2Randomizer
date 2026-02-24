@@ -96,13 +96,21 @@ Seed: {config.Seed}
                     if(!tokenSource.IsCancellationRequested && output.success)
                     {
                         var flags = config.SerializeFlags();
-                        var filename = $"Z2_{config.Seed}_{flags}.nes";
+                        var basename = $"Z2_{config.Seed}_{flags}";
+                        var filename = basename + ".nes";
                         await files.SaveGeneratedBinaryFile(filename, output.romdata!, Main.OutputFilePath);
+#if DEBUG
+                        var debugfile = basename + ".mlb";
+                        if (!string.IsNullOrEmpty(output.debuginfo))
+                        {
+                            await files.SaveSpoilerFile(debugfile, output.debuginfo, Main.OutputFilePath);
+                        }
+#endif
                         if (config.GenerateSpoiler)
                         {
-                            var spoilerFilename = $"Z2_{config.Seed}_{flags}_spoiler.txt";
+                            var spoilerFilename = basename + "_spoiler.txt";
                             await files.SaveSpoilerFile(spoilerFilename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
-                            var spoilerMapFilename = $"Z2_{config.Seed}_{flags}_spoiler.png";
+                            var spoilerMapFilename = basename + "_spoiler.png";
                             await files.SaveGeneratedBinaryFile(spoilerMapFilename, new Spoiler(randomizer.ROMData).CreateSpoilerImage(randomizer.worlds), Main.OutputFilePath);
                         }
                         ProgressHeading = "Generation Complete";
