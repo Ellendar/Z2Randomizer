@@ -383,6 +383,9 @@ public sealed class EastHyrule : World
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
     {
+        Terrain normalWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
+        Terrain preplacedWater = props.CanWalkOnWaterWithBoots ? Terrain.PREPLACED_WATER_WALKABLE : Terrain.PREPLACED_WATER;
+
         foreach (Location location in AllLocations)
         {
             location.CanShuffle = true;
@@ -536,9 +539,6 @@ public sealed class EastHyrule : World
         }
         else //Not vanilla / vanillaShuffle
         {
-            Terrain normalWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
-            Terrain preplacedWater = props.CanWalkOnWaterWithBoots ? Terrain.PREPLACED_WATER_WALKABLE : Terrain.PREPLACED_WATER;
-
             int bytesWritten = 2000;
             locationAtGP.CanShuffle = false;
             Terrain riverTerrain = Terrain.MOUNTAIN;

@@ -6,5 +6,5 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public abstract class ItemRoomSelectionStrategy
 {
-    public abstract Room[] SelectItemRooms(Palace palace, RoomPool roomPool, int itemRoomCount, Random r);
+    public abstract Room[] SelectItemRooms(Palace palace, RoomPool roomPool, int itemRoomCount, bool avoidDuplicates, Random r);
 }

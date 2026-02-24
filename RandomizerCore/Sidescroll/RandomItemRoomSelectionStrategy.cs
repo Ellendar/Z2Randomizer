@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using YamlDotNet.Core.Tokens;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public class RandomItemRoomSelectionStrategy : ItemRoomSelectionStrategy
 {
-    public override Room[] SelectItemRooms(Palace palace, RoomPool roomPool, int itemRoomCount, Random r)
+    private const int MAX_ATTEMPTS = 200;
+    public override Room[] SelectItemRooms(Palace palace, RoomPool roomPool, int itemRoomCount, bool avoidDuplicates, Random r)
     {
-        int itemRoomNumber = 0;
+        int itemRoomNumber = 0, attemptNumber = 0;
         List<Room> itemRoomCandidates = roomPool.ItemRooms.ToList();
         List<Room> itemRooms = [];
         List<Coord> replacedCoords = [];
@@ -18,13 +20,12 @@ public class RandomItemRoomSelectionStrategy : ItemRoomSelectionStrategy
             throw new Exception($"No item room candidates for palace {palace.Number} in RandomItemRoomSelectionStrategy");
         }
 
-        foreach (Room itemRoomCandidate in itemRoomCandidates)
+        while(itemRooms.Count < itemRoomCount && attemptNumber++ < MAX_ATTEMPTS)
         {
+            Room itemRoomCandidate = itemRooms.Sample(r)!;
+
             RoomExitType itemRoomExitType = itemRoomCandidate.CategorizeExits();
-            if (itemRoomCount == itemRooms.Count)
-            {
-                break;
-            }
+            
             List<Room> itemRoomReplacementCandidates =
                 palace.AllRooms.Where(i => i.IsNormalRoom() && i.CategorizeExits() == itemRoomExitType && !replacedCoords.Contains(i.coords)).ToList();
 
@@ -46,6 +47,11 @@ public class RandomItemRoomSelectionStrategy : ItemRoomSelectionStrategy
                     }
                     replacedCoords.Add(itemRoomReplacementRoom.coords);
                     itemRoomNumber++;
+
+                    if(avoidDuplicates)
+                    {
+                        itemRoomCandidates.Remove(itemRoomCandidate);
+                    }
                     break;
                 }
             }

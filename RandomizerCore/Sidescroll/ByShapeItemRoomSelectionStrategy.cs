@@ -9,16 +9,17 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy
 {
     private static readonly RoomExitType[] PRIORITY_ROOM_SHAPES = [];// [RoomExitType.DROP_STUB, RoomExitType.DROP_T];
+    private const int MAX_ATTEMPTS = 200;
 
-    public override Room[] SelectItemRooms(Palace palace, RoomPool roomPool, int itemRoomCount, Random r)
+    public override Room[] SelectItemRooms(Palace palace, RoomPool roomPool, int itemRoomCount, bool avoidDuplicates, Random r)
     {
         var shapesInPool = roomPool.GetItemRoomShapes();
         List<RoomExitType> possibleItemRoomExitTypes = ShuffleItemRoomShapes(shapesInPool, r);
-        List<Room> itemRooms = [];
+        List<Room> itemRooms = [], originalItemRooms = [];
         List<Coord> replacedCoords = [];
-        int itemRoomNumber = 0;
+        int itemRoomNumber = 0, attemptNumber = 0;
 
-        while (itemRoomNumber < itemRoomCount)
+        while (itemRoomNumber < itemRoomCount && attemptNumber++ < MAX_ATTEMPTS)
         {
             RoomExitType itemRoomExitType = possibleItemRoomExitTypes[0];
             List<Room> itemRoomCandidates = roomPool.GetItemRoomsForShape(itemRoomExitType).ToList();
@@ -54,6 +55,12 @@ internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy
                         replacedCoords.Add(itemRoomReplacementRoom.coords);
                         itemRoomNumber++;
                         itemRoomPlaced = true;
+
+                        if (!avoidDuplicates || !originalItemRooms.Contains(itemRoom))
+                        {
+                            originalItemRooms.Add(itemRoom);
+                            itemRooms.Add(itemRoom);
+                        }
                         break;
                     }
                 }

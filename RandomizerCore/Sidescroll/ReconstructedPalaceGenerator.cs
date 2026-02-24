@@ -56,29 +56,23 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 if (palaceNumber < 7) //Not GP
                 {
                     ItemRoomSelectionStrategy itemRoomSelector = new ByEntranceDirectionItemRoomSelectionStrategy();
-                    Room[] originalItemRooms = itemRoomSelector.SelectItemRooms(palace, roomPool, props.PalaceItemRoomCounts[palaceNumber - 1], r);
-                    if (originalItemRooms == null)
+                    Room[] itemRooms = itemRoomSelector.SelectItemRooms(palace, roomPool, props.PalaceItemRoomCounts[palaceNumber - 1], duplicateProtection, r);
+                    if (itemRooms == null || itemRooms.Length != props.PalaceItemRoomCounts[palaceNumber - 1])
                     {
                         palace.IsValid = false;
                         return palace;
                     }
-                    foreach(Room originalItemRoom in originalItemRooms)
+
+                    foreach (Room itemRoom in itemRooms)
                     {
-                        Room itemRoom = new(originalItemRoom);
                         palace.ItemRooms.Add(itemRoom);
                         palace.AllRooms.Add(itemRoom);
 
-                        if (duplicateProtection)
-                        {
-                            roomPool.RemoveDuplicates(props, itemRoom);
-                        }
                         if (itemRoom.LinkedRoomName != null)
                         {
                             Room segmentedItemRoom1, segmentedItemRoom2;
                             segmentedItemRoom1 = itemRoom;
                             segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
-                            // segmentedItemRoom2.PalaceGroup = palaceGroup;
-                            //segmentedItemRoom2.SetItem((Item)palaceNumber);
                             segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
                             segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
                             palace.AllRooms.Add(segmentedItemRoom2);

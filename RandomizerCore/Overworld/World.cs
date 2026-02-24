@@ -718,7 +718,7 @@ public abstract class World
         //Great lakes and bad boots are more likely to be incompleteable, so extend max bridge length to give them a fighting chance
         if(canWalkOnWater || climate.Name == Climates.Create(ClimateEnum.GREAT_LAKES).Name)
         {
-            //maxBridgeLength = (int)(maxBridgeLength * 1.5);
+            maxBridgeLength = (int)(maxBridgeLength * 1.5);
         }
         if (!((deadZoneMinX == 999 && deadZoneMaxX == -1 && deadZoneMinY == 999 && deadZoneMaxY == -1)
             || (deadZoneMinX != 999 && deadZoneMaxX != -1 && deadZoneMinY != 999 && deadZoneMaxY != -1)))
@@ -740,35 +740,39 @@ public abstract class World
 
         //precompute next to water tiles since there are likely more fails than successes and randomly iterating the same
         //bad tiles over and over is wasteful
-        Dictionary<(int, int), List<Direction>> nextToWaterTiles = [];
+        List<(int, int, Direction)> nextToWaterTiles = [];
         for (int y = 1; y < MAP_ROWS - 1; y++) 
         {
             for (int x = 1; x < MAP_COLS - 1; x++)
             {
                 List<Direction> waterDirections = NextToWaterDirections(x, y, crossingTerrains);
-                if(waterDirections.Count >= 1
-                    && (x < deadZoneMinX || x > deadZoneMaxX) && (y < deadZoneMinY || y > deadZoneMaxY))
+                if((x < deadZoneMinX || x > deadZoneMaxX) && (y < deadZoneMinY || y > deadZoneMaxY))
                 {
-                    nextToWaterTiles.Add((x, y), waterDirections);
+                    foreach(Direction direction in waterDirections)
+                    {
+                        nextToWaterTiles.Add((x, y, direction));
+                    }
                 }
             }
         }
+
         while (remainingBridges > 0 && tries < maxBridgeAttempts)
         {
             tries++;
             int x, y;
 
-            KeyValuePair<(int, int), List<Direction>>? nextToWaterTile = nextToWaterTiles.Sample(RNG);
+            (int, int, Direction)? nextToWaterTile = nextToWaterTiles.Sample(RNG);
             //All possible bridges have been evaluated.
             if (nextToWaterTile == null)
             {
                 return true;
             }
 
-            x = nextToWaterTile.Value.Key.Item1;
-            y = nextToWaterTile.Value.Key.Item2;
+            x = nextToWaterTile.Value.Item1;
+            y = nextToWaterTile.Value.Item2;
             int startX = x, startY = y;
-            Direction waterDirection = nextToWaterTile.Value.Value.Sample(RNG);
+
+            Direction waterDirection = nextToWaterTile.Value.Item3;
 
             int deltaX = waterDirection.DeltaX();
             int deltaY = waterDirection.DeltaY();
@@ -1177,11 +1181,8 @@ public abstract class World
                 remainingBridges--;
             }
 
-            nextToWaterTiles[(startX, startY)].Remove(waterDirection);
-            if (nextToWaterTiles[(startX, startY)].Count == 0)
-            {
-                nextToWaterTiles.Remove((startX, startY));
-            }
+            nextToWaterTiles.Remove((startX, startY, waterDirection));
+
         }
         return !placeSaria;
     }
