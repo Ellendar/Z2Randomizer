@@ -60,7 +60,7 @@ public class RoomPool
 
     public RoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
-        Dictionary<Direction, Dictionary<Room, int>> roomDirectionWeightsByDirection = [];
+        Dictionary<Direction, List<(Room, int)>> roomDirectionWeightsByDirection = [];
         roomDirectionWeightsByDirection.Add(Direction.NORTH, []);
         roomDirectionWeightsByDirection.Add(Direction.SOUTH, []);
         roomDirectionWeightsByDirection.Add(Direction.WEST, []);
@@ -88,7 +88,7 @@ public class RoomPool
                 foreach (Room room in palaceRooms.ItemRoomsByDirection(RoomGroup.VANILLA, direction).ToList())
                 {
                     bool[] weights = [room.HasUpExit, room.HasDownExit, room.HasLeftExit, room.HasRightExit, room.IsDropZone];
-                    roomDirectionWeightsByDirection[direction].Add(room, 5 - weights.Count(i => i));
+                    roomDirectionWeightsByDirection[direction].Add((room, 5 - weights.Count(i => i)));
                 }
             }
             foreach(var shape in palaceRooms.ItemRooms(RoomGroup.VANILLA).Select(i => i.CategorizeExits()).Distinct())
@@ -119,7 +119,7 @@ public class RoomPool
                 foreach (Room room in palaceRooms.ItemRoomsByDirection(RoomGroup.V4_0, direction).ToList())
                 {
                     bool[] weights = [room.HasUpExit, room.HasDownExit, room.HasLeftExit, room.HasRightExit, room.IsDropZone];
-                    roomDirectionWeightsByDirection[direction].Add(room, 5 - weights.Count(i => i));
+                    roomDirectionWeightsByDirection[direction].Add((room, 5 - weights.Count(i => i)));
                 }
             }
             foreach (var shape in palaceRooms.ItemRooms(RoomGroup.V4_0).Select(i => i.CategorizeExits()).Distinct())
@@ -150,7 +150,7 @@ public class RoomPool
                 foreach (Room room in palaceRooms.ItemRoomsByDirection(RoomGroup.V5_0, direction).ToList())
                 {
                     bool[] weights = [room.HasUpExit, room.HasDownExit, room.HasLeftExit, room.HasRightExit, room.IsDropZone];
-                    roomDirectionWeightsByDirection[direction].Add(room, 5 - weights.Count(i => i));
+                    roomDirectionWeightsByDirection[direction].Add((room, 5 - weights.Count(i => i)));
                 }
             }
             foreach (var shape in palaceRooms.ItemRooms(RoomGroup.V5_0).Select(i => i.CategorizeExits()).Distinct())
@@ -269,12 +269,12 @@ public class RoomPool
             RemoveRooms(room => !room.IsTraversable(allowedBlockers));
             foreach (var key in ItemRoomsByDirection.Keys)
             {
-                Dictionary<Room, int> updatedWeights = [];
+                List<(Room, int)> updatedWeights = [];
                 foreach (Room room in ItemRoomsByDirection[key].Keys())
                 {
                     if (room.IsTraversable(allowedBlockers))
                     {
-                        updatedWeights.Add(room, ItemRoomsByDirection[key].Weight(room));
+                        updatedWeights.Add((room, ItemRoomsByDirection[key].Weight(room)));
                     }
                 }
                 ItemRoomsByDirection[key] = new TableWeightedRandom<Room>(updatedWeights);
