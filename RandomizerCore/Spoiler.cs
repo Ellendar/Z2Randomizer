@@ -25,7 +25,9 @@ public class Spoiler
         { Terrain.LAVA, 0x116e0 },
         { Terrain.MOUNTAIN, 0x11640 },
         { Terrain.WATER, 0x116e0 },
+        { Terrain.PREPLACED_WATER, 0x116e0 },
         { Terrain.WALKABLEWATER, 0x116e0 },
+        { Terrain.PREPLACED_WATER_WALKABLE, 0x116e0 },
         { Terrain.ROCK, 0x11560 },
         { Terrain.RIVER_DEVIL, 0x11400 },
     };
@@ -45,7 +47,9 @@ public class Spoiler
         { Terrain.LAVA, 0x1c45f },
         { Terrain.MOUNTAIN, 0x1c45f },
         { Terrain.WATER, 0x100aa },
+        { Terrain.PREPLACED_WATER, 0x100aa },
         { Terrain.WALKABLEWATER, 0x1c467 },
+        { Terrain.PREPLACED_WATER_WALKABLE, 0x1c467 },
         { Terrain.ROCK, 0x1c45f },
         { Terrain.RIVER_DEVIL, 0x1c45f },
     };
