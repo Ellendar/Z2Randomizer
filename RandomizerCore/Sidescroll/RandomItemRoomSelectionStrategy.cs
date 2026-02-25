@@ -22,7 +22,11 @@ public class RandomItemRoomSelectionStrategy : ItemRoomSelectionStrategy
 
         while(itemRooms.Count < itemRoomCount && attemptNumber++ < MAX_ATTEMPTS)
         {
-            Room itemRoomCandidate = itemRooms.Sample(r)!;
+            Room? itemRoomCandidate = itemRoomCandidates.Sample(r);
+            if(itemRoomCandidate == null)
+            {
+                return [];
+            }
 
             RoomExitType itemRoomExitType = itemRoomCandidate.CategorizeExits();
             

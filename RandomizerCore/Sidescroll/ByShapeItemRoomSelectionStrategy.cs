@@ -29,6 +29,7 @@ internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy
 
             foreach (Room itemRoomCandidate in itemRoomCandidates)
             {
+                itemRoomPlaced = false;
                 if (itemRoomPlaced)
                 {
                     break;
@@ -46,7 +47,6 @@ internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy
                     {
                         Room itemRoom = new(itemRoomCandidate);
                         itemRoom.coords = itemRoomReplacementRoom.coords;
-                        itemRooms.Add(itemRoom);
                         if (itemRoomCandidate.LinkedRoomName != null)
                         {
                             Room linkedRoom = roomPool.LinkedRooms[itemRoomCandidate.LinkedRoomName];
@@ -58,7 +58,7 @@ internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy
 
                         if (!avoidDuplicates || !originalItemRooms.Contains(itemRoom))
                         {
-                            originalItemRooms.Add(itemRoom);
+                            originalItemRooms.Add(itemRoomCandidate);
                             itemRooms.Add(itemRoom);
                         }
                         break;

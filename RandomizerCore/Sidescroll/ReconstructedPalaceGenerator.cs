@@ -56,6 +56,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 if (palaceNumber < 7) //Not GP
                 {
                     ItemRoomSelectionStrategy itemRoomSelector = new ByEntranceDirectionItemRoomSelectionStrategy();
+                    //ItemRoomSelectionStrategy itemRoomSelector = new RandomItemRoomSelectionStrategy();
                     Room[] itemRooms = itemRoomSelector.SelectItemRooms(palace, roomPool, props.PalaceItemRoomCounts[palaceNumber - 1], duplicateProtection, r);
                     if (itemRooms == null || itemRooms.Length != props.PalaceItemRoomCounts[palaceNumber - 1])
                     {
