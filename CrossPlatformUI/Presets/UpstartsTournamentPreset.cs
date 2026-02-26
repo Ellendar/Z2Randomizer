@@ -20,7 +20,7 @@ public static class UpstartsTournamentPreset
 
         //Overworld
         PalacesCanSwapContinents = true,
-        ShuffleGP = true,
+        ShuffleGp = true,
         ShuffleEncounters = true,
         AllowUnsafePathEncounters = true,
         IncludeLavaInEncounterShuffle = true,

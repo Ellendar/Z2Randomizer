@@ -1,14 +1,16 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
-using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore;
@@ -173,19 +175,27 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? palacesCanSwapContinents;
 
     [Reactive]
-    private bool? shuffleGP;
-
-    [Reactive]
-    private bool? shuffleEncounters;
-
-    [Reactive]
-    private bool allowUnsafePathEncounters;
-
-    [Reactive]
-    private bool includeLavaInEncounterShuffle;
+    [ConditionallyIncludeInFlags]
+    private bool? shuffleGp;
+    public bool shuffleGpIncluded() => palacesCanSwapContinents != false;
 
     [Reactive]
     private EncounterRate encounterRate;
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool? shuffleEncounters;
+    public bool shuffleEncountersIncluded() => encounterRate != EncounterRate.NONE;
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool allowUnsafePathEncounters;
+    public bool allowUnsafePathEncountersIncluded() => shuffleEncountersIncluded() && shuffleEncounters != false;
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool includeLavaInEncounterShuffle;
+    public bool includeLavaInEncounterShuffleIncluded() => shuffleEncountersIncluded() && shuffleEncounters != false;
 
     [Reactive]
     private bool? hidePalace;
@@ -194,7 +204,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? hideKasuto;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? shuffleWhichLocationIsHidden;
+    public bool shuffleWhichLocationIsHiddenIncluded() => hidePalace != false || hideKasuto != false;
 
     [Reactive]
     private LessImportantLocationsOption lessImportantLocationsOption;
@@ -239,6 +251,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private Biome mazeBiome;
 
     [Reactive]
+    private ImmutableDictionary<Biome, int> biomeWeights = new Dictionary<Biome, int>().ToImmutableDictionary();
+
+    [Reactive]
     private ClimateEnum westClimate;
 
     [Reactive]
@@ -251,7 +266,22 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private ClimateEnum mazeClimate;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
+    [DefaultValue(true)]
     private bool vanillaShuffleUsesActualTerrain;
+    public bool vanillaShuffleUsesActualTerrainIncluded() {
+        foreach (var biome in (List<Biome>)[westBiome, eastBiome, dmBiome, mazeBiome])
+        {
+            switch (biome)
+            {
+                case Biome.VANILLA_SHUFFLE:
+                case Biome.RANDOM:
+                case Biome.RANDOM_NO_VANILLA: /* still includes shuffle */
+                    return true;
+            }
+        }
+        return false;
+    }
 
     //Palaces
     [Reactive]
@@ -261,31 +291,105 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private PalaceStyle gpStyle;
 
     [Reactive]
-    private bool randomStylesAllowVanilla;
+    [ConditionallyIncludeInFlags]
+    private ImmutableDictionary<PalaceStyle, int> palaceStyleWeights = new Dictionary<PalaceStyle, int>().ToImmutableDictionary();
+    public bool palaceStyleWeightsIncluded()
+    {
+        foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
+        {
+            switch (style)
+            {
+                case PalaceStyle.RANDOM:
+                case PalaceStyle.RANDOM_PER_PALACE:
+                case PalaceStyle.RANDOM_ALL:
+                    return true;
+            }
+        }
+        return false;
+    }
+    public static ImmutableDictionary<PalaceStyle, int> palaceStyleWeightsDefault()
+    {
+        var builder = ImmutableDictionary.CreateBuilder<PalaceStyle, int>();
+        foreach (var enumValue in Enum.GetValues<PalaceStyle>().Where(b => b.CanHaveWeight()))
+        {
+            builder.Add(enumValue, enumValue switch
+            {
+                PalaceStyle.RECONSTRUCTED => 2,
+                PalaceStyle.CHAOS => 0,
+                _ => 1,
+            });
+        }
+        return builder.ToImmutableDictionary();
+    }
+
+    private bool palaceStylesAreNotAllVanilla()
+    {
+        foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
+        {
+            switch (style)
+            {
+                case PalaceStyle.VANILLA:
+                    break;
+                default:
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private bool palaceStylesAreNotAllVanillaOrShuffled()
+    {
+        foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
+        {
+            switch (style)
+            {
+                case PalaceStyle.VANILLA:
+                case PalaceStyle.SHUFFLED:
+                    break;
+                default:
+                    return true;
+            }
+        }
+        return false;
+    }
 
     [Reactive]
     private bool? includeVanillaRooms;
+    public bool includeVanillaRoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? includev4_0Rooms;
+    public bool includev4_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? includev5_0Rooms;
+    public bool includev5_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool blockingRoomsInAnyPalace;
+    public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     private PalaceDropStyle palaceDropStyle;
+    public bool palaceDropStyleIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private BossRoomsExitType bossRoomsExitType;
+    public bool bossRoomsExitTypeIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? tBirdRequired;
+    public bool tBirdRequiredIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool removeTBird;
+    public bool removeTBirdIncluded() => tBirdRequiredIncluded() && tBirdRequired != true;
 
     [Reactive]
     private bool restartAtPalacesOnGameOver;
@@ -294,7 +398,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? global5050JarDrop = false;
 
     [Reactive]
-    private bool reduceDripperVariance = false;
+    private bool reduceDripperVariance;
 
     [Reactive]
     private bool changePalacePallettes;
@@ -303,7 +407,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool randomizeBossItemDrop;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private BossRoomMinDistance darkLinkMinDistance;
+    public bool darkLinkMinDistanceIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
     private PalaceItemRoomCount palaceItemRoomCount;
@@ -314,16 +420,20 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     [Limit(7)]
+    [ConditionallyIncludeInFlags]
+    [DefaultValue(6)]
     private int palacesToCompleteMax;
+    public bool palacesToCompleteMaxIncluded() => palacesToCompleteMin != 6;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool noDuplicateRoomsByLayout;
+    public bool noDuplicateRoomsByLayoutIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool noDuplicateRoomsByEnemies;
-
-    [Reactive]
-    private bool generatorsAlwaysMatch;
+    public bool noDuplicateRoomsByEnemiesIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     private bool hardBosses;
@@ -354,7 +464,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private int lifeLevelCap;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool scaleLevelRequirementsToCap;
+    public bool scaleLevelRequirementsToCapIncluded() => attackLevelCap < 8 || magicLevelCap < 8 || lifeLevelCap < 8;
 
     [Reactive]
     private AttackEffectiveness attackEffectiveness;
@@ -391,11 +503,22 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     private bool? shufflePalaceEnemies;
 
-    [Reactive]
-    private DripperEnemyOption dripperEnemyOption;
+    private bool anyEnemiesAreShuffled() => shuffleOverworldEnemies != false || shufflePalaceEnemies != false;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
+    private DripperEnemyOption dripperEnemyOption;
+    public bool dripperEnemyOptionIncluded() => anyEnemiesAreShuffled();
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? mixLargeAndSmallEnemies;
+    public bool mixLargeAndSmallEnemiesIncluded() => anyEnemiesAreShuffled();
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool generatorsAlwaysMatch;
+    public bool generatorsAlwaysMatchIncluded() => anyEnemiesAreShuffled();
 
     [Reactive]
     private EnemyLifeOption shuffleEnemyHP;
@@ -423,10 +546,14 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? shuffleOverworldItems;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? mixOverworldAndPalaceItems;
+    public bool mixOverworldAndPalaceItemsIncluded() => shufflePalaceItems != false && shuffleOverworldItems != false;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? includePBagCavesInItemShuffle;
+    public bool includePBagCavesInItemShuffleIncluded() => shuffleOverworldItems != false;
 
     [Reactive]
     private bool shuffleSmallItems;
@@ -731,17 +858,22 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         var index = flags.ReadInt(limit);
         return GetEnumFromIndex<T>(index)!;
     }
-    private T? DeserializeNullableEnum<T>(FlagReader flags, string name) where T: Enum
-    {
-        var limit = GetEnumCount<T>();
-        var index = flags.ReadNullableInt(limit);
-        return index == null ? default : GetEnumFromIndex<T>(index.Value)!;
-    }
 
-    private T DeserializeCustom<Serializer, T>(FlagReader flags, string name) where Serializer : IFlagSerializer where T : class
+    private ImmutableDictionary<T, int> DeserializeWeightedEnum<T>(FlagReader flags, string name, Predicate<T> includeOptionPredicate) where T : Enum
     {
-        IFlagSerializer serializer = GetSerializer<Serializer>();
-        return (T)serializer.Deserialize(flags.ReadInt(serializer.GetLimit()))!;
+        Dictionary<T, int> val = new();
+        int enumCount = GetEnumCount<T>();
+        for (int enumIndex = 0; enumIndex < enumCount; enumIndex++)
+        {
+            T enumOption = GetEnumFromIndex<T>(enumIndex)!;
+            if (includeOptionPredicate(enumOption))
+            {
+                int enumWeight = flags.ReadInt(4);
+                Debug.Assert(0 <= enumWeight && enumWeight <= 3);
+                val[enumOption] = enumWeight;
+            }
+        }
+        return val.ToImmutableDictionary();
     }
 
     private void SerializeBool(FlagBuilder flags, string name, bool? val, bool isNullable)
@@ -770,7 +902,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         }
         else
         {
-            var value = val!.Value;
+            int value = val!.Value;
             if (value < minimum || value > minimum + limit)
             {
                 logger.Warn($"Property ({name}) was out of range.");
@@ -784,6 +916,21 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         var index = GetEnumIndex<T>(val);
         var limit = GetEnumCount<T>();
         flags.Append(index, limit);
+    }
+
+    private void SerializeWeightedEnum<T>(FlagBuilder flags, string name, ImmutableDictionary<T, int>? val, Predicate<T> includeOptionPredicate) where T : Enum
+    {
+        int enumCount = GetEnumCount<T>();
+        for (int enumIndex = 0; enumIndex < enumCount; enumIndex++)
+        {
+            T enumOption = GetEnumFromIndex<T>(enumIndex)!;
+            if (includeOptionPredicate(enumOption))
+            {
+                int enumWeight = val?.GetValueOrDefault(enumOption) ?? 0;
+                Debug.Assert(0 <= enumWeight && enumWeight <= 3);
+                flags.Append(enumWeight, 4);
+            }
+        }
     }
 
     private void SerializeCustom<Serializer, T>(FlagBuilder flags, string name, T? val) where Serializer : IFlagSerializer where T : class
@@ -814,54 +961,52 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, startItemsLimit, shuffleStartingItems, properties, r);
             ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, startSpellsLimit, shuffleStartingSpells, properties, r);
 
-            List<PalaceStyle> allowedPalaceStyles;
             if(GpStyle.IsMetastyle())
             {
                 Debug.Assert(GpStyle == PalaceStyle.RANDOM);
-                allowedPalaceStyles = Enum.GetValues(typeof(PalaceStyle)).Cast<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
-                if (!randomStylesAllowVanilla)
-                {
-                    allowedPalaceStyles.RemoveAll(i => i.UsesVanillaRoomPool());
-                }
+                List<PalaceStyle> allowedPalaceStyles = Enum.GetValues<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
+                var weightedList = allowedPalaceStyles.Select(k => (k, palaceStyleWeights[k])).ToList();
+                var weightedRnd = new LinearWeightedRandom<PalaceStyle>(weightedList);
+                if (!weightedRnd.HasPositiveWeight()) { throw new UserFacingException("Impossible Palace Style Weights", "At least one style must be included at above zero weight."); }
+                properties.PalaceStyles[6] = weightedRnd.Next(r);
             }
             else
             {
-                allowedPalaceStyles = [GpStyle];
+                properties.PalaceStyles[6] = GpStyle;
             }
-            properties.PalaceStyles[6] = allowedPalaceStyles.Sample(r);
             Debug.Assert(!properties.PalaceStyles[6].IsMetastyle());
 
             if (NormalPalaceStyle.IsMetastyle())
             {
-                Debug.Assert(NormalPalaceStyle != PalaceStyle.RANDOM);
-                allowedPalaceStyles = Enum.GetValues(typeof(PalaceStyle)).Cast<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
-                if (!randomStylesAllowVanilla)
+                Debug.Assert(NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE || NormalPalaceStyle == PalaceStyle.RANDOM_ALL);
+                List<PalaceStyle> allowedPalaceStyles = Enum.GetValues<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
+                var weightedList = allowedPalaceStyles.Select(k => (k, palaceStyleWeights[k])).ToList();
+                var weightedRnd = new LinearWeightedRandom<PalaceStyle>(weightedList);
+                if (!weightedRnd.HasPositiveWeight()) { throw new UserFacingException("Impossible Palace Style Weights", "At least one style must be included at above zero weight."); }
+                if (NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
                 {
-                    allowedPalaceStyles.RemoveAll(i => i.UsesVanillaRoomPool());
+                    for (int i = 0; i < 6; i++)
+                    {
+                        properties.PalaceStyles[i] = weightedRnd.Next(r);
+                    }
+                }
+                else if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
+                {
+                    PalaceStyle style = weightedRnd.Next(r);
+                    for (int i = 0; i < 6; i++)
+                    {
+                        properties.PalaceStyles[i] = style;
+                    }
                 }
             }
             else
             {
-                allowedPalaceStyles = [NormalPalaceStyle];
+                Debug.Assert(!NormalPalaceStyle.IsMetastyle());
+                for (int i = 0; i < 6; i++)
+                {
+                    properties.PalaceStyles[i] = NormalPalaceStyle;
+                }
             }
-            PalaceStyle singlePalaceStyle = allowedPalaceStyles.Sample(r);
-            for (int i = 0; i < 6; i++)
-            {
-                if (normalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
-                {
-                    properties.PalaceStyles[i] = allowedPalaceStyles.Sample(r);
-                }
-                else if (normalPalaceStyle == PalaceStyle.RANDOM_ALL)
-                {
-                    properties.PalaceStyles[i] = singlePalaceStyle;
-                }
-                else
-                {
-                    properties.PalaceStyles[i] = normalPalaceStyle;
-                }
-                Debug.Assert(!properties.PalaceStyles[i].IsMetastyle());
-            }
-
 
             properties.PalaceLengths = Palaces.RollPalaceLengths(r, properties, this);
 
@@ -1029,7 +1174,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.AllowPathEnemies = allowUnsafePathEncounters;
         properties.IncludeLavaInEncounterShuffle = includeLavaInEncounterShuffle;
         properties.PalacesCanSwapContinent = palacesCanSwapContinents ?? GetIndeterminateFlagValue(r);
-        properties.P7shuffle = shuffleGP ?? GetIndeterminateFlagValue(r);
+        properties.P7shuffle = shuffleGp ?? GetIndeterminateFlagValue(r);
         properties.HiddenPalace = hidePalace ?? GetIndeterminateFlagValue(r);
         properties.HiddenKasuto = hideKasuto ?? GetIndeterminateFlagValue(r);
 
@@ -1833,5 +1978,29 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// Should be called with the field to reset as the expression body:
+    /// SetFieldToDefault(() => SettingToReset);
+    /// </summary>
+    public void SetFieldToDefault<T>(Expression<Func<T>> fieldExpr)
+    {
+        if (fieldExpr.Body is not MemberExpression member || member.Member is not FieldInfo field)
+        {
+            throw new ArgumentException("Expression must reference a field");
+        }
+
+        var target = ((ConstantExpression)member.Expression!).Value;
+
+        var attr = field.GetCustomAttribute<DefaultValueAttribute>();
+        if (attr != null)
+        {
+            field.SetValue(target, attr.Value);
+        }
+        else
+        {
+            field.SetValue(target, default);
+        }
     }
 }

@@ -91,6 +91,9 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     {
         Main = main;
         HostScreen = Main;
+        BiomesViewModel = new(Main);
+        PalacesViewModel = new(Main);
+        ItemsViewModel = new(Main);
         CustomizeViewModel = new(Main);
         Activator = new ViewModelActivator();
 
@@ -294,7 +297,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             .Subscribe(x =>
             {
                 if (x.Value ?? true) return;
-                Main.Config.ShuffleGP = false;
+                Main.Config.ShuffleGp = false;
             });
 
         Main.ObservableForProperty(x => x.ShuffleAllExpState).Subscribe(x =>
@@ -311,6 +314,10 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
     [JsonIgnore]
     public MainViewModel Main { get; }
+    [JsonIgnore]
+    public BiomesViewModel BiomesViewModel { get; }
+    public PalacesViewModel PalacesViewModel { get; }
+    public ItemsViewModel ItemsViewModel { get; }
     public CustomizeViewModel CustomizeViewModel { get; }
     
     [JsonIgnore]

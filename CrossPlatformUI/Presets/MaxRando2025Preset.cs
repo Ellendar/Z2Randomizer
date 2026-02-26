@@ -19,7 +19,7 @@ public static class MaxRando2025Preset
 
         //Overworld
         PalacesCanSwapContinents = true,
-        ShuffleGP = true,
+        ShuffleGp = true,
         ShuffleEncounters = true,
         AllowUnsafePathEncounters = true,
         IncludeLavaInEncounterShuffle = true,
@@ -48,7 +48,6 @@ public static class MaxRando2025Preset
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_PER_PALACE,
         GpStyle = PalaceStyle.RANDOM,
-        RandomStylesAllowVanilla = false,
         NormalPalaceLength = PalaceLengthOption.RANDOM,
         GpLength = PalaceLengthOption.RANDOM,
         IncludeVanillaRooms = true,

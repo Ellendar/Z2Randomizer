@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -49,6 +50,10 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             Namespace = classSymbol.ContainingNamespace?.ToDisplayString()
         };
 
+        var allMethodFields = classSymbol.GetMembers()
+            .OfType<IMethodSymbol>()
+            .Select(m => m.Name)
+            .ToList();
 
         // Get all fields with ReactiveAttribute for reactive property generation
         var reactiveFields = classSymbol.GetMembers()
@@ -80,15 +85,24 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         var serializeFields = classSymbol.GetMembers()
             .OfType<IFieldSymbol>()
             .Where(f => !HasIgnoreInFlagsAttribute(f))
-            .Select(f => new SerializedFieldInfo()
+            .Select(f =>
             {
-                FieldName = f.Name,
-                FieldType = f.Type.ToDisplayString(),
-                IsEnum = f.Type.TypeKind == TypeKind.Enum,
-                EnumSymbol = f.Type.TypeKind == TypeKind.Enum ? f.Type as INamedTypeSymbol : null,
-                Limit = GetCustomLimit(f),
-                Minimum = GetCustomMinimum(f),
-                CustomSerializerName = GetCustomFlagSerializer(f),
+                var dictionaryInterface = f.Type.AllInterfaces
+                    .FirstOrDefault(i => i.OriginalDefinition.ToDisplayString().StartsWith("System.Collections.Generic.IDictionary"));
+                var innerType = dictionaryInterface != null ? dictionaryInterface.TypeArguments[0] : f.Type;
+                return new SerializedFieldInfo()
+                {
+                    FieldName = f.Name,
+                    FieldType = innerType.ToDisplayString(),
+                    IsConditionallyIncluded = HasConditionallyIncludedInFlagsAttribute(f),
+                    DefaultValue = GetDefaultValue(f, allMethodFields),
+                    IsDictionary = dictionaryInterface != null,
+                    IsEnum = f.Type.TypeKind == TypeKind.Enum,
+                    EnumSymbol = f.Type.TypeKind == TypeKind.Enum ? f.Type as INamedTypeSymbol : null,
+                    Limit = GetCustomLimit(f),
+                    Minimum = GetCustomMinimum(f),
+                    CustomSerializerName = GetCustomFlagSerializer(f),
+                };
             }).ToList();
 
         classInfo.SerializedFields.AddRange(serializeFields);
@@ -122,6 +136,29 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
     {
         return classSymbol.AllInterfaces
             .Any(i => i.Name == "INotifyPropertyChanged");
+    }
+
+    private static bool HasConditionallyIncludedInFlagsAttribute(IFieldSymbol field)
+    {
+        return field.GetAttributes()
+            .Any(attr => attr.AttributeClass?.Name.StartsWith("ConditionallyIncludeInFlags") ?? false);
+    }
+
+    private static string GetDefaultValue(IFieldSymbol f, List<string> allMethodFields)
+    {
+        var defaultAttr = f.GetAttributes()
+            .FirstOrDefault(a => a.AttributeClass?.ToDisplayString() == "System.ComponentModel.DefaultValueAttribute");
+        var arg = defaultAttr?.ConstructorArguments[0];
+        if (arg != null)
+        {
+            return FormatArgument(arg.Value);
+        }
+        var methodName = $"{f.Name}Default";
+        if (allMethodFields.Contains(methodName))
+        {
+            return $"{methodName}()";
+        }
+        return "default";
     }
 
     private static bool HasIgnoreInFlagsAttribute(IFieldSymbol field)
@@ -197,7 +234,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             //     attrName = attrName[..^9];
 
             var args = attr.ConstructorArguments
-                .Select(arg => arg.Value?.ToString() ?? "null")
+                .Select(arg => FormatArgument(arg))
                 .ToList();
 
             attributes.Add(new AttributeInfo
@@ -309,7 +346,16 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             var serializeCall = GetSerializeCall(field);
-            sb.AppendLine($"{indent}        {serializeCall};");
+            if (field.IsConditionallyIncluded)
+            {
+                sb.AppendLine($"{indent}        if ({field.FieldName}Included()) {{ ");
+                sb.AppendLine($"{indent}            {serializeCall};");
+                sb.AppendLine($"{indent}        }}");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        {serializeCall};");
+            }
         }
 
         sb.AppendLine();
@@ -328,7 +374,20 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             var deserializeCall = GetDeserializeCall(field);
-            sb.AppendLine($"{indent}        {deserializeCall};");
+            if (field.IsConditionallyIncluded)
+            {
+                sb.AppendLine($"{indent}        if ({field.FieldName}Included()) {{ ");
+                sb.AppendLine($"{indent}            {deserializeCall};");
+                sb.AppendLine($"{indent}        }}");
+                sb.AppendLine($"{indent}        else");
+                sb.AppendLine($"{indent}        {{");
+                sb.AppendLine($"{indent}            {GetPropertyName(field.FieldName)} = {field.DefaultValue};");
+                sb.AppendLine($"{indent}        }}");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        {deserializeCall};");
+            }
         }
         sb.AppendLine();
         sb.AppendLine($"{indent}    }}");
@@ -366,6 +425,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             "bool" or "System.Boolean" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName}, false)",
             "bool?" or "System.Boolean?" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName}, true)",
             var type when field.IsEnum => $"SerializeEnum<{type}>(flags, \"{field.FieldName}\", {field.FieldName})",
+            var type when field.IsDictionary => $"SerializeWeightedEnum<{type}>(flags, \"{field.FieldName}\", {field.FieldName}, a => a.CanHaveWeight())",
             _ => $"SerializeCustom<{field.CustomSerializerName}, {field.FieldType}>(flags, \"{field.FieldName}\", {field.FieldName})"
         });
         return output.ToString();
@@ -386,6 +446,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             "bool" or "System.Boolean" => $"{propName} = DeserializeBool(flags, \"{field.FieldName}\")",
             "bool?" or "System.Boolean?" => $"{propName} = DeserializeNullableBool(flags, \"{field.FieldName}\")",
             var type when field.IsEnum => $"{propName} = DeserializeEnum<{type}>(flags, \"{field.FieldName}\")",
+            var type when field.IsDictionary => $"{propName} = DeserializeWeightedEnum<{type}>(flags, \"{field.FieldName}\", a => a.CanHaveWeight())",
             _ => $"{propName} = DeserializeCustom<{field.CustomSerializerName}, {field.FieldType}>(flags, \"{field.FieldName}\")"
         });
         return output.ToString();
@@ -502,6 +563,28 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         var lastDot = fullTypeName.LastIndexOf('.');
         return lastDot >= 0 ? fullTypeName[(lastDot + 1)..] : fullTypeName;
     }
+
+    private static string FormatArgument(TypedConstant arg)
+    {
+        if (arg.Kind == TypedConstantKind.Primitive)
+        {
+            return arg.Value switch
+            {
+                bool b => b ? "true" : "false",
+                string s => $"\"{s}\"",
+                char c => $"'{c}'",
+                null => "null",
+                _ => Convert.ToString(arg.Value, CultureInfo.InvariantCulture)!
+            };
+        }
+
+        if (arg.Kind == TypedConstantKind.Enum)
+        {
+            return $"{arg.Type!.ToDisplayString()}.{arg.Value}";
+        }
+
+        return "null";
+    }
 }
 
 public class ClassGenerationInfo
@@ -517,6 +600,9 @@ public class SerializedFieldInfo
 {
     public string FieldName { get; set; } = string.Empty;
     public string FieldType { get; set; } = string.Empty;
+    public bool IsConditionallyIncluded { get; set; }
+    public string? DefaultValue { get; set; }
+    public bool IsDictionary { get; set; }
     public bool IsEnum { get; set; }
     public INamedTypeSymbol? EnumSymbol { get; set; }
     public int? Limit { get; set; }

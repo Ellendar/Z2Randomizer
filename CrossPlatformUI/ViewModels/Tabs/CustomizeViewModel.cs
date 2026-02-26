@@ -12,9 +12,6 @@ public class CustomizeViewModel : ReactiveObject
     public SpritePreviewViewModel SpritePreviewViewModel { get; }
 
     [JsonConstructor]
-#pragma warning disable CS8618 
-    public CustomizeViewModel() {}
-#pragma warning restore CS8618 
     public CustomizeViewModel(MainViewModel main)
     {
         Main = main;

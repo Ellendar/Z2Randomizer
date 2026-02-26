@@ -22,7 +22,7 @@ public static class HardmodePreset
 
         //Overworld
         PalacesCanSwapContinents = true,
-        ShuffleGP = true,
+        ShuffleGp = true,
         ShuffleEncounters = false,
         AllowUnsafePathEncounters = false,
         IncludeLavaInEncounterShuffle = true,

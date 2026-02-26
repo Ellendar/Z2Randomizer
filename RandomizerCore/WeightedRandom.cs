@@ -179,6 +179,11 @@ public class LinearWeightedRandom<T> : IWeightedSampler<T> where T : notnull
         return _keys;
     }
 
+    public bool HasPositiveWeight()
+    {
+        return _totalWeight > 0;
+    }
+
     public int Weight(T t)
     {
         return _weights[t];

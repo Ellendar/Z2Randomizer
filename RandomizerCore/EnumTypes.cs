@@ -135,19 +135,19 @@ public enum LifeEffectiveness
 [DefaultValue(VANILLA)]
 public enum XPEffectiveness
 {
-    [Description("Vanilla (No Randomization)")]
+    [Description("Vanilla; (No Randomization)")]
     VANILLA,
-    [Description("Low [-3 to +1]"), RandomRangeInt(Low = -3, High = 1)]
+    [Description("Low; [-3 to +1]"), RandomRangeInt(Low = -3, High = 1)]
     RANDOM_LOW,
-    [Description("Average [-2 to +2]"), RandomRangeInt(Low = -2, High = 2)]
+    [Description("Average; [-2 to +2]"), RandomRangeInt(Low = -2, High = 2)]
     RANDOM,
-    [Description("Average (Low Variance) [-1 to +1]"), RandomRangeInt(Low = -1, High = 1)]
-    LESS_VARIANCE,
-    [Description("Above Average (Low Variance) [0 to +1]"), RandomRangeInt(Low = 0, High = 1)]
+    [Description("Low Variance; [-1 to +1]"), RandomRangeInt(Low = -1, High = 1)]
+    LOW_VARIANCE,
+    [Description("Slightly High; [0 to +1]"), RandomRangeInt(Low = 0, High = 1)]
     SLIGHTLY_HIGH,
-    [Description("High [-1 to +3]"), RandomRangeInt(Low = -1, High = 3)]
+    [Description("High; [-1 to +3]"), RandomRangeInt(Low = -1, High = 3)]
     RANDOM_HIGH,
-    [Description("Wide [-4 to +4]"), RandomRangeInt(Low = -4, High = 4)]
+    [Description("Wide; [-4 to +4]"), RandomRangeInt(Low = -4, High = 4)]
     WIDE,
     [Description("None"), RandomRangeInt(Low = -15, High = -15)]
     NONE
@@ -155,15 +155,15 @@ public enum XPEffectiveness
 
 public enum EnemyLifeOption
 {
-    [Description("Vanilla")]
+    [Description("Vanilla; (No Randomization)")]
     VANILLA,
-    [Description("Medium [-50% to +50%]"), RandomRangeDouble(Low = 0.5, High = 1.5)]
+    [Description("Medium; [-50% to +50%]"), RandomRangeDouble(Low = 0.5, High = 1.5)]
     MEDIUM,
-    [Description("High [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
+    [Description("High; [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
     HIGH,
-    [Description("Medium High [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
+    [Description("Medium High; [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
     MEDIUM_HIGH,
-    [Description("Wide [-75% to +200%]"), RandomRangeDouble(Low = 0.25, High = 3.0)]
+    [Description("Wide; [-75% to +200%]"), RandomRangeDouble(Low = 0.25, High = 3.0)]
     WIDE,
 }
 
@@ -197,26 +197,26 @@ public enum FireOption
 [DefaultValue(VANILLA)]
 public enum PalaceStyle
 {
-    [Description("Vanilla")]
+    [Description("Vanilla"), CanHaveWeight]
     VANILLA,
-    [Description("Shuffled")]
+    [Description("Shuffled"), CanHaveWeight]
     SHUFFLED,
-    [Description("Reconstructed")]
+    [Description("Reconstructed"), CanHaveWeight]
     RECONSTRUCTED,
-    [Description("Sequential")]
+    [Description("Sequential"), CanHaveWeight]
     SEQUENTIAL,
-    [Description("Random Walk")]
+    [Description("Random Walk"), CanHaveWeight]
     RANDOM_WALK,
-    [Description("Tower")]
+    [Description("Tower"), CanHaveWeight]
     TOWER,
-    [Description("Chaos")]
+    [Description("Chaos"), CanHaveWeight]
     CHAOS,
     [Description("Random"), Metastyle]
     RANDOM,
     [Description("Random (All Same)"), Metastyle]
     RANDOM_ALL,
     [Description("Random (Per Palace)"), Metastyle]
-    RANDOM_PER_PALACE
+    RANDOM_PER_PALACE,
 }
 
 public static class PalaceStyleExtensions
@@ -852,6 +852,10 @@ public class StringValueAttribute(string v) : Attribute
     }
 }
 
+public class CanHaveWeightAttribute : Attribute
+{
+}
+
 public class MetastyleAttribute : Attribute
 {
 }
@@ -887,9 +891,9 @@ public record EnumDescription
     public object? Value { get; init; }
 
     public string? Description { get; init; }
-    
-    public string? Help { get; init; }
-    
+
+    public string? Info { get; init; }
+
     public override string ToString()
     {
         return Description ?? "";
@@ -912,9 +916,9 @@ public static class Enums
     public static IEnumerable<EnumDescription> PalaceLengthOptionList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
-        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM);
+        = ToDescriptions<PalaceStyle>(i => !i.IsMetastyle() || i == PalaceStyle.RANDOM_PER_PALACE || i == PalaceStyle.RANDOM_ALL);
     public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
-        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);
+        = ToDescriptions<PalaceStyle>(i => !i.IsMetastyle() || i == PalaceStyle.RANDOM);
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();
     public static IEnumerable<EnumDescription> PalaceDropStyleList { get; } = ToDescriptions<PalaceDropStyle>();
 
@@ -965,12 +969,16 @@ public static class Enums
         return Enum.ToObject(enumType, (attributes[0] as DefaultValueAttribute)?.Value!);
     }
 
-    public static EnumDescription ToDescription(this Enum value)
+    public static EnumDescription ToDescription(this Enum self)
     {
         string description;
-        string? help = null;
-        
-        var attributes = value.GetType().GetField(value.ToString())?.GetCustomAttributes(typeof(DescriptionAttribute), false);
+        string? info = null;
+
+        Type type = self.GetType();
+        string name = Enum.GetName(type, self)!;
+        var field = type.GetField(name);
+
+        var attributes = field?.GetCustomAttributes(typeof(DescriptionAttribute), false);
         if (attributes?.Length is > 0)
         {
             description = (attributes[0] as DescriptionAttribute)?.Description!;
@@ -978,16 +986,26 @@ public static class Enums
         else
         {
             var ti = CultureInfo.CurrentCulture.TextInfo;
-            description = ti.ToTitleCase(ti.ToLower(value.ToString().Replace("_", " ")));
+            description = ti.ToTitleCase(ti.ToLower(name.Replace("_", " ")));
         }
-        
+
         if (description.IndexOf(';') is var index && index != -1)
         {
-            help = description.Substring(index + 1);
+            info = description.Substring(index + 1);
             description = description.Substring(0, index);
         }
 
-        return new EnumDescription() { Value = value, Description = description, Help = help };
+        return new EnumDescription() { Value = self, Description = description, Info = info };
+    }
+
+    public static bool CanHaveWeight(this Enum self)
+    {
+        Type type = self.GetType();
+        string? name = Enum.GetName(type, self);
+        if (name == null) { return false; }
+        FieldInfo? fieldInfo = type.GetField(name);
+        if (fieldInfo == null) { return false; }
+        return fieldInfo.IsDefined(typeof(CanHaveWeightAttribute), inherit: false);
     }
 
     public static bool IsMetastyle(this Enum self)
