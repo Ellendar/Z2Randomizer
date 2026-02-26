@@ -13,9 +13,10 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
     private const int MINIMUM_ROOMS_PER_FLOOR = 3;
 
     private const double SINGLE_WALL_CHANCE = .3;
-    private const double SEGMENTED_CHANCE = .2;
-    private const double DROP_CHANCE = .1;
-    private const double REDUNDANT_ELEVATOR_CHANCE = .1;
+    //These increase failure chance so i'm trying a higher chance to get an effective rate around .2
+    private const double SEGMENTED_CHANCE = .3;
+    private const double DROP_CHANCE = .15;
+    private const double REDUNDANT_ELEVATOR_CHANCE = .15;
 
     private TableWeightedRandom<SegmentConnectionType> SegmentConnectionOptionWeights = new([
         (SegmentConnectionType.ELEVATOR_UP, 10),

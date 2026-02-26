@@ -125,7 +125,10 @@ public class Climate
         {
             foreach (Terrain terrain in walkableTerrains)
             {
-                DistanceCoefficients[(int)terrain] /= ((mountainTerrainGrowth * constraintLimitFactor) / aggregateWalkableTerrainGrowth);
+                //decrease the distance coefficient (embiggen) proportionally to how big the mountains are and how much the safety factor is
+                //but inversely proportional to the square root of the frequency this terrain appears. This means more common terrains
+                //are less affeted per group (but more affective of the growth in total)
+                DistanceCoefficients[(int)terrain] /= (mountainTerrainGrowth * constraintLimitFactor) / float.Sqrt(aggregateWalkableTerrainGrowth);
             }
         }
     }
