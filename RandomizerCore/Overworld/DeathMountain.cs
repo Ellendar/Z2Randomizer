@@ -534,21 +534,22 @@ sealed class DeathMountain : World
                     PlaceRandomTerrain(climate, 5);
                 }
                 randomTerrainFilter.Add(Terrain.ROAD);
-                //Debug.WriteLine(GetMapDebug());
-                //XXX: Was this a double inversion
+
                 Climate growthClimate = climate.Clone();
                 float dmOpennessFactor = biome switch
                 {
                     Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),
+                    Biome.ISLANDS => (float)(RNG.NextDouble() * .5 + 1),
                     _ => 1f
                 };
                 growthClimate.ApplyDeathMountainSafety(randomTerrainFilter, dmOpennessFactor);
+                Debug.WriteLine(GetMapDebug());
                 if (!GrowTerrain(growthClimate))
                 {
                     logger.LogDebug("GrowTerrain failed");
                     return false;
                 }
-                //Debug.WriteLine(GetMapDebug());
+                Debug.WriteLine(GetMapDebug());
                 if (biome == Biome.CALDERA)
                 {
                     bool f = MakeCaldera(props.CanWalkOnWaterWithBoots);

@@ -15,12 +15,6 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_97184A2B42CB4E07A8BF3D9779D837D6"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_B0F49DB0EDF54F159193D61E9D0E0F01"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -28,6 +22,12 @@
         "Entry"
         {
         "MsmKey" = "8:_D4CF4E2CDFFB4EE6A2F61784088A2B74"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F378AD3985BD4A44AD9A2AB74FDC8F17"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5"
+                "FrameworkVersion" = "8:v4.5 "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -142,10 +142,10 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_97184A2B42CB4E07A8BF3D9779D837D6"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D4CF4E2CDFFB4EE6A2F61784088A2B74"
             {
-            "SourcePath" = "8:..\\CrossPlatformUI.Desktop\\bin\\publish\\Z2Randomizer.exe"
-            "TargetName" = "8:Z2Randomizer.exe"
+            "SourcePath" = "8:1st.ico"
+            "TargetName" = "8:1st.ico"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
             "Condition" = "8:"
@@ -162,10 +162,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D4CF4E2CDFFB4EE6A2F61784088A2B74"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F378AD3985BD4A44AD9A2AB74FDC8F17"
             {
-            "SourcePath" = "8:1st.ico"
-            "TargetName" = "8:1st.ico"
+            "SourcePath" = "8:..\\CrossPlatformUI.Desktop\\bin\\Release\\net10.0\\publish\\win-x64\\Z2Randomizer.exe"
+            "TargetName" = "8:Z2Randomizer.exe"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
             "Condition" = "8:"
@@ -248,16 +248,16 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Z2Randomizer Community Fork"
-        "ProductCode" = "8:{EEDDF500-F4CF-4B2C-B8CC-8317B4FD75B7}"
-        "PackageCode" = "8:{B43DE6EA-1008-4395-B502-9081B828E450}"
-        "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
+        "ProductName" = "8:Z2Randomizer Community Fork (Beta)"
+        "ProductCode" = "8:{8BD6E572-384D-4812-A7A3-6EB542224A29}"
+        "PackageCode" = "8:{7A69EADF-A25D-4914-9209-34ED6708ACCB}"
+        "UpgradeCode" = "8:{209F931F-26E9-4B9A-8E2C-82F66B495079}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:5.0.10"
+        "ProductVersion" = "8:5.1.0"
         "Manufacturer" = "8:Ellendar"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -799,7 +799,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B0F49DB0EDF54F159193D61E9D0E0F01"
             {
-            "SourcePath" = "8:..\\DumpRooms\\obj\\Release\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\DumpRooms\\obj\\Debug\\net10.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -827,7 +827,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FDAF64163E1242A1BC91894E0D2DCFA8"
             {
-            "SourcePath" = "8:..\\CommandLine\\obj\\Release\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\CommandLine\\obj\\Debug\\net10.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"

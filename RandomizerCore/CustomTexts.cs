@@ -277,7 +277,8 @@ public class CustomTexts
         "Woah!$Dude!",
         "PAY ME$AND I'LL$TALK",
         "the hint$is in$another$castle",
-        "did you$check the$old kasuto$hint?"
+        "did you$check the$old kasuto$hint?",
+        "Hookshot$is in$moon$palace"
     ];
 
     public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXT =
@@ -372,6 +373,7 @@ public class CustomTexts
         "all you$need is$%%",
         "the secret$word is$%%",
         "have a$%%$on the$house",
+        "I summon$%%$in attack$position!"
     ];
 
     public static List<Text> GenerateTexts(

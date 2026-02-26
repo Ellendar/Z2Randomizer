@@ -181,8 +181,8 @@ public static class Climates
             { Terrain.GRAVE, .35f },
             { Terrain.LAVA, .5f },
             { Terrain.WALKABLEWATER, .5f },
-            { Terrain.PREPLACED_WATER_WALKABLE, 1 },
-            { Terrain.PREPLACED_WATER, 1 },
+            { Terrain.PREPLACED_WATER_WALKABLE, .5f },
+            { Terrain.PREPLACED_WATER, .5f },
             { Terrain.WATER, .25f },
             { Terrain.MOUNTAIN, 1 },
             { Terrain.ROAD, 1 }

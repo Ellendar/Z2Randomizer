@@ -163,7 +163,7 @@ public enum EnemyLifeOption
     HIGH,
     [Description("Medium High [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
     MEDIUM_HIGH,
-    [Description("Medium High [-75% to +200%]"), RandomRangeDouble(Low = 0.25, High = 3.0)]
+    [Description("Wide [-75% to +200%]"), RandomRangeDouble(Low = 0.25, High = 3.0)]
     WIDE,
 }
 
@@ -926,6 +926,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
         = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();
+    public static IEnumerable<EnumDescription> PalaceDropStyleList { get; } = ToDescriptions<PalaceDropStyle>();
 
     public static IEnumerable<EnumDescription> WestBiomeList { get; } = ToDescriptions<Biome>(i => i.IsWestBiome());
     public static IEnumerable<EnumDescription> EastBiomeList { get; } = ToDescriptions<Biome>(i => i.IsEastBiome());

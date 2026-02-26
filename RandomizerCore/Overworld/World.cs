@@ -796,10 +796,8 @@ public abstract class World
 
             x += deltaX;
             y += deltaY;
-            int perpDx1 = deltaX == 0 ? 1 : 0;
-            int perpDx2 = deltaX == 0 ? -1 : 0;
-            int perpDy1 = deltaY == 0 ? 1 : 0;
-            int perpDy2 = deltaY == 0 ? -1 : 0;
+            int perpDx = deltaX == 0 ? 1 : 0;
+            int perpDy = deltaY == 0 ? 1 : 0;
 
             //iterate expanding the bridge
             while (x > 0 && x < MAP_COLS && y > 0 && y < MAP_ROWS && crossingTerrains.Contains(map[y, x]))
@@ -847,13 +845,13 @@ public abstract class World
                     adjacentRiverTerrainDirectionCount++;
                 }
                 //Check perpendicular tiles. This is allowed to be any walkable terrain on the first/last tiles of the bridge
-                if (x + perpDx1 < MAP_COLS && x + perpDx1 >= 0 && y + perpDy1 < MAP_ROWS && y - perpDy1 >= 0 &&
-                    (effectiveCrossingTerrain.Contains(map[y + perpDy1, x + perpDx1]) || map[y + perpDy1, x + perpDx1] == Terrain.MOUNTAIN))
+                if (x + perpDx < MAP_COLS && x + perpDx >= 0 && y + perpDy < MAP_ROWS && y - perpDy >= 0 &&
+                    (effectiveCrossingTerrain.Contains(map[y + perpDy, x + perpDx]) || map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
-                if (x + perpDx2 < MAP_COLS && x + perpDx2 >= 0 && y + perpDy2 < MAP_ROWS && y - perpDy2 >= 0 &&
-                    (effectiveCrossingTerrain.Contains(map[y + perpDy2, x + perpDx2]) || map[y + perpDy2, x + perpDx2] == Terrain.MOUNTAIN))
+                if (x - perpDx < MAP_COLS && x - perpDx >= 0 && y - perpDy < MAP_ROWS && y - perpDy >= 0 &&
+                    (effectiveCrossingTerrain.Contains(map[y - perpDy, x - perpDx]) || map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
@@ -916,7 +914,7 @@ public abstract class World
 
                 if (placeSaria)
                 {
-
+                    //Saria doesn't need to worry about sideways entrance since it's not a passthrough
                     map[y, x] = Terrain.TOWN;
                     Location location = GetLocationByMem(0x465F);
                     location.Y = y;
@@ -938,8 +936,23 @@ public abstract class World
                 {
                     Location bridge1 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_WEST_LOCATION);
                     Location bridge2 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_EAST_LOCATION);
-                    x -= deltaX;
-                    y -= deltaY;
+
+                    if (!walkableTerrains.Contains(map[y - deltaY, x - deltaX]))
+                    {
+                        map[y - deltaY, x - deltaX] = Terrain.BRIDGE;
+                    }
+
+                    while (walkableTerrains.Contains(map[y + perpDy, x + perpDx]) || walkableTerrains.Contains(map[y - perpDy, x - perpDx]))
+                    {
+                        if ((deltaY < 0 && y > startY) || (deltaY > 0 && y < startY) || (deltaX < 0 && x > startX) || (deltaX > 0 && x < startX))
+                        {
+                            logger.Warn("Unable to roll back bridge location with jagged entrance");
+                            return false;
+                        }
+                        x -= deltaX;
+                        y -= deltaY;
+                    }
+
                     if (deltaX > 0 || deltaY > 0)
                     {
                         bridge2.Xpos = x;
@@ -981,8 +994,23 @@ public abstract class World
                     Location bridge2 = GetLocationByMem(RomMap.EAST_TRAP_DESERT_TILE_LOCATION1);
                     if (bridge1.CanShuffle && bridge2.CanShuffle)
                     {
-                        x -= deltaX;
-                        y -= deltaY;
+                        if (!walkableTerrains.Contains(map[y - deltaY, x - deltaX]))
+                        {
+                            map[y - deltaY, x - deltaX] = Terrain.DESERT;
+                        }
+                        //Walk backwards until the first tile flanked on both sides by the river
+                        while (walkableTerrains.Contains(map[y + perpDy, x + perpDx]) || walkableTerrains.Contains(map[y - perpDy, x - perpDx]))
+                        {
+                            if ((deltaY < 0 && y > startY) || (deltaY > 0 && y < startY) || (deltaX < 0 && x > startX) || (deltaX > 0 && x < startX))
+                            {
+                                logger.Warn("Unable to roll back bridge location with jagged entrance");
+                                return false;
+                            }
+                            x -= deltaX;
+                            y -= deltaY;
+                        }
+
+                        //That's where the first bridge encounter is
                         if (deltaX > 0 || deltaY > 0)
                         {
                             bridge2.Xpos = x;
@@ -994,12 +1022,15 @@ public abstract class World
                             bridge1.Y = y;
                         }
 
-                        while (crossingTerrains.Contains(map[y, x]))
+                        //Keep walking back placing deserts until the path opens up
+                        while (!walkableTerrains.Contains(map[y + perpDy, x + perpDx]) && !walkableTerrains.Contains(map[y - perpDy, x - perpDx]))
                         {
                             map[y, x] = Terrain.DESERT;
                             x -= deltaX;
                             y -= deltaY;
                         }
+
+                        //now we're past the opening, so go the other way 1
                         x += deltaX;
                         y += deltaY;
                         map[y, x] = Terrain.DESERT;
