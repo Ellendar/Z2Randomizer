@@ -515,12 +515,14 @@ public class StatRandomizer
 
     protected void RandomizeRegularEnemyHp(Random r)
     {
-        if (!props.ShuffleEnemyHP.IsRandom()) {
+        RandomRangeDoubleAttribute? range = props.ShuffleEnemyHP.GetRandomRangeDouble();
+        if (range == null)
+        {
+            Debug.Assert(props.ShuffleEnemyHP == EnemyLifeOption.VANILLA);
             return;
         }
-
-        double low = props.ShuffleEnemyHP.GetRandomRangeDouble()!.Low;
-        double high = props.ShuffleEnemyHP.GetRandomRangeDouble()!.High;
+        double low = range.Low;
+        double high = range.High;
         int i;
 
         for (i = (int)EnemiesWest.MYU; i < 0x23; i++) { RandomizeInsideArray(r, WestEnemyHpTable, i, low, high); }
@@ -545,10 +547,15 @@ public class StatRandomizer
 
     protected void RandomizeBossHp(Random r)
     {
-        if (props.ShuffleBossHP == EnemyLifeOption.VANILLA) { return; }
-
-        var rr = props.ShuffleBossHP.GetRandomRangeDouble()!;
-        for (int i = 0; i < BossHpTable.Length; i++) { RandomizeInsideArray(r, BossHpTable, i, rr.Low, rr.High); }
+        RandomRangeDoubleAttribute? range = props.ShuffleBossHP.GetRandomRangeDouble();
+        if (range == null)
+        {
+            Debug.Assert(props.ShuffleBossHP == EnemyLifeOption.VANILLA);
+            return;
+        }
+        double low = range.Low;
+        double high = range.High;
+        for (int i = 0; i < BossHpTable.Length; i++) { RandomizeInsideArray(r, BossHpTable, i, low, high); }
     }
 
     protected void RandomizeEnemyStats(Random r)
@@ -558,10 +565,7 @@ public class StatRandomizer
         RandomizeEnemyAttributes(r, Palace125EnemyStatsTable, Enemies.Palace125GroundEnemies, Enemies.Palace125FlyingEnemies, Enemies.Palace125Generators);
         RandomizeEnemyAttributes(r, Palace346EnemyStatsTable, Enemies.Palace346GroundEnemies, Enemies.Palace346FlyingEnemies, Enemies.Palace346Generators);
         RandomizeEnemyAttributes(r, GpEnemyStatsTable, Enemies.GPGroundEnemies, Enemies.GPFlyingEnemies, Enemies.GPGenerators);
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            RandomizeEnemyExp(r, BossExpTable, props.EnemyXPDrops);
-        }
+        RandomizeEnemyExp(r, BossExpTable, props.EnemyXPDrops); // randomize boss XP separately
     }
 
     protected void RandomizeEnemyAttributes<T>(Random r, byte[] bytes, T[] groundEnemies, T[] flyingEnemies, T[] generators) where T : Enum
@@ -588,10 +592,7 @@ public class StatRandomizer
         {
             RandomizeBits(r, enemyBytes1, XP_STEAL_BIT);
         }
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            RandomizeEnemyExp(r, enemyBytes1, props.EnemyXPDrops);
-        }
+        RandomizeEnemyExp(r, enemyBytes1, props.EnemyXPDrops);
 
         // enemy attributes byte2
         // ..x. .... immune to projectiles
@@ -625,14 +626,21 @@ public class StatRandomizer
 
     protected static void RandomizeEnemyExp(Random r, byte[] bytes, XPEffectiveness effectiveness)
     {
-        var rr = effectiveness.GetRandomRangeInt()!;
+        RandomRangeIntAttribute? range = effectiveness.GetRandomRangeInt();
+        if (range == null)
+        {
+            Debug.Assert(effectiveness == XPEffectiveness.VANILLA);
+            return;
+        }
+        int low = range.Low;
+        int high = range.High;
 
         for (int i = 0; i < bytes.Length; i++)
         {
             int byt = bytes[i];
             int nibble = byt & 0x0f;
 
-            nibble = r.Next(nibble + rr.Low, nibble + rr.High + 1);
+            nibble = r.Next(nibble + low, nibble + high + 1);
             nibble = Math.Min(Math.Max(nibble, 0), 15);
 
             bytes[i] = (byte)((byt & 0xf0) | nibble);
