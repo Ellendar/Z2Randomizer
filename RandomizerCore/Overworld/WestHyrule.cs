@@ -283,14 +283,16 @@ public sealed class WestHyrule : World
         biome = props.WestBiome;
         if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE || props.WestSize == OverworldSizeOption.LARGE)
         {
-            MAP_ROWS = 75;
             MAP_COLS = 64;
+            MAP_ROWS = 75;
+            northSouthEncounterSeparator = 30;
         }
         else
         {
             var meta = props.WestSize.GetMeta();
-            MAP_ROWS = meta.Width;
-            MAP_COLS = meta.Height;
+            MAP_COLS = meta.Width;
+            MAP_ROWS = meta.Height;
+            northSouthEncounterSeparator = MAP_ROWS / 2;
             // TODO: use metadata for num passthrough caves to remove for small continents
             // RemoveLocations([fairyCave, fairyCave2]);
             // caveConnections.Remove((fairyCave, fairyCave2));
@@ -806,6 +808,7 @@ public sealed class WestHyrule : World
             return false;
         }
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
+        rom.Put(RomMap.NORTH_SOUTH_SEPARATOR_WEST, (byte)(northSouthEncounterSeparator + 30));
 
         visitation = new bool[MAP_ROWS, MAP_COLS];
         for (int i = 0; i < MAP_ROWS; i++)

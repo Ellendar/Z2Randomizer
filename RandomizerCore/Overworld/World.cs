@@ -48,6 +48,8 @@ public abstract class World
     public int baseAddr;
     public Continent continentId;
     protected Climate climate;
+    /// south encounter version will be used when Link's Y >= this
+    public int northSouthEncounterSeparator { get; init; }
 
     protected Random RNG;
 

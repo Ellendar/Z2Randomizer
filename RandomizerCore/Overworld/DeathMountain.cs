@@ -167,17 +167,19 @@ sealed class DeathMountain : World
         {
             MAP_COLS = 64;
             MAP_ROWS = 75;
+            northSouthEncounterSeparator = 45;
         }
         else
         {
             var meta = props.DmSize.GetMeta();
-            MAP_COLS = meta.Height;
-            MAP_ROWS = meta.Width;
+            MAP_COLS = meta.Width;
+            MAP_ROWS = meta.Height;
+            northSouthEncounterSeparator = MAP_ROWS / 2;
 
             if (biome == Biome.CALDERA) // Caldera won't work with less
             {
-                MAP_ROWS = Math.Max(MAP_ROWS, 35);
                 MAP_COLS = Math.Max(MAP_COLS, 35);
+                MAP_ROWS = Math.Max(MAP_ROWS, 35);
             }
 
             // TODO: use metadata for num caves to remove
@@ -614,7 +616,7 @@ sealed class DeathMountain : World
         }
 
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
-        
+        rom.Put(RomMap.NORTH_SOUTH_SEPARATOR_DM, (byte)(northSouthEncounterSeparator + 30));
 
         visitation = new bool[MAP_ROWS, MAP_COLS];
         for (int i = 0; i < MAP_ROWS; i++)
