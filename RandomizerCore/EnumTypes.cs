@@ -135,19 +135,19 @@ public enum LifeEffectiveness
 [DefaultValue(VANILLA)]
 public enum XPEffectiveness
 {
-    [Description("Vanilla (No Randomization)"), RandomRangeInt(Low = 0, High = 0)]
+    [Description("Vanilla (No Randomization)")]
     VANILLA,
-    [Description("Low [-3 to +1]"), RandomRangeInt(Low = -3, High = 1), IsRandom]
+    [Description("Low [-3 to +1]"), RandomRangeInt(Low = -3, High = 1)]
     RANDOM_LOW,
-    [Description("Average [-2 to +2]"), RandomRangeInt(Low = -2, High = 2), IsRandom]
+    [Description("Average [-2 to +2]"), RandomRangeInt(Low = -2, High = 2)]
     RANDOM,
-    [Description("Average (Low Variance) [-1 to +1]"), RandomRangeInt(Low = -1, High = 1), IsRandom]
+    [Description("Average (Low Variance) [-1 to +1]"), RandomRangeInt(Low = -1, High = 1)]
     LESS_VARIANCE,
-    [Description("Above Average (Low Variance) [0 to +1]"), RandomRangeInt(Low = 0, High = 1), IsRandom]
+    [Description("Above Average (Low Variance) [0 to +1]"), RandomRangeInt(Low = 0, High = 1)]
     SLIGHTLY_HIGH,
-    [Description("High [-1 to +3]"), RandomRangeInt(Low = -1, High = 3), IsRandom]
+    [Description("High [-1 to +3]"), RandomRangeInt(Low = -1, High = 3)]
     RANDOM_HIGH,
-    [Description("Wide [-4 to +4]"), RandomRangeInt(Low = -4, High = 4), IsRandom]
+    [Description("Wide [-4 to +4]"), RandomRangeInt(Low = -4, High = 4)]
     WIDE,
     [Description("None"), RandomRangeInt(Low = -15, High = -15)]
     NONE
@@ -211,11 +211,11 @@ public enum PalaceStyle
     TOWER,
     [Description("Chaos")]
     CHAOS,
-    [Description("Random")]
+    [Description("Random"), Metastyle]
     RANDOM,
-    [Description("Random (All Same)")]
+    [Description("Random (All Same)"), Metastyle]
     RANDOM_ALL,
-    [Description("Random (Per Palace)")]
+    [Description("Random (Per Palace)"), Metastyle]
     RANDOM_PER_PALACE
 }
 
@@ -227,16 +227,6 @@ public static class PalaceStyleExtensions
         {
             PalaceStyle.VANILLA => true,
             PalaceStyle.SHUFFLED => true,
-            _ => false
-        };
-    }
-    public static bool IsMetastyle(this PalaceStyle style)
-    {
-        return style switch
-        {
-            PalaceStyle.RANDOM => true,
-            PalaceStyle.RANDOM_ALL => true,
-            PalaceStyle.RANDOM_PER_PALACE => true,
             _ => false
         };
     }
@@ -294,11 +284,11 @@ public enum Biome
     VOLCANO,
     [Description("Caldera")]
     CALDERA,
-    [Description("Random (No Vanilla or Shuffle)"), IsRandom]
+    [Description("Random (No Vanilla or Shuffle)"), Metastyle]
     RANDOM_NO_VANILLA_OR_SHUFFLE,
-    [Description("Random (No Vanilla)"), IsRandom]
+    [Description("Random (No Vanilla)"), Metastyle]
     RANDOM_NO_VANILLA,
-    [Description("Random"), IsRandom]
+    [Description("Random"), Metastyle]
     RANDOM
 }
 
@@ -862,7 +852,7 @@ public class StringValueAttribute(string v) : Attribute
     }
 }
 
-public class IsRandomAttribute : Attribute
+public class MetastyleAttribute : Attribute
 {
 }
 
@@ -1000,14 +990,14 @@ public static class Enums
         return new EnumDescription() { Value = value, Description = description, Help = help };
     }
 
-    public static bool IsRandom(this Enum self)
+    public static bool IsMetastyle(this Enum self)
     {
         Type type = self.GetType();
         string? name = Enum.GetName(type, self);
         if (name == null) { return false; }
         FieldInfo? fieldInfo = type.GetField(name);
         if (fieldInfo == null) { return false; }
-        return fieldInfo.IsDefined(typeof(IsRandomAttribute), inherit: false);
+        return fieldInfo.IsDefined(typeof(MetastyleAttribute), inherit: false);
     }
 
     public static RandomRangeDoubleAttribute? GetRandomRangeDouble(this Enum self)

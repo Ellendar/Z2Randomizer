@@ -181,9 +181,7 @@ public class LinearWeightedRandom<T> : IWeightedSampler<T> where T : notnull
 
     public int Weight(T t)
     {
-        // this would just require keeping another dictionary
-        // _weights could be copied
-        throw new NotImplementedException();
+        return _weights[t];
     }
 }
 
