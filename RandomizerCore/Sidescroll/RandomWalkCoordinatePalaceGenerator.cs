@@ -12,6 +12,19 @@ public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGen
     private const float DROP_CHANCE = .06f;
     private static readonly ItemRoomSelectionStrategy itemRoomSelectionStrategy = new ByShapeItemRoomSelectionStrategy();
 
+
+    private static readonly TableWeightedRandom<int> _weightedRandomDirection = new([
+        (0, 1),  // left
+        (1, 1),  // down
+        (2, 1),  // up
+        (3, 1),  // right
+    ]);
+
+    protected virtual IWeightedSampler<int> GetDirectionWeights(int palaceNumber)
+    {
+        return _weightedRandomDirection;
+    }
+
     protected override async Task<Dictionary<Coord, RoomExitType>> GetPalaceShape(RandomizerProperties props, Palace palace, RoomPool roomPool, Random r, int roomCount)
     {
         Dictionary<Coord, RoomExitType> walkGraph = [];
@@ -29,13 +42,7 @@ public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGen
 
         var currentCoord = Coord.Origin;
 
-        //Back to even weight for now.
-        TableWeightedRandom<int> weightedRandomDirection = new([
-            (0, 35),  // left
-            (1, 35),  // down
-            (2, 35),  // up
-            (3, 35),  // right
-        ]);
+        var weightedRandomDirection = GetDirectionWeights(palace.Number);
 
         //Create graph
         while (walkGraph.Count < roomCount)
