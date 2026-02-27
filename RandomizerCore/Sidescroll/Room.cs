@@ -36,7 +36,7 @@ public class Room : IJsonOnDeserialized
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    internal Coord coords;
+    public Coord coords;
 
     public const int Group1ItemGetStartAddress = 0x17ba5;
     public const int Group2ItemGetStartAddress = 0x17bc5;

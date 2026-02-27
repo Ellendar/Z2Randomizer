@@ -220,7 +220,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
             while (
                 (!reachable
                  || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
-                 || (palaceNumber == 7 && !palace.BossRoomMinDistance(props.DarkLinkMinDistance))
+                 || (palaceNumber == 7 && !palace.IsBossRoomAtLeastMinDistance(props.DarkLinkMinDistance))
                  || palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], props.PalaceDropStyle, r)
                 ) && (tries < ROOM_SHUFFLE_ATTEMPT_LIMIT)
             );

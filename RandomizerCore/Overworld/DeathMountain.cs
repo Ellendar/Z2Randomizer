@@ -543,13 +543,13 @@ sealed class DeathMountain : World
                     _ => 1f
                 };
                 growthClimate.ApplyDeathMountainSafety(randomTerrainFilter, dmOpennessFactor);
-                Debug.WriteLine(GetMapDebug());
+                //Debug.WriteLine(GetMapDebug());
                 if (!GrowTerrain(growthClimate))
                 {
                     logger.LogDebug("GrowTerrain failed");
                     return false;
                 }
-                Debug.WriteLine(GetMapDebug());
+                //Debug.WriteLine(GetMapDebug());
                 if (biome == Biome.CALDERA)
                 {
                     bool f = MakeCaldera(props.CanWalkOnWaterWithBoots);

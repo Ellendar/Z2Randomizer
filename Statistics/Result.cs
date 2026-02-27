@@ -1,6 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FtRandoLib.Importer;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.Statistics;
 
@@ -49,7 +54,29 @@ class Result
     public int WestFailedOnBridgePlacement { get; set; }
     public int WestFailedOnIslandConnection { get; set; }
     public int WestFailedOnMakeCaldera { get; set; }
-    public int WestFailedOnConnectIslands { get; set; }
+    public int WestFailedOnConnectIslands { get; set; } = 0;
+
+    public float P1WidthRatio { get; set; }
+    public int P1Size { get; set; }
+    public int P1MinDistanceToBoss { get; set; }
+    public float P2WidthRatio { get; set; }
+    public int P2Size { get; set; }
+    public int P2MinDistanceToBoss { get; set; }
+    public float P3WidthRatio { get; set; }
+    public int P3Size { get; set; }
+    public int P3MinDistanceToBoss { get; set; }
+    public float P4WidthRatio { get; set; }
+    public int P4Size { get; set; }
+    public int P4MinDistanceToBoss { get; set; }
+    public float P5WidthRatio { get; set; }
+    public int P5Size { get; set; }
+    public int P5MinDistanceToBoss { get; set; }
+    public float P6WidthRatio { get; set; }
+    public int P6Size { get; set; }
+    public int P6MinDistanceToBoss { get; set; }
+    public float GPWidthRatio { get; set; }
+    public int GPSize { get; set; }
+    public int GPMinDistanceToBoss { get; set; }
 
 #pragma warning disable CS8618 
     public Result()
@@ -98,5 +125,44 @@ class Result
         WestFailedOnIslandConnection = WestHyrule.failedOnIslandConnection;
         WestFailedOnMakeCaldera = WestHyrule.failedOnMakeCaldera;
         WestFailedOnConnectIslands = WestHyrule.failedOnConnectIslands;
+
+        float width, height;
+        //Palace stats
+        P1Size = hyrule.palaces[0].AllRooms.Count;
+        width = hyrule.palaces[0].AllRooms.Max(i => i.coords.X) - hyrule.palaces[0].AllRooms.Min(i => i.coords.X);
+        height = hyrule.palaces[0].AllRooms.Max(i => i.coords.Y) - hyrule.palaces[0].AllRooms.Min(i => i.coords.Y);
+        P1WidthRatio = width / height;
+        P1MinDistanceToBoss = BossRoomMinDistance(hyrule.palaces[0]);
+
     }
+
+    //Proably the boss room min distance calculation should generate and int and then just compare so we don't have to duplicate this
+    //but it is _slightly_ less efficient so fuck it
+    public static int StepCountToBossRoom(Palace palace)
+    {
+        if (palace.Entrance == null) { throw new Exception("Palace Entrance is missing"); }
+        HashSet<Room> reachedRooms = [];
+        Queue<(Room, int)> roomsToCheck = [];
+        roomsToCheck.Enqueue((palace.Entrance, 0));
+        while (roomsToCheck.Count > 0)
+        {
+            var (room, stepsToRoom) = roomsToCheck.Dequeue();
+            if (room.IsBossRoom)
+            {
+                return stepsToRoom;
+            }
+
+            // This will return false if the room is already added
+            if (!reachedRooms.Add(room)) { continue; }
+
+            int stepsToNextRoom = stepsToRoom + 1;
+            if (room.Left != null) { roomsToCheck.Enqueue((room.Left, stepsToNextRoom)); }
+            if (room.Right != null) { roomsToCheck.Enqueue((room.Right, stepsToNextRoom)); }
+            if (room.Up != null) { roomsToCheck.Enqueue((room.Up, stepsToNextRoom)); }
+            if (room.Down != null) { roomsToCheck.Enqueue((room.Down, stepsToNextRoom)); }
+        }
+        return int.MaxValue; // Boss room not found??
+    }
+
+
 }

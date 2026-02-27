@@ -137,7 +137,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
         //So for now we suffer lesser performance (but still way better than Reconstructed so do we care?)
         if (!palace.AllReachable()
             || (palace.Number == 7 && props.RequireTbird && !palace.RequiresThunderbird())
-            || (palace.Number == 7 && !palace.BossRoomMinDistance(props.DarkLinkMinDistance))
+            || (palace.Number == 7 && !palace.IsBossRoomAtLeastMinDistance(props.DarkLinkMinDistance))
         )
         {
             //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));

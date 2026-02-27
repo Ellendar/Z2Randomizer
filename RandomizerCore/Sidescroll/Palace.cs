@@ -32,7 +32,7 @@ public partial class Palace
         Collectable.ONEUP
     ];
 
-    internal List<Room> AllRooms { get; private set; }
+    public List<Room> AllRooms { get; private set; }
 
     public Room? Entrance { get; set; }
     public List<Room> ItemRooms { get; set; }
@@ -156,7 +156,7 @@ public partial class Palace
         return reachedRooms;
     }
 
-    public bool BossRoomMinDistance(int minSteps)
+    public bool IsBossRoomAtLeastMinDistance(int minSteps)
     {
         if (Entrance == null) { throw new Exception("Palace Entrance is missing"); }
         HashSet<Room> reachedRooms = [];
