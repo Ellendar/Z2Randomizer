@@ -181,7 +181,7 @@ jobs:
 
       - name: Upload Browser build to artifacts
         if: ${{ matrix.platform.type == 'browser' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}
           path: |

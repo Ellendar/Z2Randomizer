@@ -41,7 +41,7 @@ jobs:
         run: dotnet publish -c Debug -o CrossPlatformUI.Desktop/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
 
       - name: Upload Regular Build To Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Z2Randomizer-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-Debug
           # don't compress hard since it's not a real release
