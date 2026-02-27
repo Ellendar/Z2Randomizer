@@ -185,6 +185,40 @@ public partial class Palace
         return false; // Boss room not found??
     }
 
+    /// same algorithm as BossRoomMinDistance except for shapes instead of rooms
+    public static bool BossRoomMinDistanceShape(Dictionary<Coord, RoomExitType> shape, Coord bossRoom, int minSteps)
+    {
+        // quick check on (non-diagonal) orthogonal distance alone
+        if (Math.Abs(bossRoom.X) + Math.Abs(bossRoom.Y) >= minSteps) {
+            return true;
+        }
+        HashSet<Coord> reachedRooms = [];
+        Queue<(Coord, int)> roomsToCheck = [];
+        roomsToCheck.Enqueue((new Coord(0, 0), 0));
+        while (roomsToCheck.Count > 0)
+        {
+            var (coord, stepsToRoom) = roomsToCheck.Dequeue();
+            if (stepsToRoom >= minSteps)
+            {
+                return true;
+            }
+            if (coord == bossRoom)
+            {
+                return false;
+            }
+            var exitType = shape[coord];
+
+            if (!reachedRooms.Add(coord)) { continue; }
+
+            int stepsToNextRoom = stepsToRoom + 1;
+            if (exitType.ContainsLeft()) { roomsToCheck.Enqueue((coord with { X = coord.X - 1}, stepsToNextRoom)); }
+            if (exitType.ContainsRight()) { roomsToCheck.Enqueue((coord with { X = coord.X + 1 }, stepsToNextRoom)); }
+            if (exitType.ContainsUp()) { roomsToCheck.Enqueue((coord with { Y = coord.Y + 1 }, stepsToNextRoom)); }
+            if (exitType.ContainsDown()) { roomsToCheck.Enqueue((coord with { Y = coord.Y - 1 }, stepsToNextRoom)); }
+        }
+        return false; // Boss room not found?
+    }
+
     public bool AllReachable(bool allowBacktracking = false)
     {
         var reachableRooms = GetReachableRooms(allowBacktracking);

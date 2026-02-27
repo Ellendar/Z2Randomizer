@@ -29,6 +29,14 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
             return palace;
         }
 
+        if (palace.BossRoom == null)
+        {
+            if (!PlaceBossRoomInShape(palace, roomPool, r, props, shape))
+            {
+                palace.IsValid = false;
+                return palace;
+            }
+        }
 
         List < Coord > prepopulatedCoordinates = [];
         prepopulatedCoordinates.Add(palace.AllRooms.FirstOrDefault(i => i.IsEntrance)?.coords ?? Coord.Uninitialized);
@@ -207,6 +215,59 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
 
         palace.IsValid = true;
         return palace;
+    }
+
+    /// used to place a boss room when we are still working with shapes
+    /// (instead of later replacing an existing room with a boss room)
+    protected bool PlaceBossRoomInShape(Palace palace, RoomPool roomPool, Random r, RandomizerProperties props, Dictionary<Coord, RoomExitType> shape)
+    {
+        if (roomPool.BossRooms.Count == 0) { throw new Exception("No boss rooms in room pool"); }
+
+        List<Room> bossRoomCandidates = roomPool.BossRooms.ToList();
+        bossRoomCandidates.FisherYatesShuffle(r);
+
+        var shapeOrdered = shape.OrderBy(i => i.Key.X).ThenByDescending(i => i.Key.Y).ToList();
+        bool palaceContinues = palace.Number < 7 && props.BossRoomsExitToPalace[palace.Number - 1];
+        int minDistance = GetBossMinDistance(props, palace.Number);
+
+        foreach (Room bossRoomCandidate in bossRoomCandidates)
+        {
+            RoomExitType bossRoomExitType = bossRoomCandidate.CategorizeExits();
+            if (palaceContinues)
+            {
+                bossRoomExitType = bossRoomExitType.AddRight();
+            }
+
+            var bossCoordCandidates = shapeOrdered.Where(pair => pair.Value == bossRoomExitType).ToList();
+            bossCoordCandidates.FisherYatesShuffle(r);
+
+            foreach (var pair in bossCoordCandidates)
+            {
+                var coord = pair.Key;
+                var upCoord = coord with { Y = coord.Y + 1 };
+                if (shape.TryGetValue(upCoord, out var exit) && exit.ContainsDrop()) { continue; }
+
+                if (minDistance > 0 && !Palace.BossRoomMinDistanceShape(shape, coord, minDistance)) { continue; }
+
+                Room bossRoom = new(bossRoomCandidate);
+                bossRoom.coords = coord;
+                bossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
+                if (palaceContinues)
+                {
+                    bossRoom.HasRightExit = true;
+                    bossRoom.AdjustContinuingBossRoom();
+                }
+                palace.AllRooms.Add(bossRoom);
+                palace.BossRoom = bossRoom;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected virtual int GetBossMinDistance(RandomizerProperties props, int palaceNumber)
+    {
+        return palaceNumber == 7 ? props.DarkLinkMinDistance : 0;
     }
 
     public static string GetLayoutDebug(Dictionary<Coord, RoomExitType> walkGraph, bool includeCoordinateGrid = true)
