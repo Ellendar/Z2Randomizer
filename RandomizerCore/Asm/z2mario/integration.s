@@ -126,6 +126,10 @@ PatchLinkDrawRoutine:
     lda $29,x
     rts
 +
+  lda $752 ; Fetch the "behind" flag from vanilla z2
+  and #$20
+  ora Player_SprAttrib
+  sta Player_SprAttrib ; and mix that in with our attributes
   ; put the player in slot 4 always
   lda #4
   sta CurrentOAMOffset
