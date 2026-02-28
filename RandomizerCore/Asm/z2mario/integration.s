@@ -104,9 +104,21 @@ PatchLinkDeathSprite:
 
 ; patch the link draw routine to skip drawing him with the vanilla code
 .org $EC02 ; ldx $11 lda $29,x
-  jsr PatchLinkDrawRoutine
+  jsr BankPatchLinkDrawRoutine
   nop
 
+.segment "PRG7"
+.reloc
+BankPatchLinkDrawRoutine:
+  jsr SwapToPRG0
+  jsr PatchLinkDrawRoutine
+  jsr SwapToSavedPRG
+  ; double return to skip the OG drawing code
+  pla
+  pla
+  rts
+
+.segment "PRG0", "PRG7"
 .reloc
 PatchLinkDrawRoutine:
   ldx $11
@@ -114,7 +126,6 @@ PatchLinkDrawRoutine:
     lda $29,x
     rts
 +
-
   ; put the player in slot 4 always
   lda #4
   sta CurrentOAMOffset
@@ -137,7 +148,6 @@ PatchLinkDrawRoutine:
       inc ReloadCHRBank
     +
 @skipplayer:
-
   ; While we are here, lets draw the fireball/hammer sprites too
   ldy #ProjectileOffset
   sty $02
@@ -150,9 +160,6 @@ PatchLinkDrawRoutine:
     ldy R2
     cpy #ProjectileOffset+2 ; Draw two fireballs and one hammer
     bne @fireballLoop
-  ; double return to skip the OG drawing code
-  pla
-  pla
   rts
 
 .reloc
@@ -228,26 +235,24 @@ OverworldLateInit:
 UpdatePlayerPalette:
   inc ReloadCHRBank ; Just reload the CHR bank to be safe here
   ; Check fire state and update the palette if we are fire still
-  ldx #0
-  lda #7
-  sta R7
+  ldx #255
   lda $76f
   and #$10
   beq +
-    ldx #7
+    ldx #7-1
   +
   ; we are still firey so write a palette update for next NMI
   ldy $301
+  dey
   -
-    lda PlayerRegularPalettePPUCommand,x
-    sta $302,y
     iny
     inx
-    dec R7
-    bne -
+    lda PlayerRegularPalettePPUCommand,x
+    sta $301+1,y
+    bpl -
   tya
   clc
-  adc #7
+  adc #6
   sta $301
   rts
 PlayerRegularPalettePPUCommand:
@@ -449,11 +454,11 @@ SetPlayerDownstabbingHitbox:
     JSR      $ECEA
     CLC
     ADC      #$25 - 4 ; - 2 cause I don't know
-    STA      $0480 ; ,x
+    STA      HitboxYCoord ; ,x
     LDA      $CC ; ,x
     CLC
     ADC      #$10 ;  + 8 ; + 8 cause UGH
-    STA      $047E ; ,x
+    STA      HitboxXCoord ; ,x
   +
   rts
 
@@ -463,9 +468,36 @@ SetPlayerDownstabbingHitbox:
 .org $E273
   jmp $E28B
 
+.segment "PRG7"
+
+LoadProjectileCollisionBox = $e4bc
+SwordCollisionCheck = $E677
+BreakBlockCollisionCheck = $e1e6
+.org $e1e0
+  ; Check the hammer hitboxes as if they were stabbing blocks
+  jsr CheckHammerHitboxes
+.reloc
+CheckHammerHitboxes:
+  lda #0
+  sta $0b
+  ldy #1
+  jsr LoadProjectileCollisionBox
+  lda R0
+  sta HitboxXCoord
+  lda R1
+  sta HitboxYCoord
+  jsr BreakBlockCollisionCheck
+  ldy #0
+  jsr LoadProjectileCollisionBox
+  lda R0
+  sta HitboxXCoord
+  lda R1
+  sta HitboxYCoord
+  jmp BreakBlockCollisionCheck
+
+; Rewrite the projectile check so that it loops for each projectile and checks hitboxes with each ene
 .org $E4A8
   jsr PatchFireballHitcheck
-.segment "PRG7"
 .reloc
 PatchFireballHitcheck:
   ldy $11 ; fireball or hammer
@@ -474,20 +506,25 @@ PatchFireballHitcheck:
   and #%01000000
   beq @IsFireball
     ; Is Hammer
-    jsr $e67e ; original hitbox check for swords (skipping past sword cooldown check)
-    jmp @AfterCheck
-@IsFireball:
-  jsr $E694 ; original hitbox check for projectiles
-@AfterCheck:
-  bcc @exit
-    ldy $11 ; fireball or hammer
-    ; if its a hammer let it pass through
-    lda Fireball_State,y
-    and #%01000000
-    bne @exit
-      ; destroy the fireball
-      lda #%10000000
-      sta Fireball_State,y
+    ; Load the X / Y coord into $47e and $480
+    ; use a "sword" type of attack for the hitbox check
+    lda #0
+    .byte $2c ; skips 2 bytes
+;    jsr $e67e ; original hitbox check for swords (skipping past sword offscreen check)
+;    jmp @AfterCheck
+  @IsFireball:
+    lda #1
+    sta $0b ; Holds the "type" of attack (0 = sword, 1 = projectile)
+    jsr $E694 ; original hitbox check for projectiles
+    bcc @exit
+      ldy $11 ; fireball or hammer
+      ; if its a hammer let it pass through
+      lda Fireball_State,y
+      and #%01000000
+      bne @exit
+        ; destroy the fireball
+        lda #%10000000
+        sta Fireball_State,y
 @exit:
   rts
 
@@ -531,6 +568,26 @@ FREE_UNTIL $e6f3
 
 ; .org $93ba
 ;   rts ; patch the link main routine to skip some unneeded stuff
+
+.segment "PRG0", "PRG7"
+; Update the position of the brick to remove the mario collision box too
+.org $A700
+  jmp ClearSpotInCollisionRam
+.reloc
+.proc ClearSpotInCollisionRam
+  ; A is always #$42 here?
+  sta ($00),y
+  lda $00
+  clc
+  adc #<(COLLISION_TILES - $6000)
+  sta $00
+  lda $01
+  adc #>(COLLISION_TILES - $6000)
+  sta $01
+  lda #0 ; Clear out the collision tile
+  sta ($00),y
+  rts
+.endproc
 
 ; Patch clearing out the ram for sideviews to also clear our new ram block
 .org $C58F
@@ -614,6 +671,24 @@ SlightlyModifiedCollisionRoutine:
 ; .org $e177 ; inc Player_PageLoc
   ; nop
   ; nop
+
+.segment "PRG0", "PRG7"
+.org $92A5
+  jmp PatchFinishPlayerPaletteCycle
+.reloc
+PatchFinishPlayerPaletteCycle:
+  sta $0301 ; write player flash counter
+  ldy $074B ; flash frame counter ; If its the last frame of the spell cycle
+  bne +
+    lda $69DE ; and we aren't using shield spell
+    cmp #$02
+    beq +
+      ; then update our colors
+      stx $0301 ; reset the position of the vram buffer write so we don't double write colors
+      jmp UpdatePlayerPalette ; And then update the player palette appropriately
+  +
+  rts
+
 
 ; Update palette locations
 ;.ifdef DEMO_CODE
@@ -796,6 +871,10 @@ SetLinkRecoil = $e371
   STA      $057D
   rts
 .assert * <= $E66A
+
+; Disable recoil when hitting enemy with hammers
+.org $E66A
+  rts
 
 ; Make mario bounce off armored enemies
 .org $E714

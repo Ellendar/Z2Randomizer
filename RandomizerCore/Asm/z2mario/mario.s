@@ -952,7 +952,7 @@ JumpSwimSub:
 DumpFall:
 ; Force downstab hitbox??
   lda Player_Y_Position
-  sta $480
+  sta HitboxYCoord
   lda VerticalForceDown      ;otherwise dump falling into main fractional
   sta VerticalForce
 ProcSwim:
@@ -2115,7 +2115,7 @@ LandPlyr:
   ; sta StompChainCounter      ;initialize enemy stomp counter
 ; cancel downstab hitbox??
   lda #$f8
-  sta $480
+  sta HitboxYCoord
   lda $cc
   clc
   adc #$10
