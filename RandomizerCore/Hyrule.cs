@@ -460,7 +460,7 @@ public class Hyrule
             var rom = await ROMData.ApplyAsm(assembler);
             if (!rom.success)
             {
-                return new RandomizerResult(false, null, null, string.Join(Environment.NewLine, rom.messages));
+                return new RandomizerResult(false, null, null, string.Join(Environment.NewLine, rom.messages.Select(x => x.ToString())));
             }
             ROMData = new ROM(rom.romdata);
 
@@ -557,7 +557,7 @@ public class Hyrule
                     File.WriteAllText("rooms.log", sb.ToString());
                 }
             }*/
-            return new RandomizerResult(true, ROMData.rawdata, rom.debugfile, string.Join(Environment.NewLine, rom.messages));
+            return new RandomizerResult(true, ROMData.rawdata, rom.debugfile, string.Join(Environment.NewLine, rom.messages.Select(x => x.ToString())));
         }
         catch(Exception e)
         {
