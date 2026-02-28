@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <Js65Version>1.0.7</Js65Version>
     <AvaloniaVersion>11.3.12</AvaloniaVersion>
