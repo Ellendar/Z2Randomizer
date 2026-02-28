@@ -260,6 +260,7 @@ EncounterSpawnTimer = $0516
 RNG = $051b
 MapNumber = $0561
 TownNumber = $056b
+PalaceNumber = $056c
 PalaceRegionIndex = $056c                ; Palace index in continent (0-2)
 LinkYVelocityHi = $057d
 Enemy0YVelocity = $057e

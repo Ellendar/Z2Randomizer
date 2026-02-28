@@ -166,8 +166,13 @@ RESV DripperRedCounter
 RESV PpuCtrlForIrq
 RESV ScrollPosForIrq
 RESV IrqSetupAlready
+; Expanded the block break list to hold up to 10 bricks at a time instead of just 5
+BREAKABLE_BLOCK_COUNT = 10
+RESV BlockBreakYCoord, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0429 - Y Low byte for collision table
+RESV BlockBreakColumnOffset, BREAKABLE_BLOCK_COUNT ; Vanilla addr $042E - Offset in the collision table
+RESV BlockBreakAddrLo, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table lo addr
+RESV BlockBreakAddrHi, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table hi addr
 
-.assert RES_BASE + RES_OFFSET < $01ad
 
 .ifdef ENABLE_Z2_MARIO
 
@@ -395,6 +400,16 @@ DeathMusic            = %00000001
 
 .endif ; ENABLE_Z2_MARIO
 
+.assert RES_BASE + RES_OFFSET < $01ad
+
+
+RelocatedRAMBase = $041A
+SET_RES_BASE RelocatedRAMBase
+RESV BlockBreakState, BREAKABLE_BLOCK_COUNT ; Vanilla addr $041a - bits 0-6 = timer; bit 7 set = step block. $00 means no brick breaking
+RESV BlockBreakMapPage, BREAKABLE_BLOCK_COUNT ; Vanilla addr $041F - Nametable select for the PPUADDR
+RESV BlockBreakXCoord, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0424 - X Low Byte for collision table
+.assert RES_BASE + RES_OFFSET < $043E
+
 ;; Stat tracking variables in SRAM
 
 ; This value is the second header byte for file 1 thats unused.
@@ -492,6 +507,7 @@ RESV Checkpoint, CHECKPOINT_LEN
 STAT_TRACKING_SIZE = RES_OFFSET
 
 ClearSRAMStart = RES_OFFSET
+
 .assert RES_OFFSET + StatTrackingBase < $7800
 
 .ifdef ENABLE_Z2_MARIO

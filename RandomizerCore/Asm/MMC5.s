@@ -802,3 +802,18 @@ LoadAreaBGMetatile:
 SetupScrollSplitEarly:
     jsr SetupScanlineIRQ
     jmp SwapToPRG0
+
+; Update the number of slots available for breaking bricks from 5 to BREAKABLE_BLOCK_COUNT
+; Not really related to MMC5, but whatever.
+.segment "PRG0", "PRG7"
+.org $a6d2
+    ldx #BREAKABLE_BLOCK_COUNT-1 ; was ldx #4 to search through the brick slots
+.org $E292
+    ldx #BREAKABLE_BLOCK_COUNT-1 ; was ldx #4 to search through the brick slots
+UPDATE_REFS BlockBreakState @ $A6DE $A6E3 $A6EF $E108 $E246 $E295
+UPDATE_REFS BlockBreakMapPage @ $A745 $E127 $E25D
+UPDATE_REFS BlockBreakXCoord @ $A752 $E120 $E258
+UPDATE_REFS BlockBreakYCoord @ $A74D $E116 $E251
+UPDATE_REFS BlockBreakColumnOffset @ $A6FC $E2A2
+UPDATE_REFS BlockBreakAddrLo @ $A6F2 $E2A7
+UPDATE_REFS BlockBreakAddrHi @ $A6F7 $E2AC
