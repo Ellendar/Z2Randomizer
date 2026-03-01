@@ -210,7 +210,8 @@ RESV EventMusicBuffer ; TODO use the vanilla music queues
 RESV WarpZoneControl
 RESV Player_CollisionBits ; Split Z2 and SMB1 collision bits
 RESV HalfwayPage
-RESV SwimmingFlag
+;RESV SwimmingFlag
+SwimmingFlag = $13
 RESV CurrentOAMOffset
 ; RESV ObjectMetasprite
 RESV PlayerAnimCtrl
@@ -325,7 +326,7 @@ ScreenLeft_X_Pos = $72c
 ScreenRight_X_Pos = $72d
 ScreenEdge_X_Pos = ScreenLeft_X_Pos
 
-InjuryTimer = $510
+InjuryTimer = $050c
 NumberofLives = $0700
 ; Player_SprAttrib = $0752
 ; SprObject_SprAttrib = Player_SprAttrib
@@ -516,7 +517,7 @@ SET_RES_BASE $6FB0
 RESV SprObject_SprAttrib, 16
 Player_SprAttrib = SprObject_SprAttrib
 Fireball_SprAttrib = SprObject_SprAttrib + FireballOffset
-Fireball_FacingDir = PlayerFacingDir + FireballOffset
+;Fireball_FacingDir = PlayerFacingDir + FireballOffset
 
 RESV Player_YMoveForceFractional, 16
 

@@ -375,12 +375,19 @@ Yhi = R7
 ; LoopCount = M0
 ; VFlip = M1
 
-  cpx #METASPRITES_COUNT
-  bcc +
-    rts ; Temp work around to prevent crashing when trying to render bad msprs
-  +
+;  cpx #METASPRITES_COUNT
+;  bcc +
+;    rts ; Temp work around to prevent crashing when trying to render bad msprs
+;  +
 
+  cpx #LAST_MARIO_METASPRITE
+  bcc +
+    ; I'm not a mario sprite so I need to use the MovingDir instead of FacingDir
+    lda Player_MovingDir,y
+    jmp @checkFacing
+  +
   lda PlayerFacingDir,y
+@checkFacing:
   lsr
   bne FacingLeft
     lda MetaspriteTableRightLo,x
@@ -407,32 +414,7 @@ DrawSprite:
   lda SprObject_Y_HighPos,y
   sta Yhi
 
-;   lda #0
-;   sta VFlip
-;   cpy #7
-;   bcs SkipVerticalFlipCheck
-;     lda ObjectVerticalFlip,y
-;     bpl NoVFlip
-;       ; Object has a vertical flip attribute set
-;       sta VFlip
-;   NoVFlip:
-;       ; Object has an added Y offset
-;       ; The negative flag is bit 5 in our number, so sign extend the value
-;       and #%00111111
-;       cmp #%00100000
-;       bcc PositiveYOffset
-;         ; subtracting a small negative offset here
-;         ora #%11000000
-;         clc
-;     PositiveYOffset:
-;       adc SprObject_Y_Position,y
-;       bcc SetYOffset
-;         ; If the carry is set, then we need to inc Yhi ... TODO
-;         ; this probably doesn't handle underflow properly?
-;         inc Yhi
-;         bcs SetYOffset ; unconditional
-; SkipVerticalFlipCheck:
-    lda SprObject_Y_Position,y
+  lda SprObject_Y_Position,y
 SetYOffset:
   sta Ylo
 
@@ -445,41 +427,36 @@ SetYOffset:
   ora SprObject_SprAttrib,y
   sta Atr
 
-  jsr MetaspriteRenderLoop
-
-
-;   lda VFlip
-;   beq DontShiftPositions
-;     ldy #0
-;     lda (Ptr),y
-;     cmp #8 + 1
-;     bcc DontShiftPositions
-;     cmp #12
-;     beq Flip3
-;       ; otherwise flip all 4 sprites
-;       lda Sprite_Tilenumber-4,x     ;with first or second row tiles
-;       pha                         ;and save tiles to the stack
-;         lda Sprite_Tilenumber-8,x
-;         pha
-;           lda Sprite_Tilenumber-12,x  ;exchange third row tiles
-;           sta Sprite_Tilenumber-4,x     ;with first or second row tiles
-;           lda Sprite_Tilenumber-16,x
-;           sta Sprite_Tilenumber-8,x
-;         pla                         ;pull first or second row tiles from stack
-;         sta Sprite_Tilenumber-16,x  ;and save in third row
-;       pla
-;       sta Sprite_Tilenumber-12,x
-;       rts
-;   Flip3:
-;     ; Custom flip code for bowser's front since he is weird.
-;     lda Sprite_Y_Position-4,x
-;     pha
-;       lda Sprite_Y_Position-12,x
-;       sta Sprite_Y_Position-8,x
-;       sta Sprite_Y_Position-4,x
-;     pla
-;     sta Sprite_Y_Position-12,x
-; DontShiftPositions:
+  txa
+  pha
+    jsr MetaspriteRenderLoop
+  pla
+  cmp #LAST_MARIO_METASPRITE
+  bcs @exit
+  ; We are rendering a mario sprite, so check if we are stuck in the mud
+  lda $0752
+  and #$20
+  beq @exit
+    ; stuck in the mud, so update bottom two sprite
+    ; x = next oam sprite id, so we can offset by 8 to hit bottom two sprites
+    ; if we are small then its the most recent two sprites. if we are big then its 4 sprites back
+    lda PlayerSize
+    beq + ; If we are large
+      lda $0202 - 8, x
+      ora #$20
+      sta $0202 - 8, x
+      lda $0202 - 4, x
+      ora #$20
+      sta $0202 - 4, x
+      rts
+    +
+      lda $0202 - 16, x
+      ora #$20
+      sta $0202 - 16, x
+      lda $0202 - 12, x
+      ora #$20
+      sta $0202 - 12, x
+@exit:
   rts
 
 .endproc
@@ -719,6 +696,8 @@ MetaspriteBox "SMALL_FIRE", "SWIMMING_STILL_2", $00, $02, $28, $2a
 
 ; Update this with the first and last metasprite if more are added before or after
 TOTAL_MARIO_METASPRITES = METASPRITE_SMALL_FIRE_SWIMMING_STILL_2 - METASPRITE_BIG_MARIO_STANDING + 1
+
+LAST_MARIO_METASPRITE = METASPRITES_COUNT
 
 FIREBALL_VRAM_OFFSET = SPRITE_BANK_0
 FIREBALL_PALETTE = $01
