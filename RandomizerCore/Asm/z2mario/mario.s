@@ -689,17 +689,17 @@ EndChgSize:
   cmp #$c4            ;check again for another specific moment
   bne ExitChgSize     ;and branch to leave if before or after that point
   ; Z2Mario - clear scroll lock after you change size
-  lda #0
-  sta ScrollLock
+;  lda #0
+  dec ScrollLock
   jmp DonePlayerTask  ;otherwise do sub to init timer control and set routine
 ExitChgSize:
   rts ; TODO check this RTS can be removed                 ;and then leave
 
 FinishedInjuryBlink:
   ; Z2Mario - clear scroll lock after you change size
-  lda #0
-  sta ScrollLock
-  beq DonePlayerTask
+;  lda #0
+  dec ScrollLock
+  jmp DonePlayerTask
 ;-------------------------------------------------------------------------------------
 ; .reloc
 PlayerInjuryBlink:
@@ -2107,11 +2107,6 @@ LandPlyr:
   sta Player_Y_Speed         ;initialize vertical speed and fractional
   sta Player_Y_MoveForce     ;movement force to stop player's vertical movement
 
-  ; Z2 Set Player_CollisionBits to fix elevator
-;  lda #~$04
-;  and Player_CollisionBits
-;  sta Player_CollisionBits
-
   ; sta StompChainCounter      ;initialize enemy stomp counter
 ; cancel downstab hitbox??
   lda #$f8
@@ -2238,6 +2233,7 @@ ExCSM:
 StopPlayerMove:
   jmp ImpedePlayerMove      ;stop player's movement
 
+.export ImpedePlayerMove
 .reloc
 ImpedePlayerMove:
   lda #$00                  ;initialize value here
@@ -2722,7 +2718,13 @@ GetProperObjOffset:
 .export ProcHammerTime
 .proc ProcHammerTime
   lda $078b ; Check for hammer in inventory
-  beq UpdateHammers
+  bne +
+    jmp UpdateHammers
+  +
+  lda PlayerSize ; Have to be big to throw hammers?
+  beq +
+    jmp UpdateHammers
+  +
     ; and that the player is pushing up + b
     lda SavedJoypadBits
     and #B_Button | Up_Dir     ;check for up + b button pressed
@@ -2907,7 +2909,7 @@ OAM_FLIP_H            = %01000000
   lda #0
   sta Fireball_SprAttrib,x
   lda #1
-  sta Fireball_FacingDir,x
+  sta Fireball_MovingDir,x
   ldy #METASPRITE_HAMMER_FRAME_1
   lda TimerControl
   bne ForceHPose
@@ -2947,7 +2949,8 @@ CheckForVerticalFlip:
 
     ; and use the sprite that faces the other way
     lda #2
-    sta Fireball_FacingDir,x
+    sta Fireball_MovingDir,x
+;    sta Fireball_FacingDir,x
 WriteMetasprite:
   tya
   sta FireballMetasprite,x

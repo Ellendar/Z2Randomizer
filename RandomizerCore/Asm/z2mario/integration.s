@@ -69,10 +69,19 @@ PatchLinkLivesScreenDraw:
   lsr ; a = 0
   sta SprObject_SprAttrib
   sta ScreenLeft_X_Pos
+  sta PlayerSize   ; Also make mario big mario in the lives screen
   lda ScreenLeft_PageLoc
   sta SprObject_PageLoc
   jsr BankSwitchMarioCHR
   jmp $EC02
+
+.org $CAe9
+  jsr AlsoResetPlayerSizeOnContinue
+.reloc
+AlsoResetPlayerSizeOnContinue:
+  sta PlayerSize
+  sta $075c ; original code
+  rts
 
 ; Jump to our own metasprite setting routine
 .org $919e
@@ -101,21 +110,60 @@ PatchLinkDeathSprite:
   inc ReloadCHRBank
   jmp BankSwitchMarioCHR
 
+.org $8fe3
+  jmp *+3 ; Skip duplicate draw???
+.reloc
+DrawFallingMarioSprite:
+.import METASPRITE_BIG_MARIO_JUMPING, METASPRITE_SMALL_MARIO_JUMPING
+  lda PlayerSize
+  beq + ; If we are large
+    lda #METASPRITE_SMALL_MARIO_JUMPING
+    .byte $2c ; bit $abs
+  +
+  lda #METASPRITE_BIG_MARIO_JUMPING
+  sta ObjectMetasprite
+  inc ReloadCHRBank
+  jsr BankSwitchMarioCHR
+  ; Skip the banked routine since we are already in PRG0 to prevent a crash
+  jmp $EC02 ; PatchLinkDrawRoutine Use the original since its a double return
+.org $8fee
+  jsr DrawFallingMarioSprite
 
 ; patch the link draw routine to skip drawing him with the vanilla code
 .org $EC02 ; ldx $11 lda $29,x
-  jsr BankPatchLinkDrawRoutine
+  jsr PatchLinkDrawRoutine
   nop
 
 .segment "PRG7"
 .reloc
 BankPatchLinkDrawRoutine:
+  lda $0769
+  bne +
+    jsr PatchLinkDrawRoutine
+    jmp @Exit
+  +
   jsr SwapToPRG0
   jsr PatchLinkDrawRoutine
   jsr SwapToSavedPRG
+@Exit:
   ; double return to skip the OG drawing code
   pla
   pla
+  rts
+
+.org $E1A2
+  jsr CheckIfAboveScreenForFallingFairyCheck
+  nop
+.reloc
+CheckIfAboveScreenForFallingFairyCheck:
+  ; Set the carry if we are properly below the screen
+  lda Player_Y_Position
+  cmp #$e4
+  bcc +
+    ; And also check the Y Hi position to make sure we aren't wrapping above the screen
+    lda Player_Y_HighPos
+    cmp #1
+  +
   rts
 
 .segment "PRG0", "PRG7"
@@ -126,10 +174,6 @@ PatchLinkDrawRoutine:
     lda $29,x
     rts
 +
-  lda $752 ; Fetch the "behind" flag from vanilla z2
-  and #$20
-  ora Player_SprAttrib
-  sta Player_SprAttrib ; and mix that in with our attributes
   ; put the player in slot 4 always
   lda #4
   sta CurrentOAMOffset
@@ -164,6 +208,9 @@ PatchLinkDrawRoutine:
     ldy R2
     cpy #ProjectileOffset+2 ; Draw two fireballs and one hammer
     bne @fireballLoop
+  ; double return to skip the OG drawing code
+  pla
+  pla
   rts
 
 .reloc
@@ -238,6 +285,8 @@ OverworldLateInit:
 .reloc
 UpdatePlayerPalette:
   inc ReloadCHRBank ; Just reload the CHR bank to be safe here
+  txa
+  pha
   ; Check fire state and update the palette if we are fire still
   ldx #255
   lda $76f
@@ -258,6 +307,8 @@ UpdatePlayerPalette:
   clc
   adc #6
   sta $301
+  pla
+  tax
   rts
 PlayerRegularPalettePPUCommand:
   .byte $3f, $11, $03, $16, $27, $18, $ff
@@ -328,11 +379,11 @@ CheckIfTurningSmall:
         ; Set player routine to ChangeSize
         lda #$0a
         sta GameEngineSubroutine
-        lda #8
-        sta InjuryTimer
+;        lda #8
+;        sta InjuryTimer
         ; we will unlock the scroll lock after the size change animation finishes
+        inc ScrollLock
         lda #1
-        sta ScrollLock
         sta Player_State
   ;      sta PlayerChangeSizeFlag
         lda #0
@@ -348,13 +399,25 @@ CheckIfTurningSmall:
 .segment "PRG0", "PRG7"
 
 ; Make mario grow when his HP increases enough
-.org $d42f ; patches over the sound effect for HP gain
-  jsr LinkGainedHPOrMagic
-  nop
+
+.org $cb23 ; patches over the "set life after level"
+  jsr LifeOrMagicSetToMax
 .reloc
-LinkGainedHPOrMagic:
-  lda #$10
-  sta $ef ; Set the sfx for gaining life/magic/exp
+LifeOrMagicSetToMax:
+  sta $773,x
+  jmp CheckIfWeAreBig
+
+; Patch the "crawl up" life regen instead so it covers collecting a heart container too
+.org $d41c
+  jsr LifeOrMagicSetToMax
+;.org $d42f ; patches over the sound effect for HP gain
+;  jsr LinkGainedHPOrMagic
+;  nop
+.reloc
+;LinkGainedHPOrMagic:
+;  lda #$10
+;  sta $ef ; Set the sfx for gaining life/magic/exp
+CheckIfWeAreBig:
   ; if we are small and gaining HP
   cpx #1 ; IF x = 1 we are increasing HP
   bne @exit
@@ -370,8 +433,8 @@ LinkGainedHPOrMagic:
           lda #$0a
           sta GameEngineSubroutine
           ; we will unlock the scroll lock after the size change animation finishes
-          lda #1
-          sta ScrollLock
+;          lda #1
+          inc ScrollLock
           lda #0
           sta ScrollAmount
           sta Player_State
@@ -404,10 +467,12 @@ PatchLinkMain:
 ;   beq @notinjured
 ;     rts
 ; @notinjured:
-;   lda $0503 ; sword slash timer
-;   bne @notwaiting
+;   lda $0503 ; sword slash timer / entrance move timer
+;   beq @notmoving
+;     ldy $701
+;     lda $93b5,y
 ;     rts
-; @notwaiting:
+; @notmoving:
   ; decrement timers here cause lazy
   ; Move the timers ahead by a frame as well
   lda TimerControl          ;if master timer control not set, decrement
@@ -442,6 +507,19 @@ NoDecTimers:
   lda #$00
   sta Left_Right_Buttons     ;nullify left and right buttons temp variable
 
+  ; Check scroll lock. If we are locked in, then prevent leaving the screen
+  lda ScrollLock
+  beq @SkipScrollLock
+    lda Player_X_Position
+    cmp #3
+    bcc @Lock
+      ; Check for right lock
+      cmp #$e5
+      bcc @SkipScrollLock ; You are still in bounds
+    @Lock:
+        .import ImpedePlayerMove
+        jsr ImpedePlayerMove
+@SkipScrollLock:
   jsr SetPlayerDownstabbingHitbox
 
   ; jsr CheckSideviewTransition ; this is already run during collision detection
@@ -484,20 +562,31 @@ BreakBlockCollisionCheck = $e1e6
 CheckHammerHitboxes:
   lda #0
   sta $0b
-  ldy #1
-  jsr LoadProjectileCollisionBox
-  lda R0
-  sta HitboxXCoord
-  lda R1
-  sta HitboxYCoord
-  jsr BreakBlockCollisionCheck
-  ldy #0
-  jsr LoadProjectileCollisionBox
-  lda R0
-  sta HitboxXCoord
-  lda R1
-  sta HitboxYCoord
-  jmp BreakBlockCollisionCheck
+  bit Fireball_State+1
+  bvc +
+    ldy #1
+    jsr LoadProjectileCollisionBox
+    lda R0
+    sta HitboxXCoord
+    lda R1
+    sta HitboxYCoord
+    jsr BreakBlockCollisionCheck
+  +
+  bit Fireball_State
+  bvc +
+    ldy #0
+    jsr LoadProjectileCollisionBox
+    lda R0
+    sta HitboxXCoord
+    lda R1
+    sta HitboxYCoord
+    jmp BreakBlockCollisionCheck
+  +
+  rts
+
+; Patch the projectile check to use the new state variable instead of metasprite
+.org $e49a
+  lda Fireball_State,y
 
 ; Rewrite the projectile check so that it loops for each projectile and checks hitboxes with each ene
 .org $E4A8
