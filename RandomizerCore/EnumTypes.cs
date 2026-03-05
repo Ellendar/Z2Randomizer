@@ -819,13 +819,13 @@ public enum BossRoomMinDistance
 
 public enum PalaceLengthOption
 {
-    [Description("Short [50% to 65%]"), RandomRangeDouble(Low = 0.50, High = 0.65)]
+    [Description("Short; [50% to 65%]"), RandomRangeDouble(Low = 0.50, High = 0.65)]
     SHORT = 0,
-    [Description("Medium [60% to 80%]"), RandomRangeDouble(Low = 0.60, High = 0.80)]
+    [Description("Medium; [60% to 80%]"), RandomRangeDouble(Low = 0.60, High = 0.80)]
     MEDIUM = 1,
-    [Description("Full [85% to 115%]"), RandomRangeDouble(Low = 0.85, High = 1.15)]
+    [Description("Full; [85% to 115%]"), RandomRangeDouble(Low = 0.85, High = 1.15)]
     FULL = 2, // remains 100% for Vanilla palaces
-    [Description("Random [50% to 115%]"), RandomRangeDouble(Low = 0.50, High = 1.15)]
+    [Description("Random; [50% to 115%]"), RandomRangeDouble(Low = 0.50, High = 1.15)]
     RANDOM = 3
 }
 

@@ -317,8 +317,22 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         return false;
     }
 
+    private bool palaceStylesAnyMetastyleSelected()
+    {
+        foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
+        {
+            if (style.IsMetastyle())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool randomStylesAllowVanilla;
+    public bool randomStylesAllowVanillaIncluded() => palaceStylesAnyMetastyleSelected();
 
     [Reactive]
     private bool? includeVanillaRooms;
