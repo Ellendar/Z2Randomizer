@@ -23,22 +23,25 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
         //ItemRoom
         if (palace.Number < 7)
         {
-            Room[] itemRooms = itemRoomSelector.SelectItemRooms(palace, roomPool, props.PalaceItemRoomCounts[palace.Number - 1], duplicateProtection, r);
-            if (itemRooms == null || itemRooms.Length != props.PalaceItemRoomCounts[palace.Number - 1])
+            if (palace.ItemRooms.Count != itemRoomTotal)
             {
-                return false;
-            }
-
-            foreach (Room itemRoom in itemRooms)
-            {
-                Room? itemRoomReplacementRoom = palace.AllRooms.FirstOrDefault(i => i.coords == itemRoom.coords);
-                if (itemRoomReplacementRoom == null)
+                Room[] itemRooms = itemRoomSelector.SelectItemRooms(palace, roomPool, itemRoomTotal, duplicateProtection, r);
+                if (itemRooms == null || itemRooms.Length != itemRoomTotal)
                 {
-                    throw new Exception("ItemRoomSelectionStrategy generated an item room replacement for a room that doesn't exist");
+                    return false;
                 }
-                palace.ReplaceRoom(itemRoomReplacementRoom, itemRoom);
-                palace.ItemRooms.Add(itemRoom);
-            } 
+
+                foreach (Room itemRoom in itemRooms)
+                {
+                    Room? itemRoomReplacementRoom = palace.AllRooms.FirstOrDefault(i => i.coords == itemRoom.coords);
+                    if (itemRoomReplacementRoom == null)
+                    {
+                        throw new Exception("ItemRoomSelectionStrategy generated an item room replacement for a room that doesn't exist");
+                    }
+                    palace.ReplaceRoom(itemRoomReplacementRoom, itemRoom);
+                    palace.ItemRooms.Add(itemRoom);
+                }
+            }
         }
         //Tbird Room
         else
