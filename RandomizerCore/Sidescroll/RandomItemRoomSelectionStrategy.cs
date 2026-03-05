@@ -23,12 +23,17 @@ public class RandomItemRoomSelectionStrategy : ItemRoomSelectionStrategy
         while(itemRooms.Count < itemRoomCount && attemptNumber++ < MAX_ATTEMPTS)
         {
             Room? itemRoomCandidate = itemRoomCandidates.Sample(r);
+
             if(itemRoomCandidate == null)
             {
                 return [];
             }
 
             RoomExitType itemRoomExitType = itemRoomCandidate.CategorizeExits();
+            if(itemRoomCandidate.LinkedRoomName != null)
+            {
+                itemRoomExitType = itemRoomExitType.Merge(roomPool.LinkedRooms[itemRoomCandidate.LinkedRoomName].CategorizeExits());
+            }
             
             List<Room> itemRoomReplacementCandidates =
                 palace.AllRooms.Where(i => i.IsNormalRoom() && i.CategorizeExits() == itemRoomExitType && !replacedCoords.Contains(i.coords)).ToList();
@@ -43,12 +48,15 @@ public class RandomItemRoomSelectionStrategy : ItemRoomSelectionStrategy
                 {
                     Room itemRoom = new(itemRoomCandidate);
                     itemRoom.coords = itemRoomReplacementRoom.coords;
-                    itemRooms.Add(itemRoom);
+
                     if (itemRoomCandidate.LinkedRoomName != null)
                     {
-                        Room linkedRoom = roomPool.LinkedRooms[itemRoomCandidate.LinkedRoomName];
+                        Room linkedRoom = new(roomPool.LinkedRooms[itemRoomCandidate.LinkedRoomName]);
+                        linkedRoom.coords = itemRoom.coords;
                         itemRoom = itemRoom.Merge(linkedRoom);
                     }
+
+                    itemRooms.Add(itemRoom);
                     replacedCoords.Add(itemRoomReplacementRoom.coords);
                     itemRoomNumber++;
 

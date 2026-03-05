@@ -140,7 +140,6 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
             || (palace.Number == 7 && !palace.IsBossRoomAtLeastMinDistance(props.DarkLinkMinDistance))
         )
         {
-            //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));
             return false;
         }
 
@@ -161,6 +160,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
 
             newPrimaryRoom.coords = primaryRoom.coords;
             newPrimaryRoom.LinkedRoom = secondaryRoom;
+            secondaryRoom.coords = primaryRoom.coords;
             secondaryRoom.LinkedRoom = newPrimaryRoom;
 
             replacements.Add((primaryRoom, newPrimaryRoom, secondaryRoom));

@@ -211,7 +211,7 @@
             </CheckBox>
             <ComboBox
                 HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
-                assists:ComboBoxAssist.Label="Boss Rooms Exit To"
+                assists:ComboBoxAssist.Label="Boss Rooms Exit to"
                 ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomsExitTypeList}}"
 				Name="BossRoomsExitTypeSelector"
                 SelectedItem="{Binding Config.BossRoomsExitType, Converter={x:Static ui:Util.EnumConvert}}"
@@ -220,13 +220,13 @@
             </ComboBox>
 			<ComboBox
 	            HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
-	            assists:ComboBoxAssist.Label="Boss Rooms Exit To"
+	            assists:ComboBoxAssist.Label="Drops Connect to"
 	            ItemsSource="{Binding Source={x:Static rc:Enums.PalaceDropStyleList}}"
 	            Name="PalaceDropStyleSelector"
 	            SelectedItem="{Binding Config.PalaceDropStyle, Converter={x:Static ui:Util.EnumConvert}}"
                         >
 				<ToolTip.Tip>
-					<TextBlock Text="{x:Static lang:Resources.BossRoomsExitToToolTip}"/>
+					<TextBlock Text="{x:Static lang:Resources.DropStyleTooltip}"/>
 				</ToolTip.Tip>
 			</ComboBox>
             <CheckBox

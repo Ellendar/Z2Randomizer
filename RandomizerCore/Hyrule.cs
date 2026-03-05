@@ -742,11 +742,11 @@ public class Hyrule
             ItemGet[Collectable.MIRROR] = true;
             ItemGet[Collectable.WATER] = true;
         }
-        else
+        else if(!props.IncludeSpellsInShuffle)
         {
             Collectable townCollectable;
             townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0];
-            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
             {
                 Debug.Assert(shufflableItems[10] == Collectable.TROPHY);
                 shufflableItems[10] = minorItems[r.Next(minorItems.Count)];
@@ -754,7 +754,7 @@ public class Hyrule
             }
 
             townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectables[0];
-            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
             {
                 Debug.Assert(shufflableItems[9] == Collectable.MEDICINE);
                 shufflableItems[9] = minorItems[r.Next(minorItems.Count)];
@@ -762,11 +762,27 @@ public class Hyrule
             }
 
             townCollectable = eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectables[0];
-            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
             {
                 Debug.Assert(shufflableItems[17] == Collectable.CHILD);
                 shufflableItems[17] = minorItems[r.Next(minorItems.Count)];
                 ItemGet[Collectable.CHILD] = true;
+            }
+
+            townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectables[0];
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
+            {
+                Debug.Assert(shufflableItems[23] == Collectable.MIRROR);
+                shufflableItems[23] = minorItems[r.Next(minorItems.Count)];
+                ItemGet[Collectable.MIRROR] = true;
+            }
+
+            townCollectable = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectables[0];
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
+            {
+                Debug.Assert(shufflableItems[24] == Collectable.WATER);
+                shufflableItems[24] = minorItems[r.Next(minorItems.Count)];
+                ItemGet[Collectable.WATER] = true;
             }
         }
 

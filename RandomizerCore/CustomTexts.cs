@@ -833,15 +833,21 @@ public class CustomTexts
                 hints[childSpellHintIndex] = kidHint;
             }
 
-            if(props.IncludeQuestItemsInShuffle)
+            if (props.IncludeQuestItemsInShuffle)
             {
                 itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.MIRROR))!;
-                Text mirrorHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.MIRROR, props.IncludeSpellsInShuffle);
-                hints[mirrorSpellHintIndex] = mirrorHint;
+                if (itemLocation != null)
+                {
+                    Text mirrorHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.MIRROR, props.IncludeSpellsInShuffle);
+                    hints[mirrorSpellHintIndex] = mirrorHint;
+                }
 
-                itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.WATER))!;
-                Text waterHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.WATER, props.IncludeSpellsInShuffle);
-                hints[waterSpellHintIndex] = waterHint;
+                if (itemLocation != null)
+                {
+                    itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.WATER))!;
+                    Text waterHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.WATER, props.IncludeSpellsInShuffle);
+                    hints[waterSpellHintIndex] = waterHint;
+                }
             }
         }
     }

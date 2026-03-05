@@ -713,7 +713,7 @@ public abstract class World
                 location.Y = 0;
             }
         }
-        Debug.WriteLine(GetMapDebug());
+        //Debug.WriteLine(GetMapDebug());
         int maxBridgeLength = MAXIMUM_BRIDGE_LENGTH[biome];
         //Great lakes and bad boots are more likely to be incompleteable, so extend max bridge length to give them a fighting chance
         if(canWalkOnWater || climate.Name == Climates.Create(ClimateEnum.GREAT_LAKES).Name)

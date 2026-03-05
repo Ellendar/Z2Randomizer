@@ -681,7 +681,7 @@ public sealed class WestHyrule : World
                     return false;
                 }
 
-                Debug.WriteLine(GetMapDebug());
+                //Debug.WriteLine(GetMapDebug());
                 if (!GrowTerrain(climate))
                 {
                     return false;
