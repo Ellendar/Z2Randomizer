@@ -465,7 +465,7 @@ public class OverworldSizeMetaAttribute : Attribute
 [DefaultValue(LARGE)]
 public enum OverworldSizeOption
 {
-    [Description("Large (75x60)"), OverworldSizeMeta(Width = 75, Height = 60)]
+    [Description("Large (60x75)"), OverworldSizeMeta(Width = 60, Height = 75)]
     LARGE,
     [Description("Medium (52x52)"), OverworldSizeMeta(Width = 52, Height = 52)]
     MEDIUM,
@@ -477,7 +477,7 @@ public enum DmSizeOption
 {
     [Description("Large  (64x45 ~37 caves)"), OverworldSizeMeta(Width = 64, Height = 45)]
     LARGE,
-    [Description("Medium (40x40 ~27 caves)"), OverworldSizeMeta(Width = 52, Height = 52)]
+    [Description("Medium (45x45 ~27 caves)"), OverworldSizeMeta(Width = 45, Height = 45)]
     MEDIUM,
     [Description("Small  (34x34 ~17 caves)"), OverworldSizeMeta(Width = 34, Height = 34)]
     SMALL,

@@ -293,14 +293,16 @@ public sealed class EastHyrule : World
         biome = props.EastBiome;
         if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE || props.EastSize == OverworldSizeOption.LARGE)
         {
-            MAP_ROWS = 75;
             MAP_COLS = 64;
+            MAP_ROWS = 75;
+            northSouthEncounterSeparator = 46;
         }
         else
         {
             var meta = props.EastSize.GetMeta();
-            MAP_ROWS = meta.Width;
-            MAP_COLS = meta.Height;
+            MAP_COLS = meta.Width;
+            MAP_ROWS = meta.Height;
+            northSouthEncounterSeparator = MAP_ROWS / 2;
             // TODO: use metadata for num trap tiles etc. to remove for small continents
             int trapTilesToRemove = 0; // must be even
             for (int i = 0; i < trapTilesToRemove; i++)
@@ -905,6 +907,7 @@ public sealed class EastHyrule : World
                     }
                 }
                 bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Y, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
+                rom.Put(RomMap.NORTH_SOUTH_SEPARATOR_EAST, (byte)(northSouthEncounterSeparator + 30));
                 //logger.Debug("East:" + bytesWritten);
             }
         }
