@@ -19,6 +19,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         Palace palace = new(palaceNumber);
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
         RoomPool roomPool = new(rooms);
+        var itemRoomSelector = GetItemRoomSelectionStrategy();
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
         Dictionary<Coord, RoomExitType> shape;
@@ -38,13 +39,38 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
             }
         }
 
-        List < Coord > prepopulatedCoordinates = [];
+        List<Coord> prepopulatedCoordinates = [];
         prepopulatedCoordinates.Add(palace.AllRooms.FirstOrDefault(i => i.IsEntrance)?.coords ?? Coord.Uninitialized);
         prepopulatedCoordinates.Add(palace.AllRooms.FirstOrDefault(i => i.IsBossRoom)?.coords ?? Coord.Uninitialized);
+
+        int itemRoomCount = palace.Number < 7 ? props.PalaceItemRoomCounts[palace.Number - 1] : 0;
+        if (palace.ItemRooms.Count < itemRoomCount && itemRoomSelector is ByShapeItemRoomSelectionStrategy shapeSelector)
+        {
+            var itemRoomShapes = GetItemRoomShapes(roomPool);
+            Room[] itemRooms = shapeSelector.SelectItemRoomsInShape(roomPool, itemRoomCount, duplicateProtection, r, shape, itemRoomShapes, prepopulatedCoordinates);
+            if (itemRooms.Length < itemRoomCount)
+            {
+                palace.IsValid = false;
+                return palace;
+            }
+            palace.ItemRooms = itemRooms.ToList();
+            palace.AllRooms.AddRange(palace.ItemRooms);
+
+            prepopulatedCoordinates.AddRange(palace.ItemRooms.Select(room => room.coords));
+        }
 
         //We aren't currently prepopulating thunderbird, but this should probably have some safety.
         //Too lazy for now
         //prepopulatedCoordinates.Add(palace.AllRooms.First(i => i.IsThunderBirdRoom).coords);
+
+        if (!ValidateShape(palace, shape))
+        {
+#if DEBUG
+            Debug.WriteLine("ValidateShape failed:\n" + GetLayoutDebug(shape, false, prepopulatedCoordinates));
+#endif
+            palace.IsValid = false;
+            return palace;
+        }
 
         //Add rooms
         roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
@@ -194,7 +220,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         }
 
 
-        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props, GetItemRoomSelectionStrategy()))
+        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props, itemRoomSelector))
         {
             palace.IsValid = false;
             return palace;
@@ -270,7 +296,17 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         return palaceNumber == 7 ? props.DarkLinkMinDistance : 0;
     }
 
-    public static string GetLayoutDebug(Dictionary<Coord, RoomExitType> walkGraph, bool includeCoordinateGrid = true)
+    protected virtual IEnumerable<RoomExitType> GetItemRoomShapes(RoomPool roomPool)
+    {
+        return roomPool.GetItemRoomShapes();
+    }
+
+    protected virtual bool ValidateShape(Palace palace, Dictionary<Coord, RoomExitType> palaceShape)
+    {
+        return true;
+    }
+
+    public static string GetLayoutDebug(Dictionary<Coord, RoomExitType> walkGraph, bool includeCoordinateGrid = true, List<Coord> prepopulatedCoordinates = null)
     {
         StringBuilder sb = new();
         if (includeCoordinateGrid)
@@ -300,14 +336,24 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
             sb.Append(includeCoordinateGrid ? y.ToString().PadLeft(3, ' ') : "   ");
             for (int x = -20; x <= 20; x++)
             {
-                if (!walkGraph.TryGetValue(new Coord(x, y), out RoomExitType room))
+                var coord = new Coord(x, y);
+                if (!walkGraph.TryGetValue(coord, out RoomExitType room))
                 {
                     sb.Append("   ");
                 }
                 else
                 {
                     sb.Append(room.ContainsLeft() ? '-' : ' ');
-                    sb.Append('X');
+
+                    if (prepopulatedCoordinates?.Contains(coord) ?? false)
+                    {
+                        sb.Append('P');
+                    }
+                    else
+                    {
+                        sb.Append('X');
+                    }
+
                     sb.Append(room.ContainsRight() ? '-' : ' ');
                 }
             }
