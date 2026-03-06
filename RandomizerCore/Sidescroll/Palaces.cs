@@ -76,6 +76,7 @@ public class Palaces
                 PalaceStyle.TOWER => new TowerCoordinatePalaceGenerator(),
                 PalaceStyle.RECONSTRUCTED => new ReconstructedPalaceGenerator(ct),
                 PalaceStyle.CHAOS => new ChaosPalaceGenerator(),
+                PalaceStyle.EXTRA_LOOPS => new ExtraLoopsPalaceGenerator(ct),
                 _ => throw new Exception("Unrecognized palace style while generating palaces")
             };
 
