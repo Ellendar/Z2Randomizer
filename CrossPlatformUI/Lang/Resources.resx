@@ -775,13 +775,15 @@ statue will be removed.
 If the palace continues after the boss, palace item rooms may be behind the boss room.</value>
 	</data>
 	<data name="DropStyleTooltip" xml:space="preserve">
-<value>Selects where drop in palaces can take you to. Has no effect in vanilla/shuffle styles.
- • Entrance: Drops must connect back to the palace's entrance in some way.
- • Any Exit: Drops are allowed to connect to either the palace entrance or the boss room. 
- This behaves identically to Entrance if palaces can continue after boss rooms.
- • Anything Goes: No restrictions on drops. This can cause you to get stuck after taking a drop,
- requiring a game over or up+A.
- • Random: Each palace's drops may or may not be allowed to lead to the boss at random. </value>
+<value>Selects the required eventual destinations for palace drops.
+(Has no effect in Vanilla/Shuffled palaces.)
+
+  • Entrance: Drops must eventually lead back to the palace entrance.
+  • Entrance/Boss Exit: Drops must eventually lead either to the palace entrance or the boss room.
+    (If palace continues after the boss, there is no boss exit, so this behaves the same as Entrance.)
+  • Balanced: Same as Entrance/Boss Exit, with a higher chance of it leading back to the entrance.
+  • Anything: No restrictions on drops. This allows drops to lead to areas without an exit,
+    requiring a Game Over or Up+A to get out.</value>
 	</data>
 	<data name="HarderCarockToolTip" xml:space="preserve">
 <value>Tired of just ducking in the corner and blocking? This option enables carock shooting

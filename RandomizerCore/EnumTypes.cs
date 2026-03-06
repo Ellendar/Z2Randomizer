@@ -247,10 +247,14 @@ public static class PalaceStyleExtensions
 
 public enum PalaceDropStyle
 {
+    [Description("Entrance")]
     ENTRANCE,
+    [Description("Entrance/Boss Exit")]
     ANY_EXIT,
+    [Description("Balanced")]
+    RANDOM,
+    [Description("Anything")]
     ANYTHING_GOES,
-    RANDOM
 }
 
 [DefaultValue(OVERWORLD)]
