@@ -769,20 +769,23 @@ public class Hyrule
                 ItemGet[Collectable.CHILD] = true;
             }
 
-            townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectables[0];
-            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
+            if (props.IncludeQuestItemsInShuffle)
             {
-                Debug.Assert(shufflableItems[23] == Collectable.MIRROR);
-                shufflableItems[23] = minorItems[r.Next(minorItems.Count)];
-                ItemGet[Collectable.MIRROR] = true;
-            }
+                townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectables[0];
+                if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
+                {
+                    Debug.Assert(shufflableItems[23] == Collectable.MIRROR);
+                    shufflableItems[23] = minorItems[r.Next(minorItems.Count)];
+                    ItemGet[Collectable.MIRROR] = true;
+                }
 
-            townCollectable = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectables[0];
-            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
-            {
-                Debug.Assert(shufflableItems[24] == Collectable.WATER);
-                shufflableItems[24] = minorItems[r.Next(minorItems.Count)];
-                ItemGet[Collectable.WATER] = true;
+                townCollectable = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectables[0];
+                if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
+                {
+                    Debug.Assert(shufflableItems[24] == Collectable.WATER);
+                    shufflableItems[24] = minorItems[r.Next(minorItems.Count)];
+                    ItemGet[Collectable.WATER] = true;
+                }
             }
         }
 
