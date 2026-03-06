@@ -397,7 +397,7 @@ public sealed class WestHyrule : World
                 ChooseConn("dmexit", connections, true);
 
                 ShuffleLocations(AllLocations);
-                if (props.VanillaShuffleUsesActualTerrain)
+                if (!props.LegacyVanillaShuffledLocations)
                 {
                     foreach (Location location in AllLocations)
                     {

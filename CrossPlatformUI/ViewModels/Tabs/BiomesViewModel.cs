@@ -12,15 +12,15 @@ public class BiomesViewModel : ReactiveObject, IActivatableViewModel
     public ViewModelActivator Activator { get; }
     public MainViewModel Main { get; }
 
-    public IObservable<bool> VanillaShuffleUsesActualTerrainIncludedObservable { get; }
+    public IObservable<bool> LegacyVanillaShuffledLocationsIncludedObservable { get; }
 
     public BiomesViewModel(MainViewModel main)
     {
         Main = main;
         Activator = new();
 
-        VanillaShuffleUsesActualTerrainIncludedObservable = Main.FlagsChanged
-            .Select(_ => Main.Config.vanillaShuffleUsesActualTerrainIncluded())
+        LegacyVanillaShuffledLocationsIncludedObservable = Main.FlagsChanged
+            .Select(_ => Main.Config.legacyVanillaShuffledLocationsIncluded())
             .DistinctUntilChanged();
 
         this.WhenActivated(OnActivate);

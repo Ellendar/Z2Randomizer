@@ -263,9 +263,8 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    [DefaultValue(true)]
-    private bool vanillaShuffleUsesActualTerrain;
-    public bool vanillaShuffleUsesActualTerrainIncluded() {
+    private bool legacyVanillaShuffledLocations;
+    public bool legacyVanillaShuffledLocationsIncluded() {
         foreach (var biome in (List<Biome>)[westBiome, eastBiome, dmBiome, mazeBiome])
         {
             switch (biome)
@@ -1283,7 +1282,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             properties.DmClimate = dmClimate;
         }
 
-        properties.VanillaShuffleUsesActualTerrain = vanillaShuffleUsesActualTerrain;
+        properties.LegacyVanillaShuffledLocations = legacyVanillaShuffledLocations;
         properties.ShuffleHidden = shuffleWhichLocationIsHidden ?? GetIndeterminateFlagValue(r);
         properties.CanWalkOnWaterWithBoots = goodBoots ?? GetIndeterminateFlagValue(r);
         properties.BagusWoods = generateBaguWoods ?? GetIndeterminateFlagValue(r);

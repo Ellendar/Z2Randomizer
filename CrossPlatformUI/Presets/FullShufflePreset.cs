@@ -43,7 +43,6 @@ public static class FullShufflePreset
         EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
         DmClimate = ClimateEnum.CLASSIC,
         MazeClimate = ClimateEnum.CLASSIC,
-        VanillaShuffleUsesActualTerrain = true,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
         //Palaces

@@ -96,7 +96,7 @@ public class RandomizerProperties
     public ClimateEnum EastClimate { get; set; }
     public ClimateEnum DmClimate { get; set; }
 #pragma warning restore CS8618 
-    public bool VanillaShuffleUsesActualTerrain { get; set; }
+    public bool LegacyVanillaShuffledLocations { get; set; }
     public bool ShuffleHidden { get; set; }
     public bool CanWalkOnWaterWithBoots { get; set; }
     public bool BagusWoods { get; set; }

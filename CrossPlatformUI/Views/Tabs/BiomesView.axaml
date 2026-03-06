@@ -141,10 +141,10 @@
 
             <StackPanel Grid.Column="1" Margin="0 0">
                 <CheckBox IsThreeState="False"
-                          IsEnabled="{Binding VanillaShuffleUsesActualTerrainIncludedObservable^}"
-                          IsChecked="{Binding Main.Config.VanillaShuffleUsesActualTerrain}"
-                          Content="Vanilla Shuffle Shows Actual Terrain">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.VanillaShuffleShowsActualTerrainToolTip}"/></ToolTip.Tip>
+                          IsEnabled="{Binding LegacyVanillaShuffledLocationsIncludedObservable^}"
+                          IsChecked="{Binding Main.Config.LegacyVanillaShuffledLocations}"
+                          Content="Legacy Vanilla Shuffled Locations">
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LegacyVanillaShuffledLocationsToolTip}"/></ToolTip.Tip>
                 </CheckBox>
             </StackPanel>
         </Grid>

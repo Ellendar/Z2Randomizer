@@ -638,11 +638,15 @@ are:
   • If the raft and bridge appear on the same continent, they are never on the same side
     (North / South / East / West)</value>
 	</data>
-	<data name="VanillaShuffleShowsActualTerrainToolTip" xml:space="preserve">
-<value>If a shuffled vanilla map is used, this option will make the shuffled locations show their
-actual terrain, instead of the original vanilla terrain.
+	<data name="LegacyVanillaShuffledLocationsToolTip" xml:space="preserve">
+<value>Only applicable to Vanilla Shuffled overworlds. When enabled, the overworld map locations
+keep their original (vanilla) icons instead of reflecting the shuffled location type.
 
-It is not recommended to disable this.</value>
+Example: the map will show a town icon where Town of Rauru appears in the original game.
+However, entering that location might instead lead to a cave—or any other shuffled location.
+The overworld tile remains unchanged even though the underlying location has been changed.
+
+Enable at your own risk.</value>
 	</data>
 	<data name="NormalPalaceStyleToolTip" xml:space="preserve">
 <value>Sets the palace generator for palaces 1 through 6. See the Wiki for more details.</value>

@@ -123,7 +123,7 @@ sealed class MazeIsland : World
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
-                if (props.VanillaShuffleUsesActualTerrain)
+                if (!props.LegacyVanillaShuffledLocations)
                 {
                     foreach (Location location in AllLocations)
                     {

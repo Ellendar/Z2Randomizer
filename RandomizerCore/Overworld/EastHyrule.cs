@@ -450,7 +450,7 @@ public sealed class EastHyrule : World
                     locationAtPalace6.CanShuffle = false;
                 }
                 ShuffleLocations(AllLocations);
-                if (props.VanillaShuffleUsesActualTerrain)
+                if (!props.LegacyVanillaShuffledLocations)
                 {
                     foreach (Location location in AllLocations)
                     {
@@ -925,14 +925,14 @@ public sealed class EastHyrule : World
         if (props.HiddenPalace)
         {
             rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCoords, hiddenPalaceLocation,
-                townAtNewKasuto, spellTower, props.VanillaShuffleUsesActualTerrain);
+                townAtNewKasuto, spellTower, !props.LegacyVanillaShuffledLocations);
             hiddenPalaceLocation.AccessRequirements = hiddenPalaceLocation.AccessRequirements.WithHardRequirement(RequirementType.FLUTE);
             hiddenPalaceLocation.Children.ForEach(i => i.AccessRequirements = i.AccessRequirements.WithHardRequirement(RequirementType.FLUTE));
         }
         if (props.HiddenKasuto)
         {
             rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome,
-                baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
+                baseAddr, terrains[hiddenKasutoLocation.MemAddress], !props.LegacyVanillaShuffledLocations);
             hiddenKasutoLocation.AccessRequirements = hiddenPalaceLocation.AccessRequirements.WithHardRequirement(RequirementType.HAMMER);
             hiddenKasutoLocation.Children.ForEach(i => i.AccessRequirements = i.AccessRequirements.WithHardRequirement(RequirementType.HAMMER));
         }

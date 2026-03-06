@@ -43,7 +43,6 @@ public static class MaxRando2025Preset
         DmClimate = ClimateEnum.RANDOM,
         MazeClimate = ClimateEnum.RANDOM,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
-        VanillaShuffleUsesActualTerrain = true,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_PER_PALACE,

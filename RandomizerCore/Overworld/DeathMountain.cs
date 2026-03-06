@@ -269,7 +269,7 @@ sealed class DeathMountain : World
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
-                if (props.VanillaShuffleUsesActualTerrain)
+                if (!props.LegacyVanillaShuffledLocations)
                 {
                     specRock.TerrainType = Terrain.ROCK;
                     foreach (Location location in AllLocations)
