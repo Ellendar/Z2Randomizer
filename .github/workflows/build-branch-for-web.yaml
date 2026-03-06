@@ -1,0 +1,54 @@
+name: Build branch for Web
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch (Optional)'
+        type: string
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+jobs:
+
+  build:
+    strategy:
+      matrix:
+        platform: [
+          { name: Browser, os: ubuntu-latest, arch: wasm, type: browser },
+        ]
+        dotnet-version: [ '10.0.x' ]
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch }}
+          submodules: recursive
+
+      - name: Setup dotnet ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+
+      - name: Build Browser
+        if: ${{ matrix.platform.type == 'browser' }}
+        run: |
+          cd CrossPlatformUI.Browser
+          dotnet workload restore
+          cd ..
+          dotnet publish -c Release CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
+
+      - name: Upload Browser build to artifacts
+        if: ${{ matrix.platform.type == 'browser' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}
+          path: |
+            CrossPlatformUI.Browser/bin/Release/net10.0-browser/browser-wasm/AppBundle/
+            !**/*.pdb
+
