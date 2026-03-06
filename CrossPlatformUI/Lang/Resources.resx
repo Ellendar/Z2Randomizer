@@ -560,11 +560,28 @@ Which location is hidden beneath may change if Shuffle Which Locations Are Hidde
 random location in the east.</value>
 	</data>
 	<data name="OverworldSizeToolTip" xml:space="preserve">
-<value>Set the size of a continent. With smaller sizes, some non-item tiles may be removed.
+<value>Set the map size of a continent.
 
-Note: The cave count does not include continent connector caves.</value>
+In the West and East continents, no locations are currently removed for smaller sizes.
+
+(Large is the map size that was used before v5.1.)</value>
 	</data>
-	<data name="WestContinentBiomeToolTip" xml:space="preserve">
+    <data name="DmSizeToolTip" xml:space="preserve">
+<value>Set the map size of Death Mountain.
+
+With smaller sizes, some caves are removed from DM. Medium and smaller sizes removes the
+duplicate cave passthroughs. The cave count does not include continent connector caves.
+
+(Large is the map size that was used before v5.1.)</value>
+	</data>
+    <data name="MazeSizeToolTip" xml:space="preserve">
+<value>Set the map size of Maze Island.
+
+With smaller sizes, some trap tiles are removed from the maze.
+
+(Large is the map size that was used before v5.1.)</value>
+	</data>
+    <data name="WestContinentBiomeToolTip" xml:space="preserve">
 <value>See the Wiki for a description of what each biome does.</value>
 	</data>
 	<data name="EastContinentBiomeToolTip" xml:space="preserve">

@@ -465,33 +465,33 @@ public class OverworldSizeMetaAttribute : Attribute
 [DefaultValue(LARGE)]
 public enum OverworldSizeOption
 {
-    [Description("Large (60x75)"), OverworldSizeMeta(Width = 60, Height = 75)]
+    [Description("Large; (60x75)"), OverworldSizeMeta(Width = 60, Height = 75)]
     LARGE,
-    [Description("Medium (52x52)"), OverworldSizeMeta(Width = 52, Height = 52)]
+    [Description("Medium; (52x52)"), OverworldSizeMeta(Width = 52, Height = 52)]
     MEDIUM,
-    [Description("Small (44x44)"), OverworldSizeMeta(Width = 44, Height = 44)]
+    [Description("Small; (44x44)"), OverworldSizeMeta(Width = 44, Height = 44)]
     SMALL,
 }
 [DefaultValue(LARGE)]
 public enum DmSizeOption
 {
-    [Description("Large  (64x45 ~37 caves)"), OverworldSizeMeta(Width = 64, Height = 45)]
+    [Description("Large; 37 caves (64x45)"), OverworldSizeMeta(Width = 64, Height = 45)]
     LARGE,
-    [Description("Medium (45x45 ~27 caves)"), OverworldSizeMeta(Width = 45, Height = 45)]
+    [Description("Medium; 27 caves (45x45)"), OverworldSizeMeta(Width = 45, Height = 45)]
     MEDIUM,
-    [Description("Small  (34x34 ~17 caves)"), OverworldSizeMeta(Width = 34, Height = 34)]
+    [Description("Small; 17 caves (34x34)"), OverworldSizeMeta(Width = 34, Height = 34)]
     SMALL,
-    [Description("Tiny   (26x26  ~9 caves)"), OverworldSizeMeta(Width = 26, Height = 26)]
+    [Description("Tiny; 9 caves (26x26)"), OverworldSizeMeta(Width = 26, Height = 26)]
     TINY,
 }
 [DefaultValue(LARGE)]
 public enum MazeSizeOption
 {
-    [Description("Large  (23x23)"), OverworldSizeMeta(Width = 23, Height = 23)]
+    [Description("Large; 7 traps (23x23)"), OverworldSizeMeta(Width = 23, Height = 23)]
     LARGE,
-    [Description("Medium (19x19)"), OverworldSizeMeta(Width = 19, Height = 19)]
+    [Description("Medium; 6 traps (19x19)"), OverworldSizeMeta(Width = 19, Height = 19)]
     MEDIUM,
-    [Description("Small  (15x15)"), OverworldSizeMeta(Width = 15, Height = 15)]
+    [Description("Small; 5 traps (15x15)"), OverworldSizeMeta(Width = 15, Height = 15)]
     SMALL,
 }
 public static class OverworldSizeExtensions
