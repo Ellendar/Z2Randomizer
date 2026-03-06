@@ -199,10 +199,8 @@ public enum PalaceStyle
 {
     [Description("Vanilla")]
     VANILLA,
-    [Description("Shuffled")]
+    [Description("Vanilla Shuffle")]
     SHUFFLED,
-    [Description("Reconstructed")]
-    RECONSTRUCTED,
     [Description("Sequential")]
     SEQUENTIAL,
     [Description("Random Walk")]
@@ -211,6 +209,10 @@ public enum PalaceStyle
     VANILLA_WEIGHTED,
     [Description("Tower")]
     TOWER,
+    [Description("Reconstructed")]
+    RECONSTRUCTED,
+    [Description("Loopy")]
+    RECONSTRUCTED_LOOPY,
     [Description("Chaos"), DefaultWeight(0)]
     CHAOS,
     [Description("Random"), Metastyle]
