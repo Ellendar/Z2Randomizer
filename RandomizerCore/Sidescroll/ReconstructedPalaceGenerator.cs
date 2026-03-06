@@ -307,7 +307,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
         }
     }
 
-    public void Consolidate(List<Room> openRooms)
+    public virtual void Consolidate(List<Room> openRooms)
     {
         Room[] openCopy = new Room[openRooms.Count];
         openRooms.CopyTo(openCopy);
@@ -330,7 +330,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
     /// <param name="room"></param> The room to be attached
     /// <param name="open"></param> The room onto which R is attached
     /// <returns>Whether or not the room was actually able to be attached.</returns>
-    private bool AttachToOpen(Room room, Room open, List<Room> openRooms)
+    protected bool AttachToOpen(Room room, Room open, List<Room> openRooms)
     {
         bool placed = false;
         //Right from open into r

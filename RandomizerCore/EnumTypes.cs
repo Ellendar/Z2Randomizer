@@ -213,6 +213,8 @@ public enum PalaceStyle
     TOWER,
     [Description("Chaos"), DefaultWeight(0)]
     CHAOS,
+    [Description("Extra Loops")]
+    EXTRA_LOOPS,
     [Description("Random"), Metastyle]
     RANDOM,
     [Description("Random (All Same)"), Metastyle]

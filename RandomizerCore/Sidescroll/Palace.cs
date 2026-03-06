@@ -185,6 +185,31 @@ public partial class Palace
         return false; // Boss room not found??
     }
 
+    public static int RoomDistance(Room room1, Room room2)
+    {
+        HashSet<Room> reachedRooms = [];
+        Queue<(Room, int)> roomsToCheck = [];
+        roomsToCheck.Enqueue((room1, 0));
+        while (roomsToCheck.Count > 0)
+        {
+            var (room, stepsToRoom) = roomsToCheck.Dequeue();
+            if (room == room2)
+            {
+                return stepsToRoom;
+            }
+
+            // This will return false if the room is already added
+            if (!reachedRooms.Add(room)) { continue; }
+
+            int stepsToNextRoom = stepsToRoom + 1;
+            if (room.Left != null) { roomsToCheck.Enqueue((room.Left, stepsToNextRoom)); }
+            if (room.Right != null) { roomsToCheck.Enqueue((room.Right, stepsToNextRoom)); }
+            if (room.Up != null) { roomsToCheck.Enqueue((room.Up, stepsToNextRoom)); }
+            if (room.Down != null) { roomsToCheck.Enqueue((room.Down, stepsToNextRoom)); }
+        }
+        return -1;
+    }
+
     /// same algorithm as BossRoomMinDistance except for shapes instead of rooms
     public static bool BossRoomMinDistanceShape(Dictionary<Coord, RoomExitType> shape, Coord bossRoom, int minSteps)
     {
