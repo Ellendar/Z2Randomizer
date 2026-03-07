@@ -43,6 +43,7 @@ static class TerrainExtensions
             Terrain.LAVA => true,
             Terrain.MOUNTAIN => false,
             Terrain.WATER => false,
+            Terrain.PREPLACED_WATER => false,
             Terrain.WALKABLEWATER => true,
             Terrain.PREPLACED_WATER_WALKABLE => true,
             Terrain.ROCK => true,
