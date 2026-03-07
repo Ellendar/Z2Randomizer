@@ -1592,7 +1592,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             properties.ShuffleHidden = false;
         }
 
-        if (properties.WestBiome is Biome.VANILLA or Biome.VANILLA_SHUFFLE)
+        if (properties.WestBiome.UsesVanillaMap())
         {
             properties.BagusWoods = false;
         }

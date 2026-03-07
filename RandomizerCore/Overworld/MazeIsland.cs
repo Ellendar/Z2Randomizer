@@ -82,7 +82,7 @@ sealed class MazeIsland : World
         VANILLA_MAP_ADDR = 0xa65c;
 
         biome = props.MazeBiome;
-        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
+        if (biome.UsesVanillaMap())
         {
             MAP_ROWS = 75;
             MAP_COLS = 64;
@@ -115,7 +115,7 @@ sealed class MazeIsland : World
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
     {
-        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
+        if (biome.UsesVanillaMap())
         {
             Debug.Assert(MAP_ROWS == 75);
             Debug.Assert(MAP_COLS == 64);

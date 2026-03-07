@@ -2334,7 +2334,7 @@ ResetRedPalettePayload:
     public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, 
         Location townAtNewKasuto, Location spellTower, bool vanillaShuffleUsesActualTerrain)
     {
-        if (biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE)
+        if (!biome.UsesVanillaMap())
         {
             Put(0x8382, (byte)hiddenPalaceCoords.Item1);
             Put(0x8388, (byte)hiddenPalaceCoords.Item2);

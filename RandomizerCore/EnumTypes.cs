@@ -318,6 +318,16 @@ static class BiomeExtensions
         };
     }
 
+    public static bool UsesVanillaMap(this Biome biome)
+    {
+        return biome switch
+        {
+            Biome.VANILLA => true,
+            Biome.VANILLA_SHUFFLE => true,
+            _ => false
+        };
+    }
+
     public static bool IsWestBiome(this Biome biome)
     {
         return biome switch

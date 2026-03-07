@@ -1661,20 +1661,16 @@ public class Hyrule
                 {
                     List<int> chosen = new List<int>();
                     int type = r.Next(4);
-                    if (props.WestBiome == Biome.VANILLA
-                        || props.WestBiome == Biome.VANILLA_SHUFFLE
-                        || props.DmBiome == Biome.VANILLA
-                        || props.DmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome.UsesVanillaMap()
+                        || props.DmBiome.UsesVanillaMap())
                     {
                         type = 3;
                     }
 
                     SetTransportation(0, 1, type);
                     chosen.Add(type);
-                    if (props.WestBiome == Biome.VANILLA
-                        || props.WestBiome == Biome.VANILLA_SHUFFLE
-                        || props.DmBiome == Biome.VANILLA
-                        || props.DmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome.UsesVanillaMap()
+                        || props.DmBiome.UsesVanillaMap())
                     {
                         type = 0;
                     }
@@ -1687,10 +1683,8 @@ public class Hyrule
                     }
                     SetTransportation(0, 1, type);
                     chosen.Add(type);
-                    if (props.WestBiome == Biome.VANILLA
-                        || props.WestBiome == Biome.VANILLA_SHUFFLE
-                        || props.EastBiome == Biome.VANILLA
-                        || props.EastBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome.UsesVanillaMap()
+                        || props.EastBiome.UsesVanillaMap())
                     {
                         type = 1;
                     }
@@ -1703,10 +1697,8 @@ public class Hyrule
                     }
                     SetTransportation(0, 2, type);
                     chosen.Add(type);
-                    if (props.EastBiome == Biome.VANILLA
-                        || props.EastBiome == Biome.VANILLA_SHUFFLE
-                        || props.MazeBiome == Biome.VANILLA
-                        || props.MazeBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.EastBiome.UsesVanillaMap()
+                        || props.MazeBiome.UsesVanillaMap())
                     {
                         type = 2;
                     }
@@ -1723,26 +1715,26 @@ public class Hyrule
                 {
                     Location l1, l2;
                     List<int> doNotPick = new List<int>();
-                    if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome.UsesVanillaMap())
                     {
                         doNotPick.Add(0);
                     }
-                    if (props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.EastBiome.UsesVanillaMap())
                     {
                         doNotPick.Add(2);
                     }
-                    if (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.DmBiome.UsesVanillaMap())
                     {
                         doNotPick.Add(1);
                     }
-                    if (props.MazeBiome == Biome.VANILLA || props.MazeBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.MazeBiome.UsesVanillaMap())
                     {
                         doNotPick.Add(3);
                     }
 
                     int raftw1 = r.Next(worlds.Count);
 
-                    if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome.UsesVanillaMap())
                     {
                         raftw1 = 0;
                     }
@@ -1755,7 +1747,7 @@ public class Hyrule
                     }
 
                     int raftw2 = r.Next(worlds.Count);
-                    if (props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.EastBiome.UsesVanillaMap())
                     {
                         raftw2 = 2;
                     }
@@ -1772,7 +1764,7 @@ public class Hyrule
                     connections[0] = (l1, l2);
 
                     int bridgew1 = r.Next(worlds.Count);
-                    if (props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.EastBiome.UsesVanillaMap())
                     {
                         bridgew1 = 2;
                     }
@@ -1784,7 +1776,7 @@ public class Hyrule
                         }
                     }
                     int bridgew2 = r.Next(worlds.Count);
-                    if (props.MazeBiome == Biome.VANILLA || props.MazeBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.MazeBiome.UsesVanillaMap())
                     {
                         bridgew2 = 3;
                     }
@@ -1801,7 +1793,7 @@ public class Hyrule
                     connections[1] = (l1, l2);
 
                     int c1w1 = r.Next(worlds.Count);
-                    if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome.UsesVanillaMap())
                     {
                         c1w1 = 0;
                     }
@@ -1813,7 +1805,7 @@ public class Hyrule
                         }
                     }
                     int c1w2 = r.Next(worlds.Count);
-                    if (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.DmBiome.UsesVanillaMap())
                     {
                         c1w2 = 1;
                     }
@@ -1830,7 +1822,7 @@ public class Hyrule
                     connections[2] = (l1, l2);
 
                     int c2w1 = r.Next(worlds.Count);
-                    if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome.UsesVanillaMap())
                     {
                         c2w1 = 0;
                     }
@@ -1842,7 +1834,7 @@ public class Hyrule
                         }
                     }
                     int c2w2 = r.Next(worlds.Count);
-                    if (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.DmBiome.UsesVanillaMap())
                     {
                         c2w2 = 1;
                     }
@@ -3102,14 +3094,14 @@ CustomFileSelectData:
             return true;
         }
         //If west and DM are both vanilla, the caves have to connect between west and DM, and vanilla connections are forced
-        if ((props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
-            && (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE))
+        if ((props.WestBiome.UsesVanillaMap())
+            && (props.DmBiome.UsesVanillaMap()))
         {
             return true;
         }
         //If east is vanilla, you can only get to it from raft or bridge, so if MI is vanilla, raft is required
-        if ((props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
-            && (props.MazeBiome == Biome.VANILLA || props.MazeBiome == Biome.VANILLA_SHUFFLE))
+        if ((props.EastBiome.UsesVanillaMap())
+            && (props.MazeBiome.UsesVanillaMap()))
         {
             return true;
         }

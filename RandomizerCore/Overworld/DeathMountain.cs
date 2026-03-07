@@ -163,7 +163,7 @@ sealed class DeathMountain : World
             Biome.DRY_CANYON => Biome.CANYON,
             _ => props.DmBiome
         };
-        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
+        if (biome.UsesVanillaMap())
         {
             MAP_COLS = 64;
             MAP_ROWS = 75;
@@ -261,7 +261,7 @@ sealed class DeathMountain : World
         {
             location.CanShuffle = true;
         }
-        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
+        if (biome.UsesVanillaMap())
         {
             Debug.Assert(MAP_ROWS == 75);
             Debug.Assert(MAP_COLS == 64);

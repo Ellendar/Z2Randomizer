@@ -146,9 +146,9 @@ public class Spoiler
 
     private void DrawWorld(SKCanvas canvas, World world, int startDrawX, int startDrawY)
     {
-        int offsetX = (world is MazeIsland && (world.biome == Biome.VANILLA || world.biome == Biome.VANILLA_SHUFFLE)) ? 32 : 0;
-        int width = ((world is DeathMountain || world is MazeIsland) && (world.biome == Biome.VANILLA || world.biome == Biome.VANILLA_SHUFFLE)) ? 32 : world.MAP_COLS;
-        int height = ((world is DeathMountain || world is MazeIsland) && (world.biome == Biome.VANILLA || world.biome == Biome.VANILLA_SHUFFLE)) ? 48 : world.MAP_ROWS;
+        int offsetX = (world is MazeIsland && world.biome.UsesVanillaMap()) ? 32 : 0;
+        int width = ((world is DeathMountain || world is MazeIsland) && world.biome.UsesVanillaMap()) ? 32 : world.MAP_COLS;
+        int height = ((world is DeathMountain || world is MazeIsland) && world.biome.UsesVanillaMap()) ? 48 : world.MAP_ROWS;
 
         var background = new SKPaint();
         background.Color = SKColors.Black;

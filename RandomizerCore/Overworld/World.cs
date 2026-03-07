@@ -1552,7 +1552,7 @@ public abstract class World
                     bytesWritten += 2;
                     continue;
                 }
-                if (hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE))
+                if (hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && biome.UsesVanillaMap())
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + currentTerrain.RomValue();

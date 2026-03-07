@@ -281,7 +281,7 @@ public sealed class WestHyrule : World
             }
         }
         biome = props.WestBiome;
-        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE || props.WestSize == OverworldSizeOption.LARGE)
+        if (biome.UsesVanillaMap() || props.WestSize == OverworldSizeOption.LARGE)
         {
             MAP_COLS = 64;
             MAP_ROWS = 75;
@@ -367,7 +367,7 @@ public sealed class WestHyrule : World
         {
             location.CanShuffle = true;
         }
-        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
+        if (biome.UsesVanillaMap())
         {
             Debug.Assert(MAP_ROWS == 75);
             Debug.Assert(MAP_COLS == 64);

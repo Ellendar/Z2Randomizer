@@ -291,7 +291,7 @@ public sealed class EastHyrule : World
         randomTerrainFilter = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER];
 
         biome = props.EastBiome;
-        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE || props.EastSize == OverworldSizeOption.LARGE)
+        if (biome.UsesVanillaMap() || props.EastSize == OverworldSizeOption.LARGE)
         {
             MAP_COLS = 64;
             MAP_ROWS = 75;
@@ -413,7 +413,7 @@ public sealed class EastHyrule : World
             ];
         }
 
-        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
+        if (biome.UsesVanillaMap())
         {
             Debug.Assert(MAP_ROWS == 75);
             Debug.Assert(MAP_COLS == 64);
@@ -1612,7 +1612,7 @@ public sealed class EastHyrule : World
                 || (hiddenKasutoLocation.TerrainType == Terrain.TOWN && !hiddenKasutoLocation.AppearsOnMap) //no fake item locations
                 || connections.ContainsKey(hiddenKasutoLocation)
                 || !hiddenKasutoLocation.CanShuffle
-                || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough != 0))
+                || (!biome.UsesVanillaMap() && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough != 0))
             {
                 hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
             }
@@ -1646,8 +1646,7 @@ public sealed class EastHyrule : World
                 || !hiddenPalaceLocation.CanShuffle
                 || hiddenPalaceLocation == hiddenKasutoLocation
                 || (hiddenPalaceLocation.TerrainType == Terrain.TOWN && !hiddenPalaceLocation.AppearsOnMap) //no fake item locations
-                || (biome != Biome.VANILLA
-                    && biome != Biome.VANILLA_SHUFFLE
+                || (!biome.UsesVanillaMap()
                     && hiddenPalaceLocation.TerrainType == Terrain.LAVA
                     && hiddenPalaceLocation.PassThrough != 0))
             {
