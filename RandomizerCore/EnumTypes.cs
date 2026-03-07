@@ -211,7 +211,7 @@ public enum PalaceStyle
     VANILLA_WEIGHTED,
     [Description("Tower")]
     TOWER,
-    [Description("Chaos")]
+    [Description("Chaos"), DefaultWeight(0)]
     CHAOS,
     [Description("Random"), Metastyle]
     RANDOM,
@@ -863,6 +863,11 @@ public class MetastyleAttribute : Attribute
 {
 }
 
+public class DefaultWeightAttribute(int weight) : Attribute
+{
+    public int Weight { get; init; } = weight;
+}
+
 [AttributeUsage(AttributeTargets.Field)]
 public class RandomRangeDoubleAttribute : Attribute
 {
@@ -1009,6 +1014,29 @@ public static class Enums
         FieldInfo? fieldInfo = type.GetField(name);
         if (fieldInfo == null) { return false; }
         return fieldInfo.IsDefined(typeof(MetastyleAttribute), inherit: false);
+    }
+
+    private static int GetWeight(this Enum self, int fallback=1)
+    {
+        Type type = self.GetType();
+        string? name = Enum.GetName(type, self);
+        if (name == null) { return fallback; }
+        FieldInfo? fieldInfo = type.GetField(name);
+        if (fieldInfo == null) { return fallback; }
+        return fieldInfo.GetCustomAttribute<DefaultWeightAttribute>(inherit: false)?.Weight ?? fallback;
+    }
+
+    /// <summary>
+    /// Get a list of enum values of a type, not including Metastyles,
+    /// repeating values if they have a weight set,
+    /// omitting values if their weight is 0.
+    /// </summary>
+    public static List<T> GetShufflableList<T>() where T : struct, Enum
+    {
+        return Enum.GetValues<T>()
+            .Where(i => !i.IsMetastyle())
+            .SelectMany(i => Enumerable.Repeat(i, i.GetWeight()))
+            .ToList();
     }
 
     public static RandomRangeDoubleAttribute? GetRandomRangeDouble(this Enum self)

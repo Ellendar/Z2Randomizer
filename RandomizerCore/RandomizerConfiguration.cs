@@ -913,7 +913,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             if(GpStyle.IsMetastyle())
             {
                 Debug.Assert(GpStyle == PalaceStyle.RANDOM);
-                allowedPalaceStyles = Enum.GetValues(typeof(PalaceStyle)).Cast<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
+                allowedPalaceStyles = Enums.GetShufflableList<PalaceStyle>();
                 if (!randomStylesAllowVanilla)
                 {
                     allowedPalaceStyles.RemoveAll(i => i.UsesVanillaRoomPool());
@@ -929,7 +929,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             if (NormalPalaceStyle.IsMetastyle())
             {
                 Debug.Assert(NormalPalaceStyle != PalaceStyle.RANDOM);
-                allowedPalaceStyles = Enum.GetValues(typeof(PalaceStyle)).Cast<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
+                allowedPalaceStyles = Enums.GetShufflableList<PalaceStyle>();
                 if (!randomStylesAllowVanilla)
                 {
                     allowedPalaceStyles.RemoveAll(i => i.UsesVanillaRoomPool());
