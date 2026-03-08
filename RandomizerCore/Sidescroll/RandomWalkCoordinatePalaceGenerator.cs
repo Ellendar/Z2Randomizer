@@ -158,7 +158,7 @@ public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGen
 
         //Debug.WriteLine(GetLayoutDebug(walkGraph, false));
 
-        return await Task.FromResult(walkGraph);
+        return walkGraph;
     }
 
     protected override ItemRoomSelectionStrategy GetItemRoomSelectionStrategy()

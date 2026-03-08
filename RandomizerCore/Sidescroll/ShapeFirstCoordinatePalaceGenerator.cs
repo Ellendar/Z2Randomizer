@@ -22,7 +22,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
         Dictionary<Coord, RoomExitType> shape;
-        shape = GetPalaceShape(props, palace, roomPool, r, roomCount).Result;
+        shape = await GetPalaceShape(props, palace, roomPool, r, roomCount);
         if(shape.Count == 0)
         {
             palace.IsValid = false;

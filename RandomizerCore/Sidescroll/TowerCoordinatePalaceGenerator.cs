@@ -328,7 +328,7 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
         }
 
         //Debug.WriteLine(GetLayoutDebug(shape));
-        return await Task.FromResult(shape);
+        return shape;
 
     }
 
