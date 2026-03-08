@@ -837,8 +837,8 @@ public abstract class World
                 int adjacentRiverTerrainDirectionCount = 0;
                 //If the tile just before or just after is walkable, this is the first or last tile of the bridge
                 //When that happens, the adjacent (not forward/back) directions are allowed to be any walkable terrain
-                bool isFirstStep = walkableTerrains.Contains(map[y - deltaY, x - deltaX]);
-                bool isLastStep = walkableTerrains.Contains(map[y + deltaY, x + deltaX]);
+                bool isFirstStep = !crossingTerrains.Contains(map[y - deltaY, x - deltaX]);
+                bool isLastStep = !crossingTerrains.Contains(map[y + deltaY, x + deltaX]);
                 Terrain[] effectiveCrossingTerrain = isFirstStep || isLastStep ? edgeCrossingTerrains : crossingTerrains;
 
                 //Check forward
@@ -944,7 +944,7 @@ public abstract class World
                         map[y - deltaY, x - deltaX] = Terrain.BRIDGE;
                     }
 
-                    while (walkableTerrains.Contains(map[y + perpDy, x + perpDx]) || walkableTerrains.Contains(map[y - perpDy, x - perpDx]))
+                    while (!crossingTerrains.Contains(map[y + perpDy, x + perpDx]) || !crossingTerrains.Contains(map[y - perpDy, x - perpDx]))
                     {
                         if ((deltaY < 0 && y > startY) || (deltaY > 0 && y < startY) || (deltaX < 0 && x > startX) || (deltaX > 0 && x < startX))
                         {
@@ -953,6 +953,11 @@ public abstract class World
                         }
                         x -= deltaX;
                         y -= deltaY;
+                    }
+                    if (crossingTerrains.Contains(map[y + deltaY, x + deltaX]))
+                    {
+                        x += deltaX;
+                        y += deltaY;
                     }
 
                     if (deltaX > 0 || deltaY > 0)
@@ -966,15 +971,40 @@ public abstract class World
                         bridge1.Y = y;
                     }
 
-                    while (crossingTerrains.Contains(map[y, x]))
+                    if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
+                        && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                    {
+                        map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
+                    }
+                    if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
+                        && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
+                    {
+                        map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                    }
+
+                    while ((deltaX != 0 && x != startX) || (deltaY != 0 && y != startY))
                     {
                         map[y, x] = Terrain.BRIDGE;
                         x -= deltaX;
                         y -= deltaY;
+                    }
 
+                    if (crossingTerrains.Contains(map[y,x]))
+                    {
+                        map[y, x] = map[y - deltaY, x - deltaX];
                     }
                     x += deltaX;
                     y += deltaY;
+                    if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
+                        && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                    {
+                        map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
+                    }
+                    if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
+                        && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
+                    {
+                        map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                    }
                     map[y, x] = Terrain.BRIDGE;
                     if (deltaX > 0 || deltaY > 0)
                     {
@@ -1001,7 +1031,7 @@ public abstract class World
                             map[y - deltaY, x - deltaX] = Terrain.DESERT;
                         }
                         //Walk backwards until the first tile flanked on both sides by the river
-                        while (walkableTerrains.Contains(map[y + perpDy, x + perpDx]) || walkableTerrains.Contains(map[y - perpDy, x - perpDx]))
+                        while (!crossingTerrains.Contains(map[y + perpDy, x + perpDx]) && !crossingTerrains.Contains(map[y - perpDy, x - perpDx]))
                         {
                             if ((deltaY < 0 && y > startY) || (deltaY > 0 && y < startY) || (deltaX < 0 && x > startX) || (deltaX > 0 && x < startX))
                             {
@@ -1024,17 +1054,45 @@ public abstract class World
                             bridge1.Y = y;
                         }
 
+                        if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
+                            && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                        {
+                            map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
+                        }
+                        if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
+                            && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
+                        {
+                            map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                        }
+
                         //Keep walking back placing deserts until the path opens up
-                        while (!walkableTerrains.Contains(map[y + perpDy, x + perpDx]) && !walkableTerrains.Contains(map[y - perpDy, x - perpDx]))
+                        while ((deltaX != 0 && x != startX) || (deltaY != 0 && y != startY))
                         {
                             map[y, x] = Terrain.DESERT;
                             x -= deltaX;
                             y -= deltaY;
                         }
+                        //If you're going into a C-shape, you'll have a dead stub of water. fill it in
+                        if (map[y, x].IsWater())
+                        {
+                            map[y, x] = map[y - deltaY, x - deltaX];
+                        }
 
                         //now we're past the opening, so go the other way 1
                         x += deltaX;
                         y += deltaY;
+
+                        //If exactly one of the tiles adjacent to the bridge is a potentially impassable, demolish it so you can't get stuck in it.
+                        if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
+                            && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                        {
+                            map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
+                        }
+                        if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
+                            && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
+                        {
+                            map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                        }
                         map[y, x] = Terrain.DESERT;
                         if (deltaX > 0 || deltaY > 0)
                         {
