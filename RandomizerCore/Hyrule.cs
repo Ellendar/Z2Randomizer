@@ -2327,9 +2327,9 @@ public class Hyrule
         if (props.EncounterRates == EncounterRate.HALF)
         {
             //terrain timers
-            rom.Put(0x250, 0x40);
-            rom.Put(0x251, 0x30);
-            rom.Put(0x252, 0x30);
+            rom.Put(0x250, 0x40); // grass
+            rom.Put(0x251, 0x30); // desert
+            rom.Put(0x252, 0x30); // forest
             rom.Put(0x253, 0x40);
             rom.Put(0x254, 0x12);
             rom.Put(0x255, 0x06);

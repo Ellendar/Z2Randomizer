@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -45,8 +45,8 @@ public class Palaces
         VANILLA_P7_ALLOWED_BLOCKERS
     ];
 
-    public static readonly ReadOnlyCollection<int> VANILLA_LENGTHS = [14, 21, 15, 21, 28, 27, 55];
-    public static readonly ReadOnlyCollection<int> VANILLA_MIN_PALACE_LENGTHS = [11, 16, 10, 19, 23, 20, 31];
+    public static readonly ImmutableArray<int> VANILLA_LENGTHS = [14, 21, 15, 21, 28, 27, 55];
+    public static readonly ImmutableArray<int> VANILLA_MIN_PALACE_LENGTHS = [11, 16, 10, 19, 23, 20, 31];
 
     public static Dictionary<RoomExitType, int> itemRoomCounts = [];
 
@@ -158,7 +158,7 @@ public class Palaces
         return palaces;
     }
 
-    public static int[] RollPalaceLengths(Random r, RandomizerProperties props, RandomizerConfiguration conf)
+    public static int[] RollPalaceLengths(RandomizerConfiguration conf, RandomizerProperties props, Random r)
     {
         int[] sizes = [.. VANILLA_LENGTHS];
 
@@ -262,6 +262,13 @@ public class Palaces
         int intMin = (int)Math.Round(rr.Low * vanillaLength);
         int intMax = (int)(Math.Round(rr.High * vanillaLength) + 1);
         return Math.Min(Math.Max(random.Next(intMin, intMax), hardMin), hardMax);
+    }
+
+    public static int MaxLengthRoll(int vanillaLength, PalaceLengthOption length)
+    {
+        var rr = length.GetRandomRangeDouble()!;
+        int intMax = (int)(Math.Round(rr.High * vanillaLength) + 1);
+        return intMax;
     }
 
     private static bool ValidatePalaces(RandomizerProperties props, bool raftIsRequired, List<Palace> palaces)

@@ -958,7 +958,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             }
 
 
-            properties.PalaceLengths = Palaces.RollPalaceLengths(r, properties, this);
+            properties.PalaceLengths = Palaces.RollPalaceLengths(this, properties, r);
 
             properties.DarkLinkMinDistance = GetDarkLinkMinDistance();
 
@@ -1631,34 +1631,8 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         //I'm not sure whether I like the bias introduced in generating random values and then capping them
         //vs just determining min/max ranges and fair rolling between them. Keeping it for now.
         int[] palaceItemRoomsMin = palaceItemRoomCount == PalaceItemRoomCount.RANDOM_INCLUDE_ZERO ? [0, 0, 0, 0, 0, 0] : [1, 1, 1, 1, 1, 1];
-        // To keep weighting consistent between 0-item and 1-item rooms across
-        // Standard, Max Rando, etc., we roll the room count the same way
-        // regardless of palace type. This also reduces how much (imperfect)
-        // information the item count reveals about the palace style.
-        int[] palaceItemRoomsMax = palaceItemRoomCount switch
-        {
-            PalaceItemRoomCount.ZERO => [0, 0, 0, 0, 0, 0],
-            PalaceItemRoomCount.ONE => [1, 1, 1, 1, 1, 1],
-            PalaceItemRoomCount.TWO => [2, 2, 2, 2, 2, 2],
-            PalaceItemRoomCount.RANDOM_NOT_ZERO or
-            PalaceItemRoomCount.RANDOM_INCLUDE_ZERO =>
-                properties.PalaceLengths.Select(len => len switch
-                {
-                    < 14 => 1,
-                    < 24 => 2,
-                    _    => 3,
-                }).ToArray(),
-            _ => throw new NotImplementedException(),
-        };
-        // We have to cap the number of item rooms for some styles.
-        // Vanilla, because it doesn't make sense to change any rooms,
-        // and Vanilla Shuffled, because it crashes with more than two.
-        int[] palaceItemRoomsLimit = properties.PalaceStyles.Select(style => style switch
-        {
-            PalaceStyle.VANILLA => 1,
-            PalaceStyle.SHUFFLED => 2,
-            _ => int.MaxValue,
-        }).ToArray();
+        int[] palaceItemRoomsMax = GetPalaceItemRoomMaxCounts(palaceItemRoomCount, properties.PalaceLengths);
+        int[] palaceItemRoomsLimit = GetPalaceItemRoomLimits(properties.PalaceStyles);
 
         switch (palaceItemRoomCount)
         {
@@ -1702,6 +1676,43 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         }
     }
 
+    /// Note: this value can be limited by other things, like the style being Vanilla
+    public static int[] GetPalaceItemRoomMaxCounts(PalaceItemRoomCount palaceItemRoomCount, int[] palaceLengths)
+    {
+        // To keep weighting consistent between 0-item and 1-item rooms across
+        // Standard, Max Rando, etc., we roll the room count the same way
+        // regardless of palace type. This also reduces how much (imperfect)
+        // information the item count reveals about the palace style.
+        return palaceItemRoomCount switch
+        {
+            PalaceItemRoomCount.ZERO => [0, 0, 0, 0, 0, 0],
+            PalaceItemRoomCount.ONE => [1, 1, 1, 1, 1, 1],
+            PalaceItemRoomCount.TWO => [2, 2, 2, 2, 2, 2],
+            PalaceItemRoomCount.RANDOM_NOT_ZERO or
+            PalaceItemRoomCount.RANDOM_INCLUDE_ZERO =>
+                palaceLengths.Select(len => len switch
+                {
+                    < 16 => 1,
+                    < 26 => 2,
+                    _ => 3,
+                }).ToArray(),
+            _ => throw new NotImplementedException(),
+        };
+    }
+
+    public static int[] GetPalaceItemRoomLimits(PalaceStyle[] palaceStyles)
+    {
+        // We have to cap the number of item rooms for some styles.
+        // Vanilla, because it doesn't make sense to change any rooms,
+        // and Vanilla Shuffled, because it crashes with more than two.
+        return palaceStyles.Select(style => style switch
+        {
+            PalaceStyle.VANILLA => 1,
+            PalaceStyle.SHUFFLED => 2,
+            _ => int.MaxValue,
+        }).ToArray();
+    }
+
     /// Let the user know when their combination of flags will not be
     /// possible to achieve.
     /// 
@@ -1713,10 +1724,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         if ((startingHeartContainersMax ?? 8) < 4)
         {
             requiredMinorItemReplacements = 4 - (startingHeartContainersMax ?? 4);
-        }
-        if (palaceItemRoomCount == PalaceItemRoomCount.ZERO)
-        {
-            requiredMinorItemReplacements += 6;
         }
         if (CountPossibleMinorItems() < requiredMinorItemReplacements)
         {
@@ -1905,6 +1912,13 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         count += heartContainerReplacementSmallItemsCount;
 
         count += 4 - (8 - (startingMagicContainersMax ?? 8));
+
+        var palaceLengthsMax = Palaces.VANILLA_LENGTHS[..6].Select(n => Palaces.MaxLengthRoll(n, normalPalaceLength)).ToArray();
+        var itemCountMaxRoll = GetPalaceItemRoomMaxCounts(palaceItemRoomCount, palaceLengthsMax);
+        var itemCountLimit = GetPalaceItemRoomLimits(Enumerable.Repeat(normalPalaceStyle, 6).ToArray());
+        var palaceItemsMaxDiff = itemCountMaxRoll.Zip(itemCountLimit, Math.Min).Sum(n => n - 1);
+
+        count += palaceItemsMaxDiff;
 
         return count;
     }
