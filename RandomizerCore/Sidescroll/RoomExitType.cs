@@ -41,6 +41,7 @@ public enum RoomExitType
 public static class RoomExitTypeExtensions
 {
     public static RoomExitType[] ALL = Enum.GetValues(typeof(RoomExitType)).Cast<RoomExitType>().ToArray();
+    public static RoomExitType[] DEADENDS = [RoomExitType.DEADEND_EXIT_RIGHT, RoomExitType.DEADEND_EXIT_UP, RoomExitType.DEADEND_EXIT_LEFT, RoomExitType.DEADEND_EXIT_DOWN];
 
     public const int LEFT = 0b00010000;
     public const int DOWN = 0b00001000;
