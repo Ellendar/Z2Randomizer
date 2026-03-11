@@ -42,7 +42,6 @@ public static class StandardPreset
         WestClimate = ClimateEnum.CLASSIC,
         EastClimate = ClimateEnum.CLASSIC,
         DmClimate = ClimateEnum.CLASSIC,
-        MazeClimate = ClimateEnum.CLASSIC,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
         //Palaces

@@ -447,16 +447,6 @@ static class ClimateExtensions
             _ => true,
         };
     }
-
-    public static bool IsMazeClimate(this ClimateEnum climate)
-    {
-        return climate switch
-        {
-            ClimateEnum.VANILLA_WEIGHTED_WEST => false,
-            ClimateEnum.VANILLA_WEIGHTED_EAST => false,
-            _ => true,
-        };
-    }
 }
 
 [DefaultValue(NORMAL)]
@@ -947,7 +937,6 @@ public static class Enums
     public static IEnumerable<EnumDescription> WestClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsWestClimate());
     public static IEnumerable<EnumDescription> EastClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsEastClimate());
     public static IEnumerable<EnumDescription> DmClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsDmClimate());
-    public static IEnumerable<EnumDescription> MazeClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsMazeClimate());
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
     public static IEnumerable<EnumDescription> OverworldSizeList { get; } = ToDescriptions<OverworldSizeOption>();
     public static IEnumerable<EnumDescription> DmSizeList { get; } = ToDescriptions<DmSizeOption>();

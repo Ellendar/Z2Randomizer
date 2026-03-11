@@ -259,9 +259,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private ClimateEnum dmClimate;
 
     [Reactive]
-    private ClimateEnum mazeClimate;
-
-    [Reactive]
     [ConditionallyIncludeInFlags]
     private bool legacyVanillaShuffledLocations;
     public bool legacyVanillaShuffledLocationsIncluded() {
@@ -796,7 +793,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         westClimate = ClimateEnum.CLASSIC;
         eastClimate = ClimateEnum.CLASSIC;
         dmClimate = ClimateEnum.CLASSIC;
-        mazeClimate = ClimateEnum.CLASSIC;
         if (sprite == null)
         {
             throw new ImpossibleException();

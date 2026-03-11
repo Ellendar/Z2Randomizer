@@ -41,7 +41,6 @@ public static class MaxRandoPreset
         WestClimate = ClimateEnum.RANDOM,
         EastClimate = ClimateEnum.RANDOM,
         DmClimate = ClimateEnum.RANDOM,
-        MazeClimate = ClimateEnum.RANDOM,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
         //Palaces

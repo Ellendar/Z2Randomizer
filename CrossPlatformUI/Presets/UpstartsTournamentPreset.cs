@@ -43,7 +43,6 @@ public static class UpstartsTournamentPreset
         WestClimate = ClimateEnum.CLASSIC,
         EastClimate = ClimateEnum.CLASSIC,
         DmClimate = ClimateEnum.CLASSIC,
-        MazeClimate = ClimateEnum.CLASSIC,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RECONSTRUCTED,

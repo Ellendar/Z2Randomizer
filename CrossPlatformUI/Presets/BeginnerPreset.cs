@@ -44,7 +44,6 @@ public static class BeginnerPreset
         WestClimate = ClimateEnum.VANILLA_WEIGHTED_WEST,
         EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
         DmClimate = ClimateEnum.CLASSIC,
-        MazeClimate = ClimateEnum.CLASSIC,
         ContinentConnectionType = ContinentConnectionType.NORMAL,
 
         //Palaces
