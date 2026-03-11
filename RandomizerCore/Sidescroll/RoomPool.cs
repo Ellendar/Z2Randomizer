@@ -266,19 +266,7 @@ public class RoomPool
         if (!props.BlockersAnywhere)
         {
             RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
-            RemoveRooms(room => !room.IsTraversable(allowedBlockers));
-            foreach (var key in ItemRoomsByDirection.Keys)
-            {
-                List<(Room, int)> updatedWeights = [];
-                foreach (Room room in ItemRoomsByDirection[key].Keys())
-                {
-                    if (room.IsTraversable(allowedBlockers))
-                    {
-                        updatedWeights.Add((room, ItemRoomsByDirection[key].Weight(room)));
-                    }
-                }
-                ItemRoomsByDirection[key] = new TableWeightedRandom<Room>(updatedWeights);
-            }
+            RemoveRooms(room => !room.IsTraversable(allowedBlockers, false));
         }
     }
 
