@@ -61,6 +61,7 @@ public static class StandardSwissPreset
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = false,
+        PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,

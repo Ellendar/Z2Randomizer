@@ -61,6 +61,7 @@ public static class MaxRando2025Preset
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
+        PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,

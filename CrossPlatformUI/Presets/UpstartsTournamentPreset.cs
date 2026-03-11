@@ -57,6 +57,7 @@ public static class UpstartsTournamentPreset
         PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         ChangePalacePallettes = true,
+        PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = false,
         NoDuplicateRoomsByEnemies = true,

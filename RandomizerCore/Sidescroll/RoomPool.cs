@@ -280,6 +280,15 @@ public class RoomPool
                 ItemRoomsByDirection[key] = new TableWeightedRandom<Room>(updatedWeights);
             }
         }
+
+        if (props.RemoveLongDeadEnds)
+        {
+            RemoveRooms(room => room.Tags != null && room.Tags.Contains("LongDeadEnd"));
+        }
+        if (!props.IncludeExpertRooms)
+        {
+            RemoveRooms(room => room.Tags != null && room.Tags.Contains("Expert"));
+        }
     }
 
     public IEnumerable<RoomExitType> GetItemRoomShapes()

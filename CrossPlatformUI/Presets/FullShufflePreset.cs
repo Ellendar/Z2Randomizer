@@ -61,6 +61,7 @@ public static class FullShufflePreset
         ReduceDripperVariance = false,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
+        PalaceDropStyle = PalaceDropStyle.RANDOM,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,

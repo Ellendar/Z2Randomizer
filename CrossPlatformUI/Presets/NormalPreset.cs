@@ -61,6 +61,7 @@ public static class NormalPreset
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = false,
+        PalaceDropStyle = PalaceDropStyle.RANDOM,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,

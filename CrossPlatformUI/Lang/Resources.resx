@@ -765,7 +765,23 @@ prevent duplicates for Random Walk generated palaces.</value>
 <value>Allows rooms that require an item or spell to traverse to appear in any palace. Otherwise,
 palaces can only contain blocks according to the following table.</value>
 	</data>
-	<data name="BossRoomsExitToToolTip" xml:space="preserve">
+	<data name="RemoveLongDeadEndsToolTip" xml:space="preserve">
+<value>Removes dead-end rooms from the room pool. This helps newer players who are not yet
+familiar with all rooms in the randomizer by reducing time spent exploring long dead ends,
+evening the odds a bit and lowering the learning curve.
+
+This option is only available when the 5.0 room pool is enabled
+(as it is the only pool that contains short dead-end replacements.)</value>
+	</data>
+	<data name="IncludeExpertRoomsToolTip" xml:space="preserve">
+<value>Includes the more demanding palace rooms in the room pool. These rooms may feature:
+
+  • Precise, punishing platforming over lava
+  • Unfair enemy placements
+  • Repeated required 3-tile-high jumps</value>
+	</data>
+
+    <data name="BossRoomsExitToToolTip" xml:space="preserve">
 <value>Selects whether the boss room exits into the overworld (like in vanilla), or more palace
 rooms. This can be selected for all palaces, Randomly per palace, or Random but the same
 selection for all palaces. When a palace continues outside, there will always be an
