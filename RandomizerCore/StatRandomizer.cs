@@ -712,4 +712,11 @@ public class StatRandomizer
             BossHpTable[2] = reboHp;
         }
     }
+
+    public int GetSpellCost(Collectable spell, int level)
+    {
+        var spellIndex = spell.VanillaSpellOrder();
+        int index = spellIndex * 8 + level - 1;
+        return MagicEffectivenessTable[index];
+    }
 }
