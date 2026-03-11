@@ -8,8 +8,10 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
+using Material.Colors;
 using Avalonia.Controls;
-using Avalonia.Styling;
+using Avalonia.Media;
+using Material.Styles.Themes;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
@@ -56,22 +58,17 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         }
     }
 
-    private string themeVariantName = "";
+    [JsonIgnore]
+    public BehaviorSubject<string> ThemeVariantSubject = new("");
     public string ThemeVariantName 
     {
         get
         {
-            return themeVariantName;
+            return ThemeVariantSubject.Value;
         }
         set
         {
-            App.Current!.RequestedThemeVariant = value switch
-            {
-                "Light" => ThemeVariant.Light,
-                "Dark" => ThemeVariant.Dark,
-                _ => ThemeVariant.Default
-            };
-            themeVariantName = value;
+            ThemeVariantSubject.OnNext(ThemeHelper.SetTheme(value));
         }
     }
     private int currentTabIndex;
@@ -94,6 +91,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         BiomesViewModel = new(Main);
         PalacesViewModel = new(Main);
         ItemsViewModel = new(Main);
+        HintsViewModel = new(Main, this);
         CustomizeViewModel = new(Main);
         Activator = new ViewModelActivator();
 
@@ -132,15 +130,14 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
         ToggleTheme = ReactiveCommand.Create(() =>
         {
-            if(App.Current!.ActualThemeVariant == ThemeVariant.Dark)
+            if(ThemeVariantName == "Dark")
             {
-                App.Current!.RequestedThemeVariant = ThemeVariant.Light;
+                ThemeVariantName = "Light";
             }
-            else if (App.Current!.ActualThemeVariant == ThemeVariant.Light)
+            else
             {
-                App.Current!.RequestedThemeVariant = ThemeVariant.Dark;
+                ThemeVariantName = "Dark";
             }
-            ThemeVariantName = App.Current.RequestedThemeVariant?.Key.ToString() ?? "Default";
         });
 
         var seedValidObservable = this.WhenAnyValue(x => x.Main.Config.Seed, seed => !string.IsNullOrWhiteSpace(seed));
@@ -318,6 +315,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public BiomesViewModel BiomesViewModel { get; }
     public PalacesViewModel PalacesViewModel { get; }
     public ItemsViewModel ItemsViewModel { get; }
+    public HintsViewModel HintsViewModel { get; }
     public CustomizeViewModel CustomizeViewModel { get; }
     
     [JsonIgnore]
