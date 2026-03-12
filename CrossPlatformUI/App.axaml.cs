@@ -189,6 +189,7 @@ public partial class SerializationContext : JsonSerializerContext
     private static JsonSerializerOptions InitSafeOptions()
     {
         var options = Default.GeneratedSerializerOptions!;
+        options.Converters.Add(new SafeBoolConverter());
         options.Converters.Add(new SafeStringEnumConverterFactory());
         return options;
     }
@@ -200,8 +201,41 @@ public partial class SerializationContext : JsonSerializerContext
         {
             TypeInfoResolver = SerializationContext.Default
         };
+        options.Converters.Add(new SafeBoolConverter());
         options.Converters.Add(new SafeStringEnumConverterFactory());
         return options;
+    }
+}
+
+public sealed class SafeBoolConverter : JsonConverter<bool>
+{
+    public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        try
+        {
+            if (reader.TokenType == JsonTokenType.True) { return true; }
+            if (reader.TokenType == JsonTokenType.False) { return false; }
+            if (reader.TokenType == JsonTokenType.Null) { return false; }
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                var s = reader.GetString();
+                if (bool.TryParse(s, out var result)) { return result; }
+            }
+            if (reader.TokenType == JsonTokenType.Number)
+            {
+                if (reader.TryGetInt32(out var n)) { return n > 0; }
+            }
+        }
+        catch
+        {
+        }
+
+        return false;
+    }
+
+    public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
+    {
+        writer.WriteBooleanValue(value);
     }
 }
 
