@@ -97,7 +97,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
         RerollSeed = ReactiveCommand.Create(() =>
         {
-            Main.Config.Seed = new Random().Next(0, 999999999).ToString();
+            Main.Config.Seed = new System.Random().Next(0, 999999999).ToString();
         });
         
         LoadPreset = ReactiveCommand.Create<RandomizerConfiguration>(config =>

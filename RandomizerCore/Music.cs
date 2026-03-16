@@ -158,7 +158,7 @@ internal class MusicRandomizer
         bool safeOnly)
     {
         _hyrule = hyrule;
-        _shuffler = new RandomShuffler(new Random(seed));
+        _shuffler = new RandomShuffler(new System.Random(seed));
         _rom = _hyrule.ROMData.GetBytes(0, ROM.RomSize);
         _romAccess = new(_rom);
         _jsonLibPaths = new(jsonLibPaths);

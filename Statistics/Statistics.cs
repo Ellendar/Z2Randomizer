@@ -35,7 +35,7 @@ class Statistics
         StatisticsDbContext dbContext = new StatisticsDbContext(DB_PATH);
 
         RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
-        Random random = new Random(0);
+        System.Random random = new(0);
         Hyrule.NewAssemblerFn createAsm = (opts, debug) => new DesktopJsEngine(opts, debug);
         var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
