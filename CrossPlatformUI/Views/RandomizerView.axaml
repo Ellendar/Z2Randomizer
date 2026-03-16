@@ -202,8 +202,8 @@
             <TabItem Header="Drops">
                 <tabs:DropsView DataContext="{Binding Main}"/>
             </TabItem>
-            <TabItem Header="Hints">
-                <tabs:HintsView DataContext="{Binding Main}"/>
+            <TabItem Header="Hints" Background="{Binding HintsViewModel.HeaderBackgroundObservable^}">
+                <tabs:HintsView DataContext="{Binding HintsViewModel}"/>
             </TabItem>
             <TabItem Header="Customize">
                 <tabs:CustomizeView DataContext="{Binding CustomizeViewModel}" />

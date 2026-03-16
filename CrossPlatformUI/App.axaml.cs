@@ -139,6 +139,8 @@ public sealed partial class App : Application // , IDisposable
         var state = !TransitionAssist.GetDisableTransitions(TopLevel!);
         TransitionAssist.SetDisableTransitions(TopLevel!, state);
 
+        ThemeHelper.SetTheme(main.RandomizerViewModel.ThemeVariantName);
+
         base.OnFrameworkInitializationCompleted();
     }
 
