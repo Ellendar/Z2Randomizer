@@ -268,6 +268,15 @@ public class RoomPool
             RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
             RemoveRooms(room => !room.IsTraversable(allowedBlockers, false));
         }
+
+        if (props.RemoveLongDeadEnds)
+        {
+            RemoveRooms(room => room.Tags != null && room.Tags.Contains("LongDeadEnd"));
+        }
+        if (!props.IncludeExpertRooms)
+        {
+            RemoveRooms(room => room.Tags != null && room.Tags.Contains("Expert"));
+        }
     }
 
     public IEnumerable<RoomExitType> GetItemRoomShapes()

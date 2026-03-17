@@ -201,6 +201,16 @@
                         </ToolTip>
                     </ToolTip.Tip>
                 </CheckBox>
+                <CheckBox IsChecked="{Binding Main.Config.RemoveLongDeadEnds}"
+                          IsEnabled="{Binding RemoveLongDeadEndsIncludedObservable^}"
+                          Content="Remove Long Dead End Rooms">
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RemoveLongDeadEndsToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox IsChecked="{Binding Main.Config.IncludeExpertRooms}"
+                          IsEnabled="{Binding IncludeExpertRoomsIncludedObservable^}"
+                          Content="Include Expert Rooms">
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeExpertRoomsToolTip}"/></ToolTip.Tip>
+                </CheckBox>
             </StackPanel>
 
             <StackPanel Grid.Column="2" Margin="0 0">
