@@ -10,12 +10,22 @@ using NLog;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
-public record struct Coord(int X, int Y)
+public record struct Coord(int X, int Y) : IComparable<Coord>
 {
     public Coord((int, int) coords) : this(coords.Item1, coords.Item2) {}
     public static Coord Uninitialized = new(0, 0);
     //I want a separate constant for this in case implementation changes the value of Unitialized, but origin should always be 0,0
     public static Coord Origin = new(0, 0);
+
+    public int CompareTo(Coord other)
+    {
+        int yComparison = Y.CompareTo(other.Y);
+        if (yComparison != 0)
+        {
+            return yComparison;
+        }
+        return X.CompareTo(other.X);
+    }
 }
 
 [JsonSourceGenerationOptions(
