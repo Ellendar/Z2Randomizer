@@ -12,6 +12,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
+    public const int FILL_SHAPE_TRIES = 10;
 
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
@@ -72,6 +73,22 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         }
 
         //Add rooms
+        bool success = false;
+        for (int i = 0; i < FILL_SHAPE_TRIES; i++)
+        {
+            if (await FillShape())
+            {
+                success = true;
+                break;
+            }
+        }
+        if (!success)
+        {
+            palace.IsValid = false;
+            return palace;
+        }
+        async Task<bool> FillShape()
+        {
         roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
         Dictionary<RoomExitType, bool> stubOnlyExitTypes = new();
         foreach (KeyValuePair<Coord, RoomExitType> item in shape.OrderBy(i => i.Key.X).ThenByDescending(i => i.Key.Y))
@@ -128,14 +145,12 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
                 {
                     //We need to use a drop zone stub but one does not (and cannot) exist so this graph is doomed.
                     //Debug.WriteLine(GetLayoutDebug(walkGraph, false));
-                    palace.IsValid = false;
-                    return palace;
+                        return false;
                 }
             }
             if (newRoom == null)
             {
-                palace.IsValid = false;
-                return palace;
+                    return false;
             }
             else
             {
@@ -214,15 +229,13 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         //unreachable because up was the only way to get there.
         if (!palace.AllReachable())
         {
-            palace.IsValid = false;
-            return palace;
+                return false;
         }
 
 
         if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props, itemRoomSelector))
         {
-            palace.IsValid = false;
-            return palace;
+                return false;
         }
 
         if (palace.AllRooms.Count(i => i.Enabled) != roomCount)
@@ -232,8 +245,10 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
 
         if (palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], props.PalaceDropStyle, r))
         {
-            palace.IsValid = false;
-            return palace;
+                return false;
+        }
+
+            return true;
         }
 
         palace.AllRooms.ForEach(i => i.PalaceNumber = palaceNumber);
