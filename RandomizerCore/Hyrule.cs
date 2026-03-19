@@ -1,18 +1,16 @@
-﻿using DynamicData;
-using FtRandoLib.Importer;
-using js65;
-using NLog;
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
+using js65;
+using FtRandoLib.Importer;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
@@ -174,7 +172,7 @@ public class Hyrule
     */
 
     public ROM ROMData { get; set; }
-    public Random r { get; set; }
+    public RandomizerCore.Random r { get; set; }
     public string Flags { get; private set; }
     public int SeedHash { get; private set; }
     public RandomizerProperties Props
@@ -1273,7 +1271,7 @@ public class Hyrule
         try
         {
             ROM testRom = new(ROMData);
-            Random testRng = new Random();
+            Random testRng = new(SeedHash);
             //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
             //be tested here, but we don't actually know what they will be until later, for now i'm just
             //testing with the vanilla text, but this could be an issue down the line.
