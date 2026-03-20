@@ -1300,8 +1300,6 @@ public class Hyrule
 
     private bool IsEverythingReachable(Dictionary<Collectable, bool> itemGet)
     {
-        //XXX: Fix
-        return true;
         totalReachableCheck++;
         int dm = 0;
         int mi = 0;
