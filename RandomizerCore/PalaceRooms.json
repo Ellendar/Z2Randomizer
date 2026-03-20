@@ -18229,7 +18229,7 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
