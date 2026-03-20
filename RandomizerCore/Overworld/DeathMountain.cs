@@ -165,21 +165,21 @@ sealed class DeathMountain : World
         };
         if (biome.UsesVanillaMap())
         {
-            MAP_COLS = 64;
-            MAP_ROWS = 75;
+            MapColumns = 64;
+            MapRows = 75;
             northSouthEncounterSeparator = 45;
         }
         else
         {
             var meta = props.DmSize.GetMeta();
-            MAP_COLS = meta.Width;
-            MAP_ROWS = meta.Height;
-            northSouthEncounterSeparator = MAP_ROWS / 2;
+            MapColumns = meta.Width;
+            MapRows = meta.Height;
+            northSouthEncounterSeparator = MapRows / 2;
 
             if (biome == Biome.CALDERA) // Caldera won't work with less
             {
-                MAP_COLS = Math.Max(MAP_COLS, 35);
-                MAP_ROWS = Math.Max(MAP_ROWS, 35);
+                MapColumns = Math.Max(MapColumns, 35);
+                MapRows = Math.Max(MapRows, 35);
             }
 
             // TODO: use metadata for num caves to remove
@@ -263,9 +263,9 @@ sealed class DeathMountain : World
         }
         if (biome.UsesVanillaMap())
         {
-            Debug.Assert(MAP_ROWS == 75);
-            Debug.Assert(MAP_COLS == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
+            Debug.Assert(MapRows == 75);
+            Debug.Assert(MapColumns == 64);
+            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
@@ -296,18 +296,18 @@ sealed class DeathMountain : World
             int bytesWritten = 2000;
             while (bytesWritten > MAP_SIZE_BYTES)
             {
-                map = new Terrain[MAP_ROWS, MAP_COLS];
+                map = new Terrain[MapRows, MapColumns];
                 Terrain riverT = Terrain.MOUNTAIN;
                 if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA && biome != Biome.ISLANDS)
                 {
-                    int colsBeforeWater = Math.Min(MAP_COLS, 29);
-                    for (int i = 0; i < MAP_ROWS; i++)
+                    int colsBeforeWater = Math.Min(MapColumns, 29);
+                    for (int i = 0; i < MapRows; i++)
                     {
                         for (int j = 0; j < colsBeforeWater; j++)
                         {
                             map[i, j] = Terrain.NONE;
                         }
-                        for (int j = 29; j < MAP_COLS; j++)
+                        for (int j = 29; j < MapColumns; j++)
                         {
                             map[i, j] = preplacedWater;
                         }
@@ -315,9 +315,9 @@ sealed class DeathMountain : World
                 }
                 else
                 {
-                    for (int i = 0; i < MAP_ROWS; i++)
+                    for (int i = 0; i < MapRows; i++)
                     {
-                        for (int j = 0; j < MAP_COLS; j++)
+                        for (int j = 0; j < MapColumns; j++)
                         {
                             map[i, j] = Terrain.NONE;
                         }
@@ -327,16 +327,16 @@ sealed class DeathMountain : World
                 if (biome == Biome.ISLANDS)
                 {
                     riverT = preplacedWater;
-                    for (int i = 0; i < MAP_COLS; i++)
+                    for (int i = 0; i < MapColumns; i++)
                     {
                         map[0, i] = preplacedWater;
-                        map[MAP_ROWS - 1, i] = preplacedWater;
+                        map[MapRows - 1, i] = preplacedWater;
                     }
 
-                    for (int i = 0; i < MAP_ROWS; i++)
+                    for (int i = 0; i < MapRows; i++)
                     {
                         map[i, 0] = preplacedWater;
-                        map[i, MAP_COLS - 1] = preplacedWater;
+                        map[i, MapColumns - 1] = preplacedWater;
                     }
 
                     int cols = RNG.Next(2, 4);
@@ -346,10 +346,10 @@ sealed class DeathMountain : World
 
                     while (cols > 0)
                     {
-                        int col = RNG.Next(1, MAP_COLS);
+                        int col = RNG.Next(1, MapColumns);
                         if (!pickedC.Contains(col))
                         {
-                            for (int i = 0; i < MAP_ROWS; i++)
+                            for (int i = 0; i < MapRows; i++)
                             {
                                 if (map[i, col] == Terrain.NONE)
                                 {
@@ -363,10 +363,10 @@ sealed class DeathMountain : World
 
                     while (rows > 0)
                     {
-                        int row = RNG.Next(5, MAP_ROWS - 6);
+                        int row = RNG.Next(5, MapRows - 6);
                         if (!pickedR.Contains(row))
                         {
-                            for (int i = 0; i < MAP_COLS; i++)
+                            for (int i = 0; i < MapColumns; i++)
                             {
                                 if (map[row, i] == Terrain.NONE)
                                 {
@@ -375,7 +375,7 @@ sealed class DeathMountain : World
                                 else if (map[row, i] == preplacedWater)
                                 {
                                     int adjust = RNG.Next(-3, 4);
-                                    while (row + adjust < 1 || row + adjust > MAP_ROWS - 2)
+                                    while (row + adjust < 1 || row + adjust > MapRows - 2)
                                     {
                                         adjust = RNG.Next(-3, 4);
                                     }
@@ -418,16 +418,16 @@ sealed class DeathMountain : World
                 else if (biome == Biome.MOUNTAINOUS)
                 {
                     riverT = Terrain.MOUNTAIN;
-                    for (int i = 0; i < MAP_COLS; i++)
+                    for (int i = 0; i < MapColumns; i++)
                     {
                         map[0, i] = Terrain.MOUNTAIN;
-                        map[MAP_ROWS - 1, i] = Terrain.MOUNTAIN;
+                        map[MapRows - 1, i] = Terrain.MOUNTAIN;
                     }
 
-                    for (int i = 0; i < MAP_ROWS; i++)
+                    for (int i = 0; i < MapRows; i++)
                     {
                         map[i, 0] = Terrain.MOUNTAIN;
-                        map[i, MAP_COLS - 1] = Terrain.MOUNTAIN;
+                        map[i, MapColumns - 1] = Terrain.MOUNTAIN;
                     }
 
 
@@ -438,10 +438,10 @@ sealed class DeathMountain : World
 
                     while (cols > 0)
                     {
-                        int col = RNG.Next(10, MAP_COLS - 11);
+                        int col = RNG.Next(10, MapColumns - 11);
                         if (!pickedC.Contains(col))
                         {
-                            for (int i = 0; i < MAP_ROWS; i++)
+                            for (int i = 0; i < MapRows; i++)
                             {
                                 if (map[i, col] == Terrain.NONE)
                                 {
@@ -455,10 +455,10 @@ sealed class DeathMountain : World
 
                     while (rows > 0)
                     {
-                        int row = RNG.Next(10, MAP_ROWS - 11);
+                        int row = RNG.Next(10, MapRows - 11);
                         if (!pickedR.Contains(row))
                         {
-                            for (int i = 0; i < MAP_COLS; i++)
+                            for (int i = 0; i < MapColumns; i++)
                             {
                                 if (map[row, i] == Terrain.NONE)
                                 {
@@ -506,8 +506,8 @@ sealed class DeathMountain : World
                         int tries = 0;
                         do
                         {
-                            x = RNG.Next(MAP_COLS - 2) + 1;
-                            y = RNG.Next(MAP_ROWS - 2) + 1;
+                            x = RNG.Next(MapColumns - 2) + 1;
+                            y = RNG.Next(MapRows - 2) + 1;
                             tries++;
                             if (++tries >= 100)
                             {
@@ -540,10 +540,15 @@ sealed class DeathMountain : World
                 Climate growthClimate = climate.Clone();
                 float dmOpennessFactor = biome switch
                 {
+                    Biome.CALDERA => (float)(RNG.NextDouble() * .75 + 1),
                     Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),
                     Biome.ISLANDS => (float)(RNG.NextDouble() * .5 + 1),
                     _ => 1f
                 };
+                if (growthClimate.Type != null && growthClimate.Type == ClimateEnum.SCRUBLAND)
+                {
+                    dmOpennessFactor *= 2;
+                }
                 growthClimate.ApplyDeathMountainSafety(randomTerrainFilter, dmOpennessFactor);
                 //Debug.WriteLine(GetMapDebug());
                 if (!GrowTerrain(growthClimate))
@@ -585,8 +590,8 @@ sealed class DeathMountain : World
 
                 do
                 {
-                    x = RNG.Next(MAP_COLS - 2) + 1;
-                    y = RNG.Next(MAP_ROWS - 2) + 1;
+                    x = RNG.Next(MapColumns - 2) + 1;
+                    y = RNG.Next(MapRows - 2) + 1;
                 } while (!walkableTerrains.Contains(map[y, x]) || map[y + 1, x] == Terrain.CAVE || map[y - 1, x] == Terrain.CAVE || map[y, x + 1] == Terrain.CAVE || map[y, x - 1] == Terrain.CAVE);
 
                 map[y, x] = Terrain.ROCK;
@@ -609,7 +614,9 @@ sealed class DeathMountain : World
                 bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
             }
         }
-        if(!ValidateBasicRouting())
+        visitation = new bool[MapRows, MapColumns];
+
+        if (!ValidateBasicRouting())
         {
             logger.LogDebug("ValidateBasicRouting failed");
             return false;
@@ -618,10 +625,9 @@ sealed class DeathMountain : World
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
         rom.Put(RomMap.NORTH_SOUTH_SEPARATOR_DM, (byte)(northSouthEncounterSeparator + 30));
 
-        visitation = new bool[MAP_ROWS, MAP_COLS];
-        for (int i = 0; i < MAP_ROWS; i++)
+        for (int i = 0; i < MapRows; i++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MapColumns; j++)
             {
                 visitation[i, j] = false;
             }
@@ -675,22 +681,22 @@ sealed class DeathMountain : World
             tries = 0;
             do
             {
-                x = RNG.Next(MAP_COLS - 2) + 1;
-                y = RNG.Next(MAP_ROWS - 2) + 1;
+                x = RNG.Next(MapColumns - 2) + 1;
+                y = RNG.Next(MapRows - 2) + 1;
                 if (++tries >= 100)
                 {
                     return false;
                 }
-            } while (x < 5 || x > MAP_COLS - 5
-                  || y < 5 || y > MAP_ROWS - 5
+            } while (x < 5 || x > MapColumns - 5
+                  || y < 5 || y > MapRows - 5
                   || !AllTerrainIn3x3Equals(x, y, Terrain.NONE));
 
-            int minDistX = Math.Min(MAP_COLS / 2 - 1, 15);
-            int minDistY = Math.Min(MAP_ROWS / 2 - 1, 15);
+            int minDistX = Math.Min(MapColumns / 2 - 1, 15);
+            int minDistY = Math.Min(MapRows / 2 - 1, 15);
 
             while ((direction == Direction.NORTH && y < minDistY)
-                || (direction == Direction.EAST && x > MAP_COLS - minDistX)
-                || (direction == Direction.SOUTH && y > MAP_ROWS - minDistY)
+                || (direction == Direction.EAST && x > MapColumns - minDistX)
+                || (direction == Direction.SOUTH && y > MapRows - minDistY)
                 || (direction == Direction.WEST && x < minDistX))
             {
                 direction = (Direction)RNG.Next(4);
@@ -733,8 +739,8 @@ sealed class DeathMountain : World
                     {
                         return false;
                     }
-                } while (otherx <= 1 || otherx >= MAP_COLS - 1
-                      || othery <= 1 || othery >= MAP_ROWS - 1
+                } while (otherx <= 1 || otherx >= MapColumns - 1
+                      || othery <= 1 || othery >= MapRows - 1
                       || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
 
                 List<Location> l2 = connectionsDM[location];
@@ -787,8 +793,8 @@ sealed class DeathMountain : World
                     {
                         return false;
                     }
-                } while (otherx <= 1 || otherx >= MAP_COLS - 1
-                      || othery <= 1 || othery >= MAP_ROWS - 1
+                } while (otherx <= 1 || otherx >= MapColumns - 1
+                      || othery <= 1 || othery >= MapRows - 1
                       || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
 
                 List<Location> caveExits = connectionsDM[location];
@@ -816,8 +822,8 @@ sealed class DeathMountain : World
                     {
                         return false;
                     }
-                } while (newx > 2 && newx < MAP_COLS - 2
-                      && newy > 2 && newy < MAP_ROWS - 2
+                } while (newx > 2 && newx < MapColumns - 2
+                      && newy > 2 && newy < MapRows - 2
                       && !AllTerrainIn3x3Equals(newx, newy, Terrain.NONE));
 
                 location3.CanShuffle = false;
@@ -862,8 +868,8 @@ sealed class DeathMountain : World
                     {
                         return false;
                     }
-                } while (otherx <= 1 || otherx >= MAP_COLS - 1
-                      || othery <= 1 || othery >= MAP_ROWS - 1
+                } while (otherx <= 1 || otherx >= MapColumns - 1
+                      || othery <= 1 || othery >= MapRows - 1
                       || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
 
                 location4.CanShuffle = false;
@@ -887,8 +893,8 @@ sealed class DeathMountain : World
         {
             water = Terrain.WALKABLEWATER;
         }
-        int mapCenterX = MAP_COLS / 2; // 32
-        int mapCenterY = MAP_ROWS / 2; // 22
+        int mapCenterX = MapColumns / 2; // 32
+        int mapCenterY = MapRows / 2; // 22
         int calderaCenterX, calderaCenterY;
 
         int tries = 0;
@@ -901,13 +907,13 @@ sealed class DeathMountain : World
                 int maxX = mapCenterX + 5;
                 calderaCenterX = RNG.Next(minX, maxX);
                 int minY = Math.Max(7, mapCenterY - 5);
-                int maxY = Math.Min(mapCenterY + 5, MAP_ROWS - 8);
+                int maxY = Math.Min(mapCenterY + 5, MapRows - 8);
                 calderaCenterY = RNG.Next(minY, maxY);
             }
             else
             {
                 int minX = Math.Max(7, mapCenterX - 11);
-                int maxX = Math.Min(mapCenterX + 9, MAP_COLS - 8);
+                int maxX = Math.Min(mapCenterX + 9, MapColumns - 8);
                 calderaCenterX = RNG.Next(minX, maxX);
                 int minY = mapCenterY - 5;
                 int maxY = mapCenterY + 5;
@@ -1189,7 +1195,7 @@ sealed class DeathMountain : World
     {
         List<Location> unreachedLocations = RequiredLocations(false, false).ToList();
 
-        bool[,] visitedCoordinates = new bool[MAP_ROWS, MAP_COLS];
+        bool[,] visitedCoordinates = new bool[MapRows, MapColumns];
         List<(int, int)> pendingCoordinates = new();
         foreach(Location location in GetContinentConnections())
         {
@@ -1225,7 +1231,7 @@ sealed class DeathMountain : World
             {
                 pendingCoordinates.Add((y, x - 1));
             }
-            if (x < MAP_COLS - 1 && map[y, x + 1].IsWalkable())
+            if (x < MapColumns - 1 && map[y, x + 1].IsWalkable())
             {
                 pendingCoordinates.Add((y, x + 1));
             }
@@ -1233,7 +1239,7 @@ sealed class DeathMountain : World
             {
                 pendingCoordinates.Add((y - 1, x));
             }
-            if (y < MAP_ROWS - 1 && map[y + 1, x].IsWalkable())
+            if (y < MapRows - 1 && map[y + 1, x].IsWalkable())
             {
                 pendingCoordinates.Add((y + 1, x));
             }

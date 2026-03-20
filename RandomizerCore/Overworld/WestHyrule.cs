@@ -283,16 +283,16 @@ public sealed class WestHyrule : World
         biome = props.WestBiome;
         if (biome.UsesVanillaMap() || props.WestSize == OverworldSizeOption.LARGE)
         {
-            MAP_COLS = 64;
-            MAP_ROWS = 75;
+            MapColumns = 64;
+            MapRows = 75;
             northSouthEncounterSeparator = 30;
         }
         else
         {
             var meta = props.WestSize.GetMeta();
-            MAP_COLS = meta.Width;
-            MAP_ROWS = meta.Height;
-            northSouthEncounterSeparator = MAP_ROWS / 2;
+            MapColumns = meta.Width;
+            MapRows = meta.Height;
+            northSouthEncounterSeparator = MapRows / 2;
             // TODO: use metadata for num passthrough caves to remove for small continents
             // RemoveLocations([fairyCave, fairyCave2]);
             // caveConnections.Remove((fairyCave, fairyCave2));
@@ -369,9 +369,9 @@ public sealed class WestHyrule : World
         }
         if (biome.UsesVanillaMap())
         {
-            Debug.Assert(MAP_ROWS == 75);
-            Debug.Assert(MAP_COLS == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
+            Debug.Assert(MapRows == 75);
+            Debug.Assert(MapColumns == 64);
+            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 areasByLocation = new SortedDictionary<string, List<Location>>
@@ -450,12 +450,12 @@ public sealed class WestHyrule : World
                 locationAtSariaSouth.CanShuffle = false;
                 locationAtSariaNorth.CanShuffle = false;
 
-                map = new Terrain[MAP_ROWS, MAP_COLS];
+                map = new Terrain[MapRows, MapColumns];
 
                 //blank the whole map to start
-                for (int i = 0; i < MAP_ROWS; i++)
+                for (int i = 0; i < MapRows; i++)
                 {
-                    for (int j = 0; j < MAP_COLS; j++)
+                    for (int j = 0; j < MapColumns; j++)
                     {
                         map[i, j] = Terrain.NONE;
                     }
@@ -468,15 +468,15 @@ public sealed class WestHyrule : World
                         riverTerrain = preplacedWater;
 
                         //Fill the edges with water
-                        for (int i = 0; i < MAP_COLS; i++)
+                        for (int i = 0; i < MapColumns; i++)
                         {
                             map[0, i] = preplacedWater;
-                            map[MAP_ROWS - 1, i] = preplacedWater;
+                            map[MapRows - 1, i] = preplacedWater;
                         }
-                        for (int i = 0; i < MAP_ROWS; i++)
+                        for (int i = 0; i < MapRows; i++)
                         {
                             map[i, 0] = preplacedWater;
-                            map[i, MAP_COLS - 1] = preplacedWater;
+                            map[i, MapColumns - 1] = preplacedWater;
                         }
 
 
@@ -488,10 +488,10 @@ public sealed class WestHyrule : World
 
                         while (cols > 0)
                         {
-                            int col = RNG.Next(10, MAP_COLS - 11);
+                            int col = RNG.Next(10, MapColumns - 11);
                             if (!pickedC.Contains(col))
                             {
-                                for (int i = 0; i < MAP_ROWS; i++)
+                                for (int i = 0; i < MapRows; i++)
                                 {
                                     if (map[i, col] == Terrain.NONE)
                                     {
@@ -504,10 +504,10 @@ public sealed class WestHyrule : World
                         }
                         while (rows > 0)
                         {
-                            int row = RNG.Next(10, MAP_ROWS - 11);
+                            int row = RNG.Next(10, MapRows - 11);
                             if (!pickedR.Contains(row))
                             {
-                                for (int i = 0; i < MAP_COLS; i++)
+                                for (int i = 0; i < MapColumns; i++)
                                 {
                                     if (map[row, i] == Terrain.NONE)
                                     {
@@ -557,16 +557,16 @@ public sealed class WestHyrule : World
                         randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
 
                         riverTerrain = Terrain.MOUNTAIN;
-                        for (int i = 0; i < MAP_COLS; i++)
+                        for (int i = 0; i < MapColumns; i++)
                         {
                             map[0, i] = Terrain.MOUNTAIN;
-                            map[MAP_ROWS - 1, i] = Terrain.MOUNTAIN;
+                            map[MapRows - 1, i] = Terrain.MOUNTAIN;
                         }
 
-                        for (int i = 0; i < MAP_ROWS; i++)
+                        for (int i = 0; i < MapRows; i++)
                         {
                             map[i, 0] = Terrain.MOUNTAIN;
-                            map[i, MAP_COLS - 1] = Terrain.MOUNTAIN;
+                            map[i, MapColumns - 1] = Terrain.MOUNTAIN;
                         }
 
 
@@ -577,10 +577,10 @@ public sealed class WestHyrule : World
 
                         while (cols > 0)
                         {
-                            int col = RNG.Next(10, MAP_COLS - 11);
+                            int col = RNG.Next(10, MapColumns - 11);
                             if (!pickedC.Contains(col))
                             {
-                                for (int i = 0; i < MAP_ROWS; i++)
+                                for (int i = 0; i < MapRows; i++)
                                 {
                                     if (map[i, col] == Terrain.NONE)
                                     {
@@ -594,10 +594,10 @@ public sealed class WestHyrule : World
 
                         while (rows > 0)
                         {
-                            int row = RNG.Next(10, MAP_ROWS - 11);
+                            int row = RNG.Next(10, MapRows - 11);
                             if (!pickedR.Contains(row))
                             {
-                                for (int i = 0; i < MAP_COLS; i++)
+                                for (int i = 0; i < MapColumns; i++)
                                 {
                                     if (map[row, i] == Terrain.NONE)
                                     {
@@ -810,10 +810,10 @@ public sealed class WestHyrule : World
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
         rom.Put(RomMap.NORTH_SOUTH_SEPARATOR_WEST, (byte)(northSouthEncounterSeparator + 30));
 
-        visitation = new bool[MAP_ROWS, MAP_COLS];
-        for (int i = 0; i < MAP_ROWS; i++)
+        visitation = new bool[MapRows, MapColumns];
+        for (int i = 0; i < MapRows; i++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MapColumns; j++)
             {
                 visitation[i, j] = false;
             }
@@ -833,13 +833,13 @@ public sealed class WestHyrule : World
     {
         bagu.CanShuffle = true;
         lostWoods.ForEach(i => i.CanShuffle = true);
-        int y = RNG.Next(6, MAP_ROWS - 7);
-        int x = RNG.Next(6, MAP_COLS - 7);
+        int y = RNG.Next(6, MapRows - 7);
+        int x = RNG.Next(6, MapColumns - 7);
         int tries = 0;
         while((map[y, x] != Terrain.NONE || GetLocationByCoordsNoOffset((y, x)) != null) && tries < 1000)
         {
-            y = RNG.Next(6, MAP_ROWS - 7);
-            x = RNG.Next(6, MAP_COLS - 7);
+            y = RNG.Next(6, MapRows - 7);
+            x = RNG.Next(6, MapColumns - 7);
         }
         if(tries >= 1000)
         {
@@ -880,8 +880,8 @@ public sealed class WestHyrule : World
     }
     private bool MakeCaldera(Terrain water, bool useSaneCaves)
     {
-        int mapCenterX = MAP_COLS / 2; // 32
-        int mapCenterY = MAP_ROWS / 2; // 37
+        int mapCenterX = MapColumns / 2; // 32
+        int mapCenterY = MapRows / 2; // 37
         int tries = 0;
         bool placeable;
         do
@@ -892,13 +892,13 @@ public sealed class WestHyrule : World
                 int maxX = mapCenterX + 5;
                 calderaCenterX = RNG.Next(minX, maxX);
                 int minY = Math.Max(7, mapCenterY - 15);
-                int maxY = Math.Min(mapCenterY + 15, MAP_ROWS - 8);
+                int maxY = Math.Min(mapCenterY + 15, MapRows - 8);
                 calderaCenterY = RNG.Next(minY, maxY);
             }
             else
             {
                 int minX = Math.Max(7, mapCenterX - 11);
-                int maxX = Math.Min(mapCenterX + 9, MAP_COLS - 8);
+                int maxX = Math.Min(mapCenterX + 9, MapColumns - 8);
                 calderaCenterX = RNG.Next(minX, maxX);
                 int minY = mapCenterY - 3;
                 int maxY = mapCenterY + 5;
@@ -1085,11 +1085,11 @@ public sealed class WestHyrule : World
 
         int cavenum1 = RNG.Next(caveConnections.Count);
         (cave1l, cave1r) = caveConnections[cavenum1];
-        if (cave1l.Y < MAP_ROWS && cave1l.Xpos < MAP_COLS)
+        if (cave1l.Y < MapRows && cave1l.Xpos < MapColumns)
         {
             map[cave1l.Y, cave1l.Xpos] = Terrain.MOUNTAIN;
         }
-        if (cave1r.Y < MAP_ROWS && cave1r.Xpos < MAP_COLS)
+        if (cave1r.Y < MapRows && cave1r.Xpos < MapColumns)
         {
             map[cave1r.Y, cave1r.Xpos] = Terrain.MOUNTAIN;
         }
@@ -1102,11 +1102,11 @@ public sealed class WestHyrule : World
                 cavenum2 = RNG.Next(caveConnections.Count);
             } while (cavenum2 == cavenum1);
             (cave2l, cave2r) = caveConnections[cavenum2];
-            if (cave2l.Y < MAP_ROWS && cave2l.Xpos < MAP_COLS)
+            if (cave2l.Y < MapRows && cave2l.Xpos < MapColumns)
             {
                 map[cave2l.Y, cave2l.Xpos] = Terrain.MOUNTAIN;
             }
-            if (cave2r.Y < MAP_ROWS && cave2r.Xpos < MAP_COLS)
+            if (cave2r.Y < MapRows && cave2r.Xpos < MapColumns)
             {
                 map[cave2r.Y, cave2r.Xpos] = Terrain.MOUNTAIN;
             }
@@ -1322,7 +1322,7 @@ public sealed class WestHyrule : World
         /*readonly*/ int mountStartY = RNG.Next(22, 42);
         /*readonly*/ int mountEndY = RNG.Next(22, 42);
         /*readonly*/ int mountMargin = RNG.Next(2, 8);
-        /*readonly*/ int mountEndRight = MAP_COLS - mountMargin;
+        /*readonly*/ int mountEndRight = MapColumns - mountMargin;
         map[mountStartY, 0] = Terrain.MOUNTAIN;
         bool placedRoad = false;
 
@@ -1337,7 +1337,7 @@ public sealed class WestHyrule : World
                 {
                     x--;
                 }
-                else if (x < MAP_COLS - 1)
+                else if (x < MapColumns - 1)
                 {
                     x++;
                 }
@@ -1348,7 +1348,7 @@ public sealed class WestHyrule : World
                 {
                     y--;
                 }
-                else if (y < MAP_ROWS - 1)
+                else if (y < MapRows - 1)
                 {
                     y++;
                 }
@@ -1442,7 +1442,7 @@ public sealed class WestHyrule : World
     {
         List<Location> unreachedLocations = RequiredLocations(false, false).ToList();
 
-        bool[,] visitedCoordinates = new bool[MAP_ROWS, MAP_COLS];
+        bool[,] visitedCoordinates = new bool[MapRows, MapColumns];
         Queue<(int, int)> pendingCoordinates = new();
         foreach (Location location in GetContinentConnections())
         {
@@ -1478,7 +1478,7 @@ public sealed class WestHyrule : World
             {
                 pendingCoordinates.Enqueue((y, x - 1));
             }
-            if (x < MAP_COLS - 1 && map[y, x + 1].IsWalkable())
+            if (x < MapColumns - 1 && map[y, x + 1].IsWalkable())
             {
                 pendingCoordinates.Enqueue((y, x + 1));
             }
@@ -1486,7 +1486,7 @@ public sealed class WestHyrule : World
             {
                 pendingCoordinates.Enqueue((y - 1, x));
             }
-            if (y < MAP_ROWS - 1 && map[y + 1, x].IsWalkable())
+            if (y < MapRows - 1 && map[y + 1, x].IsWalkable())
             {
                 pendingCoordinates.Enqueue((y + 1, x));
             }

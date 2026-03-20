@@ -1279,7 +1279,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 1 => ClimateEnum.CHAOS,
                 2 => ClimateEnum.WETLANDS,
                 3 => ClimateEnum.GREAT_LAKES,
-                4 => ClimateEnum.SCRUBLAND,
+                4 => ClimateEnum.DM_SCRUBLAND,
                 _ => throw new Exception("Unrecognized climate")
             };
         }

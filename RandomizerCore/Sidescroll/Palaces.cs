@@ -341,7 +341,7 @@ public class Palaces
             requireables.Add(RequirementType.FAIRY);
 
             //If we can't clear 2 without the items available, we can never get the glove, so the palace is unbeatable
-            if (!palace2.CanClearAllRooms(requireables, Collectable.GLOVE))
+            if (!palace2.CanReachAnItemRoom(requireables))
             {
                 return false;
             }

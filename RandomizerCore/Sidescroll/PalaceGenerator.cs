@@ -57,6 +57,7 @@ public abstract class PalaceGenerator
                     return true;
                 }
             }
+            return false;
         }
         return true;
     }

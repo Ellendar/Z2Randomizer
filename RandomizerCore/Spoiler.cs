@@ -116,10 +116,10 @@ public class Spoiler
 
     public byte[] CreateSpoilerImage(List<World> worlds)
     {
-        int column1Width = Math.Max(worlds[0].MAP_COLS, worlds[1].MAP_COLS);
-        int column2Width = Math.Max(worlds[2].MAP_COLS, worlds[3].MAP_COLS);
-        int row1Height = Math.Max(worlds[0].MAP_ROWS, worlds[2].MAP_ROWS);
-        int row2Height = Math.Max(worlds[1].MAP_ROWS, worlds[3].MAP_ROWS);
+        int column1Width = Math.Max(worlds[0].MapColumns, worlds[1].MapColumns);
+        int column2Width = Math.Max(worlds[2].MapColumns, worlds[3].MapColumns);
+        int row1Height = Math.Max(worlds[0].MapRows, worlds[2].MapRows);
+        int row2Height = Math.Max(worlds[1].MapRows, worlds[3].MapRows);
         int gapSize = 1;
         int tilesWide = column1Width + column2Width + gapSize;
         int tilesHigh = row1Height + row2Height + gapSize;
@@ -147,8 +147,8 @@ public class Spoiler
     private void DrawWorld(SKCanvas canvas, World world, int startDrawX, int startDrawY)
     {
         int offsetX = (world is MazeIsland && world.biome.UsesVanillaMap()) ? 32 : 0;
-        int width = ((world is DeathMountain || world is MazeIsland) && world.biome.UsesVanillaMap()) ? 32 : world.MAP_COLS;
-        int height = ((world is DeathMountain || world is MazeIsland) && world.biome.UsesVanillaMap()) ? 48 : world.MAP_ROWS;
+        int width = ((world is DeathMountain || world is MazeIsland) && world.biome.UsesVanillaMap()) ? 32 : world.MapColumns;
+        int height = ((world is DeathMountain || world is MazeIsland) && world.biome.UsesVanillaMap()) ? 48 : world.MapRows;
 
         var background = new SKPaint();
         background.Color = SKColors.Black;

@@ -21,12 +21,12 @@ class Statistics
 {
     //private static readonly string FLAGS = "hEAK0thCqbLyhAAL4XpGU+!5@W4xeWvdAALhA"; //Random% vanilla
     //private static readonly string FLAGS = "AAAA2dJALw3kToaJESXL#o4++o6WFU9WaAkyAAWAoh"; //Standard Swiss
-    private static readonly string FLAGS = "g7+y2SHCACtOJ3hAAAAABoWyMocY+#caVWVprWmAQAABVFbh"; //test
+    private static readonly string FLAGS = "hEAApSNpADUFX9hC0w7jBFW2oZSr+#5@W3ypss4WYAACqH!A"; //test
     //private static readonly string FLAGS = "g7+y2SHCACtOJ3hAAAAACsWhtocY+#caVWVprWmCQAABVAbh"; //short/short
     //private static readonly string FLAGS =   "g7+y2SHCACtOJ3hAAAAACsWhtocY+#caVWVprWmCQAABVFbh"; //long/long
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
-    private static readonly string DB_PATH = "..\\..\\..\\..\\db\\palace1000short.sqlite";
+    private static readonly string DB_PATH = "..\\..\\..\\..\\db\\1000random.sqlite";
     private static readonly int LIMIT = 1000;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     static void Main()
@@ -40,12 +40,12 @@ class Statistics
         var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
         var palaceRooms = new PalaceRooms(roomsJson, false);
-        var randomizer = new Hyrule(createAsm,palaceRooms);
         logger.Info("Started statistics generation with limit: " + LIMIT);
         try
         {
             for (int i = 0; i < LIMIT; i++)
             {
+                var randomizer = new Hyrule(createAsm, palaceRooms);
                 int seed = random.Next(1000000000);
                 //int seed = 704113586;
                 config.Seed = seed.ToString();

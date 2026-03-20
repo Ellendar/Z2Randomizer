@@ -414,6 +414,8 @@ public enum ClimateEnum
     GREAT_LAKES,
     [Description("Scrubland")]
     SCRUBLAND,
+    [Description("Scrubland")]
+    DM_SCRUBLAND,
     [Description("Random")]
     RANDOM
 }
@@ -426,6 +428,7 @@ static class ClimateExtensions
         {
             ClimateEnum.VANILLA_WEIGHTED_WEST => true,
             ClimateEnum.VANILLA_WEIGHTED_EAST => false,
+            ClimateEnum.DM_SCRUBLAND => false,
             _ => true,
         };
     }
@@ -436,6 +439,7 @@ static class ClimateExtensions
         {
             ClimateEnum.VANILLA_WEIGHTED_WEST => false,
             ClimateEnum.VANILLA_WEIGHTED_EAST => true,
+            ClimateEnum.DM_SCRUBLAND => false,
             _ => true,
         };
     }
@@ -446,6 +450,7 @@ static class ClimateExtensions
         {
             ClimateEnum.VANILLA_WEIGHTED_WEST => false,
             ClimateEnum.VANILLA_WEIGHTED_EAST => false,
+            ClimateEnum.SCRUBLAND => false,
             _ => true,
         };
     }

@@ -161,13 +161,10 @@ public class RoomPool
                 ItemRoomsByShape[shape] = ls;
             }
         }
-        else
-        {
-            //If we are using these categorized exits to cap paths, there needs to always be a path of each type
-            //Since vanilla and 4.0 don't normally contain up/down elevator deadends, we add some dummy ones
-            DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_DOWN, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit).First());
-            DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_UP, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit).First());
-        }
+        //If we are using these categorized exits to cap paths, there needs to always be a path of each type
+        //Since vanilla and 4.0 don't normally contain up/down elevator deadends, we add some dummy ones
+        DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_DOWN, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit).First());
+        DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_UP, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit).First());
         foreach (var direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
         {
             if (roomDirectionWeightsByDirection[direction].Count > 0)
@@ -293,6 +290,16 @@ public class RoomPool
 
     public void RemoveDuplicates(RandomizerProperties props, Room roomThatWasUsed)
     {
+        //Default stubs are used when no deadend rooms of that direction exist. They are always allowed to
+        //be duplicates and should never be removed from the pool.
+        if (DefaultStubsByDirection.TryGetValue(roomThatWasUsed.CategorizeExits(), out Room directionStub))
+        {
+            if(directionStub == roomThatWasUsed)
+            {
+                return;
+            }
+        }
+
         if (props.NoDuplicateRoomsBySideview)
         {
             var sideviewBytes = roomThatWasUsed.SideView;

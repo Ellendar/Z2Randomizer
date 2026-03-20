@@ -293,16 +293,16 @@ public sealed class EastHyrule : World
         biome = props.EastBiome;
         if (biome.UsesVanillaMap() || props.EastSize == OverworldSizeOption.LARGE)
         {
-            MAP_COLS = 64;
-            MAP_ROWS = 75;
+            MapColumns = 64;
+            MapRows = 75;
             northSouthEncounterSeparator = 46;
         }
         else
         {
             var meta = props.EastSize.GetMeta();
-            MAP_COLS = meta.Width;
-            MAP_ROWS = meta.Height;
-            northSouthEncounterSeparator = MAP_ROWS / 2;
+            MapColumns = meta.Width;
+            MapRows = meta.Height;
+            northSouthEncounterSeparator = MapRows / 2;
             // TODO: use metadata for num trap tiles etc. to remove for small continents
             int trapTilesToRemove = 0; // must be even
             for (int i = 0; i < trapTilesToRemove; i++)
@@ -415,9 +415,9 @@ public sealed class EastHyrule : World
 
         if (biome.UsesVanillaMap())
         {
-            Debug.Assert(MAP_ROWS == 75);
-            Debug.Assert(MAP_COLS == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
+            Debug.Assert(MapRows == 75);
+            Debug.Assert(MapColumns == 64);
+            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
 
             if (biome == Biome.VANILLA_SHUFFLE)
             {
@@ -572,11 +572,11 @@ public sealed class EastHyrule : World
                     };
                 }
 
-                map = new Terrain[MAP_ROWS, MAP_COLS];
+                map = new Terrain[MapRows, MapColumns];
 
-                for (int i = 0; i < MAP_ROWS; i++)
+                for (int i = 0; i < MapRows; i++)
                 {
-                    for (int j = 0; j < MAP_COLS; j++)
+                    for (int j = 0; j < MapColumns; j++)
                     {
                         map[i, j] = Terrain.NONE;
                     }
@@ -585,16 +585,16 @@ public sealed class EastHyrule : World
                 if (biome == Biome.ISLANDS)
                 {
                     riverTerrain = preplacedWater;
-                    for (int i = 0; i < MAP_COLS; i++)
+                    for (int i = 0; i < MapColumns; i++)
                     {
                         map[0, i] = preplacedWater;
-                        map[MAP_ROWS - 1, i] = preplacedWater;
+                        map[MapRows - 1, i] = preplacedWater;
                     }
 
-                    for (int i = 0; i < MAP_ROWS; i++)
+                    for (int i = 0; i < MapRows; i++)
                     {
                         map[i, 0] = preplacedWater;
-                        map[i, MAP_COLS - 1] = preplacedWater;
+                        map[i, MapColumns - 1] = preplacedWater;
                     }
                     MakeValleyOfDeath();
                     int cols = RNG.Next(2, 4);
@@ -604,10 +604,10 @@ public sealed class EastHyrule : World
 
                     while (cols > 0)
                     {
-                        int col = RNG.Next(1, MAP_COLS - 1);
+                        int col = RNG.Next(1, MapColumns - 1);
                         if (!pickedC.Contains(col))
                         {
-                            for (int i = 0; i < MAP_ROWS; i++)
+                            for (int i = 0; i < MapRows; i++)
                             {
                                 if (map[i, col] == Terrain.NONE)
                                 {
@@ -621,10 +621,10 @@ public sealed class EastHyrule : World
 
                     while (rows > 0)
                     {
-                        int row = RNG.Next(1, MAP_ROWS - 1);
+                        int row = RNG.Next(1, MapRows - 1);
                         if (!pickedR.Contains(row))
                         {
-                            for (int i = 0; i < MAP_COLS; i++)
+                            for (int i = 0; i < MapColumns; i++)
                             {
                                 if (map[row, i] == Terrain.NONE)
                                 {
@@ -670,16 +670,16 @@ public sealed class EastHyrule : World
                 else if (biome == Biome.MOUNTAINOUS)
                 {
                     riverTerrain = Terrain.MOUNTAIN;
-                    for (int i = 0; i < MAP_COLS; i++)
+                    for (int i = 0; i < MapColumns; i++)
                     {
                         map[0, i] = Terrain.MOUNTAIN;
-                        map[MAP_ROWS - 1, i] = Terrain.MOUNTAIN;
+                        map[MapRows - 1, i] = Terrain.MOUNTAIN;
                     }
 
-                    for (int i = 0; i < MAP_ROWS; i++)
+                    for (int i = 0; i < MapRows; i++)
                     {
                         map[i, 0] = Terrain.MOUNTAIN;
-                        map[i, MAP_COLS - 1] = Terrain.MOUNTAIN;
+                        map[i, MapColumns - 1] = Terrain.MOUNTAIN;
                     }
                     MakeValleyOfDeath();
 
@@ -690,10 +690,10 @@ public sealed class EastHyrule : World
 
                     while (cols > 0)
                     {
-                        int col = RNG.Next(10, MAP_COLS - 11);
+                        int col = RNG.Next(10, MapColumns - 11);
                         if (!pickedC.Contains(col))
                         {
-                            for (int i = 0; i < MAP_ROWS; i++)
+                            for (int i = 0; i < MapRows; i++)
                             {
                                 if (map[i, col] == Terrain.NONE)
                                 {
@@ -707,10 +707,10 @@ public sealed class EastHyrule : World
 
                     while (rows > 0)
                     {
-                        int row = RNG.Next(10, MAP_ROWS - 11);
+                        int row = RNG.Next(10, MapRows - 11);
                         if (!pickedR.Contains(row))
                         {
-                            for (int i = 0; i < MAP_COLS; i++)
+                            for (int i = 0; i < MapColumns; i++)
                             {
                                 if (map[row, i] == Terrain.NONE)
                                 {
@@ -940,10 +940,10 @@ public sealed class EastHyrule : World
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Y, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
 
 
-        visitation = new bool[MAP_ROWS, MAP_COLS];
-        for (int i = 0; i < MAP_ROWS; i++)
+        visitation = new bool[MapRows, MapColumns];
+        for (int i = 0; i < MapRows; i++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MapColumns; j++)
             {
                 visitation[i, j] = false;
             }
@@ -968,19 +968,19 @@ public sealed class EastHyrule : World
         int xmin, xmax, ymin, ymax;
         if (biome == Biome.VOLCANO)
         {
-            int mapCenterX = MAP_COLS / 2; // 32
-            int mapCenterY = MAP_ROWS / 2; // 37
+            int mapCenterX = MapColumns / 2; // 32
+            int mapCenterY = MapRows / 2; // 37
             xmin = mapCenterX - 11;
             xmax = mapCenterX + 9;
             ymin = Math.Max(5, mapCenterY - 15);
-            ymax = Math.Min(mapCenterY + 15, MAP_ROWS - 6);
+            ymax = Math.Min(mapCenterY + 15, MapRows - 6);
         }
         else
         {
             xmin = 5;
             ymin = 5;
-            xmax = MAP_COLS - 6;
-            ymax = MAP_COLS - 6;
+            xmax = MapColumns - 6;
+            ymax = MapColumns - 6;
         }
         int palacex = RNG.Next(xmin, xmax);
         int palacey = RNG.Next(ymin, ymax);
@@ -1066,7 +1066,7 @@ public sealed class EastHyrule : World
 
         if (biome != Biome.CANYON && biome != Biome.DRY_CANYON)
         {
-            if (palacex > MAP_COLS / 2)
+            if (palacex > MapColumns / 2)
             {
                 deltax = -1;
                 startx = palacex - 4;
@@ -1077,7 +1077,7 @@ public sealed class EastHyrule : World
                 deltay = 1;
                 starty = palacey + 4;
                 startx = palacex;
-                if (palacey > MAP_ROWS / 2)
+                if (palacey > MapRows / 2)
                 {
                     deltay = -1;
                     starty = palacey - 4;
@@ -1088,7 +1088,7 @@ public sealed class EastHyrule : World
         {
             if (isHorizontal)
             {
-                if (palacey < MAP_ROWS / 2)
+                if (palacey < MapRows / 2)
                 {
                     deltay = 1;
                     deltax = 0;
@@ -1105,7 +1105,7 @@ public sealed class EastHyrule : World
             }
             else
             {
-                if (palacex > MAP_COLS / 2)
+                if (palacex > MapColumns / 2)
                 {
                     deltax = -1;
                     startx = palacex - 4;
@@ -1157,15 +1157,15 @@ public sealed class EastHyrule : World
             int maxadjust = 2;
             int c = 0;
             while (startx > 1
-                && startx < MAP_COLS - 1
+                && startx < MapColumns - 1
                 && starty > 1
-                && starty < MAP_ROWS - 1
+                && starty < MapRows - 1
                 && (((biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON) && map[starty, startx] == Terrain.MOUNTAIN) || (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON && c < length)))
             {
                 c++;
                 map[starty, startx] = Terrain.LAVA;
                 int adjust = RNG.Next(minadjust, maxadjust);
-                while ((deltax != 0 && (starty + adjust < 1 || starty + adjust > MAP_ROWS - 2)) || (deltay != 0 && (startx + adjust < 1 || startx + adjust > MAP_COLS - 2)))
+                while ((deltax != 0 && (starty + adjust < 1 || starty + adjust > MapRows - 2)) || (deltay != 0 && (startx + adjust < 1 || startx + adjust > MapColumns - 2)))
                 {
                     adjust = RNG.Next(minadjust, maxadjust);
                 }
@@ -1429,7 +1429,7 @@ public sealed class EastHyrule : World
                         vodcave1 = vodcave3;
                         vodcave2 = vodcave4;
                     }
-                    if (vodcave1.Y < MAP_ROWS && vodcave1.Xpos < MAP_COLS)
+                    if (vodcave1.Y < MapRows && vodcave1.Xpos < MapColumns)
                     {
                         map[vodcave1.Y, vodcave1.Xpos] = Terrain.MOUNTAIN;
                     }
@@ -1462,7 +1462,7 @@ public sealed class EastHyrule : World
 
                     if (horizontalPath)
                     {
-                        if (starty > MAP_ROWS / 2)
+                        if (starty > MapRows / 2)
                         {
                             starty += RNG.Next(-9, -4);
                         }
@@ -1473,7 +1473,7 @@ public sealed class EastHyrule : World
                     }
                     else
                     {
-                        if (startx > MAP_COLS / 2)
+                        if (startx > MapColumns / 2)
                         {
                             startx += RNG.Next(-9, -4);
                         }
@@ -1486,7 +1486,7 @@ public sealed class EastHyrule : World
                     {
                         return false;
                     }
-                    if (vodcave2.Y < MAP_ROWS && vodcave2.Xpos < MAP_COLS)
+                    if (vodcave2.Y < MapRows && vodcave2.Xpos < MapColumns)
                     {
                         map[vodcave2.Y, vodcave2.Xpos] = Terrain.MOUNTAIN;
                     }
@@ -1631,8 +1631,8 @@ public sealed class EastHyrule : World
     private bool RandomizeHiddenPalace(ROM rom, bool shuffleHidden, bool hiddenKasuto)
     {
         bool done = false;
-        int xpos = RNG.Next(6, MAP_COLS - 6);
-        int ypos = RNG.Next(6, MAP_ROWS - 6);
+        int xpos = RNG.Next(6, MapColumns - 6);
+        int ypos = RNG.Next(6, MapRows - 6);
         if (shuffleHidden)
         {
             hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];
@@ -1660,8 +1660,8 @@ public sealed class EastHyrule : World
         int tries = 0;
         while (!done && tries < 1000)
         {
-            xpos = RNG.Next(6, MAP_COLS - 6);
-            ypos = RNG.Next(6, MAP_ROWS - 6);
+            xpos = RNG.Next(6, MapColumns - 6);
+            ypos = RNG.Next(6, MapRows - 6);
             //#124 - Hidden palace and hidden kasuto on the same X-coordinate causes a wrong warp when leaving hidden palace
             if (hiddenKasuto && xpos == hiddenKasutoLocation.Xpos)
             {
@@ -1817,10 +1817,10 @@ public sealed class EastHyrule : World
     {
         bool placedSpider = !useRiverDevil;
 
-        /*readonly*/ int mountStartY1 = RNG.Next(MAP_COLS / 3 - 10, MAP_COLS / 3 + 10);
-        /*readonly*/ int mountEndY1 = RNG.Next(MAP_COLS / 3 - 10, MAP_COLS / 3 + 10);
+        /*readonly*/ int mountStartY1 = RNG.Next(MapColumns / 3 - 10, MapColumns / 3 + 10);
+        /*readonly*/ int mountEndY1 = RNG.Next(MapColumns / 3 - 10, MapColumns / 3 + 10);
         /*readonly*/ int endMountMargin1 = RNG.Next(2, 8);
-        /*readonly*/ int endMountEndRight1 = MAP_COLS - endMountMargin1;
+        /*readonly*/ int endMountEndRight1 = MapColumns - endMountMargin1;
         int x = 0;
         int y = mountStartY1;
         int roadEncounters = 0;
@@ -1901,12 +1901,12 @@ public sealed class EastHyrule : World
             }
         }
 
-        /*readonly*/ int mountStartY2 = RNG.Next(MAP_COLS * 2 / 3 - 10, MAP_COLS * 2 / 3 + 10);
+        /*readonly*/ int mountStartY2 = RNG.Next(MapColumns * 2 / 3 - 10, MapColumns * 2 / 3 + 10);
         map[mountStartY2, 0] = Terrain.MOUNTAIN;
 
-        /*readonly*/ int mountEndY2 = RNG.Next(MAP_COLS * 2 / 3 - 10, MAP_COLS * 2 / 3 + 10);
+        /*readonly*/ int mountEndY2 = RNG.Next(MapColumns * 2 / 3 - 10, MapColumns * 2 / 3 + 10);
         /*readonly*/ int endMountMargin2 = RNG.Next(2, 8);
-        /*readonly*/ int endMountEndRight2 = MAP_COLS - endMountMargin2;
+        /*readonly*/ int endMountEndRight2 = MapColumns - endMountMargin2;
 
         x = 0;
         y = mountStartY2;
@@ -2011,7 +2011,7 @@ public sealed class EastHyrule : World
         //SpellTower's connection logic isn't implemented here, nor do we care since we're assuming you have everything.
         unreachedLocations.Remove(spellTower);
 
-        bool[,] visitedCoordinates = new bool[MAP_ROWS, MAP_COLS];
+        bool[,] visitedCoordinates = new bool[MapRows, MapColumns];
         List<(int, int)> pendingCoordinates = new();
         foreach (Location location in GetContinentConnections())
         {
@@ -2047,7 +2047,7 @@ public sealed class EastHyrule : World
             {
                 pendingCoordinates.Add((y, x - 1));
             }
-            if (x < MAP_COLS - 1 && map[y, x + 1].IsWalkable())
+            if (x < MapColumns - 1 && map[y, x + 1].IsWalkable())
             {
                 pendingCoordinates.Add((y, x + 1));
             }
@@ -2055,7 +2055,7 @@ public sealed class EastHyrule : World
             {
                 pendingCoordinates.Add((y - 1, x));
             }
-            if (y < MAP_ROWS - 1 && map[y + 1, x].IsWalkable())
+            if (y < MapRows - 1 && map[y + 1, x].IsWalkable())
             {
                 pendingCoordinates.Add((y + 1, x));
             }

@@ -60,7 +60,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
                 palace.IsValid = false;
                 if(stallCount++ >= STALL_LIMIT)
                 {
-                    //Debug.WriteLine(palace.GetLayoutDebug());
+                    //Debug.WriteLineIf(palaceNum == 7, palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
                     stallFailureCounts[palaceNumber - 1]++;
                 }
                 return palace;
@@ -110,7 +110,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             if(UpdateRoom(mergedRoom))
             {
                 palace.AllRooms.Add(mergedRoom);
-                Debug.WriteLineIf(debug == 78, palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
+                //Debug.WriteLineIf(debug == 78, palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
                 if (duplicateProtection)
                 {
                     roomPool.RemoveDuplicates(props, originalRoom);

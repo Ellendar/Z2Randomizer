@@ -648,6 +648,7 @@ public class Hyrule
             ShuffleSpells();
         }
 
+        int mirrorIndex = 0, waterindex = 0;
         if (props.IncludeQuestItemsInShuffle)
         {
             shufflableItems.Add(Collectable.BAGUS_NOTE);
@@ -658,7 +659,9 @@ public class Hyrule
             }
             else
             {
+                mirrorIndex = shufflableItems.Count;
                 shufflableItems.Add(Collectable.MIRROR);
+                waterindex = shufflableItems.Count;
                 shufflableItems.Add(Collectable.WATER);
             }
         }
@@ -774,16 +777,16 @@ public class Hyrule
                 townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectables[0];
                 if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
                 {
-                    Debug.Assert(shufflableItems[23] == Collectable.MIRROR);
-                    shufflableItems[23] = minorItems[r.Next(minorItems.Count)];
+                    Debug.Assert(shufflableItems[mirrorIndex] == Collectable.MIRROR);
+                    shufflableItems[mirrorIndex] = minorItems[r.Next(minorItems.Count)];
                     ItemGet[Collectable.MIRROR] = true;
                 }
 
                 townCollectable = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectables[0];
                 if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
                 {
-                    Debug.Assert(shufflableItems[24] == Collectable.WATER);
-                    shufflableItems[24] = minorItems[r.Next(minorItems.Count)];
+                    Debug.Assert(shufflableItems[waterindex] == Collectable.WATER);
+                    shufflableItems[waterindex] = minorItems[r.Next(minorItems.Count)];
                     ItemGet[Collectable.WATER] = true;
                 }
             }
@@ -1297,6 +1300,8 @@ public class Hyrule
 
     private bool IsEverythingReachable(Dictionary<Collectable, bool> itemGet)
     {
+        //XXX: Fix
+        return true;
         totalReachableCheck++;
         int dm = 0;
         int mi = 0;

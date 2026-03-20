@@ -7,15 +7,18 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 
 public class Climate
 {
+    public ClimateEnum? Type { get; }
     private const float EXCESSIVELY_LARGE = 1000f; 
     public float[] DistanceCoefficients { get; }
     public string Name { get; init; }
     public int SeedTerrainCount { get; set; }
     private IWeightedSampler<Terrain> weightedSampler;
 
-    public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, IWeightedSampler<Terrain> terrainWeights, int seedTerrainCount)
+    public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, IWeightedSampler<Terrain> terrainWeights, 
+        int seedTerrainCount, ClimateEnum? type = null)
     {
         Name = name;
+        Type = type;
         // Precompute distance coefficients into a inverse list
         DistanceCoefficients = new float[Enum.GetValues<Terrain>().Length];
         for(int i = 0; i < DistanceCoefficients.Length; i++)
@@ -74,7 +77,8 @@ public class Climate
                 .Select((value, index) => new { value, index })
                 .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)),
             weightedSampler.Clone(),
-            SeedTerrainCount);
+            SeedTerrainCount,
+            Type);
     }
 
     /// renamed this because Clone returning an object with different values is not great
@@ -85,7 +89,8 @@ public class Climate
                 .Select((value, index) => new { value, index })
                 .ToDictionary(pair => (Terrain)pair.index, pair => pair.value == EXCESSIVELY_LARGE ? EXCESSIVELY_LARGE : 1f / pair.value)),
             weightedSampler.Clone(),
-            SeedTerrainCount);
+            SeedTerrainCount,
+            Type);
     }
 
     /// <summary>

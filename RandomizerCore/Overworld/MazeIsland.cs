@@ -84,14 +84,14 @@ sealed class MazeIsland : World
         biome = props.MazeBiome;
         if (biome.UsesVanillaMap())
         {
-            MAP_ROWS = 75;
-            MAP_COLS = 64;
+            MapRows = 75;
+            MapColumns = 64;
         }
         else
         {
             var meta = props.MazeSize.GetMeta();
-            MAP_COLS = meta.Height;
-            MAP_ROWS = meta.Width;
+            MapColumns = meta.Height;
+            MapRows = meta.Width;
 
             // TODO: use metadata for num caves to remove
             var trapTilesToRemove = props.MazeSize switch
@@ -117,9 +117,9 @@ sealed class MazeIsland : World
     {
         if (biome.UsesVanillaMap())
         {
-            Debug.Assert(MAP_ROWS == 75);
-            Debug.Assert(MAP_COLS == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
+            Debug.Assert(MapRows == 75);
+            Debug.Assert(MapColumns == 64);
+            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
@@ -161,46 +161,46 @@ sealed class MazeIsland : World
             while (bytesWritten > MAP_SIZE_BYTES)
             {
 
-                map = new Terrain[MAP_ROWS, 64];
-                bool[,] visited = new bool[MAP_ROWS, MAP_COLS];
+                map = new Terrain[MapRows, 64];
+                bool[,] visited = new bool[MapRows, MapColumns];
 
-                for (int i = 0; i < MAP_COLS; i++)
+                for (int i = 0; i < MapColumns; i++)
                 {
                     map[0, i] = Terrain.WALKABLEWATER;
-                    map[MAP_ROWS - 1, i] = Terrain.WALKABLEWATER;
-                    visited[MAP_ROWS - 1, i] = true;
+                    map[MapRows - 1, i] = Terrain.WALKABLEWATER;
+                    visited[MapRows - 1, i] = true;
 
                     visited[0, i] = true;
 
                 }
 
-                for (int i = 0; i < MAP_ROWS; i++)
+                for (int i = 0; i < MapRows; i++)
                 {
                     map[i, 0] = Terrain.WALKABLEWATER;
                     visited[i, 0] = true;
-                    map[i, MAP_COLS - 1] = Terrain.WALKABLEWATER;
-                    visited[i, MAP_COLS - 1] = true;
+                    map[i, MapColumns - 1] = Terrain.WALKABLEWATER;
+                    visited[i, MapColumns - 1] = true;
                 }
-                for (int i = 1; i < MAP_ROWS - 1; i += 2)
+                for (int i = 1; i < MapRows - 1; i += 2)
                 {
 
-                    for (int j = 1; j < MAP_COLS - 1; j++)
+                    for (int j = 1; j < MapColumns - 1; j++)
                     {
                         map[i, j] = Terrain.MOUNTAIN;
                     }
                 }
 
-                for (int i = 0; i < MAP_ROWS; i++)
+                for (int i = 0; i < MapRows; i++)
                 {
-                    for (int j = MAP_COLS; j < 64; j++)
+                    for (int j = MapColumns; j < 64; j++)
                     {
                         map[i, j] = Terrain.WATER;
                     }
                 }
 
-                for (int j = 1; j < MAP_COLS; j += 2)
+                for (int j = 1; j < MapColumns; j += 2)
                 {
-                    for (int i = 1; i < MAP_ROWS - 1; i++)
+                    for (int i = 1; i < MapRows - 1; i++)
                     {
                         {
                             map[i, j] = Terrain.MOUNTAIN;
@@ -208,9 +208,9 @@ sealed class MazeIsland : World
                     }
                 }
 
-                for (int i = 1; i < MAP_ROWS; i++)
+                for (int i = 1; i < MapRows; i++)
                 {
-                    for (int j = 1; j < MAP_COLS; j++)
+                    for (int j = 1; j < MapColumns; j++)
                     {
                         if (map[i, j] != Terrain.MOUNTAIN && map[i, j] != Terrain.WATER && map[i, j] != Terrain.WALKABLEWATER)
                         {
@@ -224,7 +224,7 @@ sealed class MazeIsland : World
                     }
                 }
                 //choose starting position
-                int starty = RNG.Next(2, MAP_ROWS);
+                int starty = RNG.Next(2, MapRows);
                 if (starty == 0)
                 {
                     starty++;
@@ -299,11 +299,11 @@ sealed class MazeIsland : World
                 bool canPlace = false;
 
                 int palace4x = RNG.Next(15) + 3;
-                int palace4y = RNG.Next(MAP_ROWS - 6) + 3;
+                int palace4y = RNG.Next(MapRows - 6) + 3;
                 while (!canPlace)
                 {
                     palace4x = RNG.Next(15) + 3;
-                    palace4y = RNG.Next(MAP_ROWS - 6) + 3;
+                    palace4y = RNG.Next(MapRows - 6) + 3;
                     canPlace = true;
                     if (map[palace4y, palace4x] != Terrain.ROAD)
                     {
@@ -337,18 +337,18 @@ sealed class MazeIsland : World
                 int riverStartY;
                 do
                 {
-                    riverStartY = RNG.Next((MAP_ROWS - 5) / 2) * 2 + 3;
+                    riverStartY = RNG.Next((MapRows - 5) / 2) * 2 + 3;
                 }
                 while (riverStartY == starty);
 
-                int riverEndY = RNG.Next((MAP_ROWS - 5) / 2) * 2 + 3;
+                int riverEndY = RNG.Next((MapRows - 5) / 2) * 2 + 3;
                 bool openWest, openEast;
                 do
                 {
                     openWest = RNG.Next(2) == 1;
                     openEast = RNG.Next(2) == 1;
                 } while (!openWest && !openEast);
-                int riverEndX = Math.Min(MAP_COLS - 2, 21);
+                int riverEndX = Math.Min(MapColumns - 2, 21);
                 Debug.Assert(riverEndX % 2 == 1); // even number loops forever
                 Debug.Assert(riverEndY % 2 == 1);
                 DrawRiver(riverStartY, 1, riverEndY, riverEndX, openWest, openEast);
@@ -365,12 +365,12 @@ sealed class MazeIsland : World
                     if (raftDirection == Direction.NORTH)
                     {
 
-                        raftX = RNG.Next(2, MAP_COLS - 1);
+                        raftX = RNG.Next(2, MapColumns - 1);
                         while (raftY != 2)
                         {
-                            raftX = RNG.Next(2, MAP_COLS - 1);
+                            raftX = RNG.Next(2, MapColumns - 1);
                             raftY = 0;
-                            while (raftY < MAP_ROWS && map[raftY, raftX] != Terrain.ROAD)
+                            while (raftY < MapRows && map[raftY, raftX] != Terrain.ROAD)
                             {
                                 raftY++;
                             }
@@ -393,12 +393,12 @@ sealed class MazeIsland : World
                     }
                     else if (raftDirection == Direction.SOUTH)
                     {
-                        raftY = MAP_ROWS - 1;
-                        raftX = RNG.Next(2, MAP_COLS - 1);
-                        while (raftY != MAP_ROWS - 3)
+                        raftY = MapRows - 1;
+                        raftX = RNG.Next(2, MapColumns - 1);
+                        while (raftY != MapRows - 3)
                         {
-                            raftY = MAP_ROWS - 1;
-                            raftX = RNG.Next(2, MAP_COLS - 1);
+                            raftY = MapRows - 1;
+                            raftX = RNG.Next(2, MapColumns - 1);
                             while (raftY > 0 && map[raftY, raftX] != Terrain.ROAD)
                             {
                                 raftY--;
@@ -410,7 +410,7 @@ sealed class MazeIsland : World
                         raft.Xpos = raftX;
                         raftY++;
 
-                        while (raftY < MAP_ROWS)
+                        while (raftY < MapRows)
                         {
                             if (map[raftY, raftX] != Terrain.PALACE && map[raftY, raftX] != Terrain.CAVE)
                             {
@@ -425,8 +425,8 @@ sealed class MazeIsland : World
                         while (raftX != 2)
                         {
                             raftX = 0;
-                            raftY = RNG.Next(2, MAP_ROWS - 2);
-                            while (raftX < MAP_COLS && map[raftY, raftX] != Terrain.ROAD)
+                            raftY = RNG.Next(2, MapRows - 2);
+                            while (raftX < MapColumns && map[raftY, raftX] != Terrain.ROAD)
                             {
                                 raftX++;
                             }
@@ -450,10 +450,10 @@ sealed class MazeIsland : World
                     }
                     else
                     {
-                        while (raftX != MAP_COLS - 3)
+                        while (raftX != MapColumns - 3)
                         {
-                            raftX = MAP_COLS - 1;
-                            raftY = RNG.Next(2, MAP_ROWS - 2);
+                            raftX = MapColumns - 1;
+                            raftY = RNG.Next(2, MapRows - 2);
                             while (raftX > 0 && map[raftY, raftX] != Terrain.ROAD)
                             {
                                 raftX--;
@@ -464,7 +464,7 @@ sealed class MazeIsland : World
                         raft.Y = raftY;
                         raft.Xpos = raftX;
                         raftX++;
-                        while (raftX < MAP_COLS)
+                        while (raftX < MapColumns)
                         {
                             if (map[raftY, raftX] != Terrain.PALACE && map[raftY, raftX] != Terrain.CAVE)
                             {
@@ -491,8 +491,8 @@ sealed class MazeIsland : World
 
                     if (bridgeDirection == Direction.NORTH)
                     {
-                        bridgeX = RNG.Next(2, MAP_COLS - 1);
-                        while (bridgeY < MAP_ROWS && map[bridgeY, bridgeX] != Terrain.ROAD)
+                        bridgeX = RNG.Next(2, MapColumns - 1);
+                        while (bridgeY < MapRows && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
                             //the bridge can't intersect another bridge, either because it is a mini-bridge
                             //or because that bridge is actually the raft tile.
@@ -505,7 +505,7 @@ sealed class MazeIsland : World
 
                         //If the bridge spawns on the edge of the map, and it also corresponds to where the river is, it creates a 
                         //giant bridge across the entire map because it never finds road.
-                        if(bridgeY == MAP_ROWS)
+                        if(bridgeY == MapRows)
                         {
                             return false;
                         }
@@ -534,8 +534,8 @@ sealed class MazeIsland : World
                     }
                     else if (bridgeDirection == Direction.SOUTH)
                     {
-                        bridgeY = MAP_ROWS - 1;
-                        bridgeX = RNG.Next(2, MAP_COLS - 1);
+                        bridgeY = MapRows - 1;
+                        bridgeX = RNG.Next(2, MapColumns - 1);
                         while (bridgeY > 0 && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
                             if (map[bridgeY, bridgeX] == Terrain.BRIDGE)
@@ -555,7 +555,7 @@ sealed class MazeIsland : World
                         bridge.Y = bridgeY;
                         bridge.Xpos = bridgeX;
 
-                        while (bridgeY < MAP_ROWS)
+                        while (bridgeY < MapRows)
                         {
                             if (map[bridgeY, bridgeX] == Terrain.PALACE
                                 || map[bridgeY, bridgeX] == Terrain.CAVE
@@ -574,12 +574,12 @@ sealed class MazeIsland : World
                     }
                     else if (bridgeDirection == Direction.WEST)
                     {
-                        bridgeY = RNG.Next(2, MAP_ROWS - 2);
+                        bridgeY = RNG.Next(2, MapRows - 2);
                         while(bridgeY == riverEndY || bridgeY == riverStartY)
                         {
-                            bridgeY = RNG.Next(2, MAP_ROWS - 2);
+                            bridgeY = RNG.Next(2, MapRows - 2);
                         }
-                        while (bridgeX < MAP_COLS && map[bridgeY, bridgeX] != Terrain.ROAD)
+                        while (bridgeX < MapColumns && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
                             if (map[bridgeY, bridgeX] == Terrain.BRIDGE)
                             {
@@ -587,7 +587,7 @@ sealed class MazeIsland : World
                             }
                             bridgeX++;
                         }
-                        if (bridgeX == MAP_COLS)
+                        if (bridgeX == MapColumns)
                         {
                             return false;
                         }
@@ -616,15 +616,15 @@ sealed class MazeIsland : World
                     }
                     else
                     {
-                        bridgeX = MAP_COLS + 3;
-                        bridgeY = RNG.Next(2, MAP_ROWS - 2);
+                        bridgeX = MapColumns + 3;
+                        bridgeY = RNG.Next(2, MapRows - 2);
                         while (bridgeY == riverEndY || bridgeY == riverStartY)
                         {
                             if (map[bridgeY, bridgeX] == Terrain.BRIDGE)
                             {
                                 return false;
                             }
-                            bridgeY = RNG.Next(2, MAP_ROWS - 2);
+                            bridgeY = RNG.Next(2, MapRows - 2);
                         }
                         while (bridgeX > 0 && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
@@ -640,7 +640,7 @@ sealed class MazeIsland : World
                         bridge.Y = bridgeY;
                         bridge.Xpos = bridgeX;
 
-                        while (bridgeX < MAP_COLS)
+                        while (bridgeX < MapColumns)
                         {
                             if (map[bridgeY, bridgeX] == Terrain.PALACE
                                 || map[bridgeY, bridgeX] == Terrain.CAVE
@@ -671,7 +671,7 @@ sealed class MazeIsland : World
                             do
                             {
                                 x = RNG.Next(19) + 2;
-                                y = RNG.Next(MAP_ROWS - 4) + 2;
+                                y = RNG.Next(MapRows - 4) + 2;
                             } while (map[y, x] != Terrain.ROAD 
                             || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN)
                             || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN))
@@ -686,7 +686,7 @@ sealed class MazeIsland : World
                             do
                             {
                                 x = RNG.Next(19) + 2;
-                                y = RNG.Next(MAP_ROWS - 4) + 2;
+                                y = RNG.Next(MapRows - 4) + 2;
                             } while (map[y, x] != Terrain.ROAD
                             || GetLocationByCoordsNoOffset((y, x + 1)) != null
                             || GetLocationByCoordsNoOffset((y, x - 1)) != null
@@ -719,10 +719,10 @@ sealed class MazeIsland : World
             }
         }
 
-        visitation = new bool[MAP_ROWS, MAP_COLS];
-        for (int i = 0; i < MAP_ROWS; i++)
+        visitation = new bool[MapRows, MapColumns];
+        for (int i = 0; i < MapRows; i++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MapColumns; j++)
             {
                 visitation[i, j] = false;
             }
@@ -799,7 +799,7 @@ sealed class MazeIsland : World
             x.Add((currx - 2, curry));
         }
 
-        if (currx + 2 < MAP_COLS && v[curry, currx + 2] == false)
+        if (currx + 2 < MapColumns && v[curry, currx + 2] == false)
         {
             x.Add((currx + 2, curry));
         }
@@ -809,7 +809,7 @@ sealed class MazeIsland : World
             x.Add((currx, curry - 2));
         }
 
-        if (curry + 2 < MAP_ROWS && v[curry + 2, currx] == false)
+        if (curry + 2 < MapRows && v[curry + 2, currx] == false)
         {
             x.Add((currx, curry + 2));
         }
@@ -852,7 +852,7 @@ sealed class MazeIsland : World
                             }
 
                         }
-                        if (deltaX > 0 && fromX < MAP_COLS)
+                        if (deltaX > 0 && fromX < MapColumns)
                         {
                             fromX++;
 
@@ -890,7 +890,7 @@ sealed class MazeIsland : World
                                 map[fromY, fromX] = terrain;
                             }
                         }
-                        if (diff > 0 && fromY < MAP_ROWS - 1)
+                        if (diff > 0 && fromY < MapRows - 1)
                         {
                             fromY++;
                             
@@ -918,9 +918,9 @@ sealed class MazeIsland : World
         while (changed)
         {
             changed = false;
-            for (int i = 0; i < MAP_ROWS; i++)
+            for (int i = 0; i < MapRows; i++)
             {
-                for (int j = 0; j < MAP_COLS; j++)
+                for (int j = 0; j < MapColumns; j++)
                 {
                     if (!visitation[i, j]
                     && (
@@ -942,7 +942,7 @@ sealed class MazeIsland : World
 
                         }
 
-                        if (i + 1 < MAP_ROWS)
+                        if (i + 1 < MapRows)
                         {
                             if (visitation[i + 1, j])
                             {
@@ -962,7 +962,7 @@ sealed class MazeIsland : World
                             }
                         }
 
-                        if (j + 1 < MAP_COLS)
+                        if (j + 1 < MapColumns)
                         {
                             if (visitation[i, j + 1])
                             {
