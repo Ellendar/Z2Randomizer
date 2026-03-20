@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media;
+using Avalonia.Styling;
 using Material.Styles.Themes;
 
 namespace CrossPlatformUI;
@@ -20,31 +21,42 @@ public class ThemeHelper
         LightMaterialTheme = Theme.Create(Theme.Light, Color.Parse("#002a88"), Color.Parse("#696969"));
     }
 
-    public static string SetTheme(string name)
+    public static bool IsDark(string? theme)
+    {
+        switch (theme)
+        {
+            case "Dark":
+                return true;
+            case "Light":
+                return false;
+            default:
+                var app = App.Current;
+                if (app == null)
+                {
+                    return false;
+                }
+                var actualTheme = app.ActualThemeVariant;
+                return actualTheme == ThemeVariant.Dark;
+        }
+    }
+
+    public static void SetTheme(string? name)
     {
         var app = App.Current;
         if (app == null)
         {
-            return "Light";
+            return;
         }
+
         var themeBootstrap = app.LocateMaterialTheme<MaterialTheme>();
-        switch (name)
-        {
-            case "Dark":
-                themeBootstrap.CurrentTheme = DarkMaterialTheme;
-                return "Dark";
-            case "Light":
-            default:
-                themeBootstrap.CurrentTheme = LightMaterialTheme;
-                return "Light";
-        }
+        themeBootstrap.CurrentTheme = IsDark(name) ? DarkMaterialTheme : LightMaterialTheme;
     }
 
-    public static IBrush GetFlagAlertBackgroundBrush(string theme, bool alert)
+    public static IBrush GetFlagAlertBackgroundBrush(string? theme, bool alert)
     {
         if (alert)
         {
-            return theme == "Dark" ? DarkNonStandardFlagEnabledBackground : LightNonStandardFlagEnabledBackground;
+            return IsDark(theme) ? DarkNonStandardFlagEnabledBackground : LightNonStandardFlagEnabledBackground;
         }
         else
         {

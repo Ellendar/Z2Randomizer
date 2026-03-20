@@ -68,7 +68,8 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         }
         set
         {
-            ThemeVariantSubject.OnNext(ThemeHelper.SetTheme(value));
+            ThemeHelper.SetTheme(value);
+            ThemeVariantSubject.OnNext(value);
         }
     }
     private int currentTabIndex;
@@ -130,7 +131,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
         ToggleTheme = ReactiveCommand.Create(() =>
         {
-            if(ThemeVariantName == "Dark")
+            if(ThemeHelper.IsDark(ThemeVariantName))
             {
                 ThemeVariantName = "Light";
             }
