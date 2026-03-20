@@ -10593,6 +10593,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10619,6 +10620,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10645,6 +10647,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10671,6 +10674,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -18114,7 +18118,7 @@
     "sideviewData": "34600510D500F01F5062546254625462F41F5062546254625463D4051071F25000F11271D200F01F5063556254625462F310D105",
     "hasBoss": false,
     "isBossRoom": false,
-    "name": "aaron jam 4_4 P4_M29 v2 (5)",
+    "name": "aaron's 4-way Lava Elevator Room of Bubbles and Death",
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
@@ -20028,7 +20032,7 @@
     "isUpDownReversed": false
   },
   {
-    "name": "z2oot fire temple block building room",
+    "name": "Chadbert's folly (z2oot fire temple block building room)",
     "group": "V5_0",
     "map": 45,
     "enabled": true,
