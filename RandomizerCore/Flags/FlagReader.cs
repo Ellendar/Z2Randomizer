@@ -134,20 +134,17 @@ public class FlagReader
     /// Reads an integer value using a fixed number of bits.
     /// 
     /// The number of bits read will be the minimum number of bits needed
-    /// to represent values in the range <c>[minimum, minimum + extent - 1]</c>.
+    /// to represent values in the range <c>[0, extent - 1]</c>.
     /// </summary>
     /// <param name="extent">
     /// The number of distinct values that may be represented.
-    /// </param>
-    /// <param name="minimum">
-    /// Optional minimum value added to the decoded result.
     /// </param>
     /// <returns>
     /// The decoded integer value.
     /// </returns>
     /// <remarks>
     /// <example>
-    /// Examples (with <c>minimum = 0</c>):
+    /// Examples:
     /// <list type="bullet">
     /// <item><description>
     /// <c>extent = 4</c> → values 0–3, uses 2 bits
@@ -158,13 +155,12 @@ public class FlagReader
     /// </list>
     /// </example>
     ///
-    /// The same <paramref name="extent"/> and <paramref name="minimum"/> values
+    /// The same <paramref name="extent"/> value
     /// must be used during encoding to ensure correct decoding.
     /// </remarks>
-    public int ReadInt(int extent, int? minimum = null)
+    public int ReadInt(int extent)
     {
-        var min = minimum ?? 0;
-        return Take(BitOperations.Log2((uint)extent - 1) + 1) + min;
+        return Take(BitOperations.Log2((uint)(extent - 1)) + 1);
     }
 
     /// <summary>
@@ -172,21 +168,18 @@ public class FlagReader
     /// 
     /// The number of bits read will be the minimum number of bits needed
     /// to represent values in the range
-    /// <c>[minimum, minimum + extent - 1]</c>, where the value
-    /// <c>minimum + extent</c> is reserved as a sentinel representing <c>null</c>.
+    /// <c>[0, extent - 1]</c>, where the value
+    /// <c>extent</c> is reserved as a sentinel representing <c>null</c>.
     /// </summary>
     /// <param name="extent">
     /// The number of distinct non-null values that may be represented.
-    /// </param>
-    /// <param name="minimum">
-    /// Optional minimum value added to non-null decoded results.
     /// </param>
     /// <returns>
     /// The decoded integer value, or <c>null</c>.
     /// </returns>
     /// <remarks>
     /// <example>
-    /// Examples (with <c>minimum = 0</c>):
+    /// Examples:
     /// <list type="bullet">
     /// <item><description>
     /// <c>extent = 3</c> → values 0–2 or null, uses 2 bits
@@ -197,17 +190,16 @@ public class FlagReader
     /// </list>
     /// </example>
     ///
-    /// The same <paramref name="extent"/> and <paramref name="minimum"/> values
+    /// The same <paramref name="extent"/> value
     /// must be used during encoding to ensure correct decoding.
     /// </remarks>
-    public int? ReadNullableInt(int extent, int? minimum = null)
+    public int? ReadNullableInt(int extent)
     {
-        var min = minimum ?? 0;
         int result = (byte)Take(BitOperations.Log2((uint)extent) + 1);
         if (result == extent)
         {
             return null;
         }
-        return result + min;
+        return result;
     }
 }

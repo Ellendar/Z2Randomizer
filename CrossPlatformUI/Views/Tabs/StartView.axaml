@@ -112,7 +112,7 @@
                                    Height="72"
                                    Value="{Binding Config.StartingMagicContainersMin}"
                                    FormatString="N0" ParsingNumberStyle="Integer"
-                                   ClipValueToMinMax="True" Minimum="0" Maximum="{Binding Config.StartingMagicContainersMax}" assists:TextFieldAssist.Hints="Start Min"/>
+                                   ClipValueToMinMax="True" Minimum="1" Maximum="{Binding Config.StartingMagicContainersMax}" assists:TextFieldAssist.Hints="Start Min"/>
 					<NumericUpDown Grid.Column="1"
                                    Height="72"
                                    Value="{Binding Config.StartingMagicContainersMax}"

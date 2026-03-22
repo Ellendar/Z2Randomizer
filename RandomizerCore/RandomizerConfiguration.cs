@@ -123,23 +123,23 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private StartingResourceLimit startSpellsLimit;
 
     [Reactive]
-    [Limit(8)]
     [Minimum(1)]
+    [Maximum(8)]
     private int? startingHeartContainersMin;
 
     [Reactive]
-    [Limit(8)]
     [Minimum(1)]
+    [Maximum(8)]
     private int? startingHeartContainersMax;
 
     [Reactive]
-    [Limit(8)]
-    [Minimum(0)]
+    [Minimum(1)]
+    [Maximum(8)]
     private int? startingMagicContainersMin;
 
     [Reactive]
-    [Limit(8)]
-    [Minimum(0)]
+    [Minimum(1)]
+    [Maximum(8)]
     private int? startingMagicContainersMax;
 
     [Reactive]
@@ -152,18 +152,18 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private StartingLives startingLives;
 
     [Reactive]
-    [Limit(8)]
     [Minimum(1)]
+    [Maximum(8)]
     private int startingAttackLevel;
 
     [Reactive]
-    [Limit(8)]
     [Minimum(1)]
+    [Maximum(8)]
     private int startingMagicLevel;
 
     [Reactive]
-    [Limit(8)]
     [Minimum(1)]
+    [Maximum(8)]
     private int startingLifeLevel;
 
     [Reactive]
@@ -402,11 +402,13 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private PalaceItemRoomCount palaceItemRoomCount;
 
     [Reactive]
-    [Limit(7)]
+    [Minimum(0)]
+    [Maximum(6)]
     private int palacesToCompleteMin;
 
     [Reactive]
-    [Limit(7)]
+    [Minimum(0)]
+    [Maximum(6)]
     [ConditionallyIncludeInFlags]
     [DefaultValue(6)]
     private int palacesToCompleteMax;
@@ -436,18 +438,18 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleLifeExperience;
 
     [Reactive]
-    [Limit(8)]
     [Minimum(1)]
+    [Maximum(8)]
     private int attackLevelCap;
 
     [Reactive]
-    [Limit(8)]
     [Minimum(1)]
+    [Maximum(8)]
     private int magicLevelCap;
 
     [Reactive]
-    [Limit(8)]
     [Minimum(1)]
+    [Maximum(8)]
     private int lifeLevelCap;
 
     [Reactive]
@@ -828,20 +830,21 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     {
         return flags.ReadNullableBool();
     }
-    private int DeserializeInt(FlagReader flags, string name, int limit, int? minimum)
+    private int DeserializeInt(FlagReader flags, string name, int minimum, int maximum)
     {
-        int min = minimum ?? 0;
-        return flags.ReadInt(limit) + min;
+        var extent = maximum - minimum + 1;
+        return flags.ReadInt(extent) + minimum;
     }
-    private int? DeserializeNullableInt(FlagReader flags, string name, int limit, int? minimum)
+    private int? DeserializeNullableInt(FlagReader flags, string name, int minimum, int maximum)
     {
-        return flags.ReadNullableInt(limit, minimum);
+        var extent = maximum - minimum + 1;
+        return flags.ReadNullableInt(extent) + minimum;
     }
 
     private T DeserializeEnum<T>(FlagReader flags, string name) where T: Enum
     {
-        var limit = GetEnumCount<T>();
-        var index = flags.ReadInt(limit);
+        var extent = GetEnumCount<T>();
+        var index = flags.ReadInt(extent);
         return GetEnumFromIndex<T>(index)!;
     }
 
@@ -858,8 +861,11 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         }
     }
 
-    private void SerializeInt(FlagBuilder flags, string name, int? val, bool isNullable, int limit, int? minimum)
+    private void SerializeInt(FlagBuilder flags, string name, int? val, int minimum, int maximum)
     {
+        // We don't actually have any real nullable ints in the flags.
+        // Enums would probably always be a better option anyway.
+        /*
         // limit is checked for null in the flags source generator
         if (isNullable)
         {
@@ -869,22 +875,21 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             }
             flags.Append(val, limit, minimum);
         }
-        else
+        */
+        int extent = maximum - minimum + 1;
+        int value = val ?? minimum;
+        if (value < minimum || value > maximum)
         {
-            var value = val!.Value;
-            if (value < minimum || value > minimum + limit)
-            {
-                logger.Warn($"Property ({name}) was out of range.");
-            }
-            flags.Append(value, limit, minimum);
+            logger.Warn($"Property ({name}={value}) is out of range.");
         }
+        flags.Append(value, extent, minimum);
     }
 
     private void SerializeEnum<T>(FlagBuilder flags, string name, T? val) where T: Enum
     {
         var index = GetEnumIndex<T>(val);
-        var limit = GetEnumCount<T>();
-        flags.Append(index, limit);
+        var extent = GetEnumCount<T>();
+        flags.Append(index, extent);
     }
 
     private void SerializeCustom<Serializer, T>(FlagBuilder flags, string name, T? val) where Serializer : IFlagSerializer where T : class

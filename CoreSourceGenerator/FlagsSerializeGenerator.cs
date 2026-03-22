@@ -89,8 +89,8 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
                 DefaultValue = GetDefaultValue(f),
                 IsEnum = f.Type.TypeKind == TypeKind.Enum,
                 EnumSymbol = f.Type.TypeKind == TypeKind.Enum ? f.Type as INamedTypeSymbol : null,
-                Limit = GetCustomLimit(f),
                 Minimum = GetCustomMinimum(f),
+                Maximum = GetCustomMaximum(f),
                 CustomSerializerName = GetCustomFlagSerializer(f),
             }).ToList();
 
@@ -153,20 +153,6 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             .Any(attr => attr.AttributeClass?.Name.StartsWith("Reactive") ?? false);
     }
 
-    private static int? GetCustomLimit(IFieldSymbol property)
-    {
-        var customAttr = property.GetAttributes()
-            .FirstOrDefault(attr => attr.AttributeClass?.Name.StartsWith("Limit") ?? false);
-
-        if (customAttr?.ConstructorArguments.Length > 0 &&
-            customAttr.ConstructorArguments[0].Value is int limit)
-        {
-            return limit;
-        }
-
-        return null;
-    }
-
     private static int? GetCustomMinimum(IFieldSymbol property)
     {
         var customAttr = property.GetAttributes()
@@ -176,6 +162,20 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             customAttr.ConstructorArguments[0].Value is int minimum)
         {
             return minimum;
+        }
+
+        return null;
+    }
+
+    private static int? GetCustomMaximum(IFieldSymbol property)
+    {
+        var customAttr = property.GetAttributes()
+            .FirstOrDefault(attr => attr.AttributeClass?.Name.StartsWith("Maximum") ?? false);
+
+        if (customAttr?.ConstructorArguments.Length > 0 &&
+            customAttr.ConstructorArguments[0].Value is int maximum)
+        {
+            return maximum;
         }
 
         return null;
@@ -393,15 +393,21 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
 
     private static string GetSerializeCall(SerializedFieldInfo field)
     {
-        var limitExpression = field.Limit != null ? $"{field.Limit}" : "null";
-        var minExpression = $"{field.Minimum ?? 0}";
         var output = new StringBuilder();
-        if (field.FieldType is "int" or "int?" && field.Limit == null)
-            output.AppendLine($"#error Numeric type {field.FieldName} must have a `Limit` attribute!");
+        if (field.FieldType is "int" or "int?")
+        {
+            if (field.Minimum == null)
+            {
+                output.AppendLine($"#error Numeric type {field.FieldName} must have a `Minimum` attribute!");
+            }
+            if (field.Maximum == null)
+            {
+                output.AppendLine($"#error Numeric type {field.FieldName} must have a `Maximum` attribute!");
+            }
+        }
         output.Append(field.FieldType switch
         {
-            "int" or "System.Int32" => $"SerializeInt(flags, \"{field.FieldName}\", {field.FieldName}, false, {limitExpression}, {minExpression})",
-            "int?" or "System.Int32?" => $"SerializeInt(flags, \"{field.FieldName}\", {field.FieldName}, true, {limitExpression}, {minExpression})",
+            "int" or "int?" => $"SerializeInt(flags, \"{field.FieldName}\", {field.FieldName}, {field.Minimum}, {field.Maximum})",
             "bool" or "System.Boolean" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName}, false)",
             "bool?" or "System.Boolean?" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName}, true)",
             var type when field.IsEnum => $"SerializeEnum<{type}>(flags, \"{field.FieldName}\", {field.FieldName})",
@@ -412,16 +418,11 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
 
     private static string GetDeserializeCall(SerializedFieldInfo field)
     {
-        var limitExpression = field.Limit != null ? $"{field.Limit}" : "null";
-        var minExpression = $"{field.Minimum ?? 0}";
         var output = new StringBuilder();
         var propName = GetPropertyName(field.FieldName);
-        if (field.FieldType is "int" or "int?" && field.Limit == null)
-            output.AppendLine($"#error Numeric type {field.FieldName} must have a `Limit` attribute!");
         output.Append(field.FieldType switch
         {
-            "int" or "System.Int32" => $"{propName} = DeserializeInt(flags, \"{field.FieldName}\", {limitExpression}, {minExpression})",
-            "int?" or "System.Int32?" => $"{propName} = DeserializeNullableInt(flags, \"{field.FieldName}\", {limitExpression}, {minExpression})",
+            "int" or "int?" => $"{propName} = DeserializeInt(flags, \"{field.FieldName}\", {field.Minimum}, {field.Maximum})",
             "bool" or "System.Boolean" => $"{propName} = DeserializeBool(flags, \"{field.FieldName}\")",
             "bool?" or "System.Boolean?" => $"{propName} = DeserializeNullableBool(flags, \"{field.FieldName}\")",
             var type when field.IsEnum => $"{propName} = DeserializeEnum<{type}>(flags, \"{field.FieldName}\")",
@@ -582,7 +583,7 @@ public class SerializedFieldInfo
     public string? DefaultValue { get; set; }
     public bool IsEnum { get; set; }
     public INamedTypeSymbol? EnumSymbol { get; set; }
-    public int? Limit { get; set; }
+    public int? Maximum { get; set; }
     public int? Minimum { get; set; }
     public string? CustomSerializerName { get; set; }
 }
