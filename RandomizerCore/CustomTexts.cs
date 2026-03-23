@@ -463,9 +463,10 @@ public class CustomTexts
                 //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when you don't have
                 //enough magic containers and container requirements are on.
                 texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!);
-                //Old kasuto guy has a different vanilla not enough containers message
-                texts[95] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!);
             }
+            //Old kasuto guy has a different vanilla not enough containers message
+            //It should be the same, even when community text is off;
+            texts[95] = texts[17];
 
             if (props.TownNameHints)
             {
