@@ -21,7 +21,7 @@ class Statistics
 {
     //private static readonly string FLAGS = "hEAK0thCqbLyhAAL4XpGU+!5@W4xeWvdAALhA"; //Random% vanilla
     //private static readonly string FLAGS = "AAAA2dJALw3kToaJESXL#o4++o6WFU9WaAkyAAWAoh"; //Standard Swiss
-    private static readonly string FLAGS = "hEAApSNpADUFX9hC0w7jBFW2oZSr+#5@W3ypss4WYAACqH!A"; //test
+    private static readonly string FLAGS = "hEABexKyA3zWoqAw0LJidsqd2COQ+56swoE@WXss7AAWA+h"; //test
     //private static readonly string FLAGS = "g7+y2SHCACtOJ3hAAAAACsWhtocY+#caVWVprWmCQAABVAbh"; //short/short
     //private static readonly string FLAGS =   "g7+y2SHCACtOJ3hAAAAACsWhtocY+#caVWVprWmCQAABVFbh"; //long/long
 
@@ -35,7 +35,7 @@ class Statistics
         StatisticsDbContext dbContext = new StatisticsDbContext(DB_PATH);
 
         RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
-        Random random = new Random(0);
+        Random random = new Random(2);
         Hyrule.NewAssemblerFn createAsm = (opts, debug) => new DesktopJsEngine(opts, debug);
         var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;

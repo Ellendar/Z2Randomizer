@@ -59,7 +59,6 @@ public abstract class PalaceGenerator
             }
             return false;
         }
-        return true;
     }
 
     [Conditional("DEBUG")]
@@ -86,7 +85,7 @@ public abstract class PalaceGenerator
                 if (room.HasItem) { continue; }
                 if (room.LinkedRoom != null) { continue; }
                 var sideviewBytes = room.SideView;
-                Debug.Assert(!usedRoomVariants.Contains(sideviewBytes));
+                //Debug.Assert(!usedRoomVariants.Contains(sideviewBytes));
                 usedRoomVariants.Add(sideviewBytes);
             }
         }

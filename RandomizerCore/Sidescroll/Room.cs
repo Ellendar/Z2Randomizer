@@ -346,6 +346,32 @@ public class Room : IJsonOnDeserialized
         return exits;
     }
 
+    public string OpenExitsDebug()
+    {
+        StringBuilder sb = new();
+        sb.Append($"{Name}: ");
+        if (HasRightExit && Right == null)
+        {
+            sb.Append("Right ");
+        }
+
+        if (HasLeftExit && Left == null)
+        {
+            sb.Append("Left ");
+        }
+
+        if (HasUpExit && Up == null)
+        {
+            sb.Append("Up ");
+        }
+
+        if (HasDownExit && Down == null)
+        {
+            sb.Append(HasDrop ? "Drop " : "Down ");
+        }
+        return sb.ToString();
+    }
+
     public void AdjustContinuingBossRoom()
     {
         const PalaceObject statueId = PalaceObject.IRON_KNUCKLE_STATUE;

@@ -1296,15 +1296,8 @@ public partial class Palace
         }
     }
 
-    public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla, int roomCount)
+    public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla, int roomCount, bool removeTbird)
     {
-        //I have no idea why this was here and it breaks stuff. For future removal.
-        /*
-        if(isVanilla)
-        {
-            return AllRooms.Max(i => (byte)(i.Map + 1));
-        }
-        */
         int startingCurrentMap = currentMap;
         if (!AllRooms.Contains(Entrance!))
         {
@@ -1324,7 +1317,7 @@ public partial class Palace
             throw new Exception("Palace has an extra boss room");
         }
         BossRoom.Map = currentMap++;
-        if (isGP)
+        if (isGP && !removeTbird)
         {
             if (TbirdRoom == null || !AllRooms.Contains(TbirdRoom))
             {

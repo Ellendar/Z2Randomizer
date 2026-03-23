@@ -44,7 +44,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
             }
         }
         //Tbird Room
-        else
+        else if(!props.RemoveTbird)
         {
             if (roomPool.TbirdRooms.Count == 0)
             {
@@ -139,7 +139,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
         //Maybe we use ShuffleRooms()?
         //So for now we suffer lesser performance (but still way better than Reconstructed so do we care?)
         if (!palace.AllReachable()
-            || (palace.Number == 7 && props.RequireTbird && !palace.RequiresThunderbird())
+            || (palace.Number == 7 && !props.RemoveTbird && !palace.RequiresThunderbird())
             || (palace.Number == 7 && !palace.IsBossRoomAtLeastMinDistance(props.DarkLinkMinDistance))
         )
         {

@@ -842,9 +842,9 @@ public class CustomTexts
                     hints[mirrorSpellHintIndex] = mirrorHint;
                 }
 
+                itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.WATER))!;
                 if (itemLocation != null)
                 {
-                    itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.WATER))!;
                     Text waterHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.WATER, props.IncludeSpellsInShuffle);
                     hints[waterSpellHintIndex] = waterHint;
                 }
