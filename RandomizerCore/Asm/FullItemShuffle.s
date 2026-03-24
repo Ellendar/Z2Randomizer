@@ -140,8 +140,8 @@ CheckIfWeAlreadyHaveItemForTown:
         lda TownToItemTable,y
         jmp GetItemDontKillEnemy
 @AlreadyHaveItem:
-    inc $048c ; Use the 'Already have item' dialog
-    jmp DialogConditionsDefault
+    inc $048c ; removes the flashing
+    SetDialogPointerAndJump AlreadyHaveItemText
     FREE_UNTIL $b54e
 
 .else # not _DO_SPELL_SHUFFLE_WIZARD_UPDATE

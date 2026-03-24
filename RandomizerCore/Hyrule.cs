@@ -3127,6 +3127,14 @@ CustomFileSelectData:
             a.Label("NotEnoughContainersText");
             a.Byt(bytes);
         }
+        if (props.IncludeSpellsInShuffle)
+        {
+            byte[] bytes = [.. ROM.StringToZ2Bytes("I CANNOT\nHELP YOU\nANYMORE.\nGO NOW."), 0xff];
+            a.Segment("PRG3");
+            a.Reloc();
+            a.Label("AlreadyHaveItemText");
+            a.Byt(bytes);
+        }
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     
