@@ -2426,12 +2426,6 @@ public class Hyrule
 
         }
 
-        if (props.DisableMagicRecs)
-        {
-            rom.Put(0xF539, (byte)0xC9);
-            rom.Put(0xF53A, (byte)0);
-        }
-
         rom.SetLevelCap(a, props.AttackCap, props.MagicCap, props.LifeCap);
 
         rom.ChangeLevelUpCancelling(a);
@@ -3125,6 +3119,14 @@ CustomFileSelectData:
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
         a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", props.IncludeSpellsInShuffle ? 1 : 0);
+        if (!props.DisableMagicRecs)
+        {
+            byte[] bytes = [.. ROM.StringToZ2Bytes("COME BACK\nWHEN YOU\nARE READY."), 0xff];
+            a.Segment("PRG3");
+            a.Reloc();
+            a.Label("NotEnoughContainersText");
+            a.Byt(bytes);
+        }
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     

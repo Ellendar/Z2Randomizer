@@ -20,6 +20,7 @@ UpStabGetItem = $b4d7
 TalkWithStandingStillNpc = $b554
 MirrorWaterGetItem = $b5ae
 WizardDialogGetItem = $b518
+DialogStartWithPointerSet = $b614
 WizardDialogCheckSecondTimeTalking = $B645
 
 ; This is in the middle of the normal get item check after it checks if its a item
@@ -34,6 +35,15 @@ EnemyDeath = $e880
 JankPowerOfTwoMask = $c28d
 ; $08,$04,$02,$01,$80,$40,$20,$10
 JankPowerOfTwo = $c28d
+
+; Macro to show dialog containing the text at pointer
+.macro SetDialogPointerAndJump pointer
+    lda #.lobyte(pointer)
+    sta $0569
+    lda #.hibyte(pointer)
+    sta $056a
+    jmp DialogStartWithPointerSet
+.endmacro
 
 .org MirrorWaterGetItem
     jmp MirrorOrWaterLocation
@@ -92,6 +102,10 @@ FREE_UNTIL $b4eb
 .reloc
 WizardMagicContainerRequirement:
     .byte $01,$02,$03,$04,$05,$06,$07,$08
+
+.reloc
+SetupNotEnoughContainersText:
+    SetDialogPointerAndJump NotEnoughContainersText
 .endif
 
 .if _DO_SPELL_SHUFFLE_WIZARD_UPDATE
@@ -114,7 +128,9 @@ CheckIfWeAlreadyHaveItemForTown:
 .if _CHECK_WIZARD_MAGIC_CONTAINER
         lda $0783
         cmp WizardMagicContainerRequirement,y
-        bcc @EarlyExit
+        bcs @EnoughContainers
+        jmp SetupNotEnoughContainersText
+@EnoughContainers:
 .endif
         ; Earning the item so move the dialog to the next state
         inc $05
@@ -125,9 +141,34 @@ CheckIfWeAlreadyHaveItemForTown:
         jmp GetItemDontKillEnemy
 @AlreadyHaveItem:
     inc $048c ; Use the 'Already have item' dialog
-@EarlyExit:
     jmp DialogConditionsDefault
     FREE_UNTIL $b54e
+
+.else # not _DO_SPELL_SHUFFLE_WIZARD_UPDATE
+
+.org $b526
+.if _CHECK_WIZARD_MAGIC_CONTAINER
+    lda $0783
+    jsr CheckMagicContainersOld
+    nop
+.reloc
+CheckMagicContainersOld:
+    cmp $01
+    bcc @NotEnoughContainersOld
+    rts
+@NotEnoughContainersOld:
+    pla ; pop subroutine calling pointer from the stack as we dont want to return
+    pla
+    jmp SetupNotEnoughContainersText
+.else
+    nop ; remove magic container check entirely
+    nop
+    nop
+    nop
+    nop
+    nop
+    nop
+.endif
 .endif
 
 .reloc

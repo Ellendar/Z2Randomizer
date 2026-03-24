@@ -2234,6 +2234,7 @@ ResetRedPalettePayload:
         { 'Z', 0xf3 },
         { ' ', 0xf4 },
         { '-', 0xf6 },
+        { '\n', 0xfd },
     };
 
     private static readonly IDictionary<byte, char> ReverseCharMap = CharMap.ToDictionary(x => x.Value, x => x.Key);
