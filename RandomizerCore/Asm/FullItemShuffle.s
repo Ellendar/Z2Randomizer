@@ -146,8 +146,8 @@ CheckIfWeAlreadyHaveItemForTown:
 
 .else # not _DO_SPELL_SHUFFLE_WIZARD_UPDATE
 
-.org $b526
 .if _CHECK_WIZARD_MAGIC_CONTAINER
+.org $b526
     lda $0783
     jsr CheckMagicContainersOld
     nop
@@ -161,13 +161,12 @@ CheckMagicContainersOld:
     pla
     jmp SetupNotEnoughContainersText
 .else
-    nop ; remove magic container check entirely
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
+.org $b51f
+    ; skip over and free magic container check
+    beq $b52d
+    inc $048c
+    bne $b52d ; always jumps
+    FREE_UNTIL $b52d
 .endif
 .endif
 
