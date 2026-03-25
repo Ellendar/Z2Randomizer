@@ -200,7 +200,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
                 if (openRooms.Count >= roomCount - palace.AllRooms.Count) //consolidate
                 {
-                    Consolidate(openRooms);
+                    Consolidate(openRooms, props, palaceNumber);
                 }
             }
 
@@ -319,7 +319,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
         }
     }
 
-    public virtual void Consolidate(List<Room> openRooms)
+    public virtual void Consolidate(List<Room> openRooms, RandomizerProperties props, int palaceNumber)
     {
         Room[] openCopy = new Room[openRooms.Count];
         openRooms.CopyTo(openCopy);
