@@ -1533,6 +1533,7 @@ public class Hyrule
                     //Location is a palace
                     if (location.PalaceNumber != null && location.PalaceNumber < 7)
                     {
+                        Debug.Assert(location.CollectableRequirements == World.DEFAULT_PALACE_REQUIREMENTS);
                         Palace palace = palaces[(int)location.PalaceNumber - 1];
                         canGet = CanGet(location)
                             //All palaces inherently require fairy spell or magic key

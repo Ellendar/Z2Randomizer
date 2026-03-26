@@ -76,6 +76,7 @@ sealed class MazeIsland : World
         magicContainerDrop = GetLocationByMem(RomMap.MI_MAGIC_CONTAINER_DROP_TILE);
         locationAtPalace4 = GetLocationByMem(RomMap.MI_PALACE_TILE);
         locationAtPalace4.PalaceNumber = 4;
+        locationAtPalace4.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
 
         baseAddr = 0xA10c;
         continentId = Continent.MAZE;

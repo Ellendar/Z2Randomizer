@@ -159,10 +159,11 @@ public sealed class EastHyrule : World
 
         locationAtPalace6 = GetLocationByMem(RomMap.EAST_PALACE6_TILE_LOCATION);
         locationAtPalace6.PalaceNumber = 6;
-        locationAtPalace5.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
+        locationAtPalace6.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
 
         locationAtGP = GetLocationByMem(RomMap.EAST_GREAT_PALACE_TILE_LOCATION);
         locationAtGP.PalaceNumber = 7;
+        locationAtGP.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS; // the same as this gets shuffled with regular palaces
         locationAtGP.VanillaCollectable = Collectable.DO_NOT_USE;
         locationAtGP.Collectables = [];
 
