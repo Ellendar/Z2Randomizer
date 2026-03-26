@@ -646,9 +646,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool dashAlwaysOn;
 
     [Reactive]
-    private bool shuffleSpritePalettes;
-
-    [Reactive]
     private bool permanentBeamSword;
 
     //Custom
@@ -724,6 +721,10 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     [IgnoreInFlags]
     private NesColor shieldTunic;
+
+    [Reactive]
+    [IgnoreInFlags]
+    private bool shuffleSpritePalettes;
 
     [Reactive]
     [IgnoreInFlags]

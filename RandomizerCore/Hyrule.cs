@@ -2532,32 +2532,21 @@ public class Hyrule
 
         if (props.ShuffleEnemyPalettes)
         {
-            List<int> doubleLocs = [0x40b4, 0x80b4, 0x100b4, 0x100b8, 0x100bc, 0x140b4, 0x140b8, 0x140bc];
-            List<int> singleLocs = [0x40b8, 0x40bc, 0x80b8, 0x80bc];
+            Random customizationRng = new Random(SeedHash);
+            RerollPaletteTable(RomMap.WEST_PALETTE_TABLE, customizationRng);
+            RerollPaletteTable(RomMap.EAST_PALETTE_TABLE, customizationRng);
+            RerollPaletteTable(RomMap.TOWN_PALETTE_TABLE, customizationRng);
+            RerollPaletteTable(RomMap.PALACE_PALETTE_TABLE_MAJOR, customizationRng);
+            RerollPaletteTable(RomMap.GP_PALETTE_TABLE_MAJOR, customizationRng);
 
-            foreach (int i in doubleLocs)
-            {
-                int low = r.Next(12) + 1;
-                int high = (r.Next(2) + 1) * 16;
-                int color = high + low;
-                ROMData.Put(i, (byte)color);
-                ROMData.Put(i + 16, (byte)color);
-                ROMData.Put(i - 1, (byte)(color - 15));
-                ROMData.Put(i + 16 - 1, (byte)(color - 15));
-            }
-            foreach (int i in singleLocs)
-            {
-                int low = r.Next(13);
-                int high = (r.Next(3)) * 16;
-                int color = high + low;
-                ROMData.Put(i, (byte)color);
-                ROMData.Put(i + 16, (byte)color);
-                ROMData.Put(i + 16 - 1, (byte)(color - 15));
-            }
+            /*
+            lets no longer shuffle orange/red/blue bits for enemies, it changes
+            what is visible in the dark and also doesn't add enough to be worth it imo.
+            I also prefer if we can have the palette shuffle as a customize (non-flag) option.
 
-            for (int i = 0x54e8; i < 0x5508; i++)
+            for (int i = RomMap.WEST_ENEMY_STATS_TABLE + 0x3; i < RomMap.WEST_ENEMY_STATS_TABLE + 0x23; i++)
             {
-                if (i != 0x54f8)
+                if (i != RomMap.WEST_ENEMY_STATS_TABLE + 0x13) // skip elevator
                 {
                     int b = ROMData.GetByte(i);
                     int p = b & 0x3F;
@@ -2566,7 +2555,6 @@ public class Hyrule
                     ROMData.Put(i, (byte)(n + p));
                 }
             }
-
             for (int i = 0x94e8; i < 0x9508; i++)
             {
                 if (i != 0x94f8)
@@ -2611,6 +2599,7 @@ public class Hyrule
                     ROMData.Put(i, (byte)(n + p));
                 }
             }
+            */
         }
 
         //WRITE UPDATES TO WIZARD/QUEST COLLECTABLES HERE
@@ -2825,6 +2814,104 @@ public class Hyrule
         for (int i = 0; i < 16; i++)
         {
             ROMData.Put(ROM.ChrRomOffset + 0x12CC0 + i, ROMData.GetByte(ROM.ChrRomOffset + 0x14CC0 + i));
+        }
+    }
+
+    private void RerollPaletteTable(int paletteTableAddr, Random r)
+    {
+        byte dark, middle, light;
+
+        // we are NOT rolling the white color for magic/interface that should match the orange sprite light
+        // (white looks fine with all 2 other sprite colors anyway)
+        // int[] magicBgColorAddr = [paletteTableAddr + 0x01, paletteTableAddr + 0x11];
+        // we ARE rolling the red sprite and matching the red tile color for the life bars to it
+        // (it would limit the palette a lot if the red color has to stay red)
+        List<int> lifeBgColorAddr = [.. Enumerable.Range(0, 9).Select(i => paletteTableAddr + 0x10 * i + 0x03)];
+        List<int> orangeSpriteColorAddr = [paletteTableAddr + 0x94];
+        List<int> redSpriteColorAddr = [paletteTableAddr + 0x98];
+        List<int> blueSpriteColorAddr = [paletteTableAddr + 0x9c];
+
+        List<int> darkRangeFull = [.. Enumerable.Range(0x01, 12), .. Enumerable.Range(0x11, 13), 0x2d];
+        // we make the life color range slightly narrower, to not make the HUD look too awful
+        List<int> darkRangeLife = [.. Enumerable.Range(0x04, 3), .. Enumerable.Range(0x13, 5), .. Enumerable.Range(0x19, 4)];
+        // brighter dark colors do not look good in towns
+        List<int> darkRangeTown = [.. Enumerable.Range(0x01, 12), 0x1d];
+
+        if (paletteTableAddr == RomMap.PALACE_PALETTE_TABLE_MAJOR)
+        {
+            orangeSpriteColorAddr.AddRange(Enumerable.Range(0, 3).Select(i => paletteTableAddr + 0xa4 + 0x10 * i));
+            // additional per-palace palettes
+            lifeBgColorAddr.AddRange(Enumerable.Range(0, 6).Select(i => RomMap.PALACE_PALETTE_TABLE_ENTRANCES + 0x10 * i + 0x03));
+            lifeBgColorAddr.AddRange(Enumerable.Range(0, 6).Select(i => RomMap.PALACE_PALETTE_TABLE_PER_PALACE + 0x10 * i + 0x03));
+        }
+        if (paletteTableAddr == RomMap.GP_PALETTE_TABLE_MAJOR)
+        {
+            lifeBgColorAddr.Add(0x1c48f + 0x03); // palette PPU cmd when fading to Dark Link
+            lifeBgColorAddr.Add(0x1c4a3 + 0x03); // palette PPU cmd when Dark Link has been defeated
+            orangeSpriteColorAddr.Add(paletteTableAddr + 0xa4);
+            orangeSpriteColorAddr.Add(paletteTableAddr + 0xc4);
+            redSpriteColorAddr.Add(paletteTableAddr + 0xa8);
+            blueSpriteColorAddr.Add(paletteTableAddr + 0xac);
+        }
+        if (paletteTableAddr == RomMap.TOWN_PALETTE_TABLE)
+        {
+            var stabguy = paletteTableAddr + 0xac;
+            List<int> wizardAddr = [.. Enumerable.Range(0, 4).Select(i => paletteTableAddr + 0xa4 + 0x10 * i)];
+            orangeSpriteColorAddr.AddRange(wizardAddr);
+            (dark, middle, light) = NES.RollMatchingColorTriple(r, darkRangeFull);
+            ROMData.Put(stabguy + 1, dark);
+            ROMData.Put(stabguy + 2, middle);
+            ROMData.Put(stabguy + 3, light);
+        }
+        if (paletteTableAddr == RomMap.WEST_PALETTE_TABLE || paletteTableAddr == RomMap.EAST_PALETTE_TABLE)
+        {
+            orangeSpriteColorAddr.AddRange(Enumerable.Range(0, 4).Select(i => paletteTableAddr + 0xa4 + 0x10 * i));
+            redSpriteColorAddr.Add(paletteTableAddr + 0xa8);
+            blueSpriteColorAddr.Add(paletteTableAddr + 0xac);
+        }
+
+        List<List<int>> tripples = [orangeSpriteColorAddr, redSpriteColorAddr, blueSpriteColorAddr];
+        List<int> usedColors = [];
+        if (paletteTableAddr == RomMap.TOWN_PALETTE_TABLE)
+        {
+            usedColors.Add(0x22); // blue sky
+        }
+
+        foreach (List<int> list in tripples)
+        {
+            bool isOrange = list == orangeSpriteColorAddr;
+
+            List<int> darkRange = (paletteTableAddr, isOrange) switch
+            {
+                (RomMap.TOWN_PALETTE_TABLE, true) => darkRangeTown.Intersect(darkRangeLife).ToList(),
+                (RomMap.TOWN_PALETTE_TABLE, false) => darkRangeTown,
+                (RomMap.GP_PALETTE_TABLE_MAJOR, true) => darkRangeLife.Where(x => x != 0x14 && x != 0x15).ToList(),
+                (_, true) => darkRangeLife,
+                (_, false) => darkRangeFull,
+            };
+
+            do
+            {
+                (dark, middle, light) = NES.RollMatchingColorTriple(r, darkRange);
+            } while ((dark != 0x2d && usedColors.Contains(dark)) ||
+                     usedColors.Contains(middle) ||
+                     (light != 0x30 && usedColors.Contains(light)));
+
+            // prevent adjacent colors from being picked again
+            usedColors.AddRange(Enumerable.Range(-1, 3).Select(i => dark + i));
+            usedColors.AddRange(Enumerable.Range(-1, 3).Select(i => middle + i));
+            usedColors.AddRange(Enumerable.Range(-1, 3).Select(i => light + i));
+
+            foreach (var i in list)
+            {
+                ROMData.Put(i + 1, dark);
+                ROMData.Put(i + 2, middle);
+                if (list != orangeSpriteColorAddr) { ROMData.Put(i + 3, light); }
+            }
+            if (list == orangeSpriteColorAddr)
+            {
+                foreach (var j in lifeBgColorAddr) { ROMData.Put(j, dark); }
+            }
         }
     }
 

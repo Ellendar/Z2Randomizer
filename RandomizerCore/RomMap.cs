@@ -248,4 +248,12 @@ class RomMap
         // (0x15453, 0x16406), // Thunderbird
         // (0x15454, 0x158aa), // Dark Link
     ];
+
+    public const int WEST_PALETTE_TABLE = 0x401e;
+    public const int EAST_PALETTE_TABLE = 0x801e;
+    public const int TOWN_PALETTE_TABLE = 0xc01e;
+    public const int PALACE_PALETTE_TABLE_MAJOR = 0x1001e;
+    public const int PALACE_PALETTE_TABLE_ENTRANCES = 0x10480;
+    public const int PALACE_PALETTE_TABLE_PER_PALACE = 0x13f10;
+    public const int GP_PALETTE_TABLE_MAJOR = 0x1401e;
 }

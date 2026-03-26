@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -32,6 +30,60 @@ public class NES
         Color.FromArgb(237, 234, 164), Color.FromArgb(214, 244, 164), Color.FromArgb(197, 248, 184), Color.FromArgb(190, 246, 211),
         Color.FromArgb(191, 241, 241), Color.FromArgb(185, 185, 185), Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),
     ];
+
+    /// this should roll three colors that go well together
+    /// darkRange argument may be passed if you want to specify
+    /// a base range, to avoid conflicts with other colors and such.
+    ///
+    /// (there is definitely room for improvements,
+    ///  allowing complementary colors, for example.)
+    public static (byte dark, byte middle, byte light) RollMatchingColorTriple(Random r, List<int> darkRange)
+    {
+        float hueDistance(float h1, float h2)
+        {
+            float diff = Math.Abs(h1 - h2);
+            return Math.Min(diff, 360f - diff);
+        }
+
+        int dark, middle = 0, light = 0;
+        Color darkColor, middleColor, lightColor;
+        float darkHue, middleHue = 0f, lightHue;
+
+        dark = darkRange.Sample(r);
+        darkColor = NesColors[dark];
+        darkHue = darkColor.GetHue();
+
+        List<int> middleList = new(26);
+        if (dark < 0x0d) { middleList.AddRange(Enumerable.Range(0x11, 0x0c)); }
+        middleList.AddRange(Enumerable.Range(0x21, 0x0c));
+        bool darkIsGrayscale = dark == 0x00 || dark == 0x10 || dark == 0x1d || dark == 0x2d;
+        while (middleList.Count > 0)
+        {
+            middle = middleList.Sample(r);
+            middleColor = NesColors[middle];
+            middleHue = middleColor.GetHue();
+            if (darkIsGrayscale) { break; }
+            if (hueDistance(middleHue, darkHue) < 80f) { break; }
+            middleList.Remove(middle);
+        }
+
+        List<int> lightList = new(26);
+        if (middle < 0x1d) { lightList.AddRange(Enumerable.Range(0x21, 0x0c)); }
+        lightList.AddRange(Enumerable.Range(0x31, 0x0c));
+        while (lightList.Count > 0)
+        {
+            light = lightList.Sample(r);
+            lightColor = NesColors[light];
+            lightHue = lightColor.GetHue();
+            if (light == (int)NesColor.White) { break; }
+            float hueDiffDark = darkIsGrayscale ? 0f : hueDistance(lightHue, darkHue);
+            float hueDiffMiddle = hueDistance(lightHue, middleHue);
+            if (hueDiffDark < 80f && hueDiffMiddle < 80f) { break; }
+            lightList.Remove(middle);
+        }
+
+        return ((byte)dark, (byte)middle, (byte)light);
+    }
 }
 
 /// <summary>
