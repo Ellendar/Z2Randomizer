@@ -789,7 +789,9 @@ selection for all palaces. When a palace continues outside, there will always be
 Ironknuckle statue right before the exit like in vanilla. When the palace continues, that
 statue will be removed.
 
-If the palace continues after the boss, palace item rooms may be behind the boss room.</value>
+If the palace continues after the boss, palace item rooms may be behind the boss room.
+
+Tower palace style always exits after the boss and is not affected by this setting.</value>
 	</data>
 	<data name="DropStyleTooltip" xml:space="preserve">
 <value>Selects the required eventual destinations for palace drops.

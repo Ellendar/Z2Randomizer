@@ -322,6 +322,8 @@ public class Hyrule
                 assembler.Add(sideviewModule);
             }
 
+            //palaces.ForEach(i => Debug.WriteLine(i.GetLayoutDebug(PalaceStyle.TOWER, false)));
+
             ROMData.WriteKasutoJarAmount(props.NewKasutoBasementRequirement);
             ROMData.DoHackyFixes();
             ROMData.AdjustGpProjectileDamage();
