@@ -20,6 +20,7 @@ UpStabGetItem = $b4d7
 TalkWithStandingStillNpc = $b554
 MirrorWaterGetItem = $b5ae
 WizardDialogGetItem = $b518
+DialogStartWithPointerSet = $b614
 WizardDialogCheckSecondTimeTalking = $B645
 
 ; This is in the middle of the normal get item check after it checks if its a item
@@ -34,6 +35,19 @@ EnemyDeath = $e880
 JankPowerOfTwoMask = $c28d
 ; $08,$04,$02,$01,$80,$40,$20,$10
 JankPowerOfTwo = $c28d
+
+.macro JumpToDialogFromWestTable index
+    ldx #2
+    ldy #index * 2
+    jmp $b5ff
+.endmacro
+
+; (Note that in the CustomTexts list east dialog is offset by 52)
+.macro JumpToDialogFromEastTable index
+    ldx #4
+    ldy #index * 2
+    jmp $b5ff
+.endmacro
 
 .org MirrorWaterGetItem
     jmp MirrorOrWaterLocation
@@ -88,10 +102,19 @@ FREE_UNTIL $b4d3
 FREE_UNTIL $b4eb
 
 
+.reloc
+ShowAlreadyHaveItemDialog:
+    inc $048c ; removes the flashing
+    JumpToDialogFromWestTable ALREADY_HAVE_ITEM_DIALOG_WEST_INDEX
+
 .if _CHECK_WIZARD_MAGIC_CONTAINER
 .reloc
 WizardMagicContainerRequirement:
     .byte $01,$02,$03,$04,$05,$06,$07,$08
+
+.reloc
+ShowNotEnoughContainersDialog:
+    JumpToDialogFromEastTable NOT_ENOUGH_CONTAINERS_DIALOG_EAST_INDEX
 .endif
 
 .if _DO_SPELL_SHUFFLE_WIZARD_UPDATE
@@ -114,7 +137,9 @@ CheckIfWeAlreadyHaveItemForTown:
 .if _CHECK_WIZARD_MAGIC_CONTAINER
         lda $0783
         cmp WizardMagicContainerRequirement,y
-        bcc @EarlyExit
+        bcs @EnoughContainers
+        jmp ShowNotEnoughContainersDialog
+@EnoughContainers:
 .endif
         ; Earning the item so move the dialog to the next state
         inc $05
@@ -124,10 +149,34 @@ CheckIfWeAlreadyHaveItemForTown:
         lda TownToItemTable,y
         jmp GetItemDontKillEnemy
 @AlreadyHaveItem:
-    inc $048c ; Use the 'Already have item' dialog
-@EarlyExit:
-    jmp DialogConditionsDefault
+    jmp ShowAlreadyHaveItemDialog
     FREE_UNTIL $b54e
+
+.else # not _DO_SPELL_SHUFFLE_WIZARD_UPDATE
+
+.if _CHECK_WIZARD_MAGIC_CONTAINER
+.org $b526
+    lda $0783
+    jsr CheckMagicContainersOld
+    nop
+.reloc
+CheckMagicContainersOld:
+    cmp $01
+    bcc @NotEnoughContainersOld
+    rts
+@NotEnoughContainersOld:
+    pla ; pop subroutine calling pointer from the stack as we dont want to return
+    pla
+    jmp ShowNotEnoughContainersDialog
+
+.else # not _CHECK_WIZARD_MAGIC_CONTAINER
+.org $b51f
+    ; skip over and free magic container check
+    beq $b52d
+    inc $048c
+    bne $b52d ; always jumps
+    FREE_UNTIL $b52d
+.endif
 .endif
 
 .reloc
@@ -184,21 +233,12 @@ TownToItemTable:
     .byte $16       ; Use the original Old Kasuto "sign" hint text that we moved
 
 
-.segment "PRG7"
-
-; Patch GetItem to add stat tracking
-.import CheckAddItemTimestamp
-.org GetItem
-    jsr CheckAddItemTimestamp
-
 .reloc
 ; Check first if we've already gotten this item from a custom location before
 ; we call the get item for this spot
 AlreadyHaveItemAtLocationExit:
     pla
-    inc $05 ; Chooses which dialog table to use (ie: which dialog state you are in)
-    inc $048c ; Changes which "person" you are, affects the offset
-    jmp DialogConditionsDefault
+    jmp ShowAlreadyHaveItemDialog
 CheckGetItemCustomLocationMisc:
     ; Y contains the location id 0 - 4
     ; A contains the new item id
@@ -217,6 +257,14 @@ GetItemDontKillEnemy:
     dec DontKillEnemyFlag
     jsr GetItem
     jmp DialogConditionsDefault
+
+
+.segment "PRG7"
+
+; Patch GetItem to add stat tracking
+.import CheckAddItemTimestamp
+.org GetItem
+    jsr CheckAddItemTimestamp
 
 ; Patch the return calls for the item get and only clear the enemy if the flag isn't set
 .org $e797

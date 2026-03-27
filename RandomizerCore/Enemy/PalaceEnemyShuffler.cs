@@ -50,108 +50,6 @@ public class PalaceEnemyShuffler
             }
             return cachedResult.Value;
         }
-        bool PositionKingBot(ref bool? cachedResult, Enemy<T> enemy)
-        {
-            // Vanilla King Bot positions for reference:
-            // GP Map 37 at y == 1 where floor is at y == 8
-            // GP Map 48 at y == 3 where floor is at y == 11
-
-            // Do our best to position King Bots high up, so they are unlikely to
-            // spawn inside the player's position.  y==3 is the preferred spot unless
-            // the floor is high, as there is also the risk of having the King Bot
-            // spawn in your position when you are Fairying over a room.
-            // (Enemies in Zelda II cannot be positioned at y == 0 or y == 2.)
-
-            // We also check that we don't elevator or drop straight into a King Bot.
-
-            // Unless we find a 3x6 empty area here we will not spawn a King Bot.
-            if (cachedResult == null)
-            {
-                if (room.ElevatorScreen != -1)
-                {
-                    var elevatorXPos = (room.ElevatorScreen * 16) + 7;
-                    if (elevatorXPos - 3 <= enemy.X && elevatorXPos + 2 >= enemy.X)
-                    {
-                        cachedResult = false;
-                        return false;
-                    }
-                }
-                if (room.IsDropZone)
-                {
-                    if (14 <= enemy.X && 48 >= enemy.X)
-                    {
-                        cachedResult = false;
-                        return false;
-                    }
-                }
-                var solidGrid = GetSolidGrid<GreatPalaceObject>();
-
-                int newY = 0;
-                foreach (int j in new int[] { 3, 4, 1, 5 })
-                {
-                    if (SolidGridHelper.AreaIsOpen(solidGrid, enemy.X, j, 3, 6))
-                    {
-                        newY = j;
-                        break;
-                    }
-                }
-                if (newY != 0)
-                {
-                    enemy.Y = newY;
-                    cachedResult = true;
-                }
-                else
-                {
-                    cachedResult = false;
-                }
-            }
-            return cachedResult.Value;
-        }
-
-        bool PositionDoomknocker(ref bool? cachedResult, Enemy<T> enemy)
-        {
-            // We want to avoid putting Doomknockers where there are low
-            // ceilings. You need a 4 high open space to jump over his maces.
-            // Basically, we're gonna check that there are 4x4 open tiles on
-            // both sides of the Doomknocker. He might be in a staircase or
-            // similar, so it doesn't have to be symmetrical.
-            if (cachedResult == null)
-            {
-                var solidGrid = GetSolidGrid<PalaceObject>();
-                var floorY = SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 2);
-                int leftX = Math.Max(0, enemy.X - 4);
-                int upperY = Math.Max(0, floorY - 4);
-                int height = Math.Min(4, floorY + 1); // require less space if we're at the top of the screen
-                bool acceptableSpace = false;
-                for (int j = upperY; j <= upperY + 4; j++)
-                {
-                    if (SolidGridHelper.AreaIsOpen(solidGrid, leftX, j, 4, height))
-                    {
-                        acceptableSpace = true;
-                        break;
-                    }
-                }
-                if (acceptableSpace)
-                {
-                    acceptableSpace = false;
-                    int rightX = enemy.X + 1;
-                    for (int j = upperY; j <= upperY + 4; j++)
-                    {
-                        if (SolidGridHelper.AreaIsOpen(solidGrid, rightX, j, 4, height))
-                        {
-                            acceptableSpace = true;
-                            break;
-                        }
-                    }
-                    if (acceptableSpace)
-                    {
-                        enemy.Y = floorY;
-                    }
-                }
-                cachedResult = acceptableSpace;
-            }
-            return cachedResult.Value;
-        }
 
         T RerollLargeEnemyIfNeeded(Enemy<T> enemy, T swapToId)
         {
@@ -194,7 +92,7 @@ public class PalaceEnemyShuffler
                         case EnemiesPalace346.DOOMKNOCKER:
                             // Not caring about vanilla enemy positioning here because
                             // those rooms were not made to be entered from both directions
-                            reroll = !PositionDoomknocker(ref roomForDoomknocker, enemy);
+                            reroll = !PositionDoomknocker(ref roomForDoomknocker, ref enemy, GetSolidGrid<PalaceObject>());
                             break;
                     }
 
@@ -242,7 +140,7 @@ public class PalaceEnemyShuffler
                             break;
 
                         case EnemiesGreatPalace.KING_BOT:
-                            reroll = !PositionKingBot(ref roomForKingBot, enemy); // updates enemy position on success
+                            reroll = !PositionKingBot(ref roomForKingBot, ref enemy, room, GetSolidGrid<GreatPalaceObject>()); // updates enemy position on success
                             break;
                     }
 
@@ -323,5 +221,114 @@ public class PalaceEnemyShuffler
             }
         }
         return ee.Finalize();
+    }
+
+    private static bool PositionDoomknocker<T>(ref bool? cachedResult, ref Enemy<T> enemy, bool[,] solidGrid) where T : Enum
+    {
+        if (cachedResult == null)
+        {
+            cachedResult = PositionDoomknocker(ref enemy, solidGrid);
+        }
+        return cachedResult.Value;
+    }
+
+    public static bool PositionDoomknocker<T>(ref Enemy<T> enemy, bool[,] solidGrid) where T : Enum
+    {
+        // We want to avoid putting Doomknockers where there are low
+        // ceilings. You need a 4 high open space to jump over his maces.
+        // Basically, we're gonna check that there are 4x4 open tiles on
+        // both sides of the Doomknocker. He might be in a staircase or
+        // similar, so it doesn't have to be symmetrical.
+        var floorY = SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 2);
+        int leftX = Math.Max(0, enemy.X - 4);
+        int upperY = Math.Max(0, floorY - 4);
+        int height = Math.Min(4, floorY + 1); // require less space if we're at the top of the screen
+        bool acceptableSpace = false;
+        for (int j = upperY; j <= upperY + 4; j++)
+        {
+            if (SolidGridHelper.AreaIsOpen(solidGrid, leftX, j, 4, height))
+            {
+                acceptableSpace = true;
+                break;
+            }
+        }
+        if (acceptableSpace)
+        {
+            acceptableSpace = false;
+            int rightX = enemy.X + 1;
+            for (int j = upperY; j <= upperY + 4; j++)
+            {
+                if (SolidGridHelper.AreaIsOpen(solidGrid, rightX, j, 4, height))
+                {
+                    acceptableSpace = true;
+                    break;
+                }
+            }
+            if (acceptableSpace)
+            {
+                enemy.Y = floorY;
+            }
+        }
+        return acceptableSpace;
+    }
+
+    private static bool PositionKingBot<T>(ref bool? cachedResult, ref Enemy<T> enemy, Room room, bool[,] solidGrid) where T : Enum
+    {
+        if (cachedResult == null)
+        {
+            cachedResult = PositionKingBot(ref enemy, room, solidGrid);
+        }
+        return cachedResult.Value;
+    }
+
+    public static bool PositionKingBot<T>(ref Enemy<T> enemy, Room room, bool[,] solidGrid) where T : Enum
+    {
+        // Vanilla King Bot positions for reference:
+        // GP Map 37 at y == 1 where floor is at y == 8
+        // GP Map 48 at y == 3 where floor is at y == 11
+
+        // Do our best to position King Bots high up, so they are unlikely to
+        // spawn inside the player's position.  y==3 is the preferred spot unless
+        // the floor is high, as there is also the risk of having the King Bot
+        // spawn in your position when you are Fairying over a room.
+        // (Enemies in Zelda II cannot be positioned at y == 0 or y == 2.)
+
+        // We also check that we don't elevator or drop straight into a King Bot.
+
+        // Unless we find a 3x6 empty area here we will not spawn a King Bot.
+        if (room.ElevatorScreen != -1)
+        {
+            var elevatorXPos = (room.ElevatorScreen * 16) + 7;
+            if (elevatorXPos - 3 <= enemy.X && elevatorXPos + 2 >= enemy.X)
+            {
+                return false;
+            }
+        }
+        if (room.IsDropZone)
+        {
+            if (14 <= enemy.X && 48 >= enemy.X)
+            {
+                return false;
+            }
+        }
+
+        int newY = 0;
+        foreach (int j in new int[] { 3, 4, 1, 5 })
+        {
+            if (SolidGridHelper.AreaIsOpen(solidGrid, enemy.X, j, 3, 6))
+            {
+                newY = j;
+                break;
+            }
+        }
+        if (newY != 0)
+        {
+            enemy.Y = newY;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

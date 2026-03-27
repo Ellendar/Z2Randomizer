@@ -45,6 +45,7 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
             h => Config.PropertyChanged -= h)
             .Where(e => e.EventArgs.PropertyName == "Flags")
             .Select(_ => Unit.Default)
+            .StartWith(Unit.Default)
             .Replay(1)
             .RefCount();
 

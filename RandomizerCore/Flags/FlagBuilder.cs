@@ -113,7 +113,7 @@ public class FlagBuilder
             throw new ArgumentException("Value is greater than extent in FlagBuilder.Append(int, int)");
         }
 
-        BitArray argBits = new BitArray([value]);
+        BitArray argBits = new([value]);
         for (int i = BitOperations.Log2((uint)extent - 1); i >= 0; i--)
         {
             bits.Add(argBits[i]);

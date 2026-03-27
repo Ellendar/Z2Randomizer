@@ -56,7 +56,7 @@ public abstract class World
 
     private const int MINIMUM_BRIDGE_LENGTH = 2;
 
-    protected readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new Requirements([RequirementType.FAIRY, RequirementType.KEY]);
+    public static readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new Requirements([RequirementType.FAIRY, RequirementType.KEY]);
 
     private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
     {

@@ -133,22 +133,29 @@ public sealed class WestHyrule : World
         //Towns
         locationAtRauru = GetLocationByMem(RomMap.WEST_TOWN_RAURO_TILE_LOCATION);
         locationAtRauru.Collectables = [Collectable.SHIELD_SPELL];
+        locationAtRauru.CollectableRequirements = props.DisableMagicRecs ? Requirements.NONE : new Requirements([RequirementType.ONE_CONTAINER]);
 
         locationAtRuto = GetLocationByMem(RomMap.WEST_TOWN_RUTO_TILE_LOCATION); //0x465e
         locationAtRuto.Collectables = [Collectable.JUMP_SPELL];
-        locationAtRuto.CollectableRequirements = new Requirements([RequirementType.TROPHY]);
+        locationAtRuto.CollectableRequirements = props.DisableMagicRecs ?
+            new Requirements([RequirementType.TROPHY])
+            : new Requirements([], [[RequirementType.TROPHY, RequirementType.TWO_CONTAINERS]]);
 
         locationAtSariaNorth = GetLocationByMem(RomMap.WEST_TOWN_SARIA_NORTH_TILE_LOCATION); //0x00004660
         locationAtSariaNorth.Collectables = [Collectable.LIFE_SPELL];
         locationAtSariaNorth.ConnectionRequirements = new Requirements([RequirementType.FAIRY, RequirementType.BAGU_LETTER], [[RequirementType.JUMP, RequirementType.DASH]]);
-        locationAtSariaNorth.CollectableRequirements = new Requirements([RequirementType.MIRROR]);
+        locationAtSariaNorth.CollectableRequirements = props.DisableMagicRecs ?
+            new Requirements([RequirementType.MIRROR])
+            : new Requirements([], [[RequirementType.MIRROR, RequirementType.THREE_CONTAINERS]]);
 
         locationAtSariaSouth = GetLocationByMem(RomMap.WEST_TOWN_SARIA_SOUTH_TILE_LOCATION); //0x0000465f
         locationAtSariaSouth.ConnectionRequirements = locationAtSariaNorth.ConnectionRequirements;
 
         locationAtMido = GetLocationByMem(RomMap.WEST_TOWN_MIDO_TILE_LOCATION); //0x00004662
         locationAtMido.Collectables = [Collectable.FAIRY_SPELL];
-        locationAtMido.CollectableRequirements = new Requirements([RequirementType.MEDICINE]);
+        locationAtMido.CollectableRequirements = props.DisableMagicRecs ?
+            new Requirements([RequirementType.MEDICINE])
+            : new Requirements([], [[RequirementType.MEDICINE, RequirementType.FOUR_CONTAINERS]]);
 
         //Palaces
         locationAtPalace1 = GetLocationByMem(RomMap.WEST_PALACE1_TILE_LOCATION);

@@ -10593,6 +10593,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10619,6 +10620,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10645,6 +10647,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10671,6 +10674,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -13958,7 +13962,7 @@
     "connections": "27FCFC2C",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "0B009924D92B190D860246",
+    "enemies": "07009924D92B19",
     "group": "V5_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -13980,7 +13984,7 @@
       "FAIRY"
     ],
     "tags": ["Expert"],
-    "sideviewData": "5D600310602570221183D2009109F21F506B26008009A0C2664061511184A140F11F6053B2424230503060423139A2406143520F00A2406142F11F41305030B04261531184A34061516240516B25008009A0C2F115662211839009D205"
+    "sideviewData": "5960041060251183D2009109F215506B2600700990C1F11F654061511184A1406153B242429060423139F21FA0406143520F00A24061424290B04261531184A3406151F2156040516B2500700990C1F115662211839009D205"
   },
   {
     "author": "valence",
@@ -14824,7 +14828,7 @@
     "connections": "3FFFFF44",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "097E0E0D2302630F0F",
+    "enemies": "070D2302630F0F",
     "group": "V5_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -15540,7 +15544,7 @@
     "connections": "93FCFCAC",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "0D4D835783349E6D1923042652",
+    "enemies": "0B449E67836D1913041652",
     "group": "V5_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -15556,11 +15560,9 @@
     "name": "island adventure collapsed hall",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-      "GLOVE"
-    ],
+    "requirements": ["GLOVE"],
     "suppressWarning": ["EnemyTooCloseToEntrance"],
-    "sideviewData": "36600E0803D5D1F073C2A020F115906576C2A0206875D20E4073A831929D611A701A511880306136709173948531A331A3306277D6F0"
+    "sideviewData": "34600D08A02903D4D1F074C2F117906778C2A02ED50D00D4AA2F923BD10B50218132623470307292D20D81309430A12F0AD4D1F0"
   },
   {
     "author": "miralupa",
@@ -15685,7 +15687,7 @@
     "linkedRoomName": null,
     "map": 24,
     "memoryAddress": 70345,
-    "name": "z2oot spirit temple ship room",
+    "name": "z2oot shadow temple ship room",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
@@ -16625,7 +16627,7 @@
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Updated left dead end drop zone (aaron jam 4_4 P5_M45)",
-    "author": "aaron2u2 / initsu",
+    "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
     "enabled": true,
@@ -16979,7 +16981,7 @@
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Updated right dead end drop zone (aaron jam 4_4 P5_M59)",
-    "author": "aaron2u2 / initsu",
+    "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
     "enabled": true,
@@ -18114,7 +18116,7 @@
     "sideviewData": "34600510D500F01F5062546254625462F41F5062546254625463D4051071F25000F11271D200F01F5063556254625462F310D105",
     "hasBoss": false,
     "isBossRoom": false,
-    "name": "aaron jam 4_4 P4_M29 v2 (5)",
+    "name": "aaron's 4-way Lava Elevator Room of Bubbles and Death",
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
@@ -18225,7 +18227,7 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
@@ -20028,7 +20030,7 @@
     "isUpDownReversed": false
   },
   {
-    "name": "z2oot fire temple block building room",
+    "name": "Chadbert's folly (z2oot fire temple block building room)",
     "group": "V5_0",
     "map": 45,
     "enabled": true,

@@ -44,6 +44,9 @@ FREE "PRG2" [$93c9, $9400)
 FREE "PRG2" [$9f85, $a000)
 FREE "PRG2" [$a933, $b480)
 
+;FREE "PRG3" [$8bb1, $90f0]
+;FREE "PRG3" [$9134, $9400]
+;FREE "PRG3" [$9d0a, $a000]
 FREE "PRG3" [$B803, $c000)
 
 FREE "PRG4" [$83DC, $8470)

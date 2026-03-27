@@ -67,9 +67,9 @@
         <StackPanel Grid.Column="1" Orientation="Vertical">
             <TextBlock>Sprite Preview</TextBlock>
             <Image MaxHeight="200"
-                   Source="{Binding Path=Sprite.Preview, FallbackValue=''}"
+                   Source="{Binding Path=Sprite?.Preview}"
                    RenderOptions.BitmapInterpolationMode="None" />
-            <TextBlock Text="{Binding Sprite.Credit, FallbackValue='LOAD ROM FOR SPRITES'}" />
+            <TextBlock Text="{Binding Sprite?.Credit, FallbackValue='LOAD ROM FOR SPRITES'}" />
         </StackPanel>
     </Grid>
 </UserControl>

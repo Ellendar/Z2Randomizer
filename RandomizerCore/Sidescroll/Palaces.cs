@@ -104,17 +104,17 @@ public class Palaces
 
             if (palace.PalaceGroup == PalaceGrouping.Palace125)
             {
-                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize);
+                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize, props.RemoveTbird);
             }
             
             if (palace.PalaceGroup == PalaceGrouping.Palace346)
             {
-                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize);
+                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize, props.RemoveTbird);
             }
             
             if (palace.PalaceGroup == PalaceGrouping.PalaceGp)
             {
-                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize);
+                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize, props.RemoveTbird);
             }
             palace.AllRooms.ForEach(i => i.PalaceNumber = currentPalace);
             palace.ValidateRoomConnections();
