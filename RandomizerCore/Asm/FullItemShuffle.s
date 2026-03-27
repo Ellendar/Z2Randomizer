@@ -167,7 +167,7 @@ CheckMagicContainersOld:
 @NotEnoughContainersOld:
     pla ; pop subroutine calling pointer from the stack as we dont want to return
     pla
-    jmp SetupNotEnoughContainersText
+    jmp ShowNotEnoughContainersDialog
 
 .else # not _CHECK_WIZARD_MAGIC_CONTAINER
 .org $b51f
