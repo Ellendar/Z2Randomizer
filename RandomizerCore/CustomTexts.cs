@@ -1,11 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using DynamicData.Kernel;
 using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.RandomizerCore;
+
+// Gradually add indexes here as needed. I think in the end we will probably have two Text lists as well.
+public enum DialogWest
+{
+    ALREADY_HAVE_ITEM = 16,
+}
+
+// In the CustomTexts constants, the east indexes are +52. This enum however, uses the indexes the assembly uses.
+public enum DialogEast
+{
+    NOT_ENOUGH_CONTAINERS = 17,
+    ALREADY_HAVE_ITEM = 19,                // not used if spells are in the pool
+    OLD_KASUTO_NOT_ENOUGH_CONTAINERS = 43, // not used if spells are in the pool
+}
 
 public class CustomTexts
 {
@@ -68,6 +82,7 @@ public class CustomTexts
         {Town.OLD_KASUTO, 94},
     };
 
+    public const int WEST_TEXT_COUNT = 52;
     private const int MAX_TEXT_LENGTH = 3134;
     private const int numberOfTextEntries = 98;
     //TODO: This should just be a listing of every text index by continent, but for now it's a pile.
@@ -281,6 +296,12 @@ public class CustomTexts
         "Hookshot$is in$moon$palace"
     ];
 
+    public static readonly string[] ALREADY_HAVE_ITEM_TEXTS =
+    [
+        "sorry,$an impostor$was here$earlier and$took it",
+        "what more$do you want$from me?",
+    ];
+
     public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXT =
     [
         "all signs$point to$no",
@@ -291,7 +312,7 @@ public class CustomTexts
         "The magic$class did$not help$you enough",
         "Show me$your$credits!",
         "I cannot$contain$my laughter",
-        "You must$construct$addtional$pylons",
+        "You must$construct$additional$pylons",
         "bet you$forgot$this flag$was on",
         "I'll tell$you when$you're$older"
     ];
@@ -376,6 +397,35 @@ public class CustomTexts
         "I summon$%%$in attack$position!"
     ];
 
+    public List<Text> Texts { get; private set; }
+
+    public Text GetText(DialogWest index)
+    {
+        return Texts[(int)index];
+    }
+    public void SetText(DialogWest index, Text text)
+    {
+        Texts[(int)index] = text;
+    }
+    public Text GetText(DialogEast index)
+    {
+        return Texts[(int)index + WEST_TEXT_COUNT];
+    }
+    public void SetText(DialogEast index, Text text)
+    {
+        Texts[(int)index + WEST_TEXT_COUNT] = text;
+    }
+
+    public CustomTexts(ROM rom)
+    {
+        Texts = rom.GetGameText();
+    }
+
+    public CustomTexts(List<Text> texts)
+    {
+        Texts = texts;
+    }
+
     public static List<Text> GenerateTexts(
         IEnumerable<Location> locations,
         IEnumerable<Location> itemLocations,
@@ -383,6 +433,12 @@ public class CustomTexts
         RandomizerProperties props,
         Random hashRNG)
     {
+        DebugValidateTexts();
+
+        // This will use the `texts` list internally. A compromise because I shouldn't refactor this entire class at the moment,
+        // and I can still use proper east indexes.
+        CustomTexts customTexts = new(texts);
+
         // Make a new RNG for community text so that it doesn't affect the final hash.
         var nonhashRNG = new Random(hashRNG.Next());
         do
@@ -460,13 +516,14 @@ public class CustomTexts
 
             if (props.UseCommunityText)
             {
-                //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when you don't have
-                //enough magic containers and container requirements are on.
-                texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!);
+                //Generate replacements for "I CANNOT HELP YOU ANYMORE. GO NOW."
+                customTexts.SetText(DialogWest.ALREADY_HAVE_ITEM, new Text(ALREADY_HAVE_ITEM_TEXTS.Sample(nonhashRNG)!));
+                customTexts.SetText(DialogEast.ALREADY_HAVE_ITEM, new Text(ALREADY_HAVE_ITEM_TEXTS.Sample(nonhashRNG)!));
+                //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when
+                //you don't have enough magic containers and container requirements are on.
+                customTexts.SetText(DialogEast.NOT_ENOUGH_CONTAINERS, new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!));
             }
-            //Old kasuto guy has a different vanilla not enough containers message
-            //It should be the same, even when community text is off;
-            texts[95] = texts[17];
+            customTexts.SetText(DialogEast.OLD_KASUTO_NOT_ENOUGH_CONTAINERS, customTexts.GetText(DialogEast.NOT_ENOUGH_CONTAINERS));
 
             if (props.TownNameHints)
             {
@@ -476,6 +533,7 @@ public class CustomTexts
 
         return texts;
     }
+
     private static Text GenerateBaguWoodsHint(Location bagu)
     {
         int baguy = bagu.Y;
@@ -538,7 +596,7 @@ public class CustomTexts
             texts[TOWN_SIGN_INDEXES[(Town)location.ActualTown!]] = GenerateTownSignHint(location.Collectables[0], linkedFire);
         }
     }
-    public static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
+    private static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
     {
         string text = spell.EnglishText();
         if(spell == Collectable.FIRE_SPELL && linkedFire)
@@ -549,7 +607,7 @@ public class CustomTexts
         return new Text(text);
     }
 
-    public static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText)
+    private static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText)
     {
         if(location.ActualTown == null)
         {
@@ -906,5 +964,31 @@ public class CustomTexts
             }
         }
         return sum;
+    }
+
+    /// Make sure all strings are max 11x6
+    [Conditional("DEBUG")]
+    private static void DebugValidateTexts()
+    {
+        List<string> allTexts = [
+            .. GENERIC_WIZARD_TEXTS,
+            .. RIVER_MAN_TEXTS,
+            .. BAGU_TEXTS,
+            .. DOWNSTAB_TEXTS,
+            .. UPSTAB_TEXTS,
+            .. KNOW_NOTHING_TEXTS,
+            .. ALREADY_HAVE_ITEM_TEXTS,
+            .. NOT_ENOUGH_CONTAINERS_TEXT,
+            .. COMMUNITY_NONSPELL_GET_TEXT,
+
+            .. WIZARD_SPELL_TEXTS_BY_TOWN.SelectMany(ls => ls.Value),
+            .. WIZARD_SPELL_TEXTS_BY_COLLECTABLE.SelectMany(ls => ls.Value),
+        ];
+
+        foreach (var s in allTexts)
+        {
+            var text = new Text(s);
+            Debug.Assert(text.ValidateDialogText());
+        }
     }
 }

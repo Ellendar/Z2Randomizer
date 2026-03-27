@@ -3204,25 +3204,17 @@ CustomFileSelectData:
         {
             a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectables[0]);
         }
+        foreach (var val in Enum.GetValues<DialogWest>())
+        {
+            a.Set($"{val.ToString()}_DIALOG_WEST_INDEX", (int)val);
+        }
+        foreach (var val in Enum.GetValues<DialogEast>())
+        {
+            a.Set($"{val.ToString()}_DIALOG_EAST_INDEX", (int)val);
+        }
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
         a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", props.IncludeSpellsInShuffle ? 1 : 0);
-        if (!props.DisableMagicRecs)
-        {
-            byte[] bytes = [.. ROM.StringToZ2Bytes("COME BACK\nWHEN YOU\nARE READY."), 0xff];
-            a.Segment("PRG3");
-            a.Reloc();
-            a.Label("NotEnoughContainersText");
-            a.Byt(bytes);
-        }
-        if (props.IncludeSpellsInShuffle)
-        {
-            byte[] bytes = [.. ROM.StringToZ2Bytes("I CANNOT\nHELP YOU\nANYMORE.\nGO NOW."), 0xff];
-            a.Segment("PRG3");
-            a.Reloc();
-            a.Label("AlreadyHaveItemText");
-            a.Byt(bytes);
-        }
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     
@@ -3570,14 +3562,14 @@ EndTileComparisons = $8601
         a.Reloc();
         a.Label("Towns_in_West_Hyrule");
         // There are 52 texts in this first table
-        for (var i = 0; i < 52; i++) {
+        for (var i = 0; i < CustomTexts.WEST_TEXT_COUNT; i++) {
             var hint = hints[i];
             a.Word(a.Symbol($"HintText{i}"));
         }
         // and the rest are in this table
         a.Reloc();
         a.Label("Towns_in_East_Hyrule");
-        for (var i = 52; i < hints.Count; i++) {
+        for (var i = CustomTexts.WEST_TEXT_COUNT; i < hints.Count; i++) {
             var hint = hints[i];
             a.Word(a.Symbol($"HintText{i}"));
         }
