@@ -31,6 +31,8 @@ public class CustomTexts
     private const int errorTextIndex1 = 25; // Error inside house on 1st screen in Ruto, 1st message
     private const int errorTextIndex2 = 26; // Error 2nd message
 
+    private const int SariaGreeterNpc = 28;
+
     private const int talkingBotIndexSleeping = 49; // Sleeping Bot in Saria inside house on 2nd screen, Zzz... message the first 3 talks
     private const int talkingBotIndexTalking = 50; // Sleeping Bot final message
 
@@ -55,6 +57,10 @@ public class CustomTexts
     private static readonly int[] movingNabooru = [61, 60];
     private static readonly int[] daruniaMoving = [72, 75];
     private static readonly int[] newkasutoMoving = [88, 89];
+
+    private static readonly List<int> kidHintNpcs = [12, 73, 77];
+    private static readonly List<int> outsideHintNpcs = [18, 28, 32, 64, 73, 83];
+
 
     private static readonly Collectable[] smallItems = [
         Collectable.BLUE_JAR,
@@ -288,9 +294,6 @@ public class CustomTexts
         "your$call is$important$please hold",
         "silence$is golden",
         "Bless you",
-        "Hola!",
-        "I am not$a vire$in$disguise",
-        "Woah!$Dude!",
         "PAY ME$AND I'LL$TALK",
         "the hint$is in$another$castle",
         "did you$check the$old kasuto$hint?",
@@ -303,8 +306,50 @@ public class CustomTexts
         "Password$is$Ken$sent me",
         "Why$are we$always$yelling?",
         "Rebo-shark$doot doot$doot doot$doot doot",
-        "Im trying$my best to$not turn$into an$ache",
         "If I knew$something,$I would$tell you"
+    ];
+
+    public static readonly string[] KNOW_NOTHING_OUTSIDE_TEXTS =
+    [
+        .. KNOW_NOTHING_TEXTS,
+        "I am not$a vire$in$disguise",
+        "Im trying$my best to$not turn$into an$ache",
+    ];
+
+    public static readonly string[] KNOW_NOTHING_KID_TEXTS =
+    [
+        .. KNOW_NOTHING_TEXTS,
+        "They call$me the$hintless$kid",
+    ];
+
+    public static readonly string[] KNOW_NOTHING_SARIA_GREETER_TEXTS =
+    [
+        .. KNOW_NOTHING_OUTSIDE_TEXTS,
+        "Whats the$deal with$pots?  You$Break them$and no one$notices!",
+        "Whats the$deal with$lava?$Jump in,$refill MP,$no problem!",
+    ];
+
+    public static readonly string[] MOVING_NPC_TEXTS =
+    [
+        "I Know$Nothing",
+        "Knowledge$Is Not$Mine",
+        "Nothing$Know I",
+        "Try To$Get A$Guide",
+        "What$timeline$is this?",
+        "Bless you",
+        "Hola!",
+        "I am not$a vire$in$disguise",
+        "Woah!$Dude!",
+        "Ness is$homesick",
+        "Hi!$Billy Mays$here",
+        "I like$turtles",
+        "I hear$3D Zeldas$Have$SIX stabs",
+        "I CANT TELL$YA HOW$NOTHING$I KNOW",
+        "Password$is$Ken$sent me",
+        "Why$are we$always$yelling?",
+        "Im trying$my best to$not turn$into an$ache",
+        "If I knew$something,$I would$tell you",
+        "Im running$a swordless$seed",
     ];
 
     public static readonly string[] ALREADY_HAVE_ITEM_TEXTS =
@@ -732,32 +777,45 @@ public class CustomTexts
             int textIndex = stationary[i];
             if (!placedIndexes.Contains(textIndex))
             {
-                if (textIndex == 12)
+                Text hint;
+                if (useCommunityText)
                 {
-                    hints[textIndex] = new Text("I am just$a kid"); // default new line for kid in Rauro (for testing purposes)
-                }
-                else if (textIndex == 77)
-                {
-                    hints[textIndex] = new Text("Who were$you$expecting?"); // default line for new purple kid in Darunia (for testing purposes)
+                    if (kidHintNpcs.Contains(textIndex))
+                    {
+                        hint = new Text(KNOW_NOTHING_KID_TEXTS.Sample(r)!);
+                    }
+                    else if (textIndex == SariaGreeterNpc)
+                    {
+                        hint = new Text(KNOW_NOTHING_SARIA_GREETER_TEXTS.Sample(r)!);
+                    }
+                    else if (outsideHintNpcs.Contains(textIndex))
+                    {
+                        hint = new Text(KNOW_NOTHING_OUTSIDE_TEXTS.Sample(r)!);
+                    }
+                    else
+                    {
+                        hint = new Text(KNOW_NOTHING_TEXTS.Sample(r)!);
+                    }
                 }
                 else
                 {
-                    hints[textIndex] = useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
-                    if (textIndex == talkingAcheIndexTalking)
-                    {
-                        hints[talkingAcheIndexSleeping] = hints[textIndex];
-                    }
-                    else if (textIndex == talkingBotIndexTalking)
-                    {
-                        hints[talkingBotIndexSleeping] = hints[textIndex];
-                    }
+                    hint = defaultKnowNothing;
+                }
+                hints[textIndex] = hint;
+                if (textIndex == talkingAcheIndexTalking)
+                {
+                    hints[talkingAcheIndexSleeping] = hint;
+                }
+                else if (textIndex == talkingBotIndexTalking)
+                {
+                    hints[talkingBotIndexSleeping] = hint;
                 }
             }
         }
 
         for (int i = 0; i < moving.Count; i++)
         {
-            hints[moving[i]] =  useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
+            hints[moving[i]] =  useCommunityText ? new Text(MOVING_NPC_TEXTS.Sample(r)!) : defaultKnowNothing;
         }
     }
 
@@ -998,6 +1056,10 @@ public class CustomTexts
             .. DOWNSTAB_TEXTS,
             .. UPSTAB_TEXTS,
             .. KNOW_NOTHING_TEXTS,
+            .. KNOW_NOTHING_OUTSIDE_TEXTS,
+            .. KNOW_NOTHING_KID_TEXTS,
+            .. KNOW_NOTHING_SARIA_GREETER_TEXTS,
+            .. MOVING_NPC_TEXTS,
             .. ALREADY_HAVE_ITEM_TEXTS,
             .. NOT_ENOUGH_CONTAINERS_TEXT,
             .. COMMUNITY_NONSPELL_GET_TEXT,
