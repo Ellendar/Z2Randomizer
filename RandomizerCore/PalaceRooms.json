@@ -18242,6 +18242,7 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["Expert"],
     "suppressWarning": ["SingleFallingBlock"],
     "isDropZone": false,
     "hasItem": false,
