@@ -254,7 +254,8 @@ public class CustomTexts
         "Tiger$Uppercut!",
         "Never$gonna let$you down",
         "Thanks$for not$skipping$me",
-        "The$Opportunity$Arises"
+        "The$Opportunity$Arises",
+        "When you$up, press$jump to$stab"
     ];
 
     public static readonly string[] KNOW_NOTHING_TEXTS =
@@ -278,7 +279,17 @@ public class CustomTexts
         "PAY ME$AND I'LL$TALK",
         "the hint$is in$another$castle",
         "did you$check the$old kasuto$hint?",
-        "Hookshot$is in$moon$palace"
+        "Hookshot$is in$moon$palace",
+        "Ness is$homesick",
+        "Hi!$Billy Mays$here",
+        "I like$turtles",
+        "I hear$3D Zeldas$Have$SIX stabs",
+        "I CANT TELL$YA HOW$NOTHING$I KNOW",
+        "Password$is$Ken$sent me",
+        "Why$are we$always$yelling?",
+        "Rebo-shark$doot doot$doot doot$doot doot",
+        "Im trying$my best to$not turn$into an$ache",
+        "If I knew$something,$I would$tell you"
     ];
 
     public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXT =
@@ -303,7 +314,7 @@ public class CustomTexts
         { Town.SARIA_NORTH, ["Water$you$doing?"] },
         { Town.MIDO_WEST, [] },
         { Town.MIDO_CHURCH, [] },
-        { Town.NABOORU, [] },
+        { Town.NABOORU, ["Do not$drink the$fountain$water here$...$trust me."] },
         { Town.DARUNIA_ROOF, [] },
         { Town.DARUNIA_WEST, ["You saved$a kid$for this?", "Dont$forget to$get upstab"] },
         { Town.NEW_KASUTO, [] },
@@ -319,7 +330,7 @@ public class CustomTexts
         { Collectable.FIRE_SPELL, ["this is$fine", "use this$to burn$gems", "This spell$is$worthless", "Goodness$Gracious!", "This one$goes out$to the one$I love"]},
         { Collectable.DASH_SPELL, ["Rolling$around at$the speed$of sound", "Gotta$Go$Fast", "Use the$boost to$get through"]},
         { Collectable.REFLECT_SPELL, ["I am not$Mirror$Shield", "Crysta$was$here", "Youre$rubber,$Theyre$glue", "Send$Carock my$regards", "Is This$Hera$Basement?"]},
-        { Collectable.SPELL_SPELL, ["Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy"]},
+        { Collectable.SPELL_SPELL, ["Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy", "How do you$Spell$Spell$Spell"]},
         { Collectable.THUNDER_SPELL, ["With this$you can$now beat$the game", "Ultrazord$Power Up!", "Terrible$terrible$damage", "hes dead$jim"]},
         { Collectable.UPSTAB, UPSTAB_TEXTS },
         { Collectable.DOWNSTAB, DOWNSTAB_TEXTS }
@@ -373,7 +384,17 @@ public class CustomTexts
         "all you$need is$%%",
         "the secret$word is$%%",
         "have a$%%$on the$house",
-        "I summon$%%$in attack$position!"
+        "I summon$%%$in attack$position!",
+        "It puts the$%%$on its$skin",
+        "I can haz$%%",
+        "I know$this is$the$%%",
+        "Smells$like$%%$in here",
+        "Have this$%$But I will$ask a$favor of$you later",
+        "I knew it!$%%$is the one.",
+        "Zora has$%$cheaper$but this$saves on$shipping",
+        "%%$gon give$it to ya",
+        "Promise me$you will$use$%%$responsibly",
+        "Try using$%%$at your$next party",
     ];
 
     public static List<Text> GenerateTexts(
