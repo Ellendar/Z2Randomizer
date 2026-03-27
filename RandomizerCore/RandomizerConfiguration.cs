@@ -332,7 +332,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     private bool? includeVanillaRooms;
-    public bool includeVanillaRoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
@@ -356,7 +355,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool removeLongDeadEnds;
-    public bool removeLongDeadEndsIncluded() => palaceStylesAreNotAllVanilla() && includev5_0Rooms is not false;
+    public bool removeLongDeadEndsIncluded() => includev5_0RoomsIncluded() && includev5_0Rooms is not false;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
