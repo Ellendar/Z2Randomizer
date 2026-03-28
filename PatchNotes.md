@@ -1,5 +1,57 @@
 # Z2Randomizer Changelog
 
+## Version 5.1.0 - ???
+
+### New Features
+- New palace styles:
+	- Vanilla-Weighted: A variation on random walk that is weighted to be more likely to be similar dimensions to the vanilla palace. The minimum distance to the boss is on average about the same as the vanilla distance to the boss in that palace. It also has a check to prevent long paths that do not lead to either the boss or an item.
+	- Tower: Climb to the top of the tower to fight the boss and place the gem. Palace geometry is coordinate-based, but loops around the outside of the tower horizontally. Each level of the tower has the same number of rooms, except lower floors may have up to 1 extra room. Because the boss is always at the top, leaving the boss room will always exit regardless of the palace exit setting.
+	- Loopy: A variation of reconstructed where all the deadends are replaced by more loops. Like in reconstructed, the geometry does not make sense, and these loops can take you anywhere else in the palace. Loopy palaces do not have any drop rooms.
+- Added the ability to set/randomize starting magic containers (1-8)
+	- When "Disable Magic Container Requirements" is off, western wizards will require 1-4 containers based on their vanilla town order
+	- Casting Jump logically requires 2 magic containers
+	- All other spell requirements logically require 4 containers.
+	- If starting hearts, magic containers, and starting items are too few, there may not be enough minor items to replace. The randomizer will tell you and you'll need to edit your settings.
+- Added a selector for overworld size. 
+	- Smaller overworlds may remove some unimportant locations, but there will always be the normal amount of item checks/palaces/towns.
+- Shuffle sprite palettes no longer affects what is visible in the dark, and has been moved to the customize tab. This no longer affects the flags.
+- Climates can now be set per-continent
+- Added new options for enemy health randomization
+- Separated boss and normal HP shuffle options
+- Added new options for enemy XP reward randomization
+- Added new options for palace length.
+- Added a setting for whether drops should be able to connect to the boss/entrance/anywhere
+- Old Kasuto's hint is now always a real hint when helpful hints are enabled. This does not replace one of the existing hints.
+- Added new sprites
+	- Goriya
+	- Moblin
+	- Rambo
+	- Kirby
+	- Old Man
+	- Luigi
+
+### Improvements
+- Updated scale level requirements to be more accurate
+- Significantly improved overworld generation speed.
+- Fixed a large number of issues where climate/biome combinations didn't work well
+- Improved the connection behavior for islands/mountainous to work more consistently. This should reduce the number of islands seeds with immediate boot requirements.
+- Improved the placement of bridge/raft continent connectors.
+- Added a new sprite for linked fire spell. If fire spell is unlinked it still uses the old sprite.
+- Palaces now place their item rooms differently depending on style. Each should now be more representative of the palace's style.
+- Significantly reduced the number of drops in Random Walk.
+- Revised some 5.0 rooms based on community feedback.
+- Added a menu indicator when fire spell is linked.
+- "Vanilla shuffle uses actual terrain" is now the default behavior. The option to turn it off is renamed to "Legacy Vanilla Shuffled Locations".
+	
+### Bug Fixes
+- Sleepy hint givers now consistently give the same know nothing message on their sleeping and waking states.
+- Towns can no longer give hints for items in that town
+- Fixed even more bugs relating to hidden locations
+- River Devil / rocks can no longer block valley of death encounters/caves.
+- Restored the erroneously omitted P6 up elevator entrance.
+- Fixed several bugs in sequential palace style. This should result in the correct number of segmented or otherwise weird rooms appearing.
+- Old kasuto insufficient containers message is now the same as other towns when community text is off.
+
 ## Version 5.0.10 - February 06, 2026
 
 - Added some new sprites. Thanks Varcal, MisterMike, and Irenepunmaster!
