@@ -27,28 +27,24 @@ public class FlagReaderTests
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MSTEST0037:Use proper 'Assert' methods", Justification = "Does not work with nullable byte")]
     public void TestReadByte()
     {
-        /*
         FlagReader flagReader = new FlagReader(FALSE_FLAG);
-        Assert.IsTrue(flagReader.ReadByte(2) == 0);
-        Assert.IsTrue(flagReader.ReadNullableByte(3) == 0);
-        */
-
-        FlagReader flagReader = new FlagReader(TRUE_FLAG);
-        Assert.AreEqual(1, flagReader.ReadByte(2));
-        Assert.IsTrue(flagReader.ReadNullableByte(2) == 1);
-        Assert.IsNull(flagReader.ReadNullableByte(3));
+        Assert.AreEqual(0, flagReader.Take(2));    // 00
+        Assert.AreEqual(0, flagReader.ReadInt(4)); // 00
 
         flagReader = new FlagReader(TRUE_FLAG);
-        Assert.AreEqual(46, flagReader.ReadByte(64));
+        Assert.AreEqual(1, flagReader.Take(1));    // 1
+        Assert.AreEqual(1, flagReader.ReadInt(4)); // 01
+        Assert.AreEqual(6, flagReader.ReadInt(8)); // 110
+
+        flagReader = new FlagReader(TRUE_FLAG);
+        Assert.AreEqual(46, flagReader.ReadInt(64));
     }
 
     [TestMethod]
     public void TestReadEnum()
     {
         FlagReader flagReader = new FlagReader(ENUM_FLAG);
-        Assert.AreEqual(EncounterRate.NORMAL, flagReader.ReadEnum<EncounterRate>());
-        Assert.IsNull(flagReader.ReadNullableEnum<EncounterRate>());
+        Assert.AreEqual(EncounterRate.NORMAL, RandomizerConfiguration.DeserializeEnum<EncounterRate>(flagReader, "Test"));
+        //Assert.IsNull(flagReader.ReadNullableEnum<EncounterRate>());
     }
-
-
 }

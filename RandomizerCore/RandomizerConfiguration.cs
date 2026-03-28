@@ -7,7 +7,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization;
 using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
 using Z2Randomizer.RandomizerCore.Sidescroll;
@@ -34,7 +33,7 @@ public class ReactiveAttribute : Attribute
 public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 {
     [IgnoreInFlags]
-    private readonly Logger logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     [IgnoreInFlags]
     private readonly static Collectable[] POSSIBLE_STARTING_ITEMS = [
@@ -822,80 +821,57 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     {
         Deserialize(flagstring);
     }
-    private bool DeserializeBool(FlagReader flags, string name)
+
+    public static bool DeserializeBool(FlagReader flags, string name)
     {
         return flags.ReadBool();
     }
-    private bool? DeserializeNullableBool(FlagReader flags, string name)
+
+    public static bool? DeserializeNullableBool(FlagReader flags, string name)
     {
         return flags.ReadNullableBool();
     }
-    private int DeserializeInt(FlagReader flags, string name, int minimum, int maximum)
+
+    public static int DeserializeInt(FlagReader flags, string name, int minimum, int maximum)
     {
         var extent = maximum - minimum + 1;
         return flags.ReadInt(extent) + minimum;
     }
-    private int? DeserializeNullableInt(FlagReader flags, string name, int minimum, int maximum)
-    {
-        var extent = maximum - minimum + 1;
-        return flags.ReadNullableInt(extent) + minimum;
-    }
 
-    private T DeserializeEnum<T>(FlagReader flags, string name) where T: Enum
+    public static T DeserializeEnum<T>(FlagReader flags, string name) where T: Enum
     {
         var extent = GetEnumCount<T>();
         var index = flags.ReadInt(extent);
         return GetEnumFromIndex<T>(index)!;
     }
 
-    private void SerializeBool(FlagBuilder flags, string name, bool? val, bool isNullable)
+    public static void SerializeBool(FlagBuilder flags, string name, bool val)
     {
-        if (isNullable)
-        {
-            flags.Append(val);
-        }
-        else
-        {
-            bool v = val!.Value;
-            flags.Append(v);
-        }
+        flags.Append(val);
     }
 
-    private void SerializeInt(FlagBuilder flags, string name, int? val, int minimum, int maximum)
+    public static void SerializeNullableBool(FlagBuilder flags, string name, bool? val)
     {
-        // We don't actually have any real nullable ints in the flags.
-        // Enums would probably always be a better option anyway.
-        /*
-        // limit is checked for null in the flags source generator
-        if (isNullable)
-        {
-            if (val != null && (val < minimum || val > minimum + limit))
-            {
-                logger.Warn($"Property ({name}) was out of range.");
-            }
-            flags.Append(val, limit, minimum);
-        }
-        */
+        flags.Append(val);
+    }
+    public static void SerializeInt(FlagBuilder flags, string name, int? val, int minimum, int maximum)
+    {
+        // null values will be coerced to the minimum value
+        // For nullable ints, Enums are our preferred option.
         int extent = maximum - minimum + 1;
-        int value = val ?? minimum;
+        int value = val - minimum ?? minimum;
         if (value < minimum || value > maximum)
         {
             logger.Warn($"Property ({name}={value}) is out of range.");
         }
-        flags.Append(value, extent, minimum);
+        flags.Append(value, extent);
     }
 
-    private void SerializeEnum<T>(FlagBuilder flags, string name, T? val) where T: Enum
+    public static void SerializeEnum<T>(FlagBuilder flags, string name, T? val) where T: Enum
     {
         var index = GetEnumIndex<T>(val);
         var extent = GetEnumCount<T>();
         flags.Append(index, extent);
-    }
-
-    private void SerializeCustom<Serializer, T>(FlagBuilder flags, string name, T? val) where Serializer : IFlagSerializer where T : class
-    {
-        var serializer = GetSerializer<Serializer>();
-        flags.Append(serializer.Serialize(val), serializer.GetLimit());
     }
 
     public RandomizerProperties Export(Random r)

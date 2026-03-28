@@ -408,8 +408,8 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         output.Append(field.FieldType switch
         {
             "int" or "int?" => $"SerializeInt(flags, \"{field.FieldName}\", {field.FieldName}, {field.Minimum}, {field.Maximum})",
-            "bool" or "System.Boolean" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName}, false)",
-            "bool?" or "System.Boolean?" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName}, true)",
+            "bool" or "System.Boolean" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName})",
+            "bool?" or "System.Boolean?" => $"SerializeNullableBool(flags, \"{field.FieldName}\", {field.FieldName})",
             var type when field.IsEnum => $"SerializeEnum<{type}>(flags, \"{field.FieldName}\", {field.FieldName})",
             _ => $"SerializeCustom<{field.CustomSerializerName}, {field.FieldType}>(flags, \"{field.FieldName}\", {field.FieldName})"
         });
