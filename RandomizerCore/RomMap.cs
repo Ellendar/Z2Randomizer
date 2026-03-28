@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.RandomizerCore;
@@ -24,7 +26,24 @@ class RomMap
     public const int START_HAMMER = 0x17B07;
     public const int START_MAGICAL_KEY = 0x17B08;
 
-    //Addresses for vanilla locations. These addresses holds Y coordinate
+    // Base offsets for continent location tables.
+    // Add overworldYOffset et al to these.
+    public const int WEST_LOCATIONS_BASE = 0x462f;
+    public const int DM_LOCATIONS_BASE = 0x610c;
+    public const int EAST_LOCATIONS_BASE = 0x862f;
+    public const int MI_LOCATIONS_BASE = 0xa10c;
+
+    public static readonly int[] ContinentLocationBaseArray = [
+        WEST_LOCATIONS_BASE,
+        DM_LOCATIONS_BASE,
+        EAST_LOCATIONS_BASE,
+        MI_LOCATIONS_BASE,
+    ];
+
+    public static readonly IReadOnlyDictionary<Continent, int> ContinentLocationBases = Enum.GetValues<Continent>()
+        .ToDictionary(c => c, c => ContinentLocationBaseArray[(int)c]);
+
+    /*//Addresses for vanilla locations. These addresses holds Y coordinate
     //bytes. The X coord bytes are at the same address + 0x3F.
     public const int WEST_NORTH_PALACE_TILE_LOCATION = 0x462f;
     public const int WEST_CAVE_TROPHY_TILE_LOCATION = 0x4630;
@@ -164,9 +183,10 @@ class RomMap
     public const int MI_TRAP_TILE4 = 0xA146;
     public const int MI_TRAP_TILE5 = 0xA147;
     public const int MI_TRAP_TILE6 = 0xA148;
-    public const int MI_TRAP_TILE7 = 0xA149;
+    public const int MI_TRAP_TILE7 = 0xA149;*/
 
     //Overworld data
+    public const int overworldYOffset = 0;
     public const int overworldXOffset = 0x3F;
     public const int overworldMapOffset = 0x7E;
     public const int overworldWorldOffset = 0xBD;
