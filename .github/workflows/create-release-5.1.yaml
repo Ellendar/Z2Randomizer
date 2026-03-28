@@ -109,8 +109,8 @@ jobs:
     strategy:
       matrix:
         platform: [
-          { name: Windows-Portable, os: windows-latest, arch: x64, type: portable },
-          { name: Windows-Installer, os: windows-latest, arch: x64, type: installer },
+          { name: Windows-Portable, os: windows-2025-vs2026, arch: x64, type: portable },
+          { name: Windows-Installer, os: windows-2025-vs2026, arch: x64, type: installer },
           { name: Ubuntu, os: ubuntu-latest, arch: x64 },
           { name: macOS, os: macos-14, arch: arm64 },
           { name: Browser, os: ubuntu-latest, arch: wasm, type: browser },
