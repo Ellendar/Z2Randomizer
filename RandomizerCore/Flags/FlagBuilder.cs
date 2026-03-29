@@ -86,12 +86,10 @@ public class FlagBuilder
     /// The current <see cref="FlagBuilder"/> instance for fluent chaining.
     /// </returns>
     /// <remarks>
-    /// The encoded value is rebased by subtracting <paramref name="minimum"/>
-    /// before writing bits. The same <paramref name="extent"/> and
-    /// <paramref name="minimum"/> values must be used during decoding.
+    /// The same <paramref name="extent"/> value must be used during decoding.
     ///
     /// <example>
-    /// Examples (with <c>minimum = 0</c>):
+    /// Examples:
     /// <list type="bullet">
     /// <item><description>
     /// <c>extent = 4</c> → values 0–3 possible, uses 2 bits
@@ -102,68 +100,21 @@ public class FlagBuilder
     /// </list>
     /// </example>
     /// </remarks>
-    public FlagBuilder Append(int val, int extent, int? minimum = null)
+    public FlagBuilder Append(int val, int extent)
     {
-        var min = minimum ?? 0;
         // Subtract value - min to rebase the value to zero.
         // We add min when extracting the bit when converting back to the value
-        int value = val - min;
-        if (value >= extent)
+        if (val >= extent)
         {
             throw new ArgumentException("Value is greater than extent in FlagBuilder.Append(int, int)");
         }
 
-        BitArray argBits = new([value]);
+        BitArray argBits = new([val]);
         for (int i = BitOperations.Log2((uint)extent - 1); i >= 0; i--)
         {
             bits.Add(argBits[i]);
         }
         return this;
-    }
-
-    /// <summary>
-    /// Appends a nullable integer value using a fixed number of bits.
-    /// 
-    /// The number of bits written will be the minimum number of bits needed
-    /// to represent values in the range
-    /// <c>[minimum, minimum + extent - 1]</c>, with one additional reserved
-    /// encoding used to represent <c>null</c>.
-    /// </summary>
-    /// <param name="value">
-    /// The nullable integer value to encode.
-    /// </param>
-    /// <param name="extent">
-    /// The number of distinct non-null values that may be represented.
-    /// </param>
-    /// <param name="minimum">
-    /// Optional minimum value used to rebase non-null values.
-    /// </param>
-    /// <returns>
-    /// The current <see cref="FlagBuilder"/> instance for fluent chaining.
-    /// </returns>
-    /// <remarks>
-    /// Internally, values are rebased by subtracting <paramref name="minimum"/>.
-    /// Non-null values are encoded in the range <c>[0, extent - 1]</c>.
-    /// The value <c>extent</c> is reserved as a sentinel representing <c>null</c>.
-    ///
-    /// <example>
-    /// Examples (with <c>minimum = 0</c>):
-    /// <list type="bullet">
-    /// <item><description>
-    /// <c>extent = 3</c> → values 0–2 or null possible, uses 2 bits
-    /// </description></item>
-    /// <item><description>
-    /// <c>extent = 7</c> → values 0–6 or null possible, uses 3 bits
-    /// </description></item>
-    /// </list>
-    /// </example>
-    ///
-    /// The same <paramref name="extent"/> and <paramref name="minimum"/> values
-    /// must be used during decoding to ensure correct decoding.
-    /// </remarks>
-    public FlagBuilder Append(int? value, int extent, int? minimum = null)
-    {
-        return Append((value - minimum) ?? extent, extent + 1);
     }
 
     /// <summary>

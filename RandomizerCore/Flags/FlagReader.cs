@@ -81,7 +81,7 @@ public class FlagReader
     /// Bits are interpreted most-significant first, matching the encoding behavior
     /// of <see cref="FlagBuilder"/>.
     /// </remarks>
-    private int Take(int count)
+    public int Take(int count)
     {
         switch (count)
         {

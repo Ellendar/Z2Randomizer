@@ -5,6 +5,7 @@ namespace Z2Randomizer.Tests;
 [TestClass]
 public class FlagBuilderTests
 {
+    /* Nullable int flags are no longer allowed (use Enums).
     [TestMethod]
     public void TestAppendNullableInt()
     {
@@ -15,6 +16,7 @@ public class FlagBuilderTests
         flagBuilder.Append(nullInt, 8);
         Assert.AreEqual("jA", flagBuilder.ToString());
     }
+    */
 
     [TestMethod]
     public void TestAppendBool()
