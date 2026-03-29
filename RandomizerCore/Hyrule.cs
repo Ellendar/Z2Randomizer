@@ -1574,7 +1574,7 @@ public class Hyrule
 
     public List<RequirementType> GetRequireables(RandomizerProperties props)
     {
-        List<RequirementType> requireables = new();
+        List<RequirementType> requireables = [];
 
         foreach(Collectable item in ItemGet.Keys)
         {

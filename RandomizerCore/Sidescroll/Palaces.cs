@@ -21,19 +21,19 @@ public class Palaces
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = [ 
-        RequirementType.KEY ];
+        RequirementType.KEY, ..RequirementTypeExtensions.UpToXContainers(5)];
     private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = [ 
-        RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE ];
+        RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(6) ];
     private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = [ 
-        RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE];
+        RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(6) ];
     private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = [ 
-        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP];
+        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, ..RequirementTypeExtensions.UpToXContainers(7) ];
     private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = [ 
-        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP];
+        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, ..RequirementTypeExtensions.UpToXContainers(7) ];
     private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = [ 
-        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE];
+        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8) ];
     private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = [ 
-        RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE];
+        RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8)];
 
     public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = [ 
         VANILLA_P1_ALLOWED_BLOCKERS,
@@ -310,7 +310,8 @@ public class Palaces
             RequirementType.UPSTAB,
             RequirementType.DOWNSTAB,
             RequirementType.JUMP,
-            RequirementType.FAIRY
+            RequirementType.FAIRY,
+            ..RequirementTypeExtensions.UpToXContainers(4)
         ];
         for(int i = 0; i < 6; i++)
         {
@@ -328,12 +329,13 @@ public class Palaces
     {
         if (!props.ShufflePalaceItems)
         {
-            List<RequirementType> requireables = new List<RequirementType>();
+            List<RequirementType> requireables = [..RequirementTypeExtensions.UpToXContainers(props.StartMagicContainers)];
             //If shuffle overworld items is on, we assume you can get all the items / spells
             //as all progression items will eventually shuffle into spots that work
             if (props.ShuffleOverworldItems)
             {
-                requireables.Add(RequirementType.KEY);
+                requireables = [RequirementType.KEY, ..RequirementTypeExtensions.UpToXContainers(8)];
+
             }
             //Otherwise if it's vanilla items we can't get the magic key, because we could need glove for boots for flute to get to new kasuto
             requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
@@ -355,23 +357,29 @@ public class Palaces
         //or it will send the logic into an uinrecoverable nosedive since the palaces can't re-generate
         if (!props.ShufflePalaceItems && raftIsRequired)
         {
-            List<RequirementType> requireables = new List<RequirementType>();
+            List<RequirementType> requireables;
             //If shuffle overworld items is on, we assume you can get all the items / spells
             //as all progression items will eventually shuffle into spots that work
             if (props.ShuffleOverworldItems)
             {
-                requireables.Add(RequirementType.KEY);
-                requireables.Add(RequirementType.GLOVE);
-                requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
-                requireables.Add(RequirementType.JUMP);
-                requireables.Add(RequirementType.FAIRY);
+                requireables = [
+                    RequirementType.KEY,
+                    RequirementType.GLOVE,
+                    props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB,
+                    RequirementType.JUMP,
+                    RequirementType.FAIRY,
+                    .. RequirementTypeExtensions.UpToXContainers(8)
+                ];
             }
             //Otherwise we can only get the things you can get on the west normally
             else
             {
-                requireables.Add(RequirementType.JUMP);
-                requireables.Add(RequirementType.FAIRY);
-                requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
+                requireables = [
+                    props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB,
+                    RequirementType.JUMP,
+                    RequirementType.FAIRY,
+                    .. RequirementTypeExtensions.UpToXContainers(6)
+                ];
             }
             //If we can clear P2 with this stuff, we can also get the glove
             if (palace2.CanClearAllRooms(requireables, Collectable.GLOVE))
