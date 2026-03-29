@@ -403,6 +403,10 @@ public class Hyrule
             {
                 ROMData.Put(0x17b18, 0x20); //Child
             }
+            if (props.StartMagicContainers >= props.NewKasutoBasementRequirement)
+            {
+                ROMData.Put(0x17b19, 0x08); // give New Kasuto Basement access at start
+            }
 
             if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
             UpdateProgress(progress, 9);
