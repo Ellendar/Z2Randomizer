@@ -136,26 +136,7 @@ public sealed class EastHyrule : World
             GetLocation(LocationID.EAST_TRAP_LAVA3),
         ];
 
-        //reachableAreas = new HashSet<string>();
-
-        Dictionary<Location, Location> connectionsOld = new();
-        connectionsOld.Add(GetLocation(LocationID.EAST_CAVE_NABOORU_PASSTHROUGH_SOUTH), GetLocation(LocationID.EAST_CAVE_NABOORU_PASSTHROUGH_NORTH));
-        connectionsOld.Add(GetLocation(LocationID.EAST_CAVE_NABOORU_PASSTHROUGH_NORTH), GetLocation(LocationID.EAST_CAVE_NABOORU_PASSTHROUGH_SOUTH));
-
-        connectionsOld.Add(GetLocation(LocationID.EAST_CAVE_NEW_KASUTO_PASSTHROUGH_WEST), GetLocation(LocationID.EAST_CAVE_NEW_KASUTO_PASSTHROUGH_EAST));
-        connectionsOld.Add(GetLocation(LocationID.EAST_CAVE_NEW_KASUTO_PASSTHROUGH_EAST), GetLocation(LocationID.EAST_CAVE_NEW_KASUTO_PASSTHROUGH_WEST));
-
-        //valley of death 19-20
-        connectionsOld.Add(GetLocation(LocationID.EAST_CAVE_VOD_PASSTHROUGH2_START), GetLocation(LocationID.EAST_CAVE_VOD_PASSTHROUGH2_END));
-        connectionsOld.Add(GetLocation(LocationID.EAST_CAVE_VOD_PASSTHROUGH2_END), GetLocation(LocationID.EAST_CAVE_VOD_PASSTHROUGH2_START));
-
-        //valley of death 17-18
-        connectionsOld.Add(GetLocation(LocationID.EAST_CAVE_VOD_PASSTHROUGH1_END), GetLocation(LocationID.EAST_CAVE_VOD_PASSTHROUGH1_START));
-        connectionsOld.Add(GetLocation(LocationID.EAST_CAVE_VOD_PASSTHROUGH1_START), GetLocation(LocationID.EAST_CAVE_VOD_PASSTHROUGH1_END));
-
         CreateConnections();
-
-        CheckConnections(ConvertConnections(connectionsOld), ConvertConnections(connections));
 
         //Palaces
         locationAtPalace5 = GetLocation(LocationID.EAST_PALACE5);

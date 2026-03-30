@@ -212,26 +212,11 @@ public sealed class WestHyrule : World
             caveConnections.Add((fairyCave, fairyCave2));
         }
 
-        Dictionary<Location, Location> connectionsOld = new();
-
-        connectionsOld.Add(parapaCave1, parapaCave2);
-        connectionsOld.Add(parapaCave2, parapaCave1);
-        connectionsOld.Add(jumpCave, jumpCave2);
-        connectionsOld.Add(jumpCave2, jumpCave);
-        connectionsOld.Add(fairyCave, fairyCave2);
-        connectionsOld.Add(fairyCave2, fairyCave);
-        connectionsOld.Add(locationAtSariaNorth, locationAtSariaSouth);
-        connectionsOld.Add(locationAtSariaSouth, locationAtSariaNorth);
-        connectionsOld.Add(bridge1, bridge2);
-        connectionsOld.Add(bridge2, bridge1);
-
         CreateConnections(new()
         {
             LocationID.WEST_KINGS_TOMB,
             LocationID.WEST_BAGU_HOUSE,
         });
-
-        CheckConnections(ConvertConnections(connectionsOld), ConvertConnections(connections));
 
         sideviewPtrTable = 0x4533;
         sideviewBank = 1;

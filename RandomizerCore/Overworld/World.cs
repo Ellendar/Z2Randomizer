@@ -264,17 +264,6 @@ public abstract class World
         }
     }
 
-    protected Dictionary<Location, List<Location>> ConvertConnections(Dictionary<Location, Location> locs)
-        => locs.ToDictionary(kv => kv.Key, kv => new List<Location>() { kv.Value });
-
-    protected void CheckConnections(Dictionary<Location, List<Location>> correct,
-        Dictionary<Location, List<Location>> test)
-    {
-        Debug.Assert(new HashSet<Location>(correct.Keys).SetEquals(test.Keys));
-        foreach (var (srcLoc, tgtLocs) in correct)
-            Debug.Assert(new HashSet<Location>(tgtLocs).SetEquals(test[srcLoc]));
-    }
-
     protected void ChooseConn(String section, Dictionary<Location, Location> co, bool changeType)
     {
         if (co.Count > 0)
