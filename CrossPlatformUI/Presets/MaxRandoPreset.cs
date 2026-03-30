@@ -1,5 +1,4 @@
 ﻿using Z2Randomizer.RandomizerCore;
-using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
@@ -8,32 +7,34 @@ public static class MaxRandoPreset
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start
-        ShuffleStartingItems = false,
-        ShuffleStartingSpells = false,
+        ShuffleStartingItems = true,
+        ShuffleStartingSpells = true,
         MaxHeartContainers = MaxHeartsOption.RANDOM,
         StartingHeartContainersMin = 1,
         StartingHeartContainersMax = 8,
+        StartingMagicContainersMin = 1,
+        StartingMagicContainersMax = 8,
         StartingTechniques = StartingTechs.RANDOM,
         StartingLives = StartingLives.LivesRandom,
         IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
-        PalacesCanSwapContinents = true,
-        ShuffleGP = true,
-        ShuffleEncounters = true,
+        PalacesCanSwapContinents = null,
+        ShuffleGP = null,
+        ShuffleEncounters = null,
         AllowUnsafePathEncounters = true,
         IncludeLavaInEncounterShuffle = true,
         EncounterRate = EncounterRate.HALF,
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
-        EastRocks = true,
-        GenerateBaguWoods = true,
-        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
+        EastRocks = null,
+        GenerateBaguWoods = null,
+        LessImportantLocationsOption = LessImportantLocationsOption.RANDOM,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,
         HidePalace = null,
         HideKasuto = null,
-        ShuffleWhichLocationIsHidden = true,
+        ShuffleWhichLocationIsHidden = null,
         WestBiome = Biome.RANDOM_NO_VANILLA,
         EastBiome = Biome.RANDOM_NO_VANILLA,
         MazeBiome = Biome.VANILLALIKE,
@@ -52,6 +53,7 @@ public static class MaxRandoPreset
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
         Includev5_0Rooms = true,
+        IncludeExpertRooms = true,
         TBirdRequired = false,
         RemoveTBird = false,
         PalacesToCompleteMin = 0,
@@ -61,6 +63,7 @@ public static class MaxRandoPreset
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
+        PalaceDropStyle = PalaceDropStyle.ANYTHING_GOES,
         BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
@@ -100,7 +103,7 @@ public static class MaxRandoPreset
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,
         ShuffleSwordImmunity = true,
-        EnemyXPDrops = XPEffectiveness.RANDOM,
+        EnemyXPDrops = XPEffectiveness.WIDE,
 
         //Items
         ShufflePalaceItems = true,

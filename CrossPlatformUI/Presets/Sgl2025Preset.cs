@@ -1,9 +1,8 @@
 ﻿using Z2Randomizer.RandomizerCore;
-using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
-public static class HardmodePreset
+public static class Sgl2025Preset
 {
     public static readonly RandomizerConfiguration Preset = new()
     {
@@ -25,12 +24,12 @@ public static class HardmodePreset
         ShuffleGP = true,
         ShuffleEncounters = false,
         AllowUnsafePathEncounters = false,
-        IncludeLavaInEncounterShuffle = true,
+        IncludeLavaInEncounterShuffle = false,
         EncounterRate = EncounterRate.HALF,
-        RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
-        EastRocks = true,
+        RiverDevilBlockerOption = RiverDevilBlockerOption.PATH,
+        EastRocks = false,
         GenerateBaguWoods = true,
-        LessImportantLocationsOption = LessImportantLocationsOption.REMOVE,
+        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,
@@ -41,44 +40,47 @@ public static class HardmodePreset
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
         DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
-        WestClimate = ClimateEnum.VANILLA_WEIGHTED_WEST,
-        EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
+        WestClimate = ClimateEnum.CLASSIC,
+        EastClimate = ClimateEnum.CLASSIC,
         DmClimate = ClimateEnum.CLASSIC,
-
         ContinentConnectionType = ContinentConnectionType.TRANSPORTATION_SHUFFLE,
 
         //Palaces
-        NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
-        GpStyle = PalaceStyle.RANDOM_WALK,
-        NormalPalaceLength = PalaceLengthOption.FULL,
+        NormalPalaceStyle = PalaceStyle.RECONSTRUCTED,
+        GpStyle = PalaceStyle.RECONSTRUCTED,
+        NormalPalaceLength = PalaceLengthOption.SHORT,
         GpLength = PalaceLengthOption.MEDIUM,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
-        Includev5_0Rooms = true,
+        Includev5_0Rooms = false,
+        IncludeExpertRooms = true,
         TBirdRequired = true,
         PalacesToCompleteMin = 6,
         PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
-        Global5050JarDrop = true,
-        ReduceDripperVariance = true,
+        Global5050JarDrop = false,
+        ReduceDripperVariance = false,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = false,
+        PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
-        NoDuplicateRoomsByLayout = true,
+        NoDuplicateRoomsByLayout = false,
+        NoDuplicateRoomsByEnemies = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
+        // +"Aggressive Thunderbird"
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
-        DarkLinkMinDistance = BossRoomMinDistance.MEDIUM,
+        DarkLinkMinDistance = BossRoomMinDistance.NONE,
 
         //Levels
         ShuffleAttackExperience = true,
         ShuffleMagicExperience = true,
         ShuffleLifeExperience = true,
 
-        AttackLevelCap = 7,
+        AttackLevelCap = 6,
         MagicLevelCap = 8,
         LifeLevelCap = 8,
-        AttackEffectiveness = AttackEffectiveness.AVERAGE_LOW,
+        AttackEffectiveness = AttackEffectiveness.AVERAGE_LOW, // was AttackValues = [2, 3, 4, 6, 8, 12, 14, 16];
         MagicEffectiveness = MagicEffectiveness.AVERAGE,
         LifeEffectiveness = LifeEffectiveness.VANILLA,
 
@@ -89,6 +91,7 @@ public static class HardmodePreset
         RandomizeSpellSpellEnemy = false,
         SwapUpAndDownStab = true,
         FireOption = FireOption.NORMAL,
+        // +"Expensive Thunder"
 
         //Enemies
         ShuffleOverworldEnemies = true,
@@ -97,12 +100,12 @@ public static class HardmodePreset
         MixLargeAndSmallEnemies = true,
         GeneratorsAlwaysMatch = true,
 
-        ShuffleEnemyHP = EnemyLifeOption.MEDIUM,
+        ShuffleEnemyHP = EnemyLifeOption.MEDIUM, // was 100-150%
         ShuffleBossHP = EnemyLifeOption.VANILLA,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,
-        ShuffleSwordImmunity = true,
-        EnemyXPDrops = XPEffectiveness.VANILLA,
+        ShuffleSwordImmunity = false,
+        EnemyXPDrops = XPEffectiveness.SLIGHTLY_HIGH, // was +0 to +2
 
         //Items
         ShufflePalaceItems = true,
@@ -111,20 +114,20 @@ public static class HardmodePreset
         IncludePBagCavesInItemShuffle = false,
         IncludeSwordTechsInShuffle = false,
         IncludeQuestItemsInShuffle = false,
-        IncludeSpellsInShuffle = true,
+        IncludeSpellsInShuffle = false,
 
-        ShuffleSmallItems = true,
+        ShuffleSmallItems = false,
         RemoveSpellItems = false,
         ShufflePBagAmounts = false,
         PalacesContainExtraKeys = false,
-        RandomizeNewKasutoJarRequirements = true,
+        RandomizeNewKasutoJarRequirements = false,
         AllowImportantItemDuplicates = false,
 
         //Drops
         ShuffleItemDropFrequency = false,
         RandomizeDrops = false,
         StandardizeDrops = true,
-        // Keeping the small drop pool empty for the 1/8 P-Bag chance
+        SmallEnemiesCanDropBlueJar = true,
         LargeEnemiesCanDropRedJar = true,
         LargeEnemiesCanDropLargeBag = true,
 

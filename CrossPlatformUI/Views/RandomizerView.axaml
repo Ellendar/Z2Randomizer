@@ -37,16 +37,16 @@
                                               CommandParameter="{Binding Source={x:Static presets:StandardSwissPreset.Preset}}"/>
                                     <MenuItem Header="Standard Tournament Brackets Preset" Command="{Binding LoadPreset}"
                                               CommandParameter="{Binding Source={x:Static presets:StandardPreset.Preset}}"/>
-									<MenuItem Header="Max Rando Preset (Testing)" Command="{Binding LoadPreset}"
-										  CommandParameter="{Binding Source={x:Static presets:MaxRandoPreset.Preset}}"/>
-									
+                                    <MenuItem Header="Max Rando Tournament Preset" Command="{Binding LoadPreset}"
+                                              CommandParameter="{Binding Source={x:Static presets:MaxRandoPreset.Preset}}"/>
+
                                     <MenuItem Header="More Presets">
-										<MenuItem Header="Max Rando (2025) Preset" Command="{Binding LoadPreset}"
-	                                    	  CommandParameter="{Binding Source={x:Static presets:MaxRando2025Preset.Preset}}"/>
+                                        <MenuItem Header="SGL 2025 Preset" Command="{Binding LoadPreset}"
+                                                  CommandParameter="{Binding Source={x:Static presets:Sgl2025Preset.Preset}}"/>
                                         <MenuItem Header="Upstarts Tournament 2025 Preset" Command="{Binding LoadPreset}"
                                                   CommandParameter="{Binding Source={x:Static presets:UpstartsTournamentPreset.Preset}}"/>
-                                        <MenuItem Header="Modified SGL Preset" Command="{Binding LoadPreset}"
-                                                  CommandParameter="{Binding Source={x:Static presets:HardmodePreset.Preset}}"/>
+                                        <MenuItem Header="Max Rando Tournament 2025 Preset" Command="{Binding LoadPreset}"
+                                                  CommandParameter="{Binding Source={x:Static presets:MaxRando2025Preset.Preset}}"/>
                                         <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
                                                   CommandParameter="{Binding Source={x:Static presets:RandomPercentPreset.Preset}}"/>
                                     </MenuItem>

@@ -52,6 +52,7 @@ public static class StandardPreset
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
         Includev5_0Rooms = true,
+        IncludeExpertRooms = true,
         TBirdRequired = true,
         RemoveTBird = false,
         PalacesToCompleteMin = 6,

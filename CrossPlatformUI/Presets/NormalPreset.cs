@@ -35,6 +35,7 @@ public static class NormalPreset
         HidePalace = null,
         HideKasuto = null,
         ShuffleWhichLocationIsHidden = false,
+        DmSize = DmSizeOption.MEDIUM,
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
@@ -45,13 +46,14 @@ public static class NormalPreset
         ContinentConnectionType = ContinentConnectionType.TRANSPORTATION_SHUFFLE,
 
         //Palaces
-        NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
+        NormalPalaceStyle = PalaceStyle.VANILLA_WEIGHTED,
         GpStyle = PalaceStyle.RANDOM_WALK,
         NormalPalaceLength = PalaceLengthOption.MEDIUM,
         GpLength = PalaceLengthOption.SHORT,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
         Includev5_0Rooms = true,
+        IncludeExpertRooms = false,
         TBirdRequired = true,
         RemoveTBird = false,
         PalacesToCompleteMin = 6,
@@ -65,7 +67,7 @@ public static class NormalPreset
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
-        HardBosses = false,
+        HardBosses = true,
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
         DarkLinkMinDistance = BossRoomMinDistance.SHORT,
 

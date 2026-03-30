@@ -46,6 +46,7 @@ public static class RandomPercentPreset
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_PER_PALACE,
         GpStyle = PalaceStyle.RANDOM,
+        RandomStylesAllowVanilla = true,
         NormalPalaceLength = PalaceLengthOption.RANDOM,
         GpLength = PalaceLengthOption.RANDOM,
         IncludeVanillaRooms = null,
@@ -60,6 +61,7 @@ public static class RandomPercentPreset
         ReduceDripperVariance = false,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
+        PalaceDropStyle = PalaceDropStyle.ANYTHING_GOES,
         BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,

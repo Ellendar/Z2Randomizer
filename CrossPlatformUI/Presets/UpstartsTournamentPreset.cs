@@ -35,7 +35,6 @@ public static class UpstartsTournamentPreset
         HideKasuto = null,
         ShuffleWhichLocationIsHidden = true,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
-
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
@@ -52,6 +51,7 @@ public static class UpstartsTournamentPreset
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
         Includev5_0Rooms = false,
+        IncludeExpertRooms = true,
         TBirdRequired = true,
         PalacesToCompleteMin = 6,
         PalacesToCompleteMax = 6,
