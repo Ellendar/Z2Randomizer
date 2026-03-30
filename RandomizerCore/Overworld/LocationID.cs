@@ -232,7 +232,7 @@ public static class LocationIDUtils
         Debug.Assert(startLid.GetIndex() + lidCount <= NumLocationIndices);
 
         for (int i = 0; i < lidCount; i++)
-            yield return startLid + lidCount;
+            yield return startLid + i;
     }
 
     /// <summary>
