@@ -92,6 +92,7 @@ Tournament preset for the swiss part of the Standard Tournament of 2026.
         ShuffleSmallItems = true,
         RandomizeNewKasutoJarRequirements = true,
         PreventSpellItemChains = false,
+        FastItemPickup = true,
 
         //Drops
         ShuffleItemDropFrequency = true,

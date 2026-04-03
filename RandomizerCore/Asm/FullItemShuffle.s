@@ -518,8 +518,8 @@ ItemTileTable:
     .byte $72, $F5 ; Experience Bag - 100 pts
     .byte $72, $F5 ; Experience Bag - 200 pts
     .byte $72, $F5 ; Experience Bag - 500 pts
-    .byte $83, $83 ; Magic Container
-    .byte $81, $81 ; Heart Container
+    .byte $fd, $fd ; Magic Container
+    .byte $d9, $d9 ; Heart Container
     .byte $8A, $F5 ; Blue Jar
     .byte $8A, $F5 ; Red Jar
     .byte $A8, $F5 ; Link Doll
@@ -541,6 +541,7 @@ ItemTileTable:
     .byte $f1, $f1 ; Spell Spell
     .byte $f7, $f9 ; Thunder Spell
     .byte $cf, $92 ; Dash Spell
+.export ItemTileTable
 
 ; In vanilla this table is limited only to the 6 items in $10-$16
 ; We can keep the first $10 items using the original, and just expand the rest

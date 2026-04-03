@@ -410,6 +410,9 @@ added to the item pool to replace the number of those items that were in the shu
 If you have insufficient containers, the lady blocking the door will tell you the
 requirement.</value>
 	</data>
+	<data name="FastItemPickupToolTip" xml:space="preserve">
+<value>Skip the animation where Link holds items over his head when he picks them up.</value>
+	</data>
 	<data name="AllowImportantItemDuplicatesToolTip" xml:space="preserve">
 <value>After the normal item shuffle is done, this feature will go through the items, and make
 one copy of each important item, replacing minor items (like P-Bags), as space allows.
@@ -1277,6 +1280,9 @@ This is a wildly different gameplay experience, so be warned when setting this f
 	</data>
 	<data name="AllowConnectionCavesToBeBlocked" xml:space="preserve">
 		<value>Allow Connection Caves to Be Blocked</value>
+	</data>
+	<data name="FastItemPickup" xml:space="preserve">
+		<value>Fast Item Pickup</value>
 	</data>
 	<data name="AllowImportantItemDuplicates" xml:space="preserve">
 		<value>Allow Duplicates of Important Items</value>

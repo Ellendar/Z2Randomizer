@@ -199,6 +199,7 @@ public class RandomizerProperties
     public bool PreventSpellItemChains { get; set; }
     public bool RandomizeSmallItems { get; set; }
     public bool ExtraKeys { get; set; }
+    public bool FastItemPickup { get; set; }
     public bool AllowImportantItemDuplicates { get; set; }
     public int NewKasutoBasementRequirement { get; set; }
     //Include PBag caves in item shuffle

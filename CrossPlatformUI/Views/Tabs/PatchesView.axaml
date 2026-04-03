@@ -16,6 +16,7 @@
             <z:Z2CheckBox Flag="RestartAtPalacesOnGameOver" />
             <z:Z2CheckBox Flag="Global5050JarDrop" />
             <z:Z2CheckBox Flag="ReduceDripperVariance" />
+            <z:Z2CheckBox Flag="FastItemPickup" />
             <StackPanel Margin="0">
                 <z:Z2CheckBox Flag="RevealWalkthroughWalls" />
                 <z:Z2CheckBox Flag="RevealHiddenJars" />

@@ -630,6 +630,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool randomizeNewKasutoJarRequirements = false;
 
     [Reactive]
+    private bool fastItemPickup = false;
+
+    [Reactive]
     private bool allowImportantItemDuplicates = false;
 
     [Reactive]
@@ -1383,6 +1386,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.RandomizeSmallItems = shuffleSmallItems;
         properties.ExtraKeys = palacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
         properties.NewKasutoBasementRequirement = randomizeNewKasutoJarRequirements ? r.Next(5, 8) : 7;
+        properties.FastItemPickup = fastItemPickup;
         properties.AllowImportantItemDuplicates = allowImportantItemDuplicates;
         properties.ShufflePbagXp = shufflePBagAmounts ?? GetIndeterminateFlagValue(r);
         properties.IncludeBagusNoteInShuffle = IncludeBagusNoteInShuffle ?? GetIndeterminateFlagValue(r);

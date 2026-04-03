@@ -72,6 +72,7 @@ Starting items and spells: Candle, Life, Fairy, Downstab
         RandomizeNewKasutoJarRequirements = true,
         ShufflePBagAmounts = true,
         PreventSpellItemChains = true,
+        FastItemPickup = true,
         ShuffleItemDropFrequency = true,
         RandomizeDrops = true,
         StandardizeDrops = true,

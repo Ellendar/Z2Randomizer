@@ -83,6 +83,7 @@ Tournament preset for the final week of the Upstarts Tournament of 2025.
         ShufflePBagAmounts = true,
         RandomizeNewKasutoJarRequirements = true,
         PreventSpellItemChains = false,
+        FastItemPickup = true,
 
         //Drops
         ShuffleItemDropFrequency = true,

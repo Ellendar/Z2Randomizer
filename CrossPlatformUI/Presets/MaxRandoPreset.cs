@@ -112,6 +112,7 @@ Very high variance in difficulty. You may start with anything from 1 Heart Conta
         ShufflePBagAmounts = true,
         RandomizeNewKasutoJarRequirements = true,
         PreventSpellItemChains = false,
+        FastItemPickup = true,
 
         //Drops
         ShuffleItemDropFrequency = true,

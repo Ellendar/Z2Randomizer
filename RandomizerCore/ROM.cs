@@ -2031,20 +2031,65 @@ SetStartLocationHook:
 """");
     }
 
-    public void FixItemPickup(Assembler asm)
+    public void FixItemPickup(Assembler asm, bool fastItemPickup)
     {
-        // In Z2R, Link never holds items above his head. So,
-        // we don't set the hold item over head timer ($0x49c), and
-        // we don't set the hold item over head ID ($0x49d).
-        // (If we wanted we could remove all code using these)
+        // Keeping both versions of the patch here, with and without the
+        // item pickup animation.
         //
-        // Instead, we clear out $a8,x to fix the item pickup phantom damage,
+        // We have to clear out $a8,x to fix the item pickup phantom damage,
         // caused by generator code that interprets it as collision data.
         //
         // Also, since 1-ups can drop anywhere, if we're picking up a 1-up
-        // we don't reset the velocity.
+        // we don't reset the velocity (or hoist it).
         var a = asm.Module();
-        a.Code(/* lang=s */"""
+        if (!fastItemPickup)
+        {
+            a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import ItemTileTable
+.segment "PRG7"
+.org $e53b
+SetPostItemPickupVars:
+    lda $af,x                          ; this byte has the item ID we picked up
+    and #$7f                           ; keep bits .xxx xxxx
+    sta $49d
+    cmp #$12                           ; check if item is 1-up
+    beq SetPostItemPickupKeepVelocity  ; skip resetting velocity if 1-up
+        jmp HoistItem
+SetPostItemPickupKeepVelocity:
+    jsr FlagHudUpdate
+    jmp ClearEnemyByte
+FREE_UNTIL $e54f
+
+.reloc
+ClearEnemyByte:
+    lda #$00
+ClearEnemyByteASet:
+    sta $a8,x                          ; clear item/enemy collision byte to prevent phantom damage
+    rts
+
+.org $ed26
+    lda ItemTileTable,y
+.org $ed2c
+    lda ItemTileTable+1,y
+.org $ed54
+    rts
+FREE_UNTIL $ed66
+
+.reloc
+HoistItem:
+    lda #$70
+    sta $49c                           ; set hold item above head timer to 0x70
+    lda #$00
+    sta $70                            ; set Link's X velocity to zero
+    sta $57d                           ; set Link's Y velocity to zero
+    jmp ClearEnemyByteASet
+
+""");
+        }
+        else
+        {
+            a.Code(/* lang=s */"""
 .include "z2r.inc"
 .import FlagHudUpdate
 
@@ -2063,10 +2108,9 @@ SetPostItemPickupKeepVelocity:
     lda #$00
     sta $a8,x                          ; clear item/enemy collision byte to prevent phantom damage
     rts
-
 FREE_UNTIL $e54f
-
 """);
+        }
     }
 
     public void OptimizeOverworldByteDecode(Assembler asm)
