@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5 "
+                "FrameworkVersion" = "8:v4.5  "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -248,10 +248,10 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Z2Randomizer Community Fork (Beta)"
-        "ProductCode" = "8:{D1414E41-5EEF-46B3-AF72-29332174FAAA}"
-        "PackageCode" = "8:{FC47439F-0254-4E67-B70D-1CA5D6D1682D}"
-        "UpgradeCode" = "8:{209F931F-26E9-4B9A-8E2C-82F66B495079}"
+        "ProductName" = "8:Z2Randomizer Community Fork"
+        "ProductCode" = "8:{3FA52A22-D39B-4089-B722-02F61AF50D3D}"
+        "PackageCode" = "8:{9FA94C26-05E2-4C7C-959C-DF99A16E2654}"
+        "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -799,7 +799,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B0F49DB0EDF54F159193D61E9D0E0F01"
             {
-            "SourcePath" = "8:..\\DumpRooms\\obj\\Release\\net10.0\\apphost.exe"
+            "SourcePath" = "8:..\\DumpRooms\\obj\\Debug\\net10.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -827,7 +827,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FDAF64163E1242A1BC91894E0D2DCFA8"
             {
-            "SourcePath" = "8:..\\CommandLine\\obj\\Release\\net10.0\\apphost.exe"
+            "SourcePath" = "8:..\\CommandLine\\obj\\Debug\\net10.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
