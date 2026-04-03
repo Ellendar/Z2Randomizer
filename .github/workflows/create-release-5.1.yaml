@@ -5,7 +5,7 @@ on:
     inputs:
       branch:
         description: 'Branch to release from'
-        default: 5.1
+        default: main
         required: true
         type: string
       version:
