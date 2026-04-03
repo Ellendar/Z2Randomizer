@@ -1,18 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using DynamicData.Kernel;
 using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.RandomizerCore;
 
+// Gradually add indexes here as needed. I think in the end we will probably have two Text lists as well.
+public enum DialogWest
+{
+    ALREADY_HAVE_ITEM = 16,
+}
+
+// In the CustomTexts constants, the east indexes are +52. This enum however, uses the indexes the assembly uses.
+public enum DialogEast
+{
+    NOT_ENOUGH_CONTAINERS = 17,
+    ALREADY_HAVE_ITEM = 19,                // not used if spells are in the pool
+    OLD_KASUTO_NOT_ENOUGH_CONTAINERS = 43, // not used if spells are in the pool
+}
+
 public class CustomTexts
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    //Experimental. If people like this it may get a flag or just be always on
+    private const bool OLD_KASUTO_HINT_IS_ALWAYS_GOOD = true;
+
     private const int errorTextIndex1 = 25; // Error inside house on 1st screen in Ruto, 1st message
     private const int errorTextIndex2 = 26; // Error 2nd message
+
+    private const int SariaGreeterNpc = 28;
 
     private const int talkingBotIndexSleeping = 49; // Sleeping Bot in Saria inside house on 2nd screen, Zzz... message the first 3 talks
     private const int talkingBotIndexTalking = 50; // Sleeping Bot final message
@@ -38,6 +57,10 @@ public class CustomTexts
     private static readonly int[] movingNabooru = [61, 60];
     private static readonly int[] daruniaMoving = [72, 75];
     private static readonly int[] newkasutoMoving = [88, 89];
+
+    private static readonly List<int> kidHintNpcs = [12, 73, 77];
+    private static readonly List<int> outsideHintNpcs = [18, 28, 32, 64, 73, 83];
+
 
     private static readonly Collectable[] smallItems = [
         Collectable.BLUE_JAR,
@@ -65,6 +88,7 @@ public class CustomTexts
         {Town.OLD_KASUTO, 94},
     };
 
+    public const int WEST_TEXT_COUNT = 52;
     private const int MAX_TEXT_LENGTH = 3134;
     private const int numberOfTextEntries = 98;
     //TODO: This should just be a listing of every text index by continent, but for now it's a pile.
@@ -118,8 +142,8 @@ public class CustomTexts
         { Collectable.THUNDER_SPELL, 96 },
     };
 
-    private static readonly int[][] hintIndexes = [rauruHints, rutoHints, sariaHints, kingsTomb, midoHints, nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint
-    ];
+    private static readonly int[][] hintIndexes = [rauruHints, rutoHints, sariaHints, midoHints, 
+        nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint, kingsTomb];
 
     public static readonly string[] GENERIC_WIZARD_TEXTS =
     [
@@ -251,7 +275,8 @@ public class CustomTexts
         "Tiger$Uppercut!",
         "Never$gonna let$you down",
         "Thanks$for not$skipping$me",
-        "The$Opportunity$Arises"
+        "The$Opportunity$Arises",
+        "When you$up, press$jump to$stab"
     ];
 
     public static readonly string[] KNOW_NOTHING_TEXTS =
@@ -269,12 +294,68 @@ public class CustomTexts
         "your$call is$important$please hold",
         "silence$is golden",
         "Bless you",
+        "PAY ME$AND I'LL$TALK",
+        "the hint$is in$another$castle",
+        "did you$check the$old kasuto$hint?",
+        "Hookshot$is in$moon$palace",
+        "Ness is$homesick",
+        "Hi!$Billy Mays$here",
+        "I like$turtles",
+        "I hear$3D Zeldas$Have$SIX stabs",
+        "I CANT TELL$YA HOW$NOTHING$I KNOW",
+        "Password$is$Ken$sent me",
+        "Why$are we$always$yelling?",
+        "Rebo-shark$doot doot$doot doot$doot doot",
+        "If I knew$something,$I would$tell you"
+    ];
+
+    public static readonly string[] KNOW_NOTHING_OUTSIDE_TEXTS =
+    [
+        .. KNOW_NOTHING_TEXTS,
+        "I am not$a vire$in$disguise",
+        "Im trying$my best to$not turn$into an$ache",
+    ];
+
+    public static readonly string[] KNOW_NOTHING_KID_TEXTS =
+    [
+        .. KNOW_NOTHING_TEXTS,
+        "They call$me the$hintless$kid",
+    ];
+
+    public static readonly string[] KNOW_NOTHING_SARIA_GREETER_TEXTS =
+    [
+        .. KNOW_NOTHING_OUTSIDE_TEXTS,
+        "Whats the$deal with$pots?  You$Break them$and no one$notices!",
+        "Whats the$deal with$lava?$Jump in,$refill MP,$no problem!",
+    ];
+
+    public static readonly string[] MOVING_NPC_TEXTS =
+    [
+        "I Know$Nothing",
+        "Knowledge$Is Not$Mine",
+        "Nothing$Know I",
+        "Try To$Get A$Guide",
+        "What$timeline$is this?",
+        "Bless you",
         "Hola!",
         "I am not$a vire$in$disguise",
         "Woah!$Dude!",
-        "PAY ME$AND I'LL$TALK",
-        "the hint$is in$another$castle",
-        "did you$check the$old kasuto$hint?"
+        "Ness is$homesick",
+        "Hi!$Billy Mays$here",
+        "I like$turtles",
+        "I hear$3D Zeldas$Have$SIX stabs",
+        "I CANT TELL$YA HOW$NOTHING$I KNOW",
+        "Password$is$Ken$sent me",
+        "Why$are we$always$yelling?",
+        "Im trying$my best to$not turn$into an$ache",
+        "If I knew$something,$I would$tell you",
+        "Im running$a swordless$seed",
+    ];
+
+    public static readonly string[] ALREADY_HAVE_ITEM_TEXTS =
+    [
+        "sorry,$an impostor$was here$earlier and$took it",
+        "what more$do you want$from me?",
     ];
 
     public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXT =
@@ -287,7 +368,7 @@ public class CustomTexts
         "The magic$class did$not help$you enough",
         "Show me$your$credits!",
         "I cannot$contain$my laughter",
-        "You must$construct$addtional$pylons",
+        "You must$construct$additional$pylons",
         "bet you$forgot$this flag$was on",
         "I'll tell$you when$you're$older"
     ];
@@ -299,7 +380,7 @@ public class CustomTexts
         { Town.SARIA_NORTH, ["Water$you$doing?"] },
         { Town.MIDO_WEST, [] },
         { Town.MIDO_CHURCH, [] },
-        { Town.NABOORU, [] },
+        { Town.NABOORU, ["Do not$drink the$fountain$water here$...$trust me."] },
         { Town.DARUNIA_ROOF, [] },
         { Town.DARUNIA_WEST, ["You saved$a kid$for this?", "Dont$forget to$get upstab"] },
         { Town.NEW_KASUTO, [] },
@@ -315,7 +396,7 @@ public class CustomTexts
         { Collectable.FIRE_SPELL, ["this is$fine", "use this$to burn$gems", "This spell$is$worthless", "Goodness$Gracious!", "This one$goes out$to the one$I love"]},
         { Collectable.DASH_SPELL, ["Rolling$around at$the speed$of sound", "Gotta$Go$Fast", "Use the$boost to$get through"]},
         { Collectable.REFLECT_SPELL, ["I am not$Mirror$Shield", "Crysta$was$here", "Youre$rubber,$Theyre$glue", "Send$Carock my$regards", "Is This$Hera$Basement?"]},
-        { Collectable.SPELL_SPELL, ["Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy"]},
+        { Collectable.SPELL_SPELL, ["Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy", "How do you$Spell$Spell$Spell"]},
         { Collectable.THUNDER_SPELL, ["With this$you can$now beat$the game", "Ultrazord$Power Up!", "Terrible$terrible$damage", "hes dead$jim"]},
         { Collectable.UPSTAB, UPSTAB_TEXTS },
         { Collectable.DOWNSTAB, DOWNSTAB_TEXTS }
@@ -327,49 +408,89 @@ public class CustomTexts
     [
         "GET$EQUIPPED$WITH THE$%",
         "Tis a good$Day for$%%",
-        "I can't$believe$it's$%",
-        "All Hail$%$heroes$rise again",
+        "I can't$believe$it's$%%",
+        "All Hail$%%$heroes$rise again",
         "Congrats!$it's a$%%",
-        "One Fish$Two Fish$Red Fish$%",
-        "Master it$and you$can have$%",
-        "%$it's what$plants$crave",
-        "%$bagu$gives it$5 stars",
-        "The$power of$%$is yours",
-        "ganon is$jealous$of your$%",
+        "One Fish$Two Fish$Red Fish$%%",
+        "Master it$and you$can have$%%",
+        "%%$it's what$plants$crave",
+        "%%$bagu$gives it$5 stars",
+        "The$power of$%%$is yours",
+        "ganon is$jealous$of your$%%",
         "the secret$to life is$%%",
-        "Your love$is like$bad$%",
-        "Screw the$rules I$have this$%",
-        "excuse me$you forgot$this$%",
-        "takes this!$%$now I can$retire",
-        "you$gotta$have$%",
+        "Your love$is like$bad$%%",
+        "Screw the$rules I$have this$%%",
+        "excuse me$you forgot$this$%%",
+        "takes this!$%%$now I can$retire",
+        "you$gotta$have$%%",
         "I love the$%%$its so bad",
-        "don't feed$%$after$midnight",
-        "take the$%$leave the$cannoli",
+        "don't feed$%%$after$midnight",
+        "take the$%%$leave the$cannoli",
         "%$%$%$Yay!",
-        "I will$give you$%$to go away",
+        "I will$give you$%%$to go away",
         "%%$does not$spark joy",
-        "lets talk$about$%$baby!",
-        "When all$else fails$try$%",
+        "lets talk$about$%%$baby!",
+        "When all$else fails$try$%%",
         "%%$it's what's$for dinner",
         "%%$needs food$badly",
         "%%$detected",
-        "Badger$Badger$Badger$%",
-        "The$World$is a$%",
-        "link$meets$%",
-        "a brand$new$%$!!!",
-        "Earth Fire$wind water$%",
-        "happy$%$day!!",
-        "%$%$never$changes",
+        "Badger$Badger$Badger$%%",
+        "The$World$is a$%%",
+        "link$meets$%%",
+        "a brand$new$%%$!!!",
+        "Earth Fire$wind water$%%",
+        "happy$%%$day!!",
+        "%%$%%$never$changes",
         "%%$is$cheating",
-        "This seed$sponsored$by$%",
-        "we all$live in$a yellow$%",
-        "its$%$time!",
-        "fresh$%$50 rupees$obo",
-        "no whammy$no whammy$and stop!$%",
+        "This seed$sponsored$by$%%",
+        "we all$live in$a yellow$%%",
+        "its$%%$time!",
+        "fresh$%%$50 rupees$obo",
+        "no whammy$no whammy$and stop!$%%",
         "all you$need is$%%",
-        "the secret$word is$%",
-        "have a$%$on the$house",
+        "the secret$word is$%%",
+        "have a$%%$on the$house",
+        "I summon$%%$in attack$position!",
+        "It puts the$%%$on its$skin",
+        "I can haz$%%",
+        "I know$this is$the$%%",
+        "Smells$like$%%$in here",
+        "Have this$%$But I will$ask a$favor of$you later",
+        "I knew it!$%%$is the one.",
+        "Zora has$%$cheaper$but this$saves on$shipping",
+        "%%$gon give$it to ya",
+        "Promise me$you will$use$%%$responsibly",
+        "Try using$%%$at your$next party",
     ];
+
+    public List<Text> Texts { get; private set; }
+
+    public Text GetText(DialogWest index)
+    {
+        return Texts[(int)index];
+    }
+    public void SetText(DialogWest index, Text text)
+    {
+        Texts[(int)index] = text;
+    }
+    public Text GetText(DialogEast index)
+    {
+        return Texts[(int)index + WEST_TEXT_COUNT];
+    }
+    public void SetText(DialogEast index, Text text)
+    {
+        Texts[(int)index + WEST_TEXT_COUNT] = text;
+    }
+
+    public CustomTexts(ROM rom)
+    {
+        Texts = rom.GetGameText();
+    }
+
+    public CustomTexts(List<Text> texts)
+    {
+        Texts = texts;
+    }
 
     public static List<Text> GenerateTexts(
         IEnumerable<Location> locations,
@@ -378,6 +499,12 @@ public class CustomTexts
         RandomizerProperties props,
         Random hashRNG)
     {
+        DebugValidateTexts();
+
+        // This will use the `texts` list internally. A compromise because I shouldn't refactor this entire class at the moment,
+        // and I can still use proper east indexes.
+        CustomTexts customTexts = new(texts);
+
         // Make a new RNG for community text so that it doesn't affect the final hash.
         var nonhashRNG = new Random(hashRNG.Next());
         do
@@ -455,12 +582,14 @@ public class CustomTexts
 
             if (props.UseCommunityText)
             {
-                //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when you don't have
-                //enough magic containers and container requirements are on.
-                texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!);
-                //Old kasuto guy has a different vanilla not enough containers message
-                texts[95] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!);
+                //Generate replacements for "I CANNOT HELP YOU ANYMORE. GO NOW."
+                customTexts.SetText(DialogWest.ALREADY_HAVE_ITEM, new Text(ALREADY_HAVE_ITEM_TEXTS.Sample(nonhashRNG)!));
+                customTexts.SetText(DialogEast.ALREADY_HAVE_ITEM, new Text(ALREADY_HAVE_ITEM_TEXTS.Sample(nonhashRNG)!));
+                //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when
+                //you don't have enough magic containers and container requirements are on.
+                customTexts.SetText(DialogEast.NOT_ENOUGH_CONTAINERS, new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!));
             }
+            customTexts.SetText(DialogEast.OLD_KASUTO_NOT_ENOUGH_CONTAINERS, customTexts.GetText(DialogEast.NOT_ENOUGH_CONTAINERS));
 
             if (props.TownNameHints)
             {
@@ -470,9 +599,10 @@ public class CustomTexts
 
         return texts;
     }
+
     private static Text GenerateBaguWoodsHint(Location bagu)
     {
-        int baguy = bagu.Ypos - 30;
+        int baguy = bagu.Y;
         int bagux = bagu.Xpos;
         string hint = "BAGU IN$";
         if (baguy < 25)
@@ -532,7 +662,7 @@ public class CustomTexts
             texts[TOWN_SIGN_INDEXES[(Town)location.ActualTown!]] = GenerateTownSignHint(location.Collectables[0], linkedFire);
         }
     }
-    public static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
+    private static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
     {
         string text = spell.EnglishText();
         if(spell == Collectable.FIRE_SPELL && linkedFire)
@@ -543,7 +673,7 @@ public class CustomTexts
         return new Text(text);
     }
 
-    public static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText)
+    private static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText)
     {
         if(location.ActualTown == null)
         {
@@ -626,8 +756,8 @@ public class CustomTexts
             .. kingsTomb,
             .. oldkasutoHint,
             errorTextIndex2,
-            talkingBotIndexSleeping,
-            talkingAcheIndexSleeping,
+            talkingAcheIndexTalking,
+            talkingBotIndexTalking,
         ];
 
         List<int> moving =
@@ -647,24 +777,45 @@ public class CustomTexts
             int textIndex = stationary[i];
             if (!placedIndexes.Contains(textIndex))
             {
-                if (textIndex == 12)
+                Text hint;
+                if (useCommunityText)
                 {
-                    hints[textIndex] = new Text("I am just$a kid"); // default new line for kid in Rauro (for testing purposes)
-                }
-                else if (textIndex == 77)
-                {
-                    hints[textIndex] = new Text("Who were$you$expecting?"); // default line for new purple kid in Darunia (for testing purposes)
+                    if (kidHintNpcs.Contains(textIndex))
+                    {
+                        hint = new Text(KNOW_NOTHING_KID_TEXTS.Sample(r)!);
+                    }
+                    else if (textIndex == SariaGreeterNpc)
+                    {
+                        hint = new Text(KNOW_NOTHING_SARIA_GREETER_TEXTS.Sample(r)!);
+                    }
+                    else if (outsideHintNpcs.Contains(textIndex))
+                    {
+                        hint = new Text(KNOW_NOTHING_OUTSIDE_TEXTS.Sample(r)!);
+                    }
+                    else
+                    {
+                        hint = new Text(KNOW_NOTHING_TEXTS.Sample(r)!);
+                    }
                 }
                 else
                 {
-                    hints[textIndex] = useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
+                    hint = defaultKnowNothing;
+                }
+                hints[textIndex] = hint;
+                if (textIndex == talkingAcheIndexTalking)
+                {
+                    hints[talkingAcheIndexSleeping] = hint;
+                }
+                else if (textIndex == talkingBotIndexTalking)
+                {
+                    hints[talkingBotIndexSleeping] = hint;
                 }
             }
         }
 
         for (int i = 0; i < moving.Count; i++)
         {
-            hints[moving[i]] =  useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
+            hints[moving[i]] =  useCommunityText ? new Text(MOVING_NPC_TEXTS.Sample(r)!) : defaultKnowNothing;
         }
     }
 
@@ -700,6 +851,10 @@ public class CustomTexts
         }
 
         int hintsCount = HELPFUL_HINTS_COUNT;
+        if(OLD_KASUTO_HINT_IS_ALWAYS_GOOD)
+        {
+            hintsCount++;
+        }
         //trying without the bonus hint now that spell shuffle has town hints.
         /*
         if(props.IncludeSwordTechsInShuffle && props.IncludeQuestItemsInShuffle)
@@ -730,17 +885,32 @@ public class CustomTexts
         }
         hintCollectables.Add(items.Where(smallItems.Contains).ToList().Sample(r));
 
-
+        bool requiredOldKasutoHintPlaced = !OLD_KASUTO_HINT_IS_ALWAYS_GOOD;
         foreach(Collectable hintCollectable in hintCollectables)
         {
             List<Location> possibleHintLocations = locations.Where(i => i.Collectables.Contains(hintCollectable)).ToList();
-            Location hintLocation = possibleHintLocations.Sample(r) ?? throw new ImpossibleException("Error generating hint for unplaced item");
-            Text hint = Text.GenerateHelpfulHint(locations.ToList(), hintLocation, hintCollectable, props.IncludeSpellsInShuffle);
-            int town = r.Next(9);
-            while (placedTowns.Contains(town))
+
+            Location hintLocation;
+            int town;
+            do
             {
-                town = r.Next(9);
+                //This fails if we ever have more than 1 item location in old kasuto, but that is unlikely
+                if(!hintCollectable.IsMinorItem() && !requiredOldKasutoHintPlaced)
+                {
+                    town = 7;
+                    requiredOldKasutoHintPlaced = true;
+                }
+                else
+                {
+                    town = r.Next(9);
+                }
+                hintLocation = possibleHintLocations.Sample(r) ?? throw new ImpossibleException("Error generating hint for unplaced item");
+
             }
+            //don't let hints be for items in the same town
+            while ((hintLocation.ActualTown ?? Town.INVALID).VanillaTownOrder() - 1 == town
+             || placedTowns.Contains(town));
+            Text hint = Text.GenerateHelpfulHint(locations.ToList(), hintLocation, hintCollectable, props.IncludeSpellsInShuffle);
             int index = hintIndexes[town][r.Next(hintIndexes[town].Length)];
             switch (index)
             {
@@ -801,15 +971,21 @@ public class CustomTexts
                 hints[childSpellHintIndex] = kidHint;
             }
 
-            if(props.IncludeQuestItemsInShuffle)
+            if (props.IncludeQuestItemsInShuffle)
             {
                 itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.MIRROR))!;
-                Text mirrorHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.MIRROR, props.IncludeSpellsInShuffle);
-                hints[mirrorSpellHintIndex] = mirrorHint;
+                if (itemLocation != null)
+                {
+                    Text mirrorHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.MIRROR, props.IncludeSpellsInShuffle);
+                    hints[mirrorSpellHintIndex] = mirrorHint;
+                }
 
                 itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.WATER))!;
-                Text waterHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.WATER, props.IncludeSpellsInShuffle);
-                hints[waterSpellHintIndex] = waterHint;
+                if (itemLocation != null)
+                {
+                    Text waterHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.WATER, props.IncludeSpellsInShuffle);
+                    hints[waterSpellHintIndex] = waterHint;
+                }
             }
         }
     }
@@ -867,5 +1043,35 @@ public class CustomTexts
             }
         }
         return sum;
+    }
+
+    /// Make sure all strings are max 11x6
+    [Conditional("DEBUG")]
+    private static void DebugValidateTexts()
+    {
+        List<string> allTexts = [
+            .. GENERIC_WIZARD_TEXTS,
+            .. RIVER_MAN_TEXTS,
+            .. BAGU_TEXTS,
+            .. DOWNSTAB_TEXTS,
+            .. UPSTAB_TEXTS,
+            .. KNOW_NOTHING_TEXTS,
+            .. KNOW_NOTHING_OUTSIDE_TEXTS,
+            .. KNOW_NOTHING_KID_TEXTS,
+            .. KNOW_NOTHING_SARIA_GREETER_TEXTS,
+            .. MOVING_NPC_TEXTS,
+            .. ALREADY_HAVE_ITEM_TEXTS,
+            .. NOT_ENOUGH_CONTAINERS_TEXT,
+            .. COMMUNITY_NONSPELL_GET_TEXT,
+
+            .. WIZARD_SPELL_TEXTS_BY_TOWN.SelectMany(ls => ls.Value),
+            .. WIZARD_SPELL_TEXTS_BY_COLLECTABLE.SelectMany(ls => ls.Value),
+        ];
+
+        foreach (var s in allTexts)
+        {
+            var text = new Text(s);
+            Debug.Assert(text.ValidateDialogText());
+        }
     }
 }

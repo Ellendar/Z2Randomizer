@@ -1,9 +1,7 @@
 using System.Reflection;
 using CrossPlatformUI.Presets;
-using FluentAssertions.Execution;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Flags;
-using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.Tests;
 
@@ -17,17 +15,19 @@ public class FlagsTests
         flagBuilder.Append(false);
         String flags = flagBuilder.ToString();
         FlagReader flagReader = new FlagReader(flags);
-        Assert.AreEqual(false, flagReader.ReadBool());
+        Assert.IsFalse(flagReader.ReadBool());
 
         flagBuilder.Append(false);
         flagBuilder.Append(true);
         flags = flagBuilder.ToString();
         flagReader = new FlagReader(flags);
-        Assert.AreEqual(false, flagReader.ReadBool());
-        Assert.AreEqual(false, flagReader.ReadBool());
-        Assert.AreEqual(true, flagReader.ReadBool());
+        Assert.IsFalse(flagReader.ReadBool());
+        Assert.IsFalse(flagReader.ReadBool());
+        Assert.IsTrue(flagReader.ReadBool());
     }
+
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MSTEST0037:Use proper 'Assert' methods", Justification = "Does not work with nullable bool")]
     public void TestNullableBoolEncodeCycle()
     {
         bool? nullBool = null;
@@ -45,43 +45,46 @@ public class FlagsTests
         Assert.AreEqual((bool?)false, flagReader.ReadNullableBool());
         Assert.AreEqual((bool?)true, flagReader.ReadNullableBool());
     }
+
     [TestMethod]
     public void TestIntEncodeCycle()
     {
-        var limit = 8;
-        var minimum = 1;
+        var extent = 8; // 3 bits
         FlagBuilder flagBuilder = new FlagBuilder();
-        flagBuilder.Append(1, limit, minimum);
+        flagBuilder.Append(1, extent);
         String flags = flagBuilder.ToString();
         FlagReader flagReader = new FlagReader(flags);
-        Assert.AreEqual(1, flagReader.ReadInt(limit, minimum));
+        Assert.AreEqual(1, flagReader.ReadInt(extent));
 
-        flagBuilder.Append(8, limit, minimum);
-        flagBuilder.Append(3, limit, minimum);
+        flagBuilder.Append(7, extent);
+        flagBuilder.Append(3, extent);
         flags = flagBuilder.ToString();
         flagReader = new FlagReader(flags);
-        Assert.AreEqual(1, flagReader.ReadInt(limit, minimum));
-        Assert.AreEqual(8, flagReader.ReadInt(limit, minimum));
-        Assert.AreEqual(3, flagReader.ReadInt(limit, minimum));
+        Assert.AreEqual(1, flagReader.ReadInt(extent));
+        Assert.AreEqual(7, flagReader.ReadInt(extent));
+        Assert.AreEqual(3, flagReader.ReadInt(extent));
     }
+
     [TestMethod]
     public void TestEnumEncodeCycle()
     {
-        var index = RandomizerConfiguration.GetEnumIndex<StartingResourceLimit>(StartingResourceLimit.NO_LIMIT);
+        var index = RandomizerConfiguration.GetEnumIndex(StartingResourceLimit.NO_LIMIT);
         var count = RandomizerConfiguration.GetEnumCount<StartingResourceLimit>();
         FlagBuilder flagBuilder = new FlagBuilder();
         flagBuilder.Append(index, count);
         String flags = flagBuilder.ToString();
         FlagReader flagReader = new FlagReader(flags);
-        Assert.AreEqual(StartingResourceLimit.NO_LIMIT, flagReader.ReadEnum<StartingResourceLimit>());
+        Assert.AreEqual(StartingResourceLimit.NO_LIMIT, RandomizerConfiguration.DeserializeEnum<StartingResourceLimit>(flagReader, "Test1"));
 
-        index = RandomizerConfiguration.GetEnumIndex<StartingResourceLimit>(StartingResourceLimit.FOUR);
+        index = RandomizerConfiguration.GetEnumIndex(StartingResourceLimit.FOUR);
         flagBuilder.Append(index, count);
         flags = flagBuilder.ToString();
         flagReader = new FlagReader(flags);
-        Assert.AreEqual(StartingResourceLimit.NO_LIMIT, flagReader.ReadEnum<StartingResourceLimit>());
-        Assert.AreEqual(StartingResourceLimit.FOUR, flagReader.ReadEnum<StartingResourceLimit>());
+        Assert.AreEqual(StartingResourceLimit.NO_LIMIT, RandomizerConfiguration.DeserializeEnum<StartingResourceLimit>(flagReader, "Test2"));
+        Assert.AreEqual(StartingResourceLimit.FOUR, RandomizerConfiguration.DeserializeEnum<StartingResourceLimit>(flagReader, "Test3"));
     }
+
+    /* We no longer have any custom flag encodes
     [TestMethod]
     public void TestCustomEncodeCycle()
     {
@@ -92,7 +95,9 @@ public class FlagsTests
         String flags = flagBuilder.ToString();
         FlagReader flagReader = new FlagReader(flags);
         Assert.AreEqual(climate, serializer.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
-    }
+    }*/
+
+    /* Nullable int flags are no longer allowed (use Enums).
     [TestMethod]
     public void TestNullableIntEncodeCycle()
     {
@@ -113,12 +118,13 @@ public class FlagsTests
         Assert.AreEqual((int?)8, flagReader.ReadNullableInt(limit, minimum));
         Assert.AreEqual((int?)3, flagReader.ReadNullableInt(limit, minimum));
     }
+    */
+
     [TestMethod]
     public void TestBlankEncodeCycle()
     {
         RandomizerConfiguration config = new();
-        string flags = config.Flags;
-        RandomizerConfiguration config2 = new(flags);
+        RandomizerConfiguration config2 = new(config.SerializeFlags());
         var failures = new List<string>();
         foreach(PropertyInfo property in typeof(RandomizerConfiguration).GetProperties())
         {
@@ -131,7 +137,7 @@ public class FlagsTests
             if (v1 != v2)
                 failures.Add($"{property.Name} did not match. Config: {v1} Config2: {v2}");
         }
-        Assert.IsTrue(failures.Count == 0,
+        Assert.IsEmpty(failures,
             $"The following assertions failed: {Environment.NewLine}{string.Join(Environment.NewLine, failures)}");
     }
 
@@ -139,15 +145,15 @@ public class FlagsTests
     public void TestStandardFlagsEncodeCycle()
     {
         RandomizerConfiguration config = StandardPreset.Preset;
-        RandomizerConfiguration config2 = new RandomizerConfiguration(StandardPreset.Preset.Flags);
-        Assert.AreEqual(config.Flags, config2.Flags);
+        RandomizerConfiguration config2 = new RandomizerConfiguration(StandardPreset.Preset.SerializeFlags());
+        Assert.AreEqual(config.SerializeFlags(), config2.SerializeFlags());
     }
 
     [TestMethod]
     public void TestMaxRandoEncodeCycle()
     {
-        RandomizerConfiguration config = MaxRandoPreset.Preset;
-        RandomizerConfiguration config2 = new RandomizerConfiguration(MaxRandoPreset.Preset.Flags);
-        Assert.AreEqual(config.Flags, config2.Flags);
+        RandomizerConfiguration config = MaxRando2025Preset.Preset;
+        RandomizerConfiguration config2 = new RandomizerConfiguration(MaxRando2025Preset.Preset.SerializeFlags());
+        Assert.AreEqual(config.SerializeFlags(), config2.SerializeFlags());
     }
 }

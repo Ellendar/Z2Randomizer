@@ -251,6 +251,10 @@ public static class CollectableExtensions
             Collectable.CHILD => RequirementType.CHILD,
             Collectable.MIRROR => RequirementType.MIRROR,
             Collectable.WATER => RequirementType.WATER,
+            Collectable.FLUTE => RequirementType.FLUTE,
+            Collectable.HAMMER => RequirementType.HAMMER,
+            Collectable.BOOTS => RequirementType.BOOTS,
+            Collectable.BAGUS_NOTE => RequirementType.BAGU_LETTER,
             _ => null
         };
     }

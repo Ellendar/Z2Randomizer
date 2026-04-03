@@ -25,7 +25,9 @@ public class Spoiler
         { Terrain.LAVA, 0x116e0 },
         { Terrain.MOUNTAIN, 0x11640 },
         { Terrain.WATER, 0x116e0 },
+        { Terrain.PREPLACED_WATER, 0x116e0 },
         { Terrain.WALKABLEWATER, 0x116e0 },
+        { Terrain.PREPLACED_WATER_WALKABLE, 0x116e0 },
         { Terrain.ROCK, 0x11560 },
         { Terrain.RIVER_DEVIL, 0x11400 },
     };
@@ -45,7 +47,9 @@ public class Spoiler
         { Terrain.LAVA, 0x1c45f },
         { Terrain.MOUNTAIN, 0x1c45f },
         { Terrain.WATER, 0x100aa },
+        { Terrain.PREPLACED_WATER, 0x100aa },
         { Terrain.WALKABLEWATER, 0x1c467 },
+        { Terrain.PREPLACED_WATER_WALKABLE, 0x1c467 },
         { Terrain.ROCK, 0x1c45f },
         { Terrain.RIVER_DEVIL, 0x1c45f },
     };
@@ -76,11 +80,13 @@ public class Spoiler
                 case Terrain.GRASS:
                 case Terrain.SWAMP:
                 case Terrain.WALKABLEWATER:
+                case Terrain.PREPLACED_WATER_WALKABLE:
                 case Terrain.ROAD:
                 case Terrain.LAVA:
                     // repeat 8x8 tile 4 times into a 16x16 tile
                     tileBitmap = LoadChrFillPattern(rom, chrAddr, 1, 1, 2, 2, palette);
                     break;
+                case Terrain.PREPLACED_WATER:
                 case Terrain.WATER:
                     palette = [.. palette[..3], 0x11]; // distinguish between walkable and unwalkable water
                     tileBitmap = LoadChrFillPattern(rom, chrAddr, 1, 1, 2, 2, palette);
@@ -110,10 +116,10 @@ public class Spoiler
 
     public byte[] CreateSpoilerImage(List<World> worlds)
     {
-        int column1Width = Math.Max(worlds[0].MAP_COLS, worlds[1].MAP_COLS);
-        int column2Width = Math.Max(worlds[2].MAP_COLS, worlds[3].MAP_COLS);
-        int row1Height = Math.Max(worlds[0].MAP_ROWS, worlds[2].MAP_ROWS);
-        int row2Height = Math.Max(worlds[1].MAP_ROWS, worlds[3].MAP_ROWS);
+        int column1Width = Math.Max(worlds[0].MapColumns, worlds[1].MapColumns);
+        int column2Width = Math.Max(worlds[2].MapColumns, worlds[3].MapColumns);
+        int row1Height = Math.Max(worlds[0].MapRows, worlds[2].MapRows);
+        int row2Height = Math.Max(worlds[1].MapRows, worlds[3].MapRows);
         int gapSize = 1;
         int tilesWide = column1Width + column2Width + gapSize;
         int tilesHigh = row1Height + row2Height + gapSize;
@@ -140,9 +146,9 @@ public class Spoiler
 
     private void DrawWorld(SKCanvas canvas, World world, int startDrawX, int startDrawY)
     {
-        int offsetX = (world is MazeIsland && (world.biome == Biome.VANILLA || world.biome == Biome.VANILLA_SHUFFLE)) ? 32 : 0;
-        int width = ((world is DeathMountain || world is MazeIsland) && (world.biome == Biome.VANILLA || world.biome == Biome.VANILLA_SHUFFLE)) ? 32 : world.MAP_COLS;
-        int height = ((world is DeathMountain || world is MazeIsland) && (world.biome == Biome.VANILLA || world.biome == Biome.VANILLA_SHUFFLE)) ? 48 : world.MAP_ROWS;
+        int offsetX = (world is MazeIsland && world.biome.UsesVanillaMap()) ? 32 : 0;
+        int width = ((world is DeathMountain || world is MazeIsland) && world.biome.UsesVanillaMap()) ? 32 : world.MapColumns;
+        int height = ((world is DeathMountain || world is MazeIsland) && world.biome.UsesVanillaMap()) ? 48 : world.MapRows;
 
         var background = new SKPaint();
         background.Color = SKColors.Black;

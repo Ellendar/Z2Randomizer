@@ -26,13 +26,22 @@ FREE "PRG7" [$FEAA, $FFE8)
 	.word IrqHdlr
 
 bank7_code0 = $c000
+bank7_Remove_All_Sprites = $d24c
 
-
-; Use the HP tile instead of the original sprite zero sliver tile
-; This frees up tile $c5
+; Remove sprite zero sliver tile. This frees up tile $c5 and one sprite.
 .segment "PRG0"
-.org $8CDD
-    .byte $0f, $6e, $21, $68
+.org $8cdd  ; old sprite 0 table followed by old SideviewInit
+FREE_UNTIL NewSideviewInit
+
+.segment "PRG5"
+.org $a7a8
+JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
+
+.segment "PRG7"
+.org $c1a2
+JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
+.org $c212
+JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
 
 .segment "PRG7"
 ; Replace the code to wait for sprite 0 with code to set up the scanline IRQ

@@ -1,12 +1,14 @@
 <Project>
   <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <AvaloniaVersion>11.3.4</AvaloniaVersion>
-    <DialogHostAvaloniaVersion>0.9.3</DialogHostAvaloniaVersion>
-    <MaterialAvaloniaVersion>3.13.0</MaterialAvaloniaVersion>
-    <MaterialIconsAvaloniaVersion>2.1.12</MaterialIconsAvaloniaVersion>
+    <Js65Version>1.0.7</Js65Version>
+    <AvaloniaVersion>11.3.12</AvaloniaVersion>
+    <DialogHostAvaloniaVersion>0.10.4</DialogHostAvaloniaVersion>
+    <MaterialAvaloniaVersion>3.13.4</MaterialAvaloniaVersion>
+    <MaterialIconsAvaloniaVersion>2.4.1</MaterialIconsAvaloniaVersion>
     <SkiaSharpVersion>2.88.9</SkiaSharpVersion> <!-- Match version used by Avalonia internally -->
-<!--    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <EnableWorkloadRestore>true</EnableWorkloadRestore>
@@ -16,9 +18,9 @@
     <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
 <!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
-    </PropertyGroup>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <Workload Include="wasm-tools" />
-    </ItemGroup>
+  <ItemGroup>
+    <Workload Include="wasm-tools" />
+  </ItemGroup>
 </Project>

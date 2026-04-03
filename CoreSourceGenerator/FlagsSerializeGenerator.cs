@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -84,10 +85,12 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             {
                 FieldName = f.Name,
                 FieldType = f.Type.ToDisplayString(),
+                IsConditionallyIncluded = HasConditionallyIncludedInFlagsAttribute(f),
+                DefaultValue = GetDefaultValue(f),
                 IsEnum = f.Type.TypeKind == TypeKind.Enum,
                 EnumSymbol = f.Type.TypeKind == TypeKind.Enum ? f.Type as INamedTypeSymbol : null,
-                Limit = GetCustomLimit(f),
                 Minimum = GetCustomMinimum(f),
+                Maximum = GetCustomMaximum(f),
                 CustomSerializerName = GetCustomFlagSerializer(f),
             }).ToList();
 
@@ -124,6 +127,20 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             .Any(i => i.Name == "INotifyPropertyChanged");
     }
 
+    private static bool HasConditionallyIncludedInFlagsAttribute(IFieldSymbol field)
+    {
+        return field.GetAttributes()
+            .Any(attr => attr.AttributeClass?.Name.StartsWith("ConditionallyIncludeInFlags") ?? false);
+    }
+
+    private static string GetDefaultValue(IFieldSymbol f)
+    {
+        var defaultAttr = f.GetAttributes()
+            .FirstOrDefault(a => a.AttributeClass?.ToDisplayString() == "System.ComponentModel.DefaultValueAttribute");
+        var arg = defaultAttr?.ConstructorArguments[0];
+        return arg != null ? FormatArgument(arg.Value) : "default";
+    }
+
     private static bool HasIgnoreInFlagsAttribute(IFieldSymbol field)
     {
         return field.GetAttributes()
@@ -136,20 +153,6 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             .Any(attr => attr.AttributeClass?.Name.StartsWith("Reactive") ?? false);
     }
 
-    private static int? GetCustomLimit(IFieldSymbol property)
-    {
-        var customAttr = property.GetAttributes()
-            .FirstOrDefault(attr => attr.AttributeClass?.Name.StartsWith("Limit") ?? false);
-
-        if (customAttr?.ConstructorArguments.Length > 0 &&
-            customAttr.ConstructorArguments[0].Value is int limit)
-        {
-            return limit;
-        }
-
-        return null;
-    }
-
     private static int? GetCustomMinimum(IFieldSymbol property)
     {
         var customAttr = property.GetAttributes()
@@ -159,6 +162,20 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             customAttr.ConstructorArguments[0].Value is int minimum)
         {
             return minimum;
+        }
+
+        return null;
+    }
+
+    private static int? GetCustomMaximum(IFieldSymbol property)
+    {
+        var customAttr = property.GetAttributes()
+            .FirstOrDefault(attr => attr.AttributeClass?.Name.StartsWith("Maximum") ?? false);
+
+        if (customAttr?.ConstructorArguments.Length > 0 &&
+            customAttr.ConstructorArguments[0].Value is int maximum)
+        {
+            return maximum;
         }
 
         return null;
@@ -197,7 +214,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             //     attrName = attrName[..^9];
 
             var args = attr.ConstructorArguments
-                .Select(arg => arg.Value?.ToString() ?? "null")
+                .Select(arg => FormatArgument(arg))
                 .ToList();
 
             attributes.Add(new AttributeInfo
@@ -292,7 +309,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         sb.AppendLine($"{indent}            {{");
         sb.AppendLine($"{indent}                {field.FieldName} = value;");
         sb.AppendLine($"{indent}                OnPropertyChanged(nameof({field.PropertyName}));");
-        sb.AppendLine($"{indent}                OnPropertyChanged(nameof(Flags));");
+        sb.AppendLine($"{indent}                OnPropertyChanged(\"Flags\");");
         sb.AppendLine($"{indent}            }}");
         sb.AppendLine($"{indent}        }}");
         sb.AppendLine($"{indent}    }}{defaultValue}");
@@ -309,7 +326,16 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             var serializeCall = GetSerializeCall(field);
-            sb.AppendLine($"{indent}        {serializeCall};");
+            if (field.IsConditionallyIncluded)
+            {
+                sb.AppendLine($"{indent}        if ({field.FieldName}Included()) {{ ");
+                sb.AppendLine($"{indent}            {serializeCall};");
+                sb.AppendLine($"{indent}        }}");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        {serializeCall};");
+            }
         }
 
         sb.AppendLine();
@@ -328,7 +354,20 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             var deserializeCall = GetDeserializeCall(field);
-            sb.AppendLine($"{indent}        {deserializeCall};");
+            if (field.IsConditionallyIncluded)
+            {
+                sb.AppendLine($"{indent}        if ({field.FieldName}Included()) {{ ");
+                sb.AppendLine($"{indent}            {deserializeCall};");
+                sb.AppendLine($"{indent}        }}");
+                sb.AppendLine($"{indent}        else");
+                sb.AppendLine($"{indent}        {{");
+                sb.AppendLine($"{indent}            {GetPropertyName(field.FieldName)} = {field.DefaultValue};");
+                sb.AppendLine($"{indent}        }}");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        {deserializeCall};");
+            }
         }
         sb.AppendLine();
         sb.AppendLine($"{indent}    }}");
@@ -354,17 +393,23 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
 
     private static string GetSerializeCall(SerializedFieldInfo field)
     {
-        var limitExpression = field.Limit != null ? $"{field.Limit}" : "null";
-        var minExpression = $"{field.Minimum ?? 0}";
         var output = new StringBuilder();
-        if (field.FieldType is "int" or "int?" && field.Limit == null)
-            output.AppendLine($"#error Numeric type {field.FieldName} must have a `Limit` attribute!");
+        if (field.FieldType is "int" or "int?")
+        {
+            if (field.Minimum == null)
+            {
+                output.AppendLine($"#error Numeric type {field.FieldName} must have a `Minimum` attribute!");
+            }
+            if (field.Maximum == null)
+            {
+                output.AppendLine($"#error Numeric type {field.FieldName} must have a `Maximum` attribute!");
+            }
+        }
         output.Append(field.FieldType switch
         {
-            "int" or "System.Int32" => $"SerializeInt(flags, \"{field.FieldName}\", {field.FieldName}, false, {limitExpression}, {minExpression})",
-            "int?" or "System.Int32?" => $"SerializeInt(flags, \"{field.FieldName}\", {field.FieldName}, true, {limitExpression}, {minExpression})",
-            "bool" or "System.Boolean" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName}, false)",
-            "bool?" or "System.Boolean?" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName}, true)",
+            "int" or "int?" => $"SerializeInt(flags, \"{field.FieldName}\", {field.FieldName}, {field.Minimum}, {field.Maximum})",
+            "bool" or "System.Boolean" => $"SerializeBool(flags, \"{field.FieldName}\", {field.FieldName})",
+            "bool?" or "System.Boolean?" => $"SerializeNullableBool(flags, \"{field.FieldName}\", {field.FieldName})",
             var type when field.IsEnum => $"SerializeEnum<{type}>(flags, \"{field.FieldName}\", {field.FieldName})",
             _ => $"SerializeCustom<{field.CustomSerializerName}, {field.FieldType}>(flags, \"{field.FieldName}\", {field.FieldName})"
         });
@@ -373,16 +418,11 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
 
     private static string GetDeserializeCall(SerializedFieldInfo field)
     {
-        var limitExpression = field.Limit != null ? $"{field.Limit}" : "null";
-        var minExpression = $"{field.Minimum ?? 0}";
         var output = new StringBuilder();
         var propName = GetPropertyName(field.FieldName);
-        if (field.FieldType is "int" or "int?" && field.Limit == null)
-            output.AppendLine($"#error Numeric type {field.FieldName} must have a `Limit` attribute!");
         output.Append(field.FieldType switch
         {
-            "int" or "System.Int32" => $"{propName} = DeserializeInt(flags, \"{field.FieldName}\", {limitExpression}, {minExpression})",
-            "int?" or "System.Int32?" => $"{propName} = DeserializeNullableInt(flags, \"{field.FieldName}\", {limitExpression}, {minExpression})",
+            "int" or "int?" => $"{propName} = DeserializeInt(flags, \"{field.FieldName}\", {field.Minimum}, {field.Maximum})",
             "bool" or "System.Boolean" => $"{propName} = DeserializeBool(flags, \"{field.FieldName}\")",
             "bool?" or "System.Boolean?" => $"{propName} = DeserializeNullableBool(flags, \"{field.FieldName}\")",
             var type when field.IsEnum => $"{propName} = DeserializeEnum<{type}>(flags, \"{field.FieldName}\")",
@@ -502,6 +542,28 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         var lastDot = fullTypeName.LastIndexOf('.');
         return lastDot >= 0 ? fullTypeName[(lastDot + 1)..] : fullTypeName;
     }
+
+    private static string FormatArgument(TypedConstant arg)
+    {
+        if (arg.Kind == TypedConstantKind.Primitive)
+        {
+            return arg.Value switch
+            {
+                bool b => b ? "true" : "false",
+                string s => $"\"{s}\"",
+                char c => $"'{c}'",
+                null => "null",
+                _ => Convert.ToString(arg.Value, CultureInfo.InvariantCulture)!
+            };
+        }
+
+        if (arg.Kind == TypedConstantKind.Enum)
+        {
+            return $"{arg.Type!.ToDisplayString()}.{arg.Value}";
+        }
+
+        return "null";
+    }
 }
 
 public class ClassGenerationInfo
@@ -517,9 +579,11 @@ public class SerializedFieldInfo
 {
     public string FieldName { get; set; } = string.Empty;
     public string FieldType { get; set; } = string.Empty;
+    public bool IsConditionallyIncluded { get; set; }
+    public string? DefaultValue { get; set; }
     public bool IsEnum { get; set; }
     public INamedTypeSymbol? EnumSymbol { get; set; }
-    public int? Limit { get; set; }
+    public int? Maximum { get; set; }
     public int? Minimum { get; set; }
     public string? CustomSerializerName { get; set; }
 }

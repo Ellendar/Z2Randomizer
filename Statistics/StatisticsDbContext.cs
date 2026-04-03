@@ -35,12 +35,14 @@ internal class StatisticsDbContext : DbContext
     {
         JsonSerializerOptions options = new JsonSerializerOptions();
 
+        /*
         modelBuilder
         .Entity<RandomizerProperties>()
         .Property(e => e.Climate)
         .HasConversion(
             v => v.Name,
             v => Climates.ByName(v));
+        */
 
         modelBuilder.Entity<RandomizerProperties>()
             .Property(e => e.PalaceStyles)

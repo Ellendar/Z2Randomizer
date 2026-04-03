@@ -14,9 +14,12 @@ using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Disposables.Fluent;
 
 namespace CrossPlatformUI.ViewModels;
 
+[RequiresUnreferencedCode("")]
 public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
 {
 
@@ -43,9 +46,10 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
             var config = host.Config;
             var version = Assembly.GetEntryAssembly()!.GetName().Version!;
             var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
+            var flags = config.SerializeFlags();
             await clipboard.SetTextAsync($"""
 Version: {versionstr}
-Flags: {config.Flags}
+Flags: {flags}
 Seed: {config.Seed}
 ```
 {lastError}
@@ -89,19 +93,31 @@ Seed: {config.Seed}
                 {
                     var romdata = host.RomFileViewModel.RomData!.ToArray();
                     var output = await Task.Run(async () => await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token));
-                    if(!tokenSource.IsCancellationRequested)
+                    if(!tokenSource.IsCancellationRequested && output.success)
                     {
-                        var filename = $"Z2_{config.Seed}_{config.Flags}.nes";
-                        await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
+                        var flags = config.SerializeFlags();
+                        var basename = $"Z2_{config.Seed}_{flags}";
+                        var filename = basename + ".nes";
+                        await files.SaveGeneratedBinaryFile(filename, output.romdata!, Main.OutputFilePath);
+#if DEBUG
+                        var debugfile = basename + ".mlb";
+                        if (!string.IsNullOrEmpty(output.debuginfo))
+                        {
+                            await files.SaveSpoilerFile(debugfile, output.debuginfo, Main.OutputFilePath);
+                        }
+#endif
                         if (config.GenerateSpoiler)
                         {
-                            var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.txt";
+                            var spoilerFilename = basename + "_spoiler.txt";
                             await files.SaveSpoilerFile(spoilerFilename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
-                            var spoilerMapFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.png";
+                            var spoilerMapFilename = basename + "_spoiler.png";
                             await files.SaveGeneratedBinaryFile(spoilerMapFilename, new Spoiler(randomizer.ROMData).CreateSpoilerImage(randomizer.worlds), Main.OutputFilePath);
                         }
                         ProgressHeading = "Generation Complete";
                         ProgressBody = $"Hash: {randomizer.Hash}\n\nFile: {filename}";
+                    } else if (!output.success)
+                    {
+                        throw new Exception(output.messages);
                     }
                     IsComplete = true;
                 }
@@ -111,8 +127,7 @@ Seed: {config.Seed}
                     lastError = e;
                     HasError = true;
                     string errorHeading, errorBody;
-                    var userError = e as UserFacingException;
-                    if (userError != null)
+                    if (e is UserFacingException userError)
                     {
                         errorHeading = userError.Heading;
                         errorBody = userError.Message;
@@ -120,7 +135,7 @@ Seed: {config.Seed}
                     else
                     {
 #if DEBUG
-                        if (System.Diagnostics.Debugger.IsAttached) { throw; }
+                        // if (System.Diagnostics.Debugger.IsAttached) { throw; }
 #endif
                         errorHeading = "Error Generating Seed";
                         errorBody = "Please report this on the discord";

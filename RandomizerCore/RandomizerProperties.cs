@@ -55,13 +55,15 @@ public class RandomizerProperties
     //Other starting attributes
     public int StartHearts { get; set; }
     public int MaxHearts { get; set; }
+    public int StartMagicContainers { get; set; }
+    public int MaxMagicContainers { get; set; }
     public bool StartWithUpstab { get; set; }
     public bool StartWithDownstab { get; set; }
     public int StartLives { get; set; }
     public bool PermanentBeam { get; set; }
     public bool UseCommunityText { get; set; }
     public int StartAtk { get; set; }
-    public int StartMag { get; set; }
+    public int StartingMagicLevel { get; set; }
     public int StartLifeLvl { get; set; }
     public bool SwapUpAndDownStab { get; set; }
 
@@ -76,19 +78,25 @@ public class RandomizerProperties
     public bool TownSwap { get; set; }
     public EncounterRate EncounterRates { get; set; }
     public ContinentConnectionType ContinentConnections { get; set; }
+    public OverworldSizeOption WestSize { get; set; }
+    public OverworldSizeOption EastSize { get; set; }
+    public DmSizeOption DmSize { get; set; }
+    public MazeSizeOption MazeSize { get; set; }
     public bool BoulderBlockConnections { get; set; }
     public Biome WestBiome { get; set; }
     public Biome EastBiome { get; set; }
-    public Biome MazeBiome { get; set; }
     public Biome DmBiome { get; set; }
+    public Biome MazeBiome { get; set; }
     public bool DmIsHorizontal { get; set; }
     public bool WestIsHorizontal { get; set; }
     public bool EastIsHorizontal { get; set; }
     public bool EastRockIsPath { get; set; }
 #pragma warning disable CS8618
-    public Climate Climate { get; set; }
+    public ClimateEnum WestClimate { get; set; }
+    public ClimateEnum EastClimate { get; set; }
+    public ClimateEnum DmClimate { get; set; }
 #pragma warning restore CS8618 
-    public bool VanillaShuffleUsesActualTerrain { get; set; }
+    public bool LegacyVanillaShuffledLocations { get; set; }
     public bool ShuffleHidden { get; set; }
     public bool CanWalkOnWaterWithBoots { get; set; }
     public bool BagusWoods { get; set; }
@@ -100,8 +108,8 @@ public class RandomizerProperties
     //Palaces
     [NotMapped]
     public PalaceStyle[] PalaceStyles { get; set; } = new PalaceStyle[7];
-    public bool ShortenNormalPalaces { get; set; }
-    public bool ShortenGP { get; set; }
+    [NotMapped]
+    public int[] PalaceLengths { get; set; } = new int[7];
     public int StartGems { get; set; }
     public bool RequireTbird { get; set; }
     public int DarkLinkMinDistance { get; set; }
@@ -112,9 +120,13 @@ public class RandomizerProperties
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
     public bool BlockersAnywhere { get; set; }
+    public bool RemoveLongDeadEnds { get; set; }
+    public bool IncludeExpertRooms { get; set; }
     [NotMapped]
     public bool[] BossRoomsExitToPalace { get; set; } = new bool[7];
     public bool NoDuplicateRooms { get; set; }
+    public PalaceDropStyle PalaceDropStyle { get; set; }
+
     public bool NoDuplicateRoomsBySideview { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
     public bool AllowVanillaRooms { get; set; }
@@ -127,14 +139,15 @@ public class RandomizerProperties
     public bool RevealWalkthroughWalls { get; set; }
 
     //Enemies
-    public bool ShuffleEnemyHP { get; set; }
+    public EnemyLifeOption ShuffleEnemyHP { get; set; }
+    public EnemyLifeOption ShuffleBossHP { get; set; }
     public bool ShuffleEnemyStealExp { get; set; }
     public bool ShuffleStealExpAmt { get; set; }
     public bool ShuffleSwordImmunity { get; set; }
     public bool ShuffleOverworldEnemies { get; set; }
     public bool ShufflePalaceEnemies { get; set; }
     public bool MixLargeAndSmallEnemies { get; set; }
-    public bool ShuffleDripper { get; set; }
+    public DripperEnemyOption DripperEnemyOption { get; set; }
     public bool ShuffleEnemyPalettes { get; set; }
     public XPEffectiveness EnemyXPDrops { get; set; }
 
@@ -165,7 +178,7 @@ public class RandomizerProperties
     public bool RandomizeSmallItems { get; set; }
     public bool ExtraKeys { get; set; }
     public bool AllowImportantItemDuplicates { get; set; }
-    public bool RandomizeNewKasutoBasementRequirement { get; set; }
+    public int NewKasutoBasementRequirement { get; set; }
     //Include PBag caves in item shuffle
     public bool PbagItemShuffle { get; set; }
     public bool StartWithSpellItems { get; set; }
@@ -333,6 +346,7 @@ public class RandomizerProperties
 
         //more or less than 4 containers in the seed adds/removes minor items
         minorItemCount -= MaxHearts - StartHearts - 4;
+        minorItemCount -= MaxMagicContainers - StartMagicContainers - 4;
 
         //palace items other than 1 adjusts the count
         minorItemCount += PalaceItemRoomCounts.Select(c => c - 1).Sum();

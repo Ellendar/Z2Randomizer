@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0-browser</TargetFramework>
+        <TargetFramework>net10.0-browser</TargetFramework>
         <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
         <WasmMainJSPath>wwwroot\main.js</WasmMainJSPath>
         <WasmRuntimeAssetsLocation>./_framework</WasmRuntimeAssetsLocation>
@@ -18,7 +18,6 @@
 
         <Platforms>AnyCPU</Platforms>
 <!--        <TrimMode>partial</TrimMode>-->
-<!--        <WasmEmitSymbolMap>false</WasmEmitSymbolMap>-->
 <!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
     </PropertyGroup>
 
@@ -65,7 +64,7 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />
+        <PackageReference Include="js65.browser" Version="$(Js65Version)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -76,7 +75,7 @@
         <ProjectReference Include="..\CrossPlatformUI\CrossPlatformUI.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <TrimmerRootAssembly Include="RandomizerCore" />
-    </ItemGroup>
+<!--    <ItemGroup>-->
+<!--        <TrimmerRootAssembly Include="RandomizerCore" />-->
+<!--    </ItemGroup>-->
 </Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -13,13 +14,14 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 public partial class Palace
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+    private const double DROPS_CAN_LEAD_TO_BOSS_CHANCE = 0.4;
 
     //private const bool DROPS_ARE_BLOCKERS = false;
     private const byte OUTSIDE_ROOM_EXIT = 0b11111100;
     private readonly SortedDictionary<int, List<Room>> rooms;
     internal bool IsValid { get; set; } = false;
 
-    public static readonly Collectable[] SHUFFLABLE_SMALL_ITEMS = [
+    public static readonly ReadOnlyCollection<Collectable> SHUFFLABLE_SMALL_ITEMS = [
         Collectable.KEY,
         Collectable.SMALL_BAG,
         Collectable.MEDIUM_BAG,
@@ -30,7 +32,7 @@ public partial class Palace
         Collectable.ONEUP
     ];
 
-    internal List<Room> AllRooms { get; private set; }
+    public List<Room> AllRooms { get; private set; }
 
     public Room? Entrance { get; set; }
     public List<Room> ItemRooms { get; set; }
@@ -63,55 +65,6 @@ public partial class Palace
     {
         CheckSpecialPaths(Entrance!);
         return !BossRoom!.IsBeforeTbird;
-    }
-
-    [Obsolete("This was redundant with HasInescapableDrop, which worked more correctly.")]
-    public bool HasDeadEnd()
-    {
-
-        List<Room> dropExits = AllRooms.Where(i => i is { HasDownExit: true, HasDrop: true }).ToList();
-        if (dropExits.Count == 0 || dropExits.Any(i => i.Down == null))
-        {
-            return false;
-        }
-        Room end = BossRoom!;
-        foreach (Room r in dropExits)
-        {
-            if(r.Down == null)
-            {
-                continue;
-            }
-            HashSet<Room> reachable = [];
-            Stack<Room> roomsToCheck = [];
-            reachable.Add(r.Down);
-            roomsToCheck.Push(r.Down);
-
-            while (roomsToCheck.Count > 0)
-            {
-                Room c = roomsToCheck.Pop();
-                if (c.Left != null && reachable.Add(c.Left))
-                {
-                    roomsToCheck.Push(c.Left);
-                }
-                if (c.Right != null && reachable.Add(c.Right))
-                {
-                    roomsToCheck.Push(c.Right);
-                }
-                if (c.Up != null && reachable.Add(c.Up))
-                {
-                    roomsToCheck.Push(c.Up);
-                }
-                if (c.Down != null && reachable.Add(c.Down))
-                {
-                    roomsToCheck.Push(c.Down);
-                }
-            }
-            if (!reachable.Contains(Entrance!) && !reachable.Contains(end))
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void CheckSpecialPaths(Room r)
@@ -203,7 +156,7 @@ public partial class Palace
         return reachedRooms;
     }
 
-    public bool BossRoomMinDistance(int minSteps)
+    public bool IsBossRoomAtLeastMinDistance(int minSteps)
     {
         if (Entrance == null) { throw new Exception("Palace Entrance is missing"); }
         HashSet<Room> reachedRooms = [];
@@ -230,6 +183,65 @@ public partial class Palace
             if (room.Down != null) { roomsToCheck.Enqueue((room.Down, stepsToNextRoom)); }
         }
         return false; // Boss room not found??
+    }
+
+    public static int RoomDistance(Room room1, Room room2)
+    {
+        HashSet<Room> reachedRooms = [];
+        Queue<(Room, int)> roomsToCheck = [];
+        roomsToCheck.Enqueue((room1, 0));
+        while (roomsToCheck.Count > 0)
+        {
+            var (room, stepsToRoom) = roomsToCheck.Dequeue();
+            if (room == room2)
+            {
+                return stepsToRoom;
+            }
+
+            // This will return false if the room is already added
+            if (!reachedRooms.Add(room)) { continue; }
+
+            int stepsToNextRoom = stepsToRoom + 1;
+            if (room.Left != null) { roomsToCheck.Enqueue((room.Left, stepsToNextRoom)); }
+            if (room.Right != null) { roomsToCheck.Enqueue((room.Right, stepsToNextRoom)); }
+            if (room.Up != null) { roomsToCheck.Enqueue((room.Up, stepsToNextRoom)); }
+            if (room.Down != null) { roomsToCheck.Enqueue((room.Down, stepsToNextRoom)); }
+        }
+        return -1;
+    }
+
+    /// same algorithm as BossRoomMinDistance except for shapes instead of rooms
+    public static bool BossRoomMinDistanceShape(Dictionary<Coord, RoomExitType> shape, Coord bossRoom, int minSteps)
+    {
+        // quick check on (non-diagonal) orthogonal distance alone
+        if (Math.Abs(bossRoom.X) + Math.Abs(bossRoom.Y) >= minSteps) {
+            return true;
+        }
+        HashSet<Coord> reachedRooms = [];
+        Queue<(Coord, int)> roomsToCheck = [];
+        roomsToCheck.Enqueue((new Coord(0, 0), 0));
+        while (roomsToCheck.Count > 0)
+        {
+            var (coord, stepsToRoom) = roomsToCheck.Dequeue();
+            if (stepsToRoom >= minSteps)
+            {
+                return true;
+            }
+            if (coord == bossRoom)
+            {
+                return false;
+            }
+            var exitType = shape[coord];
+
+            if (!reachedRooms.Add(coord)) { continue; }
+
+            int stepsToNextRoom = stepsToRoom + 1;
+            if (exitType.ContainsLeft()) { roomsToCheck.Enqueue((coord with { X = coord.X - 1}, stepsToNextRoom)); }
+            if (exitType.ContainsRight()) { roomsToCheck.Enqueue((coord with { X = coord.X + 1 }, stepsToNextRoom)); }
+            if (exitType.ContainsUp()) { roomsToCheck.Enqueue((coord with { Y = coord.Y + 1 }, stepsToNextRoom)); }
+            if (exitType.ContainsDown()) { roomsToCheck.Enqueue((coord with { Y = coord.Y - 1 }, stepsToNextRoom)); }
+        }
+        return false; // Boss room not found?
     }
 
     public bool AllReachable(bool allowBacktracking = false)
@@ -626,15 +638,15 @@ public partial class Palace
         }
     }
 
-    public void Shorten(Random random)
+    /// Only used by Vanilla & Vanilla Shuffled generators
+    public void Shorten(Random random, int roomCount)
     {
         ValidateRoomConnections();
         int numRooms = AllRooms.Count;
 
-        int target = random.Next(numRooms / 2, (numRooms * 3) / 4) + 1;
         int rooms = numRooms;
         int tries = 0;
-        while (rooms > target && tries < 1000)
+        while (rooms > roomCount && tries < 1000)
         {
             //remove rooms without bias
             //don't remove important rooms
@@ -864,7 +876,7 @@ public partial class Palace
                 }
             }
         }
-        logger.Debug("Target: " + target + " Rooms: " + rooms);
+        logger.Debug("Target: " + roomCount + " Rooms: " + rooms);
     }
 
     public void RandomizeSmallItems(Random r, bool extraKeys)
@@ -1045,8 +1057,22 @@ public partial class Palace
         return unclearableRooms.Count == 0;
     }
 
-    public bool HasInescapableDrop(bool palacesContinueAfterBoss)
+    public bool HasDisallowedDrop(bool palacesContinueAfterBoss, PalaceDropStyle dropStyle, Random r)
     {
+        if(dropStyle == PalaceDropStyle.ANYTHING_GOES)
+        {
+            return false;
+        }
+
+        PalaceDropStyle effectiveDropStyle;
+        if (dropStyle == PalaceDropStyle.RANDOM)
+        {
+            effectiveDropStyle = r.NextDouble() < DROPS_CAN_LEAD_TO_BOSS_CHANCE ? PalaceDropStyle.ANY_EXIT : PalaceDropStyle.ENTRANCE;
+        }
+        else 
+        {
+            effectiveDropStyle = dropStyle;
+        }
         //get a list of effective drop zones in the palace
         List<Room> dropZonesToCheck = [];
         foreach (Room room in AllRooms.Where(i => i.HasDrop))
@@ -1068,8 +1094,8 @@ public partial class Palace
             while (pendingRooms.Count > 0)
             {
                 Room room = pendingRooms.Pop();
-                //if you find the entrance, remove and continue
-                if (room == Entrance || (room.IsBossRoom && !palacesContinueAfterBoss))
+                //if you find the entrance, or a boss room that does't continue, and boss drops are allowed, remove and continue
+                if (room == Entrance || (room.IsBossRoom && !palacesContinueAfterBoss && effectiveDropStyle == PalaceDropStyle.ANY_EXIT))
                 {
                     found = true;
                     break;
@@ -1270,15 +1296,9 @@ public partial class Palace
         }
     }
 
-    public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla)
+    public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla, int roomCount, bool removeTbird)
     {
-        //I have no idea why this was here and it breaks stuff. For future removal.
-        /*
-        if(isVanilla)
-        {
-            return AllRooms.Max(i => (byte)(i.Map + 1));
-        }
-        */
+        int startingCurrentMap = currentMap;
         if (!AllRooms.Contains(Entrance!))
         {
             throw new Exception("Palace lost its entrance");
@@ -1297,7 +1317,7 @@ public partial class Palace
             throw new Exception("Palace has an extra boss room");
         }
         BossRoom.Map = currentMap++;
-        if (isGP)
+        if (isGP && !removeTbird)
         {
             if (TbirdRoom == null || !AllRooms.Contains(TbirdRoom))
             {
@@ -1338,7 +1358,9 @@ public partial class Palace
         {
             room.Map = room.LinkedRoom!.Map;
         }
-        if(currentMap > 63)
+        Debug.Assert(currentMap - Entrance!.Map <= roomCount);
+        //Debug.Assert(currentMap - startingCurrentMap == roomCount);
+        if (currentMap > 63)
         {
             throw new Exception("Map number has exceeded maximum");
         }

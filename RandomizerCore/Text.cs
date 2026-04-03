@@ -54,6 +54,31 @@ public class Text : IEquatable<Text>
         EncodedText = Util.ToGameText(RawText, true);
     }
 
+    private Text(string rawText, byte[] encodedText)
+    {
+        RawText = rawText;
+        EncodedText = encodedText;
+    }
+
+    public bool ValidateDialogText()
+    {
+        var lines = RawText.Split("$");
+        if (lines.Count() > 6)
+        {
+            logger.Error($"Dialog text \"{RawText}\" has too many lines");
+            return false;
+        }
+        foreach (var line in lines)
+        {
+            if (line.Count() > 11)
+            {
+                logger.Error($"Dialog line \"{line}\" is too long.");
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static Text GenerateHelpfulHint(List<Location> allLocations, Location location, Collectable collectable, bool useTownSpecificHints)
     {
         string? hint = null;
@@ -150,5 +175,10 @@ public class Text : IEquatable<Text>
     public override int GetHashCode()
     {
         return HashCode.Combine(EncodedText);
+    }
+
+    public Text Clone()
+    {
+        return new(RawText, EncodedText);
     }
 }

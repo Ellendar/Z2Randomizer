@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -263,5 +265,21 @@ public static class AssemblyExtensions
         }
         using var reader = new BinaryReader(stream);
         return reader.ReadBytes((int)stream.Length);
+    }
+}
+
+public static class LoggerExtensions
+{
+    /// <summary>
+    /// Logger.Debug for debug builds only -
+    /// will be fully optimized away for release builds.
+    /// </summary>
+    [Conditional("DEBUG")]
+    public static void LogDebug(this Logger logger, string message)
+    {
+        logger.Log(
+            typeof(LoggerExtensions),
+            new LogEventInfo(LogLevel.Debug, logger.Name, message)
+        );
     }
 }

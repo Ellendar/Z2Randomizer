@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -39,6 +40,9 @@ public enum RoomExitType
 
 public static class RoomExitTypeExtensions
 {
+    public static RoomExitType[] ALL = Enum.GetValues(typeof(RoomExitType)).Cast<RoomExitType>().ToArray();
+    public static RoomExitType[] DEADENDS = [RoomExitType.DEADEND_EXIT_RIGHT, RoomExitType.DEADEND_EXIT_UP, RoomExitType.DEADEND_EXIT_LEFT, RoomExitType.DEADEND_EXIT_DOWN];
+
     public const int LEFT = 0b00010000;
     public const int DOWN = 0b00001000;
     public const int DROP = 0b00000100;
@@ -70,17 +74,21 @@ public static class RoomExitTypeExtensions
         return (RoomExitType)((int)exitType | UP);
     }
 
-    public static RoomExitType AddDown(this RoomExitType exitType)
+    public static RoomExitType AddDown(this RoomExitType exitType, bool overwriteDrop = false)
     {
         if(exitType.ContainsDrop())
         {
+            if (overwriteDrop)
+            {
+                return (RoomExitType)((int)exitType & 0b11011 | DOWN);
+            }
             throw new Exception("Can't add down to a room that drops");
         }
         return (RoomExitType)((int)exitType | DOWN);
     }
     public static RoomExitType AddDrop(this RoomExitType exitType)
     {
-        if (exitType.ContainsDrop())
+        if (exitType.ContainsDown())
         {
             throw new Exception("Can't add drop to a room that downs");
         }
@@ -118,6 +126,16 @@ public static class RoomExitTypeExtensions
     public static RoomExitType RemoveUp(this RoomExitType exitType)
     {
         return (RoomExitType)((int)exitType & 0b11101);
+    }
+
+    public static RoomExitType RemoveLeft(this RoomExitType exitType)
+    {
+        return (RoomExitType)((int)exitType & 0b01111);
+    }
+
+    public static RoomExitType RemoveRight(this RoomExitType exitType)
+    {
+        return (RoomExitType)((int)exitType & 0b11110);
     }
 
     public static RoomExitType Merge(this RoomExitType exitType, RoomExitType toMerge)

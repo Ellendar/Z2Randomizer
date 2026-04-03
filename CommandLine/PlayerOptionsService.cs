@@ -1,13 +1,15 @@
-﻿using Z2Randomizer.CommandLine.Models;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Newtonsoft.Json;
 using NLog;
-using System.Reflection;
 using CrossPlatformUI.Services;
 using Desktop.Common;
+using Z2Randomizer.CommandLine.Models;
 using Z2Randomizer.RandomizerCore;
 
 namespace Z2Randomizer.CommandLine
 {
+    [RequiresUnreferencedCode("Newtonsoft.Json uses reflection")]
     public class PlayerOptionsService
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -91,7 +93,7 @@ namespace Z2Randomizer.CommandLine
             // configuration.Sprite = CharacterSprite.LINK;
         }
 
-        private void ValidateTunicColor(string? color)
+        private static void ValidateTunicColor(string? color)
         {
             if (color == null || !SupportedTunicColors.Contains(color))
             {

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
@@ -25,14 +27,17 @@ public abstract class World
     public IReadOnlyList<int> nonEncounterMaps { get; protected set; }
     protected SortedDictionary<(int, int), Location> locsByCoords;
     public Terrain[,] map;
-    public int MAP_ROWS;
-    public int MAP_COLS;
+    public const int MAP_ROWS_FULL = 75;
+    public const int MAP_COLS_FULL = 64;
+    private const int MAX_LOCATION_PLACEMENT_ATTEMPTS = 5000;
+    public int MapRows { get; init; }
+    public int MapColumns { get; init; }
     protected List<Terrain> randomTerrainFilter;
     protected List<Terrain> walkableTerrains;
     protected bool[,] visitation;
     protected const int MAP_SIZE_BYTES = 1400;
     protected List<Location> unimportantLocs;
-    public Biome biome { get; protected set; }
+    public Biome biome { get; init; }
     protected bool isHorizontal;
     protected int VANILLA_MAP_ADDR;
     protected SortedDictionary<(int, int), string> section;
@@ -42,11 +47,16 @@ public abstract class World
     public Location? cave2;
 
     public int baseAddr;
+    public Continent continentId;
     protected Climate climate;
+    /// south encounter version will be used when Link's Y >= this
+    public int northSouthEncounterSeparator { get; init; }
 
     protected Random RNG;
 
     private const int MINIMUM_BRIDGE_LENGTH = 2;
+
+    public static readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new Requirements([RequirementType.FAIRY, RequirementType.KEY]);
 
     private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
     {
@@ -110,6 +120,7 @@ public abstract class World
 
 
     public List<Location> AllLocations { get; }
+    public List<Location> RemovedLocations { get; }
     public Dictionary<Terrain, List<Location>> Locations { get; set; }
 
     public bool AllReached { get; set; }
@@ -129,6 +140,7 @@ public abstract class World
             Locations.Add(Terrain, new List<Location>());
         }
         AllLocations = [];
+        RemovedLocations = [];
         locsByCoords = [];
         unimportantLocs = [];
         areasByLocation = [];
@@ -174,21 +186,37 @@ public abstract class World
     protected void Swap(Location l1, Location l2)
     {
         (l2.Xpos, l1.Xpos) = (l1.Xpos, l2.Xpos);
-        (l2.Ypos, l1.Ypos) = (l1.Ypos, l2.Ypos);
+        (l2.Y, l1.Y) = (l1.Y, l2.Y);
         (l2.PassThrough, l1.PassThrough) = (l1.PassThrough, l2.PassThrough);
 
         foreach (Location child in l1.Children)
         {
             child.Xpos = l1.Xpos;
-            child.Ypos = l1.Ypos;
+            child.Y = l1.Y;
             child.PassThrough = l1.PassThrough;
         }
 
         foreach (Location child in l2.Children)
         {
             child.Xpos = l2.Xpos;
-            child.Ypos = l2.Ypos;
+            child.Y = l2.Y;
             child.PassThrough = l2.PassThrough;
+        }
+    }
+
+    protected void RemoveLocations(ICollection<Location> locationsToRemove)
+    {
+        foreach (var loc in locationsToRemove)
+        {
+            loc.Clear();
+
+            AllLocations.Remove(loc);
+            RemovedLocations.Add(loc);
+            foreach (List<Location> ls in Locations.Values)
+            {
+                ls.Remove(loc);
+            }
+            connections.Remove(loc);
         }
     }
 
@@ -239,9 +267,20 @@ public abstract class World
         }
     }
 
-    protected Location? GetLocationByCoords((int, int)coords)
+    protected Location? GetLocationByPos(IntVector2 pos)
     {
-        return AllLocations.FirstOrDefault(i => i.Coords.Equals(coords));
+        return AllLocations.FirstOrDefault(i => i.Pos == pos);
+    }
+
+    protected Location? GetLocationByCoordsNoOffset((int, int) coords)
+    {
+        IntVector2 pos = new(coords.Item2, coords.Item1); // y,x -> x,y
+        return AllLocations.FirstOrDefault(i => i.Pos == pos);
+    }
+
+    protected Location? GetLocationByCoordsY30Offset((int, int)coords)
+    {
+        return AllLocations.FirstOrDefault(i => i.CoordsY30Offset.Equals(coords));
     }
 
     protected Location GetLocationByMem(int mem)
@@ -256,23 +295,27 @@ public abstract class World
     }
     protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location? hiddenKasutoLocation, int hiddenPalaceX)
     {
-        //return true;
-        int i = 0;
+        int placementAttempt = 0;
         foreach (Location location in AllLocations.Where(loc => loc.AppearsOnMap))
         {
-            i++;
             if ((location.TerrainType != Terrain.BRIDGE
                     && location.CanShuffle
                     && !unimportantLocs.Contains(location)
                     && location.PassThrough == 0)
-                || location.NeedHammer)
+                || location.AccessRequirements.HasHardRequirement(RequirementType.HAMMER))
             {
                 int x, y;
                 //Place the location in a spot that is not adjacent to any other location
                 do
                 {
-                    x = RNG.Next(MAP_COLS - 2) + 1;
-                    y = RNG.Next(MAP_ROWS - 2) + 1;
+                    //It's possible there just literlly aren't enough open places to place locations (chaos does this a lot)
+                    //So if we fail enough, give up and try again.
+                    if (++placementAttempt > MAX_LOCATION_PLACEMENT_ATTEMPTS)
+                    {
+                        return false;
+                    }
+                    x = RNG.Next(MapColumns - 2) + 1;
+                    y = RNG.Next(MapRows - 2) + 1;
                 } while (
                     map[y, x] != Terrain.NONE
                     || map[y - 1, x] != Terrain.NONE
@@ -315,7 +358,7 @@ public abstract class World
                         PlaceCaveCount++;
                         PlaceCave(x, y, direction, entranceTerrain);
                         location.Xpos = x;
-                        location.Ypos = y + 30;
+                        location.Y = y;
                         location.CanShuffle = false;
                     }
                 }
@@ -331,7 +374,7 @@ public abstract class World
                     map[y - 1, x] = s;
                     map[y - 1, x + 1] = s;
                     location.Xpos = x;
-                    location.Ypos = y + 30;
+                    location.Y = y;
                     location.CanShuffle = false;
                 }
                 else if (location.TerrainType != Terrain.TOWN || 
@@ -351,7 +394,7 @@ public abstract class World
                     map[y - 1, x] = t;
                     map[y - 1, x + 1] = t;
                     location.Xpos = x;
-                    location.Ypos = y + 30;
+                    location.Y = y;
                     location.CanShuffle = false;
                 }
             }
@@ -361,7 +404,7 @@ public abstract class World
                 foreach (Location linkedLocation in AllLocations.Where(
                     loc => !loc.AppearsOnMap && loc.ActualTown?.GetMasterTown() == location.ActualTown))
                 {
-                    linkedLocation.Coords = location.Coords;
+                    linkedLocation.Pos = location.Pos;
                 }
             }
         }
@@ -388,7 +431,7 @@ public abstract class World
         {
             for (int x = smallx; x < largex; x++)
             {
-                if (y > 0 && y < MAP_ROWS && x > 0 && x < MAP_COLS && map[y, x] == riverTerrain)
+                if (y > 0 && y < MapRows && x > 0 && x < MapColumns && map[y, x] == riverTerrain)
                 {
                     return true;
                 }
@@ -487,11 +530,13 @@ public abstract class World
         //That is also not adjacent to any other location.
         do
         {
-            x = RNG.Next(MAP_COLS - 2) + 1;
-            y = RNG.Next(MAP_ROWS - 2) + 1;
-        } while (x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE);
+            x = RNG.Next(MapColumns - 2) + 1;
+            y = RNG.Next(MapRows - 2) + 1;
+        } while (x < 5 || y < 5 || x > MapColumns - 5 || y > MapRows - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE);
 
-        while ((direction == Direction.NORTH && y < 15) || (direction == Direction.EAST && x > MAP_COLS - 15) || (direction == Direction.SOUTH && y > MAP_ROWS - 15) || (direction == Direction.WEST && x < 15))
+        int minDistX = Math.Min(MapColumns / 2 - 1, 15);
+        int minDistY = Math.Min(MapRows / 2 - 1, 15);
+        while ((direction == Direction.NORTH && y < minDistY) || (direction == Direction.EAST && x > MapColumns - minDistX) || (direction == Direction.SOUTH && y > MapRows - minDistY) || (direction == Direction.WEST && x < minDistX))
         {
             direction = (Direction)RNG.Next(4);
         }
@@ -551,9 +596,9 @@ public abstract class World
         } while (
             !crossing
             || otherx <= 1
-            || otherx >= MAP_COLS - 1
+            || otherx >= MapColumns - 1
             || othery <= 1
-            || othery >= MAP_ROWS - 1
+            || othery >= MapRows - 1
             || map[othery, otherx] != Terrain.NONE
             || map[othery - 1, otherx] != Terrain.NONE
             || map[othery + 1, otherx] != Terrain.NONE
@@ -567,13 +612,26 @@ public abstract class World
         Location location2 = connections[location];
         location.CanShuffle = false;
         location.Xpos = x;
-        location.Ypos = y + 30;
+        location.Y = y;
         location2.CanShuffle = false;
         location2.Xpos = otherx;
-        location2.Ypos = othery + 30;
+        location2.Y = othery;
         PlaceCave(x, y, direction, climate.GetRandomTerrain(RNG, walkableTerrains));
         PlaceCave(otherx, othery, direction.Reverse(), climate.GetRandomTerrain(RNG, walkableTerrains));
         return true;
+    }
+
+    /// swaps the positions of two caves if the cave that is going East/South
+    /// in the Overworld is not the cave that enters the sideview from the left
+    protected static void AlignCavePositionsLeftToRight(Direction location1Direction, Location location1, Location location2)
+    {
+        bool overworldGoingRight = location1Direction == Direction.EAST || location1Direction == Direction.SOUTH;
+        bool sideviewGoingRight = location1.MapPage < location2.MapPage;
+        if (overworldGoingRight != sideviewGoingRight)
+        {
+            // should swap the entrances so left-to-right aligns
+            (location1.Pos, location2.Pos) = (location2.Pos, location1.Pos);
+        }
     }
 
     public void PlaceHiddenLocations(LessImportantLocationsOption lessImportantLocationsOption)
@@ -585,12 +643,7 @@ public abstract class World
                 {
                     if (location.CanShuffle)
                     {
-                        location.ExternalWorld = 0;
-                        location.Ypos = 0;
-                        location.appear2loweruponexit = 0;
-                        location.Secondpartofcave = 0;
-                        location.Xpos = 0;
-                        location.CanShuffle = false;
+                        location.Clear();
                     }
                 }
                 break;
@@ -603,20 +656,20 @@ public abstract class World
                         int x, y;
                         do
                         {
-                            x = RNG.Next(MAP_COLS);
-                            y = RNG.Next(MAP_ROWS);
+                            x = RNG.Next(MapColumns);
+                            y = RNG.Next(MapRows);
                             tries++;
-                        } while ((map[y, x] != location.TerrainType || GetLocationByCoords((y + 30, x)) != null) && tries < 2000);
+                        } while ((map[y, x] != location.TerrainType || GetLocationByCoordsNoOffset((y, x)) != null) && tries < 2000);
 
                         if (tries < 2000)
                         {
                             location.Xpos = x;
-                            location.Ypos = y + 30;
+                            location.Y = y;
                         }
                         else
                         {
                             location.Xpos = 0;
-                            location.Ypos = 0;
+                            location.YRaw = 0;
                         }
                         location.CanShuffle = false;
                     }
@@ -629,55 +682,105 @@ public abstract class World
     /// Creates "bridges" connecting contiguous landmasses with terrain from either connected landmass, or various kinds of special connections.
     /// </summary>
     /// <param name="maxBridges">Maximum number of bridges to create</param>
-    /// <param name="placeTown">If true, one of the bridges is the saria river crossing</param>
+    /// <param name="placeSaria">If true, one of the bridges is the saria river crossing</param>
     /// <param name="riverTerrain">Type of terrain the rivers are crossing over. Usually this is water, but on Mountanous, the "bridges" are over mountains</param>
     /// <param name="riverDevil">If true, one of the bridges will be a road blocked by the river devil</param>
     /// <param name="placeLongBridge">If true, one of the bridges is the bridge from vanilla west connecting DM to the SE desert with encounters at both ends</param>
-    /// <param name="placeDarunia">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
+    /// <param name="placeDaruniaDesert">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
-    protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, 
-        bool rockBlock, bool placeLongBridge, bool placeDarunia, 
-        bool canWalkOnWater, Biome biome, int? deadZoneMinX = null, int? deadZoneMaxX = null, int? deadZoneMinY = null, int? deadZoneMaxY = null)
+    protected bool ConnectIslands(int maxBridges, bool placeSaria, Terrain riverTerrain, bool riverDevil, 
+        bool rockBlock, bool placeLongBridge, bool placeDaruniaDesert,
+        bool canWalkOnWater, Biome biome, int deadZoneMinX = 999, int deadZoneMaxX = -1, int deadZoneMinY = 999, int deadZoneMaxY = -1)
     {
+        //Any of the bridge locations that are being placed need to be reset so their vanilla locations aren't avoided.
+        if(placeSaria)
+        {
+            foreach (Location location in AllLocations.Where(i => i.ActualTown == Town.SARIA_NORTH 
+                || i.ActualTown == Town.SARIA_SOUTH 
+                || i.ActualTown == Town.SARIA_TABLE))
+            {
+                location.Xpos = 0;
+                location.Y = 0;
+            }
+        }
+        if(placeDaruniaDesert)
+        {
+            foreach (Location location in AllLocations.Where(i => i.MemAddress == RomMap.EAST_TRAP_DESERT_TILE_LOCATION1 
+                || i.MemAddress == RomMap.EAST_TRAP_DESERT_TILE_LOCATION2))
+            {
+                location.Xpos = 0;
+                location.Y = 0;
+            }
+        }
+        if (placeLongBridge)
+        {
+            foreach (Location location in AllLocations.Where(i => i.MemAddress == RomMap.WEST_BRIDGE_AFTER_DM_WEST_LOCATION
+                || i.MemAddress == RomMap.WEST_BRIDGE_AFTER_DM_EAST_LOCATION))
+            {
+                location.Xpos = 0;
+                location.Y = 0;
+            }
+        }
+        //Debug.WriteLine(GetMapDebug());
         int maxBridgeLength = MAXIMUM_BRIDGE_LENGTH[biome];
-        maxBridgeLength = canWalkOnWater ? maxBridgeLength : (int)(maxBridgeLength * 1.5);
-        if (!((deadZoneMinX == null && deadZoneMaxX == null && deadZoneMinY == null && deadZoneMaxY == null)
-            || (deadZoneMinX != null && deadZoneMaxX != null && deadZoneMinY != null && deadZoneMaxY != null)))
+        //Great lakes and bad boots are more likely to be incompleteable, so extend max bridge length to give them a fighting chance
+        if(canWalkOnWater || climate.Name == Climates.Create(ClimateEnum.GREAT_LAKES).Name)
+        {
+            maxBridgeLength = (int)(maxBridgeLength * 1.5);
+        }
+        if (!((deadZoneMinX == 999 && deadZoneMaxX == -1 && deadZoneMinY == 999 && deadZoneMaxY == -1)
+            || (deadZoneMinX != 999 && deadZoneMaxX != -1 && deadZoneMinY != 999 && deadZoneMaxY != -1)))
         {
             throw new ArgumentException("ConnectIslands dead zone is improperly defined. 0 or 4 values must be specified.");
         }
         int maxBridgeAttempts = MAXIMUM_BRIDGE_ATTEMPTS[biome];
         maxBridgeAttempts *= canWalkOnWater ? 1 : 2;
         int[,] globs = GetTerrainGlobs();
-        Dictionary<int, List<int>> massConnections = new Dictionary<int, List<int>>();
+        List<(int, int)> globConnections = [];
         int remainingBridges = maxBridges;
         int TerrainCycle = 0;
         int tries = 0;
+
+        Terrain[] crossingTerrains = riverTerrain.IsWater()
+            ? [Terrain.WATER, Terrain.PREPLACED_WATER, Terrain.WALKABLEWATER, Terrain.PREPLACED_WATER_WALKABLE]
+            : [riverTerrain];
+        Terrain[] edgeCrossingTerrains = [.. crossingTerrains, .. walkableTerrains];
+
+        //precompute next to water tiles since there are likely more fails than successes and randomly iterating the same
+        //bad tiles over and over is wasteful
+        List<(int, int, Direction)> nextToWaterTiles = [];
+        for (int y = 1; y < MapRows - 1; y++) 
+        {
+            for (int x = 1; x < MapColumns - 1; x++)
+            {
+                List<Direction> waterDirections = NextToWaterDirections(x, y, crossingTerrains);
+                if((x < deadZoneMinX || x > deadZoneMaxX) && (y < deadZoneMinY || y > deadZoneMaxY))
+                {
+                    foreach(Direction direction in waterDirections)
+                    {
+                        nextToWaterTiles.Add((x, y, direction));
+                    }
+                }
+            }
+        }
+
         while (remainingBridges > 0 && tries < maxBridgeAttempts)
         {
             tries++;
             int x, y;
-            /*
-            if(deadZoneMaxX != null && x >= deadZoneMinX && x <= deadZoneMaxX && y >= deadZoneMinY && y <= deadZoneMaxY)
+
+            (int, int, Direction)? nextToWaterTile = nextToWaterTiles.Sample(RNG);
+            //All possible bridges have been evaluated.
+            if (nextToWaterTile == null)
             {
-                continue;
+                return true;
             }
-            */
-            //Find a tile adjacent to water that isn't within a dead zone to start the bridge
-            Direction waterDirection;
-            int waterTries = 0;
-            do
-            {
-                x = RNG.Next(MAP_COLS - 2) + 1;
-                y = RNG.Next(MAP_ROWS - 2) + 1;
-                waterDirection = NextToWater(x, y, riverTerrain);
-                waterTries++;
-                if (waterTries >= 2000)
-                {
-                    return false;
-                }
-            } while (waterDirection == Direction.NONE
-                || (deadZoneMaxX != null && x >= deadZoneMinX && x <= deadZoneMaxX && y >= deadZoneMinY && y <= deadZoneMaxY));
+
+            x = nextToWaterTile.Value.Item1;
+            y = nextToWaterTile.Value.Item2;
+            int startX = x, startY = y;
+
+            Direction waterDirection = nextToWaterTile.Value.Item3;
 
             int deltaX = waterDirection.DeltaX();
             int deltaY = waterDirection.DeltaY();
@@ -690,97 +793,79 @@ public abstract class World
             int startMass = globs[y, x];
 
             //if there is a location at or 1 tile adjacent to the bridge start, it's no good.
-            if (GetLocationByCoords((y + 30, x)) != null
-                || GetLocationByCoords((y + 30, x + 1)) != null
-                || GetLocationByCoords((y + 30, x - 1)) != null
-                || GetLocationByCoords((y + 31, x)) != null
-                || GetLocationByCoords((y + 29, x)) != null)
+            if (GetLocationByCoordsNoOffset((y, x)) != null
+                || GetLocationByCoordsNoOffset((y, x + 1)) != null
+                || GetLocationByCoordsNoOffset((y, x - 1)) != null
+                || GetLocationByCoordsNoOffset((y + 1, x)) != null
+                || GetLocationByCoordsNoOffset((y - 1, x)) != null)
             {
                 length = 100;
             }
 
             x += deltaX;
             y += deltaY;
+            int perpDx = deltaX == 0 ? 1 : 0;
+            int perpDy = deltaY == 0 ? 1 : 0;
 
             //iterate expanding the bridge
-            while (x > 0 && x < MAP_COLS && y > 0 && y < MAP_ROWS && map[y, x] == riverTerrain)
+            while (x > 0 && x < MapColumns && y > 0 && y < MapRows && crossingTerrains.Contains(map[y, x]))
             {
-                //if we hit the edge of the map or too close to a location, give up
-                if (x + 1 < MAP_COLS && GetLocationByCoords((y + 30, x + 1)) != null)
+                //if we are too close to a location, give up
+                if (x + 1 < MapColumns && GetLocationByCoordsNoOffset((y, x + 1)) != null)
                 {
                     length = 100;
+                    break;
                 }
-                if (x - 1 > 0 && GetLocationByCoords((y + 30, x - 1)) != null)
+                if (x - 1 > 0 && GetLocationByCoordsNoOffset((y, x - 1)) != null)
                 {
                     length = 100;
+                    break;
                 }
 
-                if (y + 1 < MAP_ROWS && GetLocationByCoords((y + 31, x)) != null)
+                if (y + 1 < MapRows && GetLocationByCoordsNoOffset((y + 1, x)) != null)
                 {
                     length = 100;
+                    break;
                 }
-                if (y - 1 > 0 && GetLocationByCoords((y + 29, x)) != null)
+                if (y - 1 > 0 && GetLocationByCoordsNoOffset((y - 1, x)) != null)
                 {
                     length = 100;
+                    break;
+                }
+                //if advancing goes off the edge of the map, give up
+                if(!(x + deltaX < MapColumns && x + deltaX >= 0 && y + deltaY < MapRows && y + deltaY >= 0))
+                {
+                    length = 100;
+                    break;
                 }
 
                 //count how many tiles adjacent to the bridge are the passing terrain
                 int adjacentRiverTerrainDirectionCount = 0;
-                if (x + 1 < MAP_COLS && (map[y, x + 1] == riverTerrain || map[y, x + 1] == Terrain.MOUNTAIN))
-                {
-                    adjacentRiverTerrainDirectionCount++;
-                }
-                if (x - 1 >= 0 && (map[y, x - 1] == riverTerrain || map[y, x - 1] == Terrain.MOUNTAIN))
-                {
-                    adjacentRiverTerrainDirectionCount++;
-                }
-                if (y + 1 < MAP_ROWS && (map[y + 1, x] == riverTerrain || map[y + 1, x] == Terrain.MOUNTAIN))
-                {
-                    adjacentRiverTerrainDirectionCount++;
-                }
-                if (y - 1 >= 0 && (map[y - 1, x] == riverTerrain || map[y - 1, x] == Terrain.MOUNTAIN))
-                {
-                    adjacentRiverTerrainDirectionCount++;
-                }
+                //If the tile just before or just after is walkable, this is the first or last tile of the bridge
+                //When that happens, the adjacent (not forward/back) directions are allowed to be any walkable terrain
+                bool isFirstStep = !crossingTerrains.Contains(map[y - deltaY, x - deltaX]);
+                bool isLastStep = !crossingTerrains.Contains(map[y + deltaY, x + deltaX]);
+                Terrain[] effectiveCrossingTerrain = isFirstStep || isLastStep ? edgeCrossingTerrains : crossingTerrains;
 
-                if (deltaX != 0)
+                //Check forward
+                if (effectiveCrossingTerrain.Contains(map[y + deltaY, x + deltaX]) || map[y + deltaY, x + deltaX] == Terrain.MOUNTAIN)
                 {
-                    if (y - 1 > 0)
-                    {
-                        if (map[y - 1, x] != riverTerrain && map[y - 1, x] != Terrain.MOUNTAIN)
-                        {
-                            length = 100;
-                        }
-                    }
-                    if (y + 1 < MAP_ROWS)
-                    {
-                        if (map[y + 1, x] != riverTerrain && map[y + 1, x] != Terrain.MOUNTAIN)
-                        {
-                            length = 100;
-                        }
-                    }
+                    adjacentRiverTerrainDirectionCount++;
                 }
-
-                if (deltaY != 0)
+                //Check perpendicular tiles. This is allowed to be any walkable terrain on the first/last tiles of the bridge
+                if (x + perpDx < MapColumns && x + perpDx >= 0 && y + perpDy < MapRows && y - perpDy >= 0 &&
+                    (effectiveCrossingTerrain.Contains(map[y + perpDy, x + perpDx]) || map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN))
                 {
-                    if (x - 1 > 0)
-                    {
-                        if (map[y, x - 1] != riverTerrain && map[y, x - 1] != Terrain.MOUNTAIN)
-                        {
-                            length = 100;
-                        }
-                    }
-                    if (x + 1 < MAP_ROWS)
-                    {
-                        if (map[y, x + 1] != riverTerrain && map[y, x + 1] != Terrain.MOUNTAIN)
-                        {
-                            length = 100;
-                        }
-                    }
+                    adjacentRiverTerrainDirectionCount++;
+                }
+                if (x - perpDx < MapColumns && x - perpDx >= 0 && y - perpDy < MapRows && y - perpDy >= 0 &&
+                    (effectiveCrossingTerrain.Contains(map[y - perpDy, x - perpDx]) || map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN))
+                {
+                    adjacentRiverTerrainDirectionCount++;
                 }
 
                 //if all 3 tiles adjacent to the new tile aren't the passing terrain, give up
-                if (adjacentRiverTerrainDirectionCount <= 2)
+                if (adjacentRiverTerrainDirectionCount < 3)
                 {
                     length = 100;
                 }
@@ -796,15 +881,14 @@ public abstract class World
                 length = 100;
             }
 
-            //if we're ending, it has to be on a different chunk of terrain so the bridge doesn't just cross a bay
             int endMass = 0;
-            if (y > 0 && x > 0 && y < MAP_ROWS - 1 && x < MAP_COLS - 1)
+            if (y > 0 && x > 0 && y < MapRows - 1 && x < MapColumns - 1)
             {
-                if (GetLocationByCoords((y + 30, x)) != null
-                    || GetLocationByCoords((y + 30, x + 1)) != null
-                    || GetLocationByCoords((y + 30, x - 1)) != null
-                    || GetLocationByCoords((y + 31, x)) != null
-                    || GetLocationByCoords((y + 29, x)) != null)
+                if (GetLocationByCoordsNoOffset((y, x)) != null
+                    || GetLocationByCoordsNoOffset((y, x + 1)) != null
+                    || GetLocationByCoordsNoOffset((y, x - 1)) != null
+                    || GetLocationByCoordsNoOffset((y + 1, x)) != null
+                    || GetLocationByCoordsNoOffset((y - 1, x)) != null)
                 {
                     length = 100;
                     //Debug.WriteLine(GetGlobDebug(globs));
@@ -812,166 +896,224 @@ public abstract class World
                 endMass = globs[y, x];
             }
 
-            if ((riverTerrain != Terrain.DESERT && biome != Biome.CALDERA && biome != Biome.VOLCANO)
+            //if we're ending, it has to be on a different chunk of terrain so the bridge doesn't just cross a bay
+            if (riverTerrain != Terrain.DESERT && biome != Biome.CALDERA && biome != Biome.VOLCANO
                 && (startMass == 0
                     || endMass == 0
                     || endMass == startMass
-                    || (massConnections.ContainsKey(startMass) && massConnections[startMass].Contains(endMass))
+                    || globConnections.Contains((startMass, endMass))
                 )
             )
             {
                 length = 100;
             }
             if (
-                (placeTown && length < maxBridgeLength || (length < maxBridgeLength && length > MINIMUM_BRIDGE_LENGTH))
+                (placeSaria && length < maxBridgeLength || (length < maxBridgeLength && length > MINIMUM_BRIDGE_LENGTH))
                 && x > 0
-                && x < MAP_COLS - 1
+                && x < MapColumns - 1
                 && y > 0
-                && y < MAP_ROWS - 1
+                && y < MapRows - 1
                 && walkableTerrains.Contains(map[y, x])
                 && map[y, x] != riverTerrain)
             {
-                if (!massConnections.ContainsKey(startMass))
-                {
-                    List<int> c = new List<int>();
-                    c.Add(endMass);
-                    massConnections[startMass] = c;
-                }
-                else
-                {
-                    massConnections[startMass].Add(endMass);
-                }
-
-                if (!massConnections.ContainsKey(endMass))
-                {
-                    List<int> c = new List<int>();
-                    c.Add(startMass);
-                    massConnections[endMass] = c;
-                }
-                else
-                {
-                    massConnections[endMass].Add(startMass);
-                }
-
                 Terrain terrain = map[y, x];
+                globConnections.Add((startMass, endMass));
+                globConnections.Add((endMass, startMass));
 
-
-                if (placeTown)
+                if (placeSaria)
                 {
-
+                    //Saria doesn't need to worry about sideways entrance since it's not a passthrough
                     map[y, x] = Terrain.TOWN;
                     Location location = GetLocationByMem(0x465F);
-                    location.Ypos = y + 30;
+                    location.Y = y;
                     location.Xpos = x;
                     x -= deltaX;
                     y -= deltaY;
-                    while (map[y, x] == riverTerrain)
+                    while (crossingTerrains.Contains(map[y, x]))
                     {
                         x -= deltaX;
                         y -= deltaY;
-                        //if(map[y + deltaY, x + deltaX] != Terrain.town && riverT != Terrain.walkablewater)
-                        //{
-                        //    map[y + deltaY, x + deltaX] = Terrain.walkablewater;
-                        //}
                     }
                     map[y, x] = Terrain.TOWN;
                     location = GetLocationByMem(0x4660);
-                    location.Ypos = y + 30;
+                    location.Y = y;
                     location.Xpos = x;
-                    placeTown = false;
+                    placeSaria = false;
                 }
                 else if (placeLongBridge)
                 {
-                    Location bridge1 = GetLocationByMem(0x4644);
-                    Location bridge2 = GetLocationByMem(0x4645);
-                    x -= deltaX;
-                    y -= deltaY;
+                    Location bridge1 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_WEST_LOCATION);
+                    Location bridge2 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_EAST_LOCATION);
+
+                    if (!walkableTerrains.Contains(map[y - deltaY, x - deltaX]))
+                    {
+                        map[y - deltaY, x - deltaX] = Terrain.BRIDGE;
+                    }
+
+                    while (!crossingTerrains.Contains(map[y + perpDy, x + perpDx]) && !crossingTerrains.Contains(map[y - perpDy, x - perpDx]))
+                    {
+                        if ((deltaY < 0 && y > startY) || (deltaY > 0 && y < startY) || (deltaX < 0 && x > startX) || (deltaX > 0 && x < startX))
+                        {
+                            logger.Warn("Unable to roll back bridge location with jagged entrance");
+                            return false;
+                        }
+                        x -= deltaX;
+                        y -= deltaY;
+                    }
+                    if (crossingTerrains.Contains(map[y + deltaY, x + deltaX]))
+                    {
+                        x += deltaX;
+                        y += deltaY;
+                    }
+
                     if (deltaX > 0 || deltaY > 0)
                     {
                         bridge2.Xpos = x;
-                        bridge2.Ypos = y + 30;
+                        bridge2.Y = y;
                     }
                     else
                     {
                         bridge1.Xpos = x;
-                        bridge1.Ypos = y + 30;
+                        bridge1.Y = y;
                     }
 
-                    while (map[y, x] == riverTerrain)
+                    if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
+                        && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                    {
+                        map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
+                    }
+                    if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
+                        && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
+                    {
+                        map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                    }
+
+                    while ((deltaX != 0 && x != startX) || (deltaY != 0 && y != startY))
                     {
                         map[y, x] = Terrain.BRIDGE;
                         x -= deltaX;
                         y -= deltaY;
-                        //if(map[y + deltaY, x + deltaX] != Terrain.town && riverT != Terrain.walkablewater)
-                        //{
-                        //    map[y + deltaY, x + deltaX] = Terrain.walkablewater;
-                        //}
+                    }
 
+                    if (crossingTerrains.Contains(map[y,x]))
+                    {
+                        map[y, x] = map[y - deltaY, x - deltaX];
                     }
                     x += deltaX;
                     y += deltaY;
+                    if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
+                        && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                    {
+                        map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
+                    }
+                    if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
+                        && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
+                    {
+                        map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                    }
                     map[y, x] = Terrain.BRIDGE;
                     if (deltaX > 0 || deltaY > 0)
                     {
                         bridge1.Xpos = x;
-                        bridge1.Ypos = y + 30;
+                        bridge1.Y = y;
                     }
                     else
                     {
                         bridge2.Xpos = x;
-                        bridge2.Ypos = y + 30;
+                        bridge2.Y = y;
                     }
                     placeLongBridge = false;
                     bridge1.CanShuffle = false;
                     bridge2.CanShuffle = false;
                 }
-                else if (placeDarunia)
+                else if (placeDaruniaDesert)
                 {
-                    Location bridge1 = GetLocationByMem(0x8638);
-                    Location bridge2 = GetLocationByMem(0x8637);
+                    Location bridge1 = GetLocationByMem(RomMap.EAST_TRAP_DESERT_TILE_LOCATION2);
+                    Location bridge2 = GetLocationByMem(RomMap.EAST_TRAP_DESERT_TILE_LOCATION1);
                     if (bridge1.CanShuffle && bridge2.CanShuffle)
                     {
-                        x -= deltaX;
-                        y -= deltaY;
+                        if (!walkableTerrains.Contains(map[y - deltaY, x - deltaX]))
+                        {
+                            map[y - deltaY, x - deltaX] = Terrain.DESERT;
+                        }
+                        //Walk backwards until the first tile flanked on both sides by the river
+                        while (!crossingTerrains.Contains(map[y + perpDy, x + perpDx]) && !crossingTerrains.Contains(map[y - perpDy, x - perpDx]))
+                        {
+                            if ((deltaY < 0 && y > startY) || (deltaY > 0 && y < startY) || (deltaX < 0 && x > startX) || (deltaX > 0 && x < startX))
+                            {
+                                logger.Warn("Unable to roll back bridge location with jagged entrance");
+                                return false;
+                            }
+                            x -= deltaX;
+                            y -= deltaY;
+                        }
+
+                        //That's where the first bridge encounter is
                         if (deltaX > 0 || deltaY > 0)
                         {
                             bridge2.Xpos = x;
-                            bridge2.Ypos = y + 30;
+                            bridge2.Y = y;
                         }
                         else
                         {
                             bridge1.Xpos = x;
-                            bridge1.Ypos = y + 30;
+                            bridge1.Y = y;
                         }
 
-                        while (map[y, x] == riverTerrain)
+                        if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
+                            && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                        {
+                            map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
+                        }
+                        if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
+                            && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
+                        {
+                            map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                        }
+
+                        //Keep walking back placing deserts until the path opens up
+                        while ((deltaX != 0 && x != startX) || (deltaY != 0 && y != startY))
                         {
                             map[y, x] = Terrain.DESERT;
                             x -= deltaX;
                             y -= deltaY;
-                            //if(map[y + deltaY, x + deltaX] != Terrain.town && riverT != Terrain.walkablewater)
-                            //{
-                            //    map[y + deltaY, x + deltaX] = Terrain.walkablewater;
-                            //}
-
                         }
+                        //If you're going into a C-shape, you'll have a dead stub of water. fill it in
+                        if (map[y, x].IsWater())
+                        {
+                            map[y, x] = map[y - deltaY, x - deltaX];
+                        }
+
+                        //now we're past the opening, so go the other way 1
                         x += deltaX;
                         y += deltaY;
+
+                        //If exactly one of the tiles adjacent to the bridge is a potentially impassable, demolish it so you can't get stuck in it.
+                        if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
+                            && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                        {
+                            map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
+                        }
+                        if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
+                            && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
+                        {
+                            map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                        }
                         map[y, x] = Terrain.DESERT;
                         if (deltaX > 0 || deltaY > 0)
                         {
                             bridge1.Xpos = x;
-                            bridge1.Ypos = y + 30;
+                            bridge1.Y = y;
                         }
                         else
                         {
                             bridge2.Xpos = x;
-                            bridge2.Ypos = y + 30;
+                            bridge2.Y = y;
                         }
                         bridge1.CanShuffle = false;
                         bridge2.CanShuffle = false;
                     }
-                    placeDarunia = false;
+                    placeDaruniaDesert = false;
 
                 }
                 else
@@ -987,23 +1129,18 @@ public abstract class World
                         map[y, x] = Terrain.ROAD;
                         x -= deltaX;
                         y -= deltaY;
-                        while (map[y, x] == riverTerrain)
+                        while (crossingTerrains.Contains(map[y, x]))
                         {
                             map[y, x] = Terrain.WALKABLEWATER;
                             x -= deltaX;
                             y -= deltaY;
-
-                            //if(map[y + deltaY, x + deltaX] != Terrain.town && riverT != Terrain.walkablewater)
-                            //{
-                            //    map[y + deltaY, x + deltaX] = Terrain.walkablewater;
-                            //}
                         }
                         map[y, x] = Terrain.ROAD;
 
                     }
                     else
                     {
-                        while (map[y, x] == riverTerrain)
+                        while (crossingTerrains.Contains(map[y, x]))
                         {
 
                             if (biome == Biome.MOUNTAINOUS || biome == Biome.VANILLALIKE)
@@ -1041,7 +1178,7 @@ public abstract class World
                                     {
                                         if (location.CanShuffle && !placed)
                                         {
-                                            location.Ypos = y + 30;
+                                            location.Y = y;
                                             location.Xpos = x;
                                             location.CanShuffle = false;
                                             break;
@@ -1075,7 +1212,7 @@ public abstract class World
                                         {
                                             if (location.CanShuffle && !placed)
                                             {
-                                                location.Ypos = y + 30;
+                                                location.Y = y;
                                                 location.Xpos = x;
                                                 location.CanShuffle = false;
                                                 break;
@@ -1086,7 +1223,10 @@ public abstract class World
                                 }
                                 else if (TerrainCycle == 1)
                                 {
-                                    if (riverTerrain == Terrain.WATER || riverTerrain == Terrain.WALKABLEWATER || riverTerrain == Terrain.MOUNTAIN || (riverTerrain != Terrain.WALKABLEWATER && curr != length / 2 + 1))
+                                    if (
+                                        riverTerrain.IsWater()
+                                        || riverTerrain == Terrain.MOUNTAIN 
+                                        || (riverTerrain != Terrain.WALKABLEWATER && curr != length / 2 + 1))
                                     {
                                         map[y, x] = Terrain.BRIDGE;
                                     }
@@ -1109,7 +1249,7 @@ public abstract class World
                                         {
                                             if (location.CanShuffle && !placed)
                                             {
-                                                location.Ypos = y + 30;
+                                                location.Y = y;
                                                 location.Xpos = x;
                                                 location.CanShuffle = false;
                                                 break;
@@ -1126,20 +1266,22 @@ public abstract class World
                     TerrainCycle++;
                     if (riverTerrain != Terrain.MOUNTAIN && riverTerrain != Terrain.DESERT && !canWalkOnWater)
                     {
-                        TerrainCycle = TerrainCycle % 3;
+                        TerrainCycle %= 3;
                     }
                     else
                     {
-                        TerrainCycle = TerrainCycle % 2;
+                        TerrainCycle %= 2;
                     }
 
                 }
 
                 remainingBridges--;
-
             }
+
+            nextToWaterTiles.Remove((startX, startY, waterDirection));
+
         }
-        return !placeTown;
+        return !placeSaria;
     }
 
     /// <summary>
@@ -1148,18 +1290,18 @@ public abstract class World
     /// <returns>An int[][] mapping each x-y on the map to an int corresponding to the group that tile is a member of</returns>
     private int[,] GetTerrainGlobs()
     {
-        int[,] mass = new int[MAP_ROWS, MAP_COLS];
-        for (int i = 0; i < MAP_ROWS; i++)
+        int[,] mass = new int[MapRows, MapColumns];
+        for (int i = 0; i < MapRows; i++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MapColumns; j++)
             {
                 mass[i, j] = 0;
             }
         }
         int massNo = 1;
-        for (int i = 0; i < MAP_ROWS; i++)
+        for (int i = 0; i < MapRows; i++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MapColumns; j++)
             {
                 if (mass[i, j] == 0 && walkableTerrains.Contains(map[i, j]))
                 {
@@ -1185,7 +1327,7 @@ public abstract class World
         {
             CategorizeTerrainGlob(y - 1, x, massNo, mass);
         }
-        if (y + 1 < MAP_ROWS && mass[y + 1, x] == 0 && walkableTerrains.Contains(map[y + 1, x]))
+        if (y + 1 < MapRows && mass[y + 1, x] == 0 && walkableTerrains.Contains(map[y + 1, x]))
         {
             CategorizeTerrainGlob(y + 1, x, massNo, mass);
         }
@@ -1193,7 +1335,7 @@ public abstract class World
         {
             CategorizeTerrainGlob(y, x - 1, massNo, mass);
         }
-        if (x + 1 < MAP_COLS && mass[y, x + 1] == 0 && walkableTerrains.Contains(map[y, x + 1]))
+        if (x + 1 < MapColumns && mass[y, x + 1] == 0 && walkableTerrains.Contains(map[y, x + 1]))
         {
             CategorizeTerrainGlob(y, x + 1, massNo, mass);
         }
@@ -1204,9 +1346,9 @@ public abstract class World
     {
         char[] encoding = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q' };
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < MAP_ROWS; i++)
+        for (int i = 0; i < MapRows; i++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MapColumns; j++)
             {
                 sb.Append(encoding[mass[i, j]]);
             }
@@ -1215,31 +1357,32 @@ public abstract class World
         return sb.ToString();
     }
 
-    protected Direction NextToWater(int x, int y, Terrain riverTerrain)
+    protected List<Direction> NextToWaterDirections(int x, int y, Terrain[] crossingTerrains)
     {
-        if (walkableTerrains.Contains(map[y, x]) && map[y, x] != riverTerrain)
+        List<Direction> directions = [];
+        if (walkableTerrains.Contains(map[y, x]) && !crossingTerrains.Contains(map[y, x]))
         {
-            if (map[y + 1, x] == riverTerrain)
+            if (crossingTerrains.Contains(map[y + 1, x]))
             {
-                return Direction.SOUTH;
+                directions.Add(Direction.SOUTH);
             }
 
-            if (map[y - 1, x] == riverTerrain)
+            if (crossingTerrains.Contains(map[y - 1, x]))
             {
-                return Direction.NORTH;
+                directions.Add(Direction.NORTH);
             }
 
-            if (map[y, x + 1] == riverTerrain)
+            if (crossingTerrains.Contains(map[y, x + 1]))
             {
-                return Direction.EAST;
+                directions.Add(Direction.EAST);
             }
 
-            if (map[y, x - 1] == riverTerrain)
+            if (crossingTerrains.Contains(map[y, x - 1]))
             {
-                return Direction.WEST;
+                directions.Add(Direction.WEST);
             }
         }
-        return Direction.NONE;
+        return directions;
     }
 
     /// <summary>
@@ -1251,9 +1394,9 @@ public abstract class World
     private bool IsSingleTile(int y, int x)
     {
         int count = 0;
-        if (x < MAP_COLS && x > 0)
+        if (x < MapColumns && x > 0)
         {
-            if (y + 1 < MAP_ROWS && !walkableTerrains.Contains(map[y + 1, x]))
+            if (y + 1 < MapRows && !walkableTerrains.Contains(map[y + 1, x]))
             {
                 count++;
             }
@@ -1262,9 +1405,9 @@ public abstract class World
                 count++;
             }
         }
-        if (y < MAP_ROWS && y > 0)
+        if (y < MapRows && y > 0)
         {
-            if (x + 1 < MAP_COLS && !walkableTerrains.Contains(map[y, x + 1]))
+            if (x + 1 < MapColumns && !walkableTerrains.Contains(map[y, x + 1]))
             {
                 count++;
             }
@@ -1276,72 +1419,136 @@ public abstract class World
         return count == 4;
 
     }
+
+    /// used for GrowTerrain optimization
+    private readonly struct PlacedTerrainPreCalc
+    {
+        public readonly double X;
+        public readonly double Y;
+        public readonly Terrain Terrain;
+        public readonly double CoefSquared;
+        public PlacedTerrainPreCalc(int x, int y, Terrain terrain, double coefSquared)
+        {
+            X = x;
+            Y = y;
+            Terrain = terrain;
+            CoefSquared = coefSquared;
+        }
+    }
+
+    /// Pre-build an array to loop over, since this used MAP_ROWS * MAP_COLS times
+    private PlacedTerrainPreCalc[] GrowTerrainGetPlacedTerrains(Climate climate)
+    {
+        List<Terrain> consideredTerrains = Enum.GetValues<Terrain>().ToList();
+        List<(int, int)> placedCoords = new();
+        for (int y = 0; y < MapRows; y++)
+        {
+            for (int x = 0; x < MapColumns; x++)
+            {
+                Terrain t = map[y, x];
+                if (t != Terrain.NONE && consideredTerrains.Contains(t))
+                {
+                    placedCoords.Add((y, x));
+                }
+            }
+        }
+        Debug.Assert(placedCoords.Count > 0);
+        PlacedTerrainPreCalc[] placedTerrains = new PlacedTerrainPreCalc[placedCoords.Count];
+        for (int i = 0; i < placedCoords.Count; i++)
+        {
+            var (py, px) = placedCoords[i];
+            Terrain t = map[py, px];
+            double c = climate.DistanceCoefficients[(int)t];
+            placedTerrains[i] = new PlacedTerrainPreCalc(px, py, t, c * c);
+        }
+        return placedTerrains;
+    }
+
     protected bool GrowTerrain(Climate climate)
     {
-        List<Terrain> randomTerrains = climate.RandomTerrains(randomTerrainFilter).ToList();
         TerrainGrowthAttempts++;
-        Terrain[,] mapCopy = new Terrain[MAP_ROWS, MAP_COLS];
-        List<(int, int)> placed = new();
-        for (int y = 0; y < MAP_ROWS; y++)
+        Terrain[,] mapCopy = new Terrain[MapRows, MapColumns];
+        PlacedTerrainPreCalc[] placedTerrains = GrowTerrainGetPlacedTerrains(climate);
+        const double EPSILON = 1e-9;
+        double distance, minDistance;
+        List<Terrain> choices = new();
+        for (int y = 0; y < MapRows; y++)
         {
-            for (int x = 0; x < MAP_COLS; x++)
+            for (int x = 0; x < MapColumns; x++)
             {
-                if (map[y, x] != Terrain.NONE && randomTerrains.Contains(map[y, x]))
+                var existingT = map[y, x];
+                if (existingT != Terrain.NONE)
                 {
-                    placed.Add((y, x));
+                    mapCopy[y, x] = existingT;
                 }
-            }
-        }
-
-        int dy, dx;
-        double distance;
-        List<Terrain> choices = new List<Terrain>();
-        for (int y = 0; y < MAP_ROWS; y++)
-        {
-            for (int x = 0; x < MAP_COLS; x++)
-            {
-                if (map[y, x] == Terrain.NONE)
+                else
                 {
                     choices.Clear();
-                    double mindistance = double.MaxValue;
+                    minDistance = double.MaxValue;
 
-                    foreach ((int, int)t in placed)
+                    for (int i = 0; i < placedTerrains.Length; i++)
                     {
-                        dy = t.Item1 - y;
-                        dx = t.Item2 - x;
-                        distance = (climate.DistanceCoefficients[(int)map[t.Item1, t.Item2]]) * Math.Sqrt(dy * dy + dx * dx);
-                        //distance = ((tx + (tx >> 31)) ^ (tx >> 31)) + ((ty + (ty >> 31)) ^ (ty >> 31));
-                        //distance = Math.Abs(tx) + Math.Abs(ty);
-                        if (distance < mindistance)
+                        ref readonly var placedTerrain = ref placedTerrains[i];
+                        double dx = placedTerrain.X - x;
+                        double dy = placedTerrain.Y - y;
+                        Terrain t = placedTerrain.Terrain;
+
+                        // optimize further by skipping square root, because the
+                        // minimum distance will also be the minimum distance squared
+                        distance = placedTerrain.CoefSquared * (dx * dx + dy * dy);
+                        if (distance > minDistance) // most likely case first
+                        {
+                            continue;
+                        }
+                        else if (distance + EPSILON < minDistance)
                         {
                             choices.Clear();
-                            choices.Add(map[t.Item1, t.Item2]);
-                            mindistance = distance;
+                            choices.Add(t);
+                            minDistance = distance;
                         }
-                        else if (distance == mindistance)
+                        else
                         {
-                            choices.Add(map[t.Item1, t.Item2]);
+                            choices.Add(t);
                         }
                     }
+                    Debug.Assert(choices.Count > 0);
                     mapCopy[y, x] = choices[RNG.Next(choices.Count)];
-                    //mapCopy[y, x] = Terrain.ROAD;
                 }
             }
         }
-
-        //Write the locations that already had terrain before the growth back onto the copy before we clone over.
-        for (int y = 0; y < MAP_ROWS; y++)
-        {
-            for (int x = 0; x < MAP_COLS; x++)
-            {
-                if (map[y, x] != Terrain.NONE)
-                {
-                    mapCopy[y, x] = map[y, x];
-                }
-            }
-        }
-        map = (Terrain[,])mapCopy.Clone();
+        map = mapCopy; // no need to clone as we created this array at the start of the method
         return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int DistanceSquared(Location l, int x2, int y2)
+    {
+        int dx = l.Xpos - x2;
+        int dy = l.Y - y2;
+        return dx * dx + dy * dy;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int DistanceSquared(int x1, int y1, int x2, int y2)
+    {
+        int dx = x1 - x2;
+        int dy = y1 - y2;
+        return dx * dx + dy * dy;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected bool AllTerrainIn3x3Equals(int x, int y, Terrain t)
+    {
+        return
+            map[y - 1, x - 1] == t &&
+            map[y - 1, x    ] == t &&
+            map[y - 1, x + 1] == t &&
+            map[y,     x - 1] == t &&
+            map[y,     x    ] == t &&
+            map[y,     x + 1] == t &&
+            map[y + 1, x - 1] == t &&
+            map[y + 1, x    ] == t &&
+            map[y + 1, x + 1] == t;
     }
 
     protected void PlaceRandomTerrain(Climate climate, int seedCountMaximum = 500)
@@ -1358,8 +1565,8 @@ public abstract class World
             Terrain t = climate.GetRandomTerrain(RNG, randomTerrainFilter);
             do
             {
-                x = RNG.Next(MAP_COLS);
-                y = RNG.Next(MAP_ROWS);
+                x = RNG.Next(MapColumns);
+                y = RNG.Next(MapRows);
                 consecutivelyPlaced++;
             } while (map[y, x] != Terrain.NONE && consecutivelyPlaced < EXHAUSTION_LIMIT);
             if (consecutivelyPlaced < EXHAUSTION_LIMIT)
@@ -1387,36 +1594,37 @@ public abstract class World
         int bytesWritten = 0; //Number of bytes written so far
         Terrain currentTerrain = map[0, 0];
         int currentTerrainCount = 0;
-        for (int y = 0; y < MAP_ROWS; y++)
+        Terrain edgeOfContinentTerrain = map[0, MapColumns - 1] == Terrain.MOUNTAIN ? Terrain.MOUNTAIN : Terrain.WATER;
+        for (int y = 0; y < MapRows; y++)
         {
-            for (int x = 0; x < MAP_COLS; x++)
+            for (int x = 0; x < MAP_COLS_FULL; x++)
             {
                 //These two conditionals ABSOLUTELY should not be processed here.
                 //Refactor them and remove the excess boolean parameters.
                 if (hiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
                 {
                     currentTerrainCount--;
-                    int b = currentTerrainCount * 16 + (int)currentTerrain;
+                    int b = currentTerrainCount * 16 + currentTerrain.RomValue();
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
                         romData.Put(loc, (byte)b);
-                        romData.Put(loc + 1, (byte)currentTerrain);
+                        romData.Put(loc + 1, currentTerrain.RomValue());
                     }
                     currentTerrainCount = 0;
                     loc += 2;
                     bytesWritten += 2;
                     continue;
                 }
-                if (hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE))
+                if (hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && biome.UsesVanillaMap())
                 {
                     currentTerrainCount--;
-                    int b = currentTerrainCount * 16 + (int)currentTerrain;
+                    int b = currentTerrainCount * 16 + currentTerrain.RomValue();
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
                         romData.Put(loc, (byte)b);
-                        romData.Put(loc + 1, (byte)currentTerrain);
+                        romData.Put(loc + 1, currentTerrain.RomValue());
                     }
                     currentTerrainCount = 0;
                     loc += 2;
@@ -1424,38 +1632,37 @@ public abstract class World
                     continue;
                 }
 
-                if (map[y, x] == currentTerrain && currentTerrainCount < 16)
+                Terrain nextTerrain = x < MapColumns ? map[y, x] : edgeOfContinentTerrain;
+                if (currentTerrainCount == 16 || currentTerrain != nextTerrain)
                 {
-                    currentTerrainCount++;
-                }
-                else
-                {
-                    currentTerrainCount--;
                     //First 4 bits are the number of tiles to draw with that Terrain type. Last 4 are the Terrain type.
-                    int b = currentTerrainCount * 16 + (int)currentTerrain;
+                    int b = ((currentTerrainCount - 1) << 4) | currentTerrain.RomValue();
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
                         romData.Put(loc, (byte)b);
                     }
-
-                    currentTerrain = map[y, x];
+                    currentTerrain = nextTerrain;
                     //This is almost certainly an off by one error, but very very unlikely to matter
                     currentTerrainCount = 1;
                     loc++;
                     bytesWritten++;
                 }
+                else
+                {
+                    currentTerrainCount++;
+            }
             }
             //Write the last Terrain segment for this row
             currentTerrainCount--;
-            int b2 = currentTerrainCount * 16 + (int)currentTerrain;
+            int b2 = currentTerrainCount * 16 + currentTerrain.RomValue();
             //logger.WriteLine("Hex: {0:X}", b2);
             if (doWrite)
             {
                 romData.Put(loc, (byte)b2);
             }
 
-            if (y < MAP_ROWS - 1)
+            if (y < MapRows - 1)
             {
                 currentTerrain = map[y + 1, 0];
             }
@@ -1476,13 +1683,8 @@ public abstract class World
         return nonPaddingBytesWritten;
     }
 
-    protected void DrawOcean(Direction direction, bool walkableWater)
+    protected bool DrawOcean(Direction direction, Terrain oceanTerrain)
     {
-        Terrain water = Terrain.WATER;
-        if (walkableWater)
-        {
-            water = Terrain.WALKABLEWATER;
-        }
         int x;
         int y;
         int olength = 0;
@@ -1490,53 +1692,57 @@ public abstract class World
         if (direction == Direction.WEST)
         {
             x = 0;
-            y = RNG.Next(MAP_ROWS);
-            olength = RNG.Next(Math.Max(y, MAP_ROWS - y));
+            y = RNG.Next(MapRows);
+            olength = RNG.Next(Math.Max(y, MapRows - y));
         }
         else if (direction == Direction.EAST)
         {
-            x = MAP_COLS - 1;
-            y = RNG.Next(MAP_ROWS);
-            olength = RNG.Next(Math.Max(y, MAP_ROWS - y));
+            x = MapColumns - 1;
+            y = RNG.Next(MapRows);
+            olength = RNG.Next(Math.Max(y, MapRows - y));
         }
         else if (direction == Direction.NORTH)
         {
-            x = RNG.Next(MAP_COLS);
+            x = RNG.Next(MapColumns);
             y = 0;
-            olength = RNG.Next(Math.Max(x, MAP_COLS - x));
+            olength = RNG.Next(Math.Max(x, MapColumns - x));
         }
         else //south
         {
-            x = RNG.Next(MAP_COLS);
-            y = MAP_ROWS - 1;
-            olength = RNG.Next(Math.Max(x, MAP_COLS - x));
+            x = RNG.Next(MapColumns);
+            y = MapRows - 1;
+            olength = RNG.Next(Math.Max(x, MapColumns - x));
         }
         //draw ocean on right side
 
         if (direction == Direction.EAST || direction == Direction.WEST)
         {
-            if (y < MAP_ROWS / 2)
+            if (y < MapRows / 2)
             {
                 for (int i = 0; i < olength; i++)
                 {
-                    if (map[y + i, x] != Terrain.NONE && biome != Biome.MOUNTAINOUS)
+                    var t = map[y + i, x];
+                    if (t != Terrain.NONE && biome != Biome.MOUNTAINOUS && biome != Biome.CALDERA)
                     {
-                        return;
+                        logger.LogDebug("DrawOcean could not add water west"); 
+                        return false;
                     }
-                    map[y + i, x] = water;
+                    map[y + i, x] = oceanTerrain;
                 }
             }
-            else //north or south
+            else
             {
                 try
                 {
                     for (int i = 0; i < olength; i++)
                     {
-                        if (map[y - i, x] != Terrain.NONE && biome != Biome.MOUNTAINOUS)
+                        var t = map[y - i, x];
+                        if (t != Terrain.NONE && biome != Biome.MOUNTAINOUS && biome != Biome.CALDERA)
                         {
-                            return;
+                            logger.LogDebug("DrawOcean could not add water east");
+                            return false;
                         }
-                        map[y - i, x] = water;
+                        map[y - i, x] = oceanTerrain;
                     }
                 }
                 catch (IndexOutOfRangeException e)
@@ -1547,40 +1753,45 @@ public abstract class World
         }
         else // north or south
         {
-            if (x < MAP_COLS / 2)
+            if (x < MapColumns / 2)
             {
                 for (int i = 0; i < olength; i++)
                 {
-                    if (map[y, x + i] != Terrain.NONE && biome != Biome.MOUNTAINOUS)
+                    var t = map[y, x + i];
+                    if (t != Terrain.NONE && biome != Biome.MOUNTAINOUS && biome != Biome.CALDERA)
                     {
-                        return;
+                        logger.LogDebug("DrawOcean could not add water north");
+                        return false;
                     }
-                    map[y, x + i] = water;
+                    map[y, x + i] = oceanTerrain;
                 }
             }
             else
             {
                 for (int i = 0; i < olength; i++)
                 {
-                    if (map[y, x - 1] != Terrain.NONE && biome != Biome.MOUNTAINOUS)
+                    var t = map[y, x - 1];
+                    if (t != Terrain.NONE && biome != Biome.MOUNTAINOUS && biome != Biome.CALDERA)
                     {
-                        return;
+                        logger.LogDebug("DrawOcean could not add water south");
+                        return false;
                     }
-                    map[y, x - i] = water;
+                    map[y, x - i] = oceanTerrain;
                 }
             }
         }
+        return true;
     }
   
-    protected void UpdateReachable(Dictionary<Collectable, bool> itemGet)
+    protected void UpdateReachable(List<RequirementType> requireables)
     {
 
         List<Location> starts = GetPathingStarts();
 
-        bool[,] covered = new bool[MAP_ROWS, MAP_COLS];
-        for (int i = 0; i < MAP_ROWS; i++)
+        bool[,] covered = new bool[MapRows, MapColumns];
+        for (int i = 0; i < MapRows; i++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MapColumns; j++)
             {
                 covered[i, j] = false;
             }
@@ -1589,9 +1800,9 @@ public abstract class World
         //Run the initial steps
         foreach (Location start in starts)
         {
-            if (start.Ypos >= 30 && start.Xpos >= 0)
+            if (start.Y >= 0 && start.Xpos >= 0)
             {
-                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, itemGet);
+                UpdateReachable(ref covered, start.Y, start.Xpos, requireables);
             }
         }
 
@@ -1604,7 +1815,7 @@ public abstract class World
     }
 
     //This signature has gotten out of control, consider a refactor
-    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, Dictionary<Collectable, bool> itemGet)
+    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, List<RequirementType> requireables)
     {
         Stack<(int, int)> to_visit = new();
         // push the initial coord to the visitation stack
@@ -1620,7 +1831,7 @@ public abstract class World
                     continue;
                 }
                 covered[y, x] = true;
-                Location? location = GetLocationByCoords((y + 30, x));
+                Location? location = GetLocationByCoordsNoOffset((y, x));
 
 
                 Terrain terrain = map[y, x];
@@ -1631,22 +1842,11 @@ public abstract class World
                     || terrain == Terrain.PALACE
                     || terrain == Terrain.TOWN
                     || walkableTerrains.Contains(terrain)
-                    || (terrain == Terrain.WALKABLEWATER && itemGet[Collectable.BOOTS])
-                    || (terrain == Terrain.ROCK && itemGet[Collectable.HAMMER])
-                    || (terrain == Terrain.RIVER_DEVIL && itemGet[Collectable.FLUTE]))
-
-                    //East desert jump blocker
-                    && !(
-                        location != null
-                        && location.NeedJump
-                        && (!itemGet[Collectable.JUMP_SPELL] && !itemGet[Collectable.FAIRY_SPELL])
-                    )
-                    //Fairy cave is traversable
-                    && !(
-                        location != null
-                        && location.NeedFairy 
-                        && !itemGet[Collectable.FAIRY_SPELL]
-                    )
+                    || (terrain == Terrain.WALKABLEWATER && requireables.Contains(RequirementType.BOOTS))
+                    || (terrain == Terrain.PREPLACED_WATER_WALKABLE && requireables.Contains(RequirementType.BOOTS))
+                    || (terrain == Terrain.ROCK && requireables.Contains(RequirementType.HAMMER))
+                    || (terrain == Terrain.RIVER_DEVIL && requireables.Contains(RequirementType.FLUTE)))
+                    && (location == null || location!.AccessRequirements.AreSatisfiedBy(requireables))
                 )
                 {
                     visitation[y, x] = true;
@@ -1654,7 +1854,7 @@ public abstract class World
                     {
                         to_visit.Push((y - 1, x));
                     }
-                    if (y + 1 < MAP_ROWS && !covered[y + 1, x])
+                    if (y + 1 < MapRows && !covered[y + 1, x])
                     {
                         to_visit.Push((y + 1, x));
                     }
@@ -1662,7 +1862,7 @@ public abstract class World
                     {
                         to_visit.Push((y, x - 1));
                     }
-                    if (x + 1 < MAP_COLS && !covered[y, x + 1])
+                    if (x + 1 < MapColumns && !covered[y, x + 1])
                     {
                         to_visit.Push((y, x + 1));
                     }
@@ -1679,9 +1879,9 @@ public abstract class World
     //Should the visibility calculation table even be persistent? Why is this not just in scope of the calculation itself?
     public void ResetVisitabilityState()
     {
-        for (int i = 0; i < MAP_ROWS; i++)
+        for (int i = 0; i < MapRows; i++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MapColumns; j++)
             {
                 visitation[i, j] = false;
             }
@@ -1693,16 +1893,20 @@ public abstract class World
         }
     }
 
-    protected bool DrawRaft(bool drawBridgeInstead, Direction direction)
+    protected bool DrawBridge(Direction direction)
     {
-        int raftx = 0;
-        int deltax = 1;
-        int deltay = 0;
-        int rafty = RNG.Next(0, MAP_ROWS);
+        return DrawBridge(RNG, map, bridge, walkableTerrains, direction);
+    }
+
+    public static bool DrawBridge(Random r, Terrain[,] map, Location? bridge, List<Terrain> walkableTerrains, Direction direction)
+    {
+        if (bridge == null) { throw new Exception("Unable to draw unloaded bridge"); }
+        int x = 0;
+        int y = 0;
+        GetAwayFromEdgeDeltas(direction, out int deltax, out int deltay);
 
         int tries = 0;
         int length = 0;
-        //Debug.WriteLine(GetMapDebug());
 
         do
         {
@@ -1712,185 +1916,269 @@ public abstract class World
             {
                 return false;
             }
-            if (direction == Direction.WEST)
-            {
-                raftx = 0;
-                int rtries = 0;
-                do
-                {
-                    rafty = RNG.Next(0, MAP_ROWS);
-                    rtries++;
-                    if (rtries > 100)
-                    {
-                        return false;
-                    }
-                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
-                deltax = 1;
-            }
-            else if (direction == Direction.NORTH)
-            {
-                rafty = 0;
-                int rtries = 0;
 
-                do
-                {
-                    raftx = RNG.Next(0, MAP_COLS);
-                    rtries++;
-                    if (rtries > 100)
-                    {
-                        return false;
-                    }
-                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
-                deltax = 0;
-                deltay = 1;
-            }
-            else if (direction == Direction.SOUTH)
+            if (!FindWaterTileAtEdge(r, map, direction, out x, out y, 100))
             {
-                rafty = MAP_ROWS - 1;
-                int rtries = 0;
+                return false;
+            }
 
-                do
-                {
-                    raftx = RNG.Next(0, MAP_COLS);
-                    rtries++;
-                    if (rtries > 100)
-                    {
-                        return false;
-                    }
-                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
-                deltax = 0;
-                deltay = -1;
-            }
-            else //EAST
-            {
-                raftx = MAP_COLS - 1;
-                int rtries = 0;
-
-                do
-                {
-                    rafty = RNG.Next(0, MAP_ROWS);
-                    rtries++;
-                    if (rtries > 100)
-                    {
-                        return false;
-                    }
-                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
-
-                deltax = -1;
-                deltay = 0;
-            }
-            while (rafty >= 0 && rafty < MAP_ROWS && raftx >= 0 && raftx < MAP_COLS && (map[rafty, raftx] == Terrain.WALKABLEWATER || map[rafty, raftx] == Terrain.WATER))
-            {
-                rafty += deltay;
-                raftx += deltax;
-                length++;
-            }
-        } while (rafty < 0 || rafty >= MAP_ROWS || raftx < 0 || raftx >= MAP_COLS || !walkableTerrains.Contains(map[rafty, raftx]) || (drawBridgeInstead && length > 10) || (drawBridgeInstead && length <= 1));
-
-
-        rafty -= deltay;
-        raftx -= deltax;
-        if (drawBridgeInstead)
-        {
-            if(bridge == null)
-            {
-                throw new Exception("Unable to draw unloaded bridge");
-            }
-            map[rafty, raftx] = Terrain.BRIDGE;
-            bridge.Xpos = raftx;
-            bridge.Ypos = rafty + 30;
-            bridge.PassThrough = 0;
-            bridge.CanShuffle = false;
-            if (direction == Direction.EAST)
-            {
-                for (int i = raftx + 1; i < MAP_COLS; i++)
-                {
-                    map[rafty, i] = Terrain.BRIDGE;
-                }
-            }
-            else if (direction == Direction.WEST)
-            {
-                for (int i = raftx - 1; i >= 0; i--)
-                {
-                    map[rafty, i] = Terrain.BRIDGE;
-                }
-            }
-            else if (direction == Direction.SOUTH)
-            {
-                for (int i = rafty + 1; i < MAP_ROWS; i++)
-                {
-                    map[i, raftx] = Terrain.BRIDGE;
-                }
-            }
-            else if (direction == Direction.NORTH)
-            {
-                for (int i = rafty - 1; i >= 0; i--)
-                {
-                    map[i, raftx] = Terrain.BRIDGE;
-                }
-            }
+            length = MeasureWaterPath(map, x, y, deltax, deltay, out x, out y);
         }
-        else
-        {
-            if (raft == null)
-            {
-                throw new Exception("Unable to draw unloaded raft");
-            }
-            map[rafty, raftx] = Terrain.BRIDGE;
-            raft.Xpos = raftx;
-            raft.Ypos = rafty + 30;
-            raft.CanShuffle = false;
-        }
+        while (length <= 1 || length > 10 || !IsValidEndTile(map, walkableTerrains, x, y));
+
+        y -= deltay;
+        x -= deltax;
+
+        PlaceBridge(map, bridge, x, y, direction);
+
         return true;
-
     }
 
-    public Location LoadRaft(ROM rom, Continent world, Continent connectedContinent)
+    protected bool DrawRaft(Direction direction)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, world));
-        raft = GetLocationByMem(baseAddr + 41);
-        raft.Continent = world;
+        return DrawRaft(RNG, map, raft, walkableTerrains, direction);
+    }
+
+    public static bool DrawRaft(Random r, Terrain[,] map, Location? raft, List<Terrain> walkableTerrains, Direction direction)
+    {
+        if (raft == null) { throw new Exception("Unable to draw unloaded raft"); }
+        int x = 0;
+        int y = 0;
+        GetAwayFromEdgeDeltas(direction, out int deltax, out int deltay);
+
+        int tries = 0;
+
+        do
+        {
+            tries++;
+            if (tries > 100) {
+                return false;
+            }
+
+            if (!FindWaterTileAtEdge(r, map, direction, out x, out y, 100))
+            {
+                return false;
+            }
+
+            MeasureWaterPath(map, x, y, deltax, deltay, out x, out y);
+        }
+        while (!IsValidEndTile(map, walkableTerrains, x, y));
+
+        y -= deltay;
+        x -= deltax;
+
+        PlaceRaft(map, raft, x, y);
+
+        return true;
+    }
+
+    /// Tries to find a water tile at the edge of the map in `direction`.
+    /// If a water tile is found, true is returned and (x,y) contains the position.
+    /// Otherwise, false is returned and (x,y) is set to (0,0).
+    protected static bool FindWaterTileAtEdge(Random r, Terrain[,] map, Direction direction, out int x, out int y, int maxTries)
+    {
+        int mapRows = map.GetLength(0);
+        int mapCols = map.GetLength(1);
+
+        switch (direction)
+        {
+            case Direction.WEST:
+            case Direction.EAST:
+                x = direction == Direction.WEST ? 0 : mapCols - 1;
+                for (int tries = 0; tries < maxTries; tries++)
+                {
+                    y = r.Next(0, mapRows);
+                    if (map[y, x].IsWater()) { return true; }
+                }
+                break;
+
+            case Direction.NORTH:
+            case Direction.SOUTH:
+                y = direction == Direction.NORTH ? 0 : mapRows - 1;
+                for (int tries = 0; tries < maxTries; tries++)
+                {
+                    x = r.Next(0, mapCols);
+                    if (map[y, x].IsWater()) { return true; }
+                }
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(direction));
+        }
+
+        x = 0; y = 0;
+        return false;
+    }
+
+    /// Get (dx,dy) vector pointing away from the edge for `direction`.
+    protected static void GetAwayFromEdgeDeltas(Direction direction, out int dx, out int dy)
+    {
+        (dx, dy) = direction switch
+        {
+            Direction.WEST => (1, 0),
+            Direction.EAST => (-1, 0),
+            Direction.NORTH => (0, 1),
+            Direction.SOUTH => (0, -1),
+            _ => (0, 0)
+        };
+    }
+
+    /// Walk from (startX,startY) in (dx,dy) direction until we are no longer on water.
+    /// End position is stored in (endX,endY) and the length of the path is returned.
+    protected static int MeasureWaterPath(Terrain[,] map, int startX, int startY, int dx, int dy, out int endX, out int endY)
+    {
+        int mapRows = map.GetLength(0);
+        int mapCols = map.GetLength(1);
+        int length = 0;
+        int x = startX;
+        int y = startY;
+
+        while (y >= 0 && y < mapRows && x >= 0 && x < mapCols && map[y, x].IsWater())
+        {
+            y += dy;
+            x += dx;
+            length++;
+        }
+
+        endX = x;
+        endY = y;
+        return length;
+    }
+
+    /// Check for DrawBridge & DrawRaft if (x,y) would be an acceptable placement
+    protected static bool IsValidEndTile(Terrain[,] map, List<Terrain> walkableTerrains, int x, int y)
+    {
+        int mapRows = map.GetLength(0);
+        int mapCols = map.GetLength(1);
+
+        if (x < 0 || y < 0 || x >= mapCols || y >= mapRows) { return false; }
+        return walkableTerrains.Contains(map[y, x]);
+    }
+
+    public static void PlaceBridge(Terrain[,] map, Location bridge, int x, int y, Direction direction)
+    {
+        int mapRows = map.GetLength(0);
+        int mapCols = map.GetLength(1);
+
+        map[y, x] = Terrain.BRIDGE;
+        bridge.Xpos = x;
+        bridge.Y = y;
+        bridge.PassThrough = 0;
+        bridge.CanShuffle = false;
+
+        if (direction == Direction.EAST)
+        {
+            for (int i = x + 1; i < mapCols; i++)
+            {
+                map[y, i] = Terrain.BRIDGE;
+            }
+        }
+        else if (direction == Direction.WEST)
+        {
+            for (int i = x - 1; i >= 0; i--)
+            {
+                map[y, i] = Terrain.BRIDGE;
+            }
+        }
+        else if (direction == Direction.SOUTH)
+        {
+            for (int i = y + 1; i < mapRows; i++)
+            {
+                map[i, x] = Terrain.BRIDGE;
+            }
+        }
+        else if (direction == Direction.NORTH)
+        {
+            for (int i = y - 1; i >= 0; i--)
+            {
+                map[i, x] = Terrain.BRIDGE;
+            }
+        }
+    }
+
+    public static void PlaceRaft(Terrain[,] map, Location raft, int x, int y)
+    {
+        map[y, x] = Terrain.BRIDGE;
+        raft.Xpos = x;
+        raft.Y = y;
+        raft.CanShuffle = false;
+    }
+
+    public Location LoadRaft(ROM rom, Continent continent, Continent connectedContinent)
+    {
+        Debug.Assert(continent == continentId); // we can remove param if this is always true
+        var newRaft = rom.LoadLocation(baseAddr + Location.CONNECTOR_RAFT_ID, Terrain.BRIDGE, continent);
+        AddLocation(newRaft);
+        raft = GetLocationByMem(baseAddr + Location.CONNECTOR_RAFT_ID);
+        Debug.Assert(newRaft == raft);
+        Debug.Assert(raft.Continent == continent);
         raft.ConnectedContinent = connectedContinent;
         raft.ExternalWorld = 0x80;
-        raft.Map = 41;
+        raft.Map = Location.CONNECTOR_RAFT_ID;
         raft.TerrainType = Terrain.BRIDGE;
+        if (!WithinMapBounds(raft.Pos))
+        {
+            raft.Pos = IntVector2.Random(RNG, MapColumns, MapRows);
+        }
         return raft;
     }
 
-    public Location LoadBridge(ROM rom, Continent world, Continent connectedContinent)
+    public Location LoadBridge(ROM rom, Continent continent, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, world));
-        bridge = GetLocationByMem(baseAddr + 40);
-        bridge.Continent = world;
+        Debug.Assert(continent == continentId); // we can remove param if this is always true
+        var newBridge = rom.LoadLocation(baseAddr + Location.CONNECTOR_BRIDGE_ID, Terrain.BRIDGE, continent);
+        AddLocation(newBridge);
+        bridge = GetLocationByMem(baseAddr + Location.CONNECTOR_BRIDGE_ID);
+        Debug.Assert(newBridge == bridge);
+        Debug.Assert(bridge.Continent == continent);
         bridge.ConnectedContinent = connectedContinent;
         bridge.ExternalWorld = 0x80;
-        bridge.Map = 40;
+        bridge.Map = Location.CONNECTOR_BRIDGE_ID;
         bridge.PassThrough = 0;
+        if (!WithinMapBounds(bridge.Pos))
+        {
+            bridge.Pos = IntVector2.Random(RNG, MapColumns, MapRows);
+        }
         return bridge;
     }
 
     public Location LoadCave1(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, world));
-        cave1 = GetLocationByMem(baseAddr + 42);
-        cave1.Continent = world;
+        Debug.Assert(world == continentId); // we can remove param if this is always true
+        var newCave = rom.LoadLocation(baseAddr + Location.CONNECTOR_CAVE1_ID, Terrain.CAVE, world);
+        AddLocation(newCave);
+        cave1 = GetLocationByMem(baseAddr + Location.CONNECTOR_CAVE1_ID);
+        Debug.Assert(newCave == cave1);
+        Debug.Assert(cave1.Continent == world);
         cave1.ConnectedContinent = connectedContinent;
         cave1.ExternalWorld = 0x80;
-        cave1.Map = 42;
+        cave1.Map = Location.CONNECTOR_CAVE1_ID;
         cave1.CanShuffle = true;
+        if (!WithinMapBounds(cave1.Pos))
+        {
+            cave1.Pos = IntVector2.Random(RNG, MapColumns, MapRows);
+        }
         return cave1;
     }
 
     public Location LoadCave2(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, world));
-        cave2 = GetLocationByMem(baseAddr + 43);
+        Debug.Assert(world == continentId); // we can remove param if this is always true
+        var newCave = rom.LoadLocation(baseAddr + Location.CONNECTOR_CAVE2_ID, Terrain.CAVE, world);
+        AddLocation(newCave);
+        cave2 = GetLocationByMem(baseAddr + Location.CONNECTOR_CAVE2_ID);
+        Debug.Assert(newCave == cave2);
+        Debug.Assert(cave2.Continent == world);
         cave2.ConnectedContinent = connectedContinent;
         cave2.ExternalWorld = 0x80;
         cave2.Continent = world;
-        cave2.Map = 43;
-        cave2.TerrainType = Terrain.CAVE;
+        cave2.Map = Location.CONNECTOR_CAVE2_ID;
+        Debug.Assert(cave2.TerrainType == Terrain.CAVE);
         cave2.CanShuffle = true;
+        if (!WithinMapBounds(cave2.Pos))
+        {
+            cave2.Pos = IntVector2.Random(RNG, MapColumns, MapRows);
+        }
         return cave2;
     }
 
@@ -1903,7 +2191,7 @@ public abstract class World
     {
         if (raft != null)
         {
-            visitation[raft.Ypos - 30, raft.Xpos] = true;
+            visitation[raft.Y, raft.Xpos] = true;
         }
     }
 
@@ -1911,7 +2199,7 @@ public abstract class World
     {
         if (bridge != null)
         {
-            visitation[bridge.Ypos - 30, bridge.Xpos] = true;
+            visitation[bridge.Y, bridge.Xpos] = true;
         }
     }
 
@@ -1919,7 +2207,7 @@ public abstract class World
     {
         if (cave1 != null)
         {
-            visitation[cave1.Ypos - 30, cave1.Xpos] = true;
+            visitation[cave1.Y, cave1.Xpos] = true;
         }
     }
 
@@ -1927,7 +2215,7 @@ public abstract class World
     {
         if (cave2 != null)
         {
-            visitation[cave2.Ypos - 30, cave2.Xpos] = true;
+            visitation[cave2.Y, cave2.Xpos] = true;
         }
     }
 
@@ -1957,32 +2245,32 @@ public abstract class World
         if (dirr == 0) //north
         {
             deltay = 1;
-            startx = RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
+            startx = RNG.Next(MapColumns / 3, (MapColumns / 3) * 2);
             starty = 0;
         }
         else if (dirr == 1) //east
         {
             deltax = -1;
-            startx = MAP_COLS - 1;
-            starty = RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
+            startx = MapColumns - 1;
+            starty = RNG.Next(MapRows / 3, (MapRows / 3) * 2);
         }
         else if (dirr == 2) //south
         {
             deltay = -1;
-            startx = RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
-            starty = MAP_ROWS - 1;
+            startx = RNG.Next(MapColumns / 3, (MapColumns / 3) * 2);
+            starty = MapRows - 1;
         }
         else //west
         {
             deltax = 1;
             startx = 0;
-            starty = RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
+            starty = RNG.Next(MapRows / 3, (MapRows / 3) * 2);
         }
 
-        int stopping = RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
+        int stopping = RNG.Next(MapColumns / 3, (MapColumns / 3) * 2);
         if (deltay != 0)
         {
-            stopping = RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
+            stopping = RNG.Next(MapRows / 3, (MapRows / 3) * 2);
         }
         int curr = 0;
         while (curr < stopping)
@@ -1996,7 +2284,7 @@ public abstract class World
                 {
                     adjust = RNG.Next(0, 2);
                 }
-                else if ((deltax == 0 && startx == MAP_COLS - 2) || (deltay == 0 && starty == MAP_ROWS - 2))
+                else if ((deltax == 0 && startx == MapColumns - 2) || (deltay == 0 && starty == MapRows - 2))
                 {
                     adjust = RNG.Next(-1, 1);
                 }
@@ -2048,7 +2336,7 @@ public abstract class World
         {
             deltax = 1;
         }
-        while (startx > 0 && startx < MAP_COLS && starty > 0 && starty < MAP_ROWS)
+        while (startx > 0 && startx < MapColumns && starty > 0 && starty < MapRows)
         {
 
             if (map[starty, startx] == Terrain.NONE)
@@ -2059,7 +2347,7 @@ public abstract class World
                 {
                     adjust = RNG.Next(0, 2);
                 }
-                else if ((deltax == 0 && startx == MAP_COLS - 2) || (deltay == 0 && starty == MAP_ROWS - 2))
+                else if ((deltax == 0 && startx == MapColumns - 2) || (deltay == 0 && starty == MapRows - 2))
                 {
                     adjust = RNG.Next(-1, 1);
                 }
@@ -2101,9 +2389,9 @@ public abstract class World
 
         if (isHorizontal)
         {
-
-            int rivery = RNG.Next(15, MAP_ROWS - 15);
-            for (int x = 0; x < MAP_COLS; x++)
+            int minDistY = Math.Min(MapRows / 2 - 1, 15);
+            int rivery = RNG.Next(minDistY, MapRows - minDistY);
+            for (int x = 0; x < MapColumns; x++)
             {
                 drawLeft++;
                 drawRight++;
@@ -2126,7 +2414,7 @@ public abstract class World
 
                 int rightM = RNG.Next(14, 17);
 
-                if (rivery + rightM < MAP_ROWS)
+                if (rivery + rightM < MapRows)
                 {
                     map[rivery + rightM - 3, x] = tright;
                 }
@@ -2135,11 +2423,11 @@ public abstract class World
                 {
                     tright = climate.GetRandomTerrain(RNG, walkableTerrains); ;
                 }
-                for (int i = rivery + 1 + rightM; i < MAP_ROWS; i++)
+                for (int i = rivery + 1 + rightM; i < MapRows; i++)
                 {
                     map[i, x] = Terrain.MOUNTAIN;
                 }
-                while (rivery + adjust + 1 > MAP_ROWS - 15 || rivery + adjust < 15)
+                while (rivery + adjust + 1 > MapRows - minDistY || rivery + adjust < minDistY)
                 {
                     adjust = RNG.Next(-1, 2);
                 }
@@ -2167,8 +2455,9 @@ public abstract class World
         }
         else
         {
-            int riverx = RNG.Next(15, MAP_COLS - 15);
-            for (int y = 0; y < MAP_ROWS; y++)
+            int minDistX = Math.Min(MapColumns / 2 - 1, 15);
+            int riverx = RNG.Next(minDistX, MapColumns - minDistX);
+            for (int y = 0; y < MapRows; y++)
             {
                 drawLeft++;
                 drawRight++;
@@ -2191,7 +2480,7 @@ public abstract class World
 
                 int rightM = RNG.Next(14, 17);
 
-                if (riverx + rightM < MAP_COLS)
+                if (riverx + rightM < MapColumns)
                 {
                     map[y, riverx + rightM - 3] = tright;
                 }
@@ -2200,11 +2489,11 @@ public abstract class World
                 {
                     tright = climate.GetRandomTerrain(RNG, walkableTerrains);
                 }
-                for (int i = riverx + 1 + rightM; i < MAP_COLS; i++)
+                for (int i = riverx + 1 + rightM; i < MapColumns; i++)
                 {
                     map[y, i] = Terrain.MOUNTAIN;
                 }
-                while (riverx + adjust + 1 > MAP_COLS - 15 || riverx + adjust < 15)
+                while (riverx + adjust + 1 > MapColumns - minDistX || riverx + adjust < minDistX)
                 {
                     adjust = RNG.Next(-1, 2);
                 }
@@ -2235,16 +2524,16 @@ public abstract class World
 
     public void DrawCenterMountain()
     {
-        int top = (MAP_ROWS - 35) / 2; //20
-        int bottom = MAP_ROWS - top; //55
+        int top = (MapRows - 35) / 2; //20
+        int bottom = MapRows - top; //55
         if (isHorizontal)
         {
             //Block out a stripe of mountains where the caldera is going to be
-            for (int i = 0; i < MAP_ROWS; i++)
+            for (int i = 0; i < MapRows; i++)
             {
                 if (i < top || i > bottom)
                 {
-                    for (int j = 0; j < MAP_COLS; j++)
+                    for (int j = 0; j < MapColumns; j++)
                     {
                         map[i, j] = Terrain.MOUNTAIN;
                     }
@@ -2253,13 +2542,12 @@ public abstract class World
 
             for (int y = 0; y < 8; y++)
             {
-                int xstart = MAP_COLS / 2 - (3 + y); //29 to 
-                int xend = MAP_COLS / 2 + (3 + y);
+                int xstart = MapColumns / 2 - (3 + y); //29 to 
+                int xend = MapColumns / 2 + (3 + y);
                 //map[20 + i, jstart - 1] = Terrain.lava;
                 //map[20 + i, jend] = Terrain.lava;
                 for (int x = xstart; x < xend; x++)
                 {
-
                     map[top + y, x] = Terrain.MOUNTAIN;
                 }
             }
@@ -2270,13 +2558,13 @@ public abstract class World
 
                 for (int j = 0; j < 20; j++)
                 {
-                    map[top + 8 + i, MAP_COLS / 2 - 10 + j] = Terrain.MOUNTAIN;
+                    map[top + 8 + i, MapColumns / 2 - 10 + j] = Terrain.MOUNTAIN;
                 }
             }
             for (int i = 0; i < 8; i++)
             {
-                int jstart = MAP_COLS / 2 - (3 + (6 - i));
-                int jend = MAP_COLS / 2 + (3 + (6 - i));
+                int jstart = MapColumns / 2 - (3 + (6 - i));
+                int jend = MapColumns / 2 + (3 + (6 - i));
                 //map[47 + i, jstart - 1] = Terrain.lava;
                 //map[47 + i, jend] = Terrain.lava;
                 for (int j = jstart; j < jend; j++)
@@ -2287,13 +2575,13 @@ public abstract class World
         }
         else
         {
-            top = (MAP_COLS - 35) / 2;
-            bottom = MAP_COLS - top;
-            for (int i = 0; i < MAP_COLS; i++)
+            top = (MapColumns - 35) / 2;
+            bottom = MapColumns - top;
+            for (int i = 0; i < MapColumns; i++)
             {
                 if (i < top || i > bottom)
                 {
-                    for (int j = 0; j < MAP_ROWS; j++)
+                    for (int j = 0; j < MapRows; j++)
                     {
                         map[j, i] = Terrain.MOUNTAIN;
                     }
@@ -2302,8 +2590,8 @@ public abstract class World
 
             for (int i = 0; i < 8; i++)
             {
-                int jstart = MAP_ROWS / 2 - (3 + i);
-                int jend = MAP_ROWS / 2 + (3 + i);
+                int jstart = MapRows / 2 - (3 + i);
+                int jend = MapRows / 2 + (3 + i);
                 //map[20 + i, jstart - 1] = Terrain.lava;
                 //map[20 + i, jend] = Terrain.lava;
                 for (int j = jstart; j < jend; j++)
@@ -2319,13 +2607,13 @@ public abstract class World
 
                 for (int j = 0; j < 20; j++)
                 {
-                    map[MAP_ROWS / 2 - 10 + j, top + 8 + i] = Terrain.MOUNTAIN;
+                    map[MapRows / 2 - 10 + j, top + 8 + i] = Terrain.MOUNTAIN;
                 }
             }
             for (int i = 0; i < 8; i++)
             {
-                int jstart = MAP_ROWS / 2 - (3 + (6 - i));
-                int jend = MAP_ROWS / 2 + (3 + (6 - i));
+                int jstart = MapRows / 2 - (3 + (6 - i));
+                int jend = MapRows / 2 + (3 + (6 - i));
                 //map[47 + i, jstart - 1] = Terrain.lava;
                 //map[47 + i, jend] = Terrain.lava;
                 for (int j = jstart; j < jend; j++)
@@ -2336,214 +2624,340 @@ public abstract class World
         }
     }
 
-    protected bool HorizontalCave(int caveOrientation, int centerx, int centery, Location cave1l, Location cave1r)
+    /// <summary>
+    /// Returns true iff position is within the bounds of the map. 
+    /// Useful to avoid index out of bounds errors.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected bool WithinMapBounds(IntVector2 pos)
     {
-        if (caveOrientation == 0) //first cave left
-        {
-            int cavey = RNG.Next(centery - 2, centery + 3);
-            int cavex = centerx;
-            while (map[cavey, cavex] != Terrain.MOUNTAIN)
-            {
-                cavex--;
-            }
-            if (map[cavey + 1, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey--;
-            }
-            else if (map[cavey - 1, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey++;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Ypos = cavey + 30;
-            cave1r.Xpos = cavex;
-            cavex--;
-            int curr = 0;
-            while (cavex > 0 && map[cavey, cavex] == Terrain.MOUNTAIN)
-            {
-                cavex--;
-                curr++;
-            }
-
-            if (curr <= 2 || cavex <= 0)
-            {
-                return false;
-            }
-            if (map[cavey, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            cavex++;
-            if (map[cavey + 1, cavex] == Terrain.CAVE || map[cavey - 1, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Ypos = cavey + 30;
-            cave1l.Xpos = cavex;
-            map[cavey + 1, cavex] = Terrain.MOUNTAIN;
-            map[cavey - 1, cavex] = Terrain.MOUNTAIN;
-        }
-        else
-        {
-            int cavey = RNG.Next(centery - 2, centery + 3);
-            int cavex = centerx;
-            while (map[cavey, cavex] != Terrain.MOUNTAIN)
-            {
-                cavex++;
-            }
-            if (map[cavey + 1, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey--;
-            }
-            else if (map[cavey - 1, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey++;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Ypos = cavey + 30;
-            cave1l.Xpos = cavex;
-            cavex++;
-            int curr = 0;
-            while (cavex < MAP_COLS && map[cavey, cavex] == Terrain.MOUNTAIN)
-            {
-                cavex++;
-                curr++;
-            }
-            if (curr <= 2 || cavex >= MAP_COLS)
-            {
-                return false;
-            }
-            if (map[cavey, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            cavex--;
-            if (map[cavey + 1, cavex] == Terrain.CAVE || map[cavey - 1, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Ypos = cavey + 30;
-            cave1r.Xpos = cavex;
-            map[cavey + 1, cavex] = Terrain.MOUNTAIN;
-            map[cavey - 1, cavex] = Terrain.MOUNTAIN;
-        }
-        return true;
+        return pos.X >= 0 && pos.X < MapColumns
+            && pos.Y >= 0 && pos.Y < MapRows;
     }
 
     /// <summary>
-    /// Places a vertically oriented cave into/out of a location (currently only the caldera)
+    /// Useful variant to test if something is too close to the
+    /// edge of the map.
     /// </summary>
-    /// <param name="caveType">Which order the two passthrough caves will occur in</param>
-    /// <param name="centerx"></param>
-    /// <param name="centery"></param>
-    /// <param name="cave1l"></param>
-    /// <param name="cave1r"></param>
-    /// <returns></returns>
-    protected bool VerticalCave(int caveType, int centerx, int centery, Location cave1l, Location cave1r)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected bool WithinMapBounds(IntVector2 pos, int margin)
     {
-        if (caveType == 0) //first cave up
+        return pos.X >= margin && pos.X < MapColumns - margin
+            && pos.Y >= margin && pos.Y < MapRows - margin;
+    }
+
+    /// <summary>
+    /// Return true iff there's a cave on the map in the 3x3 tiles centered on `pos`.
+    /// Note: It's the callers responsibility that these tiles are all in bounds.
+    /// </summary>
+    protected bool HasAdjacentCave(IntVector2 pos)
+    {
+        for (int y = pos.Y - 1; y <= pos.Y + 1; y++)
         {
-            int cavey = centery;
-            int cavex = RNG.Next(centerx - 2, centerx + 3);
-            while (map[cavey, cavex] != Terrain.MOUNTAIN)
+            for (int x = pos.X - 1; x <= pos.X + 1; x++)
             {
-                cavey--;
+                if (map[y, x] == Terrain.CAVE)
+                {
+                    return true;
+                }
             }
-            if (map[cavey, cavex + 1] != Terrain.MOUNTAIN)
+        }
+        return false;
+    }
+
+    protected bool FindPassthroughCave(IntVector2 pos, IntVector2 dir, Location cave1, Location cave2)
+    {
+        var sideDir = dir.Perpendicular();
+
+        while (true)
+        {
+            if (!WithinMapBounds(pos, 1))
             {
-                cavex--;
-            }
-            else if (map[cavey, cavex - 1] != Terrain.MOUNTAIN)
-            {
-                cavex++;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Ypos = cavey + 30;
-            cave1r.Xpos = cavex;
-            cavey--;
-            int curr = 0;
-            while (cavey > 0 && map[cavey, cavex] == Terrain.MOUNTAIN)
-            {
-                cavey--;
-                curr++;
-            }
-            if (curr <= 2 || cavey <= 0)
-            {
+                logger.LogDebug("Start cave reached end of map");
                 return false;
             }
-            if (map[cavey, cavex] == Terrain.CAVE)
+            if (map[pos.Y, pos.X] == Terrain.MOUNTAIN)
             {
+                break;
+            }
+            pos += dir;
+        }
+
+        IntVector2? newPos = MoveAwayIfNextToCave(pos, sideDir);
+        if (newPos == null) { return false; }
+        pos = newPos.Value;
+        // Settled on start cave position
+        var cave1pos = pos;
+
+        int length = 0;
+        while (true)
+        {
+            pos += dir;
+            length++;
+            if (!WithinMapBounds(pos, 1))
+            {
+                logger.LogDebug("Ending cave reached end of map");
                 return false;
             }
-            cavey++;
-            if (map[cavey, cavex + 1] == Terrain.CAVE || map[cavey, cavex - 1] == Terrain.CAVE)
+            if (map[pos.Y, pos.X] != Terrain.MOUNTAIN)
             {
-                return false;
+                break;
             }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Ypos = cavey + 30;
-            cave1l.Xpos = cavex;
-            map[cavey, cavex + 1] = Terrain.MOUNTAIN;
-            map[cavey, cavex - 1] = Terrain.MOUNTAIN;
+            if (length > 2)
+            {
+                // check sideways for exits as well
+                foreach (int i in new[] { -1, 1, -2, 2 })
+                {
+                    var sidePos = pos + i * sideDir;
+                    if (!WithinMapBounds(sidePos, 1)) { continue; }
+                    if (map[sidePos.Y, sidePos.X] != Terrain.MOUNTAIN &&
+                        map[sidePos.Y, sidePos.X] != Terrain.CAVE)
+                    {
+                        pos = sidePos;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (length <= 2)
+        {
+            logger.LogDebug("Cave passthrough path not long enough");
+            return false;
+        }
+
+        if (HasAdjacentCave(pos))
+        {
+            logger.LogDebug("Cave exit is too close to existing cave");
+            return false;
+        }
+
+        pos -= dir;
+        // settled on ending cave position
+        var cave2pos = pos;
+
+        map[cave1pos.Y, cave1pos.X] = Terrain.CAVE;
+        cave1.Pos = cave1pos;
+        map[cave2pos.Y, cave2pos.X] = Terrain.CAVE;
+        cave2.Pos = cave2pos;
+
+        // add mountains on all sides of our new exit
+        var s1 = cave2pos - sideDir;
+        map[s1.Y, s1.X] = Terrain.MOUNTAIN;
+        var s2 = cave2pos + sideDir;
+        map[s2.Y, s2.X] = Terrain.MOUNTAIN;
+        var s3 = cave2pos - dir;
+        map[s3.Y, s3.X] = Terrain.MOUNTAIN;
+
+        return true;
+    }
+
+    private IntVector2? MoveAwayIfNextToCave(IntVector2 pos, IntVector2 sideDir)
+    {
+        int i = 0;
+        IntVector2 tryPos = pos;
+        while (true)
+        {
+            if (!HasAdjacentCave(tryPos))
+            {
+                return tryPos;
+            }
+            int offset = RNG.Next(-1, 2);
+            tryPos = pos + offset * sideDir;
+            if (++i == 6)
+            {
+                logger.LogDebug("Start cave too close to another cave");
+                return null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Tries to find and set positions for two caves to pass through a mountain area by carving
+    /// a horizontal passthrough near a given center point. (Currently only used for Caldera.)
+    /// <para />
+    /// See <see cref="VerticalCave(int, int, int, Location, Location)"/> for more documentation.
+    /// </summary>
+    protected bool HorizontalCave(int caveDirection, int centerX, int centerY, Location caveLeft, Location caveRight)
+    {
+        int rndY = RNG.Next(centerY - 2, centerY + 3);
+        if (caveDirection == 0)
+        {
+            return FindPassthroughCave(new(centerX, rndY), IntVector2.WEST, caveRight, caveLeft);
         }
         else
         {
-            //Debug.WriteLine(GetMapDebug());
-            int cavey = centery;
-            int cavex = RNG.Next(centerx - 2, centerx + 3);
-            while (map[cavey, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey++;
-            }
-            if (map[cavey, cavex + 1] != Terrain.MOUNTAIN)
-            {
-                cavex--;
-            }
-            else if (map[cavey, cavex - 1] != Terrain.MOUNTAIN)
-            {
-                cavex++;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Ypos = cavey + 30;
-            cave1l.Xpos = cavex;
-            cavey++;
-            int curr = 0;
-            while (cavey < MAP_ROWS && map[cavey, cavex] == Terrain.MOUNTAIN)
-            {
-                cavey++;
-                curr++;
-            }
-            if (curr <= 2 || cavey >= MAP_ROWS)
-            {
-                return false;
-            }
-            if (map[cavey, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            cavey--;
-            if (map[cavey, cavex + 1] == Terrain.CAVE || map[cavey, cavex - 1] == Terrain.CAVE)
-            {
-                return false;
-            }
-
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Ypos = cavey + 30;
-            cave1r.Xpos = cavex;
-            map[cavey, cavex + 1] = Terrain.MOUNTAIN;
-            map[cavey, cavex - 1] = Terrain.MOUNTAIN;
+            return FindPassthroughCave(new(centerX, rndY), IntVector2.EAST, caveLeft, caveRight);
         }
-        return true;
+    }
+
+    /// <summary>
+    /// Tries to find and set positions for two caves to pass through a mountain area by carving
+    /// a vertical passthrough near a given center point. (Currently only used for Caldera.)
+    /// <para />
+    ///
+    /// The method randomly selects a column within a small horizontal range around the center,
+    /// then searches vertically (upward or downward depending on <paramref name="caveDirection"/>)
+    /// for a contiguous stretch of mountain tiles. If a sufficiently deep mountain column is
+    /// found, exactly two cave tiles are placed at opposite ends of that stretch, with mountain
+    /// walls preserved on both sides of each entrance.
+    /// </summary>
+    /// <remarks>
+    /// The input coordinates of the provided <see cref="Location"/> objects are ignored.
+    /// On success, their coordinates are overwritten with the final cave positions.
+    /// <para />
+    ///
+    /// Cave placement is attempted in a column chosen randomly from
+    /// <c>centerX - 2</c> through <c>centerX + 2</c>, and searches vertically toward the
+    /// nearest map edge. Placement fails if the mountain run is too short, the search
+    /// exceeds map bounds, or the caves would intersect or touch existing caves.
+    /// </remarks>
+    /// <returns>
+    /// <c>true</c> if a valid vertical cave passthrough was created; otherwise <c>false</c>.
+    /// </returns>
+    protected bool VerticalCave(int caveDirection, int centerX, int centerY, Location caveLeft, Location caveRight)
+    {
+        int rndX = RNG.Next(centerX - 2, centerX + 3);
+        if (caveDirection == 0)
+        {
+            return FindPassthroughCave(new(rndX, centerY), IntVector2.NORTH, caveRight, caveLeft);
+        }
+        else
+        {
+            return FindPassthroughCave(new(rndX, centerY), IntVector2.SOUTH, caveLeft, caveRight);
+        }
+    }
+
+    // subset of walkable terrains that we would expect to be next to a trap tile
+    protected static readonly FrozenSet<Terrain> TRAP_PATH_VALID_TERRAIN = [Terrain.DESERT, Terrain.GRASS, Terrain.ROAD, Terrain.LAVA, Terrain.NONE];
+    protected static readonly FrozenSet<Terrain> TRAP_PATH_BLOCKING_TERRAIN = [Terrain.MOUNTAIN, Terrain.WATER];
+
+    /// <summary>
+    /// Check if the cave is possible to be blocked. It should<br/>
+    /// - Be surrounded by mountains in exactly 3 directions.<br/>
+    /// - There must not be any location on the tiles we will mutate
+    ///   when we move the mountain back to fit the block tile.<br/>
+    /// </summary>
+    public IntVector2? ValidBlockingCavePosition(IntVector2 pos)
+    {
+        if (!WithinMapBounds(pos, 1)) { return null; }
+
+        bool isMountain(IntVector2 pos) => map[pos.Y, pos.X] == Terrain.MOUNTAIN;
+        bool checkForExistingLocation(IntVector2 pos)
+        {
+            if (WithinMapBounds(pos))
+            {
+                var loc = GetLocationByPos(pos);
+                return loc != null;
+            }
+            return false;
+        }
+
+        var openDirs = IntVector2.CARDINALS
+            .Where(d => !isMountain(pos - d))
+            .ToList();
+
+        // only block caves with a single path in
+        if (openDirs.Count != 1) { return null; }
+        var dir = openDirs[0];
+        var sideways = dir.Perpendicular();
+
+        // make sure there is nothing right in front of our new blocker
+        var beforeBlockerPos = pos - 2 * dir;
+        if (checkForExistingLocation(beforeBlockerPos)) { return null; }
+
+        // make sure there is nothing where our new mountain tile will be
+        var newMountainPos = pos + 2 * dir;
+        if (checkForExistingLocation(newMountainPos)) { return null; }
+
+        // check if the terraforming would destroy a 3x3 isolated tile formation
+        for (int i = -1; i <= 1; i++)
+        {
+            var behindNewMountain = pos + 3 * dir + i * sideways;
+            if (checkForExistingLocation(behindNewMountain)) { return null; }
+        }
+
+        var newCavePos = pos + dir;
+        if (checkForExistingLocation(newCavePos)) { return null; }
+        var newBlockPos = pos - dir;
+        if (checkForExistingLocation(newBlockPos)) { return null; }
+
+        return dir;
+    }
+
+    public void PlaceCaveBlocker(Location cave, IntVector2 dir, Terrain blockerTerrain)
+    {
+        var pos = cave.Pos;
+        var blockPos = pos - dir;
+        var roadPos = pos;
+        var newCavePos = pos + dir;
+        var mountainPos = pos + 2 * dir;
+
+        map[blockPos.Y, blockPos.X] = blockerTerrain;
+        map[roadPos.Y, roadPos.X] = Terrain.ROAD;
+        map[newCavePos.Y, newCavePos.X] = Terrain.CAVE;
+        if (WithinMapBounds(mountainPos))
+        {
+            map[mountainPos.Y, mountainPos.X] = Terrain.MOUNTAIN;
+        }
+        cave.Pos = newCavePos;
+    }
+
+    /// <summary>
+    /// Check if the position is suitable as a trap tile. It should<br/>
+    /// - Be the center tile of a 3-tile long path.<br/>
+    /// - There must be no special locations on these 3 tiles.<br/>
+    /// - The perpendicular tiles should not be passable.
+    /// </summary>
+    /// <returns>
+    /// Returns east-pointing vector if it's valid for horizontal passthrough,
+    /// or south-pointing vector if it's valid for vertical passthrough,
+    /// or null.
+    /// </returns>
+    public IntVector2? ValidTrapTilePosition(IntVector2 pos)
+    {
+        bool isPassable(IntVector2 pos) => TRAP_PATH_VALID_TERRAIN.Contains(map[pos.Y, pos.X]);
+        bool isBlocking(IntVector2 pos) => TRAP_PATH_BLOCKING_TERRAIN.Contains(map[pos.Y, pos.X]);
+
+        if (!WithinMapBounds(pos, 1)) { return null; }
+        if (!isPassable(pos)) { return null; }
+
+        var dx = IntVector2.EAST;
+        var dy = IntVector2.SOUTH;
+        bool h1 = isPassable(pos + dx);
+        bool h2 = isPassable(pos - dx);
+        bool v1 = isPassable(pos + dy);
+        bool v2 = isPassable(pos - dy);
+        bool horizontalPath = h1 && h2 && !v1 && !v2;
+        bool verticalPath = v1 && v2 && !h1 && !h2;
+
+        if (!horizontalPath && !verticalPath) { return null; }
+
+        var dir = horizontalPath ? dx : dy;
+        var side = horizontalPath ? dy : dx;
+
+        if (!isBlocking(pos + side) || !isBlocking(pos - side)) { return null; }
+
+        // expensive Location check last
+        for (int i = -1; i <= 1; i++)
+        {
+            var p = pos + i * dir;
+            var l = GetLocationByPos(p);
+            if (l != null)
+            {
+                return null;
+            }
+        }
+
+        return dir;
     }
 
     public string GetGlobDebug(int[,] globs)
     {
         StringBuilder debug = new();
-        for (int y = 0; y < MAP_ROWS; y++)
+        for (int y = 0; y < MapRows; y++)
         {
-            for (int x = 0; x < MAP_COLS; x++)
+            for (int x = 0; x < MapColumns; x++)
             {
                 if(globs[y,x] < 10)
                 {
@@ -2570,9 +2984,9 @@ public abstract class World
     public string GetMapDebug()
     {
         StringBuilder debug = new();
-        for (int y = 0; y < MAP_ROWS; y++)
+        for (int y = 0; y < MapRows; y++)
         {
-            for (int x = 0; x < MAP_COLS; x++)
+            for (int x = 0; x < MapColumns; x++)
             {
                 debug.Append(map[y, x] switch
                 {
@@ -2590,6 +3004,8 @@ public abstract class World
                     Terrain.MOUNTAIN => 'M',
                     Terrain.WATER => '-',
                     Terrain.WALKABLEWATER => 'W',
+                    Terrain.PREPLACED_WATER_WALKABLE => 'K',
+                    Terrain.PREPLACED_WATER => '-',
                     Terrain.ROCK => 'X',
                     Terrain.RIVER_DEVIL => 'P',
                     Terrain.NONE => ' ',
@@ -2604,9 +3020,9 @@ public abstract class World
     public string GetReadableMap()
     {
         StringBuilder debug = new();
-        for (int y = 0; y < MAP_ROWS; y++)
+        for (int y = 0; y < MapRows; y++)
         {
-            for (int x = 0; x < MAP_COLS; x++)
+            for (int x = 0; x < MapColumns; x++)
             {
                 debug.Append(map[y, x] switch
                 {
@@ -2637,18 +3053,18 @@ public abstract class World
 
     public bool ValidateCaves()
     {
-        for(int y = 0; y < MAP_ROWS; y++)
+        for(int y = 0; y < MapRows; y++)
         {
-            for(int x = 0; x < MAP_COLS; x++)
+            for(int x = 0; x < MapColumns; x++)
             {
                 if (map[y,x] == Terrain.CAVE)
                 {
                     //If all 4 sides of a cave are unwalkable terrain, you can never leave the cave
                     //and you softlock since you can't turn around
                     if (
-                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        (y + 1 >= MapRows || !map[y + 1, x].IsWalkable())
                         && (y == 0 || !map[y - 1, x].IsWalkable())
-                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && (x + 1 >= MapColumns || !map[y, x + 1].IsWalkable())
                         && (x == 0 || !map[y, x - 1].IsWalkable())
                     )
                     {
@@ -2657,36 +3073,36 @@ public abstract class World
                     //If a cave exits into a lake, you softlock unless you have the boots, and the previous case
                     //(correctly) considers walkable water as walkable, so we need to cover that case here.
                     if (
-                        y + 1 < MAP_ROWS && map[y + 1, x] == Terrain.WALKABLEWATER
+                        y + 1 < MapRows && map[y + 1, x] == Terrain.WALKABLEWATER
                         && (y == 0 || !map[y - 1, x].IsWalkable())
-                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && (x + 1 >= MapColumns || !map[y, x + 1].IsWalkable())
                         && (x == 0 || !map[y, x - 1].IsWalkable())
                     )
                     {
                         map[y + 1, x] = Terrain.ROAD;
                     }
                     if (
-                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        (y + 1 >= MapRows || !map[y + 1, x].IsWalkable())
                         && y > 0 && map[y - 1, x] == Terrain.WALKABLEWATER
-                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && (x + 1 >= MapColumns || !map[y, x + 1].IsWalkable())
                         && (x == 0 || !map[y, x - 1].IsWalkable())
                     )
                     {
                         map[y - 1, x] = Terrain.ROAD;
                     }
                     if (
-                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        (y + 1 >= MapRows || !map[y + 1, x].IsWalkable())
                         && (y == 0 || !map[y - 1, x].IsWalkable())
-                        && x + 1 < MAP_COLS && map[y, x + 1] == Terrain.WALKABLEWATER
+                        && x + 1 < MapColumns && map[y, x + 1] == Terrain.WALKABLEWATER
                         && (x == 0 || !map[y, x - 1].IsWalkable())
                     )
                     {
                         map[y, x + 1] = Terrain.ROAD;
                     }
                     if (
-                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        (y + 1 >= MapRows || !map[y + 1, x].IsWalkable())
                         && (y == 0 || !map[y - 1, x].IsWalkable())
-                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && (x + 1 >= MapColumns || !map[y, x + 1].IsWalkable())
                         && x > 0 && map[y, x - 1] == Terrain.WALKABLEWATER
                     )
                     {
@@ -2698,17 +3114,20 @@ public abstract class World
 
         return true;
     }
+
+    /*
     public bool PassthroughsIntersectRaftCoordinates(IEnumerable<(int, int)> raftCoordinates)
     {
         foreach (Location location in AllLocations.Where(i => i.PassThrough != 0))
         {
-            if (raftCoordinates.Any(i => location.Xpos == i.Item2 && location.Ypos == i.Item1))
+            if (raftCoordinates.Any(i => location.Xpos == i.Item2 && location.YRaw == i.Item1))
             {
                 return true;
             }
         }
         return false;
     }
+    */
 
     //Short term fix, right now linked locations aren't shuffled, and they are counted as reachable when
     //their parent location is reachable, but the original location remains in the location list, creating
@@ -2722,12 +3141,12 @@ public abstract class World
             foreach (Location child in parent.Children)
             {
                 child.Xpos = parent.Xpos;
-                child.Ypos = parent.Ypos;
+                child.Y = parent.Y;
             }
         }
     }
 
-    public abstract void UpdateVisit(Dictionary<Collectable, bool> itemGet);
+    public abstract void UpdateVisit(List<RequirementType> requireables);
 
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 

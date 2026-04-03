@@ -195,8 +195,12 @@ on the continents they normally appear on.</value>
 the palace group they normally appear in (1/2/5, 3/4/6, and GP)</value>
 	</data>
 	<data name="ShuffleDripperEnemyToolTip" xml:space="preserve">
-<value>Shuffles which enemy can spwan from drippers in palaces. The dripped enemy always has the
-HP of a bot.</value>
+<value>Randomizes which enemies can spawn from drippers in palaces.
+
+The enemy that appears normally has the HP of a Bot, unless you enable the Full HP option.
+
+Easier Ground Enemies include: small enemies, Tinsuits, orange Iron Knuckles, and both Stalfos.
+(With Full HP enabled, armored Stalfos from drippers will use the unarmored HP value.)</value>
 	</data>
 	<data name="MixLargeandSmallEnemiesToolTip" xml:space="preserve">
 <value>Normally, when shuffling enemies small enemies are replaced by small and large enemies are
@@ -214,6 +218,11 @@ taking damage. Play at your own risk.</value>
 	<data name="ShuffleEnemyHPToolTip" xml:space="preserve">
 <value>If selected, each enemy type will have between 50% and 150% of its vanilla HP value.</value>
 	</data>
+	<data name="ShuffleBossHPToolTip" xml:space="preserve">
+<value>Choose how boss HP is randomized. HP will always be capped at 255.
+
+Great Palace bosses are not included.</value>
+	</data>
 	<data name="ShuffleWhichEnemiesStealEXPToolTip" xml:space="preserve">
 <value>Randomly reassigns which enemies steal EXP. The number of enemies that steal EXP in each
 group is the same as the number in that group that steal EXP in vanilla.</value>
@@ -227,17 +236,24 @@ amount.</value>
 immune in each group is the same as the number in that group that are immune in vanilla.</value>
 	</data>
 	<data name="ShuffleSpritePalettesToolTip" xml:space="preserve">
-<value>Randomizes the colors each of the enemies are. This could cause which enemies are visible
-in the dark to change.</value>
+<value>Randomizes the color palettes of enemies and NPCs. Health bar color is also randomized.
+
+Does *not* change what is visible in caves without a candle.</value>
 	</data>
 	<data name="EnemyExperienceDropsToolTip" xml:space="preserve">
-<value>Controls how much experience enemies drop. The possible experience values for an enemy are
-0, 2, 3, 5, 10, 15, 20, 30, 50, 70, 100, 150, 200, 300, 500, 700, 1000.
+<value>Controls how much experience enemies give.
 
-  • Vanilla: Same as the base game
-  • Low: Each enemy gives a random XP level between -3 and +1 levels of vanilla.
-  • Average: Each enemy gives a random XP level between -2 and +2 levels of vanilla.
-  • High: Each enemy gives a random XP level between -1 and +3 levels of vanilla.</value>
+The possible experience values for an enemy are:
+
+0, 2, 3, 5, 10, 20, 30, 50, 70, 100, 150, 200, 300, 500, 700, 1000.
+
+When XP is randomized, the enemy's XP value shifts left or right in this list by the rolled number of steps.
+
+For example, a Blue Stalfos gives 50 XP in the vanilla game. If the XP is rolled -2 to +2 levels,
+the minimum XP it could give is 20 and the maximum is 100.
+
+Also note that XP values are randomized per enemy table and can differ in a single seed. For example
+Red Iron Knuckle XP in P1/P2/P5 could roll down while Red Iron Knuckle XP in P3/P4/P6 rolls up.</value>
 	</data>
 	<data name="EnableHelpfulHintsToolTip" xml:space="preserve">
 <value>When enabled, helpful hints are scattered throughout the world. These hints are provided
@@ -491,7 +507,9 @@ Remember to use the flute again on the way out.</value>
 that the entrance of a cave will point to where the other side of the cave is. For
 example, if you enter a cave going north, you know that when you exit the other side of
 the cave you will be directly north of where you went in. The distance between cave exits
-is also restricted, such that you can often see the exit before entering the cave.</value>
+is also restricted, such that you can often see the exit before entering the cave.
+
+It is not recommended to disable this.</value>
 	</data>
 	<data name="AllowConnectionCavestoBeBlockedToolTip" xml:space="preserve">
 <value>If selected, caves that connect from one part of the continent to another or between
@@ -542,7 +560,29 @@ Which location is hidden beneath may change if Shuffle Which Locations Are Hidde
 <value>If enabled, what is hidden under Three-Eyed Rock and the New Kasuto forest tile can be any
 random location in the east.</value>
 	</data>
-	<data name="WestContinentBiomeToolTip" xml:space="preserve">
+	<data name="OverworldSizeToolTip" xml:space="preserve">
+<value>Set the map size of a continent.
+
+In the West and East continents, no locations are currently removed for smaller sizes.
+
+(Large is the map size that was used before v5.1.)</value>
+	</data>
+    <data name="DmSizeToolTip" xml:space="preserve">
+<value>Set the map size of Death Mountain.
+
+With smaller sizes, some caves are removed from DM. Medium and smaller sizes removes the
+duplicate cave passthroughs. The cave count does not include continent connector caves.
+
+(Large is the map size that was used before v5.1.)</value>
+	</data>
+    <data name="MazeSizeToolTip" xml:space="preserve">
+<value>Set the map size of Maze Island.
+
+With smaller sizes, some trap tiles are removed from the maze.
+
+(Large is the map size that was used before v5.1.)</value>
+	</data>
+    <data name="WestContinentBiomeToolTip" xml:space="preserve">
 <value>See the Wiki for a description of what each biome does.</value>
 	</data>
 	<data name="EastContinentBiomeToolTip" xml:space="preserve">
@@ -562,6 +602,9 @@ be generated.
 Classic:
 Each terrain type will appear at equal size / frequency. Just like older versions of the
 randomizer.
+
+Vanilla-Weighted:
+Each terrain type will appear at the frequency they appear in the vanilla continent.
 
 Chaos:
 The number of seed terrain tiles is massively increased, resulting in a more chaotic
@@ -596,9 +639,15 @@ are:
   • If the raft and bridge appear on the same continent, they are never on the same side
     (North / South / East / West)</value>
 	</data>
-	<data name="VanillaShuffleShowsActualTerrainToolTip" xml:space="preserve">
-<value>If a shuffled vanilla map is used, this option will make the shuffled locations show their
-actual terrain, instead of the original vanilla terrain.</value>
+	<data name="LegacyVanillaShuffledLocationsToolTip" xml:space="preserve">
+<value>Only applicable to Vanilla Shuffled overworlds. When enabled, the overworld map locations
+keep their original (vanilla) icons instead of reflecting the shuffled location type.
+
+Example: the map will show a town icon where Town of Rauru appears in the original game.
+However, entering that location might instead lead to a cave—or any other shuffled location.
+The overworld tile remains unchanged even though the underlying location has been changed.
+
+Enable at your own risk.</value>
 	</data>
 	<data name="NormalPalaceStyleToolTip" xml:space="preserve">
 <value>Sets the palace generator for palaces 1 through 6. See the Wiki for more details.</value>
@@ -606,6 +655,9 @@ actual terrain, instead of the original vanilla terrain.</value>
 	<data name="ShortenToolTip" xml:space="preserve">
 <value>If selected, palaces will be fewer rooms. The exact way this is handled varies by palace
 style, but on average the palace is 25% to 50% fewer rooms than otherwise.</value>
+	</data>
+	<data name="RandomAllowsVanillaTooltip" xml:space="preserve">
+<value>If selected, random palace styles can include vanilla or vanilla(shuffled).</value>
 	</data>
 	<data name="MinimumPathToDarkLinkToolTip" xml:space="preserve">
 <value>If you think a short Great Palace at the end of the game is anticlimactic, this is the
@@ -714,14 +766,43 @@ prevent duplicates for Random Walk generated palaces.</value>
 <value>Allows rooms that require an item or spell to traverse to appear in any palace. Otherwise,
 palaces can only contain blocks according to the following table.</value>
 	</data>
-	<data name="BossRoomsExitToToolTip" xml:space="preserve">
+	<data name="RemoveLongDeadEndsToolTip" xml:space="preserve">
+<value>Removes dead-end rooms from the room pool. This helps newer players who are not yet
+familiar with all rooms in the randomizer by reducing time spent exploring long dead ends,
+evening the odds a bit and lowering the learning curve.
+
+This option is only available when the 5.0 room pool is enabled
+(as it is the only pool that contains short dead-end replacements.)</value>
+	</data>
+	<data name="IncludeExpertRoomsToolTip" xml:space="preserve">
+<value>Includes the more demanding palace rooms in the room pool. These rooms may feature:
+
+  • Precise, punishing platforming over lava
+  • Unfair enemy placements
+  • Repeated required 3-tile-high jumps</value>
+	</data>
+
+    <data name="BossRoomsExitToToolTip" xml:space="preserve">
 <value>Selects whether the boss room exits into the overworld (like in vanilla), or more palace
 rooms. This can be selected for all palaces, Randomly per palace, or Random but the same
 selection for all palaces. When a palace continues outside, there will always be an
 Ironknuckle statue right before the exit like in vanilla. When the palace continues, that
 statue will be removed.
 
-If the palace continues after the boss, palace item rooms may be behind the boss room.</value>
+If the palace continues after the boss, palace item rooms may be behind the boss room.
+
+Tower palace style always exits after the boss and is not affected by this setting.</value>
+	</data>
+	<data name="DropStyleTooltip" xml:space="preserve">
+<value>Selects the required eventual destinations for palace drops.
+(Has no effect in Vanilla/Shuffled palaces.)
+
+  • Entrance: Drops must eventually lead back to the palace entrance.
+  • Entrance/Boss Exit: Drops must eventually lead either to the palace entrance or the boss room.
+    (If palace continues after the boss, there is no boss exit, so this behaves the same as Entrance.)
+  • Balanced: Same as Entrance/Boss Exit, with a higher chance of it leading back to the entrance.
+  • Anything: No restrictions on drops. This allows drops to lead to areas without an exit,
+    requiring a Game Over or Up+A to get out.</value>
 	</data>
 	<data name="HarderCarockToolTip" xml:space="preserve">
 <value>Tired of just ducking in the corner and blocking? This option enables carock shooting
@@ -831,7 +912,17 @@ Adjusts the total number of heart containers available:
   • If the total exceeds the starting count by more than 4, minor items in the item
     shuffle will be replaced with heart containers until the total is met.
     ◦ If needed, the &quot;Include P-Bag Caves in Item Shuffle&quot; setting will be overriden to
-      make room.</value>
+      make room.
+</value>
+	</data>
+	<data name="MagicContainersToolTip" xml:space="preserve">
+<value>Start Min / Max:
+Options: 0-8
+
+Adjust the minimum and maximum starting magic containers. The actual starting number will be
+randomly selected between these values (inclusive).
+
+</value>
 	</data>
 	<data name="StartingLevelsToolTip" xml:space="preserve">
 <value>Select Link&apos;s starting Attack / Magic / Life levels.</value>

@@ -1,4 +1,7 @@
-﻿namespace Z2Randomizer.RandomizerCore;
+﻿using System.Collections.Generic;
+using Z2Randomizer.RandomizerCore.Overworld;
+
+namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// The randomizer had an absolute crapton of raw memory addresses with no documentation.
@@ -66,6 +69,47 @@ class RomMap
     public const int WEST_PALACE2_TILE_LOCATION = 0x4664;
     public const int WEST_PALACE3_TILE_LOCATION = 0x4665;
 
+    public const int DM_CAVE1A_TILE_LOCATION = 0x610C; // DM map 0
+    public const int DM_CAVE1B_TILE_LOCATION = 0x610D;
+    public const int DM_CAVE2A_TILE_LOCATION = 0x610E;
+    public const int DM_CAVE2B_TILE_LOCATION = 0x610F;
+    public const int DM_CAVE3A_TILE_LOCATION = 0x6110;
+    public const int DM_CAVE3B_TILE_LOCATION = 0x6111;
+    public const int DM_CAVE4A_TILE_LOCATION = 0x6112;
+    public const int DM_CAVE4B_TILE_LOCATION = 0x6113;
+    public const int DM_CAVE5A_TILE_LOCATION = 0x6114;
+    public const int DM_CAVE5B_TILE_LOCATION = 0x6115;
+    public const int DM_CAVE6A_TILE_LOCATION = 0x6116;
+    public const int DM_CAVE6B_TILE_LOCATION = 0x6117;
+    public const int DM_CAVE7A_TILE_LOCATION = 0x6118;
+    public const int DM_CAVE7B_TILE_LOCATION = 0x6119;
+    public const int DM_CAVE8A_TILE_LOCATION = 0x611A;
+    public const int DM_CAVE8B_TILE_LOCATION = 0x611B;
+    public const int DM_CAVE9A_TILE_LOCATION = 0x611C;
+    public const int DM_CAVE9B_TILE_LOCATION = 0x611D;
+    public const int DM_CAVE10A_TILE_LOCATION = 0x611E;
+    public const int DM_CAVE10B_TILE_LOCATION = 0x611F;
+    public const int DM_CAVE11A_TILE_LOCATION = 0x6120;
+    public const int DM_CAVE11B_TILE_LOCATION = 0x6121;
+    public const int DM_CAVE12A_TILE_LOCATION = 0x6122;
+    public const int DM_CAVE12B_TILE_LOCATION = 0x6123;
+    public const int DM_CAVE13A_TILE_LOCATION = 0x6124;
+    public const int DM_CAVE13B_TILE_LOCATION = 0x6125;
+    public const int DM_CAVE14A_TILE_LOCATION = 0x6126;
+    public const int DM_CAVE14B_TILE_LOCATION = 0x6127;
+    public const int DM_HAMMER_CAVE_TILE_LOCATION = 0x6128;
+    public const int DM_CAVE4WAY1A_TILE_LOCATION = 0x6129;
+    public const int DM_CAVE4WAY1B_TILE_LOCATION = 0x612A;
+    public const int DM_CAVE4WAY1C_TILE_LOCATION = 0x612B;
+    public const int DM_CAVE4WAY1D_TILE_LOCATION = 0x612C;
+    public const int DM_CAVE4WAY2A_TILE_LOCATION = 0x612D;
+    public const int DM_CAVE4WAY2B_TILE_LOCATION = 0x612E;
+    public const int DM_CAVE4WAY2C_TILE_LOCATION = 0x612F;
+    public const int DM_CAVE4WAY2D_TILE_LOCATION = 0x6130;
+    public const int DM_CONTINENT_CONNECTOR1_TILE_LOCATION = 0x6136;
+    public const int DM_CONTINENT_CONNECTOR2_TILE_LOCATION = 0x6137;
+    public const int DM_SPEC_ROCK_TILE_LOCATION = 0x6144;
+
     public const int EAST_MINOR_FOREST_TILE_BY_NABOORU_LOCATION = 0x862f;
     public const int EAST_MINOR_FOREST_TILE_BY_P6_LOCATION = 0x8630;
     public const int EAST_TRAP_ROAD_TILE_LOCATION1 = 0x8631;
@@ -109,6 +153,19 @@ class RomMap
     public const int EAST_PALACE6_TILE_LOCATION = 0x8664;
     public const int EAST_GREAT_PALACE_TILE_LOCATION = 0x8665;
 
+    public const int MI_UNUSED_INDEX0_TILE = 0xA10c;
+    public const int MI_TRAP_TILE1 = 0xA131;
+    public const int MI_TRAP_TILE2 = 0xA132;
+    public const int MI_MAGIC_CONTAINER_DROP_TILE = 0xA133;
+    public const int MI_CONNECTOR_BRIDGE_TILE = 0xA134;
+    public const int MI_PALACE_TILE = 0xA140;
+    public const int MI_CHILD_DROP_TILE = 0xA143;
+    public const int MI_TRAP_TILE3 = 0xA145;
+    public const int MI_TRAP_TILE4 = 0xA146;
+    public const int MI_TRAP_TILE5 = 0xA147;
+    public const int MI_TRAP_TILE6 = 0xA148;
+    public const int MI_TRAP_TILE7 = 0xA149;
+
     //Overworld data
     public const int overworldXOffset = 0x3F;
     public const int overworldMapOffset = 0x7E;
@@ -133,4 +190,70 @@ class RomMap
     public const int MI_MAGIC_CONTAINER_DROP_COLLECTABLE = 0xA5a8;
     // int[] VANILLA_PALACE_COLLECTABLE_BYTES = [0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774];
 
+    public const int WEST_ENEMY_HP_TABLE = 0x5431;
+    public const int EAST_ENEMY_HP_TABLE = 0x9431;
+    public const int PALACE125_ENEMY_HP_TABLE = 0x11431;
+    public const int PALACE346_ENEMY_HP_TABLE = 0x12931;
+    public const int GP_ENEMY_HP_TABLE = 0x15431;
+    public const int DRIPPER_ID = 0x11927;
+    public const int WEST_ENEMY_STATS_TABLE = 0x54e5;
+    public const int EAST_ENEMY_STATS_TABLE = 0x94e5;
+    public const int PALACE125_ENEMY_STATS_TABLE = 0x114e5;
+    public const int PALACE346_ENEMY_STATS_TABLE = 0x129e5;
+    public const int GP_ENEMY_STATS_TABLE = 0x154e5;
+
+    public const int ATTACK_EFFECTIVENESS_TABLE = 0x1E67D;
+    public const int LIFE_EFFECTIVENESS_TABLE = 0x1E2BF;
+    public const int MAGIC_EFFECTIVENESS_TABLE = 0xD8B;
+
+    public const int EXPERIENCE_TO_LEVEL_TABLE = 0x1669;
+    public const int EXPERIENCE_TO_LEVEL_TEXT_TABLE = 0x1e42;
+
+    public const int NORTH_SOUTH_SEPARATOR_WEST = 0x1cb42;
+    public const int NORTH_SOUTH_SEPARATOR_DM   = 0x1cb43;
+    public const int NORTH_SOUTH_SEPARATOR_EAST = 0x1cb44;
+
+    public static readonly List<int> bossHpAddresses = [
+        0x11451, // Horsehead          (regular Palace 125 enemy table)
+        0x13C86, // Helmethead         ("bank4_Table_for_Helmethead_Gooma")
+        0x12951, // Rebonack           (regular Palace 346 enemy table)
+        0x13041, // Unhorsed Rebonack  (hardcoded, not in a table)
+        0x12953, // Carock             (regular Palace 346 enemy table)
+        0x13C87, // Gooma              ("bank4_Table_for_Helmethead_Gooma")
+        0x12952, // Barba              (regular Palace 346 enemy table)
+        // These are bank 5 enemies so we should make a separate table for them
+        // but we can deal with these when we start randomizing their hp
+        // 0x15453, // Thunderbird
+        // 0x15454, // Dark Link
+    ];
+    public static readonly List<int> bossExpAddresses = [
+        0x11505, // Horsehead          (regular Palace 125 enemy table)
+        0x13C88, // Helmethead         ("bank4_Table_for_Helmethead_Gooma")
+        0x12A05, // Rebonack           (regular Palace 346 enemy table)
+        0x129EF, // Unhorsed Rebonack  (regular Palace 346 enemy table)
+        0x12A07, // Carock             (regular Palace 346 enemy table)
+        0x13C89, // Gooma              ("bank4_Table_for_Helmethead_Gooma")
+        0x12A06, // Barba              (regular Palace 346 enemy table)
+        0x15507, // Thunderbird        (regular GP enemy table)
+    ];
+    public static readonly List<(int, int)> bossHpDivisorMap = [
+        (bossHpAddresses[0], 0x13b80), // Horsehead
+        (bossHpAddresses[1], 0x13ae2), // Helmethead
+        (bossHpAddresses[2], 0x12fd2), // Rebonack
+        (bossHpAddresses[3], 0x1325c), // Unhorsed Rebonack
+        (bossHpAddresses[4], 0x12e92), // Carock
+        (bossHpAddresses[5], 0x134cf), // Gooma
+        (bossHpAddresses[6], 0x13136), // Barba
+        // 0x13ae9 - unknown; who is this? I'm guessing its a helmet mini boss thing?
+        // (0x15453, 0x16406), // Thunderbird
+        // (0x15454, 0x158aa), // Dark Link
+    ];
+
+    public const int WEST_PALETTE_TABLE = 0x401e;
+    public const int EAST_PALETTE_TABLE = 0x801e;
+    public const int TOWN_PALETTE_TABLE = 0xc01e;
+    public const int PALACE_PALETTE_TABLE_MAJOR = 0x1001e;
+    public const int PALACE_PALETTE_TABLE_ENTRANCES = 0x10480;
+    public const int PALACE_PALETTE_TABLE_PER_PALACE = 0x13f10;
+    public const int GP_PALETTE_TABLE_MAJOR = 0x1401e;
 }

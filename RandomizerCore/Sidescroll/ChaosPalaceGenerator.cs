@@ -26,13 +26,9 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             IsRoot = true,
             // PalaceGroup = palaceGroup,
         };
-        if (props.UsePalaceItemRoomCountIndicator && palaceNumber != 7) {
-            palace.Entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r);
-        }
         palace.AllRooms.Add(palace.Entrance);
 
         palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);
-        palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
         palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
         // palace.BossRoom.PalaceGroup = palaceGroup;
         palace.AllRooms.Add(palace.BossRoom);
@@ -46,20 +42,15 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         palace.ItemRooms = [];
         if (palaceNumber < 7)
         {
-            for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCounts[palaceNumber - 1]; itemRoomNumber++)
+            ItemRoomSelectionStrategy itemRoomSelector = new ByEntranceDirectionItemRoomSelectionStrategy();
+            Room[] itemRooms = itemRoomSelector.SelectItemRooms(palace, roomPool, props.PalaceItemRoomCounts[palaceNumber - 1], duplicateProtection, r);
+            if (itemRooms == null || itemRooms.Length != props.PalaceItemRoomCounts[palaceNumber - 1])
             {
-                Direction itemRoomDirection;
-                Room? itemRoom = null;
-                while (itemRoom == null)
-                {
-                    itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-                    if (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection))
-                    {
-                        continue;
-                    }
-                    itemRoom = new(roomPool.ItemRoomsByDirection[itemRoomDirection].ElementAt(r.Next(roomPool.ItemRoomsByDirection[itemRoomDirection].Count)));
-                }
-                Debug.Assert(itemRoom != null);
+                palace.IsValid = false;
+                return palace;
+            }
+            foreach (Room itemRoom in itemRooms)
+            {
                 palace.ItemRooms.Add(itemRoom);
                 palace.AllRooms.Add(itemRoom);
 
@@ -68,11 +59,9 @@ internal class ChaosPalaceGenerator : PalaceGenerator
                     Room segmentedItemRoom1, segmentedItemRoom2;
                     segmentedItemRoom1 = itemRoom;
                     segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
-                    // segmentedItemRoom2.PalaceGroup = palaceGroup;
                     segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
                     segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
                     palace.AllRooms.Add(segmentedItemRoom2);
-                    roomCount += 1;
                 }
             }
         }
@@ -93,7 +82,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             int roomIndex = r.Next(roomPool.NormalRooms.Count);
             Room newRoom = new(roomPool.NormalRooms[roomIndex]);
             palace.AllRooms.Add(newRoom);
-            if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, newRoom); }
+            if (duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
         }
 
         Dictionary<Room, RoomExitType> roomExits = [];
@@ -170,9 +159,9 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             unreachableRooms = palace.AllRooms.Except(reachableRooms).ToList();
         };
 
+        //Chaos palaces do not check for inescapable drops. They are inherently insane and not remotely beginner-friendly.
+
         palace.IsValid = palace.AllReachable(true);
         return palace;
     }
-
-
 }

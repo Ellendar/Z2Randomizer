@@ -19,7 +19,7 @@
     <StackPanel Orientation="Vertical">
         <Grid ColumnDefinitions="2*, *, 196" RowDefinitions="Auto" Margin="0">
             <StackPanel Grid.Column="0" Margin="4 8 0 8">
-                <TextBox UseFloatingWatermark="True" Watermark="Paste Flags Here" p1:TextFieldAssist.Label="Flag String" Text="{Binding Flags}">
+                <TextBox UseFloatingWatermark="True" Watermark="Paste Flags Here" p1:TextFieldAssist.Label="Flag String" Text="{Binding FlagInput}">
                     <TextBox.InnerRightContent>
                         <Button Name="PresetsButton" ToolTip.Tip="Presets" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}">
                             <Button.Content>
@@ -33,18 +33,20 @@
                                               CommandParameter="{Binding Source={x:Static presets:NormalPreset.Preset}}"/>
                                     <MenuItem Header="Full Shuffle Preset" Command="{Binding LoadPreset}"
                                               CommandParameter="{Binding Source={x:Static presets:FullShufflePreset.Preset}}"/>
-                                    <MenuItem Header="Max Rando Preset" Command="{Binding LoadPreset}"
-                                              CommandParameter="{Binding Source={x:Static presets:MaxRandoPreset.Preset}}"/>
                                     <MenuItem Header="Standard Tournament Swiss Preset" Command="{Binding LoadPreset}"
                                               CommandParameter="{Binding Source={x:Static presets:StandardSwissPreset.Preset}}"/>
                                     <MenuItem Header="Standard Tournament Brackets Preset" Command="{Binding LoadPreset}"
                                               CommandParameter="{Binding Source={x:Static presets:StandardPreset.Preset}}"/>
+                                    <MenuItem Header="Max Rando Tournament Preset" Command="{Binding LoadPreset}"
+                                              CommandParameter="{Binding Source={x:Static presets:MaxRandoPreset.Preset}}"/>
 
                                     <MenuItem Header="More Presets">
+                                        <MenuItem Header="SGL 2025 Preset" Command="{Binding LoadPreset}"
+                                                  CommandParameter="{Binding Source={x:Static presets:Sgl2025Preset.Preset}}"/>
                                         <MenuItem Header="Upstarts Tournament 2025 Preset" Command="{Binding LoadPreset}"
                                                   CommandParameter="{Binding Source={x:Static presets:UpstartsTournamentPreset.Preset}}"/>
-                                        <MenuItem Header="Modified SGL Preset" Command="{Binding LoadPreset}"
-                                                  CommandParameter="{Binding Source={x:Static presets:HardmodePreset.Preset}}"/>
+                                        <MenuItem Header="Max Rando Tournament 2025 Preset" Command="{Binding LoadPreset}"
+                                                  CommandParameter="{Binding Source={x:Static presets:MaxRando2025Preset.Preset}}"/>
                                         <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
                                                   CommandParameter="{Binding Source={x:Static presets:RandomPercentPreset.Preset}}"/>
                                     </MenuItem>
@@ -123,16 +125,27 @@
                 <TextBox UseFloatingWatermark="True" Watermark="Paste Seed Here" p1:TextFieldAssist.Label="Seed" Text="{Binding Seed}">
                     <TextBox.InnerRightContent>
                         <Button ToolTip.Tip="Generate a random number as your Seed" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}"
-                                Content="{avalonia:MaterialIconExt DiceMultiple, Size=32}" Command="{Binding RerollSeed}" />
+                                Content="{avalonia:MaterialIconExt Kind=DiceMultiple, Size=32}" Command="{Binding RerollSeed}" />
                     </TextBox.InnerRightContent>
                 </TextBox>
             </StackPanel>
             <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button HorizontalAlignment="Right" Width="128" Content="Generate" IsEnabled="{Binding CanGenerate^}"
+                <Button HorizontalAlignment="Right" Width="128" Content="Generate" IsEnabled="{Binding CanGenerateObservable^}"
                         Command="{Binding Generate}" />
                 <Menu Padding="0" Margin="0" Width="64" ToolTip.Tip="Menu">
-                    <MenuItem Height="48" Width="48" Header="{avalonia:MaterialIconExt Cog, Size=32}" Cursor="Hand">
+                    <MenuItem Height="48" Width="48" Header="{avalonia:MaterialIconExt Kind=Cog, Size=32}" Cursor="Hand">
                         <MenuItem Header="{Binding AppVersion}" IsEnabled="false">
+                        </MenuItem>
+                        <MenuItem Header="Check For Updates" IsVisible="{Binding IsDesktop}" Command="{Binding CheckForUpdates}" >
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="Update" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Toggle Light/Dark Mode" Command="{Binding ToggleTheme}" >
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="LightbulbNight" Width="24" Height="24" />
+                            </MenuItem.Icon>
                         </MenuItem>
                         <Separator />
                         <MenuItem Header="Reload ROM" Command="{Binding LoadRom}" >
@@ -144,16 +157,6 @@
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
                             </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Check For Updates" IsVisible="{Binding IsDesktop}" Command="{Binding CheckForUpdates}" >
-                          <MenuItem.Icon>
-                            <avalonia:MaterialIcon Kind="Update" Width="24" Height="24" />
-                          </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Toggle Light/Dark Mode" Command="{Binding ToggleTheme}" >
-                          <MenuItem.Icon>
-                            <avalonia:MaterialIcon Kind="LightbulbNight" Width="24" Height="24" />
-                          </MenuItem.Icon>
                         </MenuItem>
                         <Separator />
                         <MenuItem Header="Visit Discord"
@@ -175,11 +178,14 @@
             <TabItem Header="Start">
                 <tabs:StartView DataContext="{Binding Main}"/>
             </TabItem>
+            <TabItem Header="Biomes">
+                <tabs:BiomesView DataContext="{Binding BiomesViewModel}"/>
+            </TabItem>
             <TabItem Header="Overworld">
                 <tabs:OverworldView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Palaces">
-                <tabs:PalacesView DataContext="{Binding Main}"/>
+                <tabs:PalacesView DataContext="{Binding PalacesViewModel}"/>
             </TabItem>
             <TabItem Header="Levels">
                 <tabs:LevelsView DataContext="{Binding Main}"/>
@@ -191,13 +197,13 @@
                 <tabs:EnemiesView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Items">
-                <tabs:ItemsView DataContext="{Binding Main}"/>
+                <tabs:ItemsView DataContext="{Binding ItemsViewModel}"/>
             </TabItem>
             <TabItem Header="Drops">
                 <tabs:DropsView DataContext="{Binding Main}"/>
             </TabItem>
-            <TabItem Header="Hints">
-                <tabs:HintsView DataContext="{Binding Main}"/>
+            <TabItem Header="Hints" Background="{Binding HintsViewModel.HeaderBackgroundObservable^}">
+                <tabs:HintsView DataContext="{Binding HintsViewModel}"/>
             </TabItem>
             <TabItem Header="Customize">
                 <tabs:CustomizeView DataContext="{Binding CustomizeViewModel}" />

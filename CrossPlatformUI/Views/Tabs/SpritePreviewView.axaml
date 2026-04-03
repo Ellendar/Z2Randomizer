@@ -14,7 +14,6 @@
     <Grid ColumnDefinitions="340, *">
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <ComboBox Name="SelectedSprite" assists:ComboBoxAssist.Label="Character Sprite" Theme="{StaticResource MaterialOutlineComboBox}"
-					  MaxDropDownHeight="500"
                       ItemsSource="{Binding Options}"
                       SelectedItem="{Binding Sprite}">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.CharacterSpriteToolTip}"/></ToolTip.Tip>
@@ -68,9 +67,9 @@
         <StackPanel Grid.Column="1" Orientation="Vertical">
             <TextBlock>Sprite Preview</TextBlock>
             <Image MaxHeight="200"
-                   Source="{Binding Path=Sprite.Preview, FallbackValue=''}"
+                   Source="{Binding Path=Sprite?.Preview}"
                    RenderOptions.BitmapInterpolationMode="None" />
-            <TextBlock Text="{Binding Sprite.Credit, FallbackValue='LOAD ROM FOR SPRITES'}" />
+            <TextBlock Text="{Binding Sprite?.Credit, FallbackValue='LOAD ROM FOR SPRITES'}" />
         </StackPanel>
     </Grid>
 </UserControl>

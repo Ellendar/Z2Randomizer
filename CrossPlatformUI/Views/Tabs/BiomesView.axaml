@@ -1,0 +1,152 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             xmlns:overworld="clr-namespace:Z2Randomizer.RandomizerCore.Overworld;assembly=RandomizerCore"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             mc:Ignorable="d" d:DesignWidth="940" d:DesignHeight="750"
+             x:Class="CrossPlatformUI.Views.Tabs.BiomesView"
+             x:DataType="vmt:BiomesViewModel">
+    <Grid RowDefinitions="*, *">
+        <HyperlinkButton
+            Margin="24 7 24 7"
+            HorizontalAlignment="Right"
+            Content="[Wiki: Biomes]"
+            NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Biomes"
+            FontSize="12"
+            Foreground="#4557c4"
+            Cursor="Hand"
+            />
+
+        <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *, *" RowDefinitions="*, *, *, *, *">
+            <ComboBox Grid.Row="0" Grid.Column="0"
+                      Margin="0 0" Padding="16 4 0 4" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{x:Static rc:Enums.OverworldSizeList}"
+                      SelectedItem="{Binding Main.Config.WestSize, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="West Continent Size">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <TextBlock Grid.Column="0" Text="{Binding Description}"/>
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Info}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.OverworldSizeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="0"
+                      Margin="0 0" Padding="16 4 0 4" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{x:Static rc:Enums.OverworldSizeList}"
+                      SelectedItem="{Binding Main.Config.EastSize, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="East Continent Size">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <TextBlock Grid.Column="0" Text="{Binding Description}"/>
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Info}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.OverworldSizeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox Grid.Row="2" Grid.Column="0"
+                      Margin="0 0" Padding="16 4 0 4" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{x:Static rc:Enums.DmSizeList}"
+                      SelectedItem="{Binding Main.Config.DmSize, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="Death Mountain Size">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <TextBlock Grid.Column="0" Text="{Binding Description}"/>
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Info}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DmSizeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox Grid.Row="3" Grid.Column="0"
+                      Margin="0 0" Padding="16 4 0 4" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{x:Static rc:Enums.MazeSizeList}"
+                      SelectedItem="{Binding Main.Config.MazeSize, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="Maze Island Size">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="Auto, *">
+                            <TextBlock Grid.Column="0" Text="{Binding Description}"/>
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Info}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MazeSizeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+
+            <ComboBox Grid.Row="0" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.WestBiomeList}}"
+                      SelectedItem="{Binding Main.Config.WestBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="West Continent Biome">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.WestContinentBiomeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.EastBiomeList}}"
+                      SelectedItem="{Binding Main.Config.EastBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="East Continent Biome">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EastContinentBiomeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox Grid.Row="2" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.DMBiomeList}}"
+                      SelectedItem="{Binding Main.Config.DmBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="Death Mountain Biome">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DeathMountainBiomeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox Grid.Row="3" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.MazeBiomeList}}"
+                      SelectedItem="{Binding Main.Config.MazeBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="Maze Island Biome">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MazeIslandBiomeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+
+            <ComboBox Grid.Row="0" Grid.Column="2" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.WestClimateList}}"
+                      SelectedItem="{Binding Main.Config.WestClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="West Continent Climate">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox Grid.Row="1" Grid.Column="2" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.EastClimateList}}"
+                      SelectedItem="{Binding Main.Config.EastClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="East Continent Climate">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox Grid.Row="2" Grid.Column="2" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.DmClimateList}}"
+                      SelectedItem="{Binding Main.Config.DmClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                      assists:ComboBoxAssist.Label="Death Mountain Climate">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*, *, *">
+            <StackPanel Grid.Column="0" Margin="0 0">
+                <CheckBox IsThreeState="True"
+                          IsChecked="{Binding Main.Config.GoodBoots}"
+                          Content="All Water Is Walkable With Boots">
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllWaterIsWalkableWithBootsToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Margin="0 0">
+                <CheckBox IsThreeState="False"
+                          IsEnabled="{Binding LegacyVanillaShuffledLocationsIncludedObservable^}"
+                          IsChecked="{Binding Main.Config.LegacyVanillaShuffledLocations}"
+                          Content="Legacy Vanilla Shuffled Locations">
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LegacyVanillaShuffledLocationsToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

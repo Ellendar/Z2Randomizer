@@ -10,10 +10,22 @@ using NLog;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
-public record struct Coord(int X, int Y)
+public record struct Coord(int X, int Y) : IComparable<Coord>
 {
     public Coord((int, int) coords) : this(coords.Item1, coords.Item2) {}
     public static Coord Uninitialized = new(0, 0);
+    //I want a separate constant for this in case implementation changes the value of Unitialized, but origin should always be 0,0
+    public static Coord Origin = new(0, 0);
+
+    public int CompareTo(Coord other)
+    {
+        int yComparison = Y.CompareTo(other.Y);
+        if (yComparison != 0)
+        {
+            return yComparison;
+        }
+        return X.CompareTo(other.X);
+    }
 }
 
 [JsonSourceGenerationOptions(
@@ -34,7 +46,7 @@ public class Room : IJsonOnDeserialized
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    internal Coord coords;
+    public Coord coords;
 
     public const int Group1ItemGetStartAddress = 0x17ba5;
     public const int Group2ItemGetStartAddress = 0x17bc5;
@@ -182,6 +194,7 @@ public class Room : IJsonOnDeserialized
         // PalaceGroup = room.PalaceGroup;
         PalaceNumber = room.PalaceNumber;
         DuplicateGroup = room.DuplicateGroup;
+        coords = room.coords;
 
         Connections = room.Connections;
         HasLeftExit = room.Connections[0] < 0xFC;
@@ -331,6 +344,32 @@ public class Room : IJsonOnDeserialized
             exits++;
         }
         return exits;
+    }
+
+    public string OpenExitsDebug()
+    {
+        StringBuilder sb = new();
+        sb.Append($"{Name}: ");
+        if (HasRightExit && Right == null)
+        {
+            sb.Append("Right ");
+        }
+
+        if (HasLeftExit && Left == null)
+        {
+            sb.Append("Left ");
+        }
+
+        if (HasUpExit && Up == null)
+        {
+            sb.Append("Up ");
+        }
+
+        if (HasDownExit && Down == null)
+        {
+            sb.Append(HasDrop ? "Drop " : "Down ");
+        }
+        return sb.ToString();
     }
 
     public void AdjustContinuingBossRoom()

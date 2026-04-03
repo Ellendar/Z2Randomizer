@@ -28,6 +28,7 @@ public static class TownExtensions
     {
         return town switch
         {
+            Town.INVALID => 99,
             Town.RAURU => 1,
             Town.RUTO => 2,
             Town.SARIA_NORTH => 3,

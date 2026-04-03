@@ -3,6 +3,7 @@
 /**/bin
 /**/Logs
 /**/Debug
+**/Release
 /Z2Randomizer.userprefs
 /UpgradeLog.htm
 /UpgradeLog2.htm
@@ -16,3 +17,6 @@
 .DS_Store
 *.log
 *.user
+*.mlb
+/Statistics/Db/*.sqlite-shm
+/Statistics/Db/*.sqlite-wal

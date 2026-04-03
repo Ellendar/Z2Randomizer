@@ -1,18 +1,20 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.ReactiveUI;
-using CrossPlatformUI.Services;
-using Desktop.Common;
+using ReactiveUI.Avalonia;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
-using Microsoft.Extensions.DependencyInjection;
+using CrossPlatformUI.Services;
+using Desktop.Common;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.Desktop;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public static class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any

@@ -9,6 +9,7 @@ using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.CommandLine;
 
+[RequiresUnreferencedCode("Newtonsoft.Json uses reflection")]
 public class Program
 {
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]
@@ -104,7 +105,7 @@ public class Program
 
         if (Flags == null)
         {
-            Flags = configuration.Flags;
+            Flags = configuration.SerializeFlags();
         }
         logger.Info($"Flags: {Flags}");
         logger.Info($"Rom: {Rom}");
@@ -136,7 +137,7 @@ public class Program
         var randomizer = new Hyrule(createAsm,palaceRooms);
         var rom = await randomizer.Randomize(vanillaRomData!, configuration, UpdateProgress, cts.Token);
 
-        if (rom != null)
+        if (rom.romdata != null)
         {
             
             char os_sep = Path.DirectorySeparatorChar;
@@ -150,8 +151,14 @@ public class Program
                     : Directory.GetCurrentDirectory();
             }
             string newFileName =  $"{outpath}/Z2_{Seed}_{Flags}.nes";
-            File.WriteAllBytes(newFileName, rom);
+            await File.WriteAllBytesAsync(newFileName, rom.romdata);
             logger.Info($"File {newFileName} has been created!");
+            if (rom.debuginfo != null)
+            {
+                var mlbfile = $"{outpath}/Z2_{Seed}_{Flags}.mlb";
+                await File.WriteAllTextAsync(mlbfile, rom.debuginfo);
+                logger.Info($"File {mlbfile} has been created!");
+            }
         }
         else
         {

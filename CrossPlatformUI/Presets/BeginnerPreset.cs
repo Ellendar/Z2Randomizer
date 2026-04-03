@@ -1,8 +1,10 @@
 ﻿using Z2Randomizer.RandomizerCore;
-using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
+/// <summary>
+/// Beginner and Default preset.
+/// </summary>
 public static class BeginnerPreset
 {
     public static readonly RandomizerConfiguration Preset = new()
@@ -27,28 +29,36 @@ public static class BeginnerPreset
         IncludeLavaInEncounterShuffle = false,
         EncounterRate = EncounterRate.HALF,
         RiverDevilBlockerOption = RiverDevilBlockerOption.PATH,
-        EastRocks = false,
+        EastRocks = true,
         GenerateBaguWoods = false,
-        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
+        LessImportantLocationsOption = LessImportantLocationsOption.REMOVE,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = false,
         GoodBoots = true,
         HidePalace = false,
         HideKasuto = false,
-        Climate = Climates.Classic,
-        WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
-        EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        WestSize = OverworldSizeOption.MEDIUM,
+        EastSize = OverworldSizeOption.MEDIUM,
+        DmSize = DmSizeOption.SMALL,
+        MazeSize = MazeSizeOption.MEDIUM,
+        WestBiome = Biome.VANILLALIKE,
+        EastBiome = Biome.VANILLALIKE,
+        DmBiome = Biome.VANILLALIKE,
         MazeBiome = Biome.VANILLALIKE,
-        DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        WestClimate = ClimateEnum.VANILLA_WEIGHTED_WEST,
+        EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
+        DmClimate = ClimateEnum.CLASSIC,
+        ContinentConnectionType = ContinentConnectionType.NORMAL,
 
         //Palaces
-        NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
-        GpStyle = PalaceStyle.RANDOM_WALK,
-        ShortenNormalPalaces = false,
-        ShortenGP = true,
+        NormalPalaceStyle = PalaceStyle.VANILLA_WEIGHTED,
+        GpStyle = PalaceStyle.TOWER,
+        NormalPalaceLength = PalaceLengthOption.MEDIUM,
+        GpLength = PalaceLengthOption.SHORT,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
-        Includev5_0Rooms = false,
+        Includev5_0Rooms = true,
+        IncludeExpertRooms = false,
         TBirdRequired = true,
         RemoveTBird = false,
         PalacesToCompleteMin = 6,
@@ -58,6 +68,7 @@ public static class BeginnerPreset
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = false,
+        PalaceDropStyle = PalaceDropStyle.ENTRANCE,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = false,
@@ -83,7 +94,7 @@ public static class BeginnerPreset
         //Enemies
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
-        ShuffleDripperEnemy = false,
+        DripperEnemyOption = DripperEnemyOption.ONLY_BOTS,
         MixLargeAndSmallEnemies = false,
         GeneratorsAlwaysMatch = true,
 

@@ -35,6 +35,7 @@ internal class VanillaRoomPool : RoomPool
         DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_RIGHT, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasRightExit).First());
         DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_LEFT, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasLeftExit).First());
 
+        VanillaBossRoom = palaceRooms.VanillaBossRoom(palaceNumber);
     }
 }
 

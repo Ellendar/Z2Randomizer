@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SD.Tools.Algorithmia.GeneralDataStructures;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,37 +7,40 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 
 public class Climate
 {
+    public ClimateEnum? Type { get; }
+    private const float EXCESSIVELY_LARGE = 1000f; 
     public float[] DistanceCoefficients { get; }
-    private readonly int[] TerrainWeights;
+    public string Name { get; init; }
     public int SeedTerrainCount { get; set; }
-    private List<Terrain> terrainWeightTable;
-    public string Name { get; set; }
+    private IWeightedSampler<Terrain> weightedSampler;
 
-    public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, Dictionary<Terrain, int> terrainWeights, int seedTerrainCount, bool providedDistancesAreInverted = false)
+    public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, IWeightedSampler<Terrain> terrainWeights, 
+        int seedTerrainCount, ClimateEnum? type = null)
     {
         Name = name;
+        Type = type;
         // Precompute distance coefficients into a inverse list
-        DistanceCoefficients = new float[(int)Terrain.NONE];
-        foreach (var pair in distanceCoefficients)
+        DistanceCoefficients = new float[Enum.GetValues<Terrain>().Length];
+        for(int i = 0; i < DistanceCoefficients.Length; i++)
         {
-            DistanceCoefficients[(int)pair.Key] = providedDistancesAreInverted ? pair.Value : (1f / pair.Value);
-        }
-        TerrainWeights = new int[(int)Terrain.NONE];
-        foreach (var pair in terrainWeights)
-        {
-            TerrainWeights[(int)pair.Key] = pair.Value;
-        }
-        SeedTerrainCount = seedTerrainCount;
-        //This is a lazy, not very efficient lookup method, but it has very fast lookups, and since terrain generation
-        //is one of the most expensive operations and we're going to do tens of thousands of lookups easily,
-        //this is probably good for now.
-        terrainWeightTable = new();
-        for (int terrain = 0; terrain < (int)Terrain.NONE; terrain++)
-        {
-            for (int i = 0; i < TerrainWeights[(int)terrain]; i++)
+            if(distanceCoefficients.TryGetValue((Terrain)i, out float coefficient))
             {
-                terrainWeightTable.Add((Terrain)terrain);
+                DistanceCoefficients[i] = coefficient;
             }
+            else
+            {
+                DistanceCoefficients[i] = EXCESSIVELY_LARGE;
+            }
+        }
+        weightedSampler = terrainWeights;
+        SeedTerrainCount = seedTerrainCount;
+    }
+
+    public void MultiplyDistanceCoefficients(float multiplier)
+    {
+        for (int i = 0; i < DistanceCoefficients.Length; i++)
+        {
+            DistanceCoefficients[i] *= multiplier;
         }
     }
 
@@ -45,7 +49,7 @@ public class Climate
         Terrain result;
         do
         {
-            result = terrainWeightTable[r.Next(terrainWeightTable.Count)];
+            result = weightedSampler.Next(r);
         }
         while (whitelist == null || !whitelist.Contains(result));
 
@@ -56,18 +60,14 @@ public class Climate
     {
         if (filter == null)
         {
-            return terrainWeightTable.Distinct();
+            return weightedSampler.Keys();
         }
-        return filter.Intersect(terrainWeightTable.Distinct());
-
+        return filter.Intersect(weightedSampler.Keys());
     }
 
     public void DisallowTerrain(Terrain terrain)
     {
-        for (int i = 0; i < TerrainWeights[(int)terrain]; i++)
-        {
-            terrainWeightTable.RemoveAll(i => i == terrain);
-        }
+        weightedSampler = weightedSampler.Subtract(terrain);
     }
 
     public Climate Clone()
@@ -76,31 +76,21 @@ public class Climate
             new Dictionary<Terrain, float>(DistanceCoefficients
                 .Select((value, index) => new { value, index })
                 .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)),
-            new Dictionary<Terrain, int>(TerrainWeights
+            weightedSampler.Clone(),
+            SeedTerrainCount,
+            Type);
+    }
+
+    /// renamed this because Clone returning an object with different values is not great
+    public Climate CloneWithInvertedDistances()
+    {
+        return new(Name,
+            new Dictionary<Terrain, float>(DistanceCoefficients
                 .Select((value, index) => new { value, index })
-                .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)),
-            SeedTerrainCount, providedDistancesAreInverted: true);
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is Climate climate)
-            return Equals(climate);
-        return false;
-    }
-
-    protected bool Equals(Climate other)
-    {
-        return TerrainWeights.SequenceEqual(other.TerrainWeights)
-               && terrainWeightTable.SequenceEqual(other.terrainWeightTable)
-               && DistanceCoefficients.SequenceEqual(other.DistanceCoefficients)
-               && SeedTerrainCount == other.SeedTerrainCount
-               && Name == other.Name;
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(TerrainWeights, terrainWeightTable, DistanceCoefficients, SeedTerrainCount, Name);
+                .ToDictionary(pair => (Terrain)pair.index, pair => pair.value == EXCESSIVELY_LARGE ? EXCESSIVELY_LARGE : 1f / pair.value)),
+            weightedSampler.Clone(),
+            SeedTerrainCount,
+            Type);
     }
 
     /// <summary>
@@ -129,8 +119,9 @@ public class Climate
         float totalWalkableTerrainWeight = 0f;
         foreach (Terrain terrain in walkableTerrains)
         {
-            totalRandomGrowthFactors += TerrainWeights[(int)terrain] / DistanceCoefficients[(int)terrain];
-            totalWalkableTerrainWeight += TerrainWeights[(int)terrain];
+            int w = weightedSampler.Weight(terrain);
+            totalRandomGrowthFactors += w / DistanceCoefficients[(int)terrain];
+            totalWalkableTerrainWeight += w;
         }
         float aggregateWalkableTerrainGrowth = totalRandomGrowthFactors / totalWalkableTerrainWeight;
         float mountainTerrainGrowth = 1 / DistanceCoefficients[(int)Terrain.MOUNTAIN];
@@ -139,9 +130,11 @@ public class Climate
         {
             foreach (Terrain terrain in walkableTerrains)
             {
-                DistanceCoefficients[(int)terrain] /= ((mountainTerrainGrowth * constraintLimitFactor) / aggregateWalkableTerrainGrowth);
+                //decrease the distance coefficient (embiggen) proportionally to how big the mountains are and how much the safety factor is
+                //but inversely proportional to the square root of the frequency this terrain appears. This means more common terrains
+                //are less affeted per group (but more affective of the growth in total)
+                DistanceCoefficients[(int)terrain] /= (mountainTerrainGrowth * constraintLimitFactor) / float.Sqrt(aggregateWalkableTerrainGrowth);
             }
         }
     }
 }
-

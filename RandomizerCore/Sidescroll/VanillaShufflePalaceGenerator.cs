@@ -16,8 +16,8 @@ public class VanillaShufflePalaceGenerator() : VanillaPalaceGenerator()
         while (
             !palace.AllReachable() 
             || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
-            || (palaceNumber == 7 && !palace.BossRoomMinDistance(props.DarkLinkMinDistance))
-            || palace.HasInescapableDrop(props.BossRoomsExitToPalace[palace.Number - 1])
+            || (palaceNumber == 7 && !palace.IsBossRoomAtLeastMinDistance(props.DarkLinkMinDistance))
+            || palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], props.PalaceDropStyle, r)
         )
         {
             palace.ResetRooms();

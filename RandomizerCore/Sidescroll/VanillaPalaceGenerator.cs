@@ -31,10 +31,6 @@ public class VanillaPalaceGenerator() : PalaceGenerator
 
         if (palaceNumber != 7)
         {
-            if (props.UsePalaceItemRoomCountIndicator)
-            {
-                palace.Entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r);
-            }
             Room itemRoom = new(roomPool.ItemRoom!);
             palace.ItemRooms.Add(itemRoom);
             palace.AllRooms.Add(itemRoom);
@@ -100,16 +96,17 @@ public class VanillaPalaceGenerator() : PalaceGenerator
             }
         }
 
-        if(!palace.AllReachable() 
-            || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) 
-            || palace.HasInescapableDrop(props.BossRoomsExitToPalace[palace.Number - 1]))
+        if (!palace.AllReachable()
+            || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
+            //Vanilla specifically just does an any exit check because this is just a safety check, it should never trip
+            || palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], PalaceDropStyle.ANY_EXIT, r))
         {
             throw new Exception("Vanilla palace (" + palaceNumber + ") was not all reachable. This should be impossible.");
         }
 
-        if(props.ShortenNormalPalaces && palaceNumber < 7 || props.ShortenGP && palaceNumber == 7)
+        if (roomCount < Palaces.VANILLA_LENGTHS[palaceNumber - 1])
         {
-            palace.Shorten(r);
+            palace.Shorten(r, roomCount);
         }
 
         palace.IsValid = true;

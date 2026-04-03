@@ -1,5 +1,5 @@
 ﻿import { dotnet } from './_framework/dotnet.js'
-import { compile } from 'js65/libassembler.js'
+import { compile } from './js65/libassembler.js'
 
 const BUNDLE_DOWNLOAD_SIZE = 80 * 1024 * 1024; // used for progress bar - doesn't have to be exact
 

@@ -1,17 +1,18 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Disposables.Fluent;
+using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
-using CrossPlatformUI.ViewModels;
 using ReactiveUI;
-using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using YamlDotNet.Core.Tokens;
+using ReactiveUI.Avalonia;
+using CrossPlatformUI.ViewModels;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.Views.Tabs;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class PalacesView : ReactiveUserControl<MainViewModel>
 {
     public PalacesView()
@@ -56,7 +57,7 @@ public partial class PalacesView : ReactiveUserControl<MainViewModel>
             ComboBox bossRoomsExitTypeSelector = this.FindControl<ComboBox>("BossRoomsExitTypeSelector") ?? throw new System.Exception("Missing Required Validation Element");
 
 
-            IObservable<object> normalStyleObservable = normalPalaceStyleSelector.GetObservable(ComboBox.SelectedItemProperty);
+            var normalStyleObservable = normalPalaceStyleSelector.GetObservable(ComboBox.SelectedItemProperty);
             var gpStyleObservable = gpStyleSelector.GetObservable(ComboBox.SelectedItemProperty);
 
             gpStyleObservable.Subscribe(selectedItem =>
@@ -75,7 +76,8 @@ public partial class PalacesView : ReactiveUserControl<MainViewModel>
                         thunderbirdRequiredCheckbox.IsEnabled = true;
                     }
                 }
-            });
+            })
+            .DisposeWith(disposables);
 
             normalStyleObservable.CombineLatest(gpStyleObservable, (normal, gp) =>
             {
@@ -106,8 +108,8 @@ public partial class PalacesView : ReactiveUserControl<MainViewModel>
                     blockingRoomsAnywhereCheckbox.IsChecked = enableRoomSelection;
                     bossRoomsExitTypeSelector.SelectedIndex = 0;
                 }
-            });
+            })
+            .DisposeWith(disposables);
         });
     }
-
 }

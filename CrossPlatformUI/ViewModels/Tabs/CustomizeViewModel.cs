@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Linq;
 using System.Text.Json.Serialization;
 using ReactiveUI;
@@ -5,6 +6,7 @@ using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public class CustomizeViewModel : ReactiveObject
 {
     public SpritePreviewViewModel SpritePreviewViewModel { get; }

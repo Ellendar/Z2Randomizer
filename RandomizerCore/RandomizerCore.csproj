@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>false</UseWindowsForms>
@@ -19,7 +18,9 @@
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
     <None Remove="Asm\ExpandedPauseMenu.s" />
+    <None Remove="Asm\Graphics\dash.chr" />
     <None Remove="Asm\Graphics\item_sprites.chr" />
+    <None Remove="Asm\Graphics\linkedFire.chr" />
     <None Remove="Asm\Graphics\randomizer_text.chr" />
     <None Remove="Asm\Recoil.s" />
     <None Remove="Asm\StatTracking.s" />
@@ -45,19 +46,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DynamicData" Version="8.4.1" />
-    <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />
+    <PackageReference Include="DynamicData" Version="9.4.1" />
+<!--    <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />-->
+<!--    <ProjectReference Include="..\..\js65\integrations\dotnet\js65\js65.csproj" />-->
+    <PackageReference Include="js65.interop" Version="$(Js65Version)" />
     <PackageReference Include="SD.Tools.Algorithmia" Version="1.4.0" />
-    <PackageReference Include="NLog" Version="6.0.3" />
+    <PackageReference Include="NLog" Version="6.1.1" />
     <ProjectReference Include="..\CoreSourceGenerator\CoreSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
+    <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" NoWarn="IL2026;IL2091" />
+    <TrimmerRootAssembly Include="FtRandoLib" />
     <TrimmerRootAssembly Include="CoreSourceGenerator" />
     <PackageReference Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Asm\*.s" />
+    <EmbeddedResource Include="Asm\Graphics\dash.chr" />
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
+    <EmbeddedResource Include="Asm\Graphics\linkedFire.chr" />
     <EmbeddedResource Include="Asm\Graphics\randomizer_text.chr" />
     <EmbeddedResource Include="Asm\z2r.inc" />
     <EmbeddedResource Include="Asm\z2rndft.ips" />

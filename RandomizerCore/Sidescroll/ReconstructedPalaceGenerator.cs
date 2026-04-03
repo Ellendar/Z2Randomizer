@@ -17,7 +17,6 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         int tries = 0;
-        int innertries = 0;
 
         debug++;
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
@@ -34,195 +33,191 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
             }
 
             tries = 0;
-            innertries = 0;
             int roomPlacementFailures = 0;
-            do //while (roomPlacementFailures > ROOM_PLACEMENT_FAILURE_LIMIT || palace.AllRooms.Any(i => i.CountOpenExits() > 0));
 
+            //No longer a loop since the room pool can't (and would need to be) regenerated after each attempt.
+            //Now we just fail and restart if we can't place enough rooms
+            palace = new(palaceNumber);
+            palace.Entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
             {
-                palace = new(palaceNumber);
-                palace.Entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
-                {
-                    IsRoot = true,
-                    // PalaceGroup = palaceGroup
-                };
-                if (props.UsePalaceItemRoomCountIndicator && palaceNumber != 7) {
-                    palace.Entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r);
-                }
-                palace.AllRooms.Add(palace.Entrance);
+                IsRoot = true,
+                // PalaceGroup = palaceGroup
+            };
+            palace.AllRooms.Add(palace.Entrance);
 
-                palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);
-                palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
-                palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
-                // palace.BossRoom.PalaceGroup = palaceGroup;
-                palace.AllRooms.Add(palace.BossRoom);
-                palace.ItemRooms = [];
+            palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);
+            palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
+            // palace.BossRoom.PalaceGroup = palaceGroup;
+            palace.AllRooms.Add(palace.BossRoom);
+            palace.ItemRooms = [];
 
-                if (palaceNumber < 7) //Not GP
-                {
-                    for (int i = 0; i < props.PalaceItemRoomCounts[palaceNumber - 1]; i++)
-                    {
-                        if (roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
-                        {
-                            throw new Exception("No item rooms for reconstructed palace");
-                        }
-                        Direction itemRoomDirection = Direction.NONE;
-                        Room? itemRoom = null;
-                        while (itemRoom == null)
-                        {
-                            itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-                            if (!roomPool.ItemRoomsByDirection.TryGetValue(itemRoomDirection, out var value))
-                            {
-                                continue;
-                            }
-                            var itemRoomCandidate = value.ToList().Sample(r);
-                            if (itemRoomCandidate == null)
-                            {
-                                palace.IsValid = false;
-                                return palace;
-                            }
-                            itemRoom = new(itemRoomCandidate);
-                        }
-
-                        palace.ItemRooms.Add(itemRoom);
-                        palace.AllRooms.Add(itemRoom);
-
-                        if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.ItemRoomsByDirection[itemRoomDirection], itemRoom); }
-
-                        if (itemRoom.LinkedRoomName != null)
-                        {
-                            Room segmentedItemRoom1, segmentedItemRoom2;
-                            segmentedItemRoom1 = itemRoom;
-                            segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
-                            // segmentedItemRoom2.PalaceGroup = palaceGroup;
-                            //segmentedItemRoom2.SetItem((Item)palaceNumber);
-                            segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
-                            segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
-                            palace.AllRooms.Add(segmentedItemRoom2);
-                        }
-
-
-                    }
-
-                    if (props.BossRoomsExitToPalace[palace.Number - 1])
-                    {
-                        palace.BossRoom.HasRightExit = true;
-                        palace.BossRoom.AdjustContinuingBossRoom();
-                    }
-
-                }
-                else //GP
-                {
-                    //thunderbird?
-                    if (!props.RemoveTbird)
-                    {
-                        palace.TbirdRoom = new(roomPool.TbirdRooms[r.Next(roomPool.TbirdRooms.Count)]);
-                        // palace.TbirdRoom.PalaceGroup = PalaceGrouping.PalaceGp;
-                        palace.AllRooms.Add(palace.TbirdRoom);
-                    }
-                }
-
-                //add rooms
-                roomPlacementFailures = 0;
-                while (palace.AllRooms.Count < roomCount)
-                {
-                    if (roomPool.NormalRooms.Count == 0)
-                    {
-                        //Room pool was exhausted. This is likely with this old structure. In theory we could refactor this
-                        //to work better, but for now just restart.
-                        palace.IsValid = false;
-                        return palace;
-                    }
-                    int roomIndex = r.Next(roomPool.NormalRooms.Count);
-                    Room roomToAdd = new(roomPool.NormalRooms[roomIndex]);
-
-                    // roomToAdd.PalaceGroup = palaceGroup;
-                    bool added = !(roomToAdd.HasDrop && !roomPool.NormalRooms.Any(i => i.IsDropZone && i != roomToAdd));
-                    if (added)
-                    {
-                        added = AddRoom(palace, roomToAdd, props.BlockersAnywhere);
-                        if (added && roomToAdd.LinkedRoomName != null)
-                        {
-                            Room linkedRoom = new(roomPool.LinkedRooms[roomToAdd.LinkedRoomName]);
-                            linkedRoom.LinkedRoom = roomToAdd;
-                            roomToAdd.LinkedRoom = linkedRoom;
-                            AddRoom(palace, linkedRoom, props.BlockersAnywhere);
-                        }
-                    }
-                    if (added)
-                    {
-                        if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, roomToAdd); }
-                        if (roomToAdd.LinkedRoom?.HasDrop ?? false)
-                        {
-                            roomToAdd = roomToAdd.LinkedRoom;
-                        }
-                        if (roomToAdd.HasDrop)
-                        {
-                            int numDrops = r.Next(Math.Min(3, roomCount - palace.AllRooms.Count), Math.Min(6, roomCount - palace.AllRooms.Count));
-                            numDrops = Math.Min(numDrops, roomPool.NormalRooms.Count(i => i.IsDropZone) + 1);
-                            bool continueDropping = true;
-                            int j = 0;
-                            int dropPlacementFailures = 0;
-                            while (j < numDrops && continueDropping)
-                            {
-                                List<Room> possibleDropZones = roomPool.NormalRooms.Where(i => i.IsDropZone).ToList();
-                                if (possibleDropZones.Count == 0)
-                                {
-                                    logger.Debug("Exhausted all available drop zones");
-                                    palace.IsValid = false;
-                                    return palace;
-                                }
-                                Room dropZoneRoom = new(possibleDropZones[r.Next(0, possibleDropZones.Count)]);
-                                bool added2 = AddRoom(palace, dropZoneRoom, props.BlockersAnywhere);
-                                if (added2)
-                                {
-                                    if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, dropZoneRoom); }
-                                    continueDropping = dropZoneRoom.HasDrop;
-                                    if (dropZoneRoom.LinkedRoomName != null)
-                                    {
-                                        Room linkedRoom = new(roomPool.LinkedRooms[dropZoneRoom.LinkedRoomName]);
-                                        if (AddRoom(palace, linkedRoom, props.BlockersAnywhere))
-                                        {
-                                            linkedRoom.LinkedRoom = dropZoneRoom;
-                                            dropZoneRoom.LinkedRoom = linkedRoom;
-                                            //If the drop zone isn't a drop, but is linked to a room that is a drop, keep dropping from the linked room
-                                            if (!continueDropping && linkedRoom.HasDrop)
-                                            {
-                                                continueDropping = true;
-                                            }
-                                        }
-                                    }
-                                    j++;
-                                }
-                                else if (++dropPlacementFailures > DROP_PLACEMENT_FAILURE_LIMIT)
-                                {
-                                    logger.Trace("Drop placement failure limit exceeded.");
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    else if (++roomPlacementFailures >= ROOM_PLACEMENT_FAILURE_LIMIT)
-                    {
-                        break;
-                    }
-
-                    List <Room> openRooms = palace.AllRooms.Where(i => i.IsOpen()).ToList();
-
-                    if (openRooms.Count >= roomCount - palace.AllRooms.Count) //consolidate
-                    {
-                        Consolidate(openRooms);
-                    }
-                }
-
-                innertries++;
-                //If we've exceeded this threshold, either the palace is so convoluted, or the room pool is so exhausted
-                //that the palace will never succeed, so give up.
-                if(roomPlacementFailures >= ROOM_PLACEMENT_FAILURE_LIMIT)
+            if (palaceNumber < 7) //Not GP
+            {
+                ItemRoomSelectionStrategy itemRoomSelector = new ByEntranceDirectionItemRoomSelectionStrategy();
+                //ItemRoomSelectionStrategy itemRoomSelector = new RandomItemRoomSelectionStrategy();
+                Room[] itemRooms = itemRoomSelector.SelectItemRooms(palace, roomPool, props.PalaceItemRoomCounts[palaceNumber - 1], duplicateProtection, r);
+                if (itemRooms == null || itemRooms.Length != props.PalaceItemRoomCounts[palaceNumber - 1])
                 {
                     palace.IsValid = false;
                     return palace;
                 }
-            } while (palace.AllRooms.Any(i => i.CountOpenExits() > 0));
+
+                foreach (Room itemRoom in itemRooms)
+                {
+                    palace.ItemRooms.Add(itemRoom);
+                    palace.AllRooms.Add(itemRoom);
+
+                    if (itemRoom.LinkedRoomName != null)
+                    {
+                        Room segmentedItemRoom1, segmentedItemRoom2;
+                        segmentedItemRoom1 = itemRoom;
+                        segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
+                        segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
+                        segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
+                        palace.AllRooms.Add(segmentedItemRoom2);
+                    }
+                }
+
+                if (props.BossRoomsExitToPalace[palace.Number - 1])
+                {
+                    palace.BossRoom.HasRightExit = true;
+                    palace.BossRoom.AdjustContinuingBossRoom();
+                }
+
+            }
+            else //GP
+            {
+                //thunderbird?
+                if (!props.RemoveTbird)
+                {
+                    palace.TbirdRoom = new(roomPool.TbirdRooms[r.Next(roomPool.TbirdRooms.Count)]);
+                    // palace.TbirdRoom.PalaceGroup = PalaceGrouping.PalaceGp;
+                    palace.AllRooms.Add(palace.TbirdRoom);
+                }
+            }
+
+            //add rooms
+            roomPlacementFailures = 0;
+            while (palace.AllRooms.Count < roomCount)
+            {
+                if (roomPool.NormalRooms.Count == 0)
+                {
+                    //Room pool was exhausted. This is likely with this old structure. In theory we could refactor this
+                    //to work better, but for now just restart.
+                    palace.IsValid = false;
+                    return palace;
+                }
+                int roomIndex = r.Next(roomPool.NormalRooms.Count);
+                Room roomToAdd = new(roomPool.NormalRooms[roomIndex]);
+
+                // roomToAdd.PalaceGroup = palaceGroup;
+                bool added = !(roomToAdd.HasDrop && !roomPool.NormalRooms.Any(i => i.IsDropZone && i != roomToAdd));
+                if (added)
+                {
+                    added = AddRoom(palace, roomToAdd, props.BlockersAnywhere);
+                    if (added && roomToAdd.LinkedRoomName != null)
+                    {
+                        Room linkedRoom = new(roomPool.LinkedRooms[roomToAdd.LinkedRoomName]);
+                        linkedRoom.LinkedRoom = roomToAdd;
+                        roomToAdd.LinkedRoom = linkedRoom;
+                        AddRoom(palace, linkedRoom, props.BlockersAnywhere);
+                    }
+                }
+                if (added)
+                {
+                    if (duplicateProtection)
+                    {
+                        roomPool.RemoveDuplicates(props, roomToAdd);
+                    }
+                    if (roomToAdd.LinkedRoom?.HasDrop ?? false)
+                    {
+                        roomToAdd = roomToAdd.LinkedRoom;
+                    }
+                    if (roomToAdd.HasDrop)
+                    {
+                        int numDrops = r.Next(Math.Min(3, roomCount - palace.AllRooms.Count), Math.Min(6, roomCount - palace.AllRooms.Count));
+                        numDrops = Math.Min(numDrops, roomPool.NormalRooms.Count(i => i.IsDropZone) + 1);
+                        bool continueDropping = true;
+                        int j = 0;
+                        int dropPlacementFailures = 0;
+                        while (j < numDrops && continueDropping)
+                        {
+                            List<Room> possibleDropZones = roomPool.NormalRooms.Where(i => i.IsDropZone)
+                                .Union(palace.AllRooms.Where(i => i.IsDropZone && !palace.AllRooms.Any(j => j.Down == i))).ToList();
+                            if (possibleDropZones.Count == 0)
+                            {
+                                logger.Debug("Exhausted all available drop zones");
+                                palace.IsValid = false;
+                                return palace;
+                            }
+                            Room originalDropZoneRoom = possibleDropZones[r.Next(0, possibleDropZones.Count)];
+
+                            if (palace.AllRooms.Contains(originalDropZoneRoom))
+                            {
+                                roomToAdd.Down = originalDropZoneRoom;
+                                break;
+                            }
+
+                            Room dropZoneRoom = new(originalDropZoneRoom);
+                            bool added2 = AddRoom(palace, dropZoneRoom, props.BlockersAnywhere);
+                            if (added2)
+                            {
+                                if (duplicateProtection)
+                                {
+                                    roomPool.RemoveDuplicates(props, dropZoneRoom);
+                                }
+                                continueDropping = dropZoneRoom.HasDrop;
+                                if (dropZoneRoom.LinkedRoomName != null)
+                                {
+                                    Room linkedRoom = new(roomPool.LinkedRooms[dropZoneRoom.LinkedRoomName]);
+                                    if (AddRoom(palace, linkedRoom, props.BlockersAnywhere))
+                                    {
+                                        linkedRoom.LinkedRoom = dropZoneRoom;
+                                        dropZoneRoom.LinkedRoom = linkedRoom;
+                                        //If the drop zone isn't a drop, but is linked to a room that is a drop, keep dropping from the linked room
+                                        if (!continueDropping && linkedRoom.HasDrop)
+                                        {
+                                            continueDropping = true;
+                                        }
+                                    }
+                                }
+                                j++;
+                            }
+                            else if (++dropPlacementFailures > DROP_PLACEMENT_FAILURE_LIMIT)
+                            {
+                                logger.Trace("Drop placement failure limit exceeded.");
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if (++roomPlacementFailures >= ROOM_PLACEMENT_FAILURE_LIMIT)
+                {
+                    break;
+                }
+
+                List <Room> openRooms = palace.AllRooms.Where(i => i.IsOpen()).ToList();
+
+                if (openRooms.Count >= roomCount - palace.AllRooms.Count) //consolidate
+                {
+                    Consolidate(openRooms, props, palaceNumber);
+                }
+            }
+
+            //We couldn't place enough rooms, so give up
+            if(palace.AllRooms.Any(i => i.CountOpenExits() > 0))
+            {
+                /*
+                if(palace.Number == 7 && palace.AllRooms.Count == roomCount && palace.AllRooms.Count(i => i.CountOpenExits() > 0) < 4)
+                {
+                    Debug.WriteLine("");
+                    palace.AllRooms.Where(i => i.CountOpenExits() > 0).ToList().ForEach(i => Debug.WriteLine(i.OpenExitsDebug()));
+                }
+                */
+                palace.IsValid = false;
+                return palace;
+            }
+
             int count = 0;
             bool reachable = false;
             do
@@ -237,8 +232,8 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
             while (
                 (!reachable
                  || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
-                 || (palaceNumber == 7 && !palace.BossRoomMinDistance(props.DarkLinkMinDistance))
-                 || palace.HasInescapableDrop(props.BossRoomsExitToPalace[palace.Number - 1])
+                 || (palaceNumber == 7 && !palace.IsBossRoomAtLeastMinDistance(props.DarkLinkMinDistance))
+                 || palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], props.PalaceDropStyle, r)
                 ) && (tries < ROOM_SHUFFLE_ATTEMPT_LIMIT)
             );
         } while (tries >= ROOM_SHUFFLE_ATTEMPT_LIMIT);
@@ -324,7 +319,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
         }
     }
 
-    public void Consolidate(List<Room> openRooms)
+    public virtual void Consolidate(List<Room> openRooms, RandomizerProperties props, int palaceNumber)
     {
         Room[] openCopy = new Room[openRooms.Count];
         openRooms.CopyTo(openCopy);
@@ -347,7 +342,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
     /// <param name="room"></param> The room to be attached
     /// <param name="open"></param> The room onto which R is attached
     /// <returns>Whether or not the room was actually able to be attached.</returns>
-    private bool AttachToOpen(Room room, Room open, List<Room> openRooms)
+    protected bool AttachToOpen(Room room, Room open, List<Room> openRooms)
     {
         bool placed = false;
         //Right from open into r

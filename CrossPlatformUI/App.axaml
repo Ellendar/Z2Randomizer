@@ -7,14 +7,17 @@
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:behaviors="clr-namespace:CrossPlatformUI.Behaviors"
-             x:Class="CrossPlatformUI.App"
-             RequestedThemeVariant="Default">
+             x:Class="CrossPlatformUI.App">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
-        <themes:MaterialTheme PrimaryColor="DeepPurple" SecondaryColor="LightBlue" />
+        <themes:MaterialTheme />
         <avalonia:MaterialIconStyles />
         <dialogHostAvalonia:DialogHostStyles />
-        
+
+        <Style Selector="TabItem">
+            <Setter Property="MinWidth" Value="78" />
+        </Style>
+
         <Style Selector="StackPanel">
             <Setter Property="Margin" Value="15, 8" />
         </Style>
@@ -41,8 +44,8 @@
             <!-- By default the checkbox stretched to fill the container, which made way too much clickable, so
                  No more stretching! Stick to left aligned content by default for checkboxes. -->
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="Padding" Value="0,8"/>
-            <Setter Property="Margin" Value="5, 0"/>
+            <Setter Property="Padding" Value="0 8"/>
+            <Setter Property="Margin" Value="14 0 4 0"/>
         </Style>
         
         <!-- Indeterminate state -->
@@ -59,8 +62,28 @@
                         " />
                 <Setter Property="Fill" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(assists:SelectionControlAssist.InnerForeground)}" />
             </Style>
+            <!-- Show disabled checkboxes as unchecked by default -->
+            <Style Selector="^:disabled /template/ Path#Graphic">
+                <Setter Property="Data"
+                        Value="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19Z" />
+                <Setter Property="Fill" Value="{DynamicResource MaterialCheckBoxDisabledBrush}" />
+            </Style>
+            <!-- Class DisabledMeansChecked means we display it as disabled + checked -->
+            <Style Selector="^.DisabledMeansChecked:disabled /template/ Path#Graphic">
+                <Setter Property="Data"
+                        Value="M10,17L5,12L6.41,10.58L10,14.17L17.59,6.58L19,8M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z" />
+                <Setter Property="Fill" Value="{DynamicResource MaterialCheckBoxDisabledBrush}" />
+            </Style>
         </Style>
-        
+
+        <Style Selector="ComboBox">
+            <Setter Property="Height" Value="76"/>
+            <Setter Property="Margin" Value="0 0 0 4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16 4"/>
+            <Setter Property="MaxDropDownHeight" Value="500"/>
+        </Style>
+
         <!-- Add a default behavior to all of the comboboxes to let the scroll with the mouse wheel -->
         <Style Selector="ComboBox">
             <Setter Property="(Interaction.Behaviors)">
@@ -83,5 +106,7 @@
     </Application.Styles>
   <Application.Resources>
     <converters:SumOfValuesLessThanConverter x:Key="SumOfValuesLessThanConverter"/>
+
+    <SolidColorBrush x:Key="BorderColorBrush" Color="#969696" />
   </Application.Resources>
 </Application>

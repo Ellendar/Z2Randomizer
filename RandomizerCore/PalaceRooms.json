@@ -835,6 +835,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["Easy"],
     "duplicateGroup": "P3 Floating 3x3 Bricks With Moas",
     "sideviewData": "20600E90D680447360734873607348736073487360734873607348736073D80E"
   },
@@ -1870,6 +1871,7 @@
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["LongDeadEnd"],
     "duplicateGroup": "P5 3-way With Waste-of-time P-bag",
     "sideviewData": "38600F08D2087095640F0CD20E7071D208D60E7075D60880B281B281719073D80E80B2A32304F1F050A223D7086001762782C2640F08D20E"
   },
@@ -1896,6 +1898,7 @@
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["LongDeadEnd"],
     "duplicateGroup": "P5 3-way With Waste-of-time P-bag",
     "sideviewData": "38600F08D2087095640F0CD20E7071D208D60E7075D60880B281B281719073D80E80B2A32304F1F050A223D7086001762782C2640F08D20E"
   },
@@ -1915,10 +1918,10 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
-    "linkedRoomName": "Segmented deadend/key room right side",
     "map": 50,
     "memoryAddress": 67571,
     "name": "Segmented deadend/key room left side",
+    "linkedRoomName": "Segmented deadend/key room right side",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [],
@@ -1941,10 +1944,10 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
-    "linkedRoomName": "Segmented deadend/key room left side",
     "map": 50,
     "memoryAddress": 67571,
     "name": "Segmented deadend/key room right side",
+    "linkedRoomName": "Segmented deadend/key room left side",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [],
@@ -2157,7 +2160,7 @@
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [],
-    "tags": ["Expert", "WalkthroughWall"],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "16600808E20082C26009D60DA07F70AF80AFE300D808"
   },
   {
@@ -2260,8 +2263,8 @@
     "name": "Vanilla P6 M38",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Expert"],
     "sideviewData": "25600E10D20983759075D90ED60983759075D90EA22905F1F050D7087027600F0B7837D80F"
   },
   {
@@ -2553,7 +2556,7 @@
     "requirements": [
       "GLOVE"
     ],
-    "tags": ["Expert", "WalkthroughWall"],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "186000106F0980C26B0980C26B0980C2B3A3680980C219B9"
   },
   {
@@ -2976,6 +2979,7 @@
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [],
+    "tags": ["Easy"],
     "duplicateGroup": "GP Inverse T",
     "sideviewData": "30600408102F24F4D40324F5D402102F24F6D40124F7D408D40E0306F050B0900106B090D408D401102F24F7D40224F6"
   },
@@ -3056,6 +3060,7 @@
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [],
+    "tags": ["Easy"],
     "duplicateGroup": "Beer Bridge",
     "sideviewData": "32600A0880239093D400708FF01F162B22974293768FF01F162B2297429386279097162B2297708FF01F4293DE0A80239093"
   },
@@ -3302,8 +3307,8 @@
     "name": "Vanilla P7 M36",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Easy"],
     "sideviewData": "0C608008E10082F2E2007DF3"
   },
   {
@@ -5355,8 +5360,8 @@
     "name": "roomJamGTM 3",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Easy"],
     "sideviewData": "1A600608D904D20890713302D10DE300D10830019271D204D206"
   },
   {
@@ -5381,8 +5386,8 @@
     "name": "roomJamGTM 4",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Easy"],
     "sideviewData": "19600E08DE00702B610F0D7B34D50EA625F25000F1D900DD0F"
   },
   {
@@ -5511,8 +5516,8 @@
     "name": "roomJamGTM 9",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Easy"],
     "sideviewData": "24600608D4705093709B909B643388339097A833AC3394978433749B909B64335493D406"
   },
   {
@@ -6215,6 +6220,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["Easy"],
     "duplicateGroup": "winterSolstice 1 M5",
     "sideviewData": "24600E08D3806001A521927842C4976DF01D7E099071F11B906B9C7745C4A3216602D10E"
   },
@@ -6978,8 +6984,8 @@
     "name": "winterSolstice M6",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2B600F10D302820F11DB00F01F62B1802C96C1F81F51B1702C86C2D9098073907F327B5473F15070F18573"
   },
   {
@@ -7087,8 +7093,8 @@
     "name": "winterSolstice 2 M25",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2B600F10D302810F12DC00F01F62B1802C96C1F81F51B1702C86C2D9098073907F327B5473F15070F18573"
   },
   {
@@ -7139,8 +7145,8 @@
     "name": "winterSolstice M34",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "24600F10D20C64C4D10B56C5D10AD30EF65000F1D80AD70B50C5DA0C60C4DE0F70B19040"
   },
   {
@@ -7512,7 +7518,7 @@
     "requirements": [],
     "tags": ["LongDeadEnd"],
     "suppressWarning": ["MultipleItemsOnPage"],
-    "sideviewData": "33609F00D00EB077D2E04007470713073807362BA02B2208402750C3902757C3650721075C081507A033820F0890317109D10F"
+    "sideviewData": "33609F00D00EB077D2E04007470713073807362BA02B2208402750C3902757C3650721075C081507A023820F0890217109D10F"
   },
   {
     "author": "dusterRoomJam",
@@ -7615,6 +7621,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tags": ["Easy"],
     "duplicateGroup": "link7777RoomJam M6",
     "sideviewData": "30600008102F24F8D40124F7D402102F24F6D40324F5D404102FF7500006B0900106B090D102D701102F24F7D40024F8"
   },
@@ -8631,6 +8638,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tags": ["Easy"],
     "duplicateGroup": "gtmNewgpRooms M16",
     "sideviewData": "1C600E08DF085F0A7020D10EF8500006B0910106B090D9087020DC0E"
   },
@@ -10585,6 +10593,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10611,6 +10620,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10637,6 +10647,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10663,6 +10674,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tag": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -11416,8 +11428,8 @@
     "name": "benthicKing M1",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Easy"],
     "sideviewData": "38609000007F907F23C627C6067F907F21C627C627C6017FA046B046C046237940796029F45000F1A048B048C048097F20C6907F26C626C6"
   },
   {
@@ -11598,8 +11610,8 @@
     "name": "benthicKing M8",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "29600E10D00FD60874C375C3550970C375C375C3D50EA225F25000F1D608702576357625630F0DD30F"
   },
   {
@@ -11806,8 +11818,8 @@
     "name": "easternShadow M7",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Expert"],
     "sideviewData": "36600E08D00FD20ED20BD209D208D309D20BD20E82B2D30BD209D20829C8D20BD10EA125F25000F1D50BD10821C8DA09D20BD20ED20F"
   },
   {
@@ -12254,6 +12266,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tags": ["Easy"],
     "duplicateGroup": "eunosGpRooms M2",
     "sideviewData": "2C600008102F24F8D40124F7D402102F24F6D40324F5D50162297225F250000601068797112F22F5D50224F6"
   },
@@ -12517,6 +12530,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tags": ["Easy"],
     "duplicateGroup": "flippedGp M2",
     "sideviewData": "30600208102F24F6D40124F7D408D40EF3500006B0900106B090D408D401102F24F7D40223F6D503102F23F5D50423F4"
   },
@@ -12543,6 +12557,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
+    "tags": ["Easy"],
     "duplicateGroup": "flippedGp 1 M3",
     "sideviewData": "32600A0880239093D400F01F708F162B2297429386279097162BF21F2097708F42931C2BF21F2097708F4293DE0A80239093"
   },
@@ -12750,8 +12765,7 @@
     "name": "flippedGp M15",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["FAIRY"],
     "sideviewData": "2A600F08F7500006B0900106B090D10ED500D207D205D203D201F0159277F41F74775877F41F347BDC17"
   },
   {
@@ -13948,7 +13962,7 @@
     "connections": "27FCFC2C",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "0B009924D92B190D860246",
+    "enemies": "07009924D92B19",
     "group": "V5_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -13970,7 +13984,7 @@
       "FAIRY"
     ],
     "tags": ["Expert"],
-    "sideviewData": "5D600310602570221183D2009109F21F506B26008009A0C2664061511184A140F11F6053B2424230503060423139A2406143520F00A2406142F11F41305030B04261531184A34061516240516B25008009A0C2F115662211839009D205"
+    "sideviewData": "5960041060251183D2009109F215506B2600700990C1F11F654061511184A1406153B242429060423139F21FA0406143520F00A24061424290B04261531184A3406151F2156040516B2500700990C1F115662211839009D205"
   },
   {
     "author": "valence",
@@ -14107,8 +14121,8 @@
     "bitmask": "0F",
     "connections": "FCFC9AFC",
     "elevatorScreen": 2,
-    "enabled": false,
-    "enemies": "01",
+    "enabled": true,
+    "enemies": "034A05",
     "group": "V5_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -14814,7 +14828,7 @@
     "connections": "3FFFFF44",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "097E0E0D2302630F0F",
+    "enemies": "070D2302630F0F",
     "group": "V5_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -15530,7 +15544,7 @@
     "connections": "93FCFCAC",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "0D4D835783349E6D1923042652",
+    "enemies": "0B449E67836D1913041652",
     "group": "V5_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -15546,11 +15560,9 @@
     "name": "island adventure collapsed hall",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-      "GLOVE"
-    ],
+    "requirements": ["GLOVE"],
     "suppressWarning": ["EnemyTooCloseToEntrance"],
-    "sideviewData": "36600E0803D5D1F073C2A020F115906576C2A0206875D20E4073A831929D611A701A511880306136709173948531A331A3306277D6F0"
+    "sideviewData": "34600D08A02903D4D1F074C2F117906778C2A02ED50D00D4AA2F923BD10B50218132623470307292D20D81309430A12F0AD4D1F0"
   },
   {
     "author": "miralupa",
@@ -15675,7 +15687,7 @@
     "linkedRoomName": null,
     "map": 24,
     "memoryAddress": 70345,
-    "name": "z2oot spirit temple ship room",
+    "name": "z2oot shadow temple ship room",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
@@ -15930,6 +15942,7 @@
     "sideviewData": "2C600708240A2C0AD500407F88F2A13435F480F211F9B1065170B006B10611F931F480F2417DA03485F2D907",
     "bitmask": "0F",
     "requirements": ["FAIRY"],
+    "tags": ["Expert"],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -16614,7 +16627,7 @@
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Updated left dead end drop zone (aaron jam 4_4 P5_M45)",
-    "author": "aaron2u2 / initsu",
+    "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
     "enabled": true,
@@ -16968,7 +16981,7 @@
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Updated right dead end drop zone (aaron jam 4_4 P5_M59)",
-    "author": "aaron2u2 / initsu",
+    "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
     "enabled": true,
@@ -17213,6 +17226,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": ["GLOVE"],
+    "tags": ["Expert"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0B08C70B07725D578575DD",
@@ -18102,7 +18116,7 @@
     "sideviewData": "34600510D500F01F5062546254625462F41F5062546254625463D4051071F25000F11271D200F01F5063556254625462F310D105",
     "hasBoss": false,
     "isBossRoom": false,
-    "name": "aaron jam 4_4 P4_M29 v2 (5)",
+    "name": "aaron's 4-way Lava Elevator Room of Bubbles and Death",
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
@@ -18213,7 +18227,7 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
@@ -18228,6 +18242,7 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["Expert"],
     "suppressWarning": ["SingleFallingBlock"],
     "isDropZone": false,
     "hasItem": false,
@@ -18492,7 +18507,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "033F45",
-    "sideviewData": "1E600F08E100D0805F0A7021D10EDA0F70BC90BB5AA1F3500006010652A1",
+    "sideviewData": "1E600F08E100D0805F0A7021D10EDA0F70BC90BB4AA1F3500006010642A1",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron jam 4_4 GP16",
@@ -20016,7 +20031,7 @@
     "isUpDownReversed": false
   },
   {
-    "name": "z2oot fire temple block building room",
+    "name": "Chadbert's folly (z2oot fire temple block building room)",
     "group": "V5_0",
     "map": 45,
     "enabled": true,
@@ -20456,7 +20471,7 @@
     "sideviewData": "40600E08D208540024C7A040F11E905E5300A0405400A0405400A04024C7A0405300550023C7A040F11E905E5300A0405400A0405400A04024C7A0405400D50E",
     "bitmask": "0F",
     "requirements": [],
-    "tags": ["Expert"],
+    "tags": [],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -20482,7 +20497,7 @@
     "sideviewData": "1F600F08E200DD08F017700F088090A04091565300A04024C7A0405400D50E",
     "bitmask": "0F",
     "requirements": [],
-    "tags": ["Expert"],
+    "tags": [],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -20508,7 +20523,7 @@
     "sideviewData": "1D600E08D208540024C7A040F11790565300A040740F088090A040D10F",
     "bitmask": "0F",
     "requirements": [],
-    "tags": ["Expert"],
+    "tags": [],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -20629,81 +20644,82 @@
     "suppressWarning": []
   },
   {
-  "bitmask": "0F",
-  "map": 6,
-  "palaceGroup": null,
-  "memoryAddress": 91512,
-  "connections": "000000FF",
-  "hasDrop": true,
-  "elevatorScreen": 2,
-  "requirements": [],
-  "suppressWarning": ["TilesHeader"],
-  "isDropZone": false,
-  "hasItem": false,
-  "enemies": "071E181C575945",
-  "sideviewData": "2460B60018072D08D180502560C380C1B006B106B106B10693937291D2860208F55CD20F",
-  "hasBoss": false,
-  "isBossRoom": false,
-  "name": "Left T Drop Stairs",
-  "author": "initsu",
-  "group": "V5_0",
-  "isThunderBirdRoom": false,
-  "enabled": true,
-  "isEntrance": false,
-  "palaceNumber": 7,
-  "linkedRoomName": null,
-  "isUpDownReversed": false
+    "bitmask": "0F",
+    "map": 6,
+    "palaceGroup": null,
+    "memoryAddress": 91512,
+    "connections": "000000FF",
+    "hasDrop": true,
+    "elevatorScreen": 2,
+    "requirements": [],
+    "suppressWarning": ["TilesHeader"],
+    "isDropZone": false,
+    "hasItem": false,
+    "enemies": "071E181C575945",
+    "sideviewData": "2460B60018072D08D180502560C380C1B006B106B106B10693937291D2860208F55CD20F",
+    "hasBoss": false,
+    "isBossRoom": false,
+    "name": "Left T Drop Stairs",
+    "author": "initsu",
+    "group": "V5_0",
+    "isThunderBirdRoom": false,
+    "enabled": true,
+    "isEntrance": false,
+    "palaceNumber": 7,
+    "linkedRoomName": null,
+    "isUpDownReversed": false
   },
   {
-  "bitmask": "0F",
-  "map": 6,
-  "palaceGroup": null,
-  "memoryAddress": 91512,
-  "connections": "000000FF",
-  "hasDrop": true,
-  "elevatorScreen": 0,
-  "requirements": [],
-  "isDropZone": false,
-  "hasItem": false,
-  "enemies": "034040",
-  "sideviewData": "24600808102F23F8F4500006B0900106B090D40120F7142F24F7A106A106A106A106D10F",
-  "hasBoss": false,
-  "isBossRoom": false,
-  "name": "Left T Drop Mini",
-  "author": "initsu",
-  "group": "V5_0",
-  "isThunderBirdRoom": false,
-  "enabled": true,
-  "isEntrance": false,
-  "palaceNumber": 7,
-  "linkedRoomName": null,
-  "isUpDownReversed": false
+    "bitmask": "0F",
+    "map": 6,
+    "palaceGroup": null,
+    "memoryAddress": 91512,
+    "connections": "000000FF",
+    "hasDrop": true,
+    "elevatorScreen": 0,
+    "requirements": [],
+    "tags": ["Easy"],
+    "isDropZone": false,
+    "hasItem": false,
+    "enemies": "034040",
+    "sideviewData": "24600808102F23F8F4500006B0900106B090D40120F7142F24F7A106A106A106A106D10F",
+    "hasBoss": false,
+    "isBossRoom": false,
+    "name": "Left T Drop Mini",
+    "author": "initsu",
+    "group": "V5_0",
+    "isThunderBirdRoom": false,
+    "enabled": true,
+    "isEntrance": false,
+    "palaceNumber": 7,
+    "linkedRoomName": null,
+    "isUpDownReversed": false
   },
   {
-  "bitmask": "0F",
-  "map": 6,
-  "palaceGroup": null,
-  "memoryAddress": 91512,
-  "connections": "00000000",
-  "hasDrop": true,
-  "elevatorScreen": 2,
-  "requirements": [],
-  "suppressWarning": ["TilesHeader"],
-  "isDropZone": false,
-  "hasItem": false,
-  "enemies": "073C18484452DD",
-  "sideviewData": "3A60B400170727081608D280702380C1B006B106B106B10632089193D2841207059110F521F36023F15A029120F311F52607D282D2803408D482",
-  "hasBoss": false,
-  "isBossRoom": false,
-  "name": "4-way Drop Stairs",
-  "author": "initsu",
-  "group": "V5_0",
-  "isThunderBirdRoom": false,
-  "enabled": true,
-  "isEntrance": false,
-  "palaceNumber": 7,
-  "linkedRoomName": null,
-  "isUpDownReversed": false
+    "bitmask": "0F",
+    "map": 6,
+    "palaceGroup": null,
+    "memoryAddress": 91512,
+    "connections": "00000000",
+    "hasDrop": true,
+    "elevatorScreen": 2,
+    "requirements": [],
+    "suppressWarning": ["TilesHeader"],
+    "isDropZone": false,
+    "hasItem": false,
+    "enemies": "073C18484452DD",
+    "sideviewData": "3A60B400170727081608D280702380C1B006B106B106B10632089193D2841207059110F521F36023F15A029120F311F52607D282D2803408D482",
+    "hasBoss": false,
+    "isBossRoom": false,
+    "name": "4-way Drop Stairs",
+    "author": "initsu",
+    "group": "V5_0",
+    "isThunderBirdRoom": false,
+    "enabled": true,
+    "isEntrance": false,
+    "palaceNumber": 7,
+    "linkedRoomName": null,
+    "isUpDownReversed": false
   },
   {
     "author": "miralupa",
@@ -20830,7 +20846,7 @@
     "requirements": ["GLOVE"],
     "sideviewData": "2E600F08E200D70EF05000060106D30012D9113040307030A03021D831305030803041D651D1903061D444004500"
   },
-    {
+  {
     "author": "ellendar",
     "bitmask": "0F",
     "connections": "FF0000FF",
@@ -20855,7 +20871,7 @@
     "requirements": [],
     "sideviewData": "16600D08D00FE100D50D70F5B025C025F25000F1D40F"
   },
-      {
+  {
     "author": "ellendar",
     "bitmask": "0F",
     "connections": "FF0000FF",
@@ -21065,7 +21081,7 @@
     "enabled": true,
     "connections": "FF00FFFF",
     "enemies": "091A597258709830C5",
-    "sideviewData": "2D600F08D70EF05080F1A221D1005045602B410F0333C1562F220028006327722783059771727290715109D10F",
+    "sideviewData": "2F600F08D70EF05080F1A221D100605152456029410F0333C1542F220028006327722783059771727290715109D10F",
     "bitmask": "0F",
     "requirements": [],
     "hasItem": true,

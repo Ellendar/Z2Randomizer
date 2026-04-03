@@ -6,7 +6,8 @@ namespace Z2Randomizer.RandomizerCore;
 
 internal static class ListExtensions
 {
-    //TODO: .NET8 now has a native Random.Shuffle we should use for this.
+    //.NET8 now has a native Random.Shuffle we should use for this.
+    //...Except it only works for arrays and spans but not lists, so this is still the most performant option.
     public static void FisherYatesShuffle<T>(this List<T> list, Random RNG)
     {
         for (int iteratedIndex = list.Count - 1; iteratedIndex > 0; --iteratedIndex)

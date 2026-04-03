@@ -23,7 +23,7 @@ public abstract class PalaceGenerator
         if (palaceNumber < 7)
         {
             //Short normal palace should always be safe regardless of which palace set is being used
-            if (props.ShortenNormalPalaces)
+            if (props.PalaceLengths[palaceNumber - 1] < 22) // may need to be adjusted
             {
                 return true;
             }
@@ -37,7 +37,7 @@ public abstract class PalaceGenerator
         else
         {
             //Short GP is ok with any 2 groups
-            if (props.ShortenGP)
+            if (props.PalaceLengths[6] < 35) // may need to be adjusted
             {
                 if(props.AllowV4Rooms && props.AllowV5_0Rooms
                     || props.AllowV5_0Rooms && props.AllowVanillaRooms
@@ -57,28 +57,7 @@ public abstract class PalaceGenerator
                     return true;
                 }
             }
-        }
-        return true;
-    }
-
-    protected static void RemoveDuplicatesFromPool(RandomizerProperties props, ICollection<Room> rooms, Room roomThatWasUsed)
-    {
-        if (props.NoDuplicateRoomsBySideview)
-        {
-            var sideviewBytes = roomThatWasUsed.SideView;
-            if (rooms is List<Room> list)
-            {
-                list.RemoveAll(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
-            }
-            else if (rooms is HashSet<Room> set)
-            {
-                set.RemoveWhere(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
-            }
-            else { throw new NotImplementedException(); }
-        }
-        else if (props.NoDuplicateRooms)
-        {
-            rooms.Remove(roomThatWasUsed);
+            return false;
         }
     }
 
@@ -89,7 +68,10 @@ public abstract class PalaceGenerator
         {
             case PalaceStyle.VANILLA:
             case PalaceStyle.SHUFFLED:
+            case PalaceStyle.TOWER:
+            case PalaceStyle.SEQUENTIAL:
             case PalaceStyle.RANDOM_WALK: // not implemented
+            case PalaceStyle.VANILLA_WEIGHTED: // based on Random Walk
                 return;
         }
         if (!AllowDuplicatePrevention(props, palace.Number)) { return; }
@@ -103,7 +85,7 @@ public abstract class PalaceGenerator
                 if (room.HasItem) { continue; }
                 if (room.LinkedRoom != null) { continue; }
                 var sideviewBytes = room.SideView;
-                Debug.Assert(!usedRoomVariants.Contains(sideviewBytes));
+                //Debug.Assert(!usedRoomVariants.Contains(sideviewBytes));
                 usedRoomVariants.Add(sideviewBytes);
             }
         }
