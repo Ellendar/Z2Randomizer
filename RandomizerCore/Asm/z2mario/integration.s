@@ -18,7 +18,7 @@ FREE "PRG0" [$9815, $9925)
 ; .org (($10ea - $10) .mod $4000) + $8000
 ; .byte $17
 
-.segment "PRG0", "PRG7"
+.segment "PRG7"
 SpellCastingRoutine = $8DC3 ; Link Main
 .org $D3EC ; patches the main sideview routine right before checking marios code
   jsr SwapMarioCHRBanks
@@ -39,6 +39,12 @@ BankSwitchMarioCHR:
     ; nop
     lda PlayerChrBank
     sta SpChrBank0Reg + 0
+    lda boss_animation ; if we are running the custom shadow mario boss
+    ; also switch out the other sprite bank
+    beq @noboss
+      lda boss_ChrBank
+      sta SpChrBank0Reg + 3
+  @noboss:
     lda CurrentCHRBank ; we need to write a BG bank register due to MMC5 jank
     sta BgChrBank0Reg
     lda #0
@@ -46,6 +52,7 @@ BankSwitchMarioCHR:
   +
   rts
 
+.segment "PRG0", "PRG7"
 ; patch the link draw on lives screen to set the y hi position properly
 .org $c3fb
   sta Player_X_Position ; Use the regular X position instead of the "screen" version
@@ -80,6 +87,7 @@ PatchLinkLivesScreenDraw:
 .reloc
 AlsoResetPlayerSizeOnContinue:
   sta PlayerSize
+  sta boss_animation ; and clear the dark link flag
   sta $075c ; original code
   rts
 
@@ -104,10 +112,16 @@ SetHurtMetasprite:
 PatchLinkDeathSprite:
   lda #METASPRITE_SMALL_MARIO_DEATH
   sta ObjectMetasprite
+  lda #0
+  sta boss_animation
   lda #$0b ; player death subroutine
   sta GameEngineSubroutine
   jsr PlayerGfxHandler
   inc ReloadCHRBank
+  ; Swap the vanilla CHR bank back in to reset the dark link graphics
+  lda $076E ; Vanilla CHR Bank we are using
+.import SwapCHR
+  jsr SwapCHR
   jmp BankSwitchMarioCHR
 
 .org $8fe3
@@ -196,6 +210,15 @@ PatchLinkDrawRoutine:
       inc ReloadCHRBank
     +
 @skipplayer:
+  ; Check if we are rendering the Mario Boss
+  ldx boss_animation
+  beq @noboss
+    ldy #1
+    lda #2
+    sta SprObject_SprAttrib,y
+    jsr DrawMetasprite
+    ; TODO draw boss spawned objects here
+@noboss:
   ; While we are here, lets draw the fireball/hammer sprites too
   ldy #ProjectileOffset
   sty $02

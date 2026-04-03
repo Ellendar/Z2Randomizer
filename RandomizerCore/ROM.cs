@@ -1914,8 +1914,6 @@ FREE_UNTIL $e54f
 .include "z2r.inc"
 .import SwapCHR
 
-EnemyFacingDirection = $DC91
-
 .segment "PRG7"
 
 ; Patch the start of the sideview initialization to check if the enemy is loaded in the first screen

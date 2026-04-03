@@ -128,8 +128,10 @@ MulHiReg = $5206
 NewSideviewInit = $8cec
 ClearNametables = $d266
 JumpEngine = $d385
+EnemyFacingDirection = $DC91
 LoadPlayerShieldCollisionBox = $e9d8
 ObjectCollisionCheck = $e9f9
+MoveEnemyHorizontally = $deb8
 
 ; These are new variables that use free memory
 Z2Noise_SfxLenCounter = $07f5
@@ -147,6 +149,18 @@ NoiseSoundQueue = $f0
 Square2SoundQueue = $f1
 Square1SoundQueue = $f2
 
+ProjectileYPosition = $30
+ProjectileXVelocity = $77
+ProjectileType      = $87
+EnemyType           = $a1
+Enemy_Flag = ProjectileType
+LinkXPosition       = $4d
+EnemyXPositionLo    = $4e
+EnemyXPositionHi    = $3c
+Enemy_HP            = $c2
+RNG                 = $051b
+ProjectileEnemyData = $07c0
+EnemyYVelocity = $057e
 
 ;; NEW VARIABLE ALLOCATIONS
 ; Stack RAM
@@ -254,7 +268,7 @@ RESV StarInvincibleTimer
 ALL_TIMER_COUNT = StarInvincibleTimer - Timers
 
 RESV SpriteShuffleOffset
-RESV CurrentCHRBank
+;RESV CurrentCHRBank
 RESV PlayerChrBank
 RESV ReloadCHRBank
 RESV ObjectVerticalFlip
@@ -274,6 +288,23 @@ RESV NoiseSoundBuffer
 RESV Squ1_SfxLenCounter
 RESV Squ2_SfxLenCounter
 RESV Noise_SfxLenCounter
+
+; Shadow Mario Boss RAM
+CUSTOM_BOSS_START = RES_OFFSET
+RESV boss_animation
+RESV boss_invincibility_timer
+RESV boss_screech
+RESV boss_state
+RESV boss_state_timer
+RESV boss_walking_anim
+RESV boss_bridge
+RESV boss_shootanim
+RESV boss_substate
+RESV boss_counter
+RESV boss_freeze
+RESV boss_ChrBank
+BOSS_RAM_SIZE = RES_OFFSET - CUSTOM_BOSS_START - 1
+;RESV BowserHitPoints
 
 ; MARIO SPECIFIC RAM LOCATIONS
 ; These are values that are hardcoded to match where Zelda 2 places them
@@ -304,13 +335,26 @@ Fireball_Y_Speed = SprObject_Y_Speed + FireballOffset
 RESV FireballBouncingFlag, 2
 RESV Fireball_State, 2
 
+EnemyOffset = 1   ; Enemy slot 0 = offset 1 from player
+Enemy_X_Position  = SprObject_X_Position + EnemyOffset
+Enemy_Y_Position  = SprObject_Y_Position + EnemyOffset
+Enemy_X_Speed     = SprObject_X_Speed + EnemyOffset
+Enemy_PageLoc     = SprObject_PageLoc + EnemyOffset
+Enemy_Y_HighPos   = SprObject_Y_HighPos + EnemyOffset
+Enemy_MovingDir   = Player_MovingDir + EnemyOffset
+Enemy_State       = $A8
+
+
 ; For reasons I cannot explain, player_x_moveforce is not the same as sprobject_x_moveforce
 SprObject_X_MoveForce = $03d6 ; Player_X_MoveForce
 Player_Y_MoveForce = $03e6
 SprObject_Y_MoveForce = Player_Y_MoveForce
+Enemy_X_MoveForce = SprObject_X_MoveForce + EnemyOffset
+Enemy_Y_MoveForce = SprObject_Y_MoveForce + EnemyOffset
 
 Player_Y_Speed = $057D
 SprObject_Y_Speed = Player_Y_Speed
+Enemy_Y_Speed     = SprObject_Y_Speed + EnemyOffset
 
 FrameCounter = $12
 ; CrouchingFlag = $17
@@ -401,7 +445,7 @@ DeathMusic            = %00000001
 
 .endif ; ENABLE_Z2_MARIO
 
-.assert RES_BASE + RES_OFFSET < $01ad
+.assert RES_BASE + RES_OFFSET < $01bd
 
 
 RelocatedRAMBase = $041A
@@ -520,6 +564,18 @@ Fireball_SprAttrib = SprObject_SprAttrib + FireballOffset
 ;Fireball_FacingDir = PlayerFacingDir + FireballOffset
 
 RESV Player_YMoveForceFractional, 16
+
+; Enemy-specific arrays (6 slots each: boss=0, enemies 1-5)
+; RESV Enemy_ID, 6
+; RESV Enemy_State, 6
+; RESV Enemy_Flag, 6
+; RESV Enemy_BoundBoxCtrl, 6
+; RESV Enemy_CollisionBits, 6
+; RESV Enemy_SprDataOffset, 6
+; RESV Enemy_Rel_XPos, 6
+; RESV Enemy_Rel_YPos, 6
+; RESV bbSpeed, 6              ; Bullet bill speed per slot
+; Enemy_SprAttrib = SprObject_SprAttrib + EnemyOffset
 
 ClearSRAMEnd = RES_OFFSET
 

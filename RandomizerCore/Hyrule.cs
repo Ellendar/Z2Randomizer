@@ -3805,7 +3805,7 @@ bank5_Pointer_table_for_End_Credits:
     private void MarioModeActivate(Assembler asm)
     {
         // "metasprite_engine.s" is included in metasprite.s
-        string[] modules = ["integration.s", "map.s", "mario.s", "metasprite.s", "sfx.s"];
+        string[] modules = ["boss.s", "integration.s", "map.s", "mario.s", "metasprite.s", "sfx.s"];
         foreach (var mod in modules)
         {
             var a = asm.Module();
