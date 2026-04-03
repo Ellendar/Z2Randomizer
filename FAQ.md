@@ -9,9 +9,10 @@ If you have issues you can't resolve with windows defender, let us know in the d
 
 ### I use a non-Windows operating system. Can I still use the randomizer?
 
-Yes! There are a couple available options:
+Yes! There are a few available options:
 
 - A web version is available at https://z2r.app/ . It should generate identically to the desktop version, and work on any major browser.
+- Ubuntu and MacOS versions are available on the [releases page](https://github.com/Ellendar/Z2Randomizer/releases)
 - Build the randomizer from source for your platform. See the instructions [here](https://github.com/Ellendar/Z2Randomizer/wiki/Building-From-Source)
 
 ### Right after installing, I'm getting a correct hash but incorrect seed. What's up?
