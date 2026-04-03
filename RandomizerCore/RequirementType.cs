@@ -35,6 +35,33 @@ public enum RequirementType
 
 public static class RequirementTypeExtensions
 {
+    /// Mirror of Collectable.AsRequirement()
+    public static Collectable? AsCollectable(this RequirementType requirementType)
+    {
+        return requirementType switch
+        {
+            RequirementType.JUMP => Collectable.JUMP_SPELL,
+            RequirementType.FAIRY => Collectable.FAIRY_SPELL,
+            RequirementType.UPSTAB => Collectable.UPSTAB,
+            RequirementType.DOWNSTAB => Collectable.DOWNSTAB,
+            RequirementType.KEY => Collectable.MAGIC_KEY,
+            RequirementType.DASH => Collectable.DASH_SPELL,
+            RequirementType.GLOVE => Collectable.GLOVE,
+            RequirementType.REFLECT => Collectable.REFLECT_SPELL,
+            RequirementType.SPELL => Collectable.SPELL_SPELL,
+            RequirementType.TROPHY => Collectable.TROPHY,
+            RequirementType.MEDICINE => Collectable.MEDICINE,
+            RequirementType.CHILD => Collectable.CHILD,
+            RequirementType.MIRROR => Collectable.MIRROR,
+            RequirementType.WATER => Collectable.WATER,
+            RequirementType.FLUTE => Collectable.FLUTE,
+            RequirementType.HAMMER => Collectable.HAMMER,
+            RequirementType.BOOTS => Collectable.BOOTS,
+            RequirementType.BAGU_LETTER => Collectable.BAGUS_NOTE,
+            _ => null
+        };
+    }
+
     public static RequirementType[] UpToXContainers(int x)
     {
         List<RequirementType> requirements = [];
@@ -71,5 +98,28 @@ public static class RequirementTypeExtensions
             requirements.Add(RequirementType.EIGHT_CONTAINERS);
         }
         return requirements.ToArray();
+    }
+
+    public static RequirementType MagicContainerRequirementFromCost(int magicCost)
+    {
+        switch (magicCost)
+        {
+            case <= 16:
+                return RequirementType.ONE_CONTAINER;
+            case <= 32:
+                return RequirementType.TWO_CONTAINERS;
+            case <= 48:
+                return RequirementType.THREE_CONTAINERS;
+            case <= 64:
+                return RequirementType.FOUR_CONTAINERS;
+            case <= 80:
+                return RequirementType.FIVE_CONTAINERS;
+            case <= 96:
+                return RequirementType.SIX_CONTAINERS;
+            case <= 112:
+                return RequirementType.SEVEN_CONTAINERS;
+            default:
+                return RequirementType.EIGHT_CONTAINERS;
+        }
     }
 }
