@@ -1657,7 +1657,7 @@ ExPlayerAttr:
 ;       .byte $22, $30, $27, $19 ;luigi's colors
 ;       .byte $22, $37, $27, $16 ;fiery (used by both)
 
-
+.export ImposeGravitySprObj
 ImposeGravitySprObj:
       sta R2             ;set maximum speed here
       lda #$00           ;set value to move downwards

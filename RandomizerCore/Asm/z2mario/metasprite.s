@@ -429,33 +429,57 @@ SetYOffset:
 
   txa
   pha
+  tya
+  pha
     jsr MetaspriteRenderLoop
+  pla
+  tay
   pla
   cmp #LAST_MARIO_METASPRITE
   bcs @exit
+  ; Check if this is the boss
+  cpy #0
+  beq @isplayer
+    ; Rendering dark mario so use the dark mario pattern table
+    ldx CurrentOAMOffset
+    lda #%11000000
+    ora Sprite_Tilenumber - 16,x
+    sta Sprite_Tilenumber - 16,x
+    lda #%11000000
+    ora Sprite_Tilenumber - 12,x
+    sta Sprite_Tilenumber - 12,x
+    lda #%11000000
+    ora Sprite_Tilenumber - 8,x
+    sta Sprite_Tilenumber - 8,x
+    lda #%11000000
+    ora Sprite_Tilenumber - 4,x
+    sta Sprite_Tilenumber - 4,x
+    rts
+  @isplayer:
   ; We are rendering a mario sprite, so check if we are stuck in the mud
   lda $0752
   and #$20
   beq @exit
     ; stuck in the mud, so update bottom two sprite
     ; x = next oam sprite id, so we can offset by 8 to hit bottom two sprites
+    ldx CurrentOAMOffset
     ; if we are small then its the most recent two sprites. if we are big then its 4 sprites back
     lda PlayerSize
     beq + ; If we are large
-      lda $0202 - 8, x
+      lda Sprite_Attributes - 8, x
       ora #$20
-      sta $0202 - 8, x
-      lda $0202 - 4, x
+      sta Sprite_Attributes - 8, x
+      lda Sprite_Attributes - 4, x
       ora #$20
-      sta $0202 - 4, x
+      sta Sprite_Attributes - 4, x
       rts
     +
-      lda $0202 - 16, x
+      lda Sprite_Attributes - 16, x
       ora #$20
-      sta $0202 - 16, x
-      lda $0202 - 12, x
+      sta Sprite_Attributes - 16, x
+      lda Sprite_Attributes - 12, x
       ora #$20
-      sta $0202 - 12, x
+      sta Sprite_Attributes - 12, x
 @exit:
   rts
 

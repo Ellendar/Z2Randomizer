@@ -534,9 +534,9 @@ SwapCHR:
     adc #1
     sta SpChrBank4Reg
     sta BgChrBank0Reg
-.ifdef ENABLE_Z2_MARIO
-    sta CurrentCHRBank ; Store a copy of the latest BG bank for use in z2mario
-.endif
+;.ifdef ENABLE_Z2_MARIO
+;    sta CurrentCHRBank ; Store a copy of the latest BG bank for use in z2mario
+;.endif
     adc #1
     sta SpChrBank5Reg
     sta BgChrBank1Reg
