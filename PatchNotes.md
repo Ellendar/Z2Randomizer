@@ -1,6 +1,6 @@
 # Z2Randomizer Changelog
 
-## Version 5.1.0 - ???
+## Version 5.1.0 - April 4, 2026
 
 ### New Features
 - New palace styles:
