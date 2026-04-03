@@ -16,7 +16,7 @@ Yes! There are a couple available options:
 
 ### Right after installing, I'm getting a correct hash but incorrect seed. What's up?
 
-Sometimes after installing, if you had to download the .NET8 runtimes, the wrong runtimes will be used by the application, potentially resulting in different randomness.
+Sometimes after installing, if you had to download the .NET runtimes, the wrong runtimes will be used by the application, potentially resulting in different randomness.
 Restarting your computer will correct this.
 
 ### I found a bug / crash / uncompleteable seed. What should I do?
