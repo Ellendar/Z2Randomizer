@@ -249,8 +249,8 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork (Beta)"
-        "ProductCode" = "8:{BFE21B84-026A-46EB-9B6D-06C080530CDB}"
-        "PackageCode" = "8:{5A360DF7-8594-41C1-AC87-A6D2723623C0}"
+        "ProductCode" = "8:{D1414E41-5EEF-46B3-AF72-29332174FAAA}"
+        "PackageCode" = "8:{FC47439F-0254-4E67-B70D-1CA5D6D1682D}"
         "UpgradeCode" = "8:{209F931F-26E9-4B9A-8E2C-82F66B495079}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
