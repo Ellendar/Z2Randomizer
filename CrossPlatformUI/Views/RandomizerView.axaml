@@ -193,7 +193,7 @@
                 <tabs:LevelsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Spells">
-                <tabs:SpellsView DataContext="{Binding Main}"/>
+                <tabs:SpellsView DataContext="{Binding SpellsViewModel}"/>
             </TabItem>
             <TabItem Header="Enemies">
                 <tabs:EnemiesView DataContext="{Binding Main}"/>
