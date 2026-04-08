@@ -6,42 +6,43 @@
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
-             x:DataType="vm:MainViewModel"
-             x:Class="CrossPlatformUI.Views.Tabs.SpellsView">
+             x:Class="CrossPlatformUI.Views.Tabs.SpellsView"
+             x:DataType="vmt:SpellsViewModel">
     <Grid ColumnDefinitions="*, *">
         <StackPanel Grid.Column="0">
             <CheckBox
-                IsChecked="{Binding Config.ShuffleLifeRefillAmount}"
+                IsChecked="{Binding Main.Config.ShuffleLifeRefillAmount}"
                 Content="Shuffle Life Refill Amount"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleLifeRefillAmountToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
-                IsChecked="{Binding Config.ShuffleSpellLocations}"
+                IsChecked="{Binding Main.Config.ShuffleSpellLocations}"
                 Content="Shuffle Spell Locations"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleSpellLocationsToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
-                IsChecked="{Binding Config.DisableMagicContainerRequirements}"
+                IsChecked="{Binding Main.Config.DisableMagicContainerRequirements}"
                 Content="Disable Magic Container Requirements"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DisableMagicContainerRequirementsToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
-                IsChecked="{Binding Config.RandomizeSpellSpellEnemy}"
+                IsChecked="{Binding Main.Config.RandomizeSpellSpellEnemy}"
                 Content="Randomize Spell Spell Enemy"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RandomizeSpellSpellEnemyToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
-                IsChecked="{Binding Config.SwapUpAndDownStab}"
+                IsChecked="{Binding Main.Config.SwapUpAndDownStab}"
                 Content="Swap Upstab and Downstab Location"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.SwapUpstabandDownstabLocationToolTip}"/></ToolTip.Tip>
@@ -50,26 +51,26 @@
                 Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Fire Spell"
                 ItemsSource="{Binding Source={x:Static rc:Enums.FireOptionList}}"
-                SelectedItem="{Binding Config.FireOption, Converter={x:Static ui:Util.EnumConvert}}"
+                SelectedItem="{Binding Main.Config.FireOption, Converter={x:Static ui:Util.EnumConvert}}"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.FireSpellToolTip}"/></ToolTip.Tip>
             </ComboBox>
         </StackPanel>
         <StackPanel Grid.Column="1">
             <CheckBox
-                IsChecked="{Binding Config.JumpAlwaysOn}"
+                IsChecked="{Binding Main.Config.JumpAlwaysOn}"
                 Content="Jump Always On"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.JumpAlwaysOnToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
-                IsChecked="{Binding Config.DashAlwaysOn}"
+                IsChecked="{Binding Main.Config.DashAlwaysOn}"
                 Content="Dash Always On"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DashAlwaysOnToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
-                IsChecked="{Binding Config.PermanentBeamSword}"
+                IsChecked="{Binding Main.Config.PermanentBeamSword}"
                 Content="Permanent Beam Sword"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.PermanentBeamSwordToolTip}"/></ToolTip.Tip>
