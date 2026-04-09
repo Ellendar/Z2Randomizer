@@ -247,40 +247,40 @@ public static class Climates
     );
 
     private static readonly Climate GREAT_LAKES = new(
-        "GreatLakes",
-        //Size
-        new Dictionary<Terrain, float>
-        {
+       "GreatLakes",
+       //Size
+       new Dictionary<Terrain, float>
+       {
             { Terrain.DESERT, .5f },
-            { Terrain.GRASS, 1 },
+            { Terrain.GRASS, 1.5f },
             { Terrain.FOREST, 1.5f },
             { Terrain.SWAMP, .75f },
             { Terrain.GRAVE, 1 },
             { Terrain.LAVA, 1 },
-            { Terrain.WALKABLEWATER, 5 },
+            { Terrain.WALKABLEWATER, 2.5f },
             { Terrain.PREPLACED_WATER_WALKABLE, 1.5f },
             { Terrain.PREPLACED_WATER, 1.5f },
-            { Terrain.WATER, 5 },
+            { Terrain.WATER, 2.5f },
             { Terrain.MOUNTAIN, .75f },
             { Terrain.ROAD, 1 }
-        },
-        //Frequency
-        new TableWeightedRandom<Terrain>([
-            ( Terrain.DESERT, 0 ),
-            ( Terrain.GRASS, 2 ),
-            ( Terrain.FOREST, 2 ),
-            ( Terrain.SWAMP, 2 ),
-            ( Terrain.GRAVE, 2 ),
-            ( Terrain.LAVA, 2 ),
-            ( Terrain.WALKABLEWATER, 2 ),
-            ( Terrain.WATER, 2 ),
-            ( Terrain.MOUNTAIN, 2 ),
-            ( Terrain.ROAD, 3 ),
-        ]),
-        30,
-        ClimateEnum.GREAT_LAKES
-    );
-    
+       },
+       //Frequency
+       new TableWeightedRandom<Terrain>([
+           ( Terrain.DESERT, 0 ),
+            ( Terrain.GRASS, 4 ),
+            ( Terrain.FOREST, 4 ),
+            ( Terrain.SWAMP, 4 ),
+            ( Terrain.GRAVE, 3 ),
+            ( Terrain.LAVA, 3 ),
+            ( Terrain.WALKABLEWATER, 1 ),
+            ( Terrain.WATER, 1 ),
+            ( Terrain.MOUNTAIN, 4 ),
+            ( Terrain.ROAD, 5 ),
+       ]),
+       30,
+       ClimateEnum.GREAT_LAKES
+   );
+
     public static Climate Create(ClimateEnum climate)
     {
         return climate switch

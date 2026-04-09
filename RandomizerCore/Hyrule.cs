@@ -524,7 +524,7 @@ public class Hyrule
                     z2Hash[i] = 0xF1;
                 }
             }
-            //(0xD0), 0x36);
+
             ROMData.Put(0x17C2C, z2Hash);
             Hash = Util.FromGameText(z2Hash);
 
