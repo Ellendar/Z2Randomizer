@@ -155,6 +155,7 @@ public class ROM
     public static readonly int[] ZeldaFacePaletteAddr =    { 0x4023, 0x8023, 0x14047, 0x140c9 };
     public static readonly int[] ZeldaDressPaletteAddr =   { 0x4024, 0x8024, 0x14048, 0x140c8 };
 
+
     public byte[] rawdata { get; }
 
     public ROM(string filename, bool expandRom = false)
@@ -219,15 +220,6 @@ public class ROM
         return bytes;
     }
 
-    /// <summary>
-    /// Get a byte from the location tables.
-    /// </summary>
-    /// <param name="loc"></param>
-    /// <param name="byteIdx">The byte index for the location, 0-3.</param>
-    /// <returns></returns>
-    public byte GetByte(LocationID loc, int byteIdx = 0)
-        => GetByte(loc.GetRomOffset(byteIdx));
-
     public int GetShort(int indexMsb, int indexLsb)
     {
         return (GetByte(indexMsb) << 8) + GetByte(indexLsb);
@@ -263,15 +255,6 @@ public class ROM
             rawdata[index + i] = data[i];
         }
     }
-
-    /// <summary>
-    /// Write a byte to the location tables.
-    /// </summary>
-    /// <param name="loc"></param>
-    /// <param name="byteIdx">The byte index for the location, 0-3.</param>
-    /// <param name="data"></param>
-    public void Put(LocationID loc, int byteIdx, byte data)
-        => Put(loc.GetRomOffset(byteIdx), data);
 
     public void PutShort(int indexMsb, int indexLsb, int data)
     {
@@ -2284,29 +2267,26 @@ ResetRedPalettePayload:
         return map;
     }
 
-    public List<Location> LoadLocations(LocationID baseLid, int count, SortedDictionary<LocationID, Terrain> Terrains)
+    public List<Location> LoadLocations(int startAddr, int locNum, SortedDictionary<int, Terrain> Terrains, Continent continent)
     {
-        var (continent, locNum) = baseLid.GetIndices();
-        int startAddr = baseLid.GetRomOffset();
         List<Location> locations = [];
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < locNum; i++)
         {
-            LocationID lid = baseLid + i;
-            Terrain terrain = Terrains[lid];
-            var location = LoadLocation(lid, terrain);
+            int addr = startAddr + i;
+            Terrain terrain = Terrains[addr];
+            var location = LoadLocation(addr, terrain, continent);
             locations.Add(location);
         }
         return locations;
     }
 
     /// <summary>
-    /// Loads location bytes from a LocationID, parses it, and
+    /// Loads location bytes from a ROM address, parses it, and
     /// returns a Location object with the parsed data as well as
     /// `terrain` and `continent` set.
     /// </summary>
-    public Location LoadLocation(LocationID lid, Terrain terrain)
+    public Location LoadLocation(int addr, Terrain terrain, Continent continent)
     {
-        int addr = lid.GetRomOffset();
         byte yByte = GetByte(addr);
         byte xByte = GetByte(addr + RomMap.overworldXOffset);
         byte mapByte = GetByte(addr + RomMap.overworldMapOffset);
@@ -2314,10 +2294,11 @@ ResetRedPalettePayload:
         int yPos = yByte & 0x7f;
         int xPos = xByte & 0x3f;
         int map = mapByte & 0x3f;
-        return new Location(lid, yPos, xPos, map, lid.GetContinent())
+        return new Location(yPos, xPos, addr, map, continent)
         {
             ExternalWorld = yByte & 0x80,
-            EntranceNumber = xByte / 0x40,
+            appear2loweruponexit = xByte & 0x80,
+            Secondpartofcave = xByte & 0x40,
             MapPageRaw = mapByte & 0xC0,
             FallInHole = worldByte & 0x80,
             PassThrough = worldByte & 0x40,
@@ -2484,7 +2465,7 @@ ResetRedPalettePayload:
         Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + hiddenKasutoLocation.ExternalWorld));
         Put(0x1dfac, (byte)(hiddenKasutoLocation.Y));
         Put(0x1dfb2, (byte)(hiddenKasutoLocation.Xpos + 1));
-        Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + (hiddenKasutoLocation.EntranceNumber << 6)));
+        Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + hiddenKasutoLocation.Secondpartofcave));
         Put(0x1ccdb, (byte)(hiddenKasutoLocation.YRaw));
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         Put(0x1df77, (byte)connection);

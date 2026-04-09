@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.RandomizerCore;
@@ -26,25 +24,149 @@ class RomMap
     public const int START_HAMMER = 0x17B07;
     public const int START_MAGICAL_KEY = 0x17B08;
 
-    // Base offsets for continent location tables.
-    // Add overworldYOffset et al to these.
-    public const int WEST_LOCATIONS_BASE = 0x462f;
-    public const int DM_LOCATIONS_BASE = 0x610c;
-    public const int EAST_LOCATIONS_BASE = 0x862f;
-    public const int MI_LOCATIONS_BASE = 0xa10c;
+    //Addresses for vanilla locations. These addresses holds Y coordinate
+    //bytes. The X coord bytes are at the same address + 0x3F.
+    public const int WEST_NORTH_PALACE_TILE_LOCATION = 0x462f;
+    public const int WEST_CAVE_TROPHY_TILE_LOCATION = 0x4630;
+    public const int WEST_MINOR_FOREST_TILE_AT_START_LOCATION = 0x4631;
+    public const int WEST_CAVE_MAGIC_CONTAINER_TILE_LOCATION = 0x4632;
+    public const int WEST_MINOR_FOREST_TILE_BY_SARIA_LOCATION = 0x4633;
+    public const int WEST_GRASS_TILE_LOCATION = 0x4634;
+    public const int WEST_BAGU_WOODS_TILE_LOCATION1 = 0x4635;
+    public const int WEST_TRAP_ROAD_TILE_LOCATION = 0x4636;
+    public const int WEST_MINOR_SWAMP_TILE_LOCATION1 = 0x4637;
+    public const int WEST_MINOR_GRAVE_TILE_LOCATION1 = 0x4638; //09: Red jar
+    public const int WEST_CAVE_PARAPA_NORTH_TILE_LOCATION = 0x4639;
+    public const int WEST_CAVE_PARAPA_SOUTH_TILE_LOCATION = 0x463a;
+    public const int WEST_CAVE_JUMP_NORTH_TILE_LOCATION = 0x463b;
+    public const int WEST_CAVE_JUMP_SOUTH_TILE_LOCATION = 0x463c;
+    public const int WEST_CAVE_PBAG_TILE_LOCATION = 0x463d;
+    public const int WEST_CAVE_MEDICINE_TILE_LOCATION = 0x463e;
+    public const int WEST_CAVE_HEART_CONTAINER_TILE_LOCATION = 0x463f;
+    public const int WEST_FAIRY_CAVE_DROP_TILE_LOCATION = 0x4640;
+    public const int WEST_FAIRY_CAVE_EXIT_TILE_LOCATION = 0x4641;
+    public const int WEST_BRIDGE_TILE_NORTH_OF_SARIA_LOCATION = 0x4642;
+    public const int WEST_BRIDGE_TILE_EAST_OF_SARIA_LOCATION = 0x4643;
+    public const int WEST_BRIDGE_AFTER_DM_WEST_LOCATION = 0x4644;
+    public const int WEST_BRIDGE_AFTER_DM_EAST_LOCATION = 0x4645;
+    public const int WEST_MINOR_FOREST_TILE_BY_JUMP_CAVE_LOCATION = 0x4646;
+    public const int WEST_MINOR_SWAMP_TILE_LOCATION2 = 0x4647;
+    public const int WEST_MINOR_FOREST_TILE_EAST_OF_SARIA_LOCATION = 0x4648;
+    public const int WEST_BAGU_WOODS_TILE_LOCATION2 = 0x4649;
+    public const int WEST_BAGU_WOODS_TILE_LOCATION3 = 0x464a;
+    public const int WEST_BAGU_WOODS_TILE_LOCATION4 = 0x464b;
+    public const int WEST_BAGU_WOODS_TILE_LOCATION5 = 0x464c;
+    public const int WEST_MINOR_ROAD_TILE_LOCATION = 0x464d;
+    public const int WEST_MINOR_DESERT_TILE_LOCATION = 0x464f;
+    public const int WEST_KINGS_TOMB_TILE_LOCATION = 0x465b;
+    public const int WEST_TOWN_RAURO_TILE_LOCATION = 0x465c;
+    public const int WEST_TOWN_RUTO_TILE_LOCATION = 0x465e;
+    public const int WEST_TOWN_SARIA_SOUTH_TILE_LOCATION = 0x465f;
+    public const int WEST_TOWN_SARIA_NORTH_TILE_LOCATION = 0x4660;
+    public const int WEST_BAGU_HOUSE_TILE_LOCATION = 0x4661;
+    public const int WEST_TOWN_MIDO_TILE_LOCATION = 0x4662;
+    public const int WEST_PALACE1_TILE_LOCATION = 0x4663;
+    public const int WEST_PALACE2_TILE_LOCATION = 0x4664;
+    public const int WEST_PALACE3_TILE_LOCATION = 0x4665;
 
-    public static readonly int[] ContinentLocationBaseArray = [
-        WEST_LOCATIONS_BASE,
-        DM_LOCATIONS_BASE,
-        EAST_LOCATIONS_BASE,
-        MI_LOCATIONS_BASE,
-    ];
+    public const int DM_CAVE1A_TILE_LOCATION = 0x610C; // DM map 0
+    public const int DM_CAVE1B_TILE_LOCATION = 0x610D;
+    public const int DM_CAVE2A_TILE_LOCATION = 0x610E;
+    public const int DM_CAVE2B_TILE_LOCATION = 0x610F;
+    public const int DM_CAVE3A_TILE_LOCATION = 0x6110;
+    public const int DM_CAVE3B_TILE_LOCATION = 0x6111;
+    public const int DM_CAVE4A_TILE_LOCATION = 0x6112;
+    public const int DM_CAVE4B_TILE_LOCATION = 0x6113;
+    public const int DM_CAVE5A_TILE_LOCATION = 0x6114;
+    public const int DM_CAVE5B_TILE_LOCATION = 0x6115;
+    public const int DM_CAVE6A_TILE_LOCATION = 0x6116;
+    public const int DM_CAVE6B_TILE_LOCATION = 0x6117;
+    public const int DM_CAVE7A_TILE_LOCATION = 0x6118;
+    public const int DM_CAVE7B_TILE_LOCATION = 0x6119;
+    public const int DM_CAVE8A_TILE_LOCATION = 0x611A;
+    public const int DM_CAVE8B_TILE_LOCATION = 0x611B;
+    public const int DM_CAVE9A_TILE_LOCATION = 0x611C;
+    public const int DM_CAVE9B_TILE_LOCATION = 0x611D;
+    public const int DM_CAVE10A_TILE_LOCATION = 0x611E;
+    public const int DM_CAVE10B_TILE_LOCATION = 0x611F;
+    public const int DM_CAVE11A_TILE_LOCATION = 0x6120;
+    public const int DM_CAVE11B_TILE_LOCATION = 0x6121;
+    public const int DM_CAVE12A_TILE_LOCATION = 0x6122;
+    public const int DM_CAVE12B_TILE_LOCATION = 0x6123;
+    public const int DM_CAVE13A_TILE_LOCATION = 0x6124;
+    public const int DM_CAVE13B_TILE_LOCATION = 0x6125;
+    public const int DM_CAVE14A_TILE_LOCATION = 0x6126;
+    public const int DM_CAVE14B_TILE_LOCATION = 0x6127;
+    public const int DM_HAMMER_CAVE_TILE_LOCATION = 0x6128;
+    public const int DM_CAVE4WAY1A_TILE_LOCATION = 0x6129;
+    public const int DM_CAVE4WAY1B_TILE_LOCATION = 0x612A;
+    public const int DM_CAVE4WAY1C_TILE_LOCATION = 0x612B;
+    public const int DM_CAVE4WAY1D_TILE_LOCATION = 0x612C;
+    public const int DM_CAVE4WAY2A_TILE_LOCATION = 0x612D;
+    public const int DM_CAVE4WAY2B_TILE_LOCATION = 0x612E;
+    public const int DM_CAVE4WAY2C_TILE_LOCATION = 0x612F;
+    public const int DM_CAVE4WAY2D_TILE_LOCATION = 0x6130;
+    public const int DM_CONTINENT_CONNECTOR1_TILE_LOCATION = 0x6136;
+    public const int DM_CONTINENT_CONNECTOR2_TILE_LOCATION = 0x6137;
+    public const int DM_SPEC_ROCK_TILE_LOCATION = 0x6144;
 
-    public static readonly IReadOnlyDictionary<Continent, int> ContinentLocationBases = Enum.GetValues<Continent>()
-        .ToDictionary(c => c, c => ContinentLocationBaseArray[(int)c]);
+    public const int EAST_MINOR_FOREST_TILE_BY_NABOORU_LOCATION = 0x862f;
+    public const int EAST_MINOR_FOREST_TILE_BY_P6_LOCATION = 0x8630;
+    public const int EAST_TRAP_ROAD_TILE_LOCATION1 = 0x8631;
+    public const int EAST_TRAP_ROAD_TILE_LOCATION2 = 0x8632;
+    public const int EAST_TRAP_ROAD_TILE_LOCATION3 = 0x8633;
+    public const int EAST_TRAP_ROAD_TILE_TO_VOD_LOCATION = 0x8634;
+    public const int EAST_BRIDGE_TILE_TO_P6_LOCATION = 0x8635;
+    public const int EAST_BRIDGE_TILE_TO_KASUTO_LOCATION = 0x8636;
+    public const int EAST_TRAP_DESERT_TILE_LOCATION1 = 0x8637;
+    public const int EAST_TRAP_DESERT_TILE_LOCATION2 = 0x8638;
+    public const int EAST_WATER_TILE_LOCATION = 0x8639;
+    public const int EAST_CAVE_NABOORU_PASSTHROUGH_SOUTH_LOCATION = 0x863a;
+    public const int EAST_CAVE_NABOORU_PASSTHROUGH_NORTH_LOCATION = 0x863b;
+    public const int EAST_CAVE_PBAG1_LOCATION = 0x863c;
+    public const int EAST_CAVE_PBAG2_LOCATION = 0x863d;
+    public const int EAST_CAVE_NEW_KASUTO_PASSTHROUGH_WEST_LOCATION = 0x863e;
+    public const int EAST_CAVE_NEW_KASUTO_PASSTHROUGH_EAST_LOCATION = 0x863f;
+    public const int EAST_CAVE_VOD_PASSTHROUGH2_START_LOCATION = 0x8640;
+    public const int EAST_CAVE_VOD_PASSTHROUGH2_END_LOCATION = 0x8641;
+    public const int EAST_CAVE_VOD_PASSTHROUGH1_END_LOCATION = 0x8642;
+    public const int EAST_CAVE_VOD_PASSTHROUGH1_START_LOCATION = 0x8643;
+    public const int EAST_MINOR_SWAMP_TILE_LOCATION = 0x8644;
+    public const int EAST_BUGGED_MINOR_LAVA_TILE_LOCATION = 0x8645; // in vanilla this is hidden behind another tile
+    public const int EAST_MINOR_DESERT_TILE_LOCATION1 = 0x8646;
+    public const int EAST_MINOR_DESERT_TILE_LOCATION2 = 0x8647;
+    public const int EAST_MINOR_DESERT_TILE_LOCATION3 = 0x8648;
+    public const int EAST_DESERT_TILE_LOCATION = 0x8649;
+    public const int EAST_MINOR_FOREST_TILE_LOCATION2 = 0x864a;
+    public const int EAST_MINOR_LAVA_TILE_LOCATION1 = 0x864b;
+    public const int EAST_MINOR_LAVA_TILE_LOCATION2 = 0x864c;
+    public const int EAST_TRAP_LAVA_TILE_LOCATION1 = 0x864d;
+    public const int EAST_TRAP_LAVA_TILE_LOCATION2 = 0x864e;
+    public const int EAST_TRAP_LAVA_TILE_LOCATION3 = 0x864f;
+    public const int EAST_BRIDGE_TILE_TO_MI_LOCATION = 0x8657;
+    public const int EAST_RAFT_TILE_TO_WEST_LOCATION = 0x8658;
+    public const int EAST_TOWN_OF_NABOORU_TILE_LOCATION = 0x865c;
+    public const int EAST_TOWN_OF_DARUNIA_TILE_LOCATION = 0x865e;
+    public const int EAST_TOWN_OF_NEW_KASUTO_TILE_LOCATION = 0x8660;
+    public const int EAST_TOWN_OF_OLD_KASUTO_TILE_LOCATION = 0x8662;
+    public const int EAST_PALACE5_TILE_LOCATION = 0x8663;
+    public const int EAST_PALACE6_TILE_LOCATION = 0x8664;
+    public const int EAST_GREAT_PALACE_TILE_LOCATION = 0x8665;
+
+    public const int MI_UNUSED_INDEX0_TILE = 0xA10c;
+    public const int MI_TRAP_TILE1 = 0xA131;
+    public const int MI_TRAP_TILE2 = 0xA132;
+    public const int MI_MAGIC_CONTAINER_DROP_TILE = 0xA133;
+    public const int MI_CONNECTOR_BRIDGE_TILE = 0xA134;
+    public const int MI_PALACE_TILE = 0xA140;
+    public const int MI_CHILD_DROP_TILE = 0xA143;
+    public const int MI_TRAP_TILE3 = 0xA145;
+    public const int MI_TRAP_TILE4 = 0xA146;
+    public const int MI_TRAP_TILE5 = 0xA147;
+    public const int MI_TRAP_TILE6 = 0xA148;
+    public const int MI_TRAP_TILE7 = 0xA149;
 
     //Overworld data
-    public const int overworldYOffset = 0;
     public const int overworldXOffset = 0x3F;
     public const int overworldMapOffset = 0x7E;
     public const int overworldWorldOffset = 0xBD;

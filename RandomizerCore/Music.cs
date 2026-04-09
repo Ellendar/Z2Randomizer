@@ -352,7 +352,7 @@ internal class MusicRandomizer
                 }
                 else if (loc.TerrainType == Terrain.PALACE)
                 {
-                    if (loc.PalaceNumber == 0)
+                    if (loc.PalaceNumber == null)
                         continue; // North palace
 
                     usage = (loc.PalaceNumber < 7)
