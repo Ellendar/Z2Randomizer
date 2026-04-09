@@ -15,19 +15,19 @@ sealed class MazeIsland : World
     public static readonly int[] OverworldSmallEnemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x16];
     public static readonly int[] OverworldLargeEnemies = [0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
 
-    private readonly SortedDictionary<int, Terrain> terrains = new()
+    private readonly SortedDictionary<LocationID, Terrain> terrains = new()
     {
-        { RomMap.MI_TRAP_TILE1, Terrain.ROAD },
-        { RomMap.MI_TRAP_TILE2, Terrain.ROAD },
-        { RomMap.MI_MAGIC_CONTAINER_DROP_TILE, Terrain.ROAD },
-        { RomMap.MI_CONNECTOR_BRIDGE_TILE, Terrain.BRIDGE },
-        { RomMap.MI_PALACE_TILE, Terrain.PALACE },
-        { RomMap.MI_CHILD_DROP_TILE, Terrain.ROAD },
-        { RomMap.MI_TRAP_TILE3, Terrain.ROAD },
-        { RomMap.MI_TRAP_TILE4, Terrain.ROAD },
-        { RomMap.MI_TRAP_TILE5, Terrain.ROAD },
-        { RomMap.MI_TRAP_TILE6, Terrain.ROAD },
-        { RomMap.MI_TRAP_TILE7, Terrain.ROAD },
+        { LocationID.MI_TRAP1, Terrain.ROAD },
+        { LocationID.MI_TRAP2, Terrain.ROAD },
+        { LocationID.MI_MAGIC_CONTAINER_DROP, Terrain.ROAD },
+        { LocationID.MI_CONNECTOR_BRIDGE, Terrain.BRIDGE },
+        { LocationID.MI_PALACE4, Terrain.PALACE },
+        { LocationID.MI_CHILD_DROP, Terrain.ROAD },
+        { LocationID.MI_TRAP3, Terrain.ROAD },
+        { LocationID.MI_TRAP4, Terrain.ROAD },
+        { LocationID.MI_TRAP5, Terrain.ROAD },
+        { LocationID.MI_TRAP6, Terrain.ROAD },
+        { LocationID.MI_TRAP7, Terrain.ROAD },
     };
 
     public Location childDrop;
@@ -40,15 +40,15 @@ sealed class MazeIsland : World
     public MazeIsland(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
         List<Location> trapLocations = [
-            .. rom.LoadLocations(RomMap.MI_TRAP_TILE1, 2, terrains, Continent.MAZE),
-            .. rom.LoadLocations(RomMap.MI_TRAP_TILE3, 5, terrains, Continent.MAZE),
+            .. rom.LoadLocations(LocationID.MI_TRAP1, 2, terrains),
+            .. rom.LoadLocations(LocationID.MI_TRAP3, 5, terrains),
         ];
 
         List < Location> locations =
         [
-            .. rom.LoadLocations(RomMap.MI_MAGIC_CONTAINER_DROP_TILE, 1, terrains, Continent.MAZE),
-            .. rom.LoadLocations(RomMap.MI_PALACE_TILE, 1, terrains, Continent.MAZE),
-            .. rom.LoadLocations(RomMap.MI_CHILD_DROP_TILE, 1, terrains, Continent.MAZE),
+            .. rom.LoadLocations(LocationID.MI_MAGIC_CONTAINER_DROP, 1, terrains),
+            .. rom.LoadLocations(LocationID.MI_PALACE4, 1, terrains),
+            .. rom.LoadLocations(LocationID.MI_CHILD_DROP, 1, terrains),
             .. trapLocations,
         ];
         locations.ForEach(AddLocation);
@@ -72,14 +72,14 @@ sealed class MazeIsland : World
             51, // MAZE_ISLAND_FORCED_BATTLE_6
         ];
 
-        childDrop = GetLocationByMem(RomMap.MI_CHILD_DROP_TILE);
-        magicContainerDrop = GetLocationByMem(RomMap.MI_MAGIC_CONTAINER_DROP_TILE);
-        locationAtPalace4 = GetLocationByMem(RomMap.MI_PALACE_TILE);
+        childDrop = GetLocation(LocationID.MI_CHILD_DROP);
+        magicContainerDrop = GetLocation(LocationID.MI_MAGIC_CONTAINER_DROP);
+        locationAtPalace4 = GetLocation(LocationID.MI_PALACE4);
         locationAtPalace4.PalaceNumber = 4;
         locationAtPalace4.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
 
-        baseAddr = 0xA10c;
         continentId = Continent.MAZE;
+        baseAddr = RomMap.ContinentLocationBases[continentId];
         VANILLA_MAP_ADDR = 0xa65c;
 
         biome = props.MazeBiome;
@@ -712,11 +712,11 @@ sealed class MazeIsland : World
             }
         }
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
-        for (int i = RomMap.MI_UNUSED_INDEX0_TILE; i < RomMap.MI_TRAP_TILE7; i++)
+        foreach (var lid in LocationIDUtils.Enumerate(Continent.MAZE))
         {
-            if(!terrains.Keys.Contains(i))
+            if(!terrains.Keys.Contains(lid))
             {
-                rom.Put(i, 0x00);
+                rom.Put(lid, 0, 0x00);
             }
         }
 
