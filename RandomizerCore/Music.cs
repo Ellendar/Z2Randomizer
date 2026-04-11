@@ -18,6 +18,7 @@ using SongMap = Dictionary<int, ISong?>;
 
 internal enum Usage
 {
+    Title,
     Overworld,
     Town,
     Encounter,
@@ -92,6 +93,7 @@ internal class Z2Importer : Importer
 
     record BuiltinSongInfo(int Index, string Title, Usage[] Uses);
     static BuiltinSongInfo[] _builtinSongInfos = {
+        new(0, "Title", new[] { Usage.Title }),
         new(1, "Overworld", new[] { Usage.Overworld }),
         new(3, "Battle", new[] { Usage.Encounter, Usage.Cave }),
         new(5, "Town", new[] { Usage.Town }),
@@ -189,6 +191,7 @@ internal class MusicRandomizer
 
         Dictionary<Usage, int> numUsageSongs = new()
         {
+            { Usage.Title, 1 },
             { Usage.Overworld, 1 },
             { Usage.Town, 4 },
             { Usage.Encounter, 4 },
@@ -302,6 +305,7 @@ internal class MusicRandomizer
     {
         Dictionary<Usage, int> usageSongIdcs = new()
         {
+            { Usage.Title, 0 },
             { Usage.Overworld, 1 },
             { Usage.Boss, 0xb },
             { Usage.LastBoss, 0x12 },
