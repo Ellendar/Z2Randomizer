@@ -358,7 +358,7 @@ public class CustomTexts
         "what more$do you want$from me?",
     ];
 
-    public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXT =
+    public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXTS =
     [
         "all signs$point to$no",
         "come back$as$adult link",
@@ -371,6 +371,20 @@ public class CustomTexts
         "You must$construct$additional$pylons",
         "bet you$forgot$this flag$was on",
         "I'll tell$you when$you're$older"
+    ];
+
+    //If a static hint location (like downstab/upstab) is hinting for an item you already started with
+    //the vanilla text can be misleading, so put in a more obvious replacement.
+    public static string NON_COMMUNITY_STARTED_WITH_TEXT = "YOU STARTED$WITH$%%";
+
+    public static readonly string[] STARTED_WITH_ITEM_TEXTS = 
+    [
+        "check your$tracker$for$%%",
+        "%%$is on$the menu",
+        "press$start for$%%",
+        "you forgot$to mark$%%$on your$tracker",
+        "you have$already$mastered$%%",
+        "i wish$i had a$%%$like yours"
     ];
 
     public static readonly Dictionary<Town, string[]> WIZARD_SPELL_TEXTS_BY_TOWN = new()
@@ -513,6 +527,7 @@ public class CustomTexts
             {
                 texts[70] = new Text("USE THIS$TO GO$FAST");
             }
+
             GenerateWizardTexts(texts, locations, nonhashRNG, props.UseCommunityText);
 
             if (props.SpellItemHints)
@@ -558,16 +573,27 @@ public class CustomTexts
             {
                 var downstabLoc = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.DOWNSTAB));
                 var upstabLoc = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.UPSTAB));
-                if (downstabLoc != null)
+                Text hint;
+                if (downstabLoc == null)
                 {
-                    Text hint = Text.GenerateHelpfulHint(locations.ToList(), downstabLoc, Collectable.DOWNSTAB, props.IncludeSpellsInShuffle);
-                    texts[downstabClosedDoorTextIndex] = hint;
+                    hint = props.UseCommunityText ? new Text(STARTED_WITH_ITEM_TEXTS.Sample(nonhashRNG)!, Collectable.DOWNSTAB)
+                        : new Text(NON_COMMUNITY_STARTED_WITH_TEXT, Collectable.DOWNSTAB);
                 }
-                if (upstabLoc != null)
+                else
                 {
-                    Text hint = Text.GenerateHelpfulHint(locations.ToList(), upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
-                    texts[upstabClosedDoorTextIndex] = hint;
+                    hint = Text.GenerateHelpfulHint(locations.ToList(), downstabLoc, Collectable.DOWNSTAB, props.IncludeSpellsInShuffle);
                 }
+                texts[downstabClosedDoorTextIndex] = hint;
+                if (upstabLoc == null)
+                {
+                    hint = props.UseCommunityText ? new Text(STARTED_WITH_ITEM_TEXTS.Sample(nonhashRNG)!, Collectable.DOWNSTAB)
+                        : new Text(NON_COMMUNITY_STARTED_WITH_TEXT, Collectable.DOWNSTAB);
+                }
+                else
+                {
+                    hint = Text.GenerateHelpfulHint(locations.ToList(), upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
+                }
+                texts[upstabClosedDoorTextIndex] = hint;
                 if (props.SwapUpAndDownStab)
                 {
                     (texts[upstabClosedDoorTextIndex], texts[downstabClosedDoorTextIndex]) = (texts[downstabClosedDoorTextIndex], texts[upstabClosedDoorTextIndex]);
@@ -587,7 +613,7 @@ public class CustomTexts
                 customTexts.SetText(DialogEast.ALREADY_HAVE_ITEM, new Text(ALREADY_HAVE_ITEM_TEXTS.Sample(nonhashRNG)!));
                 //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when
                 //you don't have enough magic containers and container requirements are on.
-                customTexts.SetText(DialogEast.NOT_ENOUGH_CONTAINERS, new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!));
+                customTexts.SetText(DialogEast.NOT_ENOUGH_CONTAINERS, new Text(NOT_ENOUGH_CONTAINERS_TEXTS.Sample(nonhashRNG)!));
             }
             customTexts.SetText(DialogEast.OLD_KASUTO_NOT_ENOUGH_CONTAINERS, customTexts.GetText(DialogEast.NOT_ENOUGH_CONTAINERS));
 
@@ -1061,7 +1087,7 @@ public class CustomTexts
             .. KNOW_NOTHING_SARIA_GREETER_TEXTS,
             .. MOVING_NPC_TEXTS,
             .. ALREADY_HAVE_ITEM_TEXTS,
-            .. NOT_ENOUGH_CONTAINERS_TEXT,
+            .. NOT_ENOUGH_CONTAINERS_TEXTS,
             .. COMMUNITY_NONSPELL_GET_TEXT,
 
             .. WIZARD_SPELL_TEXTS_BY_TOWN.SelectMany(ls => ls.Value),

@@ -93,15 +93,15 @@ internal class Z2Importer : Importer
 
     record BuiltinSongInfo(int Index, string Title, Usage[] Uses);
     static BuiltinSongInfo[] _builtinSongInfos = {
-        new(0, "Title", new[] { Usage.Title }),
-        new(1, "Overworld", new[] { Usage.Overworld }),
-        new(3, "Battle", new[] { Usage.Encounter, Usage.Cave }),
-        new(5, "Town", new[] { Usage.Town }),
-        new(9, "Palace", new[] { Usage.Palace }),
-        new(0xb, "Boss", new[] { Usage.Boss }),
-        new(0xd, "Great Palace", new[] { Usage.GreatPalace }),
-        new(0x10, "Credits", new[] { Usage.Credits }),
-        new(0x12, "Last Boss", new[] { Usage.LastBoss }),
+        new(0, "Title", [Usage.Title]),
+        new(1, "Overworld", [Usage.Overworld]),
+        new(3, "Battle", [Usage.Encounter, Usage.Cave]),
+        new(5, "Town", [Usage.Town]),
+        new(9, "Palace", [Usage.Palace]),
+        new(0xb, "Boss", [Usage.Boss]),
+        new(0xd, "Great Palace", [Usage.GreatPalace]),
+        new(0x10, "Credits", [Usage.Credits]),
+        new(0x12, "Last Boss", [Usage.LastBoss]),
     };
 
     public Z2Importer(IRomAccess romAccess, IEnumerable<int> freeBanks)
