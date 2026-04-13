@@ -363,8 +363,7 @@ internal class MusicRandomizer
                         ? Usage.Palace
                         : Usage.GreatPalace;
                 }
-                else if (loc.TerrainType == Terrain.CAVE
-                    || loc.FallInHole != 0)
+                else if (loc.TerrainType == Terrain.CAVE || loc.IsFallInHole)
                     usage = Usage.Cave;
                 else
                     usage = Usage.Encounter;

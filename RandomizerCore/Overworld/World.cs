@@ -83,6 +83,13 @@ public abstract class World
 
     protected abstract List<Location> GetPathingStarts();
     public abstract bool Terraform(RandomizerProperties props, ROM rom);
+    /// <summary>
+    /// Some kinds of locations aren't allowed to be passthroughs (even if their base location is a passthrough)
+    /// because that kind of location can't pass through. Previously, this was handled in Terraform, but now that we 
+    /// attempt to terraform multiple times per instatiation of that world, a late failure could cause passthroughness
+    /// to carry from attempt to attempt, so now after terraforming is done (and successful) we can unpassthrough them
+    /// </summary>
+    public abstract void DisableDisallowedPassthroughs();
     public abstract string GetName();
 
 
@@ -187,20 +194,20 @@ public abstract class World
     {
         (l2.Xpos, l1.Xpos) = (l1.Xpos, l2.Xpos);
         (l2.Y, l1.Y) = (l1.Y, l2.Y);
-        (l2.PassThrough, l1.PassThrough) = (l1.PassThrough, l2.PassThrough);
+        (l2.IsPassthrough, l1.IsPassthrough) = (l1.IsPassthrough, l2.IsPassthrough);
 
         foreach (Location child in l1.Children)
         {
             child.Xpos = l1.Xpos;
             child.Y = l1.Y;
-            child.PassThrough = l1.PassThrough;
+            child.IsPassthrough = l1.IsPassthrough;
         }
 
         foreach (Location child in l2.Children)
         {
             child.Xpos = l2.Xpos;
             child.Y = l2.Y;
-            child.PassThrough = l2.PassThrough;
+            child.IsPassthrough = l2.IsPassthrough;
         }
     }
 
@@ -301,7 +308,7 @@ public abstract class World
             if ((location.TerrainType != Terrain.BRIDGE
                     && location.CanShuffle
                     && !unimportantLocs.Contains(location)
-                    && location.PassThrough == 0)
+                    && !location.IsPassthrough)
                 || location.AccessRequirements.HasHardRequirement(RequirementType.HAMMER))
             {
                 int x, y;
@@ -501,7 +508,7 @@ public abstract class World
     protected bool PlaceSaneCave(Direction direction, Terrain riverTerrain, Location location)
     {
         int x, y;
-        if ((location.MapPage == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
+        if ((location.MapPage == 0 || location.IsFallInHole) && !location.ForceEnterRight)
         {
             if (direction == Direction.NORTH)
             {
@@ -2063,7 +2070,7 @@ public abstract class World
         map[y, x] = Terrain.BRIDGE;
         bridge.Xpos = x;
         bridge.Y = y;
-        bridge.PassThrough = 0;
+        bridge.IsPassthrough = false;
         bridge.CanShuffle = false;
 
         if (direction == Direction.EAST)
@@ -2113,7 +2120,7 @@ public abstract class World
         Debug.Assert(newRaft == raft);
         Debug.Assert(raft.Continent == continent);
         raft.ConnectedContinent = connectedContinent;
-        raft.ExternalWorld = 0x80;
+        raft.IsExternalWorld = true;
         raft.Map = Location.CONNECTOR_RAFT_ID;
         raft.TerrainType = Terrain.BRIDGE;
         if (!WithinMapBounds(raft.Pos))
@@ -2132,9 +2139,9 @@ public abstract class World
         Debug.Assert(newBridge == bridge);
         Debug.Assert(bridge.Continent == continent);
         bridge.ConnectedContinent = connectedContinent;
-        bridge.ExternalWorld = 0x80;
+        bridge.IsExternalWorld = true;
         bridge.Map = Location.CONNECTOR_BRIDGE_ID;
-        bridge.PassThrough = 0;
+        bridge.IsPassthrough = false;
         if (!WithinMapBounds(bridge.Pos))
         {
             bridge.Pos = IntVector2.Random(RNG, MapColumns, MapRows);
@@ -2151,7 +2158,7 @@ public abstract class World
         Debug.Assert(newCave == cave1);
         Debug.Assert(cave1.Continent == world);
         cave1.ConnectedContinent = connectedContinent;
-        cave1.ExternalWorld = 0x80;
+        cave1.IsExternalWorld = true;
         cave1.Map = Location.CONNECTOR_CAVE1_ID;
         cave1.CanShuffle = true;
         if (!WithinMapBounds(cave1.Pos))
@@ -2170,7 +2177,7 @@ public abstract class World
         Debug.Assert(newCave == cave2);
         Debug.Assert(cave2.Continent == world);
         cave2.ConnectedContinent = connectedContinent;
-        cave2.ExternalWorld = 0x80;
+        cave2.IsExternalWorld = true;
         cave2.Continent = world;
         cave2.Map = Location.CONNECTOR_CAVE2_ID;
         Debug.Assert(cave2.TerrainType == Terrain.CAVE);

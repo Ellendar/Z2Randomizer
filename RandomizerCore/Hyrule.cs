@@ -1945,6 +1945,7 @@ public class Hyrule
                 mazeIsland.ResetVisitabilityState();
                 timeSpentBuildingMI += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
+                worlds.Where(i => i.biome == Biome.VANILLA_SHUFFLE).ToList().ForEach(i => i.DisableDisallowedPassthroughs());
                 worlds.ForEach(i => i.SynchronizeLinkedLocations());
 
                 if (ct.IsCancellationRequested) { return; }

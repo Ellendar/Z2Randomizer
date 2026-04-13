@@ -29,6 +29,9 @@
     <None Remove="Asm\MMC5.s" />
     <None Remove="Asm\z2r.inc" />
     <None Remove="Asm\z2rndft.ips" />
+    <None Update="Music\Faxanadu.json5">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
 
     <None Update="Music\README.txt" CopyToOutputDirectory="PreserveNewest" />
 

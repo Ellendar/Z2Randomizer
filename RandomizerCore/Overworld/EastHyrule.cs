@@ -371,8 +371,8 @@ public sealed class EastHyrule : World
             { (0x66, 0x2D), "south" },
             { (0x49, 0x04), "gp" }
         };
-        townAtNewKasuto.ExternalWorld = 128;
-        locationAtPalace6.ExternalWorld = 128;
+        townAtNewKasuto.IsExternalWorld = true;
+        locationAtPalace6.IsExternalWorld = true;
         hiddenPalaceLocation = locationAtPalace6;
         hiddenKasutoLocation = townAtNewKasuto;
 
@@ -458,56 +458,6 @@ public sealed class EastHyrule : World
                         map[location.Y, location.Xpos] = location.TerrainType;
                     }
                 }
-                foreach (Location location in Locations[Terrain.CAVE])
-                {
-                    location.PassThrough = 0;
-                }
-                foreach (Location location in Locations[Terrain.TOWN])
-                {
-                    location.PassThrough = 0;
-                }
-                foreach (Location location in Locations[Terrain.PALACE])
-                {
-                    location.PassThrough = 0;
-                }
-                if(raft != null)
-                {
-                    raft.PassThrough = 0;
-                }
-                if (bridge != null)
-                {
-                    bridge.PassThrough = 0;
-                }
-                //Issue #2: Desert tile passthrough causes the wrong screen to load, making the item unobtainable.
-                desertTile.PassThrough = 0;
-
-                desertTile.MapPage = 1;
-
-                Location? desert = GetLocationByMem(RomMap.EAST_MINOR_DESERT_TILE_LOCATION1);
-                Location? swamp = GetLocationByMem(RomMap.EAST_MINOR_SWAMP_TILE_LOCATION);
-                if(desert == null || swamp == null)
-                {
-                    throw new ImpossibleException("Unable to find desert/swamp passthrough on east.");
-                }
-
-                if (desert.PassThrough != 0)
-                {
-                    desert.AccessRequirements = desert.AccessRequirements.WithHardRequirement(RequirementType.JUMP);
-                }
-                else
-                {
-                    desert.AccessRequirements = desert.AccessRequirements.Without(RequirementType.JUMP);
-                }
-
-                if (swamp.PassThrough != 0)
-                {
-                    swamp.AccessRequirements = swamp.AccessRequirements.WithHardRequirement(RequirementType.FAIRY);
-                }
-                else
-                {
-                    swamp.AccessRequirements = swamp.AccessRequirements.Without(RequirementType.FAIRY);
-                }
-
             }
 			
             //in vanilla shuffle, post location shuffling, the locations have moved, but the hidden palace spot doesn't
@@ -1613,7 +1563,7 @@ public sealed class EastHyrule : World
                 || (hiddenKasutoLocation.TerrainType == Terrain.TOWN && !hiddenKasutoLocation.AppearsOnMap) //no fake item locations
                 || connections.ContainsKey(hiddenKasutoLocation)
                 || !hiddenKasutoLocation.CanShuffle
-                || (!biome.UsesVanillaMap() && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough != 0))
+                || (!biome.UsesVanillaMap() && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.IsPassthrough))
             {
                 hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
             }
@@ -1649,7 +1599,7 @@ public sealed class EastHyrule : World
                 || (hiddenPalaceLocation.TerrainType == Terrain.TOWN && !hiddenPalaceLocation.AppearsOnMap) //no fake item locations
                 || (!biome.UsesVanillaMap()
                     && hiddenPalaceLocation.TerrainType == Terrain.LAVA
-                    && hiddenPalaceLocation.PassThrough != 0))
+                    && hiddenPalaceLocation.IsPassthrough))
             {
                 hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];
             }
@@ -2170,5 +2120,58 @@ public sealed class EastHyrule : World
 
         sb.AppendLine();
         return sb.ToString();
+    }
+
+    public override void DisableDisallowedPassthroughs()
+    {
+        foreach (Location location in Locations[Terrain.CAVE])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.TOWN])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.PALACE])
+        {
+            location.IsPassthrough = false;
+        }
+        if (raft != null)
+        {
+            raft.IsPassthrough = false;
+        }
+        if (bridge != null)
+        {
+            bridge.IsPassthrough = false;
+        }
+        //Issue #2: Desert tile passthrough causes the wrong screen to load, making the item unobtainable.
+        desertTile.IsPassthrough = false;
+
+        desertTile.MapPage = 1;
+
+        Location? desert = GetLocationByMem(RomMap.EAST_MINOR_DESERT_TILE_LOCATION1);
+        Location? swamp = GetLocationByMem(RomMap.EAST_MINOR_SWAMP_TILE_LOCATION);
+        if (desert == null || swamp == null)
+        {
+            throw new ImpossibleException("Unable to find desert/swamp passthrough on east.");
+        }
+
+        if (desert.IsPassthrough)
+        {
+            desert.AccessRequirements = desert.AccessRequirements.WithHardRequirement(RequirementType.JUMP);
+        }
+        else
+        {
+            desert.AccessRequirements = desert.AccessRequirements.Without(RequirementType.JUMP);
+        }
+
+        if (swamp.IsPassthrough)
+        {
+            swamp.AccessRequirements = swamp.AccessRequirements.WithHardRequirement(RequirementType.FAIRY);
+        }
+        else
+        {
+            swamp.AccessRequirements = swamp.AccessRequirements.Without(RequirementType.FAIRY);
+        }
     }
 }

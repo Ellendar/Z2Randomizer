@@ -2296,13 +2296,13 @@ ResetRedPalettePayload:
         int map = mapByte & 0x3f;
         return new Location(yPos, xPos, addr, map, continent)
         {
-            ExternalWorld = yByte & 0x80,
-            appear2loweruponexit = xByte & 0x80,
-            Secondpartofcave = xByte & 0x40,
+            IsExternalWorld = (yByte & 0x80) > 0,
+            Appear2LowerUponExit = (xByte & 0x80) > 0,
+            IsSecondPartOfCave = (xByte & 0x40) > 0,
             MapPageRaw = mapByte & 0xC0,
-            FallInHole = worldByte & 0x80,
-            PassThrough = worldByte & 0x40,
-            ForceEnterRight = worldByte & 0x20,
+            IsFallInHole = (worldByte & 0x80) > 0,
+            IsPassthrough = (worldByte & 0x40) > 0,
+            ForceEnterRight = (worldByte & 0x20) > 0,
             TerrainType = terrain,
             AppearsOnMap = true
         };
@@ -2342,7 +2342,7 @@ ResetRedPalettePayload:
         }
         int pos = hiddenPalaceLocation.YRaw;
 
-        Put(0x1df78, (byte)(pos + hiddenPalaceLocation.ExternalWorld));
+        Put(0x1df78, (byte)(pos + (hiddenPalaceLocation.IsExternalWorld ? 0x80 : 0)));
         Put(0x1df84, 0xff);
         Put(0x1ccc0, (byte)pos);
         int connection = hiddenPalaceLocation.MemAddress - 0x862F;
@@ -2462,11 +2462,11 @@ ResetRedPalettePayload:
     public void UpdateKasuto(Location hiddenKasutoLocation, Location townAtNewKasuto, Location spellTower, Biome biome,
         int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
     {
-        Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + hiddenKasutoLocation.ExternalWorld));
+        Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + (hiddenKasutoLocation.IsExternalWorld ? 0x80 : 0)));
         Put(0x1dfac, (byte)(hiddenKasutoLocation.Y));
         Put(0x1dfb2, (byte)(hiddenKasutoLocation.Xpos + 1));
-        Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + hiddenKasutoLocation.Secondpartofcave));
-        Put(0x1ccdb, (byte)(hiddenKasutoLocation.YRaw));
+        Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + (hiddenKasutoLocation.IsSecondPartOfCave ? 0x40 : 0)));
+        Put(0x1ccdb, (byte)hiddenKasutoLocation.YRaw);
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         Put(0x1df77, (byte)connection);
         if (hiddenKasutoLocation == spellTower)

@@ -411,27 +411,6 @@ public sealed class WestHyrule : World
                         map[location.Y, location.Xpos] = location.TerrainType;
                     }
                 }
-                foreach(Location location in Locations[Terrain.CAVE])
-                {
-                    location.PassThrough = 0;
-                }
-                foreach (Location location in Locations[Terrain.TOWN])
-                {
-                    location.PassThrough = 0;
-                }
-                foreach (Location location in Locations[Terrain.PALACE])
-                {
-                    location.PassThrough = 0;
-                }
-                if(raft != null)
-                {
-                    raft.PassThrough = 0;
-                }
-                bridge1.PassThrough = 0;
-                bridge2.PassThrough = 0;
-
-                fairyCave.PassThrough = 0; //fairy cave
-
             }
         }
         else //Not vanilla
@@ -1601,5 +1580,29 @@ public sealed class WestHyrule : World
         {
             mirrorTable.Reachable = true;
         }
+    }
+
+    public override void DisableDisallowedPassthroughs()
+    {
+        foreach (Location location in Locations[Terrain.CAVE])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.TOWN])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.PALACE])
+        {
+            location.IsPassthrough = false;
+        }
+        if (raft != null)
+        {
+            raft.IsPassthrough = false;
+        }
+        bridge1.IsPassthrough = false;
+        bridge2.IsPassthrough = false;
+
+        fairyCave.IsPassthrough = false; //fairy cave
     }
 }

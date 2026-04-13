@@ -277,18 +277,6 @@ sealed class DeathMountain : World
                         map[location.Y, location.Xpos] = location.TerrainType;
                     }
                 }
-                foreach (Location location in Locations[Terrain.CAVE])
-                {
-                    location.PassThrough = 0;
-                }
-                foreach (Location location in Locations[Terrain.TOWN])
-                {
-                    location.PassThrough = 0;
-                }
-                foreach (Location location in Locations[Terrain.PALACE])
-                {
-                    location.PassThrough = 0;
-                }
             }
         }
         else //Not vanilla/shuffle
@@ -652,7 +640,7 @@ sealed class DeathMountain : World
 
         if (props.SaneCaves && connectionsDM.ContainsKey(location))
         {
-            if ((location.MapPage == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
+            if ((location.MapPage == 0 || location.IsFallInHole) && !location.ForceEnterRight)
             {
                 if (direction == Direction.NORTH)
                 {
@@ -1281,5 +1269,21 @@ sealed class DeathMountain : World
 
         sb.AppendLine();
         return sb.ToString();
+    }
+
+    public override void DisableDisallowedPassthroughs()
+    {
+        foreach (Location location in Locations[Terrain.CAVE])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.TOWN])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.PALACE])
+        {
+            location.IsPassthrough = false;
+        }
     }
 }

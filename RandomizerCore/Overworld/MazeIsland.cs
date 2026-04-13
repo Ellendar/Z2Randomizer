@@ -129,27 +129,9 @@ sealed class MazeIsland : World
                     foreach (Location location in AllLocations)
                     {
                         map[location.Y, location.Xpos] = location.TerrainType;
-                        location.PassThrough = 64;
+                        location.IsPassthrough = true;
                     }
                 }
-                foreach (Location location in Locations[Terrain.CAVE])
-                {
-                    location.PassThrough = 0;
-                }
-                foreach (Location location in Locations[Terrain.TOWN])
-                {
-                    location.PassThrough = 0;
-                }
-                foreach (Location location in Locations[Terrain.PALACE])
-                {
-                    location.PassThrough = 0;
-                }
-                if (bridge != null)
-                {
-                    bridge.PassThrough = 0;
-                }
-                magicContainerDrop.PassThrough = 0;
-                childDrop.PassThrough = 0;
             }
         }
         else
@@ -1039,5 +1021,27 @@ sealed class MazeIsland : World
 
         sb.AppendLine();
         return sb.ToString();
+    }
+
+    public override void DisableDisallowedPassthroughs()
+    {
+        foreach (Location location in Locations[Terrain.CAVE])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.TOWN])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.PALACE])
+        {
+            location.IsPassthrough = false;
+        }
+        if (bridge != null)
+        {
+            bridge.IsPassthrough = false;
+        }
+        magicContainerDrop.IsPassthrough = false;
+        childDrop.IsPassthrough = false;
     }
 }
