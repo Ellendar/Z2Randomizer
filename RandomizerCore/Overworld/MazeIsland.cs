@@ -140,6 +140,7 @@ sealed class MazeIsland : World
             foreach (Location location in AllLocations)
             {
                 location.CanShuffle = true;
+                location.IsPassthrough = location.WasPassthrough;
             }
             while (bytesWritten > MAP_SIZE_BYTES)
             {

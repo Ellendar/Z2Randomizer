@@ -99,6 +99,7 @@ public class Location
     public bool Appear2LowerUponExit { get; set; } //1:0
     public bool IsSecondPartOfCave { get; set; }//1:1
     public bool IsFallInHole { get; set; }//3:0
+    internal bool WasPassthrough { get; }
     public bool IsPassthrough { get; set; }//3:1
     public bool ForceEnterRight { get; set; }//3:2
 
@@ -137,7 +138,7 @@ public class Location
     .x.. .... - Pass through
     x... .... - Fall in hole
     */
-    public Location(int yPos, int xPos, int memoryAddress, int map, Continent continent)
+    public Location(int yPos, int xPos, int memoryAddress, int map, Continent continent, bool isPassthrough = false)
     {
         Map = map;
         YRaw = yPos;
@@ -153,6 +154,8 @@ public class Location
         AccessRequirements = Requirements.NONE;
         CollectableRequirements = Requirements.NONE;
         ConnectionRequirements = Requirements.NONE;
+        IsPassthrough = isPassthrough;
+        WasPassthrough = isPassthrough;
 
         //Shoutouts to thetruekingofspace for datamining this
         Name = (Continent, YRaw, Xpos, Map) switch

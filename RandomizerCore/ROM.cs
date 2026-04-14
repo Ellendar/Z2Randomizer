@@ -2294,14 +2294,13 @@ ResetRedPalettePayload:
         int yPos = yByte & 0x7f;
         int xPos = xByte & 0x3f;
         int map = mapByte & 0x3f;
-        return new Location(yPos, xPos, addr, map, continent)
+        return new Location(yPos, xPos, addr, map, continent, isPassthrough: (worldByte & 0x40) > 0)
         {
             IsExternalWorld = (yByte & 0x80) > 0,
             Appear2LowerUponExit = (xByte & 0x80) > 0,
             IsSecondPartOfCave = (xByte & 0x40) > 0,
             MapPageRaw = mapByte & 0xC0,
             IsFallInHole = (worldByte & 0x80) > 0,
-            IsPassthrough = (worldByte & 0x40) > 0,
             ForceEnterRight = (worldByte & 0x20) > 0,
             TerrainType = terrain,
             AppearsOnMap = true

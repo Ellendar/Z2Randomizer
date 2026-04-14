@@ -260,6 +260,7 @@ sealed class DeathMountain : World
         foreach (Location location in AllLocations)
         {
             location.CanShuffle = true;
+            location.IsPassthrough = location.WasPassthrough;
         }
         if (biome.UsesVanillaMap())
         {
@@ -1273,17 +1274,17 @@ sealed class DeathMountain : World
 
     public override void DisableDisallowedPassthroughs()
     {
-        foreach (Location location in Locations[Terrain.CAVE])
-        {
-            location.IsPassthrough = false;
-        }
-        foreach (Location location in Locations[Terrain.TOWN])
-        {
-            location.IsPassthrough = false;
-        }
-        foreach (Location location in Locations[Terrain.PALACE])
-        {
-            location.IsPassthrough = false;
-        }
+                        foreach (Location location in Locations[Terrain.CAVE])
+                {
+                    location.IsPassthrough = false;
+                }
+                foreach (Location location in Locations[Terrain.TOWN])
+                {
+                    location.IsPassthrough = false;
+                }
+                foreach (Location location in Locations[Terrain.PALACE])
+                {
+                    location.IsPassthrough = false;
+                }
     }
 }
