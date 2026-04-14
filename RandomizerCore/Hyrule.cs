@@ -3522,17 +3522,12 @@ PLAYER_X = $74
 AREA_LOCATION_INDEX = $0748
 PLAYER_HAS_RAFT = $0787
 
-; AREA_LOCATION_INDEX will later be changed to the side-scrolling location
-; index. z2ft needs this, at this specific address.
-AREA_ENTRANCE_INDEX = $69ff
-
 .org $8528 ; we don't use this data anymore
 FREE_UNTIL $8553 ; remove unused data here
 ; bridge connector coordinates are at $8553
 
 .org $8599
     stx AREA_LOCATION_INDEX  ; X stashed away like in the original code
-    stx AREA_ENTRANCE_INDEX
     cpx #RAFT_TILE_INDEX
     bne NotRaftTileProceed
     lda PLAYER_HAS_RAFT
@@ -3823,6 +3818,27 @@ bank5_Pointer_table_for_End_Credits:
         {
             rom.ApplyIps(
                 Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2rndft.ips"));
+            // really hacky workaround but i don't want to recompile z2ft
+            // z2ft is compiled using an old address for NmiBankShadow8 and NmiBankShadowA so rather than
+            // recompile that, I'm just gonna patch it here...
+            const byte LDA_ABS = 0xAD;
+            const byte STA_ABS = 0x8D;
+
+            void PatchAddress(byte opcode, int before, int after)
+            {
+                var idx = 0;
+                var needle = new ReadOnlySpan<byte>([opcode, (byte)before, (byte)(before >> 8)]);
+                while (rom.rawdata.AsSpan(idx).IndexOf(needle) is var di and >= 0)
+                {
+                    rom.Put(idx + di, opcode, (byte)after, (byte)(after >> 8));
+                    idx += di + 1;
+                }
+            }
+
+            PatchAddress(LDA_ABS, 0x07b2, 0x6380);
+            PatchAddress(LDA_ABS, 0x07b3, 0x6381);
+            PatchAddress(STA_ABS, 0x07b2, 0x6380);
+            PatchAddress(STA_ABS, 0x07b3, 0x6381);
 
             var asm = engine.Module();
             asm.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.s"), "z2ft.s");
