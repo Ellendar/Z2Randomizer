@@ -227,6 +227,50 @@ public abstract class World
         }
     }
 
+    /// <summary>
+    /// Fill out the connections map based on the location tables in ROM, so they don't need to be hard-coded. Uses the EntranceNumber to find all entrances leading to a common location.
+    /// </summary>
+    /// <param name="ignoreLocs">Entrances that should not be considered. This is used to filter out cases where multiple logically distinct locations share a single 4-page map such as King's Tomb and Mido.</param>
+    /// <param name="allConns">A map supporting more than 2 entrances per location, if necessary (DM).</param>
+    protected void CreateConnections(
+        HashSet<LocationID>? ignoreLocs = null,
+        Dictionary<Location, List<Location>>? allConns = null)
+    {
+        // Group all entrances by location
+        SortedDictionary<LocationID, HashSet<int>> locsEntrances = new();
+        foreach (var loc in AllLocations
+            .Where(loc => ignoreLocs == null || !ignoreLocs.Contains(loc.ID)))
+        {
+            var baseLid = loc.ID - loc.EntranceNumber;
+            if (!locsEntrances.TryGetValue(baseLid, out var entrs))
+            {
+                entrs = new();
+                locsEntrances[baseLid] = entrs;
+            }
+
+            entrs.Add(loc.EntranceNumber);
+        }
+
+        // Add locations with more than one entrance to the maps
+        foreach (var (lid, entrs) 
+            in locsEntrances.Where(kv => kv.Value.Count > 1))
+        {
+            var allEntrs = entrs.Select(i => GetLocation(lid + i)).ToList();
+            allEntrs.Sort((a, b) => a.ID.CompareTo(b.ID));
+
+            for (int i = 0; i < entrs.Count; i++)
+            {
+                var entrsList = allEntrs.ToList();
+                entrsList.RemoveAt(i);
+
+                if (entrsList.Count == 1)
+                    connections[allEntrs[i]] = entrsList[0];
+                if (allConns != null)
+                    allConns[allEntrs[i]] = entrsList;
+            }
+        }
+    }
+
     protected void ChooseConn(String section, Dictionary<Location, Location> co, bool changeType)
     {
         if (co.Count > 0)
@@ -274,6 +318,18 @@ public abstract class World
         }
     }
 
+    protected Location GetLocation(LocationID lid)
+    {
+        return AllLocations.FirstOrDefault(i => i.ID == lid)
+            ?? throw new Exception($"Failed to find Location with ID {lid}");
+    }
+
+    protected Location GetLocation(int locIdx)
+        => GetLocation(LocationIDUtils.FromIndex(continentId, locIdx));
+
+    protected Location GetLocation(Continent cont, int locIdx)
+        => GetLocation(LocationIDUtils.FromIndex(cont, locIdx));
+
     protected Location? GetLocationByPos(IntVector2 pos)
     {
         return AllLocations.FirstOrDefault(i => i.Pos == pos);
@@ -292,7 +348,7 @@ public abstract class World
 
     protected Location GetLocationByMem(int mem)
     {
-        return AllLocations.FirstOrDefault(i => i.MemAddress.Equals(mem)) 
+        return AllLocations.FirstOrDefault(i => i.MemAddress.Equals(mem))
             ?? throw new Exception("Failed to find Location at address: " + mem);
     }
 
@@ -712,8 +768,10 @@ public abstract class World
         }
         if(placeDaruniaDesert)
         {
-            foreach (Location location in AllLocations.Where(i => i.MemAddress == RomMap.EAST_TRAP_DESERT_TILE_LOCATION1 
-                || i.MemAddress == RomMap.EAST_TRAP_DESERT_TILE_LOCATION2))
+            int addr1 = LocationID.EAST_TRAP_DESERT1.GetRomOffset(),
+                addr2 = LocationID.EAST_TRAP_DESERT2.GetRomOffset();
+            foreach (Location location in AllLocations.Where(i => i.MemAddress == addr1
+                || i.MemAddress == addr2))
             {
                 location.Xpos = 0;
                 location.Y = 0;
@@ -721,8 +779,10 @@ public abstract class World
         }
         if (placeLongBridge)
         {
-            foreach (Location location in AllLocations.Where(i => i.MemAddress == RomMap.WEST_BRIDGE_AFTER_DM_WEST_LOCATION
-                || i.MemAddress == RomMap.WEST_BRIDGE_AFTER_DM_EAST_LOCATION))
+            int addr1 = LocationID.WEST_BRIDGE_AFTER_DM_WEST.GetRomOffset(),
+                addr2 = LocationID.WEST_BRIDGE_AFTER_DM_EAST.GetRomOffset();
+            foreach (Location location in AllLocations.Where(i => i.MemAddress == addr1
+                || i.MemAddress == addr2))
             {
                 location.Xpos = 0;
                 location.Y = 0;
@@ -931,7 +991,7 @@ public abstract class World
                 {
                     //Saria doesn't need to worry about sideways entrance since it's not a passthrough
                     map[y, x] = Terrain.TOWN;
-                    Location location = GetLocationByMem(0x465F);
+                    Location location = GetLocation(LocationID.WEST_TOWN_SARIA_SOUTH);
                     location.Y = y;
                     location.Xpos = x;
                     x -= deltaX;
@@ -942,15 +1002,15 @@ public abstract class World
                         y -= deltaY;
                     }
                     map[y, x] = Terrain.TOWN;
-                    location = GetLocationByMem(0x4660);
+                    location = GetLocation(LocationID.WEST_TOWN_SARIA_NORTH);
                     location.Y = y;
                     location.Xpos = x;
                     placeSaria = false;
                 }
                 else if (placeLongBridge)
                 {
-                    Location bridge1 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_WEST_LOCATION);
-                    Location bridge2 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_EAST_LOCATION);
+                    Location bridge1 = GetLocation(LocationID.WEST_BRIDGE_AFTER_DM_WEST);
+                    Location bridge2 = GetLocation(LocationID.WEST_BRIDGE_AFTER_DM_EAST);
 
                     if (!walkableTerrains.Contains(map[y - deltaY, x - deltaX]))
                     {
@@ -1035,8 +1095,8 @@ public abstract class World
                 }
                 else if (placeDaruniaDesert)
                 {
-                    Location bridge1 = GetLocationByMem(RomMap.EAST_TRAP_DESERT_TILE_LOCATION2);
-                    Location bridge2 = GetLocationByMem(RomMap.EAST_TRAP_DESERT_TILE_LOCATION1);
+                    Location bridge1 = GetLocation(LocationID.EAST_TRAP_DESERT2);
+                    Location bridge2 = GetLocation(LocationID.EAST_TRAP_DESERT1);
                     if (bridge1.CanShuffle && bridge2.CanShuffle)
                     {
                         if (!walkableTerrains.Contains(map[y - deltaY, x - deltaX]))
@@ -2114,9 +2174,9 @@ public abstract class World
     public Location LoadRaft(ROM rom, Continent continent, Continent connectedContinent)
     {
         Debug.Assert(continent == continentId); // we can remove param if this is always true
-        var newRaft = rom.LoadLocation(baseAddr + Location.CONNECTOR_RAFT_ID, Terrain.BRIDGE, continent);
+        var newRaft = rom.LoadLocation(LocationIDUtils.FromIndex(continent, Location.CONNECTOR_RAFT_ID), Terrain.BRIDGE);
         AddLocation(newRaft);
-        raft = GetLocationByMem(baseAddr + Location.CONNECTOR_RAFT_ID);
+        raft = GetLocation(continent, Location.CONNECTOR_RAFT_ID);
         Debug.Assert(newRaft == raft);
         Debug.Assert(raft.Continent == continent);
         raft.ConnectedContinent = connectedContinent;
@@ -2133,9 +2193,9 @@ public abstract class World
     public Location LoadBridge(ROM rom, Continent continent, Continent connectedContinent)
     {
         Debug.Assert(continent == continentId); // we can remove param if this is always true
-        var newBridge = rom.LoadLocation(baseAddr + Location.CONNECTOR_BRIDGE_ID, Terrain.BRIDGE, continent);
+        var newBridge = rom.LoadLocation(LocationIDUtils.FromIndex(continent, Location.CONNECTOR_BRIDGE_ID), Terrain.BRIDGE);
         AddLocation(newBridge);
-        bridge = GetLocationByMem(baseAddr + Location.CONNECTOR_BRIDGE_ID);
+        bridge = GetLocation(continent, Location.CONNECTOR_BRIDGE_ID);
         Debug.Assert(newBridge == bridge);
         Debug.Assert(bridge.Continent == continent);
         bridge.ConnectedContinent = connectedContinent;
@@ -2152,9 +2212,9 @@ public abstract class World
     public Location LoadCave1(ROM rom, Continent world, Continent connectedContinent)
     {
         Debug.Assert(world == continentId); // we can remove param if this is always true
-        var newCave = rom.LoadLocation(baseAddr + Location.CONNECTOR_CAVE1_ID, Terrain.CAVE, world);
+        var newCave = rom.LoadLocation(LocationIDUtils.FromIndex(world, Location.CONNECTOR_CAVE1_ID), Terrain.CAVE);
         AddLocation(newCave);
-        cave1 = GetLocationByMem(baseAddr + Location.CONNECTOR_CAVE1_ID);
+        cave1 = GetLocation(world, Location.CONNECTOR_CAVE1_ID);
         Debug.Assert(newCave == cave1);
         Debug.Assert(cave1.Continent == world);
         cave1.ConnectedContinent = connectedContinent;
@@ -2171,9 +2231,9 @@ public abstract class World
     public Location LoadCave2(ROM rom, Continent world, Continent connectedContinent)
     {
         Debug.Assert(world == continentId); // we can remove param if this is always true
-        var newCave = rom.LoadLocation(baseAddr + Location.CONNECTOR_CAVE2_ID, Terrain.CAVE, world);
+        var newCave = rom.LoadLocation(LocationIDUtils.FromIndex(world, Location.CONNECTOR_CAVE2_ID), Terrain.CAVE);
         AddLocation(newCave);
-        cave2 = GetLocationByMem(baseAddr + Location.CONNECTOR_CAVE2_ID);
+        cave2 = GetLocation(world, Location.CONNECTOR_CAVE2_ID);
         Debug.Assert(newCave == cave2);
         Debug.Assert(cave2.Continent == world);
         cave2.ConnectedContinent = connectedContinent;
