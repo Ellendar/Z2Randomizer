@@ -101,6 +101,7 @@ public class Location
     public bool IsExternalWorld { get; set; } //0:0
     public int EntranceNumber { get; set; } //1:0-1
     public bool IsFallInHole { get; set; }//3:0
+    internal bool WasPassthrough { get; }
     public bool IsPassthrough { get; set; }//3:1
     public bool ForceEnterRight { get; set; }//3:2
 
@@ -138,7 +139,7 @@ public class Location
     .x.. .... - Pass through
     x... .... - Fall in hole
     */
-    public Location(LocationID lid, int yPos, int xPos, int map, Continent continent)
+    public Location(LocationID lid, int yPos, int xPos, int map, Continent continent, bool isPassthrough = false)
     {
         ID = lid;
         Map = map;
@@ -156,6 +157,8 @@ public class Location
         AccessRequirements = Requirements.NONE;
         CollectableRequirements = Requirements.NONE;
         ConnectionRequirements = Requirements.NONE;
+        IsPassthrough = isPassthrough;
+        WasPassthrough = isPassthrough;
 
         Name = ID.GetName() ?? "Unknown (" + Continent.GetName(Continent) + ")";
         ActualTown = ID.GetTown();

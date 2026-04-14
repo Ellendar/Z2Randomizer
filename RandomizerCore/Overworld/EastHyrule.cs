@@ -378,6 +378,7 @@ public sealed class EastHyrule : World
         foreach (Location location in AllLocations)
         {
             location.CanShuffle = true;
+            location.IsPassthrough = location.WasPassthrough;
             location.AccessRequirements = location.AccessRequirements.Without([RequirementType.HAMMER, RequirementType.FLUTE]);
             if (location != raft && location != bridge && location != cave1 && location != cave2)
             {

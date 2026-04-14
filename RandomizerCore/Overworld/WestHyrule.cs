@@ -368,6 +368,7 @@ public sealed class WestHyrule : World
         foreach (Location location in AllLocations)
         {
             location.CanShuffle = true;
+            location.IsPassthrough = location.WasPassthrough;
         }
         if (biome.UsesVanillaMap())
         {

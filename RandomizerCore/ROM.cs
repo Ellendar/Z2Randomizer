@@ -2314,13 +2314,12 @@ ResetRedPalettePayload:
         int yPos = yByte & 0x7f;
         int xPos = xByte & 0x3f;
         int map = mapByte & 0x3f;
-        return new Location(lid, yPos, xPos, map, lid.GetContinent())
+        return new Location(lid, yPos, xPos, map, lid.GetContinent(), isPassthrough: (worldByte & 0x40) > 0)
         {
             IsExternalWorld = (yByte & 0x80) > 0,
             EntranceNumber = xByte / 0x40,
             MapPageRaw = mapByte & 0xC0,
             IsFallInHole = (worldByte & 0x80) > 0,
-            IsPassthrough = (worldByte & 0x40) > 0,
             ForceEnterRight = (worldByte & 0x20) > 0,
             TerrainType = terrain,
             AppearsOnMap = true
