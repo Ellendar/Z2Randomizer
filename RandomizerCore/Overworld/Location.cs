@@ -61,7 +61,7 @@ public class Location
         set { Pos = new(value, pos.Y); }
     }
 
-    /// X,Y position with Y starting at 30 for the top row
+    /// Y,X position with Y starting at 30 for the top row
     public (int, int) CoordsY30Offset
     {
         get
@@ -75,6 +75,8 @@ public class Location
             Xpos = value.Item2;
         }
     }
+
+    public (int, int) VanillaCoords { get; }
 
     //List of requirements to access this location. Required before the other requirements are evaluated,
     //and to pass through the location on the map, even if the collectable is not gettable.
@@ -145,7 +147,8 @@ public class Location
         Map = map;
         YRaw = yPos;
         Xpos = xPos;
-        MemAddress = lid.GetRomOffset(); ;
+        VanillaCoords = (Y, Xpos);
+        MemAddress = lid.GetRomOffset();
         EntranceNumber = 0;
         CanShuffle = true;
         Collectables = [];
@@ -210,6 +213,11 @@ public class Location
             + " (" + (Y) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
             + '[' + string.Join(", ", Collectables.Select(i => i.ToString())) + ']';
+    }
+
+    public void ResetCoords()
+    {
+        (Y, Xpos) = VanillaCoords;
     }
 
     public int GetWorld()

@@ -379,6 +379,7 @@ public sealed class EastHyrule : World
         {
             location.CanShuffle = true;
             location.IsPassthrough = location.WasPassthrough;
+            location.ResetCoords();
             location.AccessRequirements = location.AccessRequirements.Without([RequirementType.HAMMER, RequirementType.FLUTE]);
             if (location != raft && location != bridge && location != cave1 && location != cave2)
             {
@@ -2133,7 +2134,6 @@ public sealed class EastHyrule : World
         }
         //Issue #2: Desert tile passthrough causes the wrong screen to load, making the item unobtainable.
         desertTile.IsPassthrough = false;
-
         desertTile.MapPage = 1;
 
         Location? desert = GetLocation(LocationID.EAST_MINOR_DESERT1);
