@@ -1,5 +1,13 @@
 # Z2Randomizer Changelog
 
+## Version 5.1.1 - April 14, 2026
+
+- Fixed incorrect passthroughs in Vanilla Shuffle
+- Fixed multiple bugs with custom music.
+- Added a custom music usage for Title screen music.
+- Added non-vanilla text to up/down stab hints if you started with them reminding you.
+- Tuned great lakes biome to be less lakey and marginally less Great
+
 ## Version 5.1.0 - April 4, 2026
 
 ### New Features
