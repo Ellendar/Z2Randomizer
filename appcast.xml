@@ -6,6 +6,16 @@
 		<description>Most recent changes.</description>
 		<language>en</language>
 		<item>
+			<title>Version 5.1.1</title>
+			<description>
+				<![CDATA[
+					See the <a href="https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md">changelog</a> for details about new features.
+				]]>
+			</description>
+			<pubDate>Tuesday, 14 April 2026</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/5.1.1/Z2Randomizer-5.1.1-Windows-Installer.msi" sparkle:version="5.1.1" />
+		</item>
+		<item>
 			<title>Version 5.1.0</title>
 			<description>
 				<![CDATA[
