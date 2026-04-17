@@ -2304,7 +2304,7 @@ ResetRedPalettePayload:
     /// returns a Location object with the parsed data as well as
     /// `terrain` and `continent` set.
     /// </summary>
-    public Location LoadLocation(LocationID lid, Terrain terrain)
+    public Location LoadLocation(LocationID lid, Terrain terrain, bool? passthroughOverride = null)
     {
         int addr = lid.GetRomOffset();
         byte yByte = GetByte(addr);
@@ -2314,7 +2314,7 @@ ResetRedPalettePayload:
         int yPos = yByte & 0x7f;
         int xPos = xByte & 0x3f;
         int map = mapByte & 0x3f;
-        return new Location(lid, yPos, xPos, map, lid.GetContinent(), isPassthrough: (worldByte & 0x40) > 0)
+        return new Location(lid, yPos, xPos, map, lid.GetContinent(), isPassthrough: passthroughOverride ?? (worldByte & 0x40) > 0)
         {
             IsExternalWorld = (yByte & 0x80) > 0,
             EntranceNumber = xByte / 0x40,

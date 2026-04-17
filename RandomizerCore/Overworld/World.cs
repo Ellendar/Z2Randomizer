@@ -2193,7 +2193,9 @@ public abstract class World
     public Location LoadBridge(ROM rom, Continent continent, Continent connectedContinent)
     {
         Debug.Assert(continent == continentId); // we can remove param if this is always true
-        var newBridge = rom.LoadLocation(LocationIDUtils.FromIndex(continent, Location.CONNECTOR_BRIDGE_ID), Terrain.BRIDGE);
+        var newBridge = rom.LoadLocation(LocationIDUtils.FromIndex(continent, Location.CONNECTOR_BRIDGE_ID), Terrain.BRIDGE, false);
+        Debug.Assert(newBridge.IsPassthrough == false);
+        Debug.Assert(newBridge.WasPassthrough == false);
         AddLocation(newBridge);
         bridge = GetLocation(continent, Location.CONNECTOR_BRIDGE_ID);
         Debug.Assert(newBridge == bridge);
@@ -2201,7 +2203,6 @@ public abstract class World
         bridge.ConnectedContinent = connectedContinent;
         bridge.IsExternalWorld = true;
         bridge.Map = Location.CONNECTOR_BRIDGE_ID;
-        bridge.IsPassthrough = false;
         if (!WithinMapBounds(bridge.Pos))
         {
             bridge.Pos = IntVector2.Random(RNG, MapColumns, MapRows);
