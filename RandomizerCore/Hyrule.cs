@@ -3094,6 +3094,8 @@ public class Hyrule
     private static void AddCropGuideBoxesToFileSelect(Assembler a)
     {
         a.Module().Code("""
+.include "z2r.inc"
+
 .segment "PRG5"
 .org $b28d
     jsr CustomFileSelectUpdates
@@ -3102,7 +3104,7 @@ public class Hyrule
 CustomFileSelectUpdates:
     cpy #$01
     beq @Skip
-        sta $0726  ; perform the original hooked code before exiting
+        sta DialogBoxDrawing  ; perform the original hooked code before exiting
         rts
 @Skip:
     ldx #$20     ; copy 32 + 1 bytes of data from the rom (+1 for terminator)
@@ -3232,12 +3234,14 @@ CustomFileSelectData:
         var a = asm.Module();
         a.Assign("HelmetRoom", helmetRoom);
         a.Code("""
+.include "z2r.inc"
+
 .segment "PRG4"
 
 .reloc
 HelmetHeadGoomaFix:
     lda #<HelmetRoom
-    eor $561
+    eor MapNumber
     rts
 
 .org $bac3
@@ -3262,10 +3266,6 @@ HelmetHeadGoomaFix:
 
 update_next_level_exp = $a057
 
-;(0=caves, enemy encounters...; 1=west hyrule towns; 2=east hyrule towns; 3=palace 1,2,5 ; 4=palace 3,4,6 ; 5=great palace)
-world_number = $707
-room_code = $561
-
 .segment "PRG7"
 
 .org $cbaa
@@ -3273,26 +3273,26 @@ room_code = $561
 
 .reloc
 PalacePatch:
-    sta world_number
+    sta WorldNumber
     ; if < 3 do the original patch
     cmp #$03
     bcc @Exit
     ; or if our temp flag is already set, do the original code
     lda temp_room_flag
     bne @Exit
-        lda room_code
+        lda MapNumber
         sta temp_room_code ; store the area code into a temp ram location
         inc temp_room_flag ; set a flag in another empty ram location
 @Exit:
-    lda world_number
+    lda WorldNumber
     rts
 
 .reloc
 ReloadExpForReset:
     lda temp_room_code
-    sta room_code
+    sta MapNumber
     jsr update_next_level_exp
-    lda world_number
+    lda WorldNumber
     rts
 
 .org $cad0
@@ -3312,7 +3312,7 @@ ReloadExpForReset:
 .reloc
 SaveWorldStateAndClearFlag:
     ; Precondition y = 0
-    sty world_number
+    sty WorldNumber
     sty temp_room_flag
     rts
 
@@ -3325,18 +3325,20 @@ SaveWorldStateAndClearFlag:
     private static void FixSoftLock(Assembler a)
     {
         a.Module().Code("""
+.include "z2r.inc"
+
 .segment "PRG7"
 .org $e18a
     jsr FixSoftlock
 
 .reloc
 FixSoftlock:
-    inc $0726
-    lda $074c ; branch if dialog type is not "talking"
+    inc DialogBoxDrawing
+    lda CurrentDialogType ; branch if dialog type is not "talking"
     cmp #$02
     beq +
         ldx #$00  ; otherwise close the talking dialog
-        stx $074c
+        stx CurrentDialogType
 +   rts
 """, "fix_softlock.s");
     }
@@ -3424,16 +3426,19 @@ PalacePaletteOffset:
 
 .import SwapPRG
 
-PRG_bank = $0769
-
 .segment "PRG7"
+
+; No need to set PreviousRegionNumber ($070a) anymore
+.org $cb8b
+    jmp $cb91
+FREE_UNTIL $cb91
 
 ; Patch switching the bank when loading the overworld
 .org $cd48
     bne +
     ldy RegionNumber
     lda ExpandedRegionBankTable,y
-+   sta PRG_bank
++   sta CurrentPrgBank
     jsr SwapPRG
     beq $cd5f ; unconditional jmp to skip the freespace
 FREE_UNTIL $cd5f
@@ -3493,7 +3498,7 @@ bank7_Pointer_table_for_Item_Presence_ByWorld: ; this is referenced as -1, as in
     sta $00
     lda #06
     sta $01
-    lda $0561
+    lda MapNumber
     lsr a  ; Sets the carry flag that determines which 4 bits of the item presence byte is used
     tay
     lda ($00),y
@@ -3519,10 +3524,9 @@ World0:
 RAFT_TILE_INDEX = $29
 
 PLAYER_X = $74
-AREA_LOCATION_INDEX = $0748
 PLAYER_HAS_RAFT = $0787
 
-; AREA_LOCATION_INDEX will later be changed to the side-scrolling location
+; LocationNumber will later be changed to the side-scrolling location
 ; index. z2ft needs this, at this specific address.
 AREA_ENTRANCE_INDEX = $69ff
 
@@ -3531,7 +3535,7 @@ FREE_UNTIL $8553 ; remove unused data here
 ; bridge connector coordinates are at $8553
 
 .org $8599
-    stx AREA_LOCATION_INDEX  ; X stashed away like in the original code
+    stx LocationNumber  ; X stashed away like in the original code
     stx AREA_ENTRANCE_INDEX
     cpx #RAFT_TILE_INDEX
     bne NotRaftTileProceed

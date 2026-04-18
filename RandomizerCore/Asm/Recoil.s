@@ -2,11 +2,6 @@
 
 .segment "PRG7"
 
-LinkXVelocity = $70
-EnemyID = $a1
-LinkYVelocityLo = $03E6
-LinkYVelocityHi = $057D
-
 LinkHitRoutine = $E2EF
 
 ; Patch when a boss hits link for a strong hit to ignore the 2x multiplier
@@ -32,7 +27,7 @@ SetLinkXRecoil:
     lda #$ff
 @InvertRecoil:
   pha
-    lda EnemyID,x
+    lda Enemy0Type,x
     tay
   pla
   eor RecoilTableX,y
@@ -40,7 +35,7 @@ SetLinkXRecoil:
 
 .reloc
 SetLinkYRecoil:
-  lda EnemyID,x
+  lda Enemy0Type,x
   tay
   lda RecoilTableYLo,y
   sta LinkYVelocityLo

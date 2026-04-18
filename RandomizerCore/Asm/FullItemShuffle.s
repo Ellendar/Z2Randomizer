@@ -320,14 +320,14 @@ HandlePBagDeath:
     ; since there a lot of NPCs walking around.
     bmi @Exit ; unconditional
 @FoundEmpty:
-    lda $20,x ; enemy y hi
-    sta $20,y
-    lda $2a,x ; enemy y lo
-    sta $2a,y
-    lda $3c,x ; enemy x hi
-    sta $3c,y
-    lda $4e,x ; enemy x lo
-    sta $4e,y
+    lda Enemy0YPositionHi,x
+    sta Enemy0YPositionHi,y
+    lda Enemy0YPositionLo,x
+    sta Enemy0YPositionLo,y
+    lda Enemy0XPositionHi,x
+    sta Enemy0XPositionHi,y
+    lda Enemy0XPositionLo,x
+    sta Enemy0XPositionLo,y
     ; don't reset DontKillEnemyFlag here since its needed in HandlePBagTimerClear
     tya
     tax
@@ -376,7 +376,7 @@ ExpandedGetItem:
     @NotDashSpell:
         ; flash screen as if you got the spell from a wizard 
         lda #$c0
-        sta $074b
+        sta LinkFlashingTimer
         ; Convert from expanded item ID to regular spell ID 
         tya
         sec
@@ -393,7 +393,7 @@ ExpandedGetItem:
             bpl @CheckAllSpells
         ; Update the cursor position to point to the new spell
         pla
-        sta $0749
+        sta MagicSelectorPosition
         .byte $24 ; OPCODE bit $zp (hides pla)
     @FoundLearnedSpell:
         pla
@@ -418,9 +418,9 @@ ExpandedGetItem:
     sta $ef
     jmp $e84b ; Red/blue jar handler
 @ItemStab:
-    lda $0796
+    lda HaveStabs
     ora @StabTable - ITEM_UPSTAB,y
-    sta $0796
+    sta HaveStabs
     bne @Exit ; unconditional
 @ItemBagu:
     lda $079a
