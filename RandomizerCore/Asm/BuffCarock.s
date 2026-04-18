@@ -2,7 +2,6 @@
 
 .segment "PRG4"
 
-ProjectileEnemyData = $07c0
 ; SinWaveVelocityIncrement = $ba1c
 
 ; Hook into carrock's update code to add the new position calculation
