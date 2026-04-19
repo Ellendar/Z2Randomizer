@@ -229,22 +229,26 @@ public class Hyrule
 
             SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed!)).AsSpan()[..4]);
             r = new Random(SeedHash);
+            bool shareSeedAcrossDifficulty = config.ShareSeedAcrossDifficulty;
+            Random? difficultyRng = shareSeedAcrossDifficulty ? CreateDifficultyRng(config.Seed) : null;
 
             config.CheckForFlagConflicts();
-            props = config.Export(r);
+            props = config.Export(r, includeDifficulty: !shareSeedAcrossDifficulty);
             //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
             if(config.GenerateSpoiler)
             {
                 r.NextBytes(new byte[64]);
+                difficultyRng?.NextBytes(new byte[64]);
             }
 #if UNSAFE_DEBUG
             string export = JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties);
             Debug.WriteLine(export);
 #endif
             Flags = config.SerializeFlags();
+            string sharedSeedFlags = shareSeedAcrossDifficulty ? config.SerializeSharedSeedFlags() : Flags;
 
             using Assembler assembler = CreateAssemblyEngine();
-            logger.Info($"Started generation for flags: {Flags} seed: {config.Seed} seedhash: {SeedHash}");
+            logger.Info($"Started generation for flags: {Flags} sharedseedflags: {sharedSeedFlags} seed: {config.Seed} seedhash: {SeedHash}");
             //character = new Character(props);
             shuffler = new Shuffler(props);
 
@@ -416,9 +420,6 @@ public class Hyrule
             randomizedStats.Randomize(r);
             randomizedStats.Write(ROMData);
 
-            // ideally this should be calculated later, but custom music changes asm patches
-            byte[] randoRomHash = MD5Hash.ComputeHash(ROMData.rawdata);
-
             // ROM changes after this will vary with customize tab options
             //Allows casting magic without requeueing a spell
             if (props.FastCast)
@@ -444,6 +445,8 @@ public class Hyrule
                 return new RandomizerResult(false, null, null, string.Join(Environment.NewLine, rom.messages));
             }
             ROMData = new ROM(rom.romdata);
+            string? debugFile = rom.debugfile;
+            List<string> debugMessages = rom.messages.Select(message => message.ToString()).ToList();
 
             if (randomizeMusic)
             {
@@ -498,31 +501,35 @@ public class Hyrule
                 }
             }
 
-            byte[] finalRNGState = new byte[32];
-
-            r.NextBytes(finalRNGState);
-            byte[] hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
-                Flags +
-                SeedHash +
-                randoRomHash + // ideally this should be all that's required
-                // Util.ReadAllTextFromFile(config.GetRoomsFile()) +
-                Util.ByteArrayToHexString(finalRNGState)
-            ));
-
             UpdateRom();
 
-            //0 -> W to avoid 0/O confusion, also 6/G so 6 -> X (these are not hypothetical, they have already caused confusion)
-            byte[] z2Hash = ConvertHash(hash);
-            for(int i = 0; i < z2Hash.Length; i++)
+            byte[] z2Hash;
+            if (shareSeedAcrossDifficulty)
             {
-                if(z2Hash[i] == 0xD0)
+                byte[] sharedRngState = new byte[32];
+                r.NextBytes(sharedRngState);
+                byte[] sharedHash = CalculateHash(sharedSeedFlags, SeedHash, MD5Hash.ComputeHash(ROMData.rawdata), sharedRngState);
+
+                var difficultyPatchResult = await ApplyDifficultyOnlySettings(config, difficultyRng!);
+                if (!difficultyPatchResult.success)
                 {
-                    z2Hash[i] = 0xF0;
+                    return new RandomizerResult(false, null, null, difficultyPatchResult.errorMessage);
                 }
-                if (z2Hash[i] == 0xD6)
-                {
-                    z2Hash[i] = 0xF1;
-                }
+                debugFile ??= difficultyPatchResult.debugFile;
+                debugMessages.AddRange(difficultyPatchResult.messages);
+
+                byte[] difficultyRngState = new byte[32];
+                difficultyRng!.NextBytes(difficultyRngState);
+                byte[] finalHash = CalculateHash(Flags, SeedHash, MD5Hash.ComputeHash(ROMData.rawdata), difficultyRngState);
+                z2Hash = CombineHashes(sharedHash, finalHash);
+            }
+            else
+            {
+                byte[] finalRngState = new byte[32];
+                r.NextBytes(finalRngState);
+                byte[] finalHash = CalculateHash(Flags, SeedHash, MD5Hash.ComputeHash(ROMData.rawdata), finalRngState);
+                z2Hash = ConvertHash(finalHash);
+                SanitizeHashCharacters(z2Hash);
             }
 
             ROMData.Put(0x17C2C, z2Hash);
@@ -544,7 +551,7 @@ public class Hyrule
                     File.WriteAllText("rooms.log", sb.ToString());
                 }
             }*/
-            return new RandomizerResult(true, ROMData.rawdata, rom.debugfile, string.Join(Environment.NewLine, rom.messages));
+            return new RandomizerResult(true, ROMData.rawdata, debugFile, string.Join(Environment.NewLine, debugMessages));
         }
         catch(Exception e)
         {
@@ -588,6 +595,111 @@ public class Hyrule
             0xf4,
             (byte)(((inthash >> 25)  & 0x1F) + 0xD0)
         ];
+    }
+
+    private static byte[] CalculateHash(string flags, int seedHash, byte[] romHash, byte[] rngState)
+    {
+        return MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
+            flags +
+            seedHash +
+            romHash +
+            Util.ByteArrayToHexString(rngState)
+        ));
+    }
+
+    private static Random CreateDifficultyRng(string? seed)
+    {
+        int difficultySeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes($"{seed}:difficulty")).AsSpan()[..4]);
+        return new Random(difficultySeedHash);
+    }
+
+    private static byte[] CombineHashes(byte[] sharedHash, byte[] finalHash)
+    {
+        byte[] sharedZ2Hash = ConvertHash(sharedHash);
+        byte[] finalZ2Hash = ConvertHash(finalHash);
+        SanitizeHashCharacters(sharedZ2Hash);
+        SanitizeHashCharacters(finalZ2Hash);
+
+        return [
+            sharedZ2Hash[0], 0xF4,
+            sharedZ2Hash[2], 0xF4,
+            sharedZ2Hash[4], 0xF4,
+            sharedZ2Hash[6], 0xF4,
+            finalZ2Hash[8], 0xF4,
+            finalZ2Hash[10]
+        ];
+    }
+
+    private static void SanitizeHashCharacters(byte[] z2Hash)
+    {
+        for (int i = 0; i < z2Hash.Length; i++)
+        {
+            if (z2Hash[i] == 0xD0)
+            {
+                z2Hash[i] = 0xF0;
+            }
+            if (z2Hash[i] == 0xD6)
+            {
+                z2Hash[i] = 0xF1;
+            }
+        }
+    }
+
+    private async Task<(bool success, string? debugFile, List<string> messages, string? errorMessage)> ApplyDifficultyOnlySettings(
+        RandomizerConfiguration config,
+        Random difficultyRng)
+    {
+        config.ApplyDifficultyOnlySettings(props, difficultyRng);
+
+        ROMData.Put(RomMap.START_CANDLE, props.StartCandle ? (byte)1 : (byte)0);
+        ROMData.Put(RomMap.START_CROSS, props.StartCross ? (byte)1 : (byte)0);
+        ROMData.Put(0x1C369, (byte)props.StartLives);
+        ROMData.Put(0x17B12, (byte)((props.StartWithUpstab ? 0x04 : 0) + (props.StartWithDownstab ? 0x10 : 0)));
+
+        StatRandomizer difficultyStats = new(ROMData, props);
+        difficultyStats.RandomizeDifficultyOnly(difficultyRng);
+        difficultyStats.WriteDifficultyOnly(ROMData);
+
+        bool needsDifficultyAsm =
+            props.AttackEffectiveness == AttackEffectiveness.OHKO ||
+            props.ShuffleBossHP != EnemyLifeOption.VANILLA ||
+            props.DripperEnemyOption == DripperEnemyOption.EASIER_GROUND_ENEMIES_FULL_HP ||
+            props.AttackCap < 8 ||
+            props.MagicCap < 8 ||
+            props.LifeCap < 8;
+        if (!needsDifficultyAsm)
+        {
+            return (true, null, new List<string>(), null);
+        }
+
+        using Assembler difficultyAssembler = CreateAssemblyEngine();
+        ROMData.SetLevelCap(difficultyAssembler, props.AttackCap, props.MagicCap, props.LifeCap);
+
+        if (props.ShuffleBossHP != EnemyLifeOption.VANILLA)
+        {
+            ROMData.SetBossHpBarDivisors(difficultyAssembler, difficultyStats);
+        }
+
+        if (props.DripperEnemyOption == DripperEnemyOption.EASIER_GROUND_ENEMIES_FULL_HP)
+        {
+            byte dripperId = ROMData.GetByte(RomMap.DRIPPER_ID);
+            byte dripperHp = difficultyStats.Palace125EnemyHpTable[dripperId];
+            ROMData.SetDripperHp(difficultyAssembler, dripperHp);
+        }
+
+        if (props.AttackEffectiveness == AttackEffectiveness.OHKO)
+        {
+            ROMData.UseOHKOMode(difficultyAssembler);
+        }
+
+        var rom = await ROMData.ApplyAsm(difficultyAssembler);
+        if (!rom.success)
+        {
+            return (false, null, new List<string>(), string.Join(Environment.NewLine, rom.messages));
+        }
+
+        ROMData = new ROM(rom.romdata);
+        return (true, rom.debugfile, rom.messages.Select(message => message.ToString()).ToList(), null);
     }
 
     /*

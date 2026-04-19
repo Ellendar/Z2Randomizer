@@ -935,6 +935,11 @@ randomly selected between these values (inclusive).
 
 Random selects a random number of starting lives between 2 and 5.</value>
 	</data>
+	<data name="ShareSeedAcrossDifficultyToolTip" xml:space="preserve">
+<value>When enabled, candle/cross, starting hearts, starting lives, starting sword techniques, and attack/life effectiveness no longer change the shared 4-character seed prefix.
+
+Use this only when everyone intentionally wants the same base seed with different handicaps.</value>
+	</data>
 	<data name="RandomFlagRateToolTip" xml:space="preserve">
 <value>For flags set to an indeterminate value (question mark), those flags will be on or off at
 random, at the freqency specified by this flag.</value>

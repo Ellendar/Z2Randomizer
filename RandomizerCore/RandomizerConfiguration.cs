@@ -48,6 +48,22 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     ];
 
     [IgnoreInFlags]
+    private readonly static Collectable[] POSSIBLE_SHARED_STARTING_ITEMS = [
+        Collectable.GLOVE,
+        Collectable.RAFT,
+        Collectable.BOOTS,
+        Collectable.FLUTE,
+        Collectable.HAMMER,
+        Collectable.MAGIC_KEY
+    ];
+
+    [IgnoreInFlags]
+    private readonly static Collectable[] POSSIBLE_DIFFICULTY_STARTING_ITEMS = [
+        Collectable.CANDLE,
+        Collectable.CROSS
+    ];
+
+    [IgnoreInFlags]
     private readonly static Collectable[] POSSIBLE_STARTING_SPELLS = [
         Collectable.SHIELD_SPELL,
         Collectable.JUMP_SPELL,
@@ -65,6 +81,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleStartingItems;
 
     [Reactive]
+    [DifficultyOnly]
     private bool startWithCandle;
 
     [Reactive]
@@ -80,6 +97,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool startWithFlute;
 
     [Reactive]
+    [DifficultyOnly]
     private bool startWithCross;
 
     [Reactive]
@@ -145,9 +163,11 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private MaxHeartsOption maxHeartContainers;
 
     [Reactive]
+    [DifficultyOnly]
     private StartingTechs startingTechniques;
 
     [Reactive]
+    [DifficultyOnly]
     private StartingLives startingLives;
 
     [Reactive]
@@ -436,32 +456,38 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleLifeExperience;
 
     [Reactive]
+    [DifficultyOnly]
     [Minimum(1)]
     [Maximum(8)]
     private int attackLevelCap;
 
     [Reactive]
+    [DifficultyOnly]
     [Minimum(1)]
     [Maximum(8)]
     private int magicLevelCap;
 
     [Reactive]
+    [DifficultyOnly]
     [Minimum(1)]
     [Maximum(8)]
     private int lifeLevelCap;
 
     [Reactive]
+    [DifficultyOnly]
     [ConditionallyIncludeInFlags]
     private bool scaleLevelRequirementsToCap;
     public bool scaleLevelRequirementsToCapIncluded() => attackLevelCap < 8 || magicLevelCap < 8 || lifeLevelCap < 8;
 
     [Reactive]
+    [DifficultyOnly]
     private AttackEffectiveness attackEffectiveness;
 
     [Reactive]
     private MagicEffectiveness magicEffectiveness;
 
     [Reactive]
+    [DifficultyOnly]
     private LifeEffectiveness lifeEffectiveness;
 
     //Spells
@@ -508,9 +534,11 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     public bool generatorsAlwaysMatchIncluded() => anyEnemiesAreShuffled();
 
     [Reactive]
+    [DifficultyOnly]
     private EnemyLifeOption shuffleEnemyHP;
 
     [Reactive]
+    [DifficultyOnly]
     private EnemyLifeOption shuffleBossHP;
 
     [Reactive]
@@ -523,6 +551,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleSwordImmunity;
 
     [Reactive]
+    [DifficultyOnly]
     private XPEffectiveness enemyXPDrops;
 
     //Items
@@ -758,6 +787,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     private bool revealWalkthroughWalls;
 
+    [Reactive]
+    private bool shareSeedAcrossDifficulty;
+
     //Meta
     [Reactive]
     [Required]
@@ -772,6 +804,11 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     public String SerializeFlags()
     {
         return Serialize();
+    }
+
+    public string SerializeSharedSeedFlags()
+    {
+        return SerializeSharedSeed();
     }
 
     public RandomizerConfiguration()
@@ -874,7 +911,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         flags.Append(index, extent);
     }
 
-    public RandomizerProperties Export(Random r)
+    public RandomizerProperties Export(Random r, bool includeDifficulty = true)
     {
         RandomizerProperties properties = new()
         {
@@ -893,7 +930,8 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         do // while (!properties.HasEnoughSpaceToAllocateItems())
         {
             //Start Configuration
-            ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, startItemsLimit, shuffleStartingItems, properties, r);
+            ShuffleStartingCollectables(includeDifficulty ? POSSIBLE_STARTING_ITEMS : POSSIBLE_SHARED_STARTING_ITEMS,
+                startItemsLimit, shuffleStartingItems, properties, r);
             ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, startSpellsLimit, shuffleStartingSpells, properties, r);
 
             List<PalaceStyle> allowedPalaceStyles;
@@ -955,47 +993,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             AssignPalaceItemCounts(properties, r);
 
             //Other starting attributes
-            int startHeartsMin, startHeartsMax;
-            if (startingHeartContainersMin == null)
-            {
-                startHeartsMin = r.Next(1, 9);
-            }
-            else
-            {
-                startHeartsMin = (int)startingHeartContainersMin;
-            }
-            if (startingHeartContainersMax == null)
-            {
-                startHeartsMax = r.Next(startHeartsMin, 9);
-            }
-            else
-            {
-                startHeartsMax = (int)startingHeartContainersMax;
-            }
-            properties.StartHearts = r.Next(startHeartsMin, startHeartsMax + 1);
-
-            //+1/+2/+3
-            if (maxHeartContainers == MaxHeartsOption.RANDOM)
-            {
-                properties.MaxHearts = r.Next(properties.StartHearts, 9);
-            }
-            else if ((int)maxHeartContainers <= 8)
-            {
-                properties.MaxHearts = (int)maxHeartContainers;
-            }
-            else
-            {
-                int additionalHearts = maxHeartContainers switch
-                {
-                    MaxHeartsOption.PLUS_ONE => 1,
-                    MaxHeartsOption.PLUS_TWO => 2,
-                    MaxHeartsOption.PLUS_THREE => 3,
-                    MaxHeartsOption.PLUS_FOUR => 4,
-                    _ => throw new ImpossibleException("Invalid heart container max configuration")
-                };
-                properties.MaxHearts = Math.Min(properties.StartHearts + additionalHearts, 8);
-            }
-            properties.MaxHearts = Math.Max(properties.MaxHearts, properties.StartHearts);
+            (properties.StartHearts, properties.MaxHearts) = ResolveHeartSettings(r);
 
             int startMagicsMin, startMagicsMax;
             if (startingMagicContainersMin == null)
@@ -1055,51 +1053,11 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 break;
         }
 
-        //If both stabs are random, use the classic weightings
-        if (startingTechniques == StartingTechs.RANDOM)
-        {
-            switch (r.Next(7))
-            {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                    properties.StartWithDownstab = false;
-                    properties.StartWithUpstab = false;
-                    break;
-                case 4:
-                    properties.StartWithDownstab = true;
-                    properties.StartWithUpstab = false;
-                    break;
-                case 5:
-                    properties.StartWithDownstab = false;
-                    properties.StartWithUpstab = true;
-                    break;
-                case 6:
-                    properties.StartWithDownstab = true;
-                    properties.StartWithUpstab = true;
-                    break;
-            }
-        }
-        else
-        {
-            properties.StartWithDownstab = startingTechniques.StartWithDownstab();
-            properties.StartWithUpstab = startingTechniques.StartWithUpstab();
-        }
+        ResolveStartingTechniques(properties, r, includeDifficulty);
         properties.SwapUpAndDownStab = swapUpAndDownStab ?? GetIndeterminateFlagValue(r);
 
 
-        properties.StartLives = startingLives switch
-        {
-            StartingLives.Lives1 => 1,
-            StartingLives.Lives2 => 2,
-            StartingLives.Lives3 => 3,
-            StartingLives.Lives4 => 4,
-            StartingLives.Lives5 => 5,
-            StartingLives.Lives8 => 8,
-            StartingLives.Lives16 => 16,
-            _ => r.Next(2, 6)
-        };
+        properties.StartLives = ResolveStartingLives(r, includeDifficulty);
         properties.PermanentBeam = permanentBeamSword;
         properties.UseCommunityText = useCommunityText;
         properties.StartAtk = startingAttackLevel;
@@ -1372,8 +1330,8 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.RevealWalkthroughWalls = revealWalkthroughWalls;
 
         //Enemies
-        properties.ShuffleEnemyHP = shuffleEnemyHP;
-        properties.ShuffleBossHP = shuffleBossHP;
+        properties.ShuffleEnemyHP = includeDifficulty ? shuffleEnemyHP : EnemyLifeOption.VANILLA;
+        properties.ShuffleBossHP = includeDifficulty ? shuffleBossHP : EnemyLifeOption.VANILLA;
         properties.ShuffleEnemyStealExp = shuffleXPStealers;
         properties.ShuffleStealExpAmt = shuffleXPStolenAmount;
         properties.ShuffleSwordImmunity = shuffleSwordImmunity;
@@ -1383,22 +1341,22 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.DripperEnemyOption = dripperEnemyOption;
         properties.SpellEnemy = randomizeSpellSpellEnemy ?? GetIndeterminateFlagValue(r);
         properties.ShuffleEnemyPalettes = shuffleSpritePalettes;
-        properties.EnemyXPDrops = enemyXPDrops;
+        properties.EnemyXPDrops = includeDifficulty ? enemyXPDrops : XPEffectiveness.VANILLA;
 
         //Levels
         properties.ShuffleAtkExp = shuffleAttackExperience;
         properties.ShuffleMagicExp = shuffleMagicExperience;
         properties.ShuffleLifeExp = shuffleLifeExperience;
-        properties.AttackEffectiveness = attackEffectiveness;
+        properties.AttackEffectiveness = includeDifficulty ? attackEffectiveness : AttackEffectiveness.VANILLA;
         properties.MagicEffectiveness = magicEffectiveness;
-        properties.LifeEffectiveness = lifeEffectiveness;
+        properties.LifeEffectiveness = includeDifficulty ? lifeEffectiveness : LifeEffectiveness.VANILLA;
         properties.ShuffleLifeRefill = shuffleLifeRefillAmount;
         properties.ShuffleSpellLocations = shuffleSpellLocations ?? GetIndeterminateFlagValue(r);
         properties.DisableMagicRecs = disableMagicContainerRequirements ?? GetIndeterminateFlagValue(r);
-        properties.AttackCap = attackLevelCap;
-        properties.MagicCap = magicLevelCap;
-        properties.LifeCap = lifeLevelCap;
-        properties.ScaleLevels = scaleLevelRequirementsToCap;
+        properties.AttackCap = includeDifficulty ? attackLevelCap : 8;
+        properties.MagicCap = includeDifficulty ? magicLevelCap : 8;
+        properties.LifeCap = includeDifficulty ? lifeLevelCap : 8;
+        properties.ScaleLevels = includeDifficulty && scaleLevelRequirementsToCap;
 
         //Items
         properties.ShuffleOverworldItems = shuffleOverworldItems ?? GetIndeterminateFlagValue(r);
@@ -1615,6 +1573,22 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         return properties;
     }
 
+    public void ApplyDifficultyOnlySettings(RandomizerProperties properties, Random r)
+    {
+        ShuffleStartingCollectables(POSSIBLE_DIFFICULTY_STARTING_ITEMS, startItemsLimit, shuffleStartingItems, properties, r);
+        ResolveStartingTechniques(properties, r, includeDifficulty: true);
+        properties.StartLives = ResolveStartingLives(r, includeDifficulty: true);
+        properties.AttackCap = attackLevelCap;
+        properties.MagicCap = magicLevelCap;
+        properties.LifeCap = lifeLevelCap;
+        properties.ScaleLevels = scaleLevelRequirementsToCap;
+        properties.AttackEffectiveness = attackEffectiveness;
+        properties.LifeEffectiveness = lifeEffectiveness;
+        properties.ShuffleEnemyHP = shuffleEnemyHP;
+        properties.ShuffleBossHP = shuffleBossHP;
+        properties.EnemyXPDrops = enemyXPDrops;
+    }
+
     public void AssignPalaceItemCounts(RandomizerProperties properties, Random r)
     {
         //I'm not sure whether I like the bias introduced in generating random values and then capping them
@@ -1709,11 +1683,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     /// scenario should work.
     public void CheckForFlagConflicts()
     {
-        int requiredMinorItemReplacements = 0;
-        if ((startingHeartContainersMax ?? 8) < 4)
-        {
-            requiredMinorItemReplacements = 4 - (startingHeartContainersMax ?? 4);
-        }
+        int requiredMinorItemReplacements = Math.Max(0, 4 - ((startingHeartContainersMax ?? 4)));
         if (CountPossibleMinorItems() < requiredMinorItemReplacements)
         {
             throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for removed palace items.\n\nAdd more starting items or more palace items.");
@@ -1837,20 +1807,116 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         }
     }
 
+    private (int StartHearts, int MaxHearts) ResolveHeartSettings(Random r)
+    {
+        int startHeartsMin = startingHeartContainersMin ?? r.Next(1, 9);
+        int startHeartsMax = startingHeartContainersMax ?? r.Next(startHeartsMin, 9);
+        int startHearts = r.Next(startHeartsMin, startHeartsMax + 1);
+        int maxHearts = ResolveMaxHearts(r, startHearts);
+        maxHearts = Math.Max(maxHearts, startHearts);
+        return (startHearts, maxHearts);
+    }
+
+    private int ResolveMaxHearts(Random r, int startHearts)
+    {
+        if (maxHeartContainers == MaxHeartsOption.RANDOM)
+        {
+            return r.Next(startHearts, 9);
+        }
+        if ((int)maxHeartContainers <= 8)
+        {
+            return (int)maxHeartContainers;
+        }
+
+        int additionalHearts = maxHeartContainers switch
+        {
+            MaxHeartsOption.PLUS_ONE => 1,
+            MaxHeartsOption.PLUS_TWO => 2,
+            MaxHeartsOption.PLUS_THREE => 3,
+            MaxHeartsOption.PLUS_FOUR => 4,
+            _ => throw new ImpossibleException("Invalid heart container max configuration")
+        };
+        return Math.Min(startHearts + additionalHearts, 8);
+    }
+
+    private void ResolveStartingTechniques(RandomizerProperties properties, Random r, bool includeDifficulty)
+    {
+        if (!includeDifficulty)
+        {
+            properties.StartWithDownstab = false;
+            properties.StartWithUpstab = false;
+            return;
+        }
+
+        if (startingTechniques == StartingTechs.RANDOM)
+        {
+            switch (r.Next(7))
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    properties.StartWithDownstab = false;
+                    properties.StartWithUpstab = false;
+                    break;
+                case 4:
+                    properties.StartWithDownstab = true;
+                    properties.StartWithUpstab = false;
+                    break;
+                case 5:
+                    properties.StartWithDownstab = false;
+                    properties.StartWithUpstab = true;
+                    break;
+                case 6:
+                    properties.StartWithDownstab = true;
+                    properties.StartWithUpstab = true;
+                    break;
+            }
+        }
+        else
+        {
+            properties.StartWithDownstab = startingTechniques.StartWithDownstab();
+            properties.StartWithUpstab = startingTechniques.StartWithUpstab();
+        }
+    }
+
+    private int ResolveStartingLives(Random r, bool includeDifficulty)
+    {
+        if (!includeDifficulty)
+        {
+            return 3;
+        }
+
+        return startingLives switch
+        {
+            StartingLives.Lives1 => 1,
+            StartingLives.Lives2 => 2,
+            StartingLives.Lives3 => 3,
+            StartingLives.Lives4 => 4,
+            StartingLives.Lives5 => 5,
+            StartingLives.Lives8 => 8,
+            StartingLives.Lives16 => 16,
+            _ => r.Next(2, 6)
+        };
+    }
+
     private int CountPossibleMinorItems()
     {
         int count = 3, hardStartItemsCount = 0;
 
-        hardStartItemsCount += shuffleStartingItems || startWithCandle ? 1 : 0;
+        hardStartItemsCount += !shareSeedAcrossDifficulty && (shuffleStartingItems || startWithCandle) ? 1 : 0;
         hardStartItemsCount += shuffleStartingItems || startWithBoots ? 1 : 0;
-        hardStartItemsCount += shuffleStartingItems || startWithCross ? 1 : 0;
+        hardStartItemsCount += !shareSeedAcrossDifficulty && (shuffleStartingItems || startWithCross) ? 1 : 0;
         hardStartItemsCount += shuffleStartingItems || startWithFlute ? 1 : 0;
         hardStartItemsCount += shuffleStartingItems || startWithGlove ? 1 : 0;
         hardStartItemsCount += shuffleStartingItems || startWithHammer ? 1 : 0;
         hardStartItemsCount += shuffleStartingItems || startWithMagicKey ? 1 : 0;
         hardStartItemsCount += shuffleStartingItems || startWithRaft ? 1 : 0;
 
-        count += Math.Max(hardStartItemsCount, shuffleStartingItems ? startItemsLimit.AsInt() : 0);
+        int possibleStartItemLimit = shareSeedAcrossDifficulty
+            ? Math.Min(startItemsLimit.AsInt(), POSSIBLE_SHARED_STARTING_ITEMS.Length)
+            : startItemsLimit.AsInt();
+        count += Math.Max(hardStartItemsCount, shuffleStartingItems ? possibleStartItemLimit : 0);
 
         if(includeSpellsInShuffle ?? true)
         {
