@@ -54,15 +54,22 @@ public class StatRandomizer
         ReadEnemyStats(rom);
     }
 
-    public void Randomize(Random r)
+    public void Randomize(Random r, bool skipDifficultyOnly = false)
     {
 #if DEBUG
         Debug.Assert(!hasRandomized);
         hasRandomized = true;
 #endif
-        ExperienceToLevelTable = RandomizeExperienceToLevel(ExperienceToLevelTable, r,
-            [props.ShuffleAtkExp, props.ShuffleMagicExp, props.ShuffleLifeExp],
-            [props.AttackCap, props.MagicCap, props.LifeCap], props.ScaleLevels);
+        // When shared-seed mode is on, the XP level table depends on
+        // difficulty-only props (level caps, scaleLevels) and is randomized
+        // from vanilla in RandomizeDifficultyOnly. Skipping here keeps a
+        // single randomization pass against the vanilla baseline.
+        if (!skipDifficultyOnly)
+        {
+            ExperienceToLevelTable = RandomizeExperienceToLevel(ExperienceToLevelTable, r,
+                [props.ShuffleAtkExp, props.ShuffleMagicExp, props.ShuffleLifeExp],
+                [props.AttackCap, props.MagicCap, props.LifeCap], props.ScaleLevels);
+        }
 
         RandomizeAttackEffectiveness(r, props.AttackEffectiveness);
         RandomizeLifeEffectiveness(r, props.LifeEffectiveness);
@@ -72,6 +79,19 @@ public class StatRandomizer
         RandomizeBossHp(r);
         FixRebonackHorseKillBug();
         RandomizeEnemyStats(r);
+    }
+
+    public void RandomizeDifficultyOnly(Random r)
+    {
+        ExperienceToLevelTable = RandomizeExperienceToLevel(ExperienceToLevelTable, r,
+            [props.ShuffleAtkExp, props.ShuffleMagicExp, props.ShuffleLifeExp],
+            [props.AttackCap, props.MagicCap, props.LifeCap], props.ScaleLevels);
+        RandomizeAttackEffectiveness(r, props.AttackEffectiveness);
+        RandomizeLifeEffectiveness(r, props.LifeEffectiveness);
+        RandomizeRegularEnemyHp(r);
+        RandomizeBossHp(r);
+        FixRebonackHorseKillBug();
+        RandomizeEnemyExperienceDrops(r);
     }
 
     public void Write(ROM rom)
@@ -568,6 +588,16 @@ public class StatRandomizer
         RandomizeEnemyExp(r, BossExpTable, props.EnemyXPDrops); // randomize boss XP separately
     }
 
+    protected void RandomizeEnemyExperienceDrops(Random r)
+    {
+        RandomizeEnemyExpForTable(r, WestEnemyStatsTable, Enemies.WestGroundEnemies, Enemies.WestFlyingEnemies, Enemies.WestGenerators);
+        RandomizeEnemyExpForTable(r, EastEnemyStatsTable, Enemies.EastGroundEnemies, Enemies.EastFlyingEnemies, Enemies.EastGenerators);
+        RandomizeEnemyExpForTable(r, Palace125EnemyStatsTable, Enemies.Palace125GroundEnemies, Enemies.Palace125FlyingEnemies, Enemies.Palace125Generators);
+        RandomizeEnemyExpForTable(r, Palace346EnemyStatsTable, Enemies.Palace346GroundEnemies, Enemies.Palace346FlyingEnemies, Enemies.Palace346Generators);
+        RandomizeEnemyExpForTable(r, GpEnemyStatsTable, Enemies.GPGroundEnemies, Enemies.GPFlyingEnemies, Enemies.GPGenerators);
+        RandomizeEnemyExp(r, BossExpTable, props.EnemyXPDrops);
+    }
+
     protected void RandomizeEnemyAttributes<T>(Random r, byte[] bytes, T[] groundEnemies, T[] flyingEnemies, T[] generators) where T : Enum
     {
         List<T> allEnemies = [.. groundEnemies, .. flyingEnemies, .. generators];
@@ -621,6 +651,17 @@ public class StatRandomizer
             int index = (int)(object)allEnemies[i];
             bytes[index] = enemyBytes1[i];
             bytes[index + 0x24] = enemyBytes2[i];
+        }
+    }
+
+    protected void RandomizeEnemyExpForTable<T>(Random r, byte[] bytes, T[] groundEnemies, T[] flyingEnemies, T[] generators) where T : Enum
+    {
+        List<T> allEnemies = [.. groundEnemies, .. flyingEnemies, .. generators];
+        byte[] enemyBytes = allEnemies.Select(n => bytes[(int)(object)n]).ToArray();
+        RandomizeEnemyExp(r, enemyBytes, props.EnemyXPDrops);
+        for (int i = 0; i < allEnemies.Count; i++)
+        {
+            bytes[(int)(object)allEnemies[i]] = enemyBytes[i];
         }
     }
 
