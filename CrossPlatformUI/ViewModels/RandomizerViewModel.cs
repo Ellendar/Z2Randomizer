@@ -8,10 +8,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
-using Material.Colors;
 using Avalonia.Controls;
-using Avalonia.Media;
-using Material.Styles.Themes;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
@@ -212,6 +209,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
         // flag updates from RandomizerConfiguration always overwrites our flag input
         Main.FlagsObservable
+            .Do(x => FlagsValidSubject.OnNext(true))
             .Subscribe(flags => FlagInput = flags)
             .DisposeWith(disposables);
 
