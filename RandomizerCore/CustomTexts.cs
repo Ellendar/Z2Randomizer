@@ -770,6 +770,12 @@ public class CustomTexts
 
     private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndexes, Random r, bool useBaguWoods, bool useCommunityText)
     {
+        ShuffleBag<string> kidKnowNothingTexts = new(KNOW_NOTHING_KID_TEXTS, r);
+        ShuffleBag<string> sariaGreeterTexts = new(KNOW_NOTHING_SARIA_GREETER_TEXTS, r);
+        ShuffleBag<string> outsideKnowNothingTexts = new(KNOW_NOTHING_OUTSIDE_TEXTS, r);
+        ShuffleBag<string> knowNothingTexts = new(KNOW_NOTHING_TEXTS, r);
+        ShuffleBag<string> movingNpcTexts = new(MOVING_NPC_TEXTS, r);
+
         List<int> stationary =
         [
             .. rauruHints,
@@ -808,19 +814,19 @@ public class CustomTexts
                 {
                     if (kidHintNpcs.Contains(textIndex))
                     {
-                        hint = new Text(KNOW_NOTHING_KID_TEXTS.Sample(r)!);
+                        hint = new Text(kidKnowNothingTexts.Draw());
                     }
                     else if (textIndex == SariaGreeterNpc)
                     {
-                        hint = new Text(KNOW_NOTHING_SARIA_GREETER_TEXTS.Sample(r)!);
+                        hint = new Text(sariaGreeterTexts.Draw());
                     }
                     else if (outsideHintNpcs.Contains(textIndex))
                     {
-                        hint = new Text(KNOW_NOTHING_OUTSIDE_TEXTS.Sample(r)!);
+                        hint = new Text(outsideKnowNothingTexts.Draw());
                     }
                     else
                     {
-                        hint = new Text(KNOW_NOTHING_TEXTS.Sample(r)!);
+                        hint = new Text(knowNothingTexts.Draw());
                     }
                 }
                 else
@@ -841,7 +847,7 @@ public class CustomTexts
 
         for (int i = 0; i < moving.Count; i++)
         {
-            hints[moving[i]] =  useCommunityText ? new Text(MOVING_NPC_TEXTS.Sample(r)!) : defaultKnowNothing;
+            hints[moving[i]] = useCommunityText ? new Text(movingNpcTexts.Draw()) : defaultKnowNothing;
         }
     }
 
