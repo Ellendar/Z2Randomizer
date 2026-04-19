@@ -10,9 +10,8 @@
              x:Class="CrossPlatformUI.Views.SaveNewPresetView">
     <Grid RowDefinitions="*, Auto">
         <StackPanel VerticalAlignment="Center">
-            <TextBox UseFloatingWatermark="True"
-                     Name="PresetNameTextBox"
-                     Watermark="Preset Name"
+            <TextBox Name="PresetNameTextBox"
+                     UseFloatingPlaceholder="True" PlaceholderText="Preset Name"
                      assists:TextFieldAssist.Label="Enter a name for the preset"
                      Text="{Binding PresetName}" />
         </StackPanel>

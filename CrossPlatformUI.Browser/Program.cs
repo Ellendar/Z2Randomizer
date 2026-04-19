@@ -42,18 +42,20 @@ internal sealed partial class Program
 
         return BuildAvaloniaApp()
             .WithInterFont()
-            .UseReactiveUI()
             .AfterSetup(_ =>
-        {
-            App.ServiceContainer ??= new();
+            {
+                App.ServiceContainer ??= new();
 
-            App.ServiceContainer.AddSingleton<Hyrule.NewAssemblerFn>(MakeBrowserAssembler);
-            App.FileSystemService = new BrowserFileService();
-            App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService);
+                App.ServiceContainer.AddSingleton<Hyrule.NewAssemblerFn>(MakeBrowserAssembler);
+                App.FileSystemService = new BrowserFileService();
+                App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService);
 
-            SetTitle(App.Title);
-        })
-        .StartBrowserAppAsync("out");
+                SetTitle(App.Title);
+            })
+            .UseReactiveUI(_ =>
+            {
+            })
+            .StartBrowserAppAsync("out");
     }
 
 

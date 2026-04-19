@@ -3,11 +3,11 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <Js65Version>1.0.7</Js65Version>
-    <AvaloniaVersion>11.3.12</AvaloniaVersion>
-    <DialogHostAvaloniaVersion>0.10.4</DialogHostAvaloniaVersion>
-    <MaterialAvaloniaVersion>3.13.4</MaterialAvaloniaVersion>
-    <MaterialIconsAvaloniaVersion>2.4.1</MaterialIconsAvaloniaVersion>
-    <SkiaSharpVersion>2.88.9</SkiaSharpVersion> <!-- Match version used by Avalonia internally -->
+    <AvaloniaVersion>12.0.2</AvaloniaVersion>
+    <DialogHostAvaloniaVersion>0.12.1</DialogHostAvaloniaVersion>
+    <MaterialAvaloniaVersion>3.16.0</MaterialAvaloniaVersion>
+    <MaterialIconsAvaloniaVersion>3.0.2</MaterialIconsAvaloniaVersion>
+    <SkiaSharpVersion>3.119.3-preview.1.1</SkiaSharpVersion> <!-- Match version used by Avalonia internally -->
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>

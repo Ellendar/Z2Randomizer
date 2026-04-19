@@ -26,6 +26,9 @@ public sealed partial class App : Application // , IDisposable
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+#if DEBUG
+        this.AttachDeveloperTools();
+#endif
 
         var version = Assembly.GetExecutingAssembly().GetName().Version;
         var versionString = version?.ToString(version.Revision > 0 ? 4 : 3);

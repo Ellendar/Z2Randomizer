@@ -32,17 +32,18 @@
         <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.1" />
         <PackageReference Include="DialogHost.Avalonia" Version="$(DialogHostAvaloniaVersion)" />
         <PackageReference Include="Material.Avalonia" Version="$(MaterialAvaloniaVersion)" />
         <PackageReference Include="Material.Icons.Avalonia" Version="$(MaterialIconsAvaloniaVersion)" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
-        <PackageReference Include="ReactiveUI.Avalonia" Version="11.3.8" />
-        <PackageReference Include="ReactiveUI.Validation" Version="6.0.18" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
+        <PackageReference Include="ReactiveUI" Version="23.2.19" />
+        <PackageReference Include="ReactiveUI.Avalonia" Version="12.0.1" />
+        <PackageReference Include="ReactiveUI.Validation" Version="7.0.5" />
         <PackageReference Include="Aigamo.ResXGenerator" Version="4.3.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.9.5" />
+        <PackageReference Include="Xaml.Behaviors.Interactions" Version="12.0.0" />
     </ItemGroup>
 
     <ItemGroup>
