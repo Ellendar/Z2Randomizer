@@ -910,6 +910,7 @@ public class CustomTexts
             hintCollectables = hintCollectables.Take(hintsCount - 1).ToList();
         }
         hintCollectables.Add(items.Where(smallItems.Contains).ToList().Sample(r));
+        hintCollectables.FisherYatesShuffle(r);
 
         bool requiredOldKasutoHintPlaced = !OLD_KASUTO_HINT_IS_ALWAYS_GOOD;
         foreach(Collectable hintCollectable in hintCollectables)
