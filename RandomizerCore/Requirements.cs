@@ -21,6 +21,15 @@ public class Requirements
         {RequirementType.SPELL, [RequirementType.FOUR_CONTAINERS] },
     };
 
+    // the magic level you have to each for each spell to be considered in-logic
+    private static readonly Dictionary<RequirementType, int> ImplicitMagicLevelRequirements = new()
+    {
+        { RequirementType.JUMP, 2 },
+        { RequirementType.FAIRY, 4 },
+        { RequirementType.REFLECT, 4 },
+        { RequirementType.SPELL, 4 },
+    };
+
     public RequirementType[] IndividualRequirements { get; private set; }
     public RequirementType[][] CompositeRequirements { get; private set; }
 
@@ -149,6 +158,73 @@ public class Requirements
         return individualRequirementsSatisfied || compositeRequirementSatisfied;
     }
 
+    public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables, StatRandomizer statRoll)
+    {
+        if (IndividualRequirements.Length + CompositeRequirements.Length == 0)
+        {
+            return true;
+        }
+        var individualRequirementsSatisfied = false;
+        var requirementTypes = requireables as RequirementType[] ?? requireables.ToArray();
+
+        statRoll.AssertHasRandomized();
+
+        bool StatAdjustedContainerRequirementSatisfied(RequirementType requirement)
+        {
+            if (ImplicitMagicLevelRequirements.ContainsKey(requirement))
+            {
+                Collectable collectable = requirement.AsCollectable()!.Value;
+                var requiredLevel = ImplicitMagicLevelRequirements[requirement];
+                var magicCost = statRoll.GetSpellCost(collectable, requiredLevel);
+                var containerRequirement = MagicContainerRequirementFromCost(magicCost);
+                return requirementTypes.Contains(containerRequirement);
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        foreach (var requirement in IndividualRequirements)
+        {
+            if (requirementTypes.Contains(requirement))
+            {
+                individualRequirementsSatisfied = true;
+                if (!StatAdjustedContainerRequirementSatisfied(requirement))
+                {
+                    individualRequirementsSatisfied = false;
+                }
+
+                if (individualRequirementsSatisfied)
+                {
+                    break;
+                }
+            }
+        }
+
+        bool compositeRequirementSatisfied = false;
+        foreach (RequirementType[] compositeRequirement in CompositeRequirements)
+        {
+            if (compositeRequirement.All(i => requireables.Contains(i)))
+            {
+                compositeRequirementSatisfied = true;
+            }
+            foreach (RequirementType component in compositeRequirement)
+            {
+                if (!StatAdjustedContainerRequirementSatisfied(component))
+                {
+                    compositeRequirementSatisfied = false;
+                    break;
+                }
+            }
+            if (compositeRequirementSatisfied == true)
+            {
+                break;
+            }
+        }
+        return individualRequirementsSatisfied || compositeRequirementSatisfied;
+    }
+
     public Requirements WithHardRequirement(RequirementType requirement)
     {
         Requirements newRequirements = new();
@@ -239,6 +315,29 @@ public class Requirements
             }
         }
         return true;
+    }
+
+    public static RequirementType MagicContainerRequirementFromCost(int magicCost)
+    {
+        switch (magicCost)
+        {
+            case <= 16:
+                return RequirementType.ONE_CONTAINER;
+            case <= 32:
+                return RequirementType.TWO_CONTAINERS;
+            case <= 48:
+                return RequirementType.THREE_CONTAINERS;
+            case <= 64:
+                return RequirementType.FOUR_CONTAINERS;
+            case <= 80:
+                return RequirementType.FIVE_CONTAINERS;
+            case <= 96:
+                return RequirementType.SIX_CONTAINERS;
+            case <= 112:
+                return RequirementType.SEVEN_CONTAINERS;
+            default:
+                return RequirementType.EIGHT_CONTAINERS;
+        }
     }
 }
 
