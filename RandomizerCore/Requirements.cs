@@ -24,8 +24,8 @@ public class Requirements
     // the magic level you have to each for each spell to be considered in-logic
     private static readonly Dictionary<RequirementType, int> ImplicitMagicLevelRequirements = new()
     {
-        { RequirementType.JUMP, 3 },
-        { RequirementType.FAIRY, 3 },
+        { RequirementType.JUMP, 2 },
+        { RequirementType.FAIRY, 4 },
         { RequirementType.REFLECT, 4 },
         { RequirementType.SPELL, 4 },
     };
