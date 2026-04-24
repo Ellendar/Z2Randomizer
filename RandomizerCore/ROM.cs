@@ -2007,6 +2007,21 @@ ResetRedPalettePayload:
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
     }
 
+    public void AggressiveThunderbird()
+    {
+        const byte thunderBirdHP = 192;
+        // 0x15453 - Starting HP value
+        Put(0x15453, thunderBirdHP);
+        // 0x15ed6 - "face revealed" if HP < this value
+        Put(0x15ed6, thunderBirdHP);
+        // 0x163df - "face revealed" if HP < this value(part 2 ?)
+        Put(0x163df, thunderBirdHP);
+        // 0x163f6 - HP bar divisor(i'll make a patch for this in 4.4 soonish)
+        Put(0x16406, (byte)(thunderBirdHP / 8));
+        // 0x16403 - Hard Mode if HP < this value (vanilla half HP)
+        Put(0x16413, thunderBirdHP);
+    }
+
     public void DashSpell(Assembler asm)
     {
         var a = asm.Module();

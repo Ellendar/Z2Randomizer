@@ -3778,6 +3778,11 @@ bank5_Pointer_table_for_End_Credits:
             rom.BuffCarrock(engine);
         }
 
+        if (props.AggressiveTbird)
+        {
+            rom.AggressiveThunderbird();
+        }
+
         if (props.ReplaceFireWithDash)
         {
             rom.DashSpell(engine);

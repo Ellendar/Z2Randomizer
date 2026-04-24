@@ -133,6 +133,7 @@ public class RandomizerProperties
     public bool AllowV4Rooms { get; set; }
     public bool AllowV5_0Rooms { get; set; }
     public bool HardBosses { get; set; }
+    public bool AggressiveTbird { get; set; }
     [NotMapped]
     public int[] PalaceItemRoomCounts { get; set; } = new int[6];
     public bool UsePalaceItemRoomCountIndicator { get; set; }

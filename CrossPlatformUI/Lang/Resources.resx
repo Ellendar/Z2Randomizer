@@ -808,6 +808,10 @@ Tower palace style always exits after the boss and is not affected by this setti
 <value>Tired of just ducking in the corner and blocking? This option enables carock shooting
 high/low/wave beams, but he won&apos;t teleport on top of you anymore.</value>
 	</data>
+	<data name="AggressiveThunderbirdToolTip" xml:space="preserve">
+<value>Starts Thunderbird in his aggressive phase for the entire fight. His HP and HP bar are
+raised so the full fight uses the faster pattern.</value>
+	</data>
 
 	<data name="GPPalaceStyleToolTip" xml:space="preserve">
 <value>Sets the palace generator for the Great Palace. See the Wiki for more details about palace
