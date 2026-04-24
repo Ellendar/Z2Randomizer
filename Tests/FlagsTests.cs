@@ -156,4 +156,85 @@ public class FlagsTests
         RandomizerConfiguration config2 = new RandomizerConfiguration(MaxRando2025Preset.Preset.SerializeFlags());
         Assert.AreEqual(config.SerializeFlags(), config2.SerializeFlags());
     }
+
+    [TestMethod]
+    public void DifficultyOnlyFlagsDoNotChangeSharedSeedFlags()
+    {
+        RandomizerConfiguration baseConfig = new()
+        {
+            ShareSeedAcrossDifficulty = true
+        };
+        RandomizerConfiguration difficultyConfig = new()
+        {
+            ShareSeedAcrossDifficulty = true,
+            StartWithCandle = true,
+            StartWithCross = true,
+            StartingTechniques = StartingTechs.BOTH,
+            StartingLives = StartingLives.Lives1,
+            AttackLevelCap = 4,
+            MagicLevelCap = 6,
+            LifeLevelCap = 7,
+            ScaleLevelRequirementsToCap = true,
+            AttackEffectiveness = AttackEffectiveness.OHKO,
+            LifeEffectiveness = LifeEffectiveness.INVINCIBLE,
+            ShuffleEnemyHP = EnemyLifeOption.WIDE,
+            ShuffleBossHP = EnemyLifeOption.MEDIUM_HIGH,
+            EnemyXPDrops = XPEffectiveness.NONE
+        };
+
+        Assert.AreNotEqual(baseConfig.SerializeFlags(), difficultyConfig.SerializeFlags());
+        Assert.AreEqual(baseConfig.SerializeSharedSeedFlags(), difficultyConfig.SerializeSharedSeedFlags());
+    }
+
+    [TestMethod]
+    public void SharedSeedExportIgnoresDifficultyOnlySettings()
+    {
+        RandomizerConfiguration config = new()
+        {
+            ShareSeedAcrossDifficulty = true,
+            StartWithCandle = true,
+            StartWithCross = true,
+            StartingTechniques = StartingTechs.BOTH,
+            StartingLives = StartingLives.Lives1,
+            AttackLevelCap = 4,
+            MagicLevelCap = 6,
+            LifeLevelCap = 7,
+            ScaleLevelRequirementsToCap = true,
+            AttackEffectiveness = AttackEffectiveness.OHKO,
+            LifeEffectiveness = LifeEffectiveness.INVINCIBLE,
+            ShuffleEnemyHP = EnemyLifeOption.WIDE,
+            ShuffleBossHP = EnemyLifeOption.MEDIUM_HIGH,
+            EnemyXPDrops = XPEffectiveness.NONE
+        };
+
+        RandomizerProperties properties = config.Export(new Random(1234), includeDifficulty: false);
+
+        Assert.IsFalse(properties.StartCandle);
+        Assert.IsFalse(properties.StartCross);
+        Assert.IsFalse(properties.StartWithDownstab);
+        Assert.IsFalse(properties.StartWithUpstab);
+        Assert.AreEqual(3, properties.StartLives);
+        Assert.AreEqual(8, properties.AttackCap);
+        Assert.AreEqual(8, properties.MagicCap);
+        Assert.AreEqual(8, properties.LifeCap);
+        Assert.IsFalse(properties.ScaleLevels);
+        Assert.AreEqual(AttackEffectiveness.VANILLA, properties.AttackEffectiveness);
+        Assert.AreEqual(LifeEffectiveness.VANILLA, properties.LifeEffectiveness);
+        Assert.AreEqual(EnemyLifeOption.VANILLA, properties.ShuffleEnemyHP);
+        Assert.AreEqual(EnemyLifeOption.VANILLA, properties.ShuffleBossHP);
+        Assert.AreEqual(XPEffectiveness.VANILLA, properties.EnemyXPDrops);
+    }
+
+    [TestMethod]
+    public void ShareSeedAcrossDifficultyRoundTripsInFlags()
+    {
+        RandomizerConfiguration config = new()
+        {
+            ShareSeedAcrossDifficulty = true
+        };
+
+        RandomizerConfiguration config2 = new(config.SerializeFlags());
+
+        Assert.IsTrue(config2.ShareSeedAcrossDifficulty);
+    }
 }

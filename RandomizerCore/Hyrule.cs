@@ -229,13 +229,16 @@ public class Hyrule
 
             SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed!)).AsSpan()[..4]);
             r = new Random(SeedHash);
+            bool shareSeedAcrossDifficulty = config.ShareSeedAcrossDifficulty;
+            Random? difficultyRng = shareSeedAcrossDifficulty ? CreateDifficultyRng(config.Seed) : null;
 
             config.CheckForFlagConflicts();
-            props = config.Export(r);
+            props = config.Export(r, includeDifficulty: !shareSeedAcrossDifficulty);
             //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
             if(config.GenerateSpoiler)
             {
                 r.NextBytes(new byte[64]);
+                difficultyRng?.NextBytes(new byte[64]);
             }
 #if UNSAFE_DEBUG
             string export = JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties);
@@ -243,8 +246,12 @@ public class Hyrule
 #endif
             Flags = config.SerializeFlags();
 
+            // If shared difficulty is on, we need a stripped version of the
+            // flags for the shared part of the seed hash.
+            string sharedSeedFlags = shareSeedAcrossDifficulty ? config.SerializeSharedSeedFlags() : Flags;
+
             using Assembler assembler = CreateAssemblyEngine();
-            logger.Info($"Started generation for flags: {Flags} seed: {config.Seed} seedhash: {SeedHash}");
+            logger.Info($"Started generation for flags: {Flags} sharedseedflags: {sharedSeedFlags} seed: {config.Seed} seedhash: {SeedHash}");
             //character = new Character(props);
             shuffler = new Shuffler(props);
 
@@ -413,7 +420,22 @@ public class Hyrule
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
             StatRandomizer randomizedStats = new(ROMData, props);
-            randomizedStats.Randomize(r);
+            randomizedStats.Randomize(r, skipDifficultyOnly: shareSeedAcrossDifficulty);
+
+            // Apply difficulty after shared randomization, then let ApplyAsmPatches see full
+            // props. A second ApplyAsm pass would re-claim PRG4/PRG5 free space (js65 sees it
+            // as fully free) and clobber first-pass code like the palace elevator routines.
+            byte[]? sharedRngState = null;
+            if (shareSeedAcrossDifficulty)
+            {
+                sharedRngState = new byte[32];
+                r.NextBytes(sharedRngState);
+
+                config.ApplyDifficultyOnlySettings(props, difficultyRng!);
+                ReplaceDifficultyStartingItemsInWorld(difficultyRng!);
+                randomizedStats.RandomizeDifficultyOnly(difficultyRng!);
+            }
+
             randomizedStats.Write(ROMData);
 
             // ideally this should be calculated later, but custom music changes asm patches
@@ -498,31 +520,25 @@ public class Hyrule
                 }
             }
 
-            byte[] finalRNGState = new byte[32];
-
-            r.NextBytes(finalRNGState);
-            byte[] hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
-                Flags +
-                SeedHash +
-                randoRomHash + // ideally this should be all that's required
-                // Util.ReadAllTextFromFile(config.GetRoomsFile()) +
-                Util.ByteArrayToHexString(finalRNGState)
-            ));
-
             UpdateRom();
 
-            //0 -> W to avoid 0/O confusion, also 6/G so 6 -> X (these are not hypothetical, they have already caused confusion)
-            byte[] z2Hash = ConvertHash(hash);
-            for(int i = 0; i < z2Hash.Length; i++)
+            byte[] z2Hash;
+            if (shareSeedAcrossDifficulty)
             {
-                if(z2Hash[i] == 0xD0)
-                {
-                    z2Hash[i] = 0xF0;
-                }
-                if (z2Hash[i] == 0xD6)
-                {
-                    z2Hash[i] = 0xF1;
-                }
+                byte[] sharedHash = CalculateHash(sharedSeedFlags, SeedHash, randoRomHash, sharedRngState!);
+
+                byte[] difficultyRngState = new byte[32];
+                difficultyRng!.NextBytes(difficultyRngState);
+                byte[] finalHash = CalculateHash(Flags, SeedHash, randoRomHash, difficultyRngState);
+                z2Hash = CombineHashes(sharedHash, finalHash);
+            }
+            else
+            {
+                byte[] finalRngState = new byte[32];
+                r.NextBytes(finalRngState);
+                byte[] finalHash = CalculateHash(Flags, SeedHash, randoRomHash, finalRngState);
+                z2Hash = ConvertHash(finalHash);
+                SanitizeHashCharacters(z2Hash);
             }
 
             ROMData.Put(0x17C2C, z2Hash);
@@ -588,6 +604,84 @@ public class Hyrule
             0xf4,
             (byte)(((inthash >> 25)  & 0x1F) + 0xD0)
         ];
+    }
+
+    private static byte[] CalculateHash(string flags, int seedHash, byte[] romHash, byte[] rngState)
+    {
+        return MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
+            flags +
+            seedHash +
+            romHash +
+            Util.ByteArrayToHexString(rngState)
+        ));
+    }
+
+    private static Random CreateDifficultyRng(string? seed)
+    {
+        int difficultySeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes($"{seed}:difficulty")).AsSpan()[..4]);
+        return new Random(difficultySeedHash);
+    }
+
+    private static byte[] CombineHashes(byte[] sharedHash, byte[] finalHash)
+    {
+        byte[] sharedZ2Hash = ConvertHash(sharedHash);
+        byte[] finalZ2Hash = ConvertHash(finalHash);
+        SanitizeHashCharacters(sharedZ2Hash);
+        SanitizeHashCharacters(finalZ2Hash);
+
+        return [
+            sharedZ2Hash[0], 0xF4,
+            sharedZ2Hash[2], 0xF4,
+            sharedZ2Hash[4], 0xF4,
+            sharedZ2Hash[6], 0xF4,
+            finalZ2Hash[8], 0xF4,
+            finalZ2Hash[10]
+        ];
+    }
+
+    private static void SanitizeHashCharacters(byte[] z2Hash)
+    {
+        for (int i = 0; i < z2Hash.Length; i++)
+        {
+            if (z2Hash[i] == 0xD0)
+            {
+                z2Hash[i] = 0xF0;
+            }
+            if (z2Hash[i] == 0xD6)
+            {
+                z2Hash[i] = 0xF1;
+            }
+        }
+    }
+
+    // In shared-seed mode, candle/cross are placed in the world during the
+    // shared shuffle (StartCandle/StartCross were false at Export time). If
+    // the final difficulty flags have the player starting with either item,
+    // swap that item's world pickup for a minor item so the seed doesn't
+    // hand out a duplicate.
+    private void ReplaceDifficultyStartingItemsInWorld(Random r)
+    {
+        List<Collectable> minorItems = [
+            Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG,
+            Collectable.MEDIUM_BAG, Collectable.LARGE_BAG, Collectable.XL_BAG,
+            Collectable.ONEUP, Collectable.KEY
+        ];
+        Collectable[] difficultyStartingItems = [Collectable.CANDLE, Collectable.CROSS];
+
+        foreach (Collectable item in difficultyStartingItems)
+        {
+            if (!props.StartsWithCollectable(item)) { continue; }
+            foreach (Location location in itemLocs)
+            {
+                for (int i = 0; i < location.Collectables.Count; i++)
+                {
+                    if (location.Collectables[i] == item)
+                    {
+                        location.Collectables[i] = minorItems.Sample(r);
+                    }
+                }
+            }
+        }
     }
 
     /*

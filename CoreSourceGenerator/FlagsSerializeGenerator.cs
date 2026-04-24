@@ -85,6 +85,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             {
                 FieldName = f.Name,
                 FieldType = f.Type.ToDisplayString(),
+                IsDifficultyOnly = HasDifficultyOnlyAttribute(f),
                 IsConditionallyIncluded = HasConditionallyIncludedInFlagsAttribute(f),
                 DefaultValue = GetDefaultValue(f),
                 IsEnum = f.Type.TypeKind == TypeKind.Enum,
@@ -131,6 +132,12 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
     {
         return field.GetAttributes()
             .Any(attr => attr.AttributeClass?.Name.StartsWith("ConditionallyIncludeInFlags") ?? false);
+    }
+
+    private static bool HasDifficultyOnlyAttribute(IFieldSymbol field)
+    {
+        return field.GetAttributes()
+            .Any(attr => attr.AttributeClass?.Name.StartsWith("DifficultyOnly") ?? false);
     }
 
     private static string GetDefaultValue(IFieldSymbol f)
@@ -209,7 +216,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             // Look for attributes with "property:" target
             if (attr.AttributeClass == null) continue;
             var attrName = attr.AttributeClass.Name;
-            if (attrName.StartsWith("Reactive") || attrName.StartsWith("CustomFlagSerializer")) continue;
+            if (attrName.StartsWith("Reactive") || attrName.StartsWith("CustomFlagSerializer") || attrName.StartsWith("DifficultyOnly")) continue;
             // if (attrName.EndsWith("Attribute"))
             //     attrName = attrName[..^9];
 
@@ -318,7 +325,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
     private static void GenerateSerializeMethod(StringBuilder sb, List<SerializedFieldInfo> fields, string indent)
     {
         sb.AppendLine();
-        sb.AppendLine($"{indent}    public string Serialize()");
+        sb.AppendLine($"{indent}    private string Serialize(bool includeDifficultyOnly)");
         sb.AppendLine($"{indent}    {{");
         sb.AppendLine($"{indent}        global::Z2Randomizer.RandomizerCore.Flags.FlagBuilder flags = new();");
         sb.AppendLine();
@@ -326,9 +333,19 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             var serializeCall = GetSerializeCall(field);
+            var conditions = new List<string>();
+            if (field.IsDifficultyOnly)
+            {
+                conditions.Add("includeDifficultyOnly");
+            }
             if (field.IsConditionallyIncluded)
             {
-                sb.AppendLine($"{indent}        if ({field.FieldName}Included()) {{ ");
+                conditions.Add($"{field.FieldName}Included()");
+            }
+
+            if (conditions.Count > 0)
+            {
+                sb.AppendLine($"{indent}        if ({string.Join(" && ", conditions)}) {{ ");
                 sb.AppendLine($"{indent}            {serializeCall};");
                 sb.AppendLine($"{indent}        }}");
             }
@@ -340,6 +357,16 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
 
         sb.AppendLine();
         sb.AppendLine($"{indent}        return flags.ToString();");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine();
+        sb.AppendLine($"{indent}    public string Serialize()");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        return Serialize(includeDifficultyOnly: true);");
+        sb.AppendLine($"{indent}    }}");
+        sb.AppendLine();
+        sb.AppendLine($"{indent}    public string SerializeSharedSeed()");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        return Serialize(includeDifficultyOnly: false);");
         sb.AppendLine($"{indent}    }}");
     }
 
@@ -579,6 +606,7 @@ public class SerializedFieldInfo
 {
     public string FieldName { get; set; } = string.Empty;
     public string FieldType { get; set; } = string.Empty;
+    public bool IsDifficultyOnly { get; set; }
     public bool IsConditionallyIncluded { get; set; }
     public string? DefaultValue { get; set; }
     public bool IsEnum { get; set; }
