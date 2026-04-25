@@ -370,4 +370,10 @@ public class RoomPool
             return roomType == exitType;
         }).ToList();
     }
+
+    public void RefillNormalRoomsForExitType(RoomPool rooms, RoomExitType exitType)
+    {
+        var originalRooms = rooms.GetNormalRoomsForExitType(exitType);
+        NormalRooms.AddRange(originalRooms);
+    }
 }
