@@ -197,29 +197,29 @@ public enum FireOption
 [DefaultValue(VANILLA)]
 public enum PalaceStyle
 {
-    [Description("Vanilla")]
+    [Description("Vanilla"), DefaultWeight(10)]
     VANILLA,
-    [Description("Vanilla Shuffle")]
+    [Description("Vanilla Shuffle"), DefaultWeight(10)]
     SHUFFLED,
-    [Description("Sequential")]
+    [Description("Sequential"), DefaultWeight(10)]
     SEQUENTIAL,
-    [Description("Random Walk")]
+    [Description("Random Walk"), DefaultWeight(10)]
     RANDOM_WALK,
-    [Description("Vanilla-Weighted")]
+    [Description("Vanilla-Weighted"), DefaultWeight(10)]
     VANILLA_WEIGHTED,
-    [Description("Tower")]
+    [Description("Tower"), DefaultWeight(10)]
     TOWER,
-    [Description("Reconstructed")]
+    [Description("Reconstructed"), DefaultWeight(10)]
     RECONSTRUCTED,
-    [Description("Loopy")]
+    [Description("Loopy"), DefaultWeight(2)]
     RECONSTRUCTED_LOOPY,
     [Description("Chaos"), DefaultWeight(0)]
     CHAOS,
-    [Description("Random"), Metastyle]
+    [Description("Random"), Metastyle, DefaultWeight(10)]
     RANDOM,
-    [Description("Random (All Same)"), Metastyle]
+    [Description("Random (All Same)"), Metastyle, DefaultWeight(10)]
     RANDOM_ALL,
-    [Description("Random (Per Palace)"), Metastyle]
+    [Description("Random (Per Palace)"), Metastyle, DefaultWeight(10)]
     RANDOM_PER_PALACE
 }
 
