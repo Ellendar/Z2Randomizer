@@ -1,6 +1,4 @@
-﻿using NLog.Targets;
-using SD.Tools.Algorithmia.GeneralDataStructures;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -28,35 +26,6 @@ public class RoomPool
 #pragma warning restore CS8618 
 
     protected static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
-
-    public RoomPool(RoomPool target)
-    {
-        NormalRooms.AddRange(target.NormalRooms);
-        Entrances.AddRange(target.Entrances);
-        BossRooms.AddRange(target.BossRooms);
-        TbirdRooms.AddRange(target.TbirdRooms);
-        ItemRooms.AddRange(target.ItemRooms);
-        VanillaBossRoom = target.VanillaBossRoom;
-        DefaultUpEntrance = target.DefaultUpEntrance;
-        DefaultDownBossRoom = target.DefaultDownBossRoom;
-        foreach (var pair in target.LinkedRooms)
-        {
-            LinkedRooms.Add(pair.Key, pair.Value);
-        }
-        foreach (var direction in target.ItemRoomsByDirection.Keys)
-        {
-            ItemRoomsByDirection[direction] = target.ItemRoomsByDirection[direction];
-        }
-        foreach (var shape in target.ItemRoomsByShape.Keys)
-        {
-            var ls = target.ItemRoomsByShape[shape];
-            ItemRoomsByShape[shape] = ls.ToList();
-        }
-        foreach (var key in target.DefaultStubsByDirection.Keys)
-        {
-            DefaultStubsByDirection.Add(key, target.DefaultStubsByDirection[key]);
-        }
-    }
 
     public RoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
@@ -273,6 +242,39 @@ public class RoomPool
         if (!props.IncludeExpertRooms)
         {
             RemoveRooms(room => room.Tags != null && room.Tags.Contains("Expert"));
+        }
+    }
+
+    /// Initializes a new <see cref="RoomPool"/> by copying an existing instance.
+    /// Collections are shallow-cloned. Contained <see cref="Room"/> objects are
+    /// shared between instances.
+    public RoomPool(RoomPool target)
+    {
+        NormalRooms.AddRange(target.NormalRooms);
+        Entrances.AddRange(target.Entrances);
+        BossRooms.AddRange(target.BossRooms);
+        TbirdRooms.AddRange(target.TbirdRooms);
+        ItemRooms.AddRange(target.ItemRooms);
+
+        VanillaBossRoom = target.VanillaBossRoom;
+        DefaultUpEntrance = target.DefaultUpEntrance;
+        DefaultDownBossRoom = target.DefaultDownBossRoom;
+
+        foreach (var pair in target.LinkedRooms)
+        {
+            LinkedRooms.Add(pair.Key, pair.Value);
+        }
+        foreach (var pair in target.ItemRoomsByDirection)
+        {
+            ItemRoomsByDirection[pair.Key] = (TableWeightedRandom<Room>)pair.Value.Clone();
+        }
+        foreach (var pair in target.ItemRoomsByShape)
+        {
+            ItemRoomsByShape[pair.Key] = [.. pair.Value];
+        }
+        foreach (var pair in target.DefaultStubsByDirection)
+        {
+            DefaultStubsByDirection.Add(pair.Key, pair.Value);
         }
     }
 
