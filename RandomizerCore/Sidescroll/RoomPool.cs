@@ -40,96 +40,19 @@ public class RoomPool
             //GP also has vanilla rooms added.
             || (palaceNumber == 7 && !props.AllowVanillaRooms && !props.AllowV4Rooms && props.AllowV5_0Rooms))
         {
-            Entrances.AddRange(palaceRooms.Entrances(RoomGroup.VANILLA)
-                .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            BossRooms.AddRange(palaceRooms.BossRooms(RoomGroup.VANILLA)
-                .Where(i => (i.PalaceNumber == null && palaceNumber < 6) || i.PalaceNumber == palaceNumber).ToList());
-            TbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.VANILLA)
-                .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            ItemRooms.AddRange(palaceRooms.ItemRooms(RoomGroup.VANILLA)
-                .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            foreach (var room in palaceRooms.LinkedRooms(RoomGroup.VANILLA))
-            {
-                LinkedRooms.Add(room.Key, room.Value);
-            }
-            foreach (var direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
-            {
-                foreach (Room room in palaceRooms.ItemRoomsByDirection(RoomGroup.VANILLA, direction).ToList())
-                {
-                    bool[] weights = [room.HasUpExit, room.HasDownExit, room.HasLeftExit, room.HasRightExit, room.IsDropZone];
-                    roomDirectionWeightsByDirection[direction].Add((room, 5 - weights.Count(i => i)));
-                }
-            }
-            foreach(var shape in palaceRooms.ItemRooms(RoomGroup.VANILLA).Select(i => i.CategorizeExits()).Distinct())
-            {
-                var newRooms = palaceRooms.ItemRoomsByShape(RoomGroup.VANILLA, shape);
-                var ls = ItemRoomsByShape.GetValueOrDefault(shape, []);
-                ls.AddRange(newRooms);
-                ItemRoomsByShape[shape] = ls;
-            }
+            AddRoomGroup(palaceRooms, RoomGroup.VANILLA, palaceNumber, roomDirectionWeightsByDirection);
         }
 
         if (props.AllowV4Rooms)
         {
-            Entrances.AddRange(palaceRooms.Entrances(RoomGroup.V4_0)
-                .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            BossRooms.AddRange(palaceRooms.BossRooms(RoomGroup.V4_0)
-                .Where(i => (i.PalaceNumber == null && palaceNumber < 6) || i.PalaceNumber == palaceNumber).ToList());
-            TbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.V4_0)
-                .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            ItemRooms.AddRange(palaceRooms.ItemRooms(RoomGroup.V4_0)
-                .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            foreach (var room in palaceRooms.LinkedRooms(RoomGroup.V4_0))
-            {
-                LinkedRooms.Add(room.Key, room.Value);
-            }
-            foreach (var direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
-            {
-                foreach (Room room in palaceRooms.ItemRoomsByDirection(RoomGroup.V4_0, direction).ToList())
-                {
-                    bool[] weights = [room.HasUpExit, room.HasDownExit, room.HasLeftExit, room.HasRightExit, room.IsDropZone];
-                    roomDirectionWeightsByDirection[direction].Add((room, 5 - weights.Count(i => i)));
-                }
-            }
-            foreach (var shape in palaceRooms.ItemRooms(RoomGroup.V4_0).Select(i => i.CategorizeExits()).Distinct())
-            {
-                var newRooms = palaceRooms.ItemRoomsByShape(RoomGroup.V4_0, shape);
-                var ls = ItemRoomsByShape.GetValueOrDefault(shape, []);
-                ls.AddRange(newRooms);
-                ItemRoomsByShape[shape] = ls;
-            }
+            AddRoomGroup(palaceRooms, RoomGroup.V4_0, palaceNumber, roomDirectionWeightsByDirection);
         }
 
         if (props.AllowV5_0Rooms)
         {
-            Entrances.AddRange(palaceRooms.Entrances(RoomGroup.V5_0)
-                .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            BossRooms.AddRange(palaceRooms.BossRooms(RoomGroup.V5_0)
-                .Where(i => (i.PalaceNumber == null && palaceNumber < 6) || i.PalaceNumber == palaceNumber).ToList());
-            TbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.V5_0)
-                .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            ItemRooms.AddRange(palaceRooms.ItemRooms(RoomGroup.V5_0)
-                .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            foreach (var room in palaceRooms.LinkedRooms(RoomGroup.V5_0))
-            {
-                LinkedRooms.Add(room.Key, room.Value);
-            }
-            foreach (var direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
-            {
-                foreach (Room room in palaceRooms.ItemRoomsByDirection(RoomGroup.V5_0, direction).ToList())
-                {
-                    bool[] weights = [room.HasUpExit, room.HasDownExit, room.HasLeftExit, room.HasRightExit, room.IsDropZone];
-                    roomDirectionWeightsByDirection[direction].Add((room, 5 - weights.Count(i => i)));
-                }
-            }
-            foreach (var shape in palaceRooms.ItemRooms(RoomGroup.V5_0).Select(i => i.CategorizeExits()).Distinct())
-            {
-                var newRooms = palaceRooms.ItemRoomsByShape(RoomGroup.V5_0, shape);
-                var ls = ItemRoomsByShape.GetValueOrDefault(shape, []);
-                ls.AddRange(newRooms);
-                ItemRoomsByShape[shape] = ls;
-            }
+            AddRoomGroup(palaceRooms, RoomGroup.V5_0, palaceNumber, roomDirectionWeightsByDirection);
         }
+
         //If we are using these categorized exits to cap paths, there needs to always be a path of each type
         //Since vanilla and 4.0 don't normally contain up/down elevator deadends, we add some dummy ones
         DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_DOWN, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit).First());
@@ -278,6 +201,35 @@ public class RoomPool
         }
     }
 
+    private void AddRoomGroup(PalaceRooms palaceRooms, RoomGroup group, int palaceNumber, Dictionary<Direction, List<(Room, int)>> roomDirectionWeightsByDirection)
+    {
+        Entrances.AddRange(palaceRooms.Entrances(group).Where(room => (room.PalaceNumber == null && palaceNumber < 7) || room.PalaceNumber == palaceNumber));
+        ItemRooms.AddRange(palaceRooms.ItemRooms(group).Where(room => (room.PalaceNumber == null && palaceNumber < 7) || room.PalaceNumber == palaceNumber));
+        BossRooms.AddRange(palaceRooms.BossRooms(group).Where(room => (room.PalaceNumber == null && palaceNumber < 6) || room.PalaceNumber == palaceNumber));
+        TbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(group).Where(room => (room.PalaceNumber == null && palaceNumber == 7) || room.PalaceNumber == palaceNumber));
+        foreach (var pair in palaceRooms.LinkedRooms(group))
+        {
+            LinkedRooms[pair.Key] = pair.Value;
+        }
+        foreach (var direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
+        {
+            foreach (var room in palaceRooms.ItemRoomsByDirection(group, direction))
+            {
+                // give item rooms lower weights if they have more exits
+                bool[] hasExits = [room.HasUpExit, room.HasDownExit, room.HasLeftExit, room.HasRightExit, room.IsDropZone];
+                roomDirectionWeightsByDirection[direction].Add((room, 5 - hasExits.Count(i => i)));
+            }
+        }
+        var exitTypes = palaceRooms.ItemRooms(group).Select(r => r.CategorizeExits()).Distinct();
+        foreach (var shape in exitTypes)
+        {
+            var newRooms = palaceRooms.ItemRoomsByShape(group, shape);
+            var ls = ItemRoomsByShape.GetValueOrDefault(shape, []);
+            ls.AddRange(newRooms);
+            ItemRoomsByShape[shape] = ls;
+        }
+    }
+
     public IEnumerable<RoomExitType> GetItemRoomShapes()
     {
         var keys = ItemRoomsByShape.Keys;
@@ -402,7 +354,7 @@ public class RoomPool
 
             value.Add(room);
         }
-        
+
         return categorizedRooms;
     }
 
