@@ -1225,13 +1225,12 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
         if (westClimate == ClimateEnum.RANDOM)
         {
-            properties.WestClimate = r.Next(5) switch
+            properties.WestClimate = r.Next(4) switch
             {
                 0 => ClimateEnum.CLASSIC,
                 1 => ClimateEnum.CHAOS,
-                2 => ClimateEnum.WETLANDS,
-                3 => ClimateEnum.GREAT_LAKES,
-                4 => ClimateEnum.SCRUBLAND,
+                2 => ClimateEnum.GREAT_LAKES,
+                3 => ClimateEnum.SCRUBLAND,
                 _ => throw new Exception("Unrecognized climate")
             };
         }
@@ -1241,13 +1240,12 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         }
         if (eastClimate == ClimateEnum.RANDOM)
         {
-            properties.EastClimate = r.Next(5) switch
+            properties.EastClimate = r.Next(4) switch
             {
                 0 => ClimateEnum.CLASSIC,
                 1 => ClimateEnum.CHAOS,
-                2 => ClimateEnum.WETLANDS,
-                3 => ClimateEnum.GREAT_LAKES,
-                4 => ClimateEnum.SCRUBLAND,
+                2 => ClimateEnum.GREAT_LAKES,
+                3 => ClimateEnum.SCRUBLAND,
                 _ => throw new Exception("Unrecognized climate")
             };
         }
@@ -1257,13 +1255,12 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         }
         if (dmClimate == ClimateEnum.RANDOM)
         {
-            properties.DmClimate = r.Next(5) switch
+            properties.DmClimate = r.Next(4) switch
             {
                 0 => ClimateEnum.CLASSIC,
                 1 => ClimateEnum.CHAOS,
-                2 => ClimateEnum.WETLANDS,
-                3 => ClimateEnum.GREAT_LAKES,
-                4 => ClimateEnum.DM_SCRUBLAND,
+                2 => ClimateEnum.GREAT_LAKES,
+                3 => ClimateEnum.DM_SCRUBLAND,
                 _ => throw new Exception("Unrecognized climate")
             };
         }
