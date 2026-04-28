@@ -12,6 +12,9 @@ UpdateSound = $878c
 
 .export CallUpdateSound
 .proc CallUpdateSound
+	lda #1
+	sta PendingAudioCall
+
 	; Must preserve these because in Z2R it's possible to be interrupted by NMI that may change banks.
 	lda NmiBankShadow8
 	pha
@@ -19,7 +22,6 @@ UpdateSound = $878c
 	pha
 
 	lda #6
-
 	jsr SwapPRG
 
 	jsr UpdateSound
@@ -31,6 +33,13 @@ UpdateSound = $878c
 	sta NmiBankShadow8
 	sta PrgBank8Reg
 
+	; If a lag-frame NMI decremented PendingAudioCall to 0 while audio was running, re-run now
+	lda PendingAudioCall
+	bne @NoPending
+		jmp CallUpdateSound
+@NoPending:
+	lda #0
+	sta PendingAudioCall
 	rts
 .endproc ; CallUpdateSound
 

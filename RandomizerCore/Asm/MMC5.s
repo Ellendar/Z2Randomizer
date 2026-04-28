@@ -201,13 +201,13 @@ HandleLagFrame:
 ;        bne @loop
     jsr SetupScanlineIRQ
 @HandleAudio:
-    ; Skip processing audio during a real lag frame since thats what
-    ; vanilla accomplishes with a hard disabled NMI
-;    lda SoftDisableNmi
-;    bne @skip
-        jmp UpdateSound
-;@skip:
-;    rts
+    lda PendingAudioCall
+    beq @RunAudio
+        ; Audio is currently running on the main thread; signal it to re-run after
+        dec PendingAudioCall
+        rts
+@RunAudio:
+    jmp UpdateSound
 
 .segment "PRG7"
 
