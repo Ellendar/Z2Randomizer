@@ -27,6 +27,7 @@
     <None Remove="Asm\z2ft.s" />
     <None Remove="Asm\BuffCarock.s" />
     <None Remove="Asm\MMC5.s" />
+    <None Remove="Asm\ram.inc" />
     <None Remove="Asm\z2r.inc" />
     <None Remove="Asm\z2rndft.ips" />
     <None Update="Music\Faxanadu.json5">
@@ -68,6 +69,7 @@
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
     <EmbeddedResource Include="Asm\Graphics\linkedFire.chr" />
     <EmbeddedResource Include="Asm\Graphics\randomizer_text.chr" />
+    <EmbeddedResource Include="Asm\ram.inc" />
     <EmbeddedResource Include="Asm\z2r.inc" />
     <EmbeddedResource Include="Asm\z2rndft.ips" />
   </ItemGroup>

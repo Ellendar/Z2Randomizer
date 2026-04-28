@@ -52,7 +52,7 @@ StatTrackSwordSwipe:
     ; Need to use X so we need to preserve it
     txa
     tay
-    lda $17 ; 0 if crouching 1 if not
+    lda LinkStanding ; 0 if crouching 1 if not
     eor #1  ; so invert the bit to get 1 if crouching 0 if not
     asl
     tax
@@ -324,9 +324,9 @@ StopTimers:
 @AlreadyDoneOnce:
     ; setup and draw the old man over an over
     lda #$d0
-    sta $4e  ;monster x
+    sta Enemy0XPositionLo
     lda #$50
-    sta $2a  ;monster y
+    sta Enemy0YPositionLo
     lda #$cf
     sta $cd  ;monster position on screen (fixes triforce position on first frame)
     jsr bank7_Display ; its the credits who cares about a few cycles
@@ -412,7 +412,7 @@ LoadStatsFromCheckpoint:
 .reloc
 CheckToSkipToEnd:
     ; check if start is pressed
-    lda $f5
+    lda Controller1ButtonsPressed
     and #$10
     beq @skip
         ; don't let this skip code run once we've moved to the stats
@@ -767,7 +767,7 @@ UpdateSpritePosition:
     sta $cc
     ; link y offset
     lda #$20
-    sta $29
+    sta LinkYPos
     ; link metasprite
     lda #3
     sta $80
@@ -777,7 +777,7 @@ UpdateSpritePosition:
 .reloc
 WaitForStart:
     ; check if start is pressed
-    lda $f5
+    lda Controller1ButtonsPressed
     and #$10
     beq :>rts
         inc StatDisplayState
@@ -883,7 +883,7 @@ PALETTE_FADE_LEN = * - RandomOrderTable
 .reloc
 FadeOut:
     ; Every 16 frames step to the next palette
-    lda $12 ; global timer
+    lda FrameCounter
     and #$01
     beq :>rts
     ldx InternalState
@@ -923,7 +923,7 @@ SprPaletteTable = $80AE
 FadeIn:
     ldx InternalState
     ; Every 16 frames step to the next palette
-    lda $12 ; global timer
+    lda FrameCounter
     and #$01
     beq :>rts
     cpx #12

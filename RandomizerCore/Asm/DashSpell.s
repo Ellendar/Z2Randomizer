@@ -13,7 +13,7 @@
 .reloc
 ReplaceFireWithDashSpell:
   pha
-  lda $076f ; Current magic state
+  lda FireSpellActive ; Current magic state
   and #$10  ; fire is on
   bne @HasFire
     pla

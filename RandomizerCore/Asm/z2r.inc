@@ -47,6 +47,9 @@ OAMDMA = $4014
 JOY1 = $4016
 JOY2 = $4017
 
+;;; Include RAM values before any constants
+.include "ram.inc"
+
 ;;; MMC5 register names and associated constants
 PrgBankModeReg = $5100
 PRG_BANK_MODE_8KB_BANKS = 3
@@ -103,14 +106,6 @@ ENABLE_SCANLINE_IRQ = $80
 
 MulLoReg = $5205
 MulHiReg = $5206
-
-;; Common locations used in the code
-PpuCtrlShadow = $ff
-ScrollPosShadow = $fd
-
-PalaceNumber = $056c
-RegionNumber = $0706
-WorldNumber = $0707
 
 NewSideviewInit = $8cec
 ClearNametables = $d266

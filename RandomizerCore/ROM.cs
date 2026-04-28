@@ -1022,7 +1022,7 @@ CopySideviewIntoRAMAndLoadPointer:
     
     ; Now we have the pointer to the sideview address, load that so we can read the data
     ; and also load the enemy pointer into $d6 as well
-    lda $0561
+    lda MapNumber
     asl
     tay
     lda ($00),y
@@ -1124,7 +1124,7 @@ LoadDataThroughPointers:
 .reloc
 .import RaftWorldMappingTable
 LoadMapData:
-    ldx $0706
+    ldx RegionNumber
     lda RaftWorldMappingTable,x
     tax
     lda $8508,x
@@ -1170,12 +1170,12 @@ LoadMapData:
 .segment "PRG0"
 .org $a19f
 CheckController1ForUpAUnknown:
-  lda $f7
+  lda Controller1ButtonsHeld
   cmp #$28
 
 .org $a1dd
 CheckController1ForUpAMagic:
-  lda $f7
+  lda Controller1ButtonsHeld
   cmp #$28
 """, "UpAController1.s");
         //Put(0x21B0, 0xF7);
@@ -1232,7 +1232,8 @@ CheckController1ForUpAMagic:
     public void AllowForChangingDoorYPosition(Assembler a)
     {
         a.Module().Code("""
-ObjectYPositionData = $0730
+.include "z2r.inc"
+
 KeyDoorYPosition = $075e ; just a piece of unused ram afaict
 
 .segment "PRG4"
@@ -1243,7 +1244,7 @@ KeyDoorYPosition = $075e ; just a piece of unused ram afaict
 .segment "PRG4", "PRG7"
 .reloc
 KeyDoorCustomPositionPRG4:
-    lda ObjectYPositionData
+    lda SideviewCommandY
     and #$f0
     clc
     adc #$20
@@ -1257,7 +1258,7 @@ KeyDoorCustomPositionPRG4:
 .segment "PRG5", "PRG7"
 .reloc
 KeyDoorCustomPositionPRG5:
-    lda ObjectYPositionData
+    lda SideviewCommandY
     and #$f0
     clc
     adc #$20
@@ -1283,7 +1284,7 @@ LoadDoorYPos:
 
 .reloc
 LoadDoorYPosition:
-    lda $2a,x
+    lda Enemy0YPositionLo,x
     clc
     adc #$0c
     sta $30
@@ -1303,7 +1304,7 @@ LoadDoorYPosition:
 .segment "PRG1", "PRG7"
 .reloc
 StoreElevatorParamDM:
-    lda $0731 ; load the current elevator command
+    lda SideviewCommandOp ; load the current elevator command
     and #$0f ; the last 4 bits are the param
     sta ElevatorYStart
     lda $010A ; re-do the command JSR overwrote
@@ -1316,7 +1317,7 @@ StoreElevatorParamDM:
 .segment "PRG4", "PRG7"
 .reloc
 StoreElevatorParam:
-    lda $0731 ; load the current elevator command
+    lda SideviewCommandOp ; load the current elevator command
     and #$0f ; the last 4 bits are the param
     sta ElevatorYStart
     lda $010A ; re-do the command JSR overwrote
@@ -1329,7 +1330,7 @@ StoreElevatorParam:
 .segment "PRG5", "PRG7"
 .reloc
 StoreElevatorParamGP:
-    lda $0731 ; load the current elevator command
+    lda SideviewCommandOp ; load the current elevator command
     and #$0f ; the last 4 bits are the param
     sta ElevatorYStart
     lda $010A ; re-do the command JSR overwrote
@@ -1395,13 +1396,15 @@ CheckIfElevatorEntrance:
     public void DontCountExpDuringTalking(Assembler a)
     {
         a.Module().Code("""
+.include "z2r.inc"
+
 .segment "PRG7"
 ; Patch the count up code and check to see if we are in a dialog
 .org $d433
     jsr CheckForDialog
 .reloc
 CheckForDialog:
-    lda $74c ; current dialog type
+    lda CurrentDialogType
     beq OriginalPatchedCode
         ; We are in a dialog or something, so don't tick down
         ; by skipping ahead to after the counting code
@@ -1669,7 +1672,7 @@ closest_rts = $E0E5
 
 .org $E0A4
 HandleLavaTileCollision:
-    lda $29                          ; load Link's y pos
+    lda LinkYPos                     ; load Link's y pos
     and #$0f                         ; mask the last 4 bits, to get the Link's pixel position inside the tile
     cmp #$06                         ; check that we are deep into the lava tile
     bcc closest_rts                  ; Link's position is not low enough, return
@@ -1898,8 +1901,6 @@ FREE_UNTIL $e54f
 .import SwapCHR
 
 EnemyFacingDirection = $DC91
-CurrentPRGBank = $0769
-CurrentCHRBank = $076E
 
 .segment "PRG7"
 
@@ -1941,7 +1942,7 @@ OverwriteSpriteCHRBank:
     adc #1
     sta SpChrBank5Reg
     ; due to an MMC5 issue, we need to write a bg bank as well.
-    lda CurrentCHRBank
+    lda CurrentChrBank
     asl
     asl
     ; clc ; carry is clear here
