@@ -40,7 +40,7 @@
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Avalonia" />
         <PackageReference Include="ReactiveUI.Validation" />
-        <PackageReference Include="Aigamo.ResXGenerator" >
+        <PackageReference Include="Aigamo.ResXGenerator">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Xaml.Behaviors.Interactions" />

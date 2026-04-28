@@ -203,11 +203,11 @@ HandleLagFrame:
 @HandleAudio:
     ; Skip processing audio during a real lag frame since thats what
     ; vanilla accomplishes with a hard disabled NMI
-    lda SoftDisableNmi
-    bne @skip
-        jsr UpdateSound
-@skip:
-    rts
+;    lda SoftDisableNmi
+;    bne @skip
+        jmp UpdateSound
+;@skip:
+;    rts
 
 .segment "PRG7"
 
@@ -534,9 +534,6 @@ SwapCHR:
     adc #1
     sta SpChrBank4Reg
     sta BgChrBank0Reg
-;.ifdef ENABLE_Z2_MARIO
-;    sta CurrentCHRBank ; Store a copy of the latest BG bank for use in z2mario
-;.endif
     adc #1
     sta SpChrBank5Reg
     sta BgChrBank1Reg
