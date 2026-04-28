@@ -46,6 +46,10 @@ BankSwitchMarioCHR:
       sta SpChrBank0Reg + 3
   @noboss:
     lda CurrentCHRBank ; we need to write a BG bank register due to MMC5 jank
+    asl
+    asl
+    clc
+    adc #4
     sta BgChrBank0Reg
     lda #0
     sta ReloadCHRBank

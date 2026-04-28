@@ -1,7 +1,7 @@
 ﻿{
   "DisableMusic": false,
-  "RandomizeMusic": false,
-  "MixCustomAndOriginalMusic":  false,
+  "RandomizeMusic": true,
+  "MixCustomAndOriginalMusic": false,
   "IncludeDiverseMusic": false,
   "DisableUnsafeMusic":  true,
   "FastSpellCasting": true,
