@@ -426,7 +426,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool hardBosses;
 
     [Reactive]
-    private bool? aggressiveTbird = false;
+    private bool aggressiveTbird;
 
     //Levels
     [Reactive]
@@ -1372,7 +1372,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.NoDuplicateRoomsBySideview = noDuplicateRoomsByLayout;
         properties.GeneratorsAlwaysMatch = generatorsAlwaysMatch;
         properties.HardBosses = hardBosses;
-        properties.AggressiveTbird = aggressiveTbird ?? GetIndeterminateFlagValue(r);
+        properties.AggressiveTbird = aggressiveTbird;
         properties.RevealWalkthroughWalls = revealWalkthroughWalls;
 
         //Enemies

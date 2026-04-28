@@ -223,23 +223,31 @@
                           Content="Harder Carock">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.HarderCarockToolTip}"/></ToolTip.Tip>
                 </CheckBox>
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Main.Config.AggressiveTbird}"
-                          Content="Aggressive Thunderbird">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AggressiveThunderbirdToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Main.Config.TBirdRequired}"
-                          Name="TbirdRequiredCheckbox"
-                          Content="Thunderbird Required">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ThunderbirdRequiredToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox Name="RemoveThunderbirdCheckbox"
-                          IsEnabled="{Binding !Main.Config.TBirdRequired}"
-                          IsChecked="{Binding Main.Config.RemoveTBird}"
-                          Content="Remove Thunderbird">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RemoveThunderbirdToolTip}"/></ToolTip.Tip>
-                </CheckBox>
+				<CheckBox Name="RemoveThunderbirdCheckbox"
+		                  IsEnabled="{Binding !Main.Config.TBirdRequired}"
+		                  IsChecked="{Binding Main.Config.RemoveTBird}"
+		                  Content="Remove Thunderbird">
+					<ToolTip.Tip>
+						<TextBlock Text="{x:Static lang:Resources.RemoveThunderbirdToolTip}"/>
+					</ToolTip.Tip>
+				</CheckBox>
+				<CheckBox IsThreeState="True"
+						  IsEnabled="{Binding !Main.Config.RemoveTBird}"
+		                  IsChecked="{Binding Main.Config.TBirdRequired}"
+		                  Name="TbirdRequiredCheckbox"
+		                  Content="Thunderbird Required">
+					<ToolTip.Tip>
+						<TextBlock Text="{x:Static lang:Resources.ThunderbirdRequiredToolTip}"/>
+					</ToolTip.Tip>
+				</CheckBox>
+				<CheckBox Name="AggressiveTbirdCheckbox"
+						  IsEnabled="{Binding !Main.Config.RemoveTBird}"
+		                  IsChecked="{Binding Main.Config.AggressiveTbird}"
+		                  Content="Aggressive Thunderbird">
+					<ToolTip.Tip>
+						<TextBlock Text="{x:Static lang:Resources.AggressiveThunderbirdToolTip}"/>
+					</ToolTip.Tip>
+				</CheckBox>
                 <Separator Margin="16 10 18 10"/>
 
                 <!-- misc -->
