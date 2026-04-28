@@ -211,15 +211,15 @@ public enum PalaceStyle
     TOWER,
     [Description("Reconstructed"), DefaultWeight(10)]
     RECONSTRUCTED,
-    [Description("Loopy"), DefaultWeight(2)]
+    [Description("Loopy"), DefaultWeight(0)]
     RECONSTRUCTED_LOOPY,
     [Description("Chaos"), DefaultWeight(0)]
     CHAOS,
-    [Description("Random"), Metastyle, DefaultWeight(10)]
+    [Description("Random"), Metastyle]
     RANDOM,
-    [Description("Random (All Same)"), Metastyle, DefaultWeight(10)]
+    [Description("Random (All Same)"), Metastyle]
     RANDOM_ALL,
-    [Description("Random (Per Palace)"), Metastyle, DefaultWeight(10)]
+    [Description("Random (Per Palace)"), Metastyle]
     RANDOM_PER_PALACE
 }
 
@@ -400,23 +400,23 @@ static class BiomeExtensions
 [DefaultValue(CLASSIC)]
 public enum ClimateEnum
 {
-    [Description("Classic")]
+    [Description("Classic"), DefaultWeight(1)]
     CLASSIC,
-    [Description("Vanilla-Weighted")]
+    [Description("Vanilla-Weighted"), DefaultWeight(1)]
     VANILLA_WEIGHTED_WEST,
-    [Description("Vanilla-Weighted")]
+    [Description("Vanilla-Weighted"), DefaultWeight(1)]
     VANILLA_WEIGHTED_EAST,
-    [Description("Chaos")]
+    [Description("Chaos"), DefaultWeight(1)]
     CHAOS,
-    [Description("Wetlands")]
+    [Description("Wetlands"), DefaultWeight(0)]
     WETLANDS,
-    [Description("Great Lakes")]
+    [Description("Great Lakes"), DefaultWeight(1)]
     GREAT_LAKES,
-    [Description("Scrubland")]
+    [Description("Scrubland"), DefaultWeight(1)]
     SCRUBLAND,
-    [Description("Scrubland")]
+    [Description("Scrubland"), DefaultWeight(1)]
     DM_SCRUBLAND,
-    [Description("Random")]
+    [Description("Random"), Metastyle]
     RANDOM
 }
 

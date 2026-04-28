@@ -1223,46 +1223,31 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             properties.MazeBiome = mazeBiome;
         }
 
+        //climates
         if (westClimate == ClimateEnum.RANDOM)
         {
-            properties.WestClimate = r.Next(4) switch
-            {
-                0 => ClimateEnum.CLASSIC,
-                1 => ClimateEnum.CHAOS,
-                2 => ClimateEnum.GREAT_LAKES,
-                3 => ClimateEnum.SCRUBLAND,
-                _ => throw new Exception("Unrecognized climate")
-            };
+            List<ClimateEnum> westClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsWestClimate() && !i.IsMetastyle()).ToList();
+            properties.WestClimate = westClimates.Sample(r);
         }
         else
         {
             properties.WestClimate = westClimate;
         }
+
         if (eastClimate == ClimateEnum.RANDOM)
         {
-            properties.EastClimate = r.Next(4) switch
-            {
-                0 => ClimateEnum.CLASSIC,
-                1 => ClimateEnum.CHAOS,
-                2 => ClimateEnum.GREAT_LAKES,
-                3 => ClimateEnum.SCRUBLAND,
-                _ => throw new Exception("Unrecognized climate")
-            };
+            List<ClimateEnum> eastClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsEastClimate() && !i.IsMetastyle()).ToList();
+            properties.EastClimate = eastClimates.Sample(r);
         }
         else
         {
             properties.EastClimate = eastClimate;
         }
+
         if (dmClimate == ClimateEnum.RANDOM)
         {
-            properties.DmClimate = r.Next(4) switch
-            {
-                0 => ClimateEnum.CLASSIC,
-                1 => ClimateEnum.CHAOS,
-                2 => ClimateEnum.GREAT_LAKES,
-                3 => ClimateEnum.DM_SCRUBLAND,
-                _ => throw new Exception("Unrecognized climate")
-            };
+            List<ClimateEnum> dmClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsDmClimate() && !i.IsMetastyle()).ToList();
+            properties.DmClimate = dmClimates.Sample(r);
         }
         else
         {

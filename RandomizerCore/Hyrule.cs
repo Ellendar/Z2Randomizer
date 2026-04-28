@@ -290,7 +290,7 @@ public class Hyrule
                 }
 
                 /*
-                if(!palaces.SelectMany(i => i.AllRooms).Any(i => i.Name == "gtmOldgpRooms M10"))
+                if(!palaces.SelectMany(i => i.AllRooms).Any(i => i.Name == "2-screen upstab shortcut switchback"))
                 {
                     continue;
                 }
