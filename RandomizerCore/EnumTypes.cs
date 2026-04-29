@@ -553,8 +553,22 @@ public enum EncounterRate
     HALF,
     [Description("Normal")]
     NORMAL,
-    [Description("Random")]
+    [Description("Random"), Metastyle]
     RANDOM
+}
+
+public static class EncounterRateExtensions
+{
+    public static byte GetAsmByte(this EncounterRate encounterRate)
+    {
+        return encounterRate switch
+        {
+            EncounterRate.NORMAL => 0x0, // 0 so we can check zero flag when it's loaded from memory
+            EncounterRate.NONE => 0x1,
+            EncounterRate.HALF => 0x2,
+            _ => throw new NotImplementedException(),
+        };
+    }
 }
 
 [DefaultValue(Lives3)]

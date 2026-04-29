@@ -2494,43 +2494,6 @@ public class Hyrule
         rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
         rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
 
-        if (props.EncounterRates == EncounterRate.NONE)
-        {
-            rom.Put(0x294, 0x60); //skips the whole routine
-        }
-
-        if (props.EncounterRates == EncounterRate.HALF)
-        {
-            //terrain timers
-            rom.Put(0x250, 0x40); // grass
-            rom.Put(0x251, 0x30); // desert
-            rom.Put(0x252, 0x30); // forest
-            rom.Put(0x253, 0x40);
-            rom.Put(0x254, 0x12);
-            rom.Put(0x255, 0x06);
-
-            //initial overworld timer
-            rom.Put(0x88A, 0x10);
-
-            /*
-             * insert jump to a8aa at 2a3 (4c AA A8)
-             * 
-             * At a8aa
-             * Load $26 (A5 26)
-             * bne to end (2 bytes) (D0 0D)
-             * inc new step counter (where?) EE E0 06
-             * Load 1 to accumulator (A9 01)
-             * xor new step counter with 1 (2D E0 06)
-             * bne to end (D0 03)
-             * jump to encounter spawn 8298 (4C 98 82)
-             * jump to rts 829f (4C 93 82)
-             */
-            rom.Put(0x29f, new byte[] { 0x4C, 0xAA, 0xA8 });
-
-            rom.Put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
-        }
-
-
         if (props.ShuffleLifeRefill)
         {
             int lifeRefill = r.Next(1, 6);
@@ -3865,6 +3828,7 @@ bank5_Pointer_table_for_End_Credits:
         ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic); // will make output vary with customize tab options
         rom.AddRandomizerToTitle(engine);
         AddCropGuideBoxesToFileSelect(engine);
+        rom.SetEncounterRate(engine, props, r);
         FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetNonSideviewItemLocations());
         rom.DontCountExpDuringTalking(engine);

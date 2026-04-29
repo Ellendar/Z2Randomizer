@@ -2619,6 +2619,169 @@ ResetRedPalettePayload:
         }
     }
 
+    public void SetEncounterRate(Assembler asm, RandomizerProperties props, Random r)
+    {
+        List<EncounterRate> encounterRates = [props.EncounterRates, props.EncounterRates, props.EncounterRates, props.EncounterRates];
+        List<EncounterRate> randomCandidates = Enums.GetShufflableList<EncounterRate>();
+        encounterRates = [.. encounterRates.Select(val => val is EncounterRate.RANDOM ? randomCandidates.Sample(r) : val)];
+
+        bool allNoEncounters = encounterRates.All(val => val is EncounterRate.NONE);
+        bool anyHalfEncounters = encounterRates.Any(val => val is EncounterRate.HALF);
+        bool allNormalEncounters = encounterRates.All(val => val is EncounterRate.NORMAL);
+        bool differentRates = encounterRates.Distinct().Count() > 1;
+        Debug.Assert(allNoEncounters || anyHalfEncounters || allNormalEncounters || differentRates);
+
+        var a = asm.Module();
+        a.Set("NO_ENCOUNTERS", allNoEncounters ? 1 : 0);
+        a.Set("HAS_HALF_ENCOUNTERS", anyHalfEncounters ? 1 : 0);
+        a.Set("NORMAL_ENCOUNTERS", allNormalEncounters ? 1 : 0);
+        a.Set("VANILLA_WEST", props.WestBiome.UsesVanillaMap() ? 1 : 0);
+        a.Set("ENCOUNTER_RATE_PER_CONTINENT", differentRates ? 1 : 0);
+
+        if (differentRates)
+        {
+            byte[] encounterTable = [.. encounterRates.Select(o => o.GetAsmByte())];
+            a.Segment("PRG0");
+            a.Reloc();
+            a.Label("EncounterRateRegionTable");
+            a.Byt(encounterTable);
+        }
+
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+.segment "PRG0"
+
+EncounterTerrainTimerTable = $823f
+OverworldEncounterTick = $8284
+VanillaRegionCheck = $8287
+CheckStepCounter = $828f
+CheckTimer = $8293
+SpawnEncounter = $8298
+SetTerrainEncounterTimer = $82b4
+HammerTileTable = $84ad
+OverworldMainJsr = $8563
+SetInitialEncounterTimer = $8879
+
+.if NO_ENCOUNTERS
+    .org OverworldEncounterTick
+        rts
+        FREE_UNTIL HammerTileTable
+.endif
+
+.if ENCOUNTER_RATE_PER_CONTINENT
+    .org OverworldEncounterTick
+        jmp OverworldEncounterTickHook
+
+    .reloc
+    OverworldEncounterTickHook:
+        ldy RegionNumber
+        lda EncounterRateRegionTable,y
+        cmp #1
+        beq @none    ; A == 1
+        bcc @normal  ; A < 1
+        @half:       ; A > 1
+        .if HAS_HALF_ENCOUNTERS
+            jmp ExtraEncounterStepCheck
+        .endif
+        @normal:
+            .if VANILLA_WEST
+                tya
+                jmp VanillaRegionCheck  ; preserve special vanilla West behavior where steps are not counted in the north
+            .else
+                jmp CheckStepCounter
+            .endif
+        @none:
+        rts
+
+    .org SetInitialEncounterTimer + 2
+        jsr SetInitialEncounterTimerHook
+
+    .reloc
+    SetInitialEncounterTimerHook:
+        ldx RegionNumber
+        lda EncounterRateRegionTable,x
+        beq @normal
+        @half:
+            lda #02
+            sta OverworldStepCounterHi
+            lda #$10
+            bne @done
+        @normal:
+            lda #$08
+        @done:
+            sta EncounterSpawnTimer
+            rts
+
+    .org SetTerrainEncounterTimer
+        jsr SetTerrainEncounterTimerHook
+
+    .reloc
+    SetTerrainEncounterTimerHook:
+        ldx RegionNumber
+        lda EncounterRateRegionTable,x
+        beq @normal
+        @half:
+            lda EncounterTerrainTimerTable,y
+            asl  ; multiply timer duration by 2
+            rts
+        @normal:
+            lda EncounterTerrainTimerTable,y
+            rts
+.else  ; not EncounterRatePerContinent
+    .if NORMAL_ENCOUNTERS
+        .if !VANILLA_WEST
+            .org OverworldEncounterTick
+                FREE_UNTIL CheckStepCounter
+            .org OverworldMainJsr
+                jsr CheckStepCounter  ; overwriting jsr OverworldEncounterTick
+        .endif
+    .endif
+
+    .if HAS_HALF_ENCOUNTERS
+        .org EncounterTerrainTimerTable + 1
+            .byt $40  ; grass
+            .byt $30  ; desert
+            .byt $30  ; forest
+            .byt $40  ; swamp
+            .byt $12  ; graveyard
+            .byt $06  ; lava
+
+        .org OverworldEncounterTick
+            FREE_UNTIL CheckTimer
+        .org OverworldMainJsr
+            jsr ExtraEncounterStepCheck  ; overwriting jsr OverworldEncounterTick
+
+        .org SetInitialEncounterTimer
+            lda #$10
+            jsr SetInitialEncounterTimerHook2
+
+        .reloc
+        SetInitialEncounterTimerHook2:
+            sta EncounterSpawnTimer
+            lda #02
+            sta OverworldStepCounterHi
+            rts
+    .endif
+.endif
+
+.if HAS_HALF_ENCOUNTERS
+    .reloc
+    ExtraEncounterStepCheck:
+        lda OverworldStepCounter
+        bne @exit
+        dec OverworldStepCounterHi
+        bne @exit
+            lda #02
+            sta OverworldStepCounterHi
+            jmp SpawnEncounter
+        @exit:
+            jmp CheckTimer
+.endif
+
+""");
+    }
+
     public void UpdateItem(Collectable item, Room room)
     {
         int sideviewPtrAddr = room.GetSideviewPtrRomAddr();
