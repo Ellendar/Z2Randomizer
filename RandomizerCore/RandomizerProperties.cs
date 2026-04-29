@@ -221,6 +221,7 @@ public class RandomizerProperties
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
     public bool FastCast { get; set; }
+
     public BeamSprites BeamSprite { get; set; }
     public bool DisableMusic { get; set; }
     public bool RandomizeMusic { get; set; }
