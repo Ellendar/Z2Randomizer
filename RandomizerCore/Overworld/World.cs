@@ -3158,8 +3158,6 @@ public abstract class World
         return true;
     }
 
-    public abstract void UpdateVisit(IReadOnlySet<RequirementType> requireables);
-
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 
     //protected abstract void SetVanillaCollectables(bool useDash);
@@ -3176,5 +3174,30 @@ public abstract class World
             }
         }
         return false;
+    }
+
+    /// <summary>
+    /// Updates the visitation matrix and location reachability 
+    /// </summary>
+    public virtual void UpdateVisit(IReadOnlySet<RequirementType> requireables)
+    {
+        UpdateReachable(requireables);
+
+        foreach (Location location in AllLocations)
+        {
+            if (location.Y > 0 && visitation[location.Y, location.Xpos])
+            {
+                if (location.AccessRequirements.AreSatisfiedBy(requireables))
+                {
+                    location.Reachable = true;
+                    if (connections.ContainsKey(location) && (location.Town == null || location.Town.CanBeTraversed(requireables)))
+                    {
+                        Location connectedLocation = connections[location];
+                        connectedLocation.Reachable = true;
+                        visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
+                    }
+                }
+            }
+        }
     }
 }
