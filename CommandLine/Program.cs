@@ -67,7 +67,7 @@ public class Program
 
         if (!Seed.HasValue) 
         {
-            var r = new Random();
+            var r = new System.Random();
             Seed = r.Next(1000000000);
         } 
         configuration!.Seed = Seed.Value.ToString();

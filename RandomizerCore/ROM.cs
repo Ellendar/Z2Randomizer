@@ -633,7 +633,7 @@ TitleEnd:
 
         static int RandomUniqueColor(params int?[] forbiddenColors)
         {
-            Random random = new Random();
+            System.Random random = new();
             int color;
             do
             {
@@ -695,7 +695,7 @@ TitleEnd:
     {
         if (beamSprite == BeamSprites.RANDOM)
         {
-            Random r2 = new();
+            System.Random r2 = new();
             beamSprite = (BeamSprites)r2.Next(Enum.GetValues(typeof(BeamSprites)).Length - 1);
         }
 
