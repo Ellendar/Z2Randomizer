@@ -1388,24 +1388,7 @@ public sealed class WestHyrule : World
     public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
         visitation[northPalace.Y, northPalace.Xpos] = true;
-        UpdateReachable(requireables);
-
-        foreach (Location location in AllLocations)
-        {
-            if (location.Y > 0 && visitation[location.Y, location.Xpos])
-            {
-                if (location.AccessRequirements.AreSatisfiedBy(requireables))
-                {
-                    location.Reachable = true;
-                    if (connections.ContainsKey(location) && location.ConnectionRequirements.AreSatisfiedBy(requireables))
-                    {
-                        Location connectedLocation = connections[location];
-                        connectedLocation.Reachable = true;
-                        visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
-                    }
-                }
-            }
-        }
+        base.UpdateVisit(requireables);
     }
 
     protected override List<Location> GetPathingStarts()

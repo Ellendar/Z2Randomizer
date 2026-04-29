@@ -1669,28 +1669,6 @@ public sealed class EastHyrule : World
         }
     }
 
-    public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
-    {
-        UpdateReachable(requireables);
-
-        foreach (Location location in AllLocations)
-        {
-            if (location.Y > 0 && visitation[location.Y, location.Xpos])
-            {
-                if(location.AccessRequirements.AreSatisfiedBy(requireables))
-                {
-                    location.Reachable = true;
-                    if (connections.ContainsKey(location) && location.ConnectionRequirements.AreSatisfiedBy(requireables))
-                    {
-                        Location connectedLocation = connections[location];
-                        connectedLocation.Reachable = true;
-                        visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
-                    }
-                }
-            }
-        }
-    }
-
     private double ComputeDistance(Location l, Location l2)
     {
         return Math.Sqrt(Math.Pow(l.Xpos - l2.Xpos, 2) + Math.Pow(l.Y - l2.Y, 2));
