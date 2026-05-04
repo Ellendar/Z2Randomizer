@@ -102,6 +102,19 @@ public static class StartingTechsExtensions
     }
 }
 
+[DefaultValue(NORTH_PALACE)]
+public enum StartingLocation
+{
+    [Description("North Palace")]
+    NORTH_PALACE,
+    [Description("Regular Palace (West)")]
+    REGULAR_PALACE,
+    [Description("Great Palace (West)")]
+    GREAT_PALACE,
+    [Description("Random (West)"), Metastyle]
+    RANDOM,
+}
+
 [DefaultValue(VANILLA)]
 public enum AttackEffectiveness
 {
@@ -1091,6 +1104,7 @@ public static class Enums
 {
     public static IEnumerable<EnumDescription> StartingTechniquesList { get; } = ToDescriptions<StartingTechs>();
     public static IEnumerable<EnumDescription> StartingLivesList { get; } = ToDescriptions<StartingLives>();
+    public static IEnumerable<EnumDescription> StartingLocationList { get; } = ToDescriptions<StartingLocation>();
     public static IEnumerable<EnumDescription> AttackEffectivenessList { get; } = ToDescriptions<AttackEffectiveness>();
     public static IEnumerable<EnumDescription> MagicEffectivenessList { get; } = ToDescriptions<MagicEffectiveness>();
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();

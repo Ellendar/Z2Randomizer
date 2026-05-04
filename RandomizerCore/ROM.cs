@@ -1878,6 +1878,159 @@ SetDripperHp:
         a.Byt(splitHp);
     }
 
+    public void SetStartingLocation(Assembler asm, Location location, List<Palace> palaces)
+    {
+        if (location.ID == LocationID.WEST_NORTH_PALACE)
+        {
+            return; // vanilla starting location
+        }
+
+        int worldNumber = 0;
+        int locationNumber = (int)location.ID - (int)location.Continent * 0x40;
+        int mapNumber = location.Map;
+        int entryPage = location.MapPage;
+        int entryFacing = location.MapPage == 0 ? 0 : 1;
+
+        bool startInTown = false;
+        bool startStandingStill = false;
+        int startPage = 0;
+        int startX = location.ID switch {
+            LocationID.WEST_KINGS_TOMB => 0x78,
+            LocationID.WEST_TOWN_RAURU => 0xa8,
+            LocationID.WEST_TOWN_RUTO => 0xa8,
+            LocationID.WEST_TOWN_SARIA_NORTH => 0xb8,
+            LocationID.WEST_TOWN_MIDO => 0xc0,
+            _ => 0x78,
+        };
+
+        var a = asm.Module();
+        if (location.ID == LocationID.WEST_KINGS_TOMB)
+        {
+            startStandingStill = true;
+            worldNumber = 1;
+        }
+        else if (location.Town != null)
+        {
+            startInTown = true;
+            startStandingStill = true;
+            startPage = 3;
+            entryFacing = 1;
+            worldNumber = location.Continent is Continent.WEST ? 1 : 2;
+            locationNumber--; // Towns seem to lower this by 1 as you enter
+            a.Assign("StartTownNumber", location.GetTownNumber());
+        }
+        else if (location.Palace != null)
+        {
+            worldNumber = location.GetWorld() / 4;
+            int palaceIndex = location.Palace.Number - 1;
+            var root = palaces[palaceIndex].Entrance!;
+            mapNumber = root.Map;
+            a.Assign("StartPalaceNumber", location.Palace.Number);
+        }
+
+        if (startStandingStill)
+        {
+            entryPage = 6; // Special flag to simulate exiting a door at the desired X pos (normally used in the house when exiting New Kasuto fireplace)
+            a.Assign("StartLinkPage", startPage);
+            a.Assign("StartLinkX", startX);
+            a.Assign("StartScrollPage", startPage);
+            a.Assign("PrevScrollPage", (startPage - 1) % 4);
+            a.Assign("NextScrollPage", (startPage + 1) % 4);
+            a.Assign("StartScrollX", 0);
+        }
+
+        a.Set("_START_IN_TOWN", startInTown ? 1 : 0);
+        a.Set("_START_IN_PALACE", location.Palace != null ? 1 : 0);
+        a.Set("_START_STANDING_STILL", startStandingStill ? 1 : 0);
+        a.Assign("StartWorld", worldNumber);
+        a.Assign("StartRegion", (int)location.Continent);
+        a.Assign("StartLocationNumber", locationNumber);
+        a.Assign("StartMapNumber", mapNumber);
+        a.Assign("StartEntryPage", entryPage);
+        a.Assign("StartEntryFacing", entryFacing);
+
+        a.Code(/* lang=s */""""
+.include "z2r.inc"
+.segment "PRG0"
+
+SetStartLocationContinue = $aa20
+.org $aa0b        ; startup_init_begin_game + 3
+    ; A = 0 here
+    sta DoorDepth
+    lda #StartRegion
+    sta RegionNumber
+    lda #StartWorld
+    sta WorldNumber
+    lda #StartMapNumber
+    sta MapNumber
+    jmp SetStartLocationHook
+FREE_UNTIL SetStartLocationContinue
+
+.reloc
+SetStartLocationHook:
+    lda #StartLocationNumber
+    sta LocationNumber
+    lda #StartEntryPage
+    sta EntryPage
+    lda #StartEntryFacing
+    sta EntryFacing
+
+.if _START_IN_TOWN
+    lda #StartTownNumber
+    sta TownNumber
+.endif
+
+.if _START_IN_PALACE
+    lda #StartPalaceNumber
+    sta PalaceNumber
+    lda #StartMapNumber
+    sta temp_room_code
+.endif
+
+.if _START_STANDING_STILL
+    lda #StartLinkPage
+    sta SavedDoorExit2Page
+    lda #StartLinkX
+    sta SavedDoorExit2X
+.endif
+
+    jmp SetStartLocationContinue
+
+
+.if _START_STANDING_STILL
+; On reset, values from $a97f,y are copied to $6957,y
+; We need to set some values here to start in the desired position.
+; (These default values are normally never used.)
+
+; these are accessed in method at $8cec
+.org $a97f + $38  ; will be set to $732 (via $698f)
+    .byt PrevScrollPage
+.org $a97f + $3f  ; will be set to $733 (via $6996)
+    .byt NextScrollPage
+.org $a97f + $46  ; will be set to $734 (via $699d)
+    .byt $0b
+.org $a97f + $4d  ; will be set to $735 (via $69a4)
+    .byt $06
+.org $a97f + $69  ; will be set to $71f && $720 (via $69c0)
+    .byt $00
+.org $a97f + $54  ; will be set to ScrollPage
+    .byt StartScrollPage
+.org $a97f + $5b  ; will be set to ScrollX
+    .byt StartScrollX
+.org $a97f + $62  ; will be set to ScrollPosShadow
+    .byt StartScrollX
+
+; these are accessed in method at $c5f9
+.org $a97f + $2a  ; will be set to $732,$733 (via $6981)
+    .byt PrevScrollPage
+.org $a97f + $31  ; will be set to $734,$735 (via $6988)
+    .byt $0a
+
+.endif
+
+"""");
+    }
+
     public void FixItemPickup(Assembler asm)
     {
         // In Z2R, Link never holds items above his head. So,

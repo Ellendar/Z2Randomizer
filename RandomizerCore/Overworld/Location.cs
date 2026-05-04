@@ -219,6 +219,23 @@ public class Location
         (Y, Xpos) = isVanilla ? VanillaCoords : (0, 0);
     }
 
+    /// The TownNumber as used in game code
+    public int GetTownNumber()
+    {
+        return ID switch
+        {
+            LocationID.WEST_TOWN_RAURU => 0,
+            LocationID.WEST_TOWN_RUTO => 1,
+            LocationID.WEST_TOWN_SARIA_NORTH => 2,
+            LocationID.WEST_TOWN_MIDO => 3,
+            LocationID.EAST_TOWN_NABOORU => 4,
+            LocationID.EAST_TOWN_DARUNIA => 5,
+            LocationID.EAST_TOWN_NEW_KASUTO => 6,
+            LocationID.EAST_TOWN_OLD_KASUTO => 7,
+            _ => throw new Exception("Not a town location"),
+        };
+    }
+
     public int GetWorld()
     {
         //Towns reference their banks

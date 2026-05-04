@@ -89,6 +89,7 @@ public class Hyrule
     public List<World> worlds;
     public List<Palace> palaces;
     public List<Room> rooms;
+    private Location? startLocation;
     public StatRandomizer randomizedStats;
     public DropRandomizer randomizedDrops;
 
@@ -393,7 +394,7 @@ public class Hyrule
             }
 
             UpdateProgress(progress, ProgressEnum.APPLYING_PATCHES);
-            ApplyAsmPatches(props, assembler, r, texts, ROMData, randomizedStats);
+            ApplyAsmPatches(props, assembler, r, texts, ROMData, randomizedStats, startLocation!);
 
             UpdateProgress(progress, ProgressEnum.LINKING_ASSEMBLY);
             var rom = await ROMData.ApplyAsm(assembler);
@@ -618,10 +619,11 @@ public class Hyrule
         }
     }
 
-    //Shuffle the palace itself, not just the metadata
     private void ShufflePalaces()
     {
-        if (!props.PalacesCanSwapContinent) return;
+        if (!props.PalacesCanSwapContinent)
+            return;
+
         List<Location> palaces = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6];
 
         if (props.P7shuffle)
@@ -629,12 +631,26 @@ public class Hyrule
             palaces.Add(eastHyrule.locationAtGP);
         }
 
+        if (props.StartingLocation is StartingLocation.GREAT_PALACE)
+        {
+            var gpLocation = palaces.FirstOrDefault(loc => loc.Palace?.Number == 7);
+            if (gpLocation != null)
+            {
+                var westPalaces = palaces.Where(loc => loc.Continent is Continent.WEST).ToList();
+                if (westPalaces.Count > 0)
+                {
+                    var gpSwapLocation = westPalaces[r.Next(westPalaces.Count)];
+                    palaces.Remove(gpSwapLocation);
+                    (gpLocation.Palace, gpSwapLocation.Palace) = (gpSwapLocation.Palace, gpLocation.Palace);
+                }
+            }
+        }
+
         for (int i = palaces.Count - 1; i > 0; i--)
         {
             int swap = r.Next(i + 1);
             (palaces[i].Palace, palaces[swap].Palace) = (palaces[swap].Palace, palaces[i].Palace);
         }
-
     }
 
     private void ShuffleItems()
@@ -1867,6 +1883,10 @@ public class Hyrule
                 }
             } while (!AllContinentsAreConnected(connections));
 
+            ShufflePalaces();
+            startLocation = DetermineStartingLocation();
+            GetWorld(startLocation!).SetStart(startLocation!);
+
             int nonContinentGenerationAttempts = 0;
             int nonTerrainShuffleAttempt = 0;
             DateTime timestamp;
@@ -1977,10 +1997,6 @@ public class Hyrule
                     worlds.ForEach(i => i.ResetVisitabilityState());
                     worlds.ForEach(i => i.ResetCollectables(props));
 
-                    //There was a spooky extra call to LoadItemLocs that used to be here that shouldn't be needed, but be aware.
-                    westHyrule.SetStart();
-
-                    ShufflePalaces();
                     ShuffleItems();
                     //Debug.WriteLine(GenerateSpoiler());
 
@@ -2112,6 +2128,29 @@ public class Hyrule
             }
         }
         return continentsFound.Count == 4;
+    }
+
+    private Location DetermineStartingLocation()
+    {
+        Location[] westPalaces = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3];
+        Location[] westTowns = [westHyrule.rauru, westHyrule.ruto, westHyrule.sariaNorth, westHyrule.mido];
+        Location[] westAllEligible = [
+            .. westTowns,
+            .. westPalaces,
+            westHyrule.kingsTomb,
+        ];
+
+        return props.StartingLocation switch
+        {
+            StartingLocation.NORTH_PALACE => westHyrule.northPalace,
+            // Palace 4's Moa makes it unsuitable as a start.
+            StartingLocation.REGULAR_PALACE => westPalaces.Where(loc => loc.Palace!.Number is not (4 or 7)).ToArray().Sample(r)!,
+            // this relies on code in ShufflePalace making sure GP is in the west (if possible)
+            StartingLocation.GREAT_PALACE => westPalaces.FirstOrDefault(loc => loc.Palace!.Number == 7)
+                ?? throw new UserFacingException("Impossible Start Location", "Great Palace can not be in the West with the current settings."),
+            StartingLocation.RANDOM => westAllEligible.Sample(r)!,
+            _ => throw new NotImplementedException()
+        };
     }
 
     //ItemLocs is no longer a global reference (and probably shouldn't have been to begin with).
@@ -3865,7 +3904,7 @@ FlagHudUpdate:
         m.Byt(Util.ToGameText("TANOOKI"));
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
+    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom, StatRandomizer randomizedStats, Location startLocation)
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
@@ -3874,6 +3913,7 @@ FlagHudUpdate:
         // right now, so this is just always off, except when i manually make an update
         rom.AddRandomizerToTitle(engine, props.MarioMode, IS_RANDOMIZED);
         AddCropGuideBoxesToFileSelect(engine);
+        rom.SetStartingLocation(engine, startLocation, palaces);
         rom.SetEncounterRate(engine, props, r);
         FullItemShuffle(engine, GetFullShuffleLocationCollectables());
         rom.DontCountExpDuringTalking(engine);
@@ -4096,5 +4136,22 @@ FlagHudUpdate:
             palaceLocations[i].Palace = palaces[i];
         }
         palaceLocations.ForEach(i => i.AccessRequirements = Requirements.DEFAULT_PALACE_REQUIREMENTS);
+    }
+
+    private World GetWorld(Location location)
+    {
+        switch (location.Continent)
+        {
+            case Continent.WEST:
+                return westHyrule;
+            case Continent.DM:
+                return deathMountain;
+            case Continent.EAST:
+                return eastHyrule;
+            case Continent.MAZE:
+                return mazeIsland;
+            default:
+                throw new Exception($"Location {location} is on unknown continent");
+}
     }
 }

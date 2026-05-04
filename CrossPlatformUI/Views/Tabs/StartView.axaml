@@ -80,6 +80,7 @@
             <Separator/>
             <z:Z2ComboBox Flag="StartingTechniques" />
             <z:Z2ComboBox Flag="StartingLives" />
+            <z:Z2ComboBox Flag="StartingLocation" />
         </StackPanel>
     </Grid>
 </UserControl>

@@ -66,6 +66,7 @@ public class RandomizerProperties
     public int StartingMagicLevel { get; set; }
     public int StartLifeLvl { get; set; }
     public bool SwapUpAndDownStab { get; set; }
+    public StartingLocation StartingLocation { get; set; }
 
     //Overworld
     public bool ShuffleEncounters { get; set; }

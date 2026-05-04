@@ -1227,6 +1227,10 @@ The last 2 characters of the hash still reflect these settings, so two seeds wit
 
 Use this only when everyone intentionally wants the same base seed with different handicaps.</value>
 	</data>
+	<data name="StartingLocationToolTip" xml:space="preserve">
+<value>Select where Link will start the game, and continue after Game Over from.
+(Unless Restart at Palaces on Game Over takes precedence.)</value>
+	</data>
 	<data name="IndeterminateOptionRateToolTip" xml:space="preserve">
 <value>For flags set to an indeterminate value (question mark), those flags will be on or off at
 random, at the freqency specified by this flag.</value>
@@ -1607,6 +1611,9 @@ This is a wildly different gameplay experience, so be warned when setting this f
 	</data>
 	<data name="StandardizeDrops" xml:space="preserve">
 		<value>Standardize Drops</value>
+	</data>
+	<data name="StartingLocation" xml:space="preserve">
+		<value>Starting Location</value>
 	</data>
 	<data name="StartWithBoots" xml:space="preserve">
 		<value>Boots</value>
