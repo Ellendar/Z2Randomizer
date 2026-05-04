@@ -3,13 +3,16 @@
 .include "z2r.inc"
 
 .import METASPRITE_BIG_MARIO_SKIDDING, METASPRITE_BIG_MARIO_JUMPING, METASPRITE_FIRE_MARIO_STANDING, METASPRITE_BIG_MARIO_STANDING
-.import DrawMetasprite
+.import DrawMetasprite, METASPRITE_BIG_MARIO_WALKING_1
 .import SwapPRG, SwapToSavedPRG, SwapToPRG0
 
+.import METASPRITE_BIG_MARIO_CROUCHING
+CROUCHING = METASPRITE_BIG_MARIO_CROUCHING
 SKIDDING = METASPRITE_BIG_MARIO_SKIDDING
 JUMPING  = METASPRITE_BIG_MARIO_JUMPING
 SHOOT    = METASPRITE_FIRE_MARIO_STANDING
 STANDING = METASPRITE_BIG_MARIO_STANDING
+WALKING = METASPRITE_BIG_MARIO_WALKING_1
 mus_bossdie = 8
 
 ; Boss RAM size for clearing loop
@@ -35,11 +38,17 @@ PatchBossInit:
 .reloc
 BossLandedInCutscene:
   sta $0505
-.import METASPRITE_BIG_MARIO_CROUCHING
-  lda #METASPRITE_BIG_MARIO_CROUCHING
+  lda #CROUCHING
   sta boss_animation
   rts
 
+.segment "PRG5"
+.org $988e
+  jsr RunBoss
+  jmp $9a77
+FREE_UNTIL $9a77
+
+.segment "PRG5", "PRG7"
 .reloc
 InitShadowBoss:
       ; Clear all boss RAM
@@ -65,8 +74,56 @@ InitShadowBoss:
       sta Enemy_MovingDir,x
       rts
 
+
+.segment "PRG7"
+.import BlockBufferCollision
+.reloc
+; Trimmed down version that works just well enough for what i need
+EnemyToBGCollisionDet:
+        lda NmiBankShadow8
+        pha
+        lda NmiBankShadowA
+        pha
+
+        lda #0
+        jsr SwapPRG
+
+        lda #0                  ;set flag in A for save vertical coordinate
+        ldy #1                  ;set Y to check the bottom middle of enemy object (big mario's feet position)
+        ldx ObjectOffset        ;get object offset converted to enemy offset
+        inx
+        jsr BlockBufferCollision  ;do collision detection subroutine for sprite object
+        tax
+
+        pla
+        sta NmiBankShadowA
+        sta PrgBankAReg
+        pla
+        sta NmiBankShadow8
+        sta PrgBank8Reg
+    cpx #$00                  ;check to see if object bumped into anything
+    bne EnemyLanding
+    rts
+
+EnemyLanding:
+    ldx ObjectOffset          ;get object offset
+    lda #$00                    ;initialize vertical speed
+    sta Enemy_Y_Speed,x         ;and movement force
+    sta Enemy_Y_MoveForce,x
+    lda Enemy_State,x
+    and #%10111111 ; land the boss on the ground
+    sta Enemy_State,x
+    lda Enemy_Y_Position,x
+    and #%11110000          ;save high nybble of vertical coordinate, and
+    ; ora #%00001000          ;set d3, then store, probably used to set enemy object
+    sta Enemy_Y_Position,x  ;neatly on whatever it's landing on
+    rts
+
+.segment "PRG5", "PRG7"
 .reloc
 RunBoss:
+  lda #0
+  sta $de ; unfreeze link
       lda boss_freeze
       beq @notfreezed
       dec boss_freeze
@@ -109,7 +166,7 @@ RunBoss:
       lda TimerControl
       bne @nograv               ; skip movement if timer frozen
 
-;      jsr EnemyToBGCollisionDet ; background collision
+      jsr EnemyToBGCollisionDet ; background collision
       jsr HandleBossMovement    ; AI state machine
 
       lda Enemy_State,x
@@ -128,6 +185,9 @@ RunBoss:
 ;      jsr GetEnemyOffscreenBits
 ;      jsr GetEnemyBoundBox
 ;      jmp PlayerEnemyCollision  ; check player<->boss collision
+        ; JSR      $9A8D ; load collision hitbox (originally loads sword hitbox?)
+        jsr $9a97 ; trying random hitboxes???
+        JSR      $E4D9 ; do collision detection
         rts
 
   @decrement_timer:
@@ -375,17 +435,17 @@ MovGoToMiddle:
   @facing_right:
       ; Facing right: target $40
       lda Enemy_X_Position,x
-      cmp #$40
+      cmp #$80
       bcs @arrived
   @keep_walking:
       ; Set walk speed based on direction
       lda Enemy_MovingDir,x
       lsr
       bcs @walk_right
-      lda #<(-2)
+      lda #<(-10)
       .byte $2c                 ; skip next instruction
   @walk_right:
-      lda #2
+      lda #10
       sta Enemy_X_Speed,x
       jmp MoveEnemyHorizontally
 
@@ -414,9 +474,9 @@ BossSetWalkingAnim:
       bne @init_anim
       inc boss_walking_anim
       lda boss_walking_anim
-      cmp #$03
+      cmp #WALKING+3
       bne @init_anim
-      lda #0
+      lda #WALKING
       sta boss_walking_anim
   @init_anim:
       lda boss_walking_anim
@@ -565,7 +625,7 @@ KillBoss:
 ;      sta AreaMusicQueue
       dec boss_counter
 
-;      jsr EnemyToBGCollisionDet
+      jsr EnemyToBGCollisionDet
       lda #STANDING
       sta boss_animation
       lda Enemy_State,x
@@ -657,14 +717,31 @@ DamagePlayer:
   ora #$10 ; set flag indicating link was hit by this enemy?
   sta $a8,x
   rts
+
+.segment "PRG7"
 .reloc
 .import ImposeGravitySprObj
 MoveD_EnemyVertically:
-      ldy #$3d           ;set quick movement amount downwards
-SetHiMax:    lda #$03                ;set maximum speed in A
-SetXMoveAmt: sty R0                  ;set movement amount here
-             inx                     ;increment X for enemy offset
-             jsr ImposeGravitySprObj ;do a sub to move enemy object downwards
+        lda NmiBankShadow8
+        pha
+        lda NmiBankShadowA
+        pha
+
+        lda #0
+        jsr SwapPRG
+
+            ldy #$3d           ;set quick movement amount downwards
+            lda #$03                ;set maximum speed in A
+            sty R0                  ;set movement amount here
+            inx                     ;increment X for enemy offset
+
+            jsr ImposeGravitySprObj ;do a sub to move enemy object downwards
+        pla
+        sta NmiBankShadowA
+        sta PrgBankAReg
+        pla
+        sta NmiBankShadow8
+        sta PrgBank8Reg
              ldx ObjectOffset        ;get enemy object buffer offset and leave
              rts
 
