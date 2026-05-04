@@ -86,7 +86,7 @@ PatchLinkLivesScreenDraw:
   jsr BankSwitchMarioCHR
   jmp $EC02
 
-.org $CAe9
+.org $cae9
   jsr AlsoResetPlayerSizeOnContinue
 .reloc
 AlsoResetPlayerSizeOnContinue:
@@ -153,6 +153,9 @@ DrawFallingMarioSprite:
   nop
 
 .segment "PRG7"
+.org $dd1b ; TBird draws a flashing mario sprite here without banking
+  jsr BankPatchLinkDrawRoutine
+
 .reloc
 BankPatchLinkDrawRoutine:
   lda $0769

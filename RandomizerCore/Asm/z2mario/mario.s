@@ -222,8 +222,8 @@ PlayerSubs:
   ldy #$1d
   ; Jump to the middle of the original link collision routine
   ; jsr $e070 ; link original bg collision routine
-  jsr SlightlyModifiedCollisionRoutine
-  rts
+  jmp SlightlyModifiedCollisionRoutine
+  ; rts
 
 ;   lda Player_Y_Position
 ;   cmp #$40                    ;check to see if player is higher than 64th pixel
@@ -1774,7 +1774,7 @@ BlockBuffer_Y_Adder:
   .byte $12, $20, $20, $18, $18, $18, $18 ; small/crouching
   .byte $18, $14, $14, $06, $06, $08, $10 ; misc
 
-
+.export BlockBufferCollision
 BlockBufferColli_Feet:
   iny            ;if branched here, increment to next set of adders
 BlockBufferColli_Head:
