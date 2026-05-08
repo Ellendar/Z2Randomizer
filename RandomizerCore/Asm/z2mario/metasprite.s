@@ -442,12 +442,16 @@ SetYOffset:
   beq @isplayer
     ; Rendering dark mario so use the dark mario pattern table
     ldx CurrentOAMOffset
-    lda #%11000000
-    ora Sprite_Tilenumber - 16,x
-    sta Sprite_Tilenumber - 16,x
-    lda #%11000000
-    ora Sprite_Tilenumber - 12,x
-    sta Sprite_Tilenumber - 12,x
+    lda boss_animation
+    cmp #METASPRITE_SMALL_MARIO_DEATH
+    beq @smallmario
+      lda #%11000000
+      ora Sprite_Tilenumber - 16,x
+      sta Sprite_Tilenumber - 16,x
+      lda #%11000000
+      ora Sprite_Tilenumber - 12,x
+      sta Sprite_Tilenumber - 12,x
+  @smallmario:
     lda #%11000000
     ora Sprite_Tilenumber - 8,x
     sta Sprite_Tilenumber - 8,x

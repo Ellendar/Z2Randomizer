@@ -5,6 +5,7 @@
 .import ProcHammerTime
 .import Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
 .import SwapToSavedPRG, SwapToPRG0
+.import InjuredBoss
 .export SlightlyModifiedCollisionRoutine
 
 ; Remove unused code after we gutted link's movement
@@ -217,6 +218,13 @@ PatchLinkDrawRoutine:
     +
 @skipplayer:
   ; Check if we are rendering the Mario Boss
+  lda boss_invincibility_timer
+  beq +
+    ; if the boss is flickering skip drawing every other frame
+    lda FrameCounter
+    lsr
+    bcs @noboss
+  +
   ldx boss_animation
   beq @noboss
     ldy #1
@@ -583,6 +591,8 @@ SetPlayerDownstabbingHitbox:
 LoadProjectileCollisionBox = $e4bc
 SwordCollisionCheck = $E677
 BreakBlockCollisionCheck = $e1e6
+bank7_LoadObjectHitbox = $E942
+bank7_CollisionTest    = $E9F9
 .org $e1e0
   ; Check the hammer hitboxes as if they were stabbing blocks
   jsr CheckHammerHitboxes
@@ -627,20 +637,39 @@ PatchFireballHitcheck:
   bne @IsHammer
   lda #1
   sta $0b ; 1 = fireball
-  bne @DoCheck ; always taken
+  bne @CheckBoss ; always taken
 @IsHammer:
   lda #0
   sta $0b ; 0 = hammer (pass-through)
-@DoCheck:
+@CheckBoss:
+  ; Boss entity (type $23): bypass $E694 to avoid vanilla bank7_monster_death on HP=0
+  lda $a1,x
+  cmp #$23
+  bne @NotBoss
+    lda $0b
+    beq @exit             ; hammer doesn't damage boss
+    jsr bank7_LoadObjectHitbox  ; load boss hitbox ZP $04-$07
+    jsr bank7_CollisionTest     ; test fireball ($00-$03) vs boss ($04-$07)
+    bcc @exit             ; miss
+      ldy $11
+      lda Fireball_State,y
+      and #%01000000
+      bne @exit           ; hammer safety
+        lda #%10000000
+        sta Fireball_State,y
+        jsr InjuredBoss   ; decrement HP via controlled path, start invincibility
+@exit:
+  rts
+@NotBoss:
   jsr $E694
-  bcc @exit
+  bcc @NotBossExit
     ldy $11
     lda Fireball_State,y
     and #%01000000
-    bne @exit   ; hammer: pass through
+    bne @NotBossExit   ; hammer: pass through
       lda #%10000000
       sta Fireball_State,y
-@exit:
+@NotBossExit:
   rts
 
 ; Skip over stopping the projectile
