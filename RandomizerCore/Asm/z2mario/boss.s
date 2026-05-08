@@ -5,6 +5,7 @@
 .import METASPRITE_BIG_MARIO_SKIDDING, METASPRITE_BIG_MARIO_JUMPING, METASPRITE_FIRE_MARIO_STANDING, METASPRITE_BIG_MARIO_STANDING
 .import DrawMetasprite, METASPRITE_BIG_MARIO_WALKING_1
 .import SwapPRG, SwapToSavedPRG, SwapToPRG0
+.import METASPRITE_SMALL_MARIO_DEATH
 
 .export InjuredBoss
 
@@ -31,7 +32,7 @@ PatchBossInit:
   sta EnemyYVelocity
   jmp InitShadowBoss
 
-; Patch the location where it draws the boss
+; Patch the location where it draws the boss (effectively a nop)
 .org $9a7f
   jsr BossGraphicsHandler
 
@@ -70,9 +71,9 @@ InitShadowBoss:
       sta boss_animation,x
       dex
       bpl @loop
-      ldx ObjectOffset
+      ldx #0               ; Dark Link entity is always at enemy slot 0
       ; Set HP
-      lda #120
+      lda #60
       sta Enemy_HP,x
       lda #JUMPING
       sta boss_animation
@@ -81,7 +82,7 @@ InitShadowBoss:
       inc ReloadCHRBank
 
       ; Face left
-      ldx ObjectOffset
+      ldx #0
       lda #2
       sta Enemy_MovingDir,x
       rts
@@ -102,8 +103,8 @@ EnemyToBGCollisionDet:
 
         lda #0                  ;set flag in A for save vertical coordinate
         ldy #1                  ;set Y to check the bottom middle of enemy object (big mario's feet position)
-        ldx ObjectOffset        ;get object offset converted to enemy offset
-        inx
+        ldx #0                  ;boss is always enemy slot 0
+        inx                     ;add EnemyOffset=1: SprObject index for slot 0
         jsr BlockBufferCollision  ;do collision detection subroutine for sprite object
         tax
 
@@ -118,7 +119,7 @@ EnemyToBGCollisionDet:
     rts
 
 EnemyLanding:
-    ldx ObjectOffset          ;get object offset
+    ldx #0                    ;boss is always at enemy slot 0
     lda #$00                    ;initialize vertical speed
     sta Enemy_Y_Speed,x         ;and movement force
     sta Enemy_Y_MoveForce,x
@@ -146,9 +147,9 @@ RunBoss:
       lsr
       bcs @nodraw2
 ;      jsr RelativeEnemyPosition
-      jsr BossGraphicsHandler
+    ;   jsr BossGraphicsHandler
   @nodraw2:
-      ldx ObjectOffset
+      ldx #0
       rts
 
   @notfreezed:
@@ -164,16 +165,16 @@ RunBoss:
 ;      sta EnemyFrenzyBuffer     ; suppress enemy frenzy spawns
 
       ; Draw (skip every other frame if invincible for blink effect)
-      lda boss_invincibility_timer
-      beq @draw
-      lda FrameCounter
-      lsr
-      bcs @nodraw
-  @draw:
+;       lda boss_invincibility_timer
+;       beq @draw
+;       lda FrameCounter
+;       lsr
+;       bcs @nodraw
+;   @draw:
 ;      jsr RelativeEnemyPosition
-      jsr BossGraphicsHandler
+    ;   jsr BossGraphicsHandler
   @nodraw:
-      ldx ObjectOffset
+      ldx #0
 
       lda TimerControl
       bne @nograv               ; skip movement if timer frozen
@@ -548,7 +549,7 @@ BossSpawnFireball:
       sta Enemy_MovingDir,y
       lda #5 ; TODO What to spawn here? BowserFlame
       jsr BossSpawnEnemy
-      ldx ObjectOffset
+      ldx #0
   @done:
       rts
 
@@ -594,7 +595,7 @@ BossSpawnSideBullet:
         tay
       pla
       sta Enemy_MovingDir,y
-      ldx ObjectOffset
+      ldx #0
   @done:
       rts
 
@@ -623,37 +624,44 @@ BossSpawnEnemy:
 
 .reloc
 KillBoss:
+      ; First frame: boss_counter still equals 80 (reset each alive frame)
       lda boss_counter
-      bmi @death_complete       ; counter expired -> signal fully dead
-;      lda #Silence
-;      sta AreaMusicQueue
+      cmp #80
+      bne @animating
+        ; Initialize death animation: shrink to small mario death pose and launch upward
+        lda #METASPRITE_SMALL_MARIO_DEATH
+        sta boss_animation
+        lda #CHR_SMALLMARIO
+        sta boss_ChrBank
+        inc ReloadCHRBank
+        lda #<(-20)            ; fast upward launch (speed = -20)
+        sta Enemy_Y_Speed,x
+        lda #0
+        sta Enemy_X_Speed,x    ; stop horizontal movement
+        lda #150               ; ~2.5 second animation window
+        sta boss_counter
+        ; vanilla boss kill behavior
+        lda #$C0
+        sta $074B ; set flash timer
+        lda #$04 ; set sfx
+        sta $EC
+        lda #$14  ; force link to the ground?
+        sta $0751
+        lda $4D
+        sta $4E
+        lda $29
+        sta $2A
+        lda #$FF
+        sta $504 ; stop link from moving
+    @animating:
+      jsr MoveD_EnemyVertically  ; gravity decelerates upward motion then pulls boss down
       dec boss_counter
-
-      jsr EnemyToBGCollisionDet
-      lda #STANDING
-      sta boss_animation
-      lda Enemy_State,x
-      and #%01000000
-      beq @nograv
-      jsr MoveD_EnemyVertically
-      lda #JUMPING
-      sta boss_animation
-  @nograv:
-      ; Draw every other frame (flash effect)
-      lda FrameCounter
-      lsr
-      bcs @nodraw
-;      jsr RelativeEnemyPosition
-      jsr BossGraphicsHandler
-  @nodraw:
-      ldx ObjectOffset
-      rts
-
-  @death_complete:
-      ; Counter expired: signal death complete
-      dec Enemy_HP,x       ; HP goes to $FF (negative)
-;      lda #mus_bossdie
-;      sta AreaMusicQueue
+      bpl @done                  ; still in animation window
+      dec Enemy_HP,x
+  @done:
+      lda #1
+      sta $0505
+      ldx #0
       rts
 
 ;.reloc
@@ -723,38 +731,44 @@ DamagePlayer:
   rts
 
 ; Vanilla hitbox primitive addresses (all in fixed PRG7, callable from anywhere)
-bank7_LoadObjectHitbox = $E942  ; loads enemy hitbox into ZP $04-$07 using Enemy_X/Y_Position,x
-bank7_LoadLinkHitbox   = $E975  ; loads Link/Mario body hitbox into ZP $00-$03
-bank7_CollisionTest    = $E9F9  ; rectangle intersection; Carry set = overlap
-bank7_LinkCollision    = $D6C1  ; processes $A8,x enemy-hit flags -> calls link hurt routine
-bank7_Sword_Hit_Detection = $E677 ; check if the HitboxX/Y overlaps with the current enemy
+bank7_LoadObjectHitbox    = $E942  ; loads enemy hitbox into ZP $04-$07 using Enemy_X/Y_Position,x
+bank7_LoadLinkHitbox      = $E975  ; loads Link/Mario body hitbox into ZP $00-$03
+bank7_CollisionTest       = $E9F9  ; rectangle intersection; Carry set = overlap
+bank7_LinkCollision       = $D6C1  ; processes $A8,x enemy-hit flags -> calls link hurt routine
 .reloc
 ; Check contact between Mario and the boss each frame.
 BossPlayerCollision:
-    ldx ObjectOffset
+    ldx #0
 
-    jsr bank7_LoadObjectHitbox  ; boss body hitbox -> ZP $04-$07
-    jsr bank7_Sword_Hit_Detection ; compared with the sword stab routine
-    bcs @hit_boss
+    jsr bank7_LoadObjectHitbox    ; boss body hitbox into ZP $04-$07
 
-    jsr bank7_LoadLinkHitbox    ; Mario body hitbox -> ZP $00-$03
-    jsr bank7_CollisionTest
-    bcs @contact_damage
-    rts
-
-@hit_boss:
+    ; Stomp detection: Mario must be falling (Player_Y_Speed > 0 in SMB1 convention).
+    ; $00 = on the ground, $80-$FF = ascending, $01-$7F = falling.
+    lda Player_Y_Speed
+    beq @try_body_contact         ; standing – not a stomp
+    bmi @try_body_contact         ; going up – not a stomp
+    ; Mario is falling: check body overlap for stomp
+    jsr bank7_LoadLinkHitbox      ; Mario body hitbox into ZP $00-$03
+    jsr bank7_CollisionTest       ; carry set = overlap
+    bcc @no_contact
     jsr InjuredBossJump
     lda #$fd
-    sta Player_Y_Speed    ; bounce Mario up
-@no_collision:
+    sta Player_Y_Speed            ; bounce Mario up
+    rts
+
+@try_body_contact:
+    jsr bank7_LoadLinkHitbox      ; Mario body hitbox into ZP $00-$03
+    jsr bank7_CollisionTest
+    bcs @contact_damage
+@no_contact:
     rts
 
 @contact_damage:
-    ; Mario touched boss without downstabbing: hurt Mario via vanilla damage system
+    ; Mario touched boss without stomping: hurt Mario via vanilla damage system
     lda $a8,x
-    ora #$10              ; enemy-contacted-link flag
+    ora #$10                      ; enemy-contacted-link flag
     sta $a8,x
-    jmp bank7_LinkCollision ; processes $A8 flag to damage Mario; returns to RunBoss caller
+    jmp bank7_LinkCollision       ; processes $A8 flag to damage Mario; returns to RunBoss caller
 
 
 .reloc
@@ -769,10 +783,13 @@ InjuredBossJump:
     sbc #5
     bcs +
     lda #0              ; floor at 0
-+:
++
     sta Enemy_HP,x
-    lda #$10 ; Sword stab SFX
-    sta Z2NoiseSoundQueue ; stab SFX
+    beq +
+        ; don't play sfx for last hit
+        lda #$10 ; Sword stab SFX
+        sta Z2NoiseSoundQueue ; stab SFX
+    +
     lda #30               ; 0.5 seconds at 60 fps
     sta boss_invincibility_timer
     ; Reset state timer if currently idle (mirrors InjuredBoss behavior)
@@ -807,7 +824,7 @@ MoveD_EnemyVertically:
         pla
         sta NmiBankShadow8
         sta PrgBank8Reg
-             ldx ObjectOffset        ;get enemy object buffer offset and leave
+             ldx #0                  ;boss is always at enemy slot 0
              rts
 
 ;.reloc
