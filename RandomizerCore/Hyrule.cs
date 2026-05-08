@@ -2430,6 +2430,9 @@ public class Hyrule
             rom.Put(ROM.ChrRomOffset + 0x1a800, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.sprites_mario_hammer.chr"));
             var span = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.map_mario.chr");
             rom.Put(ROM.ChrRomOffset + 0x11a00, span[0..0x220]);
+            var title_graphics = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.mario_title.chr");
+            rom.Put(ROM.ChrRomOffset + 0x1380, title_graphics[0..0x300]);
+            rom.Put(ROM.ChrRomOffset + 0x1840, title_graphics[0x300..0x400]);
         }
 
         if (props.EncounterRates == EncounterRate.NONE)
@@ -3820,7 +3823,7 @@ bank5_Pointer_table_for_End_Credits:
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
         ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic, props.MarioMode); // will make output vary with customize tab options
-        rom.AddRandomizerToTitle(engine);
+        rom.AddRandomizerToTitle(engine, props.MarioMode);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetNonSideviewItemLocations());
@@ -3958,6 +3961,8 @@ bank5_Pointer_table_for_End_Credits:
             // recompile that, I'm just gonna patch it here...
             const byte LDA_ABS = 0xAD;
             const byte STA_ABS = 0x8D;
+            const byte LDX_ABS = 0xAE;
+            const byte STX_ABS = 0x8E;
 
             void PatchAddress(byte opcode, int before, int after)
             {
@@ -3974,6 +3979,10 @@ bank5_Pointer_table_for_End_Credits:
             PatchAddress(LDA_ABS, 0x6381, 0x6341);
             PatchAddress(STA_ABS, 0x6380, 0x6340);
             PatchAddress(STA_ABS, 0x6381, 0x6341);
+            PatchAddress(LDX_ABS, 0x6380, 0x6340);
+            PatchAddress(LDX_ABS, 0x6381, 0x6341);
+            PatchAddress(STX_ABS, 0x6380, 0x6340);
+            PatchAddress(STX_ABS, 0x6381, 0x6341);
             var asm = engine.Module();
             asm.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.s"), "z2ft.s");
         }

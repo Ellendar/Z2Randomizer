@@ -6,6 +6,8 @@
 .import DrawMetasprite, METASPRITE_BIG_MARIO_WALKING_1
 .import SwapPRG, SwapToSavedPRG, SwapToPRG0
 
+.export InjuredBoss
+
 .import METASPRITE_BIG_MARIO_CROUCHING
 CROUCHING = METASPRITE_BIG_MARIO_CROUCHING
 SKIDDING = METASPRITE_BIG_MARIO_SKIDDING
@@ -48,6 +50,16 @@ BossLandedInCutscene:
   jmp $9a77
 FREE_UNTIL $9a77
 
+; Patch bank5_Enemy_Vulnerability_Damage_Codes entry $23 (Dark Link):
+; Clear bit 5 "Immune to Flying Blade and Fire" so fireballs can hit the boss.
+.org $951C
+  .byte $14
+
+; Make dark mario use a different hitbox (vanilla has a jank $0e hitbox, switch
+; to a simple tall enemy hitbox with $00)
+.org $9540
+  .byte $00
+
 .segment "PRG5", "PRG7"
 .reloc
 InitShadowBoss:
@@ -58,9 +70,9 @@ InitShadowBoss:
       sta boss_animation,x
       dex
       bpl @loop
-      ldx #1
+      ldx ObjectOffset
       ; Set HP
-      lda #20
+      lda #120
       sta Enemy_HP,x
       lda #JUMPING
       sta boss_animation
@@ -180,15 +192,7 @@ RunBoss:
       ; Collision detection (only when not invincible)
       lda boss_invincibility_timer
       bne @decrement_timer
-;      lda #$0a
-;      sta Enemy_BoundBoxCtrl,x  ; set bounding box size
-;      jsr GetEnemyOffscreenBits
-;      jsr GetEnemyBoundBox
-;      jmp PlayerEnemyCollision  ; check player<->boss collision
-        ; JSR      $9A8D ; load collision hitbox (originally loads sword hitbox?)
-        jsr $9a97 ; trying random hitboxes???
-        JSR      $E4D9 ; do collision detection
-        rts
+        jmp BossPlayerCollision
 
   @decrement_timer:
       dec boss_invincibility_timer
@@ -717,6 +721,67 @@ DamagePlayer:
   ora #$10 ; set flag indicating link was hit by this enemy?
   sta $a8,x
   rts
+
+; Vanilla hitbox primitive addresses (all in fixed PRG7, callable from anywhere)
+bank7_LoadObjectHitbox = $E942  ; loads enemy hitbox into ZP $04-$07 using Enemy_X/Y_Position,x
+bank7_LoadLinkHitbox   = $E975  ; loads Link/Mario body hitbox into ZP $00-$03
+bank7_CollisionTest    = $E9F9  ; rectangle intersection; Carry set = overlap
+bank7_LinkCollision    = $D6C1  ; processes $A8,x enemy-hit flags -> calls link hurt routine
+bank7_Sword_Hit_Detection = $E677 ; check if the HitboxX/Y overlaps with the current enemy
+.reloc
+; Check contact between Mario and the boss each frame.
+BossPlayerCollision:
+    ldx ObjectOffset
+
+    jsr bank7_LoadObjectHitbox  ; boss body hitbox -> ZP $04-$07
+    jsr bank7_Sword_Hit_Detection ; compared with the sword stab routine
+    bcs @hit_boss
+
+    jsr bank7_LoadLinkHitbox    ; Mario body hitbox -> ZP $00-$03
+    jsr bank7_CollisionTest
+    bcs @contact_damage
+    rts
+
+@hit_boss:
+    jsr InjuredBossJump
+    lda #$fd
+    sta Player_Y_Speed    ; bounce Mario up
+@no_collision:
+    rts
+
+@contact_damage:
+    ; Mario touched boss without downstabbing: hurt Mario via vanilla damage system
+    lda $a8,x
+    ora #$10              ; enemy-contacted-link flag
+    sta $a8,x
+    jmp bank7_LinkCollision ; processes $A8 flag to damage Mario; returns to RunBoss caller
+
+
+.reloc
+; Variant of InjuredBoss that subtracts 5 HP at once (jump attack damage).
+; HP is floored at 0 so the KillBoss death-countdown path runs normally.
+InjuredBossJump:
+    lda boss_invincibility_timer
+    bne @done             ; already invincible, no damage (caller still bounces Mario)
+    inc boss_screech
+    lda Enemy_HP,x
+    sec
+    sbc #5
+    bcs +
+    lda #0              ; floor at 0
++:
+    sta Enemy_HP,x
+    lda #$10 ; Sword stab SFX
+    sta Z2NoiseSoundQueue ; stab SFX
+    lda #30               ; 0.5 seconds at 60 fps
+    sta boss_invincibility_timer
+    ; Reset state timer if currently idle (mirrors InjuredBoss behavior)
+    lda boss_state
+    bne @done
+    lda #0
+    sta boss_state_timer
+@done:
+    rts
 
 .segment "PRG7"
 .reloc

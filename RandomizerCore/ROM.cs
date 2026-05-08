@@ -434,11 +434,48 @@ public class ROM
         }
     }
 
-    public void AddRandomizerToTitle(Assembler asm)
+    public void AddRandomizerToTitle(Assembler asm, bool marioMode)
     {
         // This is just updating the macro commands used to draw the title screen tiles
         // The actual tile data will be imported into the rom data later
-        asm.Module().Code("""
+
+        var PlayerName = marioMode ? 
+"""
+Line4:
+; MARIO(TM)
+.byte $22, $ca, 14 ; Write 14 bytes to $22a7
+.byte $38, $39, $3a, $3b, $3c, $3d, $3e, $3f, $40, $41, $42, $43, $44, $45
+
+Line5:
+.byte $22, $ea, 13 ; Write 14 bytes to $22ea
+.byte $46, $47, $48, $49, $4a, $4b, $4c, $4d, $4e, $4f, $50, $51, $52
+Line6:
+.byte $23, $09, 15 ; Write 15 bytes to $2309
+.byte $53, $54, $55, $56, $57, $58, $59, $5a, $5b, $5c, $5d, $5e, $5f, $60, $61
+Line7:
+.byte $23, $29, 15 ; Write 15 bytes to $2329
+.byte $62, $63, $64, $65, $66, $67
+.byte $84, $85, $86, $87, $88, $89, $8a, $8b, $8c
+"""
+        :
+"""
+Line4:
+; LINK(TM)
+.byte $22, $ca, 14 ; Write 14 bytes to $22a7
+.byte $38, $39, $3a, $f4, $3b, $3c, $39, $3d, $39, $3e, $3f, $40, $41, $42
+
+Line5:
+.byte $22, $ea, 13 ; Write 13 bytes to $22ea
+.byte $43, $44, $45, $f4, $46, $47, $48, $49, $4a, $4b, $4c, $4d, $4e
+Line6:
+.byte $23, $09, 15 ; Write 15 bytes to $2309
+.byte $4f, $50, $51, $52, $53, $54, $55, $56, $57, $54, $58, $59, $5a, $5b, $5c
+Line7:
+.byte $23, $29, 15 ; Write 15 bytes to $2329
+.byte $5d, $5e, $5e, $5e, $5f, $5e, $60, $5e, $61, $62, $63, $64, $65, $66, $67
+""";
+        
+        asm.Module().Code($"""
 .macpack common
 .segment "PRG5"
 
@@ -521,20 +558,7 @@ Line3:
 .byte $22, $a7, 18 ; Write 18 bytes to $22a7
 .byte $26, $27, $28, $29, $2a, $2b, $2c, $2d, $2e, $2f, $30, $31, $32, $33, $34, $35, $36, $37 ; Bot
 
-Line4:
-; LINK(TM)
-.byte $22, $ca, 14 ; Write 14 bytes to $22a7
-.byte $38, $39, $3a, $f4, $3b, $3c, $39, $3d, $39, $3e, $3f, $40, $41, $42
-
-Line5:
-.byte $22, $ea, 13 ; Write 13 bytes to $22ea
-.byte $43, $44, $45, $f4, $46, $47, $48, $49, $4a, $4b, $4c, $4d, $4e
-Line6:
-.byte $23, $09, 15 ; Write 15 bytes to $2309
-.byte $4f, $50, $51, $52, $53, $54, $55, $56, $57, $54, $58, $59, $5a, $5b, $5c
-Line7:
-.byte $23, $29, 15 ; Write 15 bytes to $2329
-.byte $5d, $5e, $5e, $5e, $5f, $5e, $60, $5e, $61, $62, $63, $64, $65, $66, $67
+{PlayerName}
 TitleEnd:
 
 ; Add some filler commands to take up the rest of the space

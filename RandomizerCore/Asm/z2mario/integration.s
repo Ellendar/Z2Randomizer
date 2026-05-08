@@ -5,7 +5,6 @@
 .import ProcHammerTime
 .import Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
 .import SwapToSavedPRG, SwapToPRG0
-
 .export SlightlyModifiedCollisionRoutine
 
 ; Remove unused code after we gutted link's movement
@@ -553,9 +552,8 @@ NoDecTimers:
   jsr SetPlayerDownstabbingHitbox
 
   ; jsr CheckSideviewTransition ; this is already run during collision detection
-  jsr PlayerGfxHandler
-
-  rts
+  jmp PlayerGfxHandler
+  ; rts
 
 .reloc
 SetPlayerDownstabbingHitbox:
@@ -623,31 +621,25 @@ CheckHammerHitboxes:
   jsr PatchFireballHitcheck
 .reloc
 PatchFireballHitcheck:
-  ldy $11 ; fireball or hammer
-  ; if its a hammer let it pass through
+  ldy $11 ; fireball or hammer slot (0 or 1)
   lda Fireball_State,y
   and #%01000000
-  beq @IsFireball
-    ; Is Hammer
-    ; Load the X / Y coord into $47e and $480
-    ; use a "sword" type of attack for the hitbox check
-    lda #0
-    .byte $2c ; skips 2 bytes
-;    jsr $e67e ; original hitbox check for swords (skipping past sword offscreen check)
-;    jmp @AfterCheck
-  @IsFireball:
-    lda #1
-    sta $0b ; Holds the "type" of attack (0 = sword, 1 = projectile)
-    jsr $E694 ; original hitbox check for projectiles
-    bcc @exit
-      ldy $11 ; fireball or hammer
-      ; if its a hammer let it pass through
-      lda Fireball_State,y
-      and #%01000000
-      bne @exit
-        ; destroy the fireball
-        lda #%10000000
-        sta Fireball_State,y
+  bne @IsHammer
+  lda #1
+  sta $0b ; 1 = fireball
+  bne @DoCheck ; always taken
+@IsHammer:
+  lda #0
+  sta $0b ; 0 = hammer (pass-through)
+@DoCheck:
+  jsr $E694
+  bcc @exit
+    ldy $11
+    lda Fireball_State,y
+    and #%01000000
+    bne @exit   ; hammer: pass through
+      lda #%10000000
+      sta Fireball_State,y
 @exit:
   rts
 
@@ -882,6 +874,8 @@ ClearQueues:
 
 .reloc
 CheckMarioSq1Sfx:
+  lda $07E1             ; L990B active effect type (non-zero = L990B is driving Square 1)
+  bne @Z2ExtraActive
   jsr Square1SfxHandler
   lda Square1SoundBuffer
   beq @PlayingZ2
@@ -896,6 +890,7 @@ CheckMarioSq1Sfx:
     ; but now we can clear it.
     lda #0
     sta Z2Square1SoundBuffer
+@Z2ExtraActive:
     rts
 @ActualZ1Sfx:
   jmp $92F4 ; Original square 1 sfx from z2
@@ -920,6 +915,8 @@ CheckMarioSq2Sfx:
   jmp $9408 ; Original square 2 sfx from z2
 .reloc
 CheckMarioNoiseSfx:
+  lda $07E1             ; L990B active effect type (non-zero = L990B is driving Noise)
+  bne @Z2ExtraActive
   jsr NoiseSfxHandler
   lda NoiseSoundBuffer
   beq @PlayingZ2
@@ -934,26 +931,10 @@ CheckMarioNoiseSfx:
     ; but now we can clear it.
     lda #0
     sta Z2NoiseSoundBuffer
+@Z2ExtraActive:
     rts
 @ActualNoiseSfx:
   jmp $95A7 ; Original "complex" sfx from z2
-
-; .reloc
-; CheckMarioSfx:
-;   lda Square1SoundQueue
-;   ora MarioSquare1SoundBuffer
-;   ora Square2SoundQueue
-;   ora MarioSquare2SoundBuffer
-;   ora NoiseSoundQueue
-;   ora MarioNoiseSoundBuffer
-;   beq @NoMarioSfx
-;     jsr SFXSoundEngine
-;     sta MarioSquare1SoundPlaying
-;     jmp $901C
-; @NoMarioSfx:
-;   ; P
-;   jsr $92F4 ; Zelda 2 square 1 sfx processing
-;   rts
 
 .segment "PRG7"
 ; Make mario state "on ground" when riding an elevator
@@ -978,7 +959,7 @@ ElevatorMakeMarioStateStanding:
 
 SetLinkRecoil = $e371
 
-.reloc
+; .reloc
 ;DisableRecoilIfDownstab:
 ;  jsr CheckForDownstab
 ;  bcs +
