@@ -159,8 +159,8 @@ RunBoss:
       jmp KillBoss              ; HP == 0: playing death countdown
   @alive:
 
-      lda #80
-      sta boss_counter          ; reset death countdown each frame while alive
+    ;   lda #80
+    ;   sta boss_counter          ; reset death countdown each frame while alive
 ;      lda #0
 ;      sta EnemyFrenzyBuffer     ; suppress enemy frenzy spawns
 
@@ -624,9 +624,7 @@ BossSpawnEnemy:
 
 .reloc
 KillBoss:
-      ; First frame: boss_counter still equals 80 (reset each alive frame)
       lda boss_counter
-      cmp #80
       bne @animating
         ; Initialize death animation: shrink to small mario death pose and launch upward
         lda #METASPRITE_SMALL_MARIO_DEATH
@@ -634,68 +632,29 @@ KillBoss:
         lda #CHR_SMALLMARIO
         sta boss_ChrBank
         inc ReloadCHRBank
-        lda #<(-20)            ; fast upward launch (speed = -20)
+        lda #<(-6)            ; fast upward launch
         sta Enemy_Y_Speed,x
         lda #0
         sta Enemy_X_Speed,x    ; stop horizontal movement
-        lda #150               ; ~2.5 second animation window
+        lda #$7f
         sta boss_counter
         ; vanilla boss kill behavior
         lda #$C0
         sta $074B ; set flash timer
         lda #$04 ; set sfx
         sta $EC
-        lda #$14  ; force link to the ground?
+        lda #$14
         sta $0751
-        lda $4D
-        sta $4E
-        lda $29
-        sta $2A
         lda #$FF
         sta $504 ; stop link from moving
     @animating:
       jsr MoveD_EnemyVertically  ; gravity decelerates upward motion then pulls boss down
       dec boss_counter
-      bpl @done                  ; still in animation window
-      dec Enemy_HP,x
+      bne @done                  ; still in animation window
+        dec Enemy_HP,x
   @done:
-      lda #1
-      sta $0505
       ldx #0
       rts
-
-;.reloc
-;AnimateKilledBoss:
-;      jsr EraseEnemyObject
-;
-;      lda #3
-;      sta pal_type              ; set palette type for post-boss
-;      lda #2
-;      sta PowerUpType
-;      lda #PowerUpObject
-;      sta Enemy_ID+5
-;      lda #0
-;      sta Enemy_PageLoc+5
-;      sta Enemy_X_Speed+5
-;      lda Enemy_X_Position,x
-;      sta Enemy_X_Position+5    ; spawn at boss's position
-;      lda #$01
-;      sta Enemy_Y_HighPos+5
-;      sta Enemy_Flag+5
-;      lda Enemy_Y_Position,x
-;      sta Enemy_Y_Position+5
-;      lda #$80
-;      sta Enemy_State+5
-;      lda #$03
-;      sta Enemy_BoundBoxCtrl+5
-;
-;      lda #<(-3)
-;      sta Enemy_Y_Speed+5      ; powerup floats upward
-;
-;      lda #Sfx_GrowPowerUp
-;      sta Square2SoundQueue
-;      ldx ObjectOffset
-;      rts
 
 .reloc
 StompedBoss:

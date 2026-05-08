@@ -549,13 +549,18 @@ NoDecTimers:
   beq @SkipScrollLock
     lda Player_X_Position
     cmp #3
-    bcc @Lock
+    bcc @LockLeft
       ; Check for right lock
       cmp #$e5
       bcc @SkipScrollLock ; You are still in bounds
-    @Lock:
-        .import ImpedePlayerMove
-        jsr ImpedePlayerMove
+        lda #$e4
+        .byte $2c
+    @LockLeft:
+        lda #4
+    @StopMovement:
+        sta Player_X_Position
+        lda #0
+        sta Player_X_Speed
 @SkipScrollLock:
   jsr SetPlayerDownstabbingHitbox
 
