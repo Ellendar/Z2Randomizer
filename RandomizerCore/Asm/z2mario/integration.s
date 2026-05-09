@@ -217,22 +217,6 @@ PatchLinkDrawRoutine:
       inc ReloadCHRBank
     +
 @skipplayer:
-  ; Check if we are rendering the Mario Boss
-  lda boss_invincibility_timer
-  beq +
-    ; if the boss is flickering skip drawing every other frame
-    lda FrameCounter
-    lsr
-    bcs @noboss
-  +
-  ldx boss_animation
-  beq @noboss
-    ldy #1
-    lda #2
-    sta SprObject_SprAttrib,y
-    jsr DrawMetasprite
-    ; TODO draw boss spawned objects here
-@noboss:
   ; While we are here, lets draw the fireball/hammer sprites too
   ldy #ProjectileOffset
   sty $02
@@ -651,18 +635,16 @@ PatchFireballHitcheck:
   lda $a1,x
   cmp #$23
   bne @NotBoss
-    lda $0b
-    beq @exit             ; hammer doesn't damage boss
     jsr bank7_LoadObjectHitbox  ; load boss hitbox ZP $04-$07
-    jsr bank7_CollisionTest     ; test fireball ($00-$03) vs boss ($04-$07)
+    jsr bank7_CollisionTest     ; test projectile ($00-$03) vs boss ($04-$07)
     bcc @exit             ; miss
+      jsr InjuredBoss     ; decrement HP via controlled path, start invincibility
       ldy $11
       lda Fireball_State,y
       and #%01000000
-      bne @exit           ; hammer safety
-        lda #%10000000
+      bne @exit           ; hammer passes through; don't despawn it
+        lda #%10000000    ; fireball: trigger explosion state
         sta Fireball_State,y
-        jsr InjuredBoss   ; decrement HP via controlled path, start invincibility
 @exit:
   rts
 @NotBoss:

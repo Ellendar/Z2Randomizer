@@ -6,6 +6,8 @@
 .import DrawMetasprite, METASPRITE_BIG_MARIO_WALKING_1
 .import SwapPRG, SwapToSavedPRG, SwapToPRG0
 .import METASPRITE_SMALL_MARIO_DEATH
+.import METASPRITE_FIREBALL_FRAME_1, METASPRITE_FIREBALL_FRAME_2
+.import METASPRITE_HAMMER_FRAME_1, METASPRITE_HAMMER_FRAME_2
 
 .export InjuredBoss
 
@@ -18,8 +20,21 @@ STANDING = METASPRITE_BIG_MARIO_STANDING
 WALKING = METASPRITE_BIG_MARIO_WALKING_1
 mus_bossdie = 8
 
-; Boss RAM size for clearing loop
-;BOSS_RAM_SIZE = 11  ; boss_animation through boss_freeze (12 bytes, 0-indexed = 11)
+.segment "PRG7"
+; patch the vanilla enemy projectile check to prevent it from trying to run our hammer/fireball
+.org $d57f
+  jsr DontRunHammerFireball
+.reloc
+DontRunHammerFireball:
+  cmp #METASPRITE_FIREBALL_FRAME_1
+  bcs @HammerFireball
+    sec
+    sbc #1
+    rts
+@HammerFireball:
+  pla
+  pla
+  rts
 
 .segment "PRG5", "PRG7"
 
@@ -49,7 +64,8 @@ BossLandedInCutscene:
 .org $988e
   jsr RunBoss
   jmp $9a77
-FREE_UNTIL $9a77
+FREE_UNTIL $9a0f
+
 
 ; Patch bank5_Enemy_Vulnerability_Damage_Codes entry $23 (Dark Link):
 ; Clear bit 5 "Immune to Flying Blade and Fire" so fireballs can hit the boss.
@@ -181,6 +197,8 @@ RunBoss:
 
       jsr EnemyToBGCollisionDet ; background collision
       jsr HandleBossMovement    ; AI state machine
+      jsr ClampBossX            ; keep boss inside arena [16, 236]
+      jsr BossUpdateProjectiles ; move shadow fireballs/hammers + collision
 
       lda Enemy_State,x
       and #%01000000            ; check airborne flag
@@ -222,6 +240,7 @@ MovBossSide:
       lda RNG
       and #%00000011
       bne @no_fireball
+      jsr BossFacePlayer        ; aim at Mario before shooting
       jsr BossSpawnFireball
   @no_fireball:
 
@@ -355,34 +374,6 @@ MovBossMiddle:
       cpy #5
       bcc @loop
 
-      ; All clear: maybe spawn powerup
-;      lda Player_State
-;      cmp #2
-;      bcs @no_need_for_p        ; player already has fire power
-;      sta PowerUpType
-;      lda #PowerUpObject
-;      cmp Enemy_ID+5
-;      beq @no_need_for_p        ; powerup already exists
-;      ; Spawn powerup in slot 5
-;      ldy #5
-;      lda #PowerUpObject
-;      sta Enemy_ID,y
-;      lda Enemy_X_Position,x
-;      sta Enemy_X_Position+5
-;      lda Enemy_Y_Position,x
-;      sta Enemy_Y_Position+5
-;      lda #0
-;      sta Enemy_PageLoc+5
-;      sta Enemy_X_Speed+5
-;      lda #$01
-;      sta Enemy_Y_HighPos+5
-;      sta Enemy_Flag+5
-;      lda #$80
-;      sta Enemy_State+5
-;      lda #$03
-;      sta Enemy_BoundBoxCtrl+5
-;      lda #<(-3)
-;      sta Enemy_Y_Speed+5
   @no_need_for_p:
       lda #0
       sta boss_bridge
@@ -402,66 +393,58 @@ MovBossMiddle:
 
   @not_ready:
       dec boss_state_timer
-      ; Every 16 frames, spawn a bullet bill from a random Y position
+      ; Every 24 frames, lob a shadow hammer from the boss with a random
+      ; X-speed; BossSpawnHammer biases the throw toward Mario.
       lda FrameCounter
-      and #%00001111
+      and #%00010111
       bne @done
-      ; Random Y position
-      lda RNG
-      and #$70
-      clc
-      adc #$30
-      sta $00                   ; Y position for bullet
-      ; Alternate left/right side
-      lda FrameCounter
-      and #%00010000
-      lsr
-      lsr
-      lsr
-      lsr
-      clc
-      adc #1                    ; A = 1 or 2 (left or right)
-      jsr BossSpawnSideBullet
+      jsr BossSpawnHammer
   @done:
       rts
+
+; Right-side platform target: in vanilla Zelda 2, the great-palace dark-link
+; arena has a 3-metatile-wide platform on the right, 7 metatiles above the
+; ground.  Center of platform is X = $D8.  The boss walks toward $D8 from
+; whichever side it's on, then jumps up to land on top.
+PLATFORM_TARGET_X = $D8
+PLATFORM_TOLERANCE = 4          ; arrive band: target +/- 4 pixels
 
 MovGoToMiddle:
       jsr BossSetWalkingAnim
 
-      ; Target X: $B0 if facing left, $40 if facing right
-      lda Enemy_MovingDir,x
-      lsr
-      bcs @facing_right
-      ; Facing left: target $B0
+      ; Walk toward PLATFORM_TARGET_X.  Boss is "arrived" once within +/-4 px.
       lda Enemy_X_Position,x
-      cmp #$B0
-      bcc @keep_walking
-      bcs @arrived
-  @facing_right:
-      ; Facing right: target $40
-      lda Enemy_X_Position,x
-      cmp #$80
-      bcs @arrived
-  @keep_walking:
-      ; Set walk speed based on direction
-      lda Enemy_MovingDir,x
-      lsr
-      bcs @walk_right
-      lda #<(-10)
-      .byte $2c                 ; skip next instruction
+      cmp #PLATFORM_TARGET_X - PLATFORM_TOLERANCE
+      bcc @walk_right
+      cmp #PLATFORM_TARGET_X + PLATFORM_TOLERANCE
+      bcs @walk_left
+      jmp @arrived
+
   @walk_right:
-      lda #10
+      lda #1
+      sta Enemy_MovingDir,x
+      sta EnemyFacingDir,x
+      lda #20
+      sta Enemy_X_Speed,x
+      jmp MoveEnemyHorizontally
+
+  @walk_left:
+      lda #2
+      sta Enemy_MovingDir,x
+      sta EnemyFacingDir,x
+      lda #<(-20)
       sta Enemy_X_Speed,x
       jmp MoveEnemyHorizontally
 
   @arrived:
       lda #0
       sta Enemy_X_Speed,x
-      ; Jump onto center platform
+      ; Jump onto right platform.
+      ; lift under MoveD_EnemyVertically's gravity to clear ~7 metatiles.
       lda Enemy_State,x
       and #%01000000
       bne @already_airborne
-      lda #<(-6)
+      lda #<(-8)
       sta Enemy_Y_Speed,x
       jsr BossJump
   @already_airborne:
@@ -489,6 +472,47 @@ BossSetWalkingAnim:
       rts
 
 .reloc
+; Face the player.  Sets Enemy_MovingDir to 1 (right) if the player is to the
+; right of the boss, otherwise 2 (left).  Z2 enemy MovingDir conventions:
+; 1 = right, 2 = left.
+BossFacePlayer:
+      ldx #0
+      lda Player_X_Position
+      cmp Enemy_X_Position,x
+      lda #1                    ; default: face right
+      bcs @store
+        lda #2                  ; player is left of boss: face left
+    @store:
+      sta Enemy_MovingDir,x
+      sta EnemyFacingDir,x
+      rts
+
+.reloc
+; Keep the boss inside the arena bounds [16, 236].  If Enemy_X_Speed accelerates
+; far enough to drive Enemy_X_Position past either wall (including unsigned
+; underflow when running left) we hard-clamp the position and zero the speed so
+; MovBossRunning's deceleration logic can take over normally.
+ClampBossX:
+      ldx #0
+      lda Enemy_X_Position,x
+      cmp #16
+      bcs @notLeft
+        lda #16
+        sta Enemy_X_Position,x
+        lda #0
+        sta Enemy_X_Speed,x
+        beq @done
+    @notLeft:
+      cmp #237
+      bcc @done
+        lda #236
+        sta Enemy_X_Position,x
+        lda #0
+        sta Enemy_X_Speed,x
+    @done:
+      rts
+
+.reloc
 BossJump:
       lda #Sfx_BigJump
       sta Square1SoundQueue
@@ -499,129 +523,316 @@ BossJump:
 
 .segment "PRG7"
 .reloc
+; Draw the shadow-mario boss (and, eventually, its projectiles) into OAM.
+; Hooked at $9a7f, which is part of the bank5 dark-link state machine and
+; runs *independently* of PatchLinkDrawRoutine, so the boss no longer
+; flickers in lockstep with Mario's hurt/invincibility flicker.
+;
+; DrawMetasprite lives in PRG0, so we save the current bank, swap in PRG0,
+; do the draw, then restore the bank that was loaded at $8000/$A000 on
+; entry (typically bank5, since we were called from bank5 code).
+;
+; Boss sprites are written starting at OAM byte 48 - past the slots that
+; PatchLinkDrawRoutine uses for the player + shield + Mario projectiles -
+; so neither call clobbers the other regardless of which runs first.
+BOSS_OAM_OFFSET = 48
+
 BossGraphicsHandler:
+  lda boss_animation
+  bne @active
+    rts
+@active:
+
+  lda NmiBankShadow8
+  pha
+  lda NmiBankShadowA
+  pha
+
+  lda #0
+  jsr SwapPRG 
+    ; Boss-owned flicker: when invincible, draw on alternating frames only.
+    ; This is decoupled from any player/injury flicker.
+    lda boss_invincibility_timer
+    beq @draw
+    lda FrameCounter
+    lsr
+    bcs @restore
+@draw:
+    lda #BOSS_OAM_OFFSET
+    sta CurrentOAMOffset
+    ldy #1                    ; sprite slot 1 (Y for DrawMetasprite & SprAttrib,y)
+    lda #2                    ; palette 3 attribute (shadow mario palette)
+    sta SprObject_SprAttrib,y
+    ldx boss_animation
+    jsr DrawMetasprite
+    jsr BossDrawProjectiles   ; shadow fireballs + hammers (palette already set per-slot)
+
+@restore:
+  pla
+  sta NmiBankShadowA
+  sta PrgBankAReg
+  pla
+  sta NmiBankShadow8
+  sta PrgBank8Reg
   rts
 
 .segment "PRG5", "PRG7"
+
+; --- Boss projectile system ---------------------------------------------------
+; Boss projectiles live in SprObject indices 7 and 8 - the slots between the 6
+; vanilla enemy slots and Mario's fireball/hammer pair.  DrawMetasprite reads
+; SprObject_*,y directly so once a slot is populated we can render it with the
+; existing METASPRITE_FIREBALL_FRAME_x / METASPRITE_HAMMER_FRAME_x metasprites.
+;
+; A slot is active when EnemyProjectileType,n != 0 (zero = inactive).  We never
+; leave a metasprite ID stored at $87..$88 outside of our own update/draw paths
+; so vanilla projectile dispatch can't mistake it for a Z2 projectile type.
+;
+; We co-opt one bit of SprObject_SprAttrib,n to remember the type:
+;   bit 6 = 1  -> hammer (lobbed, gravity)
+;   bit 6 = 0  -> fireball (straight horizontal)
+; Bits 0-1 stay set to %10 = palette 3 (shadow palette) for both types.
+
+PROJ_ATTR_FIREBALL = %00000010    ; palette 3
+PROJ_ATTR_HAMMER   = %01000010    ; palette 3 + "is hammer" flag (uses OAM bit 6, harmless on render)
+
 .reloc
-FindID:
-      ; Find first empty enemy slot (5 down to 1), return in Y.
-      ; N flag set if none found.
-      ldy #5
+; FindFreeBossProjSlot: returns Y = 7..(7+ENEMY_PROJECTILE_COUNT-1) for an empty slot,
+; or Y < 7 with N flag set if none available.  Active = EnemyProjectileType,Y != 0.
+FindFreeBossProjSlot:
+      ldy #EnemyProjectileOffset
   @loop:
-      lda Enemy_Flag,y
-      beq @foundSlot
-      dey
-      bne @loop                       ; stop at 0 (don't use boss slot)
-      dey                             ; Y = $FF, N flag set
-  @foundSlot:
-      sty $04
+      lda EnemyProjectileType - EnemyProjectileOffset,y
+      beq @found
+      iny
+      cpy #EnemyProjectileOffset + ENEMY_PROJECTILE_COUNT
+      bcc @loop
+      ldy #0
+      dey                                 ; Y = $FF, N set, BCC won't take
+  @found:
       rts
 
 .reloc
+; BossSpawnFireball: spawn a horizontal shadow fireball from the boss aimed at
+; Mario.  X must hold the boss enemy slot (= 0).
 BossSpawnFireball:
-      jsr FindID                ; find empty enemy slot -> Y
-      bmi @done                 ; no slot available
+      jsr FindFreeBossProjSlot
+      bmi @done
       lda #Sfx_Fireball
       sta Square1SoundQueue
       lda #4
-      sta boss_shootanim        ; trigger shoot animation
+      sta boss_shootanim                  ; trigger shoot animation pose
+
+      ; Position: emit from boss center
       lda Enemy_Y_Position,x
       clc
       adc #4
-      sta $00                   ; Y pos
+      sta SprObject_Y_Position,y
       lda Enemy_X_Position,x
-      sta $01                   ; X pos
-      lda #0
-      sta $02                   ; page
-      lda #8
-      sta $03                   ; bounding box size
+      sta SprObject_X_Position,y
+      lda Enemy_PageLoc,x
+      sta SprObject_PageLoc,y
+      lda #1
+      sta SprObject_Y_HighPos,y
+
+      ; Direction follows boss facing (already aimed by BossFacePlayer)
       lda Enemy_MovingDir,x
-      cmp #$01
-      bne @no
-      pha
-      lda $01
-      clc
-      adc #8                    ; offset X if facing right
-      sta $01
-      pla
-  @no:
-      sta Enemy_MovingDir,y
-      lda #5 ; TODO What to spawn here? BowserFlame
-      jsr BossSpawnEnemy
+      sta Player_MovingDir,y              ; DrawMetasprite uses MovingDir for non-mario sprites
+      cmp #1
+      beq @right
+        lda #<(-3)                        ; left
+        .byte $2c
+    @right:
+        lda #3                            ; right
+      sta SprObject_X_Speed,y
+      lda #0
+      sta SprObject_Y_Speed,y             ; fireballs travel level
+
+      lda #PROJ_ATTR_FIREBALL
+      sta SprObject_SprAttrib,y
+      lda #METASPRITE_FIREBALL_FRAME_1
+      sta EnemyProjectileType - EnemyProjectileOffset,y
+
       ldx #0
   @done:
       rts
 
 .reloc
-BossSpawnSideBullet:
-      ; A = direction (1=left edge, 2=right edge)
-      ; $00 = Y position (already set by caller)
-      sta $02
-      jsr FindID
+; BossSpawnHammer: lob a hammer from the boss with a randomised X-speed so
+; successive hammers leave gaps along the floor where Mario can dodge.  Sign
+; of the X-speed is biased toward Mario.  Initial Y-speed is upward; gravity
+; in BossUpdateProjectiles brings it back down in an arc.
+BossSpawnHammer:
+      jsr FindFreeBossProjSlot
       bmi @done
-      lda $02
+      lda #Sfx_Fireball
+      sta Square1SoundQueue
+
+      ; Spawn just above the boss
+      lda Enemy_Y_Position,x
+      sec
+      sbc #8
+      sta SprObject_Y_Position,y
+      lda Enemy_X_Position,x
+      sta SprObject_X_Position,y
+      lda Enemy_PageLoc,x
+      sta SprObject_PageLoc,y
+      lda #1
+      sta SprObject_Y_HighPos,y
+
+      ; Random X-speed magnitude in 1..4, sign points toward Mario.
+      lda RNG
+      and #$03
+      clc
+      adc #1
       pha
-        lda #Sfx_Blast
-        sta Square2SoundQueue
-
-        lda $02
-        lsr
-        bcs @rightdir
-
-        lda #$f0
-        sta $01                   ; X = left edge ($F0)
-        lda #<(-60)
-        sta ProjectileXVelocity,y             ; speed = -60 (move right from left)
-        jmp @rest
-
-    @rightdir:
-        lda #0
-        sta $01                   ; X = right edge ($00)
-        lda #60
-        sta ProjectileXVelocity,y             ; speed = 60 (move left from right)
-
-    @rest:
-        lda #8
-        sta $03                   ; bounding box
-        lda #0
-        sta $02                   ; page
-
-        tya
-        pha
-          lda #10 ; TODO: what to use to make a bubble?
-          jsr BossSpawnEnemy
-        pla
-        tay
+        lda Player_X_Position
+        cmp Enemy_X_Position,x
+        bcs @aim_right
       pla
-      sta Enemy_MovingDir,y
+      eor #$ff
+      clc
+      ; negate (toward left)
+      adc #1
+      jmp @set_speed
+  @aim_right:
+      pla
+  @set_speed:
+      sta SprObject_X_Speed,y
+
+      ; initial upward velocity
+      lda #<(-6)
+      sta SprObject_Y_Speed,y
+
+      lda Enemy_MovingDir,x
+      sta Player_MovingDir,y
+      lda #PROJ_ATTR_HAMMER
+      sta SprObject_SprAttrib,y
+      lda #METASPRITE_HAMMER_FRAME_1
+      sta EnemyProjectileType - EnemyProjectileOffset,y
+
       ldx #0
   @done:
       rts
 
 .reloc
-BossSpawnEnemy:
-      ; Spawn enemy in slot Y with parameters in $00-$03
-      ; A = enemy ID
-;      sta Enemy_ID,y
-      lda $00
-      sta Enemy_Y_Position,y
-      lda $01
-      sta Enemy_X_Position,y
-      lda $02
-      sta Enemy_PageLoc,y
-;      lda $03
-;      sta Enemy_BoundBoxCtrl,y
-      lda #$01
-      sta Enemy_Y_HighPos,y
-;      sta Enemy_Flag,y
-      lsr
-      sta Enemy_X_MoveForce,y
-      sta Enemy_State,y
-      rts
-;      ldx $04                   ; slot index
-;      jmp CheckpointEnemyID     ; engine: initialize enemy by ID
+; BossUpdateProjectiles: per-frame movement + offscreen kill + collision check
+; for each active boss projectile.  Hammers gain +1 to Y velocity each frame
+; (gravity); fireballs ignore Y velocity.
+BossUpdateProjectiles:
+      ldy #EnemyProjectileOffset
+  @loop:
+      lda EnemyProjectileType - EnemyProjectileOffset,y
+      bne @active
+      jmp @next
+  @active:
+      ; X position += X speed
+      clc
+      lda SprObject_X_Position,y
+      adc SprObject_X_Speed,y
+      sta SprObject_X_Position,y
 
+      ; Hammer arc: integrate Y speed and apply gravity
+      lda SprObject_SprAttrib,y
+      and #%01000000                      ; PROJ_ATTR_HAMMER bit
+      beq @move_done
+        clc
+        lda SprObject_Y_Position,y
+        adc SprObject_Y_Speed,y
+        sta SprObject_Y_Position,y
+        ; Apply gravity once every 2 frames so hammers don't sink too fast
+        lda FrameCounter
+        lsr
+        bcs @move_done
+            lda SprObject_Y_Speed,y
+            adc #1
+            sta SprObject_Y_Speed,y
+  @move_done:
+
+      ; Offscreen kill: remove if X out of [0, 248] or Y >= $D8 (below floor).
+      lda SprObject_X_Position,y
+      cmp #248
+      bcs @kill
+      lda SprObject_Y_Position,y
+      cmp #$D8
+      bcs @kill
+
+      ; Collision with player.  Boss projectile box: 8x8 at (X,Y).  Reuse the
+      ; vanilla player hitbox loader for $00-$03, and hand-build $04-$07.
+      lda SprObject_X_Position,y
+      sta $04
+      lda #8
+      sta $06
+      lda SprObject_Y_Position,y
+      sta $05
+      lda #8
+      sta $07
+      sty $11                             ; preserve loop slot
+      jsr bank7_LoadLinkHitbox            ; Mario body in $00-$03
+      jsr bank7_CollisionTest
+      ldy $11
+      bcc @next
+      ; Hit Mario - flag him for damage and drop projectile
+      ldx #0
+      lda $a8,x
+      ora #$10
+      sta $a8,x
+      jsr bank7_LinkCollision
+
+  @kill:
+      lda #0
+      sta EnemyProjectileType - EnemyProjectileOffset,y
+  @next:
+      iny
+      cpy #EnemyProjectileOffset + ENEMY_PROJECTILE_COUNT
+      bcc @loop
+      ldx #0
+      rts
+
+.segment "PRG7"
+.reloc
+; BossDrawProjectiles: invoked from BossGraphicsHandler with PRG0 already paged
+; in, so DrawMetasprite is reachable.  This routine MUST live in PRG7 (fixed
+; bank) so it stays callable after BossGraphicsHandler's SwapPRG(0) replaces
+; PRG5 at $8000.  Animation frame toggles every 4-8 frames.
+BossDrawProjectiles:
+      ldy #EnemyProjectileOffset
+  @loop:
+      lda EnemyProjectileType - EnemyProjectileOffset,y
+      beq @next
+        ; Reload animation frame (frame_1 / frame_2) based on FrameCounter.
+        lda SprObject_SprAttrib,y
+        and #%01000000
+        bne @hammer_anim
+          lda FrameCounter
+          and #%00000100
+          beq @set_fb1
+          lda #METASPRITE_FIREBALL_FRAME_2
+          .byte $2c
+      @set_fb1:
+          lda #METASPRITE_FIREBALL_FRAME_1
+          jmp @do_draw
+      @hammer_anim:
+          lda FrameCounter
+          and #%00001000
+          beq @set_h1
+          lda #METASPRITE_HAMMER_FRAME_2
+          .byte $2c
+      @set_h1:
+          lda #METASPRITE_HAMMER_FRAME_1
+      @do_draw:
+        sta EnemyProjectileType - EnemyProjectileOffset,y
+        tax
+        sty $11
+        jsr DrawMetasprite
+        ldy $11
+  @next:
+      iny
+      cpy #EnemyProjectileOffset + ENEMY_PROJECTILE_COUNT
+      bcc @loop
+      rts
+
+.segment "PRG5", "PRG7"
 .reloc
 KillBoss:
       lda boss_counter
@@ -632,10 +843,10 @@ KillBoss:
         lda #CHR_SMALLMARIO
         sta boss_ChrBank
         inc ReloadCHRBank
-        lda #<(-6)            ; fast upward launch
+        lda #<(-6)
         sta Enemy_Y_Speed,x
         lda #0
-        sta Enemy_X_Speed,x    ; stop horizontal movement
+        sta Enemy_X_Speed,x
         lda #$7f
         sta boss_counter
         ; vanilla boss kill behavior

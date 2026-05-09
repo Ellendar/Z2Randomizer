@@ -305,7 +305,17 @@ RESV boss_counter
 RESV boss_freeze
 RESV boss_ChrBank
 BOSS_RAM_SIZE = RES_OFFSET - CUSTOM_BOSS_START - 1
-;RESV BowserHitPoints
+
+EnemyProjectileOffset = 7
+EnemyProjectileType        = ObjectMetasprite     + EnemyProjectileOffset
+EnemyProjectile_X_Position = SprObject_X_Position + EnemyProjectileOffset
+EnemyProjectile_Y_Position = SprObject_Y_Position + EnemyProjectileOffset
+EnemyProjectile_PageLoc    = SprObject_PageLoc    + EnemyProjectileOffset
+EnemyProjectile_Y_HighPos  = SprObject_Y_HighPos  + EnemyProjectileOffset
+EnemyProjectile_X_Speed    = SprObject_X_Speed    + EnemyProjectileOffset
+EnemyProjectile_Y_Speed    = SprObject_Y_Speed    + EnemyProjectileOffset
+EnemyProjectile_SprAttrib  = SprObject_SprAttrib  + EnemyProjectileOffset
+ENEMY_PROJECTILE_COUNT     = 6
 
 ; MARIO SPECIFIC RAM LOCATIONS
 ; These are values that are hardcoded to match where Zelda 2 places them
@@ -363,6 +373,7 @@ RESV CrouchingFlag
 Player_MovingDir = $5F
 Fireball_MovingDir = $6D
 PlayerFacingDir = $9F
+EnemyFacingDir = $A0
 SavedJoypadBits = $F7
 ScreenLeft_PageLoc = $72a
 ScreenRight_PageLoc = $72b
