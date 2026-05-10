@@ -1669,7 +1669,7 @@ public sealed class EastHyrule : World
         }
     }
 
-    public override void UpdateVisit(List<RequirementType> requireables)
+    public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
         UpdateReachable(requireables);
 

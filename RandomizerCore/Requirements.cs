@@ -100,24 +100,23 @@ public class Requirements
         return Serialize();
     }
 
-    public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables, bool enforceImplicitRequirements = true)
+    public bool AreSatisfiedBy(IReadOnlySet<RequirementType> requireables, bool enforceImplicitRequirements = true)
     {
         if(IndividualRequirements.Length + CompositeRequirements.Length == 0)
         {
             return true;
         }
         var individualRequirementsSatisfied = false;
-        var requirementTypes = requireables as RequirementType[] ?? requireables.ToArray();
         foreach (var requirement in IndividualRequirements)
         {
-            if (requirementTypes.Contains(requirement))
+            if (requireables.Contains(requirement))
             {
                 individualRequirementsSatisfied = true;
                 if (enforceImplicitRequirements && ImplicitRequirements.ContainsKey(requirement))
                 { 
                     foreach(RequirementType implicitRequirement in ImplicitRequirements[requirement])
                     {
-                        if(!requirementTypes.Contains(implicitRequirement))
+                        if(!requireables.Contains(implicitRequirement))
                         {
                             individualRequirementsSatisfied = false;
                             continue;
@@ -158,14 +157,13 @@ public class Requirements
         return individualRequirementsSatisfied || compositeRequirementSatisfied;
     }
 
-    public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables, StatRandomizer statRoll)
+    public bool AreSatisfiedBy(IReadOnlySet<RequirementType> requireables, StatRandomizer statRoll)
     {
         if (IndividualRequirements.Length + CompositeRequirements.Length == 0)
         {
             return true;
         }
         var individualRequirementsSatisfied = false;
-        var requirementTypes = requireables as RequirementType[] ?? requireables.ToArray();
 
         statRoll.AssertHasRandomized();
 
@@ -177,7 +175,7 @@ public class Requirements
                 var requiredLevel = ImplicitMagicLevelRequirements[requirement];
                 var magicCost = statRoll.GetSpellCost(collectable, requiredLevel);
                 var containerRequirement = MagicContainerRequirementFromCost(magicCost);
-                return requirementTypes.Contains(containerRequirement);
+                return requireables.Contains(containerRequirement);
             }
             else
             {
@@ -187,7 +185,7 @@ public class Requirements
 
         foreach (var requirement in IndividualRequirements)
         {
-            if (requirementTypes.Contains(requirement))
+            if (requireables.Contains(requirement))
             {
                 individualRequirementsSatisfied = true;
                 if (!StatAdjustedContainerRequirementSatisfied(requirement))

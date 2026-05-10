@@ -304,7 +304,7 @@ public class Palaces
         {
             return true;
         }
-        List<RequirementType> requireables =
+        HashSet<RequirementType> requireables =
         [
             RequirementType.KEY,
             RequirementType.UPSTAB,
@@ -329,12 +329,12 @@ public class Palaces
     {
         if (!props.ShufflePalaceItems)
         {
-            List<RequirementType> requireables = [..RequirementTypeExtensions.UpToXContainers(props.StartMagicContainers)];
+            HashSet<RequirementType> requireables = [.. RequirementTypeExtensions.UpToXContainers(props.StartMagicContainers)];
             //If shuffle overworld items is on, we assume you can get all the items / spells
             //as all progression items will eventually shuffle into spots that work
             if (props.ShuffleOverworldItems)
             {
-                requireables = [RequirementType.KEY, ..RequirementTypeExtensions.UpToXContainers(8)];
+                requireables = [RequirementType.KEY, .. RequirementTypeExtensions.UpToXContainers(8)];
 
             }
             //Otherwise if it's vanilla items we can't get the magic key, because we could need glove for boots for flute to get to new kasuto
@@ -357,7 +357,7 @@ public class Palaces
         //or it will send the logic into an uinrecoverable nosedive since the palaces can't re-generate
         if (!props.ShufflePalaceItems && raftIsRequired)
         {
-            List<RequirementType> requireables;
+            HashSet<RequirementType> requireables;
             //If shuffle overworld items is on, we assume you can get all the items / spells
             //as all progression items will eventually shuffle into spots that work
             if (props.ShuffleOverworldItems)

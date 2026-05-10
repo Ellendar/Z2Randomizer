@@ -154,7 +154,7 @@ public class RoomPool
 
         if (!props.BlockersAnywhere)
         {
-            RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
+            HashSet<RequirementType> allowedBlockers = [.. Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1]];
             RemoveRooms(room => !room.IsTraversable(allowedBlockers));
         }
 

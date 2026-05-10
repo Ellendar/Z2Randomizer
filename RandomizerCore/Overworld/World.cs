@@ -1849,8 +1849,8 @@ public abstract class World
         }
         return true;
     }
-  
-    protected void UpdateReachable(List<RequirementType> requireables)
+
+    protected void UpdateReachable(IReadOnlySet<RequirementType> requireables)
     {
 
         List<Location> starts = GetPathingStarts();
@@ -1882,7 +1882,7 @@ public abstract class World
     }
 
     //This signature has gotten out of control, consider a refactor
-    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, List<RequirementType> requireables)
+    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, IReadOnlySet<RequirementType> requireables)
     {
         Stack<(int, int)> to_visit = new();
         // push the initial coord to the visitation stack
@@ -3214,7 +3214,7 @@ public abstract class World
         }
     }
 
-    public abstract void UpdateVisit(List<RequirementType> requireables);
+    public abstract void UpdateVisit(IReadOnlySet<RequirementType> requireables);
 
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 

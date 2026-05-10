@@ -14,6 +14,7 @@ public class RequirementsTests
         Assert.AreEqual(json, serialized);
     }
 
+    [TestMethod]
     public void TestEmptyJsonConstructor()
     {
         string? json = @"[]";
@@ -22,11 +23,12 @@ public class RequirementsTests
         Assert.AreEqual(json, serialized);
     }
 
+    [TestMethod]
     public void TestSingleRequirement()
     {
-        Requirements requirements = new Requirements(new RequirementType[] { RequirementType.JUMP });
-        RequirementType[] requireables = new RequirementType[] { };
+        Requirements requirements = new Requirements([RequirementType.JUMP]);
+        RequirementType[] requireables = [];
 
-        Assert.IsFalse(requirements.AreSatisfiedBy(new RequirementType[] { }));
+        Assert.IsFalse(requirements.AreSatisfiedBy(new HashSet<RequirementType>()));
     }
 }

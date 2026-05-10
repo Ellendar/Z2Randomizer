@@ -454,7 +454,7 @@ public class Room : IJsonOnDeserialized
         }
         return sb.ToString();
     }
-    public bool IsTraversable(IEnumerable<RequirementType> requireables)
+    public bool IsTraversable(IReadOnlySet<RequirementType> requireables)
     {
         return Requirements.AreSatisfiedBy(requireables);
     }

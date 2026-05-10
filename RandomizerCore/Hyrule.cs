@@ -1455,7 +1455,7 @@ public class Hyrule
             previousReachableLocationsCount = reachableLocationsCount;
             previousGettableItemsCount = gettableItemsCount;
             gettableItemsCount = UpdateItemGets(props);
-            List<RequirementType> requireables = GetRequireables(props);
+            IReadOnlySet<RequirementType> requireables = GetRequireables(props);
             westHyrule.UpdateVisit(requireables);
             deathMountain.UpdateVisit(requireables);
             eastHyrule.UpdateVisit(requireables);
@@ -1640,7 +1640,7 @@ public class Hyrule
     /// <returns>Whether any items were marked accessable</returns>
     private int UpdateItemGets(RandomizerProperties props)
     {
-        List<RequirementType> requireables;
+        IReadOnlySet<RequirementType> requireables;
         accessibleMagicContainers = props.StartMagicContainers;
         accessibleHeartContainers = props.StartHearts;
         Location newKasuto = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO);
@@ -1705,9 +1705,9 @@ public class Hyrule
         return gottenItems.Count;
     }
 
-    public List<RequirementType> GetRequireables(RandomizerProperties props)
+    public IReadOnlySet<RequirementType> GetRequireables(RandomizerProperties props)
     {
-        List<RequirementType> requireables = [];
+        HashSet<RequirementType> requireables = [];
 
         foreach(Collectable item in ItemGet.Keys)
         {
