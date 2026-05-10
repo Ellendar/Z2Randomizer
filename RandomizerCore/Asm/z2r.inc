@@ -304,6 +304,7 @@ RESV boss_substate
 RESV boss_counter
 RESV boss_freeze
 RESV boss_ChrBank
+RESV boss_transition_delay      ; nonzero = boss is paused mid-state-switch (frames remaining)
 BOSS_RAM_SIZE = RES_OFFSET - CUSTOM_BOSS_START - 1
 
 EnemyProjectileOffset = 7
