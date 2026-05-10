@@ -761,6 +761,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     private bool revealWalkthroughWalls;
 
+    [Reactive]
+    private bool mario;
+
     //Meta
     [Reactive]
     [Required]
@@ -1506,6 +1509,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.UseCustomRooms = false;
         properties.DisableHUDLag = disableHUDLag;
         properties.RandomizeKnockback = randomizeKnockback;
+        properties.Mario = mario;
 
         //"Server" side validation
         //This is a replication of a bunch of logic from the UI so that configurations from sources other than the UI (YAML?)

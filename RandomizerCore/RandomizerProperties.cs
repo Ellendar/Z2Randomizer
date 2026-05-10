@@ -239,6 +239,7 @@ public class RandomizerProperties
     public bool UseCustomRooms { get; set; }
     public bool DisableHUDLag { get; set; }
     public bool RandomizeKnockback { get; set; }
+    public bool Mario { get; set; }
 
     //For Statistics
     [Key]

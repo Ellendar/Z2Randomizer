@@ -1580,9 +1580,11 @@ public class Hyrule
     {
         HashSet<RequirementType> requireables = [];
 
+        bool HaveItem(Collectable item) => ItemGet[item] || props.StartsWithCollectable(item);
+
         foreach(Collectable item in ItemGet.Keys)
         {
-            if (item.AsRequirement() != null && (ItemGet[item] || props.StartsWithCollectable(item)))
+            if (item.AsRequirement() != null && HaveItem(item))
             {
                 RequirementType? reqirement = item.AsRequirement();
                 if(reqirement != null)
@@ -1590,6 +1592,21 @@ public class Hyrule
                     requireables.Add((RequirementType)reqirement);
                 }
             }
+        }
+
+        if (props.Mario)
+        {
+            if (!HaveItem(Collectable.SHIELD_SPELL))
+            {
+                requireables.Remove(RequirementType.REFLECT); // Mario needs shield to use reflect
+            }
+            if (!HaveItem(Collectable.HAMMER))
+            {
+                requireables.Remove(RequirementType.GLOVE); // Mario needs hammer to use glove
+            }
+            requireables.Add(RequirementType.JUMP);
+            requireables.Add(RequirementType.DASH);
+            requireables.Add(RequirementType.DOWNSTAB);
         }
 
         if (accessibleMagicContainers >= 1)

@@ -122,6 +122,10 @@ public class Palaces
         }
 
         palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.WithHardRequirement(RequirementType.REFLECT);
+        if (props.Mario)
+        {
+            palaces[4].BossRoom!.Requirements = palaces[4].BossRoom!.Requirements.WithHardRequirement(RequirementType.HAMMER);
+        }
         foreach (Room room in palaces.SelectMany(i => i.ItemRooms).Where(i => i.Collectable == null))
         {
             room.Collectable = Collectable.LARGE_BAG;
