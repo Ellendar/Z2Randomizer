@@ -19,6 +19,11 @@ CONVERT = $80
 LinkJustDied:
     inc StatDeaths
     inc $0494
+    ; Patch the death routine code to clear the previous/current FT tracks so they restart after death
+    ; I just think it sounds better like that
+    lda #$ff
+    sta $69e5 ; PrevFtTrack
+    sta $69f4 ; SavedFtTrack
     rts
 
 ; Update all locations that sets $0494 - link just died
