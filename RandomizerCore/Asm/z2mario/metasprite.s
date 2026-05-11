@@ -574,7 +574,6 @@ RenderLoop:
       ora (Ptr),y
       bne WritePalette ; unconditional
 AllowPaletteChange:
-    and #%11111100
     ora Atr
 WritePalette:
     sta Sprite_Attributes,x
