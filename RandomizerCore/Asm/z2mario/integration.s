@@ -5,7 +5,6 @@
 .import ProcHammerTime
 .import Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
 .import SwapToSavedPRG, SwapToPRG0
-.import InjuredBoss
 .export SlightlyModifiedCollisionRoutine
 
 ; Remove unused code after we gutted link's movement
@@ -626,28 +625,11 @@ PatchFireballHitcheck:
   bne @IsHammer
   lda #1
   sta $0b ; 1 = fireball
-  bne @CheckBoss ; always taken
+  bne @CollisionCheck ; always taken
 @IsHammer:
   lda #0
   sta $0b ; 0 = hammer (pass-through)
-@CheckBoss:
-  ; Boss entity (type $23): bypass $E694 to avoid vanilla bank7_monster_death on HP=0
-  lda $a1,x
-  cmp #$23
-  bne @NotBoss
-    jsr bank7_LoadObjectHitbox  ; load boss hitbox ZP $04-$07
-    jsr bank7_CollisionTest     ; test projectile ($00-$03) vs boss ($04-$07)
-    bcc @exit             ; miss
-      jsr InjuredBoss     ; decrement HP via controlled path, start invincibility
-      ldy $11
-      lda Fireball_State,y
-      and #%01000000
-      bne @exit           ; hammer passes through; don't despawn it
-        lda #%10000000    ; fireball: trigger explosion state
-        sta Fireball_State,y
-@exit:
-  rts
-@NotBoss:
+@CollisionCheck:
   jsr $E694
   bcc @NotBossExit
     ldy $11
