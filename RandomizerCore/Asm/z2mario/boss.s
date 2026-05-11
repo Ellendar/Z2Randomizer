@@ -25,10 +25,6 @@ mus_bossdie = 8
 
 ; Frames the boss spends standing still after each top-level state change.
 STATE_SWITCH_DELAY = 50
-; Initial speed kicked in when MovBossRunning starts from a dead stop (e.g.
-; after a transition delay zeroed X_Speed, or after dropping off the platform
-; into the middle of the arena).
-RUNNING_KICK_SPEED = $20
 
 ; Right-side platform target: the great-palace dark-link arena has a 3-metatile-wide
 ; platform on the right, 7 metatiles above the ground. Boss will jump up here for a hammer attack
@@ -42,8 +38,15 @@ JUMP_Y_SPEED            = <(-8) ; initial upward velocity (matches old straight-
 ; floor of the arena sits at $A0+, the platform sits 7 metatiles higher).
 PLATFORM_TOP_Y_THRESHOLD = $80
 
-LEFT_EDGE_TARGET = 6*16
-RIGHT_EDGE_TARGET = 9*16
+LEFT_EDGE_TARGET = 3*16
+RIGHT_EDGE_TARGET = 10*16
+
+; Boss running model: accelerate to BOSS_MAX_RUN_SPEED while far from the
+; target wall; when within BOSS_DECEL_DISTANCE pixels of the target,
+; decelerate to zero and flip via MovChangeState.
+BOSS_MAX_RUN_SPEED  = $50
+BOSS_DECEL_DISTANCE = 3 * 16 ; in metatiles
+
 
 .segment "PRG7"
 ; patch the vanilla enemy projectile check to prevent it from trying to run our hammer/fireball
@@ -181,20 +184,25 @@ EnemyLanding:
 .segment "PRG5", "PRG7"
 .reloc
 RunBoss:
-  lda #0
-  sta $de ; unfreeze link
-      lda boss_freeze
-      beq @notfreezed
-      dec boss_freeze
-      lda #STANDING
-      sta boss_animation
-      ; Draw every other frame (flicker)
-      lda FrameCounter
-      lsr
-      bcs @nodraw2
-;      jsr RelativeEnemyPosition
-    ;   jsr BossGraphicsHandler
-  @nodraw2:
+    lda #0
+    sta $de ; unfreeze link
+
+    ; Display boss HP bar with a divisor of 7 (close enough to 60 HP)
+    lda #7
+    jsr $A4E9
+
+    lda boss_freeze
+    beq @notfreezed
+    dec boss_freeze
+    lda #STANDING
+    sta boss_animation
+    ; Draw every other frame (flicker)
+;     lda FrameCounter
+;     lsr
+;     bcs @nodraw2
+; ;      jsr RelativeEnemyPosition
+;     ;   jsr BossGraphicsHandler
+;   @nodraw2:
       ldx #0
       rts
 
@@ -262,23 +270,13 @@ AnimateKilledBoss:
 .reloc
 HandleBossMovement:
       ; If the boss is invincible (just got stomped), force-clear any pending
-      ; transition delay.  When a stomp sets boss_state_timer = 0, the next
-      ; frame's MovBossSide transition re-arms STATE_SWITCH_DELAY - clearing
-      ; it here every invincibility frame guarantees the boss skips the
-      ; standing pause when an attack is cancelled by a hit.
+      ; transition delay.
       lda boss_invincibility_timer
       beq +
         lda #0
         sta boss_transition_delay
 +
 
-      ; If a transition delay is in flight, the boss just left an attack and
-      ; is winding down before the next state runs.  Two cases:
-      ;  - Airborne (e.g. mid-leap off the platform): freeze the timer and
-      ;    keep applying X velocity so the jump arc completes.  The timer
-      ;    only ticks once we've landed; otherwise zeroing X_Speed strands
-      ;    him over the same column and he never clears the platform edge.
-      ;  - Grounded: stand still, zero X speed, tick the timer down.
       lda boss_transition_delay
       beq @run_state
         lda Enemy_State,x
@@ -292,9 +290,6 @@ HandleBossMovement:
           sta Enemy_X_Speed,x
           rts
     @airborne_delay:
-        ; In flight: hold the timer, finish the arc.  X velocity was set by
-        ; the post-attack transition; gravity is applied in RunBoss after
-        ; HandleBossMovement returns.
         lda #JUMPING
         sta boss_animation
         jmp MoveEnemyHorizontally
@@ -367,75 +362,108 @@ MovBossSide:
 MovBossRunning:
       jsr BossSetWalkingAnim
 
-      lda Enemy_X_Speed,x
-      bne @speed_ok
-        lda Enemy_X_Position,x
-        cmp #LEFT_EDGE_TARGET
-        bcc @speed_ok ; left wall: leave to @Deaccelerating
-        cmp #RIGHT_EDGE_TARGET
-        bcs @speed_ok ; right wall: leave to @Deaccelerating
-        lda Enemy_MovingDir,x
-        cmp #1
-        beq @kick_right
-          lda #<(-RUNNING_KICK_SPEED)
-          .byte $2c
-      @kick_right:
-          lda #RUNNING_KICK_SPEED
-        sta Enemy_X_Speed,x
-@speed_ok:
-
-      lda Enemy_MovingDir,x
-      cmp #$01
-      beq MovBossRight
-
-      ; Moving left
-      lda Enemy_X_Position,x
-      cmp #RIGHT_EDGE_TARGET
-      bcs @StillAccer
-      cmp #LEFT_EDGE_TARGET
-      bcs MovStillMoving
-  @Deaccelerating:
-      lda #SKIDDING
-      sta boss_animation
-      inc Enemy_X_Speed,x
-      inc Enemy_X_Speed,x
-      lda Enemy_X_Speed,x
-      bmi MovStillMoving
-      jmp MovChangeState
-  @StillAccer:
-      dec Enemy_X_Speed,x
-      dec Enemy_X_Speed,x
-      jmp MovStillMoving
-
-MovBossRight:
-      lda Enemy_X_Position,x
-      cmp #LEFT_EDGE_TARGET
-      bcc @StillAccer
-      cmp #RIGHT_EDGE_TARGET
-      bcc MovStillMoving
-  @Deaccelerating:
-      lda #SKIDDING
-      sta boss_animation
-      dec Enemy_X_Speed,x
-      dec Enemy_X_Speed,x
-      lda Enemy_X_Speed,x
-      bpl MovStillMoving
-      jmp MovChangeState
-  @StillAccer:
-      inc Enemy_X_Speed,x
-      inc Enemy_X_Speed,x
-
-MovStillMoving:
-      lda boss_bridge
-      beq @no_jump
-      dec boss_bridge
+      ; Airborne: skip the accel/decel state machine.  Just integrate the
+      ; jump-off velocity so the parabola off the platform stays clean.
       lda Enemy_State,x
       and #%01000000
-      bne @no_jump
-      lda #<(-4)
-      sta Enemy_Y_Speed,x
-      jsr BossJump
-  @no_jump:
+      beq @grounded
+        jmp MoveEnemyHorizontally
+@grounded:
+
+      ; One-shot bridge jump at the start of a run (set by MovBossSide via
+      ; inc boss_bridge when transitioning from idle).  Fires once on the
+      ; first grounded frame, sets the airborne flag, then defers further
+      ; AI work until next frame.
+      lda boss_bridge
+      beq @no_bridge
+        dec boss_bridge
+        lda #<(-4)
+        sta Enemy_Y_Speed,x
+        jsr BossJump
+        jmp @move                    ; airborne now; let the arc start
+@no_bridge:
+
+      ; Compute unsigned distance from the wall the boss is heading toward.
+      ;   Facing right -> target = RIGHT_EDGE_TARGET, distance = target - X
+      ;   Facing left  -> target = LEFT_EDGE_TARGET,  distance = X - target
+      ; If the position has already crossed the target (subtract underflows),
+      ; clamp distance to 0 so the decel branch runs and we flip immediately.
+      lda Enemy_MovingDir,x
+      cmp #1
+      beq @facing_right
+
+      lda Enemy_X_Position,x
+      sec
+      sbc #LEFT_EDGE_TARGET
+      bcs +
+        lda #0
+      +
+      cmp #BOSS_DECEL_DISTANCE
+      bcs @accel_left
+      jmp @decel_left
+
+@facing_right:
+      lda #RIGHT_EDGE_TARGET
+      sec
+      sbc Enemy_X_Position,x
+      bcs +
+        lda #0
+      +
+      cmp #BOSS_DECEL_DISTANCE
+      bcs @accel_right
+      jmp @decel_right
+
+@accel_left:
+      ; Push X_Speed toward -BOSS_MAX_RUN_SPEED at 2/frame.
+      lda Enemy_X_Speed,x
+      bpl @do_dec_l                  ; positive or zero: dec unconditionally
+      cmp #<(-BOSS_MAX_RUN_SPEED) + 1
+      bcc @move                      ; already at/past target (more negative)
+@do_dec_l:
+      dec Enemy_X_Speed,x
+      dec Enemy_X_Speed,x
+      jmp @move
+
+@accel_right:
+      ; Push X_Speed toward +BOSS_MAX_RUN_SPEED at 2/frame.
+      lda Enemy_X_Speed,x
+      bmi @do_inc_r                  ; negative: inc unconditionally
+      cmp #BOSS_MAX_RUN_SPEED
+      bcs @move                      ; already at/past target
+@do_inc_r:
+      inc Enemy_X_Speed,x
+      inc Enemy_X_Speed,x
+      jmp @move
+
+@decel_left:
+      lda #SKIDDING
+      sta boss_animation
+      lda Enemy_X_Speed,x
+      beq @flip                      ; already stopped
+      bpl @flip                      ; wrong-sign (positive while facing left)
+      inc Enemy_X_Speed,x
+      inc Enemy_X_Speed,x
+      lda Enemy_X_Speed,x
+      bmi @move                      ; still moving left: continue
+      jmp @flip                      ; crossed zero / reached zero: flip
+
+@decel_right:
+      lda #SKIDDING
+      sta boss_animation
+      lda Enemy_X_Speed,x
+      beq @flip
+      bmi @flip
+      dec Enemy_X_Speed,x
+      dec Enemy_X_Speed,x
+      lda Enemy_X_Speed,x
+      beq @flip
+      bmi @flip
+      jmp @move                      ; still moving right: continue
+
+@flip:
+      jmp MovChangeState
+
+@move:
       jmp MoveEnemyHorizontally
 
 MovChangeState:
@@ -471,24 +499,18 @@ MovBossMiddle:
       bcc @loop
 
   @no_need_for_p:
-      ; Face Mario before launching off the platform.
-      jsr BossFacePlayer
+      ; Face boss left before jumping off platform
       lda #0
       sta boss_bridge
 
-      ; Set running speed in the (now player-facing) direction.
-      lda Enemy_MovingDir,x
-      lsr
-      bcs @right
-      lda #<(-$20)
-      .byte $2c
-  @right:
-      lda #$20
+      lda #2
+      sta Enemy_MovingDir,x
+      sta EnemyFacingDir,x
+
+      ; Small hop off the platform
+      lda #<(-(20))
       sta Enemy_X_Speed,x
 
-      ; Step off the platform: nudge upward and mark airborne so RunBoss's
-      ; gravity path engages. Without this, the boss might not make it off the platform
-      ; and then start the run phase while at the top of the screen
       lda #<(-3)
       sta Enemy_Y_Speed,x
       jsr BossJump
@@ -508,12 +530,11 @@ MovBossMiddle:
         ldx #0
   @on_platform:
 
-      ; Every 24 frames, lob a shadow hammer from the boss with a random
-      ; X-speed; BossSpawnHammer biases the throw toward Mario.
+      ; Every 24 frames, lob a hammer from the boss with a random speed
       lda FrameCounter
       and #%00010111
       bne @done
-      jsr BossSpawnHammer
+        jmp BossSpawnHammer
   @done:
       rts
 
@@ -628,9 +649,9 @@ BossFacePlayer:
       ldx #0
       lda Player_X_Position
       cmp Enemy_X_Position,x
-      lda #1 ; default: face right
+      lda #1 ; face right
       bcs @store
-        lda #2 ; player is left of boss: face left
+        lda #2 ; player is left of boss
     @store:
       sta Enemy_MovingDir,x
       sta EnemyFacingDir,x
@@ -814,11 +835,13 @@ BossSpawnHammer:
       lda #1
       sta SprObject_Y_HighPos,y
 
-      ; Random X-speed magnitude in 1..4, sign points toward Mario.
+      ; Random X-speed magnitude in 0..5, sign points toward Mario.
       lda RNG
-      and #$03
-      clc
-      adc #1
+      and #7
+      cmp #6
+      bcc +
+        and #3 ; if its 6 or 7 then just make it 2 or 3 instead
+      +
       pha
         lda Player_X_Position
         cmp Enemy_X_Position,x
@@ -856,13 +879,6 @@ FIREBALL_BOUNCE_Y_SPEED = <(-4)
 PROJ_MAX_FALL_SPEED     = 4
 
 .reloc
-; BossUpdateProjectiles: per-frame motion + offscreen kill + collision check
-; for each active boss projectile.  Both fireballs and hammers integrate Y
-; velocity and accumulate gravity every other frame (capped at
-; PROJ_MAX_FALL_SPEED).  Fireballs additionally bounce off
-; FIREBALL_GROUND_Y by reversing Y_Speed - matching the SMB1 fireball that
-; skips along the floor.  Hammers fall through that line and die when they
-; drop off the bottom of the screen.
 BossUpdateProjectiles:
       ldy #EnemyProjectileOffset
   @loop:
@@ -884,23 +900,16 @@ BossUpdateProjectiles:
       sta SprObject_Y_Position,y
 
       ; Gravity: every other frame, add 1 to Y_Speed.
-      ; - Hammers (bit 6 of SprAttrib set): uncapped - they keep accelerating
-      ;   downward until they fall off the bottom of the screen and die.
-      ; - Fireballs: cap on the *positive* (downward) side at
-      ;   PROJ_MAX_FALL_SPEED so bounces don't accelerate without bound.
-      ;   Negative Y_Speed (rising fireball post-bounce) always pulls toward 0;
-      ;   the unsigned cap check would otherwise treat $FC as ">= 4" and skip
-      ;   gravity entirely, leaving the fireball travelling level forever.
       lda FrameCounter
       lsr
       bcs @after_gravity
         lda SprObject_SprAttrib,y
         and #PROJ_TYPE_HAMMER
-        bne @apply_gravity            ; hammer: uncapped
+        bne @apply_gravity ; hammer: uncapped
         lda SprObject_Y_Speed,y
-        bmi @apply_gravity            ; rising fireball: always pull toward 0
+        bmi @apply_gravity ; rising fireball: always pull toward 0
         cmp #PROJ_MAX_FALL_SPEED
-        bcs @after_gravity            ; fireball at terminal: skip
+        bcs @after_gravity ; fireball at terminal: skip
     @apply_gravity:
         clc
         lda SprObject_Y_Speed,y
@@ -930,21 +939,22 @@ BossUpdateProjectiles:
       cmp #$D8
       bcs @kill
 
+      ; Skip collision detection if mario can't be hurt right now
+      lda InjuryTimer
+      bne @next
       ; Collision with player.  Boss projectile box: 8x8 at (X,Y).  Reuse the
       ; vanilla player hitbox loader for $00-$03, and hand-build $04-$07.
       lda SprObject_X_Position,y
       sta $04
-      lda #8
-      sta $06
       lda SprObject_Y_Position,y
       sta $05
       lda #8
+      sta $06
       sta $07
       jsr bank7_LoadLinkHitbox
       jsr bank7_CollisionTest
       ldy $11
       bcc @next
-      ; Hit Mario - flag him for damage and drop projectile
       ldx #0
       lda $a8,x
       ora #$10
@@ -966,24 +976,11 @@ BossUpdateProjectiles:
 
 .segment "PRG7"
 .reloc
-; BossDrawProjectiles: invoked from BossGraphicsHandler with PRG0 already paged
-; in, so DrawMetasprite is reachable.  This routine MUST live in PRG7 (fixed
-; bank) so it stays callable after BossGraphicsHandler's SwapPRG(0) replaces
-; PRG5 at $8000.  Animation frame toggles every 4-8 frames.
 BossDrawProjectiles:
       ldy #EnemyProjectileOffset
   @loop:
       lda EnemyProjectileType - EnemyProjectileOffset,y
       beq @next
-        ; SMB1-style 16-frame rotation cycle, mirroring how vanilla Mario's
-        ; fireballs / hammers spin:
-        ;   FC bit 2: pick FRAME_1 vs FRAME_2 (toggles every 4 frames)
-        ;   FC bit 3: pick "no flip" vs "H+V flip" (toggles every 8 frames)
-        ; The four resulting (frame, flip) combinations cycle the sprite
-        ; through up-right / down-right / down-left / up-left orientations
-        ; so the projectile visibly tumbles in flight.
-
-        ; --- Frame selection ---
         lda FrameCounter
         and #%00000100
         bne @use_frame_2
@@ -991,7 +988,7 @@ BossDrawProjectiles:
           and #PROJ_TYPE_HAMMER
           beq @set_fb1
             lda #METASPRITE_HAMMER_FRAME_1
-            .byte $2c                   ; BIT abs - skip the next two bytes
+            .byte $2c
         @set_fb1:
             lda #METASPRITE_FIREBALL_FRAME_1
           jmp @set_frame
@@ -1015,11 +1012,11 @@ BossDrawProjectiles:
         and #%00001000
         beq @no_flip
           lda SprObject_SprAttrib,y
-          ora #%11000000                ; H + V flip
+          ora #%11000000 ; H + V flip
           sta SprObject_SprAttrib,y
       @no_flip:
 
-        ; --- Draw ---
+        ; Keep the current object we are processing around in $11 for the next loop
         ldx EnemyProjectileType - EnemyProjectileOffset,y
         sty $11
         jsr DrawMetasprite
@@ -1072,7 +1069,6 @@ StompedBoss:
       adc #10
       cmp Enemy_Y_Position,x
       bcc @valid_stomp
-;        jmp StompInjury           ; player below boss -> normal stomp injury to PLAYER
         jmp DamagePlayer
   @valid_stomp:
       lda #$fd
@@ -1138,7 +1134,6 @@ BossPlayerCollision:
     sta $a8,x
     jmp bank7_LinkCollision       ; processes $A8 flag to damage Mario; returns to RunBoss caller
 
-
 .reloc
 ; Variant of InjuredBoss that subtracts 5 HP at once (jump attack damage).
 ; HP is floored at 0 so the KillBoss death-countdown path runs normally.
@@ -1154,7 +1149,7 @@ InjuredBossJump:
 +
     sta Enemy_HP,x
     beq +
-        ; don't play sfx for last hit
+        ; don't play sfx for last hit. works around a weird bug i didn't bother to fix
         lda #$10 ; Sword stab SFX
         sta Z2NoiseSoundQueue ; stab SFX
     +
