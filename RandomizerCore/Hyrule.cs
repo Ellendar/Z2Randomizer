@@ -2419,7 +2419,15 @@ public class Hyrule
         }
         rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
         rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
-        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        const bool isRandomized = false;
+        if (isRandomized)
+            rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        else
+        {
+            // We need to move the "OF" graphics over the unused zelda graphics
+            // to fit the new MARIO text (whether its used or not)
+            rom.Put(ROM.ChrRomOffset + 0x1000, rom.GetBytes(ROM.ChrRomOffset + 0x1380, 0x13e0 - 0x1380));
+        }
         if (props.MarioMode)
         {
             // Overwrite link's downstab animation with fireball explosion sprites
@@ -3823,7 +3831,9 @@ bank5_Pointer_table_for_End_Credits:
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
         ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic, props.MarioMode); // will make output vary with customize tab options
-        rom.AddRandomizerToTitle(engine, props.MarioMode);
+        // the second flag determines if we should add the "randomizer" text, but we don't have a "vanilla" option
+        // right now, so this is just always off, except when i manually make an update
+        rom.AddRandomizerToTitle(engine, props.MarioMode, false);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetNonSideviewItemLocations());

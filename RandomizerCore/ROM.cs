@@ -434,12 +434,78 @@ public class ROM
         }
     }
 
-    public void AddRandomizerToTitle(Assembler asm, bool marioMode)
+    public void AddRandomizerToTitle(Assembler asm, bool marioMode, bool isRandomized)
     {
         // This is just updating the macro commands used to draw the title screen tiles
         // The actual tile data will be imported into the rom data later
 
-        var PlayerName = marioMode ? 
+        // Display the randomizer text line if randomized
+        var displayRandomizerLine = isRandomized ?
+"""
+Line0:
+; ZELDA II
+.byte $22, $4c, 8 ; Write 8 bytes to $224c
+.byte $00, $01, $02, $03, $04, $05, $06, $07
+; setup the attributes for the right hand side
+.byte $23,$E0,REPEAT | 16,$00
+.byte $23,$E7,1,$cc
+; .byte $23,$E8,REPEAT | 7,$00
+.byte $23,$EF,1,$cc
+.byte $23,$f0,REPEAT | 16,$00
+.byte $23,$f7,1,$cc
+;.byte $23,$f8,REPEAT | 7,$00
+.byte $23,$ff,1,$cc
+
+Line1:
+; RANDOMIZER
+.byte $22, $6a, 12 ; Write 12 bytes to $226a
+; skipping over $0e since its the copyright symbol used at the end
+.byte $08, $09, $0a, $0b, $0c, $0d, $0f, $10, $11, $12, $13, $14
+
+Line2:
+; THE ADVENTURE OF TOP
+.byte $22, $88, 17 ; Write 17 bytes to $2288
+.byte $15, $16, $17, $18, $19, $1a, $1b, $1c, $1d, $1e, $1f, $20, $21, $22, $23, $24, $25 ; Top
+
+Line3:
+; THE ADVENTURE OF BOT
+.byte $22, $a7, 18 ; Write 18 bytes to $22a7
+.byte $26, $27, $28, $29, $2a, $2b, $2c, $2d, $2e, $2f, $30, $31, $32, $33, $34, $35, $36, $37 ; Bot
+"""
+        :
+"""
+Line0:
+; ZELDA II
+.byte $22, $6C, 8
+.byte $10, $11, $12, $13, $14, $15, $16, $17
+; setup the attributes for the right hand side
+.byte $23,$E0,REPEAT | 16,$00
+.byte $23,$E7,1,$cc
+; .byte $23,$E8,REPEAT | 7,$00
+.byte $23,$EF,1,$cc
+.byte $23,$f0,REPEAT | 16,$00
+.byte $23,$f7,1,$cc
+;.byte $23,$f8,REPEAT | 7,$00
+.byte $23,$ff,1,$cc
+
+Line1:
+; SKIP THIS IF NOT RANDOMIZED
+.byte $22, $6a, 1 ; Write 1 useless byte to just skip this write
+.byte $f4
+
+Line2:
+; THE ADVENTURE OF TOP
+.byte $22, $88, 17
+.byte $1C,$1E,$20,$22,$24,$26,$28,$2A,$2C,$2E,$30,$32,$34,$36,$00,$02,$04
+
+Line3:
+; THE ADVENTURE OF BOT
+.byte $22, $A7, 18
+.byte $1B,$1D,$1F,$21,$23,$25,$27,$29,$2B,$2D,$2F,$31,$33,$35,$37,$01,$03,$05
+""";
+
+
+        var playerName = marioMode ? 
 """
 Line4:
 ; MARIO(TM)
@@ -526,39 +592,9 @@ TitleLineTable:
 
 .org $af69
 
-Line0:
-; ZELDA II
-.byte $22, $4c, 8 ; Write 8 bytes to $224c
-.byte $00, $01, $02, $03, $04, $05, $06, $07
-; setup the attributes for the right hand size
-.byte $23,$E0,REPEAT | 16,$00
-.byte $23,$E7,1,$cc
-; .byte $23,$E8,REPEAT | 7,$00
-.byte $23,$EF,1,$cc
-.byte $23,$f0,REPEAT | 16,$00
-.byte $23,$f7,1,$cc
-;.byte $23,$f8,REPEAT | 7,$00
-.byte $23,$ff,1,$cc
+{displayRandomizerLine}
 
-
-Line1:
-; RANDOMIZER
-.byte $22, $6a, 12 ; Write 12 bytes to $226a
-; skipping over $0e since its the copyright symbol used at the end
-.byte $08, $09, $0a, $0b, $0c, $0d, $0f, $10, $11, $12, $13, $14
-
-Line2:
-; THE ADVENTURE OF TOP
-.byte $22, $88, 17 ; Write 17 bytes to $2288
-.byte $15, $16, $17, $18, $19, $1a, $1b, $1c, $1d, $1e, $1f, $20, $21, $22, $23, $24, $25 ; Top
-
-
-Line3:
-; THE ADVENTURE OF BOT
-.byte $22, $a7, 18 ; Write 18 bytes to $22a7
-.byte $26, $27, $28, $29, $2a, $2b, $2c, $2d, $2e, $2f, $30, $31, $32, $33, $34, $35, $36, $37 ; Bot
-
-{PlayerName}
+{playerName}
 TitleEnd:
 
 ; Add some filler commands to take up the rest of the space
