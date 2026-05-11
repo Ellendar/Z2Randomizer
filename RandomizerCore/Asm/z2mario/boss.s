@@ -99,12 +99,6 @@ BossLandedInCutscene:
   jmp $9a77
 FREE_UNTIL $9a0f
 
-
-; Patch bank5_Enemy_Vulnerability_Damage_Codes entry $23 (Dark Link):
-; Clear bit 5 "Immune to Flying Blade and Fire" so fireballs can hit the boss.
-.org $951C
-  .byte $14
-
 ; Make dark mario use a different hitbox (vanilla has a jank $0e hitbox, switch
 ; to a simple tall enemy hitbox with $00)
 .org $9540
