@@ -180,6 +180,7 @@ RESV DripperRedCounter
 RESV PpuCtrlForIrq
 RESV ScrollPosForIrq
 RESV IrqSetupAlready
+RESV ProjectileProcessing
 RESV PendingAudioCall ; 1=audio running on main thread, 0=NMI decremented it (needs re-run)
 ; Expanded the block break list to hold up to 10 bricks at a time instead of just 5
 BREAKABLE_BLOCK_COUNT = 10

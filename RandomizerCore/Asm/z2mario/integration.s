@@ -630,15 +630,17 @@ PatchFireballHitcheck:
   lda #0
   sta $0b ; 0 = hammer (pass-through)
 @CollisionCheck:
+  inc ProjectileProcessing
   jsr $E694
-  bcc @NotBossExit
+  dec ProjectileProcessing
+  bcc @NoCollision
     ldy $11
     lda Fireball_State,y
     and #%01000000
-    bne @NotBossExit   ; hammer: pass through
+    bne @NoCollision   ; hammer: pass through
       lda #%10000000
       sta Fireball_State,y
-@NotBossExit:
+@NoCollision:
   rts
 
 ; Skip over stopping the projectile
@@ -804,15 +806,10 @@ PatchFinishPlayerPaletteCycle:
 
 
 ; Update palette locations
-;.ifdef DEMO_CODE
-;  UPDATE_BYTE $37 @ $285a $2a0a $40af $40bf $40cf $40df $80af $80bf $80cf $80df $c0af $c0bf $c0cf $c0df $c0ef $100af $100bf $100cf $100df $140af $140bf $140cf $140df $17c19 $1c464 $1c47c
-;  UPDATE_BYTE $27 @ $285b $2a0b $2a10 $40b0 $40c0 $40d0 $40e0 $80b0 $80c0 $80d0 $80e0 $c0b0 $c0c0 $c0d0 $c0e0 $c0f0 $100b0 $100c0 $100d0 $100e0 $140b0 $140c0 $140d0 $140e0 $17c1a $1c465 $1c47d
-;  UPDATE_BYTE $16 @ $285C $40b1 $40c1 $40d1 $80e1 $80b1 $80c1 $80d1 $80e1 $c0b1 $c0c1 $c0d1 $c0e1 $100b1 $100c1 $100d1 $100e1 $140b1 $140c1 $140d1 $140e1 $17c1b $1c466 $1c47e
-;.else
   UPDATE_BYTE $16 @ $285a $40af $40bf $40cf $40df $80af $80bf $80cf $80df $c0af $c0bf $c0cf $c0df $c0ef $100af $100bf $100cf $100df $140af $140bf $140cf $140df $17c19 $1c464 $1c47c
   UPDATE_BYTE $27 @ $285b $40b0 $40c0 $40d0 $40e0 $80b0 $80c0 $80d0 $80e0 $c0b0 $c0c0 $c0d0 $c0e0 $c0f0 $100b0 $100c0 $100d0 $100e0 $140b0 $140c0 $140d0 $140e0 $17c1a $1c465 $1c47d
   UPDATE_BYTE $18 @ $285C $40b1 $40c1 $40d1 $80e1 $80b1 $80c1 $80d1 $80e1 $c0b1 $c0c1 $c0d1 $c0e1 $100b1 $100c1 $100d1 $100e1 $140b1 $140c1 $140d1 $140e1 $17c1b $1c466 $1c47e
-;.endif
+
 ; Fire spell color. EDIT: This is regrettably not the fire spell, but a generic "after spell flash color"
 ; so it applies to anything that sets a spell color like grabbing a fairy or casting any spell or learning a spell, etc.
 ;UPDATE_BYTE $37 @ $2a0a
@@ -829,28 +826,6 @@ UPDATE_BYTE $18 $10ea
 ; shield spell color location
 UPDATE_BYTE $02 @ $0e9e
 
-
-; Replace writing registers directly with an output buffer to mix with the regular driver output.
-; RESERVE SfxOutputBuffer, 12
-
-; SND_SQUARE1_BUFFER      = SfxOutputBuffer
-; SND_SQUARE2_BUFFER      = SfxOutputBuffer + 4
-; SND_NOISE_BUFFER        = SfxOutputBuffer + 8
-
-;.macro SFXInit
-;
-;; .if ::USE_VANILLA_SFX
-;  ldy #SFXMemoryEnd - SFXMemoryStart
-;:   sta SFXMemoryStart,y     ;clear out memory used
-;    dey                   ;by the sound engines
-;    bpl :-
-;; .endif
-;
-;.endmacro
-;
-;.macro SFXPlayback
-;  jsr SFXSoundEngine
-;.endmacro
 
 ;-------------------------------------------------------------------------------------
 .segment "PRG6"
@@ -944,26 +919,13 @@ ElevatorMakeMarioStateStanding:
   sta Player_State
   rts
 
-; Make mario "downstabbing" while falling
-; .org $ED02
-;   jsr CheckForDownstab
-;   bcc $ED1B
-;   nop
 
 ; Disable vanilla recoil when jumping off enemies
 .org $e747
-;  jsr DisableRecoilIfDownstab
   jmp *+3 ; skip setting recoil for stabs
 
 SetLinkRecoil = $e371
 
-; .reloc
-;DisableRecoilIfDownstab:
-;  jsr CheckForDownstab
-;  bcs +
-;    jmp SetLinkRecoil
-;  +
-;  rts
 
 ; Make mario bounce off armored enemies
 .org $E65E
@@ -982,11 +944,11 @@ SetLinkRecoil = $e371
 .org $E714
   jsr CheckForDownstab
   bcc $E723
-  LDA      $0B
-  BNE      $E723
-  LDA      #$fc
-  STA      $057D
-  nop
+  lda ProjectileProcessing
+  bne +
+    lda #$fc
+    sta $057D
++
 .assert * = $E723
 
 .org $E9C0
