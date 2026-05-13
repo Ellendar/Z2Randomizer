@@ -19,8 +19,8 @@ public static class MaxRandoPreset
         IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
-        PalacesCanSwapContinents = null,
-        ShuffleGP = null,
+        PalacesCanSwapContinents = true,
+        ShuffleGP = true,
         ShuffleEncounters = null,
         AllowUnsafePathEncounters = true,
         IncludeLavaInEncounterShuffle = true,
