@@ -29,21 +29,21 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Fonts.Inter" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.1" />
-        <PackageReference Include="DialogHost.Avalonia" Version="$(DialogHostAvaloniaVersion)" />
-        <PackageReference Include="Material.Avalonia" Version="$(MaterialAvaloniaVersion)" />
-        <PackageReference Include="Material.Icons.Avalonia" Version="$(MaterialIconsAvaloniaVersion)" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
-        <PackageReference Include="ReactiveUI" Version="23.2.27" />
-        <PackageReference Include="ReactiveUI.Avalonia" Version="12.0.1" />
-        <PackageReference Include="ReactiveUI.Validation" Version="7.0.5" />
-        <PackageReference Include="Aigamo.ResXGenerator" Version="4.3.0">
+        <PackageReference Include="AvaloniaUI.DiagnosticsSupport" />
+        <PackageReference Include="DialogHost.Avalonia" />
+        <PackageReference Include="Material.Avalonia" />
+        <PackageReference Include="Material.Icons.Avalonia" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="ReactiveUI.Avalonia" />
+        <PackageReference Include="ReactiveUI.Validation" />
+        <PackageReference Include="Aigamo.ResXGenerator" >
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Xaml.Behaviors.Interactions" Version="12.0.0" />
+        <PackageReference Include="Xaml.Behaviors.Interactions" />
     </ItemGroup>
 
     <ItemGroup>
