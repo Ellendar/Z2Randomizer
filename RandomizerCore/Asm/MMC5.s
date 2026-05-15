@@ -152,10 +152,10 @@ HandleLagFrame:
     lda $0736
     cmp #$0b
     bne @HandleAudio
-    ; Check if we even have a sprite zero on the screen
-    lda $200
-    cmp #$f0
-    bcs @HandleAudio
+    ; Check if we even have a sprite zero on the screen (Spoiler: there is not, sprite zero was removed)
+    ;lda $200
+    ;cmp #$f0
+    ;bcs @HandleAudio
     ; keep all flags except for the nametable select to always use nametable 0
 
     lda $ff
