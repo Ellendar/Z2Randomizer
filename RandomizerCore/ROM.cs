@@ -474,7 +474,13 @@ Line3:
 """
         :
 """
+
 Line0:
+; SKIP THIS IF NOT RANDOMIZED
+.byte $22, $4a, 1 ; Write 1 useless byte to just skip this write
+.byte $f4
+
+Line1:
 ; ZELDA II
 .byte $22, $6C, 8
 .byte $10, $11, $12, $13, $14, $15, $16, $17
@@ -487,11 +493,6 @@ Line0:
 .byte $23,$f7,1,$cc
 ;.byte $23,$f8,REPEAT | 7,$00
 .byte $23,$ff,1,$cc
-
-Line1:
-; SKIP THIS IF NOT RANDOMIZED
-.byte $22, $6a, 1 ; Write 1 useless byte to just skip this write
-.byte $f4
 
 Line2:
 ; THE ADVENTURE OF TOP

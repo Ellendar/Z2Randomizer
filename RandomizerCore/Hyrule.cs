@@ -2419,6 +2419,7 @@ public class Hyrule
         }
         rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
         rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+        // Z2Mario, when making the vanilla romhack, change this flag to false
         const bool isRandomized = false;
         if (isRandomized)
             rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
