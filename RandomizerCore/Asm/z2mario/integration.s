@@ -155,6 +155,7 @@ DrawFallingMarioSprite:
 .org $dd1b ; TBird draws a flashing mario sprite here without banking
   jsr BankPatchLinkDrawRoutine
 
+.export BankPatchLinkDrawRoutine
 .reloc
 BankPatchLinkDrawRoutine:
   lda $0769
@@ -163,8 +164,9 @@ BankPatchLinkDrawRoutine:
     jmp @Exit
   +
   jsr SwapToPRG0
-  jsr PatchLinkDrawRoutine
+  jsr $EC02 ; let the double return go back to here
   jsr SwapToSavedPRG
+  rts
 @Exit:
   ; double return to skip the OG drawing code
   pla
@@ -555,7 +557,7 @@ NoDecTimers:
 SetPlayerDownstabbingHitbox:
   ; jsr $ed02 ; attempt to downstab while falling
   jsr CheckForDownstab
-  bcc +
+  bcc @notstabbing
     LDX      #0
     JSR      $ECEA
     CLC
@@ -565,7 +567,7 @@ SetPlayerDownstabbingHitbox:
     CLC
     ADC      #$10 ;  + 8 ; + 8 cause UGH
     STA      HitboxXCoord ; ,x
-  +
+@notstabbing:
   rts
 
 ; Prevent recoil and playing the sword sound when hitting a well
@@ -945,11 +947,21 @@ SetLinkRecoil = $e371
   jsr CheckForDownstab
   bcc $E723
   lda ProjectileProcessing
-  bne +
+  bne @skip
     lda #$fc
-    sta $057D
-+
+    jsr SetDownstabStatTracking
+@skip:
 .assert * = $E723
+.reloc
+SetDownstabStatTracking:
+  ;set recoil to -4 to bounce up
+  sta $057D
+  ; stomped an enemy so inc stats as well
+  inc StatDownStabCount+0
+  bne @Exit
+  inc StatDownStabCount+1
+@Exit:
+  rts
 
 .org $E9C0
   jsr InyIfDownstabbing
