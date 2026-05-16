@@ -1147,7 +1147,14 @@ ChkWtr:    lda #$01                   ;set value here (apparently always set to 
           ;  lda Whirlpool_Flag         ;if whirlpool flag not set, branch
           ;  beq GetYPhy
           ;  iny                        ;otherwise increment to 6
-GetYPhy:   lda JumpMForceData,y       ;store appropriate jump/swim
+GetYPhy:   
+
+    ; stat tracking the mario jump counter
+    inc StatUpStabCount+0
+    bne @nohighinc
+    inc StatUpStabCount+1
+@nohighinc:
+           lda JumpMForceData,y       ;store appropriate jump/swim
            sta VerticalForce          ;data here
            lda FallMForceData,y
            sta VerticalForceDown
@@ -2114,7 +2121,7 @@ LandPlyr:
   lda $cc
   clc
   adc #$10
-  sta $47e
+  sta HitboxXCoord
 InitSteP:
   lda #$00
   sta Player_State           ;set player's state to normal
@@ -2407,6 +2414,11 @@ ProcFireball_Bubble:
       lda Fireball_State,x       ;load fireball state
       bne ProcFireballs          ;if not inactive, branch
 SpawnFireball:
+; stat tracking consider a fireball a LoStab
+        inc StatLoStabCount+0
+        bne @Skip
+        inc StatLoStabCount+1
+@Skip:
         lda #Sfx_Fireball          ;play fireball sound effect
         sta Square1SoundQueue
         lda #$02                   ;load state
@@ -2745,6 +2757,11 @@ GetProperObjOffset:
       lda Fireball_State,x       ;load fireball state
       bne UpdateHammers          ;if not inactive, branch
 SpawnHammer:
+; stat tracking consider a hammer a HiStab
+        inc StatHiStabCount+0
+        bne @Skip
+        inc StatHiStabCount+1
+@Skip:
         inc JustThrownHammer
         ; make mario use the throw animation frame
         ldy PlayerAnimTimerSet     ;copy animation frame timer setting

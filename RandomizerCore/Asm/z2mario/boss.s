@@ -997,8 +997,6 @@ BossDrawProjectiles:
       @set_frame:
         sta EnemyProjectileType - EnemyProjectileOffset,y
 
-        ; --- Flip selection ---
-        ; Clear OAM flip bits while preserving palette + PROJ_TYPE_HAMMER.
         lda SprObject_SprAttrib,y
         and #%00111111
         sta SprObject_SprAttrib,y
@@ -1036,6 +1034,12 @@ KillBoss:
         sta Enemy_Y_Speed,x
         lda #0
         sta Enemy_X_Speed,x
+        sta EnemyProjectileType+0
+        sta EnemyProjectileType+1
+        sta EnemyProjectileType+2
+        sta EnemyProjectileType+3
+        sta EnemyProjectileType+4
+        sta EnemyProjectileType+5
         lda #$7f
         sta boss_counter
         ; vanilla boss kill behavior
@@ -1186,9 +1190,47 @@ MoveD_EnemyVertically:
   ldx #0                  ;boss is always at enemy slot 0
   rts
 
-;.reloc
-;MoveEnemyHorizontally:
-;      inx                         ;increment offset for enemy offset
-;      jsr MoveObjectHorizontally  ;position object horizontally according to
-;      ldx ObjectOffset            ;counters, return with saved value in A,
-;      rts                         ;put enemy offset back in X and leave
+
+; Final cutscene fixes
+
+.segment "PRG5"
+.org $9b53
+  jsr SetupMarioSpriteForCredits 
+  nop
+.reloc
+SetupMarioSpriteForCredits:
+  lda #1
+  sta $1a ; put the boss back "onscreen" for the rest of the cutscenes
+  lda #METASPRITE_BIG_MARIO_STANDING
+  sta $80  
+  rts
+
+.org $9ba8
+  lda #1 ; Make mario face right when taking the triforce
+
+.org $9bb1
+  lda #METASPRITE_BIG_MARIO_JUMPING
+
+; Zelda waking scene mario sprite tile fixes
+.org $8c0e
+  .byte $14 ; Mario jumping top left
+.org $8c12
+  .byte $16 ; Mario jumping top right
+  .byte $00 ; don't flip it
+.org $8c16
+  .byte $34 ; Mario jumping bot left
+.org $8c1a
+  .byte $36 ; Mario jumping bot right
+  .byte $00 ; dont flip it
+
+; Zelda kiss scene mario sprite tile fixes
+.org $8d8e
+  .byte $04 ; top back of mario walking
+  .byte $20 ; not flipped
+.org $8d92
+  .byte $06 ; top front of mario walking
+.org $8d9e
+  .byte $24 ; bot back of mario walking
+  .byte $20 ; not flipped
+.org $8da2
+  .byte $26 ; bot front of mario walking

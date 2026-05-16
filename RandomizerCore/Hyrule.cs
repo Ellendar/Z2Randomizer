@@ -3752,6 +3752,8 @@ EndTileComparisons = $8601
         a.Assign("PressStartStringLen", message.Length);
         AssignRealPalaceLocations(a);
         a.Set("_ALLOW_ITEM_DUPLICATES", props.AllowImportantItemDuplicates ? 1 : 0);
+        if (props.MarioMode)
+            a.Assign("ENABLE_Z2_MARIO", 1);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
 

@@ -49,6 +49,7 @@ SetPreviousFrameAction:
     sta $80
     rts
 
+.ifndef ENABLE_Z2_MARIO
 .org $95FC ; sty $0400
     jsr StatTrackSwordSwipe
 .reloc
@@ -114,6 +115,7 @@ StatTrackDownStab:
 @Exit:
     sta $80
     rts
+.endif
     
 
 .segment "PRG4"
@@ -328,6 +330,8 @@ StopTimers:
         jsr AddTimestamp
 @AlreadyDoneOnce:
     ; setup and draw the old man over an over
+    lda #$00
+    sta $c9  ; offscreen bits. $Fx means the whole block is offscreen %0000abcd - abcd are bits indicating which tile in the block is offscreen
     lda #$d0
     sta Enemy0XPositionLo
     lda #$50
@@ -770,14 +774,45 @@ UpdateSpritePosition:
     ; link x offset
     lda #$08+4
     sta $cc
+    ; link x hi byte
+    lda #0
+    sta $3b
+    ; clear shield flag
+    sta $070F
+    ; link y hi byte
+    lda #1
+    sta $19
     ; link y offset
     lda #$20
     sta LinkYPos
     ; link metasprite
+.ifdef ENABLE_Z2_MARIO
+; .import BankPatchLinkDrawRoutine, METASPRITE_BIG_MARIO_STANDING
+;     lda #METASPRITE_BIG_MARIO_STANDING
+;     sta $80
+;     lda #1
+;     sta CurrentPRGBank
+;     jmp BankPatchLinkDrawRoutine
+    ;This is wayyy harder than it needs to be, so i'm just gonna draw mario where i want him
+    ; and move on with life
+    ldx #$10-1
+    @loop:
+        lda @PlayerStandingSprite,x
+        sta $200 + $80 + 4,x
+        dex
+        bpl @loop
+    rts
+@PlayerStandingSprite:
+.byte $30, $22, $00, $20
+.byte $30, $20, $00, $18
+.byte $20, $02, $00, $20
+.byte $20, $00, $00, $18
+
+.else
     lda #3
     sta $80
     jmp $EC02 ; Draw Link based on metasprite
-;    rts
+.endif
 
 .reloc
 WaitForStart:
