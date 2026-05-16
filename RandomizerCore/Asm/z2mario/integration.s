@@ -11,7 +11,7 @@
 FREE "PRG0" [$92BF, $962D)
 
 ; Clear out the old flame / sword projectile code
-FREE "PRG0" [$9815, $9925)
+FREE "PRG0" [$9815, $9924)
 
 ; .segment "PRG0"
 ; .org (($10ea - $10) .mod $4000) + $8000
