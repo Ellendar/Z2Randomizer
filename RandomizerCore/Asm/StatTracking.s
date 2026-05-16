@@ -1366,27 +1366,55 @@ BackgroundData:
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$ca,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$ca,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$dd,$de,$da,$ed,$e1,$ec,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+    .byte $dd,$de,$da,$ed,$e1,$ec ; DEATHS
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$eb,$de,$ec,$de,$ed,$ec,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+    .byte $eb,$de,$ec,$de,$ed,$ec ; RESETS
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$e1,$e2,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+.ifdef ENABLE_Z2_MARIO
+    .byte $e1,$da,$e6,$e6,$de,$eb ; HAMMER
+.else
+    .byte $e1,$e2,$ec,$ed,$da,$db ; HISTAB
+.endif
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$e5,$e8,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+.ifdef ENABLE_Z2_MARIO
+    .byte $df,$e2,$eb,$de,$db,$e5 ; FIREBL
+.else
+    .byte $e5,$e8,$ec,$ed,$da,$db ; LOSTAB
+.endif
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$ee,$e9,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+.ifdef ENABLE_Z2_MARIO
+    .byte $e3,$ee,$e6,$e9,$cf,$cf ; JUMP..
+.else
+    .byte $ee,$e9,$ec,$ed,$da,$db ; UPSTAB
+.endif
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$dd,$f0,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+.ifdef ENABLE_Z2_MARIO
+    .byte $ec,$ed,$e8,$e6,$e9,$cf ; STOMP.
+.else
+    .byte $dd,$f0,$ec,$ed,$da,$db ; DWSTAB
+.endif
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
