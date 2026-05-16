@@ -1,6 +1,15 @@
 # Z2Randomizer Changelog
 
-## Version 5.1.1 - April 28, 2026
+## Version 5.1.4 - May 16, 2026
+
+- Fixed 3 GP rooms that could cause the player to get stuck or die endlessly after dropping in and dying in certain places.
+- Fixed an issue with "Disable HUD flask on lag"
+
+## Version 5.1.3 - May 13, 2026
+
+- Updated the Max Rando preset to reflect the update in flags.
+
+## Version 5.1.2 - April 28, 2026
 
 - Removed loopy from random palace styles
 - Removed wetlands from random Climates

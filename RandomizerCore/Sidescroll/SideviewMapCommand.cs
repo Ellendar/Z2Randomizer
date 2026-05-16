@@ -8,6 +8,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 /// Map commands can be things like: defining floors, walls,
 /// decorative objects - everything that make up a palace room.
 /// </summary>
+[DebuggerDisplay("{" + nameof(DebugString) + "(),nq}")]
 public class SideviewMapCommand<T> where T : Enum
 {
     /// <summary>
