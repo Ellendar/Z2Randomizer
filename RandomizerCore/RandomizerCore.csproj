@@ -86,6 +86,10 @@
     <EmbeddedResource Include="Asm\z2mario\mario.s" />
     <None Remove="Asm\z2mario\sprites_mario_hammer.chr" />
     <EmbeddedResource Include="Asm\z2mario\sprites_mario_hammer.chr" />
+    <None Remove="Asm\z2mario\sprites_mario_tanooki.chr" />
+    <EmbeddedResource Include="Asm\z2mario\sprites_mario_tanooki.chr" />
+    <None Remove="Asm\z2mario\tanooki_tail.chr" />
+    <EmbeddedResource Include="Asm\z2mario\tanooki_tail.chr" />
     <None Remove="Asm\Graphics\fireball_explosion.chr" />
     <None Remove="Asm\z2mario\boss.s" />
     <EmbeddedResource Include="Asm\z2mario\boss.s" />
