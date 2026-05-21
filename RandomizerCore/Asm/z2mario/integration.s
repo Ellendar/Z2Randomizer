@@ -208,6 +208,10 @@ PatchLinkDrawRoutine:
     beq +
       jsr DrawShieldSprite
     +
+    lda $D0 ; nonzero if Tanooki is active
+    beq +
+      jsr DrawTailSprite
+    +
     ; Update the player bank if the metasprite has changed
 .import PlayerBankTable
     ldy ObjectMetasprite
@@ -234,6 +238,95 @@ PatchLinkDrawRoutine:
   pla
   pla
   rts
+
+.reloc
+TailSpriteXOffset:
+  .byte 0, 24
+.import METASPRITE_TAIL_STAND, METASPRITE_TAIL_WALKING_2, METASPRITE_TAIL_STRAIGHT, METASPRITE_TAIL_CROUCHING, METASPRITE_TAIL_FLUTTER
+TailPoseTable:
+  .byte METASPRITE_TAIL_STAND       ; STANDING
+  .byte METASPRITE_TAIL_STAND       ; WALKING_1
+  .byte METASPRITE_TAIL_WALKING_2   ; WALKING_2
+  .byte METASPRITE_TAIL_STRAIGHT    ; WALKING_3
+  .byte $00                         ; SKIDDING early return
+  .byte $80                         ; JUMPING special cased
+  .byte METASPRITE_TAIL_CROUCHING   ; CROUCHING
+.reloc
+.proc DrawTailSprite
+.import MetaspriteTableLeftLo, MetaspriteTableLeftHi
+.import MetaspriteRenderLoop
+.import METASPRITE_BIG_MARIO_STANDING, METASPRITE_BIG_MARIO_JUMPING
+.import METASPRITE_BIG_MARIO_CROUCHING
+Ptr = R0
+Atr = R3
+Xlo = R4
+Xhi = R5
+Ylo = R6
+Yhi = R7
+
+  lda ObjectMetasprite
+  sec
+  sbc #METASPRITE_BIG_MARIO_STANDING
+  bcc @noTail
+  cmp #METASPRITE_BIG_MARIO_CROUCHING - METASPRITE_BIG_MARIO_STANDING + 1
+  bcs @noTail
+
+  cmp #METASPRITE_BIG_MARIO_JUMPING - METASPRITE_BIG_MARIO_STANDING
+  beq @jumping
+
+  tay
+  ldx TailPoseTable,y
+  bmi @jumping
+  bne @havePose
+    rts ; skidding so return early since the tail is part of the sprite
+@jumping:
+  ; Jumping: TAIL_STRAIGHT while rising, TAIL_FLUTTER while falling.
+  ldx #METASPRITE_TAIL_FLUTTER
+  lda Player_Y_Speed
+  bpl @havePose
+    ldx #METASPRITE_TAIL_STRAIGHT
+@havePose:
+
+  lda MetaspriteTableLeftLo,x
+  sta Ptr
+  lda MetaspriteTableLeftHi,x
+  sta Ptr+1
+
+  lda PlayerFacingDir
+  lsr
+  tay
+  lda Player_X_Position
+  sec
+  sbc ScreenLeft_X_Pos
+  sta Xlo
+  lda SprObject_PageLoc
+  sbc ScreenLeft_PageLoc
+  sta Xhi
+  lda Xlo
+  clc
+  adc TailSpriteXOffset,y
+  sta Xlo
+  bcc @noinc
+    inc Xhi
+@noinc:
+  lda Player_Y_HighPos
+  sta Yhi
+  lda SprObject_Y_Position
+  sta Ylo
+
+  cpy #1
+  bcc @flipRight
+    lda #%01000000
+    .byte $2c
+@flipRight:
+    lda #0
+  sta Atr
+
+  jmp MetaspriteRenderLoop
+
+@noTail:
+  rts
+.endproc
 
 .reloc
 ShieldSpriteXOffset:

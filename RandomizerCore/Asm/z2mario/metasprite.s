@@ -104,6 +104,7 @@
 .segment "PRG0"
 
 .export PlayerBankTable, MetaspriteRenderLoop, METASPRITE_MARIO_SHIELD
+.export METASPRITE_TAIL_STAND, METASPRITE_TAIL_WALKING_2, METASPRITE_TAIL_STRAIGHT, METASPRITE_TAIL_CROUCHING, METASPRITE_TAIL_FLUTTER
 
 PRINT_METASPRITE_IDS = 0
 
@@ -757,6 +758,17 @@ MARIO_SHIELD_VRAM_OFFSET = SPRITE_BANK_1
 MARIO_SHIELD_Y_OFFSET = -8
 MARIO_SHIELD_PALETTE = $00
 MetaspriteBox "MARIO", "SHIELD", $06
+
+
+TAIL_VRAM_OFFSET = SPRITE_BANK_1
+TAIL_PALETTE     = $00
+TAIL_X_OFFSET    = 0
+TAIL_Y_OFFSET    = 8
+MetaspriteBox "TAIL", "STRAIGHT",   $56
+MetaspriteBox "TAIL", "STAND",      $58
+MetaspriteBox "TAIL", "WALKING_2",  $5A
+MetaspriteBox "TAIL", "CROUCHING",  $5C
+MetaspriteBox "TAIL", "FLUTTER",    $5E
 
 ;;;;;;;;;;;
 ; NULL Metasprite needs to be reserved in slot 0 to allow disabling drawing a sprite before its deleted

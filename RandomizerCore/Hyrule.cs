@@ -2433,10 +2433,14 @@ public class Hyrule
         {
             // Overwrite link's downstab animation with fireball explosion sprites
             var fireballExplosion = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.fireball_explosion.chr");
+            var tanooki_tail = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.tanooki_tail.chr");
             for (var i = 0; i < 13; i++)
+            {
                 rom.Put(ROM.ChrRomOffset + 0x400 + (i * 0x2000), fireballExplosion);
-
+                rom.Put(ROM.ChrRomOffset + 0x560 + (i * 0x2000), tanooki_tail);
+            }
             rom.Put(ROM.ChrRomOffset + 0x1a800, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.sprites_mario_hammer.chr"));
+            rom.Put(ROM.ChrRomOffset + 0x1b800, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.sprites_mario_tanooki.chr"));
             var span = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.map_mario.chr");
             rom.Put(ROM.ChrRomOffset + 0x11a00, span[0..0x220]);
             var title_graphics = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.mario_title.chr");

@@ -897,7 +897,7 @@ MoveSubs:
 .word OnGroundStateSub
 .word JumpSwimSub
 .word FallingSub
-.word ClimbingSub
+.word $0000 ; ClimbingSub ; removed to save space
 
 NoMoveSub: rts
 
@@ -988,56 +988,56 @@ ExitMov1:
   jmp MovePlayerVertically   ;jump to move player vertically, then leave
 
 ;--------------------------------
-.reloc
-ClimbAdderLow:
-  .byte $0e, $04, $fc, $f2
-ClimbAdderHigh:
-  .byte $00, $00, $ff, $ff
+; .reloc
+; ClimbAdderLow:
+;   .byte $0e, $04, $fc, $f2
+; ClimbAdderHigh:
+;   .byte $00, $00, $ff, $ff
 
-ClimbingSub:
-             lda Player_YMoveForceFractional
-             clc                      ;add movement force to dummy variable
-             adc Player_Y_MoveForce   ;save with carry
-             sta Player_YMoveForceFractional
-             ldy #$00                 ;set default adder here
-             lda Player_Y_Speed       ;get player's vertical speed
-             bpl MoveOnVine           ;if not moving upwards, branch
-             dey                      ;otherwise set adder to $ff
-MoveOnVine:  sty R0                   ;store adder here
-             adc Player_Y_Position    ;add carry to player's vertical position
-             sta Player_Y_Position    ;and store to move player up or down
-             lda Player_Y_HighPos
-             adc R0                   ;add carry to player's page location
-             sta Player_Y_HighPos     ;and store
-             lda Left_Right_Buttons   ;compare left/right controller bits
-             and Player_CollisionBits ;to collision flag
-             beq InitCSTimer          ;if not set, skip to end
-             ldy ClimbSideTimer       ;otherwise check timer
-             bne ExitCSub             ;if timer not expired, branch to leave
-             ldy #$18
-             sty ClimbSideTimer       ;otherwise set timer now
-             ldx #$00                 ;set default offset here
-             ldy PlayerFacingDir      ;get facing direction
-             lsr                      ;move right button controller bit to carry
-             bcs ClimbFD              ;if controller right pressed, branch ahead
-             inx
-             inx                      ;otherwise increment offset by 2 bytes
-ClimbFD:     dey                      ;check to see if facing right
-             beq CSetFDir             ;if so, branch, do not increment
-             inx                      ;otherwise increment by 1 byte
-CSetFDir:    lda Player_X_Position
-             clc                      ;add or subtract from player's horizontal position
-             adc ClimbAdderLow,x      ;using value here as adder and X as offset
-             sta Player_X_Position
-             lda Player_PageLoc       ;add or subtract carry or borrow using value here
-             adc ClimbAdderHigh,x     ;from the player's page location
-             sta Player_PageLoc
-             lda Left_Right_Buttons   ;get left/right controller bits again
-             eor #%00000011           ;invert them and store them while player
-             sta PlayerFacingDir      ;is on vine to face player in opposite direction
-ExitCSub:    rts                      ;then leave
-InitCSTimer: sta ClimbSideTimer       ;initialize timer here
-             rts
+; ClimbingSub:
+;              lda Player_YMoveForceFractional
+;              clc                      ;add movement force to dummy variable
+;              adc Player_Y_MoveForce   ;save with carry
+;              sta Player_YMoveForceFractional
+;              ldy #$00                 ;set default adder here
+;              lda Player_Y_Speed       ;get player's vertical speed
+;              bpl MoveOnVine           ;if not moving upwards, branch
+;              dey                      ;otherwise set adder to $ff
+; MoveOnVine:  sty R0                   ;store adder here
+;              adc Player_Y_Position    ;add carry to player's vertical position
+;              sta Player_Y_Position    ;and store to move player up or down
+;              lda Player_Y_HighPos
+;              adc R0                   ;add carry to player's page location
+;              sta Player_Y_HighPos     ;and store
+;              lda Left_Right_Buttons   ;compare left/right controller bits
+;              and Player_CollisionBits ;to collision flag
+;              beq InitCSTimer          ;if not set, skip to end
+;              ldy ClimbSideTimer       ;otherwise check timer
+;              bne ExitCSub             ;if timer not expired, branch to leave
+;              ldy #$18
+;              sty ClimbSideTimer       ;otherwise set timer now
+;              ldx #$00                 ;set default offset here
+;              ldy PlayerFacingDir      ;get facing direction
+;              lsr                      ;move right button controller bit to carry
+;              bcs ClimbFD              ;if controller right pressed, branch ahead
+;              inx
+;              inx                      ;otherwise increment offset by 2 bytes
+; ClimbFD:     dey                      ;check to see if facing right
+;              beq CSetFDir             ;if so, branch, do not increment
+;              inx                      ;otherwise increment by 1 byte
+; CSetFDir:    lda Player_X_Position
+;              clc                      ;add or subtract from player's horizontal position
+;              adc ClimbAdderLow,x      ;using value here as adder and X as offset
+;              sta Player_X_Position
+;              lda Player_PageLoc       ;add or subtract carry or borrow using value here
+;              adc ClimbAdderHigh,x     ;from the player's page location
+;              sta Player_PageLoc
+;              lda Left_Right_Buttons   ;get left/right controller bits again
+;              eor #%00000011           ;invert them and store them while player
+;              sta PlayerFacingDir      ;is on vine to face player in opposite direction
+; ExitCSub:    rts                      ;then leave
+; InitCSTimer: sta ClimbSideTimer       ;initialize timer here
+;              rts
 
 ;-------------------------------------------------------------------------------------
 ;$00 - used to store offset to friction data
@@ -1071,26 +1071,27 @@ Climb_Y_MForceData:
       .byte $00, $20, $ff
 
 PlayerPhysicsSub:
-           lda Player_State          ;check player state
-           cmp #$03
-           bne CheckForJumping       ;if not climbing, branch
-           ldy #$00
-           lda Up_Down_Buttons       ;get controller bits for up/down
-           and Player_CollisionBits  ;check against player's collision detection bits
-           beq ProcClimb             ;if not pressing up or down, branch
-           iny
-           and #%00001000            ;check for pressing up
-           bne ProcClimb
-           iny
-ProcClimb: ldx Climb_Y_MForceData,y  ;load value here
-           stx Player_Y_MoveForce    ;store as vertical movement force
-           lda #$08                  ;load default animation timing
-           ldx Climb_Y_SpeedData,y   ;load some other value here
-           stx Player_Y_Speed        ;store as vertical speed
-           bmi SetCAnim              ;if climbing down, use default animation timing value
-           lsr                       ;otherwise divide timer setting by 2
-SetCAnim:  sta PlayerAnimTimerSet    ;store animation timer setting and leave
-           rts
+; Remove climbing data
+;            lda Player_State          ;check player state
+;            cmp #$03
+;            bne CheckForJumping       ;if not climbing, branch
+;            ldy #$00
+;            lda Up_Down_Buttons       ;get controller bits for up/down
+;            and Player_CollisionBits  ;check against player's collision detection bits
+;            beq ProcClimb             ;if not pressing up or down, branch
+;            iny
+;            and #%00001000            ;check for pressing up
+;            bne ProcClimb
+;            iny
+; ProcClimb: ldx Climb_Y_MForceData,y  ;load value here
+;            stx Player_Y_MoveForce    ;store as vertical movement force
+;            lda #$08                  ;load default animation timing
+;            ldx Climb_Y_SpeedData,y   ;load some other value here
+;            stx Player_Y_Speed        ;store as vertical speed
+;            bmi SetCAnim              ;if climbing down, use default animation timing value
+;            lsr                       ;otherwise divide timer setting by 2
+; SetCAnim:  sta PlayerAnimTimerSet    ;store animation timer setting and leave
+;            rts
 
 CheckForJumping:
   ; ZELDA added check for on elevator
