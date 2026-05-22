@@ -202,6 +202,11 @@ PatchLinkDrawRoutine:
   
   ldx ObjectMetasprite
   beq @skipplayer
+    ; Apply swing override if we are a tanooki.
+    lda PlayerFacingDir
+    pha
+    jsr ApplySwingOverrides
+    ldx ObjectMetasprite                ; reload after override
     ldy #0
     jsr DrawMetasprite
     lda $070f ; nonzero if shield is cast
@@ -212,6 +217,8 @@ PatchLinkDrawRoutine:
     beq +
       jsr DrawTailSprite
     +
+    pla                                 ; restore PlayerFacingDir
+    sta PlayerFacingDir
     ; Update the player bank if the metasprite has changed
 .import PlayerBankTable
     ldy ObjectMetasprite
@@ -249,6 +256,67 @@ PatchLinkDrawRoutine:
   rts
 
 .reloc
+
+.proc ProcTanookiSwing
+.import METASPRITE_BIG_MARIO_CROUCHING
+  lda $d0 ; Tanooki suit active?
+  beq @done
+  lda tail_swing_timer
+  beq @maybeStart
+    ; count down the timer if we are already swiping
+    dec tail_swing_timer
+    rts
+
+@maybeStart:
+  lda A_B_Buttons
+  and #B_Button
+  beq @done ; B not pressed this frame
+  and PreviousA_B_Buttons
+  bne @done ; B held from last frame: not a fresh press
+
+  lda $17 ; $17 == 0 means crouching. can't swipe while crouching!
+  beq @done
+  lda ObjectMetasprite
+  cmp #METASPRITE_BIG_MARIO_CROUCHING
+  beq @done
+
+  lda #18
+  sta tail_swing_timer
+@done:
+  rts
+.endproc
+
+.reloc
+; Forcefully override mario's sprite when animating the tail swing
+; frames 1-3 - straighten out the tail
+; frames 4-7 - body forced to BIG_MARIO_STANDING until i make a new metasprite
+; frames 8-11 - body STANDING, facing flipped (the "spin" frame)
+; frames 12-18 - body STANDING (original facing until i make a new metasprite)
+.proc ApplySwingOverrides
+.import METASPRITE_BIG_MARIO_STANDING
+  lda $d0
+  beq @done ; Tanooki not active
+  lda tail_swing_timer
+  beq @done ; not swinging
+  cmp #16
+  bcs @done
+  lda #METASPRITE_BIG_MARIO_STANDING
+  sta ObjectMetasprite
+
+  lda tail_swing_timer
+  cmp #12
+  bcs @done ; past 12 frames means STANDING only
+  cmp #8
+  bcc @done ; before 8 frames means STANDING only
+  ; the player is "turned around" to do the swipe
+  lda PlayerFacingDir
+  eor #%00000011
+  sta PlayerFacingDir
+@done:
+  rts
+.endproc
+
+.reloc
 TailSpriteXOffset:
   .byte 0, 24
 .import METASPRITE_TAIL_STAND, METASPRITE_TAIL_WALKING_2, METASPRITE_TAIL_STRAIGHT, METASPRITE_TAIL_CROUCHING, METASPRITE_TAIL_FLUTTER
@@ -272,6 +340,14 @@ Xlo = R4
 Xhi = R5
 Ylo = R6
 Yhi = R7
+
+  ; If a swing is in progress, the tail is forced to TAIL_STRAIGHT for the
+  ; entire animation regardless of Mario's body pose.
+  lda tail_swing_timer
+  beq @noSwing
+    ldx #METASPRITE_TAIL_STRAIGHT
+    jmp @havePose
+@noSwing:
 
   lda ObjectMetasprite
   sec
@@ -627,6 +703,7 @@ NoDecTimers:
   ; This has to come before the A/B buttons are switched over
   jsr ProcHammerTime
   jsr ProcFireball_Bubble    ;process fireballs and air bubbles
+  jsr ProcTanookiSwing
 
   lda A_B_Buttons            ;save current A and B button
   sta PreviousA_B_Buttons    ;into temp variable to be used on next frame
