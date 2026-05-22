@@ -731,8 +731,10 @@ NoDecTimers:
         lda #0
         sta Player_X_Speed
 @SkipScrollLock:
+  lda #$f8
+  sta HitboxYCoord
+  jsr SetTailSwingHitbox
   jsr SetPlayerDownstabbingHitbox
-
   ; jsr CheckSideviewTransition ; this is already run during collision detection
   jmp PlayerGfxHandler
   ; rts
@@ -740,8 +742,17 @@ NoDecTimers:
 .reloc
 SetPlayerDownstabbingHitbox:
   ; jsr $ed02 ; attempt to downstab while falling
-  jsr CheckForDownstab
+  ; skip downstab hitbox on the frames we are swinging tail.
+  ; bit of a hack, but its *only* two frames we skip so ... whatever
+  lda HitboxYCoord
+  cmp #$f0
   bcc @notstabbing
+  lda Player_State
+  cmp #1
+  bne @notstabbing
+  lda Player_Y_Speed
+  bmi @notstabbing
+  beq @notstabbing
     LDX      #0
     JSR      $ECEA
     CLC
@@ -751,7 +762,44 @@ SetPlayerDownstabbingHitbox:
     CLC
     ADC      #$10 ;  + 8 ; + 8 cause UGH
     STA      HitboxXCoord ; ,x
+    lda #1
+    .byte $2c
 @notstabbing:
+  lda #0
+  sta PlayerIsDownstabbing
+  rts
+
+; Set a hitbox for the tail swipe only on frames 9 and 12 like smb3 does it
+; this gives time for the jump check to share the hitbox so we aren't as
+; likely to fall through an enemy when we are trying to jump tail swipe
+.reloc
+SetTailSwingHitbox:
+  lda tail_swing_timer
+  beq @done
+  cmp #$0C
+  beq @active
+  cmp #$09
+  bne @disable
+@active:
+  lda Player_Y_Position
+  clc
+  adc #$10
+  sta HitboxYCoord
+  lda PlayerFacingDir
+  cmp #1
+  bne @faceLeft
+    lda $CC
+    clc
+    adc #30 ; 24 is the "correct" hitbox but I want to be lenient and give them some more room
+    jmp @writeX
+@faceLeft:
+    lda $CC
+    sec
+    sbc #14 ; 8 is the "correct" hitbox as well, but LENIENT
+@writeX:
+  sta HitboxXCoord
+@disable:
+@done:
   rts
 
 ; Prevent recoil and playing the sword sound when hitting a well
@@ -1162,16 +1210,10 @@ InyIfDownstabbing:
 
 .reloc
 CheckForDownstab:
-  lda Player_State
-  cmp #1
-  bne @notjumping
-  lda Player_Y_Speed
-  beq @notjumping
-  bmi @notjumping
-    sec
-    rts
-@notjumping:
-  clc
+  ; i broke this out into its own function cause originally it was much longer
+  ; 1 if downstabbing 0 otherwise
+  lda PlayerIsDownstabbing
+  lsr
   rts
 
 .segment "PRG3"

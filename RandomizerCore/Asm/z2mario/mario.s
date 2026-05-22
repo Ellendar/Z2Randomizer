@@ -951,8 +951,8 @@ JumpSwimSub:
   bcc ProcSwim               ;or just starting to jump, if just starting, skip ahead
 DumpFall:
 ; Force downstab hitbox??
-  lda Player_Y_Position
-  sta HitboxYCoord
+  ; lda Player_Y_Position
+  ; sta HitboxYCoord
   lda VerticalForceDown      ;otherwise dump falling into main fractional
   sta VerticalForce
 ProcSwim:
