@@ -156,7 +156,7 @@ jobs:
       - name: Build Browser
         if: ${{ matrix.platform.type == 'browser' }}
         run: |
-          dotnet workload restore
+          dotnet workload install wasm-tools
           dotnet publish -c Release CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
       - name: Upload regular build to GitHub release
