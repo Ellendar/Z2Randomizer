@@ -409,6 +409,8 @@ CHR_BIGMARIO = $6a
 CHR_MARIOACTION = $6b
 CHR_SMALLMARIO = $6c
 CHR_SMALLFIRE = $6d
+CHR_TANOOKI = $6e
+CHR_TANOOKI_ACTION = $6f
 
 A_Button              = %10000000
 B_Button              = %01000000
