@@ -19,6 +19,9 @@
         <Platforms>AnyCPU</Platforms>
         <TrimMode>partial</TrimMode>
 <!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
+
+		<CompressionEnabled>false</CompressionEnabled>
+		<BlazorEnableCompression>false</BlazorEnableCompression>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
