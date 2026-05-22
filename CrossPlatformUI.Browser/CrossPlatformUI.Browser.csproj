@@ -20,8 +20,8 @@
         <TrimMode>partial</TrimMode>
 <!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
 
-		<CompressionEnabled>false</CompressionEnabled>
-		<BlazorEnableCompression>false</BlazorEnableCompression>
+        <CompressionEnabled>false</CompressionEnabled>
+        <BlazorEnableCompression>false</BlazorEnableCompression>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -75,7 +75,7 @@
     <ItemGroup>
       <None Remove="wwwroot\index.html" />
     </ItemGroup>
-    
+
     <Target Name="GenerateIpsManifest" AfterTargets="Build">
         <WriteLinesToFile
             File="wwwroot\ips-manifest.txt"

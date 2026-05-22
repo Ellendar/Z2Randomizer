@@ -26,7 +26,7 @@ function showError(msg) {
     // identify runtime/assembly payloads
     const isBootResource = (url, res) => {
         const u = (typeof url === "string" ? url : url.url || "").toLowerCase();
-        
+
         // Skip hot reload endpoints entirely
         if (u.includes("hotreload")) {
             return false;
