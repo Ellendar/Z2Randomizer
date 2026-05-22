@@ -209,16 +209,16 @@ PatchLinkDrawRoutine:
     ldx ObjectMetasprite                ; reload after override
     ldy #0
     jsr DrawMetasprite
-    lda $070f ; nonzero if shield is cast
-    beq +
-      jsr DrawShieldSprite
-    +
     lda $D0 ; nonzero if Tanooki is active
     beq +
       jsr DrawTailSprite
     +
     pla                                 ; restore PlayerFacingDir
     sta PlayerFacingDir
+    lda $070f ; nonzero if shield is cast
+    beq +
+      jsr DrawShieldSprite
+    +
     ; Update the player bank if the metasprite has changed
 .import PlayerBankTable
     ldy ObjectMetasprite
@@ -232,6 +232,8 @@ PatchLinkDrawRoutine:
     lda $d0
     beq +
       lda PlayerChrBank
+      cmp #CHR_BIGMARIO
+      bne +
       clc
       adc #CHR_TANOOKI - CHR_BIGMARIO
       sta PlayerChrBank
@@ -259,20 +261,55 @@ PatchLinkDrawRoutine:
 
 .proc ProcTanookiSwing
 .import METASPRITE_BIG_MARIO_CROUCHING
+TANOOKI_FLUTTER_CAP = 1   ; SMB3 PLAYER_TAILWAG_YVEL
+FLUTTER_DURATION    = 16  ; SMB3 Player_WagCount initial value
   lda $d0 ; Tanooki suit active?
   beq @done
-  lda tail_swing_timer
+
+  lda TailWagCount
+  beq @afterFlutter
+    dec TailWagCount
+    lda Player_Y_Speed
+    bmi @afterFlutter         ; rising: never cap
+    cmp #TANOOKI_FLUTTER_CAP
+    bcc @afterFlutter         ; already below cap
+    lda #TANOOKI_FLUTTER_CAP
+    sta Player_Y_Speed
+@afterFlutter:
+
+  ; Check if we are starting a flutter
+  ; Skip if we just jumped this frame
+  lda Square1SoundQueue
+  and #Sfx_BigJump
+  bne @noAPress
+  lda A_B_Buttons
+  and #A_Button
+  beq @noAPress
+  and PreviousA_B_Buttons
+  bne @noAPress
+    lda #FLUTTER_DURATION
+    sta TailWagCount
+    ; Only play the sfx after it ends though to match smb3
+    lda Square1SoundBuffer
+    and #Sfx_TailWag
+    bne @noAPress
+    lda Square1SoundQueue
+    ora #Sfx_TailWag
+    sta Square1SoundQueue
+@noAPress:
+
+  lda TailSwingTimer
   beq @maybeStart
     ; count down the timer if we are already swiping
-    dec tail_swing_timer
+    dec TailSwingTimer
     rts
 
 @maybeStart:
   lda A_B_Buttons
   and #B_Button
-  beq @done ; B not pressed this frame
+  beq @done
   and PreviousA_B_Buttons
-  bne @done ; B held from last frame: not a fresh press
+  bne @done
 
   lda $17 ; $17 == 0 means crouching. can't swipe while crouching!
   beq @done
@@ -281,8 +318,8 @@ PatchLinkDrawRoutine:
   beq @done
 
   lda #18
-  sta tail_swing_timer
-  lda Square1SoundQueue       ; queue the tail-wag SFX on the same edge that started the swing
+  sta TailSwingTimer
+  lda Square1SoundQueue       ; queue the tail-wag SFX on swing start
   ora #Sfx_TailWag
   sta Square1SoundQueue
 @done:
@@ -299,14 +336,14 @@ PatchLinkDrawRoutine:
 .import METASPRITE_BIG_MARIO_STANDING
   lda $d0
   beq @done ; Tanooki not active
-  lda tail_swing_timer
+  lda TailSwingTimer
   beq @done ; not swinging
   cmp #16
   bcs @done
   lda #METASPRITE_BIG_MARIO_STANDING
   sta ObjectMetasprite
 
-  lda tail_swing_timer
+  lda TailSwingTimer
   cmp #12
   bcs @done ; past 12 frames means STANDING only
   cmp #8
@@ -346,7 +383,7 @@ Yhi = R7
 
   ; If a swing is in progress, the tail is forced to TAIL_STRAIGHT for the
   ; entire animation regardless of Mario's body pose.
-  lda tail_swing_timer
+  lda TailSwingTimer
   beq @noSwing
     ldx #METASPRITE_TAIL_STRAIGHT
     jmp @havePose
@@ -366,13 +403,33 @@ Yhi = R7
   ldx TailPoseTable,y
   bmi @jumping
   bne @havePose
+@noTail:
     rts ; skidding so return early since the tail is part of the sprite
 @jumping:
+  ; Flutter animation override:
+  ;   wag_count 15..13 (frames 2-4) -> TAIL_CROUCHING
+  ;   wag_count 12..10 (frames 5-7) -> TAIL_STRAIGHT
+  ;   otherwise -> default jumping pose
+  lda TailWagCount
+  beq @jumpDefault
+  cmp #16
+  bcs @jumpDefault             ; frame 1 (just-pressed): no override yet
+  cmp #13
+  bcs @flutterCrouching        ; 13..15
+  cmp #10
+  bcs @flutterStraight         ; 10..12
+@jumpDefault:
   ; Jumping: TAIL_STRAIGHT while rising, TAIL_FLUTTER while falling.
   ldx #METASPRITE_TAIL_FLUTTER
   lda Player_Y_Speed
   bpl @havePose
     ldx #METASPRITE_TAIL_STRAIGHT
+    jmp @havePose
+@flutterCrouching:
+  ldx #METASPRITE_TAIL_CROUCHING
+  jmp @havePose
+@flutterStraight:
+  ldx #METASPRITE_TAIL_STRAIGHT
 @havePose:
 
   lda MetaspriteTableLeftLo,x
@@ -412,8 +469,6 @@ Yhi = R7
 
   jmp MetaspriteRenderLoop
 
-@noTail:
-  rts
 .endproc
 
 .reloc
@@ -532,6 +587,11 @@ DontClearMagicState:
   tya
   rts
 
+; Don't clear out the A_B_Buttons in loading
+; keeps mario from firing a fireball on screen load
+.org $90b5
+  jmp *+3
+
 ; patch end of link's loading routine
 .org $90DB ; sta $69DE
   jsr SetupMarioControl
@@ -593,7 +653,11 @@ CheckIfTurningSmall:
   ;      sta PlayerChangeSizeFlag
         lda #0
         sta ScrollAmount
-  ;      sta PlayerSize
+        ; kill all current projectiles since we can't hammer or fire while small
+        sta Fireball_State+0
+        sta Fireball_State+1
+        sta FireballMetasprite+0
+        sta FireballMetasprite+1
         lda #$ff
         sta TimerControl          ;set master timer control flag to halt timers
         lda #Sfx_PipeDown_Injury
@@ -774,7 +838,7 @@ SetPlayerDownstabbingHitbox:
 ; likely to fall through an enemy when we are trying to jump tail swipe
 .reloc
 SetTailSwingHitbox:
-  lda tail_swing_timer
+  lda TailSwingTimer
   beq @done
   cmp #$0C
   beq @active

@@ -201,7 +201,9 @@ RESV mapMarioPrevDirection
 ; MARIO related values that are not directly mapped to vanilla z2 object values
 
 RESV JustThrownHammer
-RESV tail_swing_timer
+RESV TailSwingTimer
+; SMB3 raccoon flutter: nonzero = Y-velocity cap active
+RESV TailWagCount
 ObjectOffset = $10
 RESV FBall_OffscreenBits
 RESV AltEntranceControl
@@ -282,9 +284,9 @@ RESV PlayerProj_Cnt, 2
 ; Values use for SMB1 sfx audio engine
 
 RESV Sfx_SecondaryCounter
-RESV PauseSoundBuffer
-RESV PauseModeFlag
-RESV PauseSoundQueue
+; RESV PauseSoundBuffer
+; RESV PauseModeFlag
+; RESV PauseSoundQueue
 RESV Square1SoundBuffer
 RESV Square2SoundBuffer
 RESV NoiseSoundBuffer
