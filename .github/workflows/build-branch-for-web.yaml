@@ -38,9 +38,7 @@ jobs:
       - name: Build Browser
         if: ${{ matrix.platform.type == 'browser' }}
         run: |
-          cd CrossPlatformUI.Browser
           dotnet workload restore
-          cd ..
           dotnet publish -c Release CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
       - name: Upload Browser build to artifacts
