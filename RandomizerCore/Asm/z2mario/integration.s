@@ -444,10 +444,11 @@ PlayerFirePalettePPUCommand:
 .org $8cf4
   jsr DontClearMagicState
 .reloc
-; prevent fire from going away in screen transitions but clear everything else
+; prevent fire ($10) from going away in screen transitions but clear everything else
+; also keep around the jump spell too ($02)
 DontClearMagicState:
   lda $76f
-  and #$10
+  and #$12
   sta $76f
   tya
   rts
@@ -495,8 +496,9 @@ CheckIfTurningSmall:
       lda PlayerSize ; if player is already small don't make small
       bne +
         ; If we are fire mario, we lost the fire power, so reset our palette
+        ; also clear the jump spell too if we shrink
         lda $76f
-        and #~$10
+        and #~$12
         sta $76f
         jsr UpdatePlayerPalette
 
