@@ -221,6 +221,15 @@ PatchLinkDrawRoutine:
       sta PlayerChrBank
       inc ReloadCHRBank
     +
+    ; If the tanooki suit is on, then switch to the big version
+    lda $d0
+    beq +
+      lda PlayerChrBank
+      clc
+      adc #CHR_TANOOKI - CHR_BIGMARIO
+      sta PlayerChrBank
+      inc ReloadCHRBank
+    +
 @skipplayer:
   ; While we are here, lets draw the fireball/hammer sprites too
   ldy #ProjectileOffset
