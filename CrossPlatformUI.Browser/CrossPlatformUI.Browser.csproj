@@ -17,14 +17,13 @@
         <Configurations>Debug;Release;Unsafe Debug</Configurations>
 
         <Platforms>AnyCPU</Platforms>
-        <PublishTrimmed>false</PublishTrimmed>
-        <TrimMode>copyused</TrimMode>
+        <TrimMode>partial</TrimMode>
 <!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
     </PropertyGroup>
 
-<!--    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <RunAOTCompilation>true</RunAOTCompilation>
-    </PropertyGroup>-->
+    </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
         <DebugType>full</DebugType>
