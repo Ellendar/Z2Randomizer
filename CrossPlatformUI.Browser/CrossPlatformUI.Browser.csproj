@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net10.0-browser</TargetFramework>
@@ -17,8 +17,11 @@
         <Configurations>Debug;Release;Unsafe Debug</Configurations>
 
         <Platforms>AnyCPU</Platforms>
-<!--        <TrimMode>partial</TrimMode>-->
+        <TrimMode>partial</TrimMode>
 <!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
+
+		<CompressionEnabled>false</CompressionEnabled>
+		<BlazorEnableCompression>false</BlazorEnableCompression>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -44,17 +47,35 @@
     <ItemGroup>
         <WasmExtraFilesToDeploy Include="wwwroot\**" />
     </ItemGroup>
-    <ItemGroup>
-        <WasmExtraFilesToDeploy Include="..\RandomizerCore\Sprites\**" TargetPath="Sprites\%(Filename)%(Extension)" />
-        <WasmExtraFilesToDeploy Include="..\RandomizerCore\PalaceRooms.json" />
-        <WasmExtraFilesToDeploy Include="..\RandomizerCore\Asm\**" TargetPath="Asm\%(RecursiveDir)\%(Filename)%(Extension)" />
-    </ItemGroup>
+    <Target Name="CopyAssetsToLocalWwwRoot" BeforeTargets="BeforeBuild;AssignTargetPaths">
+        <ItemGroup>
+            <!-- Define the external source items -->
+            <ExternalSprites Include="..\RandomizerCore\Sprites\**" />
+            <ExternalJson Include="..\RandomizerCore\PalaceRooms.json" />
+            <ExternalAsm Include="..\RandomizerCore\Asm\**" />
+
+            <!-- Tell Visual Studio to watch them for changes -->
+            <UpToDateCheckInput Include="@(ExternalSprites);@(ExternalJson);@(ExternalAsm)" />
+        </ItemGroup>
+
+        <Copy SourceFiles="@(ExternalSprites)"
+              DestinationFiles="@(ExternalSprites -> 'wwwroot\Sprites\%(RecursiveDir)%(Filename)%(Extension)')"
+              SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(ExternalJson)"
+              DestinationFiles="wwwroot\PalaceRooms.json"
+              SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(ExternalAsm)"
+              DestinationFiles="@(ExternalAsm -> 'wwwroot\Asm\%(RecursiveDir)%(Filename)%(Extension)')"
+              SkipUnchangedFiles="true" />
+    </Target>
+
     <ItemGroup>
         <IpsFiles Include="..\RandomizerCore\Sprites\*.ips" />
     </ItemGroup>
     <ItemGroup>
       <None Remove="wwwroot\index.html" />
     </ItemGroup>
+    
     <Target Name="GenerateIpsManifest" AfterTargets="Build">
         <WriteLinesToFile
             File="wwwroot\ips-manifest.txt"
@@ -62,9 +83,16 @@
             Overwrite="true" />
     </Target>
 
+    <Target Name="CopyJs65Assets" AfterTargets="ResolvePackageAssets">
+        <ItemGroup>
+            <Js65Files Include="$(Pkgjs65_browser)\assets\js65\**\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(Js65Files)" DestinationFolder="$(MSBuildProjectDirectory)\wwwroot\js65\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    </Target>
+
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="js65.browser" Version="$(Js65Version)" />
+        <PackageReference Include="js65.browser" Version="$(Js65Version)" GeneratePathProperty="true" />
     </ItemGroup>
 
     <ItemGroup>
@@ -74,8 +102,4 @@
     <ItemGroup>
         <ProjectReference Include="..\CrossPlatformUI\CrossPlatformUI.csproj" />
     </ItemGroup>
-
-<!--    <ItemGroup>-->
-<!--        <TrimmerRootAssembly Include="RandomizerCore" />-->
-<!--    </ItemGroup>-->
 </Project>

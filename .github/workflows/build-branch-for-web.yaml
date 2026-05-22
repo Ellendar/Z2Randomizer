@@ -49,6 +49,6 @@ jobs:
         with:
           name: Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}
           path: |
-            CrossPlatformUI.Browser/bin/Release/net10.0-browser/browser-wasm/AppBundle/
+            CrossPlatformUI.Browser/bin/Release/net10.0-browser/publish
             !**/*.pdb
 
