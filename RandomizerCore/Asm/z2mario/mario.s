@@ -2453,7 +2453,8 @@ FireballObjCore:
   dey                          ;if fireball state set to 1, skip this part and just run it
   beq RunFB
   lda Player_X_Position        ;get player's horizontal position
-  adc #$04                     ;add four pixels and store as fireball's horizontal position
+  ; adc #$04                     ;add four pixels and store as fireball's horizontal position
+  adc #12 ; z2mario: Add an extra 8 px to account for hitbox jank 
   sta Fireball_X_Position,x
   lda Player_PageLoc           ;get player's page location
   adc #$00                     ;add carry and store as fireball's page location
