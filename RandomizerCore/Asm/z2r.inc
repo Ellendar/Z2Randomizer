@@ -290,6 +290,9 @@ RESV NoiseSoundBuffer
 RESV Squ1_SfxLenCounter
 RESV Squ2_SfxLenCounter
 RESV Noise_SfxLenCounter
+RESV TailWag_CtlHold
+RESV TailWag_FreqLo
+RESV TailWag_FreqHi
 
 ; Shadow Mario Boss RAM
 CUSTOM_BOSS_START = RES_OFFSET
@@ -423,7 +426,7 @@ Right_Dir             = %00000001
 
 ;sound effects constants
 Sfx_SmallJump         = %10000000
-Sfx_Flagpole          = %01000000
+Sfx_TailWag           = %01000000
 Sfx_Fireball          = %00100000
 Sfx_PipeDown_Injury   = %00010000
 Sfx_EnemySmack        = %00001000

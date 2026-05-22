@@ -133,13 +133,90 @@ SwimStompEnvelopeData:
       .byte $9f, $9b, $98, $96, $95, $94, $92, $90
       .byte $90, $9a, $97, $95, $93, $92
 
-PlayFlagpoleSlide:
-       lda #$40               ;store length of flagpole sound
+; -----------------------------------------------------------------------------
+; SMB3 raccoon/tanooki tail-wag SFX
+;
+; Ported verbatim from SMB3 SndLev1_SuitLost_Cont2 prg028.asm 905-929 but
+; retargeted to Square 1, since this slot replaces the dead FlagpoleSlide SFX.
+;
+; Data byte encoding:
+;   $00     - terminator
+;   $01-$7F - note index ($7E is "rest")
+;   $80-$FF - CTL1 latch, does NOT consume a new note this frame
+; -----------------------------------------------------------------------------
+PlayTailWag:
+       lda #$00
        sta Squ1_SfxLenCounter
-       lda #$62               ;load part of reg contents for flagpole sound
-       jsr SetFreq_Squ1
-       ldx #$99               ;now load the rest
-       bne FPS2nd
+       lda #$90
+       sta TailWag_CtlHold
+       ; fall through into ContinueTailWag for the first frame
+
+ContinueTailWag:
+       inc Squ1_SfxLenCounter
+@fetch:
+       ldy Squ1_SfxLenCounter
+       lda SndLev1_DataLongWag-1,y
+       beq @streamEnd
+       bpl @playNote
+       sta TailWag_CtlHold
+       inc Squ1_SfxLenCounter
+       bne @fetch
+
+@playNote:
+       tay
+       lda TailWag_CtlHold
+       sta SND_SQUARE1_REG
+       lda #$7F
+       sta SND_SQUARE1_REG+1
+       tya
+       jmp TailWag_PokeNote
+
+@streamEnd:
+       lda #$00
+       sta Squ1_SfxLenCounter
+       sta Square1SoundBuffer
+       rts
+
+; Ported from SMB3 in PRG31 $E7C1
+TailWag_PokeNote:
+       cmp #$7E
+       beq @rest
+       pha
+       ldx #$01
+@octLoop:
+       inx
+       sec
+       sbc #24
+       bpl @octLoop
+       clc
+       adc #24
+       tay
+       lda Square1_Table_Notes,y
+       sta TailWag_FreqLo
+       lda Square1_Table_Notes+1,y
+       sta TailWag_FreqHi
+@octShift:
+       lsr TailWag_FreqHi
+       ror TailWag_FreqLo
+       dex
+       bne @octShift
+       pla
+       cmp #56
+       bcc @noAdjust
+         dec TailWag_FreqLo
+@noAdjust:
+       lda TailWag_FreqLo
+       sta SND_SQUARE1_REG+2
+       lda TailWag_FreqHi
+       ora #%00001000
+       sta SND_SQUARE1_REG+3
+@rest:
+       rts
+
+; 12-note frequency LUT, copied verbatim from SMB3
+Square1_Table_Notes:
+       .word $1AB8, $1938, $17CC, $1678, $1534, $1404
+       .word $12E4, $11D4, $10D4, $0FE0, $0EFC, $0E24
 
 PlaySmallJump:
        lda #$26               ;branch here for small mario jumping sound
@@ -212,8 +289,8 @@ Square1SfxHandler:
        bcs PlayFireballThrow   ;fireball throw
        lsr Square1SoundQueue
        bcc +
-        jmp PlayFlagpoleSlide  ;slide flagpole
-       + 
+        jmp PlayTailWag        ;tanooki tail-wag (was flagpole-slide)
+       +
 
 CheckSfx1Buffer:
        lda Square1SoundBuffer   ;check for sfx in buffer 
@@ -232,7 +309,9 @@ CheckSfx1Buffer:
        lsr
        bcs ContinueBumpThrow    ;fireball throw
        lsr
-       bcs DecrementSfx1Length  ;slide flagpole
+       bcc +
+        jmp ContinueTailWag     ;tanooki tail-wag (was flagpole-slide)
+       +
 ExS1H: rts
 
 PlaySwimStomp:
