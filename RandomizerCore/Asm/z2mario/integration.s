@@ -282,6 +282,9 @@ PatchLinkDrawRoutine:
 
   lda #18
   sta tail_swing_timer
+  lda Square1SoundQueue       ; queue the tail-wag SFX on the same edge that started the swing
+  ora #Sfx_TailWag
+  sta Square1SoundQueue
 @done:
   rts
 .endproc
