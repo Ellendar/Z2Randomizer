@@ -1402,6 +1402,7 @@ OffscrJoypadBitsData:
   .byte $01, $02
 
 ; ------------------------------------------------------------
+.segment "PRG0", "PRG7"
 .reloc
 ProcessPlayerAction:
   lda Player_State      ;get player's state
@@ -1581,6 +1582,7 @@ SzOfs:
 ExPlyrAt:
   rts                         ;leave
 
+.segment "PRG0"
 ;-------------------------------------------------------------------------------------
 ;$00 - used for downward force
 ;$01 - used for upward force

@@ -201,7 +201,7 @@ RESV mapMarioPrevDirection
 ; MARIO related values that are not directly mapped to vanilla z2 object values
 
 RESV JustThrownHammer
-; RESV ObjectOffset
+RESV tail_swing_timer
 ObjectOffset = $10
 RESV FBall_OffscreenBits
 RESV AltEntranceControl
