@@ -795,7 +795,9 @@ SetTailSwingHitbox:
 @faceLeft:
     lda $CC
     sec
-    sbc #14 ; 8 is the "correct" hitbox as well, but LENIENT
+    sbc #10 ; 0 is the "correct" hitbox I THINK?
+    ; these numbers were tested so that mario breaks the brick next to him with his
+    ; tail, and not the brick past the brick next to him.
 @writeX:
   sta HitboxXCoord
 @disable:
@@ -820,21 +822,19 @@ bank7_CollisionTest    = $E9F9
   jsr CheckHammerHitboxes
 .reloc
 CheckHammerHitboxes:
+  ; Check if the stab is hitting a brick before hammers
   lda #0
   sta $0b
-  bit Fireball_State+1
-  bvc +
-    ldy #1
-    jsr LoadProjectileCollisionBox
-    lda R0
-    sta HitboxXCoord
-    lda R1
-    sta HitboxYCoord
-    jsr BreakBlockCollisionCheck
-  +
-  bit Fireball_State
-  bvc +
-    ldy #0
+  ; Run the check for tail hitbox (also stomp someday??)
+  jsr BreakBlockCollisionCheck
+  ; check one hammer every other frame instead of both.
+  ; its good enough in practice
+  lda FrameCounter
+  and #1
+  tay
+  lda Fireball_State,y
+  and #$40
+  beq +
     jsr LoadProjectileCollisionBox
     lda R0
     sta HitboxXCoord
