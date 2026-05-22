@@ -250,6 +250,7 @@ RESV Player_Pos_ForScroll
 RESV Player_X_Scroll
 RESV Player_X_MoveForce
 RESV PlayerStandingMetatile ; added to keep this for door checks and other metatiles
+RESV PlayerIsDownstabbing ; Simplify downstab checks by just storing if we set the hitbox
 
 ; Non-timer timer.
 RESV FireballThrowingTimer
