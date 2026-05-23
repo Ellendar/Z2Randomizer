@@ -47,14 +47,14 @@
   lda GameEngineSubroutine  ;run routine based on number (a few of these routines are
   jsr JumpEngine            ;merely placeholders as conditions for other routines)
 
-  .word Entrance_GameTimerSetup
-  .word Vine_AutoClimb
-  .word SideExitPipeEntry
-  .word VerticalPipeEntry
-  .word FlagpoleSlide
-  .word PlayerEndLevel
+  .word $0000 ; Entrance_GameTimerSetup
+  .word $0000 ; Vine_AutoClimb
+  .word $0000 ; SideExitPipeEntry
+  .word $0000 ; VerticalPipeEntry
+  .word $0000 ; FlagpoleSlide
+  .word $0000 ; PlayerEndLevel
   .word PlayerLoseLife
-  .word PlayerEntrance
+  .word $0000 ; PlayerEntrance
   .word PlayerCtrlRoutine
   .word PlayerChangeSize
   .word PlayerInjuryBlink
@@ -63,82 +63,82 @@
 .endproc
 
 
-;-------------------------------------------------------------------------------------
-; ; .reloc
-PlayerEntrance:
-  lda AltEntranceControl    ;check for mode of alternate entry
-  cmp #$02
-  beq EntrMode2             ;if found, branch to enter from pipe or with vine
-  lda #$00
-  ldy Player_Y_Position     ;if vertical position above a certain
-  cpy #$30                  ;point, nullify controller bits and continue
-  bcc AutoControlPlayer     ;with player movement code, do not return
-    lda PlayerEntranceCtrl    ;check player entry bits from header
-    cmp #$06
-    beq ChkBehPipe            ;if set to 6 or 7, execute pipe intro code
-    cmp #$07                  ;otherwise branch to normal entry
-    bne PlayerRdy
-ChkBehPipe:
-  ; lda InPipeTransition
-  lda Player_SprAttrib        ;check for sprite attributes
-  bne IntroEntr             ;branch if found
-    lda #$01
-    jmp AutoControlPlayer     ;force player to walk to the right
-IntroEntr:
-  jsr EnterSidePipe         ;execute sub to move player to the right
-  dec ChangeAreaTimer       ;decrement timer for change of area
-  bne ExitEntr              ;branch to exit if not yet expired
-    ; inc DisableIntermediate   ;set flag to skip world and lives display
-    ; jmp NextArea              ;jump to increment to next area and set modes
-EntrMode2:
-  lda JoypadOverride        ;if controller override bits set here,
-  bne VineEntr              ;branch to enter with vine
-    ; lda #3
-    ; jsr SetupPipeTransitionOverlay
-    lda #$ff                  ;otherwise, set value here then execute sub
-    jsr MovePlayerYAxis       ;to move player upwards
-    lda Player_Y_Position     ;check to see if player is at a specific coordinate
-    cmp #$91                  ;if player risen to a certain point (this requires pipes
-    bcs @ContinuePipeEntry    ;to be at specific height to look/function right) branch
-    ; .import FRAME_LAG_COUNT
-      ; lda #FRAME_LAG_COUNT
-      ; lda #0
-      ; sta PipeExitTimer
-      ; jsr SetupPipeTransitionOverlay
-      jmp PlayerRdy
-@ContinuePipeEntry:
-    rts                       ;to the last part, otherwise leave
-VineEntr:
-  lda Vine_Height
-  cmp #$60                  ;check vine height
-  bne ExitEntr              ;if vine not yet reached maximum height, branch to leave
-  lda Player_Y_Position     ;get player's vertical coordinate
-  cmp #$99                  ;check player's vertical coordinate against preset value
-  ldy #$00                  ;load default values to be written to
-  lda #$01                  ;this value moves player to the right off the vine
-  bcc OffVine               ;if vertical coordinate < preset value, use defaults
-  lda #$03
-  sta Player_State          ;otherwise set player state to climbing
-  iny                       ;increment value in Y
-  ; lda #$08                  ;set block in block buffer to cover hole, then
-  ; sta Block_Buffer_1+$b4    ;use same value to force player to climb
-OffVine:
-  sty DisableCollisionDet   ;set collision detection disable flag
-  jsr AutoControlPlayer     ;use contents of A to move player up or right, execute sub
-  lda Player_X_Position
-  cmp #$48                  ;check player's horizontal position
-  bcc ExitEntr              ;if not far enough to the right, branch to leave
-PlayerRdy:
-  lda #$08                  ;set routine to be executed by game engine next frame
-  sta GameEngineSubroutine
-  lda #$01                  ;set to face player to the right
-  sta PlayerFacingDir
-  lsr                       ;init A
-  sta AltEntranceControl    ;init mode of entry
-  sta DisableCollisionDet   ;init collision detection disable flag
-  sta JoypadOverride        ;nullify controller override bits
-ExitEntr:
-  rts                       ;leave!
+; ;-------------------------------------------------------------------------------------
+; ; ; .reloc
+; PlayerEntrance:
+;   lda AltEntranceControl    ;check for mode of alternate entry
+;   cmp #$02
+;   beq EntrMode2             ;if found, branch to enter from pipe or with vine
+;   lda #$00
+;   ldy Player_Y_Position     ;if vertical position above a certain
+;   cpy #$30                  ;point, nullify controller bits and continue
+;   bcc AutoControlPlayer     ;with player movement code, do not return
+;     lda PlayerEntranceCtrl    ;check player entry bits from header
+;     cmp #$06
+;     beq ChkBehPipe            ;if set to 6 or 7, execute pipe intro code
+;     cmp #$07                  ;otherwise branch to normal entry
+;     bne PlayerRdy
+; ChkBehPipe:
+;   ; lda InPipeTransition
+;   lda Player_SprAttrib        ;check for sprite attributes
+;   bne IntroEntr             ;branch if found
+;     lda #$01
+;     jmp AutoControlPlayer     ;force player to walk to the right
+; IntroEntr:
+;   jsr EnterSidePipe         ;execute sub to move player to the right
+;   dec ChangeAreaTimer       ;decrement timer for change of area
+;   bne ExitEntr              ;branch to exit if not yet expired
+;     ; inc DisableIntermediate   ;set flag to skip world and lives display
+;     ; jmp NextArea              ;jump to increment to next area and set modes
+; EntrMode2:
+;   lda JoypadOverride        ;if controller override bits set here,
+;   bne VineEntr              ;branch to enter with vine
+;     ; lda #3
+;     ; jsr SetupPipeTransitionOverlay
+;     lda #$ff                  ;otherwise, set value here then execute sub
+;     jsr MovePlayerYAxis       ;to move player upwards
+;     lda Player_Y_Position     ;check to see if player is at a specific coordinate
+;     cmp #$91                  ;if player risen to a certain point (this requires pipes
+;     bcs @ContinuePipeEntry    ;to be at specific height to look/function right) branch
+;     ; .import FRAME_LAG_COUNT
+;       ; lda #FRAME_LAG_COUNT
+;       ; lda #0
+;       ; sta PipeExitTimer
+;       ; jsr SetupPipeTransitionOverlay
+;       jmp PlayerRdy
+; @ContinuePipeEntry:
+;     rts                       ;to the last part, otherwise leave
+; VineEntr:
+;   lda Vine_Height
+;   cmp #$60                  ;check vine height
+;   bne ExitEntr              ;if vine not yet reached maximum height, branch to leave
+;   lda Player_Y_Position     ;get player's vertical coordinate
+;   cmp #$99                  ;check player's vertical coordinate against preset value
+;   ldy #$00                  ;load default values to be written to
+;   lda #$01                  ;this value moves player to the right off the vine
+;   bcc OffVine               ;if vertical coordinate < preset value, use defaults
+;   lda #$03
+;   sta Player_State          ;otherwise set player state to climbing
+;   iny                       ;increment value in Y
+;   ; lda #$08                  ;set block in block buffer to cover hole, then
+;   ; sta Block_Buffer_1+$b4    ;use same value to force player to climb
+; OffVine:
+;   sty DisableCollisionDet   ;set collision detection disable flag
+;   jsr AutoControlPlayer     ;use contents of A to move player up or right, execute sub
+;   lda Player_X_Position
+;   cmp #$48                  ;check player's horizontal position
+;   bcc ExitEntr              ;if not far enough to the right, branch to leave
+; PlayerRdy:
+;   lda #$08                  ;set routine to be executed by game engine next frame
+;   sta GameEngineSubroutine
+;   lda #$01                  ;set to face player to the right
+;   sta PlayerFacingDir
+;   lsr                       ;init A
+;   sta AltEntranceControl    ;init mode of entry
+;   sta DisableCollisionDet   ;init collision detection disable flag
+;   sta JoypadOverride        ;nullify controller override bits
+; ExitEntr:
+;   rts                       ;leave!
 
 
 ;-------------------------------------------------------------------------------------
@@ -292,97 +292,6 @@ PlayerSubs:
 ;   inc AltEntranceControl  ;set mode of entry to 3
   rts
 
-;-------------------------------------------------------------------------------------
-; .reloc
-Vine_AutoClimb:
-  lda Player_Y_HighPos   ;check to see whether player reached position
-  bne AutoClimb          ;above the status bar yet and if so, set modes
-  lda Player_Y_Position
-  cmp #$e4
-  bcc SetEntr
-AutoClimb:
-  lda #%00001000         ;set controller bits override to up
-  sta JoypadOverride
-  ldy #$03               ;set player state to climbing
-  sty Player_State
-  jmp AutoControlPlayer
-SetEntr:
-  lda #$02               ;set starting position to override
-  sta AltEntranceControl
-  jmp ChgAreaMode        ;set modes
-
-;-------------------------------------------------------------------------------------
-; .reloc
-
-VerticalPipeEntry:
-  lda #$01             ;set 1 as movement amount
-  jsr MovePlayerYAxis  ;do sub to move player downwards
-  ; jsr ScrollHandler    ;do sub to scroll screen with saved force if necessary
-  ldy #$00             ;load default mode of entry
-  lda WarpZoneControl  ;check warp zone control variable/flag
-  bne ChgAreaPipe      ;if set, branch to use mode 0
-  iny
-  lda AreaType         ;check for castle level type
-  cmp #$03
-  bne ChgAreaPipe      ;if not castle type level, use mode 1
-  iny
-  jmp ChgAreaPipe      ;otherwise use mode 2
-
-MovePlayerYAxis:
-  clc
-  adc Player_Y_Position ;add contents of A to player position
-  sta Player_Y_Position
-  rts
-
-;-------------------------------------------------------------------------------------
-; .reloc
-
-SideExitPipeEntry:
-             jsr EnterSidePipe         ;execute sub to move player to the right
-             ldy #$02
-ChgAreaPipe: dec ChangeAreaTimer       ;decrement timer for change of area
-             bne ExitCAPipe
-             sty AltEntranceControl    ;when timer expires set mode of alternate entry
-ChgAreaMode:
-  ; inc DisableScreenFlag     ;set flag to disable screen output
-            ;  lda #$00
-            ;  sta OperMode_Task         ;set secondary mode of operation
-            ;  sta Sprite0HitDetectFlag  ;disable sprite 0 check
-            ;  jsr SetupPipeTransitionOverlay
-            ;  lda #0 ; make sure we have the value 0 set since its used right after
-ExitCAPipe:  rts                       ;leave
-
-EnterSidePipe:
-  lda #$08               ;set player's horizontal speed
-  sta Player_X_Speed
-;   lda InPipeTransition
-;   bne :+
-;     lda #2
-;     jsr SetupPipeTransitionOverlay
-; :
-  ldy #$01               ;set controller right button by default
-  lda Player_X_Position  ;mask out higher nybble of player's
-  and #%00001111         ;horizontal position
-  bne RightPipe
-  sta Player_X_Speed     ;if lower nybble = 0, set as horizontal speed
-  tay                    ;and nullify controller bit override here
-RightPipe:
-  tya                    ;use contents of Y to
-  jmp AutoControlPlayer  ;execute player control routine with ctrl bits nulled
-
-;-------------------------------------------------------------------------------------
-; .reloc
-;page numbers are in order from -1 to -4
-; HalfwayPageNybbles:
-;   .byte $56, $40
-;   .byte $65, $70
-;   .byte $66, $40
-;   .byte $66, $40
-;   .byte $66, $40
-;   .byte $66, $60
-;   .byte $65, $70
-;   .byte $00, $00
-
 .proc PlayerLoseLife
   ; inc DisableScreenFlag    ;disable screen and sprite 0 check
   ; lda #$00
@@ -427,87 +336,6 @@ RightPipe:
   rts
 ;   jmp RunGameOver::ContinueGame         ;continue the game
 .endproc
-
-; .reloc
-
-PlayerStarting_X_Pos:
-  .byte $28, $18
-  .byte $38, $28
-
-AltYPosOffset:
-  .byte $08, $00
-
-PlayerStarting_Y_Pos:
-  .byte $00, $20, $b0, $50, $00, $00, $b0, $b0
-  .byte $f0
-
-PlayerBGPriorityData:
-  .byte $00, $20, $00, $00, $00, $00, $00, $00
-
-GameTimerData:
-  .byte $20 ;dummy byte, used as part of bg priority data
-  .byte $04, $03, $02
-
-Entrance_GameTimerSetup:
-          lda ScreenLeft_PageLoc      ;set current page for area objects
-          sta Player_PageLoc          ;as page location for player
-          lda #$28                    ;store value here
-          sta VerticalForceDown       ;for fractional movement downwards if necessary
-          lda #$01                    ;set high byte of player position and
-          sta PlayerFacingDir         ;set facing direction so that player faces right
-          sta Player_Y_HighPos
-          lda #$00                    ;set player state to on the ground by default
-          sta Player_State
-          sta Player_CollisionBits    ;initialize player's collision bits
-          ldy #$00                    ;initialize halfway page
-          sty HalfwayPage
-          lda AreaType                ;check area type
-          bne ChkStPos                ;if water type, set swimming flag, otherwise do not set
-          iny
-ChkStPos: sty SwimmingFlag
-          ldx PlayerEntranceCtrl      ;get starting position loaded from header
-          ldy AltEntranceControl      ;check alternate mode of entry flag for 0 or 1
-          beq SetStPos
-          cpy #$01
-          beq SetStPos
-          ldx AltYPosOffset-2,y       ;if not 0 or 1, override $0710 with new offset in X
-SetStPos: lda PlayerStarting_X_Pos,y  ;load appropriate horizontal position
-          sta Player_X_Position       ;and vertical positions for the player, using
-          lda PlayerStarting_Y_Pos,x  ;AltEntranceControl as offset for horizontal and either $0710
-          sta Player_Y_Position       ;or value that overwrote $0710 as offset for vertical
-          lda PlayerBGPriorityData,x
-          sta Player_SprAttrib        ;set player sprite attributes using offset in X
-          jsr GetPlayerColors         ;get appropriate player palette
-          ; ldy GameTimerSetting        ;get timer control value from header
-          ; beq ChkOverR                ;if set to zero, branch (do not use dummy byte for this)
-          ; lda FetchNewGameTimerFlag   ;do we need to set the game timer? if not, use
-          ; beq ChkOverR                ;old game timer setting
-          ; lda GameTimerData,y         ;if game timer is set and game timer flag is also set,
-          ; sta GameTimerDisplay        ;use value of game timer control for first digit of game timer
-          ; lda #$01
-          ; sta GameTimerDisplay+2      ;set last digit of game timer to 1
-          ; lsr
-          ; sta GameTimerDisplay+1      ;set second digit of game timer
-          ; sta FetchNewGameTimerFlag   ;clear flag for game timer reset
-          ; sta StarInvincibleTimer     ;clear star mario timer
-ChkOverR: ldy JoypadOverride          ;if controller bits not set, branch to skip this part
-          beq ChkSwimE
-          ; lda #$03                    ;set player state to climbing
-          ; sta Player_State
-          ; ldx #$00                    ;set offset for first slot, for block object
-          ; jsr InitBlock_XY_Pos
-          ; lda #$f0                    ;set vertical coordinate for block object
-          ; sta Block_Y_Position
-          ; ldx #$05                    ;set offset in X for last enemy object buffer slot
-          ; ldy #$00                    ;set offset in Y for object coordinates used earlier
-          ; farcall Setup_Vine              ;do a sub to grow vine
-ChkSwimE: ldy AreaType                ;if level not water-type,
-          bne SetPESub                ;skip this subroutine
-          ; farcall SetupBubble             ;otherwise, execute sub to set up air bubbles
-SetPESub: lda #$07                    ;set to run player entrance subroutine
-          sta GameEngineSubroutine    ;on the next frame of game engine
-          rts
-
 
 ;-------------------------------------------------------------------------------------
 ;$00 - used to store player's vertical offscreen bits
@@ -774,92 +602,6 @@ ResetPalStar:
   and #%11111100        ;mask out palette bits to force palette 0
   sta Player_SprAttrib  ;store as new player attributes
   rts                   ;and leave
-
-;-------------------------------------------------------------------------------------
-.reloc
-FlagpoleSlide:
-  ;  lda Enemy_ID+5           ;check special use enemy slot
-  ;  cmp #FlagpoleFlagObject  ;for flagpole flag object
-  ;  bne NoFPObj              ;if not found, branch to something residual
-  ; lda FlagpoleSoundQueue   ;load flagpole sound
-  ; sta Square1SoundQueue    ;into square 1's sfx queue
-  ; lda #$00
-  ; sta FlagpoleSoundQueue   ;init flagpole sound queue
-  ldy Player_Y_Position
-  cpy #$9e                 ;check to see if player has slid down
-  bcs SlidePlayer          ;far enough, and if so, branch with no controller bits set
-  lda #$04                 ;otherwise force player to climb down (to slide)
-SlidePlayer:
-  jmp AutoControlPlayer    ;jump to player control routine
-; NoFPObj:     inc GameEngineSubroutine ;increment to next routine (this may
-;              rts                      ;be residual code)
-
-;-------------------------------------------------------------------------------------
-.reloc
-; Hidden1UpCoinAmts:
-;   .byte $15, $23, $16, $1b, $17, $18, $23, $63
-
-PlayerEndLevel:
-  lda #$01                  ;force player to walk to the right
-  jsr AutoControlPlayer
-  lda Player_Y_Position     ;check player's vertical position
-  cmp #$ae
-  bcc ChkStop               ;if player is not yet off the flagpole, skip this part
-; .if ::USE_SMB2J_FEATURES
-;   lda #$00
-;   sta ScrollLock            ;reactivate scroll
-;   lda FlagpoleMusicFlag     ;check flag to see if music was already queued
-;   bne ChkStop               ;if so, skip this
-;   lda #EndOfLevelMusic
-;   sta EventMusicQueue       ;load win level music in event music queue
-;   inc FlagpoleMusicFlag     ;set flag to keep music from getting queued more than once
-; .else
-  lda ScrollLock            ;if scroll lock not set, branch ahead to next part
-  beq ChkStop               ;because we only need to do this part once
-  ; lda #EndOfLevelMusic
-  ; sta EventMusicQueue       ;load win level music in event music queue
-  lda #$00
-  sta ScrollLock            ;turn off scroll lock to skip this part later
-; .endif
-ChkStop:
-  ; lda Player_CollisionBits  ;get player collision bits
-  ; lsr                       ;check for d0 set
-  ; bcs RdyNextA              ;if d0 set, skip to next part
-;   lda StarFlagTaskControl   ;if star flag task control already set,
-;   bne InCastle              ;go ahead with the rest of the code
-;   inc StarFlagTaskControl   ;otherwise set task control now (this gets ball rolling!)
-; InCastle:
-;   lda #%00100000            ;set player's background priority bit to
-;   sta Player_SprAttrib      ;give illusion of being inside the castle
-; RdyNextA:
-;   lda StarFlagTaskControl
-;   cmp #$05                  ;if star flag task control not yet set
-;   bne ExitNA                ;beyond last valid task number, branch to leave
-; PrcNextA:
-;   inc LevelNumber           ;increment level number used for game logic
-;   lda LevelNumber
-;   cmp #$03                  ;check to see if we have yet reached level -4
-;   bne NextArea              ;and skip this last part here if not
-;   ldy WorldNumber           ;get world number as offset
-;   lda CoinTallyFor1Ups      ;check third area coin tally for bonus 1-ups
-;   cmp Hidden1UpCoinAmts,y   ;against minimum value, if player has not collected
-;   bcc NextArea              ;at least this number of coins, leave flag clear
-;   inc Hidden1UpFlag         ;otherwise set hidden 1-up box control flag
-; NextArea:
-
-  ; jroweboy added:
-  ; disable the screen since loading a new area pointer will change CHR banks
-  ; inc DisableScreenFlag
-
-  ; inc AreaNumber            ;increment area number used for address loader
-  ; jsr LoadAreaPointer       ;get new level pointer
-  ; inc FetchNewGameTimerFlag ;set flag to load new game timer
-  ; jsr ChgAreaMode           ;do sub to set secondary mode, disable screen and sprite 0
-  ; sta HalfwayPage           ;reset halfway page to 0 (beginning)
-  ; lda #Silence
-  ; sta EventMusicQueue       ;silence music and leave
-ExitNA:
-  rts
 
 ;-------------------------------------------------------------------------------------
 .reloc
