@@ -335,9 +335,9 @@ public class Hyrule
                 OverworldEnemyShuffler.Shuffle(worlds, assembler, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
             }
 
-            if (props.CombineFire)
+            if (props.LinkedFireSpell != null)
             {
-                ROMData.CombineFireSpell(assembler, spellListOrder, r);
+                ROMData.CombineFireSpell(assembler, props.LinkedFireSpell.Value, spellListOrder);
             }
 
             if (props.StartsWithCollectable(westHyrule.ruto.Town?.GetWizard()?.Collectable))
@@ -2302,7 +2302,7 @@ public class Hyrule
 
         rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.item_sprites.chr"));
         //Linked fire/dash custom sprites replace fire's sprite. This lets us free up c7 for future use.
-        if(props.CombineFire)
+        if(props.LinkedFireSpell != null)
         {
             rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.linkedFire.chr"));
         }
@@ -2661,7 +2661,7 @@ public class Hyrule
         //ROMData.UpdateWizardText(WizardCollectables);
 
         // Add marker for linked fire. Do this before old spell name shuffle so this gets shuffled in there too
-        if (props.CombineFire)
+        if (props.LinkedFireSpell != null)
         {
             ROMData.Put(0x1c72, [..ROM.StringToZ2Bytes("FIRE"), 0xFC]);
         }
