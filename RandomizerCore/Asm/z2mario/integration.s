@@ -621,8 +621,8 @@ SetupMarioControl:
   sta $69DE ; This is the color index 3 for the firey palette
   lda #8
   sta GameEngineSubroutine
-  lda #1 ; Ground area type
-  sta AreaType
+  ; lda #1 ; Ground area type
+  ; sta AreaType
   lda #$28                    ;store value here
   sta VerticalForceDown       ;for fractional movement downwards if necessary
   jmp UpdatePlayerPalette
@@ -956,7 +956,12 @@ PatchFireballHitcheck:
     ldy $11
     lda Fireball_State,y
     and #%01000000
-    bne @NoCollision   ; hammer: pass through
+    beq @WasFireball   ; bit 6 clear = fireball
+      ; Hammer landed, so mark this was a hammer so we prevent recoil later
+      lda #1
+      sta HammerHitFlag,x
+      jmp @NoCollision   ; hammer passes through: don't despawn it
+@WasFireball:
       lda #%10000000
       sta Fireball_State,y
 @NoCollision:
@@ -1267,16 +1272,32 @@ SkipRecoilForStabs:
 .org $E66A
   rts
 
+; Clear out the hammerhitflag when the enemy damage timer ends
+.org $EF16
+  jsr DecHitStateAndExpireHammerFlag
+.reloc
+DecHitStateAndExpireHammerFlag:
+  dec $040E,x
+  bne +
+    lda #0
+    sta HammerHitFlag,x ; flash just ended
+  +
+  rts
+
 .org $e395
   jsr SkipEnemyRecoilIfThrowingHammer
 .reloc
 SkipEnemyRecoilIfThrowingHammer:
-  ; if we hit an enemy through a hammer, then we don't want to set the recoil
+  ; Suppress recoil for any enemy that was hit by a hammer, we set the flag earlier
+  ; if it was a hammer that caused this damage
   ldy ProjectileProcessing
-  beq +
-    lda #0
-  +
-  sta $043e,x ; remove the recoil if it was hit by a hammer
+  bne @kill
+  ldy HammerHitFlag,x
+  beq @keep
+@kill:
+  lda #0
+@keep:
+  sta $043e,x
   rts
 
 ; Make mario bounce off armored enemies

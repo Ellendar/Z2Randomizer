@@ -151,8 +151,8 @@ PlayerCtrlRoutine:
   ; prevent moving on death
   cmp #$0b
   beq SizeChk
-    lda AreaType                ;are we in a water type area?
-    bne SaveJoyp                ;if not, branch
+    ; lda AreaType                ;are we in a water type area?
+    ; bne SaveJoyp                ;if not, branch
       ldy Player_Y_HighPos
       dey                         ;if not in vertical area between
       bne DisJoyp                 ;status bar and bottom, branch
@@ -930,8 +930,8 @@ X_Physics: ldy #$00
            bcs GetXPhy                ;if =>$19 branch here
            bcc ChkRFast               ;if not branch elsewhere
 ProcPRun:  iny                        ;if mario on the ground, increment Y
-           lda AreaType               ;check area type
-           beq ChkRFast               ;if water type, branch
+          ;  lda AreaType               ;check area type
+          ;  beq ChkRFast               ;if water type, branch
            dey                        ;decrement Y by default for non-water type area
            lda Left_Right_Buttons     ;get left/right controller bits
            cmp Player_MovingDir       ;check against moving direction
@@ -1709,8 +1709,8 @@ PlayerBGUpperExtent:
   .byte $20, $10
 
 PlayerBGCollision:
-  lda DisableCollisionDet   ;if collision detection disabled flag set,
-  bne ExPBGCol              ;branch to leave
+  ; lda DisableCollisionDet   ;if collision detection disabled flag set,
+  ; bne ExPBGCol              ;branch to leave
   ; clear the player metatile we are standing on
   sta PlayerStandingMetatile
   lda GameEngineSubroutine
@@ -1785,10 +1785,10 @@ HeadChk:
           ; we can't check solid type here since its banked out
           ; jsr CheckForSolidMTiles     ;check to see what player's head bumped on
           bcs SolidOrClimb            ;if player collided with solid metatile, branch
-          ldy AreaType                ;otherwise check area type
-          beq NYSpd                   ;if water level, branch ahead
-          ldy BlockBounceTimer        ;if block bounce timer not expired,
-          bne NYSpd                   ;branch ahead, do not process collision
+          ; ldy AreaType                ;otherwise check area type
+          ; beq NYSpd                   ;if water level, branch ahead
+          ; ldy BlockBounceTimer        ;if block bounce timer not expired,
+          ; bne NYSpd                   ;branch ahead, do not process collision
           jsr PlayerHeadCollision     ;otherwise do a sub to process collision
           jmp DoFootCheck             ;jump ahead to skip these other parts
 
