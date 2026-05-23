@@ -13,10 +13,6 @@ FREE "PRG0" [$92BF, $962D)
 ; Clear out the old flame / sword projectile code
 FREE "PRG0" [$9815, $9924)
 
-; .segment "PRG0"
-; .org (($10ea - $10) .mod $4000) + $8000
-; .byte $17
-
 .segment "PRG7"
 SpellCastingRoutine = $8DC3 ; Link Main
 .org $D3EC ; patches the main sideview routine right before checking marios code
@@ -126,6 +122,22 @@ PatchLinkDeathSprite:
 .import SwapCHR
   jsr SwapCHR
   jmp BankSwitchMarioCHR
+
+.org $8DDC
+  jsr PreventTanookiSpellWhenSmallMario
+.reloc
+PreventTanookiSpellWhenSmallMario:
+  ldy $0749 ; original instruction we replaced
+  cpy #1
+  bne @allow
+  lda PlayerSize
+  beq @allow
+  ; double return if we are small to disallow casting jump while small
+  pla
+  pla
+  jmp $8E1F
+@allow:
+  rts
 
 .org $8fe3
   jmp *+3 ; Skip duplicate draw???
@@ -534,6 +546,8 @@ FacingRight:
 .reloc
 OverworldLateInit:
   sta $0736 ; Sets game mode
+  lda #$18 ; player palette
+  sta $69de
   jmp UpdatePlayerPalette
 
 .org $8D61
@@ -565,6 +579,13 @@ UpdatePlayerPalette:
   clc
   adc #6
   sta $301
+  ; Check if we are still using shield.
+  lda $69de
+  cmp #$18 ; Check if the current "user" color is the same as the original color
+  beq +
+    ; if not, then replace it (this is the right address trust me)
+    sta $301,y
++
   pla
   tax
   rts
@@ -585,7 +606,7 @@ DontClearMagicState:
   and #$12
   sta $76f
   tya
-  rts
+  jmp UpdatePlayerPalette
 
 ; Don't clear out the A_B_Buttons in loading
 ; keeps mario from firing a fireball on screen load
@@ -597,14 +618,14 @@ DontClearMagicState:
   jsr SetupMarioControl
 .reloc
 SetupMarioControl:
-;  sta $69DE ; This is the color index 3 for the firey palette
+  sta $69DE ; This is the color index 3 for the firey palette
   lda #8
   sta GameEngineSubroutine
   lda #1 ; Ground area type
   sta AreaType
   lda #$28                    ;store value here
   sta VerticalForceDown       ;for fractional movement downwards if necessary
-  rts
+  jmp UpdatePlayerPalette
 
 
 ; Patch link's standard routine
@@ -1118,9 +1139,8 @@ UPDATE_BYTE $16 @ $2a0a
 UPDATE_BYTE $27 @ $2a10
 UPDATE_BYTE $18 @ $2a16
 
-
 ; regular palette color location
-UPDATE_BYTE $18 $10ea
+UPDATE_BYTE $18 @ $10ea
 ; shield spell color location
 UPDATE_BYTE $02 @ $0e9e
 
@@ -1217,12 +1237,21 @@ ElevatorMakeMarioStateStanding:
   sta Player_State
   rts
 
+SetObjectRecoil = $e371
 
 ; Disable vanilla recoil when jumping off enemies
 .org $e747
-  jmp *+3 ; skip setting recoil for stabs
-
-SetLinkRecoil = $e371
+  jsr SkipRecoilForStabs ; skip setting recoil for stabs
+.reloc
+SkipRecoilForStabs:
+  jsr CheckForDownstab
+  bcs +
+    lda ProjectileProcessing
+    bne +
+      ; not stabbing or tossing a hammer so add recoil to the current object
+      jmp SetObjectRecoil
+  +
+  rts
 
 
 ; Make mario bounce off armored enemies
@@ -1238,16 +1267,29 @@ SetLinkRecoil = $e371
 .org $E66A
   rts
 
+.org $e395
+  jsr SkipEnemyRecoilIfThrowingHammer
+.reloc
+SkipEnemyRecoilIfThrowingHammer:
+  ; if we hit an enemy through a hammer, then we don't want to set the recoil
+  ldy ProjectileProcessing
+  beq +
+    lda #0
+  +
+  sta $043e,x ; remove the recoil if it was hit by a hammer
+  rts
+
 ; Make mario bounce off armored enemies
 .org $E714
-  jsr CheckForDownstab
-  bcc $E723
   lda ProjectileProcessing
   bne @skip
-    lda #$fc
+  jsr CheckForDownstab
+  bcc @skip
+    lda #$fc ; set player recoil to -4
     jsr SetDownstabStatTracking
 @skip:
 .assert * = $E723
+
 .reloc
 SetDownstabStatTracking:
   ;set recoil to -4 to bounce up

@@ -2417,8 +2417,13 @@ public class Hyrule
         {
             rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.dash.chr"));
         }
-        rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
-        rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+        if (!props.MarioMode)
+        {
+            // Mario mode sprites and colors are too weird to allow changing it atm 
+            // maybe after we fix the bugs with it...
+            rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
+            rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+        }
         // Z2Mario, when making the vanilla romhack, change this flag to false
         const bool isRandomized = false;
         if (isRandomized)

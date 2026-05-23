@@ -207,7 +207,7 @@ RESV TailWagCount
 ObjectOffset = $10
 RESV FBall_OffscreenBits
 RESV AltEntranceControl
-RESV PlayerEntranceCtrl
+; RESV PlayerEntranceCtrl
 RESV JoypadOverride
 RESV Vine_Height
 RESV Player_State
