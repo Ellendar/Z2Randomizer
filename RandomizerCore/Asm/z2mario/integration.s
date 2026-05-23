@@ -920,12 +920,20 @@ CheckHammerHitboxes:
   lda Fireball_State,y
   and #$40
   beq +
-    jsr LoadProjectileCollisionBox
-    lda R0
+    ; Inlined LoadProjectileCollisionBox ($E4BC) but with an offscreen guard
+    lda Fireball_X_Position,y
+    sec
+    sbc ScreenLeft_X_Pos
     sta HitboxXCoord
-    lda R1
-    sta HitboxYCoord
-    jmp BreakBlockCollisionCheck
+    lda Fireball_PageLoc,y
+    sbc ScreenLeft_PageLoc
+    bne +
+      ; Hammer is onscreen so load setup its Y coord for the attack too
+      lda Fireball_Y_Position,y
+      clc
+      adc #$04
+      sta HitboxYCoord
+      jmp BreakBlockCollisionCheck
   +
   rts
 
