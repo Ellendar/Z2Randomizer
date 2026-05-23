@@ -570,7 +570,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool shuffleXPStolenAmount = false;
 
     [Reactive]
-    private bool shuffleSwordImmunity = false;
+    private SwordImmunityOption swordImmunityOption = SwordImmunityOption.VANILLA;
 
     [Reactive]
     [DifficultyOnly]
@@ -1320,7 +1320,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.ShuffleBossHP = includeDifficulty ? shuffleBossHP : EnemyLifeOption.VANILLA;
         properties.ShuffleEnemyStealExp = shuffleXPStealers;
         properties.ShuffleStealExpAmt = shuffleXPStolenAmount;
-        properties.ShuffleSwordImmunity = shuffleSwordImmunity;
+        properties.SwordImmunityOption = swordImmunityOption;
         properties.ShuffleOverworldEnemies = shuffleOverworldEnemies ?? GetIndeterminateFlagValue(r);
         properties.ShufflePalaceEnemies = shufflePalaceEnemies ?? GetIndeterminateFlagValue(r);
         properties.MixLargeAndSmallEnemies = mixLargeAndSmallEnemies ?? GetIndeterminateFlagValue(r);

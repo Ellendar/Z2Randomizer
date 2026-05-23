@@ -195,6 +195,33 @@ public enum FireOption
     RANDOM
 }
 
+public static class FireOptionExtensions
+{
+    public static bool CanBeDash(this FireOption fireOption)
+    {
+        return fireOption switch
+        {
+            FireOption.NORMAL => false,
+            FireOption.PAIR_WITH_RANDOM => false,
+            FireOption.REPLACE_WITH_DASH => true,
+            FireOption.RANDOM => true,
+            _ => throw new NotImplementedException(),
+        };
+    }
+}
+
+[DefaultValue(VANILLA)]
+public enum SwordImmunityOption
+{
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Shuffle")]
+    SHUFFLE,
+    [Description("Shuffle/None if Fire unusable")]
+    SHUFFLE_CONDITIONAL,
+    [Description("None")]
+    NONE,
+}
 
 [DefaultValue(VANILLA)]
 public enum PalaceStyle
@@ -944,6 +971,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> EnemyLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>();
     public static IEnumerable<EnumDescription> BossLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>(i => i != EnemyLifeOption.WIDE);
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
+    public static IEnumerable<EnumDescription> SwordImmunityOptionList { get; } = ToDescriptions<SwordImmunityOption>();
     public static IEnumerable<EnumDescription> BossRoomMinDistanceOptions { get; } = ToDescriptions<BossRoomMinDistance>();
     public static IEnumerable<EnumDescription> PalaceLengthOptionList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();

@@ -592,10 +592,28 @@ public class StatRandomizer
         const int SWORD_IMMUNE_BIT = 0b00100000;
         const int XP_STEAL_BIT = 0b00010000;
 
-        if (props.ShuffleSwordImmunity)
+        switch (props.SwordImmunityOption)
         {
-            RandomizeBits(r, enemyBytes1, SWORD_IMMUNE_BIT);
+            case SwordImmunityOption.VANILLA:
+                break;
+            case SwordImmunityOption.SHUFFLE:
+                RandomizeBits(r, enemyBytes1, SWORD_IMMUNE_BIT);
+                break;
+            case SwordImmunityOption.SHUFFLE_CONDITIONAL:
+                if (props.ReplaceFireWithDash || props.LinkedFireSpell is Collectable.FAIRY_SPELL)
+                {
+                    SetBits(enemyBytes1, SWORD_IMMUNE_BIT, false);
+                }
+                else
+                {
+                    RandomizeBits(r, enemyBytes1, SWORD_IMMUNE_BIT);
+                }
+                break;
+            case SwordImmunityOption.NONE:
+                SetBits(enemyBytes1, SWORD_IMMUNE_BIT, false);
+                break;
         }
+
         if (props.ShuffleEnemyStealExp)
         {
             RandomizeBits(r, enemyBytes1, XP_STEAL_BIT);
@@ -704,6 +722,28 @@ public class StatRandomizer
         {
             int v = bytes[i] & notMask;
             if (r.NextDouble() <= fraction)
+            {
+                v |= mask;
+            }
+            bytes[i] = (byte)v;
+        }
+    }
+
+    /// <summary>
+    /// For a given set of bytes, set a masked portion of the value of each byte to bitValue (all 1's or all 0's).
+    /// </summary>
+    /// <param name="bytes">Bytes to modify.</param>
+    /// <param name="mask">What part of the byte value at each address contains the configuration bit(s) we care about.</param>
+    public static void SetBits(byte[] bytes, int mask, bool bitValue)
+    {
+        if (bytes.Length == 0) { return; }
+
+        int notMask = mask ^ 0xFF;
+
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            int v = bytes[i] & notMask;
+            if (bitValue)
             {
                 v |= mask;
             }
