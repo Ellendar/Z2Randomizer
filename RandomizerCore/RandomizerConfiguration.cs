@@ -75,6 +75,16 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         Collectable.THUNDER_SPELL
     ];
 
+    [IgnoreInFlags]
+    private readonly static Collectable[] POSSIBLE_LINKED_FIRE_SPELLS = [
+        Collectable.SHIELD_SPELL,
+        Collectable.JUMP_SPELL,
+        Collectable.LIFE_SPELL,
+        Collectable.FAIRY_SPELL,
+        Collectable.REFLECT_SPELL,
+        Collectable.SPELL_SPELL,
+        Collectable.THUNDER_SPELL
+    ];
 
     //Start Configuration
     [Reactive]
@@ -988,38 +998,43 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         } while (!properties.HasEnoughSpaceToAllocateItems());
 
         //Handle Fire
+        Collectable RollLinkedFireSpell()
+        {
+            return POSSIBLE_LINKED_FIRE_SPELLS[r.Next(POSSIBLE_LINKED_FIRE_SPELLS.Length)];
+        }
         switch (fireOption)
         {
             case FireOption.NORMAL:
-                properties.CombineFire = false;
+                properties.LinkedFireSpell = null;
                 properties.ReplaceFireWithDash = false;
                 break;
             case FireOption.PAIR_WITH_RANDOM:
-                properties.CombineFire = true;
+                properties.LinkedFireSpell = RollLinkedFireSpell();
                 properties.ReplaceFireWithDash = false;
                 break;
             case FireOption.REPLACE_WITH_DASH:
-                properties.CombineFire = false;
+                properties.LinkedFireSpell = null;
                 properties.ReplaceFireWithDash = true;
                 break;
             case FireOption.RANDOM:
                 switch (r.Next(3))
                 {
                     case 0:
-                        properties.CombineFire = false;
+                        properties.LinkedFireSpell = null;
                         properties.ReplaceFireWithDash = false;
                         break;
                     case 1:
-                        properties.CombineFire = true;
+                        properties.LinkedFireSpell = RollLinkedFireSpell();
                         properties.ReplaceFireWithDash = false;
                         break;
                     case 2:
-                        properties.CombineFire = false;
+                        properties.LinkedFireSpell = null;
                         properties.ReplaceFireWithDash = true;
                         break;
-
                 }
                 break;
+            default:
+                throw new Exception("Illegal Fire option");
         }
 
         ResolveStartingTechniques(properties, r, includeDifficulty);
@@ -1504,7 +1519,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         if (properties.ReplaceFireWithDash)
         {
-            properties.CombineFire = false;
+            Debug.Assert(properties.LinkedFireSpell == null);
         }
 
         //If spells are in the shuffle pool, shuffle spells means nothing, so diable it

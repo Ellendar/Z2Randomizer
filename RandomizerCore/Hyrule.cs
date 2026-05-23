@@ -356,7 +356,7 @@ public class Hyrule
                 OverworldEnemyShuffler.Shuffle(worlds, assembler, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
             }
 
-            if (props.CombineFire)
+            if (props.LinkedFireSpell != null)
             {
                 List<Collectable>? customSpellOrder = props.IncludeSpellsInShuffle
                     ? null
@@ -365,7 +365,7 @@ public class Hyrule
                         //This makes the assumption that is currently true that each "town" has exactly one item.
                         //If we later restructure towns to be omni-towns to get rid of fake towns, this will be untrue
                         .Select(l => l.Collectables[0]).ToList();
-                ROMData.CombineFireSpell(assembler, customSpellOrder, r);
+                ROMData.CombineFireSpell(assembler, props.LinkedFireSpell.Value, customSpellOrder);
             }
 
             Dictionary<Town, Collectable> spellMap = new()
@@ -2447,7 +2447,7 @@ public class Hyrule
 
         rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.item_sprites.chr"));
         //Linked fire/dash custom sprites replace fire's sprite. This lets us free up c7 for future use.
-        if(props.CombineFire)
+        if(props.LinkedFireSpell != null)
         {
             rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.linkedFire.chr"));
         }
@@ -2864,7 +2864,7 @@ public class Hyrule
         //ROMData.UpdateWizardText(WizardCollectables);
 
         // Add marker for linked fire. Do this before old spell name shuffle so this gets shuffled in there too
-        if (props.CombineFire)
+        if (props.LinkedFireSpell != null)
         {
             ROMData.Put(0x1c72, [..ROM.StringToZ2Bytes("FIRE"), 0xFC]);
         }

@@ -619,7 +619,7 @@ public class CustomTexts
 
             if (props.TownNameHints)
             {
-                GenerateTownNameHints(texts, locations, props.CombineFire);
+                GenerateTownNameHints(texts, locations, props.LinkedFireSpell != null);
             }
         } while (TextLength(texts) > MAX_TEXT_LENGTH);
 

@@ -2048,7 +2048,7 @@ ResetRedPalettePayload:
         a.Byt(dash);
     }
 
-    public void CombineFireSpell(Assembler asm, List<Collectable>? customSpellOrder, Random RNG)
+    public void CombineFireSpell(Assembler asm, Collectable linkedSpell, List<Collectable>? customSpellOrder)
     {
         // These are the bit flags for each spell.  The old implementation
         // changed this table directly. However as this table is also used in
@@ -2058,8 +2058,7 @@ ResetRedPalettePayload:
         byte[] spellBytes = GetBytes(0xdcb, 8);
 
         int fireSpellIndex = 4;
-        int r = RNG.Next(7);
-        int linkedSpellIndex = r > 3 ? r + 1 : r;
+        int linkedSpellIndex = linkedSpell.VanillaSpellOrder();
 
         byte combinedSpellBits = (byte)(spellBytes[linkedSpellIndex] | spellBytes[fireSpellIndex]);
         spellBytes[fireSpellIndex] = combinedSpellBits;

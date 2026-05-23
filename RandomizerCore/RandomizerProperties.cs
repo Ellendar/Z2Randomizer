@@ -48,7 +48,7 @@ public class RandomizerProperties
     public bool StartReflect { get; set; }
     public bool StartSpell { get; set; }
     public bool StartThunder { get; set; }
-    public bool CombineFire { get; set; }
+    public Collectable? LinkedFireSpell { get; set; }
     public bool ReplaceFireWithDash { get; set; }
     public StartingResourceLimit StartSpellsLimit { get; set; }
 
