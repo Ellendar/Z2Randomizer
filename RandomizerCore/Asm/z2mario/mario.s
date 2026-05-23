@@ -153,15 +153,15 @@ PlayerCtrlRoutine:
   beq SizeChk
     ; lda AreaType                ;are we in a water type area?
     ; bne SaveJoyp                ;if not, branch
-      ldy Player_Y_HighPos
-      dey                         ;if not in vertical area between
-      bne DisJoyp                 ;status bar and bottom, branch
-        lda Player_Y_Position
-        cmp #$d0                    ;if nearing the bottom of the screen or
-        bcc SaveJoyp                ;not in the vertical area between status bar or bottom,
-DisJoyp:
-          lda #$00                    ;disable controller bits
-          sta SavedJoypadBits
+      ; ldy Player_Y_HighPos
+;       dey                         ;if not in vertical area between
+;       bne DisJoyp                 ;status bar and bottom, branch
+;         lda Player_Y_Position
+;         cmp #$d0                    ;if nearing the bottom of the screen or
+;         bcc SaveJoyp                ;not in the vertical area between status bar or bottom,
+; DisJoyp:
+;           lda #$00                    ;disable controller bits
+;           sta SavedJoypadBits
 SaveJoyp:
   lda SavedJoypadBits         ;otherwise store A and B buttons in $0a
   and #%11000000
