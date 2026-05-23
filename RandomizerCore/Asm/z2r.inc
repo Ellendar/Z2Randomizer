@@ -200,20 +200,16 @@ RESV mapMarioPrevDirection
 ;;;
 ; MARIO related values that are not directly mapped to vanilla z2 object values
 
-RESV JustThrownHammer
-RESV TailSwingTimer
-; SMB3 raccoon flutter: nonzero = Y-velocity cap active
-RESV TailWagCount
 ObjectOffset = $10
-RESV FBall_OffscreenBits
-RESV AltEntranceControl
+; RESV FBall_OffscreenBits
+; RESV AltEntranceControl
 ; RESV PlayerEntranceCtrl
-RESV JoypadOverride
-RESV Vine_Height
+; RESV JoypadOverride
+; RESV Vine_Height
 RESV Player_State
-RESV DisableCollisionDet
+; RESV DisableCollisionDet
 RESV GameEngineSubroutine
-RESV AreaType
+; RESV AreaType
 ; RESV A_B_Buttons
 A_B_Buttons = $741
 RESV PreviousA_B_Buttons
@@ -222,12 +218,12 @@ Left_Right_Buttons = $742
 ; RESV Up_Down_Buttons
 Up_Down_Buttons = $743
 RESV PlayerSize
-RESV DeathMusicLoaded
+; RESV DeathMusicLoaded
 RESV EventMusicQueue
 RESV EventMusicBuffer ; TODO use the vanilla music queues
-RESV WarpZoneControl
+; RESV WarpZoneControl
 RESV Player_CollisionBits ; Split Z2 and SMB1 collision bits
-RESV HalfwayPage
+; RESV HalfwayPage
 ;RESV SwimmingFlag
 SwimmingFlag = $13
 RESV CurrentOAMOffset
@@ -266,11 +262,10 @@ RESV ClimbSideTimer
 RESV JumpSwimTimer
 RESV RunningTimer
 RESV SideCollisionTimer
-RESV BlockBounceTimer
-RESV ChangeAreaTimer
-FRAME_TIMER_COUNT = ChangeAreaTimer - Timers
-RESV StarInvincibleTimer
-ALL_TIMER_COUNT = StarInvincibleTimer - Timers
+; RESV BlockBounceTimer
+FRAME_TIMER_COUNT = SideCollisionTimer - Timers
+; RESV StarInvincibleTimer
+ALL_TIMER_COUNT = SideCollisionTimer - Timers ; StarInvincibleTimer - Timers
 
 RESV SpriteShuffleOffset
 ;RESV CurrentCHRBank
@@ -296,6 +291,16 @@ RESV Noise_SfxLenCounter
 RESV TailWag_CtlHold
 RESV TailWag_FreqLo
 RESV TailWag_FreqHi
+
+RESV JustThrownHammer
+RESV TailSwingTimer
+; SMB3 raccoon flutter: nonzero = Y-velocity cap active
+RESV TailWagCount
+; Per-enemy "hit by hammer" flag. Persistent across the enemy's hit-flash so
+; later per-enemy recoil setters ($9AF9 etc., which run after ProjectileProcessing
+; is cleared) can still know to suppress the knockback. Cleared when the flash
+; timer at $040E,x decrements to zero (see bank7_Display patch).
+RESV HammerHitFlag, 6
 
 ; Shadow Mario Boss RAM
 CUSTOM_BOSS_START = RES_OFFSET
