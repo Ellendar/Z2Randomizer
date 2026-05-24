@@ -607,7 +607,38 @@ TitleEnd:
 .byte $20,$1F,VERTICAL | REPEAT | $1f,$FD
 
 .assert * = $b02e
-""", "randomizer_title_text.s");
+
+""", "randomizer_title_gamename.s");
+
+        // Also update the text on the title screen to our hot new L O R E
+        // There's 15 lines with 29 columns of tiles, with $fd as the 29th tile
+        // Realistically we can use 26 or so letters a line for it to be readable
+        // cause of the wall of sprites on the right
+        var titleText = """
+IN A LOCAL MILK BAR, LINK
+AND MARIO SWAPPED TALES OF
+PRINCESS PROBLEMS. MARIO
+SCOFFED WHEN LINK IMPLIED
+THAT SAVING ZELDA WAS SO
+MUCH HARDER, AFTER ALL,
+ENEMIES IN HYRULE ARE WAY
+SMARTER THAN A SILLY KOOPA.
+MARIO, IN A MILK-FILLED
+HAZE, STUMBLED DOWN THE
+WRONG PIPE AND WOKE UP IN
+HYRULE. CAN HE ACTUALLY
+SAVE PRINCESS ZELDA...
+""".Trim();
+        var a = asm.Module();
+        a.Segment("PRG5");
+        foreach (var (line, i) in titleText.Split('\n').Select((item, index) => (item, index)))
+        {
+            var blankLine = Enumerable.Repeat((byte)0xf4,29).ToArray();
+            StringToZ2Bytes(line.Trim()).CopyTo(blankLine, 0);
+            blankLine[28] = 0xfd;
+            a.Org((ushort) (0xA932 + i * 29));
+            a.Byt(blankLine);
+        }
     }
 
     public void ApplyIps(byte[] patch, bool expandRom = false)
@@ -2341,6 +2372,9 @@ ResetRedPalettePayload:
         { ' ', 0xf4 },
         { '-', 0xf6 },
         { '\n', 0xfd },
+        // Extended characters on the title screen
+        { ',', 0x9c },
+        { '©', 0x0e },
     };
 
     private static readonly IDictionary<byte, char> ReverseCharMap = CharMap.ToDictionary(x => x.Value, x => x.Key);
