@@ -98,6 +98,10 @@ SetHurtMetasprite:
 .import METASPRITE_SMALL_MARIO_DEATH
   lda #METASPRITE_SMALL_MARIO_DEATH
   sta ObjectMetasprite
+  ; Clear all spells while here too
+  lda #0
+  sta $076f
+  sta $070f
   lda #$0b ; player death subroutine
   sta GameEngineSubroutine
   rts
@@ -113,6 +117,9 @@ PatchLinkDeathSprite:
   sta ObjectMetasprite
   lda #0
   sta boss_animation
+  ; Clear all spells. Fixes oddities when dying with something cast
+  sta $076f
+  sta $070f
   lda #$0b ; player death subroutine
   sta GameEngineSubroutine
   jsr PlayerGfxHandler
