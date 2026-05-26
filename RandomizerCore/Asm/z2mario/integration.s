@@ -485,6 +485,12 @@ Yhi = R7
 @flipRight:
     lda #0
   sta Atr
+  
+  ; if stuck in mud/swamp copy over the render behind flag
+  lda $0752
+  and #$20
+  ora Atr
+  sta Atr
 
   jmp MetaspriteRenderLoop
 
