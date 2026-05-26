@@ -814,6 +814,10 @@ NoDecTimers:
   ; Check scroll lock. If we are locked in, then prevent leaving the screen
   lda ScrollLock
   beq @SkipScrollLock
+    ; don't apply scroll lock when we aren't in player control
+    lda GameEngineSubroutine
+    cmp #8
+    bne @SkipScrollLock
     lda Player_X_Position
     cmp #3
     bcc @LockLeft

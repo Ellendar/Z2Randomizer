@@ -527,6 +527,9 @@ FinishedInjuryBlink:
   ; Z2Mario - clear scroll lock after you change size
 ;  lda #0
   dec ScrollLock
+  ; and also reset the injurytimer to extend your invincibility
+  lda #$20
+  sta InjuryTimer
   jmp DonePlayerTask
 ;-------------------------------------------------------------------------------------
 ; .reloc
