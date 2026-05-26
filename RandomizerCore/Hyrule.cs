@@ -2438,11 +2438,16 @@ public class Hyrule
         {
             // Overwrite link's downstab animation with fireball explosion sprites
             var fireballExplosion = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.fireball_explosion.chr");
-            var tanooki_tail = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.tanooki_tail.chr");
+            var extra_sprites = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.tanooki_tail.chr");
+            var tanooki_tail = extra_sprites[..0xc0];
+            var oneup = extra_sprites[0xc0..0xe0];
+            var lifecount = extra_sprites[0xe0..0xf0];
             for (var i = 0; i < 13; i++)
             {
-                rom.Put(ROM.ChrRomOffset + 0x400 + (i * 0x2000), fireballExplosion);
-                rom.Put(ROM.ChrRomOffset + 0x560 + (i * 0x2000), tanooki_tail);
+                rom.Put(ROM.ChrRomOffset + 0x0400 + (i * 0x2000), fireballExplosion);
+                rom.Put(ROM.ChrRomOffset + 0x0560 + (i * 0x2000), tanooki_tail);
+                rom.Put(ROM.ChrRomOffset + 0x0a80 + (i * 0x2000), oneup);
+                rom.Put(ROM.ChrRomOffset + 0x1960 + (i * 0x2000), lifecount);
             }
             rom.Put(ROM.ChrRomOffset + 0x1a800, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.sprites_mario_hammer.chr"));
             rom.Put(ROM.ChrRomOffset + 0x1b800, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.sprites_mario_tanooki.chr"));
