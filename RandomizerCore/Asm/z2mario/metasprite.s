@@ -462,10 +462,12 @@ SetYOffset:
     rts
   @isplayer:
   ; We are rendering a mario sprite, so check if we are stuck in the mud
+  ; This is a bit hacky since we want to only apply it to the bottom half
+  ; of big mario, or all of small mario
   lda $0752
   and #$20
   beq @exit
-    ; stuck in the mud, so update bottom two sprite
+    ; stuck in the mud/swamp, so update bottom two sprite
     ; x = next oam sprite id, so we can offset by 8 to hit bottom two sprites
     ldx CurrentOAMOffset
     ; if we are small then its the most recent two sprites. if we are big then its 4 sprites back
