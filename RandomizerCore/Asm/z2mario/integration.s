@@ -1226,25 +1226,26 @@ CheckMarioSq2Sfx:
   jmp $9408 ; Original square 2 sfx from z2
 .reloc
 CheckMarioNoiseSfx:
-  lda $07E1             ; L990B active effect type (non-zero = L990B is driving Noise)
-  bne @Z2ExtraActive
-  jsr NoiseSfxHandler
-  lda NoiseSoundBuffer
-  beq @PlayingZ2
-    lda #$ff
-    sta Z2NoiseSoundBuffer
-    rts
-@PlayingZ2:
-  lda #$ff
-  cmp Z2NoiseSoundBuffer
-  bne @ActualNoiseSfx
+  ; We don't use any mario noise sfx, so we can skip processing it.
+  ; lda $07E1             ; L990B active effect type (non-zero = L990B is driving Noise)
+  ; bne @Z2ExtraActive
+  ; jsr NoiseSfxHandler
+  ; lda NoiseSoundBuffer
+  ; beq @PlayingZ2
+    ; lda #$ff
+    ; sta Z2NoiseSoundBuffer
+    ; rts
+; @PlayingZ2:
+  ; lda #$ff
+  ; cmp Z2NoiseSoundBuffer
+  ; bne @ActualNoiseSfx
     ; this is the fake sfx id we used to signal that this was a mario buffer
     ; but now we can clear it.
-    lda #0
-    sta Z2NoiseSoundBuffer
-@Z2ExtraActive:
-    rts
-@ActualNoiseSfx:
+    ; lda #0
+    ; sta Z2NoiseSoundBuffer
+; @Z2ExtraActive:
+    ; rts
+; @ActualNoiseSfx:
   jmp $95A7 ; Original "complex" sfx from z2
 
 .segment "PRG7"
