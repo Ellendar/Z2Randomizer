@@ -237,4 +237,11 @@ public class FlagsTests
 
         Assert.IsTrue(config2.ShareSeedAcrossDifficulty);
     }
+  
+    public void TestSgl2025EncodeCycle()
+    {
+        RandomizerConfiguration config = Sgl2025Preset.Preset;
+        RandomizerConfiguration config2 = new RandomizerConfiguration(Sgl2025Preset.Preset.SerializeFlags());
+        Assert.AreEqual(config.SerializeFlags(), config2.SerializeFlags());
+    }
 }

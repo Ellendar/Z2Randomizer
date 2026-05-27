@@ -353,7 +353,7 @@ void CheckDropsOverLava<T>(Room room, SideviewEditable<T> sv, List<SideviewMapCo
             if (x < 16 || x > 47) { continue; }
             if (openCeilingTiles.Contains(x))
             {
-                if (sv.Find(o => o.IsSolid && o.Intersects(x, x, 8, 11)) == null)
+                if (!sv.Commands.Any(o => o.IsSolid && o.Intersects(x, x, 8, 11)))
                 {
                     dropTilesOverLava.Add(x);
                 }

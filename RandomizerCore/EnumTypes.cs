@@ -197,21 +197,21 @@ public enum FireOption
 [DefaultValue(VANILLA)]
 public enum PalaceStyle
 {
-    [Description("Vanilla")]
+    [Description("Vanilla"), DefaultWeight(10)]
     VANILLA,
-    [Description("Vanilla Shuffle")]
+    [Description("Vanilla Shuffle"), DefaultWeight(10)]
     SHUFFLED,
-    [Description("Sequential")]
+    [Description("Sequential"), DefaultWeight(10)]
     SEQUENTIAL,
-    [Description("Random Walk")]
+    [Description("Random Walk"), DefaultWeight(10)]
     RANDOM_WALK,
-    [Description("Vanilla-Weighted")]
+    [Description("Vanilla-Weighted"), DefaultWeight(10)]
     VANILLA_WEIGHTED,
-    [Description("Tower")]
+    [Description("Tower"), DefaultWeight(10)]
     TOWER,
-    [Description("Reconstructed")]
+    [Description("Reconstructed"), DefaultWeight(10)]
     RECONSTRUCTED,
-    [Description("Loopy")]
+    [Description("Loopy"), DefaultWeight(0)]
     RECONSTRUCTED_LOOPY,
     [Description("Chaos"), DefaultWeight(0)]
     CHAOS,
@@ -400,23 +400,23 @@ static class BiomeExtensions
 [DefaultValue(CLASSIC)]
 public enum ClimateEnum
 {
-    [Description("Classic")]
+    [Description("Classic"), DefaultWeight(1)]
     CLASSIC,
-    [Description("Vanilla-Weighted")]
+    [Description("Vanilla-Weighted"), DefaultWeight(1)]
     VANILLA_WEIGHTED_WEST,
-    [Description("Vanilla-Weighted")]
+    [Description("Vanilla-Weighted"), DefaultWeight(1)]
     VANILLA_WEIGHTED_EAST,
-    [Description("Chaos")]
+    [Description("Chaos"), DefaultWeight(1)]
     CHAOS,
-    [Description("Wetlands")]
+    [Description("Wetlands"), DefaultWeight(0)]
     WETLANDS,
-    [Description("Great Lakes")]
+    [Description("Great Lakes"), DefaultWeight(1)]
     GREAT_LAKES,
-    [Description("Scrubland")]
+    [Description("Scrubland"), DefaultWeight(1)]
     SCRUBLAND,
-    [Description("Scrubland")]
+    [Description("Scrubland"), DefaultWeight(1)]
     DM_SCRUBLAND,
-    [Description("Random")]
+    [Description("Random"), Metastyle]
     RANDOM
 }
 

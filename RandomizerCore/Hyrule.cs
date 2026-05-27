@@ -38,10 +38,8 @@ public class Hyrule
     //This was originally set to 10, but increasing it to 100 massively reduces the number of extremely degenerate caldera and mountain generation times
     private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 100;
 
-    //This controls how many times
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    //This controls how many times
     private const int TERRAIN_GENERATION_ATTEMPT_LIMIT = 50000;
 
     //private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
@@ -297,7 +295,7 @@ public class Hyrule
                 }
 
                 /*
-                if(!palaces.SelectMany(i => i.AllRooms).Any(i => i.Name == "gtmOldgpRooms M10"))
+                if(!palaces.SelectMany(i => i.AllRooms).Any(i => i.Name.Contains("Lava or pit")))
                 {
                     continue;
                 }
@@ -3808,6 +3806,7 @@ bank5_Pointer_table_for_End_Credits:
         rom.FixItemPickup(engine);
         rom.FixMinibossGlitchyAppearance(engine);
         rom.FixBossKillPaletteGlitch(engine);
+        rom.FixBigBubbleSplit(engine, randomizedStats);
         StatTracking(props, engine);
         AddCredits(engine);
 
@@ -3870,6 +3869,11 @@ bank5_Pointer_table_for_End_Credits:
         if (props.HardBosses)
         {
             rom.BuffCarrock(engine);
+        }
+
+        if (props.AggressiveTbird)
+        {
+            rom.AggressiveThunderbird();
         }
 
         if (props.ReplaceFireWithDash)

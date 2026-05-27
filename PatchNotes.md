@@ -1,5 +1,27 @@
 # Z2Randomizer Changelog
 
+## Version 5.1.4 - May 16, 2026
+
+- Fixed 3 GP rooms that could cause the player to get stuck or die endlessly after dropping in and dying in certain places.
+- Fixed an issue with "Disable HUD flask on lag"
+
+## Version 5.1.3 - May 13, 2026
+
+- Updated the Max Rando preset to reflect the update in flags.
+
+## Version 5.1.2 - April 28, 2026
+
+- Removed loopy from random palace styles
+- Removed wetlands from random Climates
+- Added vanilla-weighted climate to random, which had be inadvertently not included.
+- Adjusted some palace rooms slightly.
+- Improved community text to reduce repeats
+- Added Chair sprite - Thanks Irenepunmaster
+- Re-added "Aggressive thunderbird" from the SGL flags.
+- Fixed an issue with duplicate room detection for tower/random walk palaces
+- Fixed a bug where the thunder/fairy/reflect hint for spells in shuffle pool was always the old kasuto hint
+- Fixed an issue where the bridge continent connector was sometimes exiting one tile from where it should.
+
 ## Version 5.1.1 - April 14, 2026
 
 - Fixed incorrect passthroughs in Vanilla Shuffle

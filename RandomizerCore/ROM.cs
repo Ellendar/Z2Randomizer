@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using js65;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -1855,6 +1856,19 @@ SetDripperHp:
 """);
     }
 
+    /// Set the Big Bubble split threshold to 75% HP.
+    /// This prevents immediate splitting on room entry when
+    /// the rolled HP is below the vanilla threshold.
+    public void FixBigBubbleSplit(Assembler asm, StatRandomizer randomizedStats)
+    {
+        byte bigBubbleHp = randomizedStats.GpEnemyHpTable[(int)EnemiesGreatPalace.BIG_BUBBLE];
+        byte splitHp = (byte)(0.75 * bigBubbleHp);
+        var a = asm.Module();
+        a.Segment("PRG5");
+        a.Org(0xa0a8);
+        a.Byt(splitHp);
+    }
+
     public void FixItemPickup(Assembler asm)
     {
         // In Z2R, Link never holds items above his head. So,
@@ -2005,6 +2019,21 @@ ResetRedPalettePayload:
     public void BuffCarrock(Assembler a)
     {
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
+    }
+
+    public void AggressiveThunderbird()
+    {
+        const byte thunderBirdHP = 192;
+        // 0x15453 - Starting HP value
+        Put(0x15453, thunderBirdHP);
+        // 0x15ed6 - "face revealed" if HP < this value
+        Put(0x15ed6, thunderBirdHP);
+        // 0x163df - "face revealed" if HP < this value(part 2 ?)
+        Put(0x163df, thunderBirdHP);
+        // 0x163f6 - HP bar divisor(i'll make a patch for this in 4.4 soonish)
+        Put(0x16406, (byte)(thunderBirdHP / 8));
+        // 0x16403 - Hard Mode if HP < this value (vanilla half HP)
+        Put(0x16413, thunderBirdHP);
     }
 
     public void DashSpell(Assembler asm)

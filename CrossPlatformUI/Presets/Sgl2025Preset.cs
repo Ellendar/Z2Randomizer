@@ -68,7 +68,7 @@ public static class Sgl2025Preset
         NoDuplicateRoomsByEnemies = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
-        // +"Aggressive Thunderbird"
+        AggressiveTbird = true,
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
         DarkLinkMinDistance = BossRoomMinDistance.NONE,
 

@@ -448,6 +448,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     private bool hardBosses;
 
+    [Reactive]
+    private bool aggressiveTbird;
+
     //Levels
     [Reactive]
     private bool shuffleAttackExperience;
@@ -1186,49 +1189,31 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             properties.MazeBiome = mazeBiome;
         }
 
+        //climates
         if (westClimate == ClimateEnum.RANDOM)
         {
-            properties.WestClimate = r.Next(5) switch
-            {
-                0 => ClimateEnum.CLASSIC,
-                1 => ClimateEnum.CHAOS,
-                2 => ClimateEnum.WETLANDS,
-                3 => ClimateEnum.GREAT_LAKES,
-                4 => ClimateEnum.SCRUBLAND,
-                _ => throw new Exception("Unrecognized climate")
-            };
+            List<ClimateEnum> westClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsWestClimate() && !i.IsMetastyle()).ToList();
+            properties.WestClimate = westClimates.Sample(r);
         }
         else
         {
             properties.WestClimate = westClimate;
         }
+
         if (eastClimate == ClimateEnum.RANDOM)
         {
-            properties.EastClimate = r.Next(5) switch
-            {
-                0 => ClimateEnum.CLASSIC,
-                1 => ClimateEnum.CHAOS,
-                2 => ClimateEnum.WETLANDS,
-                3 => ClimateEnum.GREAT_LAKES,
-                4 => ClimateEnum.SCRUBLAND,
-                _ => throw new Exception("Unrecognized climate")
-            };
+            List<ClimateEnum> eastClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsEastClimate() && !i.IsMetastyle()).ToList();
+            properties.EastClimate = eastClimates.Sample(r);
         }
         else
         {
             properties.EastClimate = eastClimate;
         }
+
         if (dmClimate == ClimateEnum.RANDOM)
         {
-            properties.DmClimate = r.Next(5) switch
-            {
-                0 => ClimateEnum.CLASSIC,
-                1 => ClimateEnum.CHAOS,
-                2 => ClimateEnum.WETLANDS,
-                3 => ClimateEnum.GREAT_LAKES,
-                4 => ClimateEnum.DM_SCRUBLAND,
-                _ => throw new Exception("Unrecognized climate")
-            };
+            List<ClimateEnum> dmClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsDmClimate() && !i.IsMetastyle()).ToList();
+            properties.DmClimate = dmClimates.Sample(r);
         }
         else
         {
@@ -1335,6 +1320,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.NoDuplicateRoomsBySideview = noDuplicateRoomsByLayout;
         properties.GeneratorsAlwaysMatch = generatorsAlwaysMatch;
         properties.HardBosses = hardBosses;
+        properties.AggressiveTbird = aggressiveTbird;
         properties.RevealWalkthroughWalls = revealWalkthroughWalls;
 
         //Enemies

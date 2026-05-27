@@ -17,7 +17,6 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
     {
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         Palace palace = new(palaceNumber);
-        Dictionary<RoomExitType, List<Room>> roomsByExitType;
         RoomPool roomPool = new(rooms);
         var itemRoomSelector = GetItemRoomSelectionStrategy();
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
@@ -71,9 +70,18 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
             return palace;
         }
 
-        //Add rooms
-        roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
+        var roomsByExitTypeUnmodified = roomPool.CategorizeNormalRoomExits();
         Dictionary<RoomExitType, bool> stubOnlyExitTypes = new();
+        bool IsStubOnly(RoomExitType exitType)
+        {
+            if (stubOnlyExitTypes.TryGetValue(exitType, out var cached)) { return cached; }
+            roomsByExitTypeUnmodified.TryGetValue(exitType, out var roomList);
+            bool stubOnly = roomList == null || roomList.Count == 0;
+            stubOnlyExitTypes[exitType] = stubOnly;
+            return stubOnly;
+        }
+
+        //Add rooms
         foreach (KeyValuePair<Coord, RoomExitType> item in shape.OrderBy(i => i.Key.X).ThenByDescending(i => i.Key.Y))
         {
             if (prepopulatedCoordinates.Contains(item.Key))
@@ -83,28 +91,19 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
             var (x, y) = item.Key;
             RoomExitType roomExitType = item.Value;
 
-            bool stubOnly;
-            List<Room>? roomCandidates;
+            bool stubOnly = IsStubOnly(roomExitType);
+            List<Room>? roomCandidates = stubOnly ? null : roomPool.GetNormalRoomsForExitType(roomExitType);
             Room? newRoom = null;
-            if (!stubOnlyExitTypes.TryGetValue(roomExitType, out stubOnly))
-            {
-                roomsByExitType.TryGetValue(roomExitType, out roomCandidates);
-                stubOnly = roomCandidates == null || roomCandidates.Count == 0;
-                stubOnlyExitTypes[roomExitType] = stubOnly;
-            }
-            else
-            {
-                roomCandidates = stubOnly ? null : roomsByExitType.GetValueOrDefault(roomExitType);
-            }
+
             if (!stubOnly)
             {
                 Debug.Assert(roomCandidates != null);
                 if (duplicateProtection && roomCandidates!.Count == 0)
                 {
+                    logger.Debug($"Shape-first palace ran out of rooms of exit type: {roomExitType} in palace {palaceNumber}. Starting to use duplicate rooms.");
+                    roomPool.RefillNormalRoomsForExitType(rooms, roomExitType);
                     roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
                     Debug.Assert(roomCandidates.Count() > 0);
-                    roomsByExitType[roomExitType] = roomCandidates;
-                    logger.Debug($"RandomWalk ran out of rooms of exit type: {roomExitType} in palace {palaceNumber}. Starting to use duplicate rooms.");
                 }
                 roomCandidates!.FisherYatesShuffle(r);
                 Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
