@@ -149,7 +149,7 @@ HandleLagFrame:
     and #$10
     beq @HandleAudio
     ; Check that we are in the side view mode
-    lda $0736
+    lda GameMode
     cmp #$0b
     bne @HandleAudio
     ; Check if we even have a sprite zero on the screen (Spoiler: there is not, sprite zero was removed)
@@ -320,7 +320,7 @@ IncStatTimer:
         cmp #$0b
         bne @Exit
             ; in an encounter (includes caves)
-            lda $0748
+            lda LocationNumber
             cmp #$3e
             bne @Exit
                 ; In a random encounter
@@ -334,7 +334,7 @@ IncStatTimer:
         lda RegionNumber
         asl
         asl
-        adc PalaceNumber
+        adc PalaceRegionIndex
         tay
         ldx PalaceMappingTable,y
 @IncrementTimer:
@@ -548,7 +548,7 @@ SwapToPRG0:
     lda #$00
     beq SwapPRG
 SwapToSavedPRG:
-    lda $0769
+    lda CurrentPrgBank
 SwapPRG:
     asl
     ora #$80
@@ -677,7 +677,7 @@ UPDATE_REFS SwapToSavedPRG @ $E002
 LoadAreaBGMetatile:
 ; guarantee the code is in a000 or higher otherwise we would switch this bank out from under itself
 .assert * > $a000
-    lda $0769
+    lda CurrentPrgBank
     asl
     ora #$80
     sta NmiBankShadow8
