@@ -26,6 +26,12 @@ function showError(msg) {
     // identify runtime/assembly payloads
     const isBootResource = (url, res) => {
         const u = (typeof url === "string" ? url : url.url || "").toLowerCase();
+
+        // Skip hot reload endpoints entirely
+        if (u.includes("hotreload")) {
+            return false;
+        }
+
         const ext = /\.(wasm|dll|pdb|dat|gz|br|json|blat|bundle)$/.test(u);
         const frameworkPath = u.includes("/_framework/") || u.includes("dotnet.") || u.includes("icudt");
         const ct = res?.headers?.get("content-type") || "";

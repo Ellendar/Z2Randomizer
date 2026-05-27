@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -7,15 +8,14 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Threading;
-using CrossPlatformUI.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Avalonia.Input.Platform;
+using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
-using System.Diagnostics.CodeAnalysis;
-using System.Reactive.Disposables.Fluent;
+using CrossPlatformUI.Services;
 
 namespace CrossPlatformUI.ViewModels;
 

@@ -65,5 +65,7 @@ public static class Program
                     App.Current!.LocateMaterialTheme<MaterialTheme>().BaseTheme = BaseThemeMode.Dark;
                 }
             })
-            .UseReactiveUI();
+            .UseReactiveUI(_ =>
+            {
+            });
 }

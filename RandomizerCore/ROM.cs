@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using js65;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -1853,6 +1854,19 @@ SetDripperHp:
     ldy $10  ; command overwritten by jsr
     rts
 """);
+    }
+
+    /// Set the Big Bubble split threshold to 75% HP.
+    /// This prevents immediate splitting on room entry when
+    /// the rolled HP is below the vanilla threshold.
+    public void FixBigBubbleSplit(Assembler asm, StatRandomizer randomizedStats)
+    {
+        byte bigBubbleHp = randomizedStats.GpEnemyHpTable[(int)EnemiesGreatPalace.BIG_BUBBLE];
+        byte splitHp = (byte)(0.75 * bigBubbleHp);
+        var a = asm.Module();
+        a.Segment("PRG5");
+        a.Org(0xa0a8);
+        a.Byt(splitHp);
     }
 
     public void FixItemPickup(Assembler asm)

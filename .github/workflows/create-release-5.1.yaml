@@ -156,9 +156,7 @@ jobs:
       - name: Build Browser
         if: ${{ matrix.platform.type == 'browser' }}
         run: |
-          cd CrossPlatformUI.Browser
-          dotnet workload restore
-          cd ..
+          dotnet workload install wasm-tools
           dotnet publish -c Release CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
       - name: Upload regular build to GitHub release
@@ -185,7 +183,7 @@ jobs:
         with:
           name: Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}
           path: |
-            CrossPlatformUI.Browser/bin/Release/net10.0-browser/browser-wasm/AppBundle/
+            CrossPlatformUI.Browser/bin/Release/net10.0-browser/publish
             !**/*.pdb
 
 
