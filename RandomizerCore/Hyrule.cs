@@ -1,18 +1,16 @@
-﻿using DynamicData;
-using FtRandoLib.Importer;
-using js65;
-using NLog;
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
+using js65;
+using FtRandoLib.Importer;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
@@ -172,7 +170,7 @@ public class Hyrule
     */
 
     public ROM ROMData { get; set; }
-    public Random r { get; set; }
+    public RandomizerCore.Random r { get; set; }
     public string Flags { get; private set; }
     public int SeedHash { get; private set; }
     public RandomizerProperties Props
@@ -227,13 +225,16 @@ public class Hyrule
 
             SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed!)).AsSpan()[..4]);
             r = new Random(SeedHash);
+            bool shareSeedAcrossDifficulty = config.ShareSeedAcrossDifficulty;
+            Random? difficultyRng = shareSeedAcrossDifficulty ? CreateDifficultyRng(config.Seed) : null;
 
             config.CheckForFlagConflicts();
-            props = config.Export(r);
+            props = config.Export(r, includeDifficulty: !shareSeedAcrossDifficulty);
             //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
             if(config.GenerateSpoiler)
             {
                 r.NextBytes(new byte[64]);
+                difficultyRng?.NextBytes(new byte[64]);
             }
 #if UNSAFE_DEBUG
             string export = JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties);
@@ -241,8 +242,12 @@ public class Hyrule
 #endif
             Flags = config.SerializeFlags();
 
+            // If shared difficulty is on, we need a stripped version of the
+            // flags for the shared part of the seed hash.
+            string sharedSeedFlags = shareSeedAcrossDifficulty ? config.SerializeSharedSeedFlags() : Flags;
+
             using Assembler assembler = CreateAssemblyEngine();
-            logger.Info($"Started generation for flags: {Flags} seed: {config.Seed} seedhash: {SeedHash}");
+            logger.Info($"Started generation for flags: {Flags} sharedseedflags: {sharedSeedFlags} seed: {config.Seed} seedhash: {SeedHash}");
             //character = new Character(props);
             shuffler = new Shuffler(props);
 
@@ -413,7 +418,22 @@ public class Hyrule
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
             StatRandomizer randomizedStats = new(ROMData, props);
-            randomizedStats.Randomize(r);
+            randomizedStats.Randomize(r, skipDifficultyOnly: shareSeedAcrossDifficulty);
+
+            // Apply difficulty after shared randomization, then let ApplyAsmPatches see full
+            // props. A second ApplyAsm pass would re-claim PRG4/PRG5 free space (js65 sees it
+            // as fully free) and clobber first-pass code like the palace elevator routines.
+            byte[]? sharedRngState = null;
+            if (shareSeedAcrossDifficulty)
+            {
+                sharedRngState = new byte[32];
+                r.NextBytes(sharedRngState);
+
+                config.ApplyDifficultyOnlySettings(props, difficultyRng!);
+                ReplaceDifficultyStartingItemsInWorld(difficultyRng!);
+                randomizedStats.RandomizeDifficultyOnly(difficultyRng!);
+            }
+
             randomizedStats.Write(ROMData);
 
             // ideally this should be calculated later, but custom music changes asm patches
@@ -511,18 +531,23 @@ public class Hyrule
 
             UpdateRom();
 
-            //0 -> W to avoid 0/O confusion, also 6/G so 6 -> X (these are not hypothetical, they have already caused confusion)
-            byte[] z2Hash = ConvertHash(hash);
-            for(int i = 0; i < z2Hash.Length; i++)
+            byte[] z2Hash;
+            if (shareSeedAcrossDifficulty)
             {
-                if(z2Hash[i] == 0xD0)
-                {
-                    z2Hash[i] = 0xF0;
-                }
-                if (z2Hash[i] == 0xD6)
-                {
-                    z2Hash[i] = 0xF1;
-                }
+                byte[] sharedHash = CalculateHash(sharedSeedFlags, SeedHash, randoRomHash, sharedRngState!);
+
+                byte[] difficultyRngState = new byte[32];
+                difficultyRng!.NextBytes(difficultyRngState);
+                byte[] finalHash = CalculateHash(Flags, SeedHash, randoRomHash, difficultyRngState);
+                z2Hash = CombineHashes(sharedHash, finalHash);
+            }
+            else
+            {
+                byte[] finalRngState = new byte[32];
+                r.NextBytes(finalRngState);
+                byte[] finalHash = CalculateHash(Flags, SeedHash, randoRomHash, finalRngState);
+                z2Hash = ConvertHash(finalHash);
+                SanitizeHashCharacters(z2Hash);
             }
 
             ROMData.Put(0x17C2C, z2Hash);
@@ -588,6 +613,84 @@ public class Hyrule
             0xf4,
             (byte)(((inthash >> 25)  & 0x1F) + 0xD0)
         ];
+    }
+
+    private static byte[] CalculateHash(string flags, int seedHash, byte[] romHash, byte[] rngState)
+    {
+        return MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
+            flags +
+            seedHash +
+            romHash +
+            Util.ByteArrayToHexString(rngState)
+        ));
+    }
+
+    private static Random CreateDifficultyRng(string? seed)
+    {
+        int difficultySeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes($"{seed}:difficulty")).AsSpan()[..4]);
+        return new Random(difficultySeedHash);
+    }
+
+    private static byte[] CombineHashes(byte[] sharedHash, byte[] finalHash)
+    {
+        byte[] sharedZ2Hash = ConvertHash(sharedHash);
+        byte[] finalZ2Hash = ConvertHash(finalHash);
+        SanitizeHashCharacters(sharedZ2Hash);
+        SanitizeHashCharacters(finalZ2Hash);
+
+        return [
+            sharedZ2Hash[0], 0xF4,
+            sharedZ2Hash[2], 0xF4,
+            sharedZ2Hash[4], 0xF4,
+            sharedZ2Hash[6], 0xF4,
+            finalZ2Hash[8], 0xF4,
+            finalZ2Hash[10]
+        ];
+    }
+
+    private static void SanitizeHashCharacters(byte[] z2Hash)
+    {
+        for (int i = 0; i < z2Hash.Length; i++)
+        {
+            if (z2Hash[i] == 0xD0)
+            {
+                z2Hash[i] = 0xF0;
+            }
+            if (z2Hash[i] == 0xD6)
+            {
+                z2Hash[i] = 0xF1;
+            }
+        }
+    }
+
+    // In shared-seed mode, candle/cross are placed in the world during the
+    // shared shuffle (StartCandle/StartCross were false at Export time). If
+    // the final difficulty flags have the player starting with either item,
+    // swap that item's world pickup for a minor item so the seed doesn't
+    // hand out a duplicate.
+    private void ReplaceDifficultyStartingItemsInWorld(Random r)
+    {
+        List<Collectable> minorItems = [
+            Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG,
+            Collectable.MEDIUM_BAG, Collectable.LARGE_BAG, Collectable.XL_BAG,
+            Collectable.ONEUP, Collectable.KEY
+        ];
+        Collectable[] difficultyStartingItems = [Collectable.CANDLE, Collectable.CROSS];
+
+        foreach (Collectable item in difficultyStartingItems)
+        {
+            if (!props.StartsWithCollectable(item)) { continue; }
+            foreach (Location location in itemLocs)
+            {
+                for (int i = 0; i < location.Collectables.Count; i++)
+                {
+                    if (location.Collectables[i] == item)
+                    {
+                        location.Collectables[i] = minorItems.Sample(r);
+                    }
+                }
+            }
+        }
     }
 
     /*
@@ -1282,7 +1385,7 @@ public class Hyrule
         try
         {
             ROM testRom = new(ROMData);
-            Random testRng = new Random();
+            Random testRng = new(SeedHash);
             //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
             //be tested here, but we don't actually know what they will be until later, for now i'm just
             //testing with the vanilla text, but this could be an issue down the line.
@@ -3094,6 +3197,8 @@ public class Hyrule
     private static void AddCropGuideBoxesToFileSelect(Assembler a)
     {
         a.Module().Code("""
+.include "z2r.inc"
+
 .segment "PRG5"
 .org $b28d
     jsr CustomFileSelectUpdates
@@ -3102,7 +3207,7 @@ public class Hyrule
 CustomFileSelectUpdates:
     cpy #$01
     beq @Skip
-        sta $0726  ; perform the original hooked code before exiting
+        sta DialogBoxDrawing  ; perform the original hooked code before exiting
         rts
 @Skip:
     ldx #$20     ; copy 32 + 1 bytes of data from the rom (+1 for terminator)
@@ -3232,12 +3337,14 @@ CustomFileSelectData:
         var a = asm.Module();
         a.Assign("HelmetRoom", helmetRoom);
         a.Code("""
+.include "z2r.inc"
+
 .segment "PRG4"
 
 .reloc
 HelmetHeadGoomaFix:
     lda #<HelmetRoom
-    eor $561
+    eor MapNumber
     rts
 
 .org $bac3
@@ -3262,10 +3369,6 @@ HelmetHeadGoomaFix:
 
 update_next_level_exp = $a057
 
-;(0=caves, enemy encounters...; 1=west hyrule towns; 2=east hyrule towns; 3=palace 1,2,5 ; 4=palace 3,4,6 ; 5=great palace)
-world_number = $707
-room_code = $561
-
 .segment "PRG7"
 
 .org $cbaa
@@ -3273,26 +3376,26 @@ room_code = $561
 
 .reloc
 PalacePatch:
-    sta world_number
+    sta WorldNumber
     ; if < 3 do the original patch
     cmp #$03
     bcc @Exit
     ; or if our temp flag is already set, do the original code
     lda temp_room_flag
     bne @Exit
-        lda room_code
+        lda MapNumber
         sta temp_room_code ; store the area code into a temp ram location
         inc temp_room_flag ; set a flag in another empty ram location
 @Exit:
-    lda world_number
+    lda WorldNumber
     rts
 
 .reloc
 ReloadExpForReset:
     lda temp_room_code
-    sta room_code
+    sta MapNumber
     jsr update_next_level_exp
-    lda world_number
+    lda WorldNumber
     rts
 
 .org $cad0
@@ -3312,7 +3415,7 @@ ReloadExpForReset:
 .reloc
 SaveWorldStateAndClearFlag:
     ; Precondition y = 0
-    sty world_number
+    sty WorldNumber
     sty temp_room_flag
     rts
 
@@ -3325,18 +3428,20 @@ SaveWorldStateAndClearFlag:
     private static void FixSoftLock(Assembler a)
     {
         a.Module().Code("""
+.include "z2r.inc"
+
 .segment "PRG7"
 .org $e18a
     jsr FixSoftlock
 
 .reloc
 FixSoftlock:
-    inc $0726
-    lda $074c ; branch if dialog type is not "talking"
+    inc DialogBoxDrawing
+    lda CurrentDialogType ; branch if dialog type is not "talking"
     cmp #$02
     beq +
         ldx #$00  ; otherwise close the talking dialog
-        stx $074c
+        stx CurrentDialogType
 +   rts
 """, "fix_softlock.s");
     }
@@ -3424,16 +3529,19 @@ PalacePaletteOffset:
 
 .import SwapPRG
 
-PRG_bank = $0769
-
 .segment "PRG7"
+
+; No need to set PreviousRegionNumber ($070a) anymore
+.org $cb8b
+    jmp $cb91
+FREE_UNTIL $cb91
 
 ; Patch switching the bank when loading the overworld
 .org $cd48
     bne +
     ldy RegionNumber
     lda ExpandedRegionBankTable,y
-+   sta PRG_bank
++   sta CurrentPrgBank
     jsr SwapPRG
     beq $cd5f ; unconditional jmp to skip the freespace
 FREE_UNTIL $cd5f
@@ -3493,7 +3601,7 @@ bank7_Pointer_table_for_Item_Presence_ByWorld: ; this is referenced as -1, as in
     sta $00
     lda #06
     sta $01
-    lda $0561
+    lda MapNumber
     lsr a  ; Sets the carry flag that determines which 4 bits of the item presence byte is used
     tay
     lda ($00),y
@@ -3518,11 +3626,7 @@ World0:
 ; This is currently true for vanilla and Z2R
 RAFT_TILE_INDEX = $29
 
-PLAYER_X = $74
-AREA_LOCATION_INDEX = $0748
-PLAYER_HAS_RAFT = $0787
-
-; AREA_LOCATION_INDEX will later be changed to the side-scrolling location
+; LocationNumber will later be changed to the side-scrolling location
 ; index. z2ft needs this, at this specific address.
 AREA_ENTRANCE_INDEX = $69ff
 
@@ -3531,14 +3635,14 @@ FREE_UNTIL $8553 ; remove unused data here
 ; bridge connector coordinates are at $8553
 
 .org $8599
-    stx AREA_LOCATION_INDEX  ; X stashed away like in the original code
+    stx LocationNumber  ; X stashed away like in the original code
     stx AREA_ENTRANCE_INDEX
     cpx #RAFT_TILE_INDEX
     bne NotRaftTileProceed
-    lda PLAYER_HAS_RAFT
+    lda HaveRaft
     beq EndTileComparisons  ; It's a raft tile and we don't have the raft
     ; Determine raft exit direction from our overworld position instead of the vanilla table
-    lda PLAYER_X
+    lda OverworldXPosition
     ldx #1       ; raft going right
     cmp #20
     bcs SetVariablesForRaftTravel

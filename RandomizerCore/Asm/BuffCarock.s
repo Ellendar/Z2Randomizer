@@ -2,17 +2,7 @@
 
 .segment "PRG4"
 
-ProjectileYPosition = $30
-ProjectileXVelocity = $77
-ProjectileType      = $87
-EnemyType           = $a1
-LinkXPosition       = $4d
-EnemyXPositionLo    = $4e
-EnemyXPositionHi    = $3c
-RNG                 = $051b
 ProjectileEnemyData = $07c0
-
-EnemyYVelocity = $057e
 ; SinWaveVelocityIncrement = $ba1c
 
 ; Hook into carrock's update code to add the new position calculation
@@ -29,29 +19,29 @@ ChooseNewCarrockXPosition:
     lda RNG,x
     ; By shifting links opposite side bit twice, we can force Carrock to be closer to the wall
     asl
-    sta EnemyXPositionLo,x
+    sta Enemy0XPositionLo,x
 
     ; Since Link's position can be from roughly $00fb - 01ef
     ; We can offset this by flipping the high bit, and then checking if its greater than
     ; $80 - $10 (which would be like starting the range from F0 - 70)
-    lda LinkXPosition
+    lda LinkXPositionLo
     eor #$80
     cmp #$70
 
     ; At this point, the carry contains the bit for the opposite side of the screen for link
     ; So shift it back into bosses position
-    ror EnemyXPositionLo,x
+    ror Enemy0XPositionLo,x
 
     ; Vanilla checks to see if carrock is too close to the right edge, and prevents going
     ; offscreen by dividing the position by two if it would
     lda #$e0
-    cmp EnemyXPositionLo,x
+    cmp Enemy0XPositionLo,x
     bcs @SetXHighPos
         sbc #$10 - 1
-        sta EnemyXPositionLo,x
+        sta Enemy0XPositionLo,x
 @SetXHighPos:
     lda #1
-    sta EnemyXPositionHi,x
+    sta Enemy0XPositionHi,x
     rts
 
 ; Inside a funciton that updates motion for (maybe?) all projectiles
@@ -72,10 +62,10 @@ MoveSinWaveWifiShot:
         lda ProjectileEnemyData,x
         and #$01
         tay
-        lda EnemyYVelocity,x
+        lda Enemy0YVelocity,x
         clc
         adc SinWaveVelocityIncrement,y
-        sta EnemyYVelocity,x
+        sta Enemy0YVelocity,x
         cmp SinWaveMaxVelocityExtant,y
         bne @NotAtMaxVelocity
             inc ProjectileEnemyData,x
@@ -88,8 +78,8 @@ MoveSinWaveWifiShot:
         bcc @PositiveVelocity
             ora #$f0
 @PositiveVelocity:
-        adc ProjectileYPosition,x
-        sta ProjectileYPosition,x
+        adc Projectile0YPosition,x
+        sta Projectile0YPosition,x
     ldy #$12
 @NotAWifiShot:
     ; Perform the original patched call
@@ -102,12 +92,12 @@ MoveSinWaveWifiShot:
 .reloc
 RandomizeWifiShotType:
     ldx $10
-    lda EnemyType,x
+    lda Enemy0Type,x
     cmp #$22 ; check if its spawned by carock and skip it. carock code id is 0x22
     beq @CarockShot
         ; Do the original code since its not our new buffed carock
         lda #$c0
-        sta ProjectileYPosition,y
+        sta Projectile0YPosition,y
         rts
 @CarockShot:
     ; Fetch a random number and 50/50 chance its a straight shot
@@ -120,7 +110,7 @@ RandomizeWifiShotType:
     @HiPositionShot:
         sta ProjectileEnemyData,y
         lda #0
-        sta EnemyYVelocity,y
+        sta Enemy0YVelocity,y
         lda ProjectileEnemyData,y
         ora #$b0
         ; Firing a sin wave shot, so set the flag for sin wave and then follow through setting up the position
@@ -136,12 +126,12 @@ RandomizeWifiShotType:
         clc
         adc #$10
 @WriteShotYCoord:
-    sta ProjectileYPosition,y
+    sta Projectile0YPosition,y
     ; roll a random number to see if we shoot a fast beam
     lda RNG+1
     and #1
     beq @Exit
-        lda ProjectileXVelocity,y
+        lda Projectile0XVelocity,y
         bmi @NegativeVelocity
            clc
            adc #$10
@@ -150,7 +140,7 @@ RandomizeWifiShotType:
         sec
         sbc #$10
 @DoneVelocityUpdate:
-        sta ProjectileXVelocity,y
+        sta Projectile0XVelocity,y
 @Exit:
     rts
 
