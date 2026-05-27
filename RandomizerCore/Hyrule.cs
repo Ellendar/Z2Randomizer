@@ -272,8 +272,6 @@ public class Hyrule
                 throw new UserFacingException("Vanilla ROM checksum failure", "Please provide an unmodified Zelda 2 ROM (US release).");
             }
 
-            byte [] roomsFileHash = MD5Hash.ComputeHash(new UTF8Encoding().GetBytes(Util.ReadAllTextFromFile(config.GetRoomsFile())));
-
             // Make a copy of the vanilla data to prevent seed bleed
             ROMData = new ROM(vanillaRomData.ToArray(), true);
 
@@ -517,17 +515,6 @@ public class Hyrule
                     }
                 }
             }
-
-            byte[] finalRNGState = new byte[32];
-
-            r.NextBytes(finalRNGState);
-            byte[] hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
-                Flags +
-                SeedHash +
-                randoRomHash +
-                roomsFileHash +
-                Util.ByteArrayToHexString(finalRNGState)
-            ));
 
             UpdateRom();
 

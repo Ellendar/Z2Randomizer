@@ -13,7 +13,7 @@ public partial class PalaceRooms
 
     private readonly Dictionary<string, Room> roomsByName = new();
 
-    public static readonly string roomsMD5 = "PH/R/F8fbGvk60LAskt8Sg==";
+    public static readonly string roomsMD5 = "JCa3OsnJhIe/fZ5yrx/+mA==";
 
     public PalaceRooms(string palaceJson, bool doValidation)
     {
