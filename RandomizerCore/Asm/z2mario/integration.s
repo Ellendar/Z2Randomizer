@@ -192,6 +192,11 @@ BankPatchLinkDrawRoutine:
   pla
   rts
 
+; Update z2 block collision check to use the regular link hitbox for fairy
+; by just skipping the y+1 it does to set the fairy size offset
+.org $e07f
+  jmp *+3
+
 .org $E1A2
   jsr CheckIfAboveScreenForFallingFairyCheck
   nop
