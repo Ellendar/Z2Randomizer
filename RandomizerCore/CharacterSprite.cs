@@ -56,7 +56,7 @@ public class CharacterSprite
 
     public static CharacterSprite Random(CharacterSprite[] options)
     {
-        Random random = new Random();
+        System.Random random = new();
         return options[random.Next(options.Length - 1)];
     }
 };

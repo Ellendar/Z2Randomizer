@@ -13,6 +13,7 @@
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <DefineConstants Condition="'$(Configuration)' == 'Unsafe Debug'">UNSAFE_DEBUG;$(DefineConstants)</DefineConstants>
     <PublishTrimmed>true</PublishTrimmed>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
