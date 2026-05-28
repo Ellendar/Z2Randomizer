@@ -93,7 +93,7 @@
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" />
         <PackageReference Include="js65.browser" GeneratePathProperty="true" />
-        <PackageReference Include="Microsoft.JSInterop" Version="10.0.6" />
+        <PackageReference Include="Microsoft.JSInterop" />
     </ItemGroup>
 
     <ItemGroup>
