@@ -44,6 +44,29 @@
 ;   sta $0774 ;infinite health
 ;.endif
 
+; check for going down the chimney in darunia
+    lda $070E ; chimney sinking state (0 == not sinking non zero == sink away)
+    beq @continueMario
+      inc $070E ; acts as a timer for sinking now
+      lda $070E
+      cmp #$38
+      bcs @finishedSinking
+        inc Player_Y_Position
+        lda #$20
+        sta $0752
+        sta SprObject_SprAttrib
+        ldx #METASPRITE_BIG_MARIO_CROUCHING
+        ldy #0
+        .import DrawMetasprite
+        jmp DrawMetasprite
+@finishedSinking:
+    inc $075B
+    lda #0
+    sta $0752
+    sta SprObject_SprAttrib
+    lda #$16
+    jmp $E187
+@continueMario:
   lda GameEngineSubroutine  ;run routine based on number (a few of these routines are
   jsr JumpEngine            ;merely placeholders as conditions for other routines)
 
@@ -2217,7 +2240,7 @@ FireballObjCore:
   lda #4                       ;set vertical speed of fireball
   sta Fireball_Y_Speed,x
   
-  lda #0 ; Don't add extra gravity ?
+  lda #0 ; Don't add extra gravity (probs not needed?)
   sta SprObject_X_MoveForce + FireballOffset,x
   sta SprObject_Y_MoveForce + FireballOffset,x
 ;  lda #$07
@@ -2615,8 +2638,8 @@ HammerXPosition:
 	asl
 	asl
 	asl
-	adc SprObject_X_MoveForce,x
-	sta SprObject_X_MoveForce,x
+	adc SprObject_X_MoveForce + FireballOffset,x
+	sta SprObject_X_MoveForce + FireballOffset,x
 
 	php
 	lda Fireball_X_Speed,x
