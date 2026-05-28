@@ -1498,3 +1498,10 @@ CheckIfPlayerSmall:
   .byte $00 ; big Y offset
   .byte $0f ; small Y length
   .byte $1d ; big Y length
+
+; Replace the THE END text with UNLIKE LINK
+.segment "PRG5"
+.org $8F8F
+                 ; U   N   L   I   K   E       L   I   N   K
+.byte $23,$14,$0b,$ee,$e7,$e5,$e2,$e4,$de,$f4,$e5,$e2,$e7,$e4,$ff
+.assert * = $8f9e
