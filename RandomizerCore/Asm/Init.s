@@ -31,6 +31,7 @@
 
 ; Mark unused areas in the ROM so the linker can place stuff here
 
+FREE "PRG0" [$a89e, $a980)
 ; FREE "PRG0" [$AA40, $c000)
 FREE "PRG0" [$AB00, $c000) ; give room for z2edit to patch $aa40
 
@@ -44,9 +45,9 @@ FREE "PRG2" [$93c9, $9400)
 FREE "PRG2" [$9f85, $a000)
 FREE "PRG2" [$a933, $b480)
 
-;FREE "PRG3" [$8bb1, $90f0]
-;FREE "PRG3" [$9134, $9400]
-;FREE "PRG3" [$9d0a, $a000]
+FREE "PRG3" [$8cc0, $90f0)
+FREE "PRG3" [$9135, $9400)
+FREE "PRG3" [$9d0b, $a000)
 FREE "PRG3" [$B803, $c000)
 
 FREE "PRG4" [$83DC, $8470)
@@ -76,6 +77,7 @@ FREE "PRG5" [$bda1, $c000)
 ;FREE "PRG6" [$ac09, $c000) TEMP
 FREE "PRG6" [$ac21, $c000)
 
+FREE "PRG7" [$d39a, $d3ca)
 ; DPCM data, will affect dpcm sfx but not gameplay so its fine to use this as a last ditch
 ; free space for patches. Keep it disabled as much as possible
 ; FREE "PRG7" [$f369, $fcfb)
