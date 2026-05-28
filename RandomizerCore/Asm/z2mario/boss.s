@@ -117,7 +117,7 @@ InitShadowBoss:
       ldx #0               ; Dark Link entity is always at enemy slot 0
       ; Set HP
       lda #60
-      sta Enemy_HP,x
+      sta EnemyHP,x
       lda #JUMPING
       sta boss_animation
       lda #CHR_BIGMARIO
@@ -201,7 +201,7 @@ RunBoss:
       rts
 
   @notfreezed:
-      lda Enemy_HP,x
+      lda EnemyHP,x
       bmi AnimateKilledBoss     ; HP < 0: boss is fully dead
       bne @alive
       jmp KillBoss              ; HP == 0: playing death countdown
@@ -1065,7 +1065,7 @@ KillBoss:
       jsr MoveD_EnemyVertically  ; gravity decelerates upward motion then pulls boss down
       dec boss_counter
       bne @done                  ; still in animation window
-        dec Enemy_HP,x
+        dec EnemyHP,x
   @done:
       ldx #0
       rts
@@ -1090,7 +1090,7 @@ InjuredBoss:
       lda boss_invincibility_timer
       bne @done                 ; already invincible, no damage
       inc boss_screech          ; track hit count
-      dec Enemy_HP,x       ; reduce HP
+      dec EnemyHP,x       ; reduce HP
       lda #80
       sta boss_invincibility_timer  ; 80 frames of invincibility
   @done:
@@ -1149,13 +1149,13 @@ InjuredBossJump:
     lda boss_invincibility_timer
     bne @done             ; already invincible, no damage (caller still bounces Mario)
     inc boss_screech
-    lda Enemy_HP,x
+    lda EnemyHP,x
     sec
     sbc #5
     bcs +
     lda #0              ; floor at 0
 +
-    sta Enemy_HP,x
+    sta EnemyHP,x
     beq +
         ; don't play sfx for last hit. works around a weird bug i didn't bother to fix
         lda #$10 ; Sword stab SFX

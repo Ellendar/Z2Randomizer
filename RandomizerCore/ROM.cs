@@ -1296,6 +1296,7 @@ LoadMapData:
     public void UpAController1(Assembler a)
     {
         a.Module().Code("""
+.include "z2r.inc"
 .segment "PRG0"
 .org $a19f
 CheckController1ForUpAUnknown:
@@ -2086,7 +2087,7 @@ OverwriteSpriteCHRBank:
     adc #1
     sta SpChrBank5Reg
     ; due to an MMC5 issue, we need to write a bg bank as well.
-    lda CurrentChrBank
+    lda CurrentCHRBank
     asl
     asl
     ; clc ; carry is clear here
