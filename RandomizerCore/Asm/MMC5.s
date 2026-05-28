@@ -133,6 +133,7 @@ LagFrameVar = $100
 .else
     UpdateSound = $9000
 .endif
+UpdateTitleScreenSound = $800a
 
 .segment "PRG6"
 
@@ -205,8 +206,12 @@ HandleLagFrame:
     beq @RunAudio
         ; Audio is currently running on the main thread; signal it to re-run after
         dec PendingAudioCall
+@TitleScreenSoSkip:
         rts
 @RunAudio:
+    ; Run title screen music if we are in the title screen instead
+    bit LagFrameVar
+    bvc @TitleScreenSoSkip
     jmp UpdateSound
 
 .segment "PRG7"
