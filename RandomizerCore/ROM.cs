@@ -434,6 +434,37 @@ public class ROM
         }
     }
 
+    public void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft, bool enableZ2Mario)
+    {
+        var a = asm.Module();
+        a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
+        a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
+        if (enableZ2Mario)
+            a.Assign("ENABLE_Z2_MARIO", 1);
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
+        // Copy the ganon laugh from bank F to bank 1F
+        a.Segment("PRG1F");
+        a.Org(0xf800);
+        a.Byt(GetBytes(0x1f3d0, 0x1c0));
+        a.Org(0xf9c0);
+        a.Byt(GetBytes(0x1f710, 0x115));
+        a.Org(0xfb00);
+        a.Byt(GetBytes(0x1f850, 0x115));
+        a.Org(0xfc40);
+        a.Byt(GetBytes(0x1f9d0, 0x1b1)); // Theres two samples here in vanilla back to back
+        // Update the DPCM sample address to point to the new location
+        a.Segment("PRG6");
+        a.Org(0x917f);
+        a.Byt((byte)((0xf800 - 0xc000) / 64));
+        a.Org(0x9183);
+        a.Byt((byte)((0xf9c0 - 0xc000) / 64));
+        a.Org(0x9185);
+        a.Byt((byte)((0xfb00 - 0xc000) / 64));
+        a.Org(0x9187);
+        a.Byt((byte)((0xfc40 - 0xc000) / 64));
+        a.Org(0x9189);
+        a.Byt((byte)((0xfd40 - 0xc000) / 64));
+    }
     public void AddRandomizerToTitle(Assembler asm, bool marioMode, bool isRandomized)
     {
         // This is just updating the macro commands used to draw the title screen tiles
@@ -1082,12 +1113,13 @@ ReturnNormally:
 ; move the pointers for the data for the sideviews to load from RAM instead.
 .segment "PRG7"
 .org $C50C ; patch where the pointer for sideview data is loaded
-    jsr CopySideviewIntoRAMAndLoadPointer
+    jsr LoadPointerForReadingBankedSideView
+    jsr CopySideviewIntoRAM
     jmp $C53A
 FREE_UNTIL $C53A
 
 .reloc
-CopySideviewIntoRAMAndLoadPointer:
+LoadPointerForReadingBankedSideView:
     ; y is the offset for the type to load from.
     ; 0 = encounter
     ; 1 = west hyrule town
@@ -1127,6 +1159,10 @@ CopySideviewIntoRAMAndLoadPointer:
     sta $d5
     lda ($02),y
     sta $d7
+    rts
+
+.reloc
+CopySideviewIntoRAM:
 
     ; if its not a palace area, skip switching banks
     lda WorldNumber

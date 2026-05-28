@@ -215,7 +215,6 @@ HandleLagFrame:
     jmp UpdateSound
 
 .segment "PRG7"
-
 .reloc
 RunAudioFrameOrLagFrame:
     pha
@@ -249,6 +248,8 @@ RunAudioFrameOrLagFrame:
     pla
     rti
 
+.segment "PRG7"
+
 ; Disable the final sta PPUCTRL in NMI if we handle that in the IRQ instead
 .org $C1B1
     jmp *+3
@@ -275,7 +276,6 @@ Nmi:
 .assert * = $C085
 
 ; Also run the stat timers during the title/menu in case they push the reset button
-.pushseg
 .segment "PRG5"
 .org $A612
     ; Change this from and #$7c to $fc to keep NMI running
@@ -300,9 +300,8 @@ IncStatTimerTitle:
     sta SoftDisableNmi
     ora $0747
     rts
-.popseg
 
-
+.segment "PRG7"
 ; Add a patch to increment the stat timer every NMI
 ; This is cleared when a new save file is loaded for the first time
 .reloc
@@ -341,6 +340,7 @@ IncStatTimer:
         asl
         adc PalaceRegionIndex
         tay
+.import PalaceMappingTable
         ldx PalaceMappingTable,y
 @IncrementTimer:
         inc StatTimeAtLocation+0,x
@@ -352,32 +352,7 @@ IncStatTimer:
 @Exit:
     rts
 
-; These values are exported from the randomizer and map from internal palace number
-; to the "real palace" at this offset. This way if Palace 5 is in the location of Palace 1,
-; then we increment the correct timer for Palace 5
-.reloc
-Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
-.export PalaceMappingTable
-PalaceMappingTable:
-    ; region 0 - east hyrule
-    .byte RealPalaceAtLocation1 * 3 + Palace1Offset
-    .byte RealPalaceAtLocation2 * 3 + Palace1Offset
-    .byte RealPalaceAtLocation3 * 3 + Palace1Offset
-    .byte $ff ; unused 4th palace in region 0
-    ; region 1 - death mountain 
-    .byte $ff ; unused 1st palace in region 1
-    .byte $ff ; unused 2nd palace in region 1
-    .byte $ff ; unused 3th palace in region 1
-    .byte $ff ; unused 4th palace in region 1
-    ; region 2 - west hyrule
-    .byte RealPalaceAtLocation5 * 3 + Palace1Offset
-    .byte RealPalaceAtLocation6 * 3 + Palace1Offset
-    .byte RealPalaceAtLocationGP * 3 + Palace1Offset
-    .byte $ff ; unused 4th palace in region 2
-    ; region 3 - maze island
-    .byte RealPalaceAtLocation4 * 3 + Palace1Offset
-    .byte $ff, $ff, $ff ; 3 unused palace locations
-
+.segment "PRG7"
 ; Screen split IRQ implementation. This is not technically a part of z2ft, but due to the policy of not making the game faster than vanilla, this optimization is only enabled when z2ft is enabled to partially offset the cost of FT playback.
 
 ; Patch locations that hard disable NMI to set the soft disable instead
@@ -475,7 +450,8 @@ bank1f_reset:
 	sta PrgBankEReg
 	jmp bank1f_reset_part2
 
-.org $fffc
+.org $fffa
+    .word (Bank1f_Nmi)
     .word (bank1f_reset)
 	.word (bank1f_reset)
 
@@ -668,6 +644,73 @@ UPDATE_REFS SwapToPRG0 @ $DFD9 $DFE2 $DFF6 $DFFF $E017 $E022 $E02B $E077 $E1E4 $
 UPDATE_REFS SwapToSavedPRG @ $E002
 
 .endif
+
+
+; Clear a ton of free space out of the fixed bank by banking ganon's laugh sfx
+; its only used during a scene thats otherwise doing nothing special, so we can
+; cheese it out using mmc5's ability to bank $e000.
+.segment "PRG7"
+
+.org $CA72
+    lda #$80
+    sta SoftDisableNmi
+	lda #$ff ; place the final bank in
+	sta PrgBankEReg
+    jmp GanonLaughingTeeHee
+SwapBackFromBank1f:
+	sta PrgBankEReg
+    jmp $CF05
+.assert * <= $CA85
+
+.segment "PRG1F"
+.reloc
+Bank1f_Nmi:
+    inc StatTimer
+    bne @skip
+        inc StatTimer+1
+        bne @skip
+            inc StatTimer+2
+@skip:
+    pha
+    lda $FE
+    sta PPUMASK
+    pla
+    rti
+.reloc
+GanonLaughingTeeHee:
+    lda #0
+    sta $0726
+	lda #(6*2) | PRG_BANK_ROM
+	sta PrgBank8Reg
+    lda #(6*2+1) | PRG_BANK_ROM
+	sta PrgBankAReg
+    ; re-enable rendering
+    lda $FE
+    ora #$18
+    ora $0768
+    sta $FE
+@loop:
+    ; Wait for NMI each frame
+    lda StatTimer
+@WaitForNMI:
+    cmp StatTimer
+    beq @WaitForNMI
+	jsr UpdateSound
+    jsr $D346 ; bank7_Controllers_Input ; this is in $d000 so its safe
+    lda $F7
+    and #$10
+    bne @donewaiting
+    lda $0501
+    beq @donewaiting
+        dec $0501
+        jmp @loop
+@donewaiting:
+    ldx #1
+    stx $07EE ; set to skip to the last sfx
+    dex
+    stx SoftDisableNmi
+	lda #((7*2 + 1) | PRG_BANK_ROM); place the final bank in
+    jmp SwapBackFromBank1f
 
 .segment "PRG0"
 

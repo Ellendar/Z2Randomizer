@@ -78,10 +78,19 @@ FREE "PRG5" [$bda1, $c000)
 ;FREE "PRG6" [$ac09, $c000) TEMP
 FREE "PRG6" [$ac21, $c000)
 
+; FREE "PRG7" [$d39a, $d3c2)
 ; DPCM data, will affect dpcm sfx but not gameplay so its fine to use this as a last ditch
 ; free space for patches. Keep it disabled as much as possible
 ; FREE "PRG7" [$f369, $fcfb)
-FREE "PRG7" [$f3d0, $fcfb) ; allow code in the ganon laugh sfx but not the hurt sfx
+; allow code in the ganon laugh sfx but not the hurt sfx
+; This is fine because we now put the ganon laugh in PRG1F instead
+FREE "PRG7" [$f3d0, $fcfb)
+; carve around the ganon sfx and hope it still fits
+; FREE "PRG7" [$f581, $f700)
+; FREE "PRG7" [$f814, $f840)
+; FREE "PRG7" [$f955, $f9c0)
+; FREE "PRG7" [$fb71, $fcfb)
+; FREE "PRG7" [$FEAA, $FED0)
 
 ; Currently these are only used as space for music tracks
 ;FREE "PRG10" [$a000, $c000)
@@ -101,4 +110,7 @@ FREE "PRG1D" [$a000, $c000)
 FREE "PRG1E" [$a000, $c000)
 
 ; Most of bank 1f is reserved for z2ft
-FREE "PRG1F" [$ff80, $ffe8)
+; But we have some small gaps we can slide in between the DPCM samples
+FREE "PRG1F" [$fad6, $fb00)
+FREE "PRG1F" [$fc14, $fc40)
+FREE "PRG1F" [$fe31, $ffe8)
