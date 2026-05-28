@@ -339,7 +339,7 @@ public sealed class EastHyrule : World
         {
             Debug.Assert(MapRows == 75);
             Debug.Assert(MapColumns == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
+            map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
 
             if (biome == Biome.VANILLA_SHUFFLE)
             {
@@ -444,7 +444,7 @@ public sealed class EastHyrule : World
                     };
                 }
 
-                map = new Terrain[MapRows, MapColumns];
+                map = new OverworldMap(MapRows, MapColumns);
 
                 for (int i = 0; i < MapRows; i++)
                 {

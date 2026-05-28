@@ -226,7 +226,7 @@ sealed class DeathMountain : World
         {
             Debug.Assert(MapRows == 75);
             Debug.Assert(MapColumns == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
+            map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
@@ -245,7 +245,7 @@ sealed class DeathMountain : World
             int bytesWritten = 2000;
             while (bytesWritten > MAP_SIZE_BYTES)
             {
-                map = new Terrain[MapRows, MapColumns];
+                map = new OverworldMap(MapRows, MapColumns);
                 Terrain riverT = Terrain.MOUNTAIN;
                 if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA && biome != Biome.ISLANDS)
                 {

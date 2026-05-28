@@ -340,7 +340,7 @@ public sealed class WestHyrule : World
         {
             Debug.Assert(MapRows == 75);
             Debug.Assert(MapColumns == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
+            map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 areasByLocation = new SortedDictionary<string, List<Location>>
@@ -398,7 +398,7 @@ public sealed class WestHyrule : World
                 sariaSouth.CanShuffle = false;
                 sariaNorth.CanShuffle = false;
 
-                map = new Terrain[MapRows, MapColumns];
+                map = new OverworldMap(MapRows, MapColumns);
 
                 //blank the whole map to start
                 for (int i = 0; i < MapRows; i++)
