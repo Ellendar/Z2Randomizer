@@ -207,7 +207,7 @@ internal class MusicRandomizer
             { Usage.LastBoss, 1 },
             { Usage.Credits, 1 },
             { Usage.GameComplete, 1 },
-            { Usage.House, 4 },
+            { Usage.House, 1 },
         };
         var selUsesSongs = _imptr.SelectUsesSongs<Usage>(
             usesSongs, numUsageSongs, _shuffler);
@@ -316,6 +316,7 @@ internal class MusicRandomizer
         {
             { Usage.Title, 0 },
             { Usage.Overworld, 1 },
+            { Usage.House, 7 },
             { Usage.Boss, 0xb },
             { Usage.LastBoss, 0x12 },
             { Usage.Credits, 0x10 },
