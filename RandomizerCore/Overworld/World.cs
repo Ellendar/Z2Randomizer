@@ -1012,83 +1012,69 @@ public abstract class World
                     Location bridge1 = GetLocation(LocationID.WEST_BRIDGE_AFTER_DM_WEST);
                     Location bridge2 = GetLocation(LocationID.WEST_BRIDGE_AFTER_DM_EAST);
 
-                    if (!walkableTerrains.Contains(map[y - deltaY, x - deltaX]))
+                    IntVector2 pos = new(x, y);
+                    IntVector2 startPos = new(startX, startY);
+                    IntVector2 forward = new(deltaX, deltaY);
+                    IntVector2 side = forward.Perpendicular();
+
+                    IntVector2 backPos = pos - forward;
+                    if (!walkableTerrains.Contains(map[backPos]))
                     {
-                        map[y - deltaY, x - deltaX] = Terrain.BRIDGE;
+                        map[backPos] = Terrain.BRIDGE;
                     }
 
-                    while (!crossingTerrains.Contains(map[y + perpDy, x + perpDx]) && !crossingTerrains.Contains(map[y - perpDy, x - perpDx]))
+                    while (!crossingTerrains.Contains(map[pos + side]) &&
+                           !crossingTerrains.Contains(map[pos - side]))
                     {
-                        if ((deltaY < 0 && y > startY) || (deltaY > 0 && y < startY) || (deltaX < 0 && x > startX) || (deltaX > 0 && x < startX))
+                        if (startPos.IsBehind(pos, forward))
                         {
                             logger.Warn("Unable to roll back bridge location with jagged entrance");
                             return false;
                         }
-                        x -= deltaX;
-                        y -= deltaY;
+                        pos -= forward;
                     }
-                    if (crossingTerrains.Contains(map[y + deltaY, x + deltaX]))
+
+                    if (crossingTerrains.Contains(map[pos + forward]))
                     {
-                        x += deltaX;
-                        y += deltaY;
+                        pos += forward;
                     }
 
                     if (deltaX > 0 || deltaY > 0)
                     {
-                        bridge2.Xpos = x;
-                        bridge2.Y = y;
+                        bridge2.Pos = pos;
                     }
                     else
                     {
-                        bridge1.Xpos = x;
-                        bridge1.Y = y;
+                        bridge1.Pos = pos;
                     }
 
-                    if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
-                        && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                    NormalizeBridgeSideTerrain(map, pos, side);
+
+                    while (pos != startPos)
                     {
-                        map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
-                    }
-                    if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
-                        && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
-                    {
-                        map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                        map[pos] = Terrain.BRIDGE;
+                        pos -= forward;
                     }
 
-                    while ((deltaX != 0 && x != startX) || (deltaY != 0 && y != startY))
+                    if (crossingTerrains.Contains(map[pos]))
                     {
-                        map[y, x] = Terrain.BRIDGE;
-                        x -= deltaX;
-                        y -= deltaY;
+                        map[pos] = map[pos - forward];
                     }
 
-                    if (crossingTerrains.Contains(map[y,x]))
-                    {
-                        map[y, x] = map[y - deltaY, x - deltaX];
-                    }
-                    x += deltaX;
-                    y += deltaY;
-                    if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
-                        && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
-                    {
-                        map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
-                    }
-                    if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
-                        && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
-                    {
-                        map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
-                    }
-                    map[y, x] = Terrain.BRIDGE;
+                    pos += forward;
+
+                    NormalizeBridgeSideTerrain(map, pos, side);
+                    map[pos] = Terrain.BRIDGE;
+
                     if (deltaX > 0 || deltaY > 0)
                     {
-                        bridge1.Xpos = x;
-                        bridge1.Y = y;
+                        bridge1.Pos = pos;
                     }
                     else
                     {
-                        bridge2.Xpos = x;
-                        bridge2.Y = y;
+                        bridge2.Pos = pos;
                     }
+
                     placeLongBridge = false;
                     bridge1.CanShuffle = false;
                     bridge2.CanShuffle = false;
@@ -1099,89 +1085,70 @@ public abstract class World
                     Location bridge2 = GetLocation(LocationID.EAST_TRAP_DESERT1);
                     if (bridge1.CanShuffle && bridge2.CanShuffle)
                     {
-                        if (!walkableTerrains.Contains(map[y - deltaY, x - deltaX]))
+                        IntVector2 pos = new(x, y);
+                        IntVector2 startPos = new(startX, startY);
+                        IntVector2 forward = new(deltaX, deltaY);
+                        IntVector2 side = new(perpDx, perpDy);
+
+                        if (!walkableTerrains.Contains(map[pos - forward]))
                         {
-                            map[y - deltaY, x - deltaX] = Terrain.DESERT;
+                            map[pos - forward] = Terrain.DESERT;
                         }
-                        //Walk backwards until the first tile flanked on both sides by the river
-                        while (!crossingTerrains.Contains(map[y + perpDy, x + perpDx]) && !crossingTerrains.Contains(map[y - perpDy, x - perpDx]))
+
+                        while (!crossingTerrains.Contains(map[pos + side]) &&
+                               !crossingTerrains.Contains(map[pos - side]))
                         {
-                            if ((deltaY < 0 && y > startY) || (deltaY > 0 && y < startY) || (deltaX < 0 && x > startX) || (deltaX > 0 && x < startX))
+                            if (startPos.IsBehind(pos, forward))
                             {
                                 logger.Warn("Unable to roll back bridge location with jagged entrance");
                                 return false;
                             }
-                            x -= deltaX;
-                            y -= deltaY;
+                            pos -= forward;
                         }
 
-                        //That's where the first bridge encounter is
+                        // first bridge encounter
                         if (deltaX > 0 || deltaY > 0)
                         {
-                            bridge2.Xpos = x;
-                            bridge2.Y = y;
+                            bridge2.Pos = pos;
                         }
                         else
                         {
-                            bridge1.Xpos = x;
-                            bridge1.Y = y;
+                            bridge1.Pos = pos;
                         }
 
-                        if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
-                            && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
+                        NormalizeBridgeSideTerrain(map, pos, side);
+
+                        while (pos != startPos)
                         {
-                            map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
-                        }
-                        if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
-                            && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
-                        {
-                            map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
+                            map[pos] = Terrain.DESERT;
+                            pos -= forward;
                         }
 
-                        //Keep walking back placing deserts until the path opens up
-                        while ((deltaX != 0 && x != startX) || (deltaY != 0 && y != startY))
+                        if (map[pos].IsWater())
                         {
-                            map[y, x] = Terrain.DESERT;
-                            x -= deltaX;
-                            y -= deltaY;
-                        }
-                        //If you're going into a C-shape, you'll have a dead stub of water. fill it in
-                        if (map[y, x].IsWater())
-                        {
-                            map[y, x] = map[y - deltaY, x - deltaX];
+                            map[pos] = map[pos - forward];
                         }
 
-                        //now we're past the opening, so go the other way 1
-                        x += deltaX;
-                        y += deltaY;
+                        pos += forward;
 
-                        //If exactly one of the tiles adjacent to the bridge is a potentially impassable, demolish it so you can't get stuck in it.
-                        if ((map[y + perpDy, x + perpDx] == Terrain.MOUNTAIN || map[y + perpDy, x + perpDx].IsWater())
-                            && map[y - perpDy, x - perpDx] != Terrain.MOUNTAIN && !map[y - perpDy, x - perpDx].IsWater())
-                        {
-                            map[y - perpDy, x - perpDx] = map[y + perpDy, x + perpDx];
-                        }
-                        if ((map[y - perpDy, x - perpDx] == Terrain.MOUNTAIN || map[y - perpDy, x - perpDx].IsWater())
-                            && map[y + perpDy, x + perpDx] != Terrain.MOUNTAIN && !map[y + perpDy, x + perpDx].IsWater())
-                        {
-                            map[y + perpDy, x + perpDx] = map[y - perpDy, x - perpDx];
-                        }
-                        map[y, x] = Terrain.DESERT;
+                        NormalizeBridgeSideTerrain(map, pos, side);
+
+                        map[pos] = Terrain.DESERT;
+
                         if (deltaX > 0 || deltaY > 0)
                         {
-                            bridge1.Xpos = x;
-                            bridge1.Y = y;
+                            bridge1.Pos = pos;
                         }
                         else
                         {
-                            bridge2.Xpos = x;
-                            bridge2.Y = y;
+                            bridge2.Pos = pos;
                         }
+
                         bridge1.CanShuffle = false;
                         bridge2.CanShuffle = false;
                     }
-                    placeDaruniaDesert = false;
 
+                    placeDaruniaDesert = false;
                 }
                 else
                 {
@@ -1422,6 +1389,25 @@ public abstract class World
             sb.Append('\n');
         }
         return sb.ToString();
+    }
+
+    private static void NormalizeBridgeSideTerrain(OverworldMap map, IntVector2 pos, IntVector2 side)
+    {
+        IntVector2 left = pos - side;
+        IntVector2 right = pos + side;
+
+        bool leftBlocked = map[left] == Terrain.MOUNTAIN || map[left].IsWater();
+        bool rightBlocked = map[right] == Terrain.MOUNTAIN || map[right].IsWater();
+
+        if (rightBlocked && !leftBlocked)
+        {
+            map[left] = map[right];
+        }
+
+        if (leftBlocked && !rightBlocked)
+        {
+            map[right] = map[left];
+        }
     }
 
     protected List<Direction> NextToWaterDirections(int x, int y, Terrain[] crossingTerrains)
