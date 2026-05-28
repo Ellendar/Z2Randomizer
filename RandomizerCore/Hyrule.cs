@@ -2439,7 +2439,7 @@ public class Hyrule
             // Overwrite link's downstab animation with fireball explosion sprites
             var fireballExplosion = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.fireball_explosion.chr");
             var extra_sprites = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.tanooki_tail.chr");
-            var tanooki_tail = extra_sprites[..0xc0];
+            var tanooki_tail = extra_sprites[..0xa0]; // theres an extra unused tail tile in here
             var oneup = extra_sprites[0xc0..0xe0];
             var lifecount = extra_sprites[0xe0..0xf0];
             for (var i = 0; i < 13; i++)
