@@ -775,7 +775,12 @@ BossSpawnFireball:
       clc
       adc #4
       sta SprObject_Y_Position,y
+      lda Enemy_MovingDir,x
+      lsr
       lda Enemy_X_Position,x
+      bcc +
+        adc #15
+      +
       sta SprObject_X_Position,y
       lda Enemy_PageLoc,x
       sta SprObject_PageLoc,y
@@ -1054,6 +1059,7 @@ KillBoss:
         ; Clear out links magic to fix weird issues
         lda #0
         sta $076f
+        sta $d0
         inc ReloadCHRBank
     @animating:
       jsr MoveD_EnemyVertically  ; gravity decelerates upward motion then pulls boss down
