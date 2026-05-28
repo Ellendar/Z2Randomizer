@@ -990,10 +990,10 @@ public abstract class World
                     IntVector2 forward = new(deltaX, deltaY);
                     IntVector2 side = forward.Perpendicular();
 
-                    IntVector2 backPos = pos - forward;
-                    if (!walkableTerrains.Contains(map[backPos]))
+                    pos -= forward;
+                    if (!walkableTerrains.Contains(map[pos]))
                     {
-                        map[backPos] = Terrain.BRIDGE;
+                        map[pos] = Terrain.BRIDGE;
                     }
 
                     while (!crossingTerrains.Contains(map[pos + side]) &&
@@ -1063,9 +1063,10 @@ public abstract class World
                         IntVector2 forward = new(deltaX, deltaY);
                         IntVector2 side = new(perpDx, perpDy);
 
-                        if (!walkableTerrains.Contains(map[pos - forward]))
+                        pos -= forward;
+                        if (!walkableTerrains.Contains(map[pos]))
                         {
-                            map[pos - forward] = Terrain.DESERT;
+                            map[pos] = Terrain.DESERT;
                         }
 
                         while (!crossingTerrains.Contains(map[pos + side]) &&
