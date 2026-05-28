@@ -3,39 +3,6 @@ _Z2R_INC = 1
 
 .macpack common
 
-; janky macro res till it starts working
-.macro SET_RES_BASE addr
-    RES_BASE .set addr
-    RES_OFFSET .set 0
-.endmacro
-
-.macro RESV name, size
-    .ident(.string(name)) = RES_BASE + RES_OFFSET
-    .ifnblank size
-        RES_OFFSET .set RES_OFFSET + size
-    .else
-        RES_OFFSET .set RES_OFFSET + 1
-    .endif
-.endmacro
-
-; compile time array definition
-.macro DEFINE_ARRAY name
-    .macro .ident(.concat(.string(name), "_APPEND")) value
-        .local temp
-        .define temp name
-        .undefine name
-        .ifblank temp
-            .define name value
-        .else
-            .define name temp, value
-        .endif
-        .undefine temp
-    END_MAC
-
-    .define name
-.endmacro
-.define END_MAC .endmacro
-
 ;;; Standard register names
 PPUCTRL = $2000
 PPUMASK = $2001
@@ -52,6 +19,7 @@ JOY2 = $4017
 
 ;;; Include RAM values before any constants
 .include "ram.inc"
+
 
 R0 = $00
 R1 = $01
@@ -132,288 +100,11 @@ EnemyFacingDirection = $DC91
 LoadPlayerShieldCollisionBox = $e9d8
 ObjectCollisionCheck = $e9f9
 MoveEnemyHorizontally = $deb8
-
-; These are new variables that use free memory
-Z2Noise_SfxLenCounter = $07f5
-Z2Squ2_SfxLenCounter = $07f7
-Z2Squ1_SfxLenCounter = $07f9
-Z2NoiseSoundBuffer = $07fd
-Z2Square2SoundBuffer = $07fe
-Z2Square1SoundBuffer = $07ff
-
-Z2NoiseSoundQueue = $ed
-Z2Square2SoundQueue = $ee
-Z2Square1SoundQueue = $ef
-
-NoiseSoundQueue = $f0
-Square2SoundQueue = $f1
-Square1SoundQueue = $f2
-
-ProjectileYPosition = $30
-ProjectileXVelocity = $77
-ProjectileType      = $87
-EnemyType           = $a1
-Enemy_Flag = ProjectileType
-LinkXPosition       = $4d
-EnemyXPositionLo    = $4e
-EnemyXPositionHi    = $3c
-Enemy_HP            = $c2
-RNG                 = $051b
-ProjectileEnemyData = $07c0
-EnemyYVelocity = $057e
-
-;; NEW VARIABLE ALLOCATIONS
-; Stack RAM
-StackRAMBase = $0120
-SET_RES_BASE StackRAMBase
-RESV temp_room_code ; , $0120
-RESV temp_room_flag ; , $0121
-RESV DontKillEnemyFlag ; , $0122
-RESV Global5050JarDrop ; = $123 ; $0123
-RESV PreventDoubleLag
-RESV PreviousFrameMetasprite
-RESV StatDisplayState
-RESV InternalState
-RESV GameComplete ; set when you beat the game to stop the timers
-RESV ElevatorYStart
-RESV DripperRedCounter
-RESV PpuCtrlForIrq
-RESV ScrollPosForIrq
-RESV IrqSetupAlready
-RESV ProjectileProcessing
-RESV PendingAudioCall ; 1=audio running on main thread, 0=NMI decremented it (needs re-run)
-; Expanded the block break list to hold up to 10 bricks at a time instead of just 5
-BREAKABLE_BLOCK_COUNT = 10
-RESV BlockBreakYCoord, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0429 - Y Low byte for collision table
-RESV BlockBreakColumnOffset, BREAKABLE_BLOCK_COUNT ; Vanilla addr $042E - Offset in the collision table
-RESV BlockBreakAddrLo, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table lo addr
-RESV BlockBreakAddrHi, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table hi addr
-
-
-.ifdef ENABLE_Z2_MARIO
-
-; New RAM values that aren't from vanilla SMB1 code
-RESV mapMarioIndex
-RESV mapMarioTimer
-RESV mapMarioPrevDirection
-
-;;;
-; MARIO related values that are not directly mapped to vanilla z2 object values
-
-ObjectOffset = $10
-; RESV FBall_OffscreenBits
-; RESV AltEntranceControl
-; RESV PlayerEntranceCtrl
-; RESV JoypadOverride
-; RESV Vine_Height
-RESV Player_State
-; RESV DisableCollisionDet
-RESV GameEngineSubroutine
-; RESV AreaType
-; RESV A_B_Buttons
-A_B_Buttons = $741
-RESV PreviousA_B_Buttons
-; RESV Left_Right_Buttons
-Left_Right_Buttons = $742
-; RESV Up_Down_Buttons
-Up_Down_Buttons = $743
-RESV PlayerSize
-; RESV DeathMusicLoaded
-RESV EventMusicQueue
-RESV EventMusicBuffer ; TODO use the vanilla music queues
-; RESV WarpZoneControl
-RESV Player_CollisionBits ; Split Z2 and SMB1 collision bits
-; RESV HalfwayPage
-;RESV SwimmingFlag
-SwimmingFlag = $13
-RESV CurrentOAMOffset
-; RESV ObjectMetasprite
-RESV PlayerAnimCtrl
-RESV PlayerChangeSizeFlag
-RESV VerticalForceDown
-RESV VerticalForce
-RESV JumpOrigin_Y_Position
-RESV JumpOrigin_Y_HighPos
-RESV DiffToHaltJump
-RESV PlayerAnimTimerSet
-RESV JumpspringAnimCtrl
-RESV Player_XSpeedAbsolute
-; RESV Whirlpool_Flag
-RESV RunningSpeed
-RESV MaximumLeftSpeed
-RESV MaximumRightSpeed
-RESV FrictionAdderLow
-RESV FrictionAdderHigh
-RESV Player_Pos_ForScroll
-RESV Player_X_Scroll
-RESV Player_X_MoveForce
-RESV PlayerStandingMetatile ; added to keep this for door checks and other metatiles
-RESV PlayerIsDownstabbing ; Simplify downstab checks by just storing if we set the hitbox
-
-; Non-timer timer.
-RESV FireballThrowingTimer
-
-RESV TimerControl
-RESV IntervalTimerControl
-
-Timers = PlayerAnimTimer
-RESV PlayerAnimTimer
-RESV ClimbSideTimer
-RESV JumpSwimTimer
-RESV RunningTimer
-RESV SideCollisionTimer
-; RESV BlockBounceTimer
-FRAME_TIMER_COUNT = SideCollisionTimer - Timers
-; RESV StarInvincibleTimer
-ALL_TIMER_COUNT = SideCollisionTimer - Timers ; StarInvincibleTimer - Timers
-
-RESV SpriteShuffleOffset
-;RESV CurrentCHRBank
-RESV PlayerChrBank
-RESV ReloadCHRBank
-RESV ObjectVerticalFlip
-RESV Local_eb
-; Used by hammers to track how long they've been alive
-RESV PlayerProj_Cnt, 2
-
-; Values use for SMB1 sfx audio engine
-
-RESV Sfx_SecondaryCounter
-; RESV PauseSoundBuffer
-; RESV PauseModeFlag
-; RESV PauseSoundQueue
-RESV Square1SoundBuffer
-RESV Square2SoundBuffer
-RESV NoiseSoundBuffer
-RESV Squ1_SfxLenCounter
-RESV Squ2_SfxLenCounter
-RESV Noise_SfxLenCounter
-RESV TailWag_CtlHold
-RESV TailWag_FreqLo
-RESV TailWag_FreqHi
-
-RESV JustThrownHammer
-RESV TailSwingTimer
-; SMB3 raccoon flutter: nonzero = Y-velocity cap active
-RESV TailWagCount
-; Per-enemy "hit by hammer" flag. Persistent across the enemy's hit-flash so
-; later per-enemy recoil setters ($9AF9 etc., which run after ProjectileProcessing
-; is cleared) can still know to suppress the knockback. Cleared when the flash
-; timer at $040E,x decrements to zero (see bank7_Display patch).
-RESV HammerHitFlag, 6
-
-; Shadow Mario Boss RAM
-CUSTOM_BOSS_START = RES_OFFSET
-RESV boss_animation
-RESV boss_invincibility_timer
-RESV boss_screech
-RESV boss_state
-RESV boss_state_timer
-RESV boss_walking_anim
-RESV boss_bridge
-RESV boss_shootanim
-RESV boss_substate
-RESV boss_counter
-RESV boss_freeze
-RESV boss_ChrBank
-RESV boss_transition_delay      ; nonzero = boss is paused mid-state-switch (frames remaining)
-BOSS_RAM_SIZE = RES_OFFSET - CUSTOM_BOSS_START - 1
-
-EnemyProjectileOffset = 7
-EnemyProjectileType        = ObjectMetasprite     + EnemyProjectileOffset
-EnemyProjectile_X_Position = SprObject_X_Position + EnemyProjectileOffset
-EnemyProjectile_Y_Position = SprObject_Y_Position + EnemyProjectileOffset
-EnemyProjectile_PageLoc    = SprObject_PageLoc    + EnemyProjectileOffset
-EnemyProjectile_Y_HighPos  = SprObject_Y_HighPos  + EnemyProjectileOffset
-EnemyProjectile_X_Speed    = SprObject_X_Speed    + EnemyProjectileOffset
-EnemyProjectile_Y_Speed    = SprObject_Y_Speed    + EnemyProjectileOffset
-EnemyProjectile_SprAttrib  = SprObject_SprAttrib  + EnemyProjectileOffset
-ENEMY_PROJECTILE_COUNT     = 6
-
-; MARIO SPECIFIC RAM LOCATIONS
-; These are values that are hardcoded to match where Zelda 2 places them
-Player_X_Speed = $70
-SprObject_X_Speed = Player_X_Speed
-Player_X_Position = $4D
-SprObject_X_Position = Player_X_Position
-Player_PageLoc = $3B
-SprObject_PageLoc = Player_PageLoc
-Player_Y_Position = $29
-SprObject_Y_Position = Player_Y_Position
-Player_Y_HighPos = $19
-SprObject_Y_HighPos = Player_Y_HighPos
-
-;Player_CollisionBits = $A7
-ScrollAmount = $14
-ObjectMetasprite = $80
-
-ProjectileOffset = 13
-FireballOffset = 13
-FireballMetasprite = ObjectMetasprite + FireballOffset
-Fireball_X_Position = SprObject_X_Position + FireballOffset
-Fireball_Y_Position = SprObject_Y_Position + FireballOffset
-Fireball_Y_HighPos = SprObject_Y_HighPos + FireballOffset
-Fireball_PageLoc = SprObject_PageLoc + FireballOffset
-Fireball_X_Speed = SprObject_X_Speed + FireballOffset
-Fireball_Y_Speed = SprObject_Y_Speed + FireballOffset
-RESV FireballBouncingFlag, 2
-RESV Fireball_State, 2
-
-EnemyOffset = 1   ; Enemy slot 0 = offset 1 from player
-Enemy_X_Position  = SprObject_X_Position + EnemyOffset
-Enemy_Y_Position  = SprObject_Y_Position + EnemyOffset
-Enemy_X_Speed     = SprObject_X_Speed + EnemyOffset
-Enemy_PageLoc     = SprObject_PageLoc + EnemyOffset
-Enemy_Y_HighPos   = SprObject_Y_HighPos + EnemyOffset
-Enemy_MovingDir   = Player_MovingDir + EnemyOffset
-Enemy_State       = $A8
-
-
-; For reasons I cannot explain, player_x_moveforce is not the same as sprobject_x_moveforce
-SprObject_X_MoveForce = $03d6 ; Player_X_MoveForce
-Player_Y_MoveForce = $03e6
-SprObject_Y_MoveForce = Player_Y_MoveForce
-Enemy_X_MoveForce = SprObject_X_MoveForce + EnemyOffset
-Enemy_Y_MoveForce = SprObject_Y_MoveForce + EnemyOffset
-
-Player_Y_Speed = $057D
-SprObject_Y_Speed = Player_Y_Speed
-Enemy_Y_Speed     = SprObject_Y_Speed + EnemyOffset
-
-FrameCounter = $12
-; CrouchingFlag = $17
-RESV CrouchingFlag
-Player_MovingDir = $5F
-Fireball_MovingDir = $6D
-PlayerFacingDir = $9F
-EnemyFacingDir = $A0
-SavedJoypadBits = $F7
-ScreenLeft_PageLoc = $72a
-ScreenRight_PageLoc = $72b
-ScreenEdge_PageLoc = ScreenLeft_PageLoc
-ScreenLeft_X_Pos = $72c
-ScreenRight_X_Pos = $72d
-ScreenEdge_X_Pos = ScreenLeft_X_Pos
-
-InjuryTimer = $050c
-NumberofLives = $0700
-; Player_SprAttrib = $0752
-; SprObject_SprAttrib = Player_SprAttrib
-ScrollLock = $0728
-
 MoveObjectHorizontally = $D1CE
 CheckForSolidMTiles = $850C
 CheckSideviewTransition = $E14A
 
-VRAM_Buffer1_Offset = $302
-VRAM_Buffer1 = $303
-
-Sprite_Y_Position = $200
-Sprite_Tilenumber = $201
-Sprite_Attributes = $202
-Sprite_X_Position = $203
-Sprite_Data = Sprite_Y_Position
-
+.ifdef ENABLE_Z2_MARIO
 ;; Constants
 
 CHR_BIGMARIO = $6a
@@ -472,16 +163,6 @@ DeathMusic            = %00000001
 
 .endif ; ENABLE_Z2_MARIO
 
-.assert RES_BASE + RES_OFFSET < $01bd
-
-
-RelocatedRAMBase = $041A
-SET_RES_BASE RelocatedRAMBase
-RESV BlockBreakState, BREAKABLE_BLOCK_COUNT ; Vanilla addr $041a - bits 0-6 = timer; bit 7 set = step block. $00 means no brick breaking
-RESV BlockBreakMapPage, BREAKABLE_BLOCK_COUNT ; Vanilla addr $041F - Nametable select for the PPUADDR
-RESV BlockBreakXCoord, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0424 - X Low Byte for collision table
-.assert RES_BASE + RES_OFFSET < $043E
-
 ;; Stat tracking variables in SRAM
 
 ; This value is the second header byte for file 1 thats unused.
@@ -507,30 +188,6 @@ StatTrackingBase = $773C
 SET_RES_BASE StatTrackingBase
 
 ;; The follow stats are NOT checkpointed because they persist between reloads
-
-; All Timestamp types listed below for reference
-TS_COUNT .set 0
-.macro TimestampId name
-.ident(.string(name)) = TS_COUNT
-TS_COUNT .set TS_COUNT + 1
-.endmacro
-
-TimestampId TsGlove
-TimestampId TsRaft
-TimestampId TsBoots
-TimestampId TsHammer
-TimestampId TsJumpSpell
-TimestampId TsFairySpell
-TimestampId TsReflectSpell
-TimestampId TsThunderSpell
-TimestampId TsPalace1
-TimestampId TsPalace2
-TimestampId TsPalace3
-TimestampId TsPalace4
-TimestampId TsPalace5
-TimestampId TsPalace6
-TimestampId TsPalaceGP
-TimestampId TsTowns
 
 ; All of the values prefixed with Stat are persisted across resets and Continue without saves
 
