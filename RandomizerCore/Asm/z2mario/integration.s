@@ -146,6 +146,28 @@ PreventTanookiSpellWhenSmallMario:
 @allow:
   rts
 
+; "Table_for_Spell_effects"
+; "its only a bit mask LUT"
+; "SSSHH"
+Table_for_Spell_effects = $8DBB
+.org $8DFB
+  lda $076F
+  jsr ApplySpellEffectButPreventBothFireAndJump
+.reloc
+ApplySpellEffectButPreventBothFireAndJump:
+  ; apply the new spell flag
+  ora Table_for_Spell_effects,y
+  cpy #$04 ; if we are applying the fire spell
+  bne @notFire
+    and #~$02 ; clear the jump/tanooki bit
+    rts
+@notFire:
+  cpy #1 ; jump/tanooki spell bit?
+  bne @apply
+    and #~$10 ; clear the fire bit
+@apply:
+  rts
+
 .org $8fe3
   jmp *+3 ; Skip duplicate draw???
 .reloc
