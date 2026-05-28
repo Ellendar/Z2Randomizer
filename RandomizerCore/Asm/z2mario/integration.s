@@ -192,6 +192,14 @@ BankPatchLinkDrawRoutine:
   pla
   rts
 
+.org $e0e2
+  jsr PatchGoingDownChimney
+.reloc
+PatchGoingDownChimney:
+  inc $070e ; link go down de hole flag/timer
+  lda #Sfx_PipeDown_Injury
+  sta Square1SoundQueue       ; play pipe sound
+  rts
 ; Update z2 block collision check to use the regular link hitbox for fairy
 ; by just skipping the y+1 it does to set the fairy size offset
 .org $e07f
