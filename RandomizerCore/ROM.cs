@@ -924,17 +924,18 @@ NameNotEmpty:
     nop
 LoadNewLevelCapReturn:        ; $9F7F
 
-.org $A89E
+.reloc
 LoadNewLevelCap:
     lda $0777,X               ; the instruction we overwrote with jmp
     cmp LevelCaps,X
     jmp LoadNewLevelCapReturn
 """);
-        a.Org(0xa8a7);
+        a.Reloc();
         a.Label("LevelCaps");
         a.Byt((byte)atkMax);
         a.Byt((byte)magicMax);
         a.Byt((byte)lifeMax);
+        a.Export("LevelCaps");
     }
 
     /// <summary>
@@ -953,6 +954,8 @@ LoadNewLevelCap:
         a.Code("""
 ; This is called when the game checks if it should skip the cancel option
 ; in the level up menu or not. It runs once for each stat (X).
+.import LevelCaps
+
 .segment "PRG0"
 .org $A0D4
     jmp CheckIfStatMaxed
@@ -976,8 +979,6 @@ ReturnNormally:
     asl a
     jmp CheckStatNormally
 """);
-        a.Org(0xa8a7);
-        a.Label("LevelCaps");
     }
 
     public void UseExtendedBanksForPalaceRooms(Assembler a)
