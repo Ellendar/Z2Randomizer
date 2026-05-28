@@ -528,7 +528,7 @@ public class CustomTexts
                 texts[70] = new Text("USE THIS$TO GO$FAST");
             }
 
-            GenerateWizardTexts(texts, locations, nonhashRNG, props.UseCommunityText);
+            GenerateWizardTexts(texts, locations, nonhashRNG, props.UseCommunityText, props.MarioMode);
 
             if (props.SpellItemHints)
             {
@@ -699,7 +699,7 @@ public class CustomTexts
         return new Text(text);
     }
 
-    private static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText)
+    private static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText, bool z2MarioMode)
     {
         if(location.ActualTown == null)
         {
@@ -719,6 +719,10 @@ public class CustomTexts
                     .Union(WIZARD_SPELL_TEXTS_BY_COLLECTABLE[collectable]).ToList();
                 int selectedHintIndex = r.Next(possibleWizardHints.Count());
                 return new Text(possibleWizardHints[selectedHintIndex]);
+            } else if (z2MarioMode && collectable == Collectable.JUMP_SPELL)
+            {
+                // In Mario Mode, change the JUMP spell hint text to reflect its new ability
+                return new Text("JUMP WONT$HELP YOU.$TRY THIS$INSTEAD.");
             }
             //Non community-text spells use the vanilla text corresponding to the spell you get.
             return new Text(texts[wizardTextIndexesBySpell[collectable]].RawText);
@@ -1023,7 +1027,7 @@ public class CustomTexts
         }
     }
 
-    private static void GenerateWizardTexts(List<Text> texts, IEnumerable<Location> itemLocs, Random r, bool useCommunityText)
+    private static void GenerateWizardTexts(List<Text> texts, IEnumerable<Location> itemLocs, Random r, bool useCommunityText, bool z2MarioMode)
     {
         List<Text> vanillaText = new(texts);
         List<Text> usedWizardTexts = [];
@@ -1038,7 +1042,7 @@ public class CustomTexts
             int tries = 0;
             do
             {
-                wizardHint = GenerateWizardText(vanillaText, r, location, useCommunityText);
+                wizardHint = GenerateWizardText(vanillaText, r, location, useCommunityText, z2MarioMode);
             } while (useCommunityText && usedWizardTexts.Contains(wizardHint) && tries++ < 100);
             usedWizardTexts.Add(wizardHint);
             texts[townWizardTextIndexes[(Town)location.ActualTown]] = wizardHint;

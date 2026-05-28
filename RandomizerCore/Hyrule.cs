@@ -3840,7 +3840,11 @@ bank5_Pointer_table_for_End_Credits:
             a.Assign("ENABLE_Z2_MARIO", 1);
             a.Code(Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.z2mario.{mod}"), mod);
         }
-
+        // Rename JUMP to TANOOKI
+        var m = asm.Module();
+        m.Segment("PRG0");
+        m.Org(0x9c38);
+        m.Byt(Util.ToGameText("TANOOKI"));
     }
 
     private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
