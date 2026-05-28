@@ -120,7 +120,7 @@ sealed class MazeIsland : World
         {
             Debug.Assert(MapRows == 75);
             Debug.Assert(MapColumns == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
+            map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
@@ -146,7 +146,7 @@ sealed class MazeIsland : World
             while (bytesWritten > MAP_SIZE_BYTES)
             {
 
-                map = new Terrain[MapRows, 64];
+                map = new OverworldMap(MapRows, 64);
                 bool[,] visited = new bool[MapRows, MapColumns];
 
                 for (int i = 0; i < MapColumns; i++)

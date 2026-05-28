@@ -26,7 +26,7 @@ public abstract class World
     public IReadOnlyList<int> overworldEncounterMapDuplicate { get; protected set; } = [];
     public IReadOnlyList<int> nonEncounterMaps { get; protected set; }
     protected SortedDictionary<(int, int), Location> locsByCoords;
-    public Terrain[,] map;
+    public OverworldMap map;
     public const int MAP_ROWS_FULL = 75;
     public const int MAP_COLS_FULL = 64;
     private const int MAX_LOCATION_PLACEMENT_ATTEMPTS = 5000;
@@ -1534,7 +1534,7 @@ public abstract class World
     protected bool GrowTerrain(Climate climate)
     {
         TerrainGrowthAttempts++;
-        Terrain[,] mapCopy = new Terrain[MapRows, MapColumns];
+        var mapCopy = new OverworldMap(MapRows, MapColumns);
         PlacedTerrainPreCalc[] placedTerrains = GrowTerrainGetPlacedTerrains(climate);
         const double EPSILON = 1e-9;
         double distance, minDistance;
@@ -1965,7 +1965,7 @@ public abstract class World
         return DrawBridge(RNG, map, bridge, walkableTerrains, direction);
     }
 
-    public static bool DrawBridge(Random r, Terrain[,] map, Location? bridge, List<Terrain> walkableTerrains, Direction direction)
+    public static bool DrawBridge(Random r, OverworldMap map, Location? bridge, List<Terrain> walkableTerrains, Direction direction)
     {
         if (bridge == null) { throw new Exception("Unable to draw unloaded bridge"); }
         int x = 0;
@@ -2006,7 +2006,7 @@ public abstract class World
         return DrawRaft(RNG, map, raft, walkableTerrains, direction);
     }
 
-    public static bool DrawRaft(Random r, Terrain[,] map, Location? raft, List<Terrain> walkableTerrains, Direction direction)
+    public static bool DrawRaft(Random r, OverworldMap map, Location? raft, List<Terrain> walkableTerrains, Direction direction)
     {
         if (raft == null) { throw new Exception("Unable to draw unloaded raft"); }
         int x = 0;
@@ -2042,7 +2042,7 @@ public abstract class World
     /// Tries to find a water tile at the edge of the map in `direction`.
     /// If a water tile is found, true is returned and (x,y) contains the position.
     /// Otherwise, false is returned and (x,y) is set to (0,0).
-    protected static bool FindWaterTileAtEdge(Random r, Terrain[,] map, Direction direction, out int x, out int y, int maxTries)
+    protected static bool FindWaterTileAtEdge(Random r, OverworldMap map, Direction direction, out int x, out int y, int maxTries)
     {
         int mapRows = map.GetLength(0);
         int mapCols = map.GetLength(1);
@@ -2092,7 +2092,7 @@ public abstract class World
 
     /// Walk from (startX,startY) in (dx,dy) direction until we are no longer on water.
     /// End position is stored in (endX,endY) and the length of the path is returned.
-    protected static int MeasureWaterPath(Terrain[,] map, int startX, int startY, int dx, int dy, out int endX, out int endY)
+    protected static int MeasureWaterPath(OverworldMap map, int startX, int startY, int dx, int dy, out int endX, out int endY)
     {
         int mapRows = map.GetLength(0);
         int mapCols = map.GetLength(1);
@@ -2113,7 +2113,7 @@ public abstract class World
     }
 
     /// Check for DrawBridge & DrawRaft if (x,y) would be an acceptable placement
-    protected static bool IsValidEndTile(Terrain[,] map, List<Terrain> walkableTerrains, int x, int y)
+    protected static bool IsValidEndTile(OverworldMap map, List<Terrain> walkableTerrains, int x, int y)
     {
         int mapRows = map.GetLength(0);
         int mapCols = map.GetLength(1);
@@ -2122,7 +2122,7 @@ public abstract class World
         return walkableTerrains.Contains(map[y, x]);
     }
 
-    public static void PlaceBridge(Terrain[,] map, Location bridge, int x, int y, Direction direction)
+    public static void PlaceBridge(OverworldMap map, Location bridge, int x, int y, Direction direction)
     {
         int mapRows = map.GetLength(0);
         int mapCols = map.GetLength(1);
@@ -2163,7 +2163,7 @@ public abstract class World
         }
     }
 
-    public static void PlaceRaft(Terrain[,] map, Location raft, int x, int y)
+    public static void PlaceRaft(OverworldMap map, Location raft, int x, int y)
     {
         map[y, x] = Terrain.BRIDGE;
         raft.Xpos = x;
