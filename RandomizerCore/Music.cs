@@ -347,7 +347,6 @@ internal class MusicRandomizer
             Usage.GreatPalace,
             Usage.Cave,
             Usage.Encounter,
-            Usage.House
         }.ToDictionary(k => k, k => new List<Location>());
 
         foreach (var world in _hyrule.worlds)
@@ -363,7 +362,7 @@ internal class MusicRandomizer
                         /*|| loc.ActualTown == Town.SARIA_SOUTH*/)
                         continue;
 
-                    usage = (!loc.AppearsOnMap) ? Usage.House : Usage.Town;
+                    usage = Usage.Town;
                 }
                 else if (loc.TerrainType == Terrain.PALACE)
                 {

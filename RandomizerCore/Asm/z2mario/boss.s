@@ -1051,6 +1051,10 @@ KillBoss:
         sta $0751
         lda #$FF
         sta $504 ; stop link from moving
+        ; Clear out links magic to fix weird issues
+        lda #0
+        sta $076f
+        inc ReloadCHRBank
     @animating:
       jsr MoveD_EnemyVertically  ; gravity decelerates upward motion then pulls boss down
       dec boss_counter
