@@ -1320,6 +1320,10 @@ CheckController1ForUpAMagic:
         Put(0x2A03, 0x12);
         Put(0x1C9FA, 0x16);
         Put(0x1C9FC, 0x16);
+        // final flashing color is black for some reason in vanilla
+        // change this to red, the game will still put a black background
+        // next frame. this prevents a black flash when game overing
+        Put(0x1ca19, 0x16);
     }
 
     public async Task<Js65CompileResult> ApplyAsm(Assembler engine)
