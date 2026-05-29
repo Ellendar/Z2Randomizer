@@ -4006,6 +4006,17 @@ bank5_Pointer_table_for_End_Credits:
             PatchAddress(STX_ABS, 0x6381, 0x6341);
             var asm = engine.Module();
             asm.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.s"), "z2ft.s");
+
+            if (props.MarioMode)
+            {
+                // There is a patch in z2ft to reduce offscreen enemy checking overhead
+                // but for the randomizer, it counters out its own lag reduction by adding
+                // additional forced lag to counterbalance the lag it removed.
+                // For z2mario, there's just so much more stuff going on, and people don't
+                // have the same expectations for the game, so this will "unpatch" the
+                // extra lag routine, so that it uses the lag reduction code.
+                rom.Put(0x1ffec, 0xb4, 0xf2);
+            }
         }
 
         UpdateTexts(engine, texts);
