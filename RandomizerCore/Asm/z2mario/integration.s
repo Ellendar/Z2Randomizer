@@ -1300,7 +1300,7 @@ ClearQueues:
 .reloc
 CheckMarioSq1Sfx:
   lda $07E1             ; L990B active effect type (non-zero = L990B is driving Square 1)
-  bne @Z2ExtraActive
+  bne @ActualZ1Sfx
   jsr Square1SfxHandler
   lda Square1SoundBuffer
   beq @PlayingZ2
@@ -1315,7 +1315,6 @@ CheckMarioSq1Sfx:
     ; but now we can clear it.
     lda #0
     sta Z2Square1SoundBuffer
-@Z2ExtraActive:
     rts
 @ActualZ1Sfx:
   jmp $92F4 ; Original square 1 sfx from z2
