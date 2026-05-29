@@ -1137,6 +1137,61 @@ FREE_UNTIL $e6f3
 ; .org $93ba
 ;   rts ; patch the link main routine to skip some unneeded stuff
 
+
+; Update the falling block "set block on ground" so that it updates marios
+; tile collision memory too
+.segment "PRG4"
+.org $AC34
+  jsr AddFallingBlockToMarioCollision
+  nop
+.reloc
+AddFallingBlockToMarioCollision:
+  pha
+    lda $da
+    clc
+    adc #<(COLLISION_TILES - $6000)
+    sta $da
+    lda $db
+    adc #>(COLLISION_TILES - $6000)
+    sta $db
+  pla
+  sta ($da),y
+  ; original code
+  lda $2a,x
+  and #$f8
+  rts
+
+; Riverman has a custom bridge building routine and we need to update the
+; mario collision to match
+.segment "PRG0"
+.org $A809
+  jsr AddSariaBridgeToMarioCollision
+.reloc
+AddSariaBridgeToMarioCollision:
+  txa
+  sta ($00),y
+  lda $01
+  pha
+  lda $00
+  pha
+    ; now also put the tile into mario
+    clc
+    adc #<(COLLISION_TILES - $6000)
+    sta $00
+    lda $01
+    adc #>(COLLISION_TILES - $6000)
+    sta $01
+    txa
+    cmp #$56
+    bcc @notcollision
+      sta ($00),y
+@notcollision:
+  pla
+  sta $00
+  pla
+  sta $01
+  rts
+
 .segment "PRG0", "PRG7"
 ; Update the position of the brick to remove the mario collision box too
 .org $A700
