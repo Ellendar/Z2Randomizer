@@ -1535,3 +1535,18 @@ CheckIfPlayerSmall:
                  ; U   N   L   I   K   E       L   I   N   K
 .byte $23,$14,$0b,$ee,$e7,$e5,$e2,$e4,$de,$f4,$e5,$e2,$e7,$e4,$ff
 .assert * = $8f9e
+
+
+; TODO: The following are locations where it draws the "shadow"
+; behind link after defeating a boss, but idgac right now to fix it
+; waaayyyy more work than its worth atm.
+.segment "PRG4"
+.org $978F
+  jmp *+3
+
+.org $AE08
+  jmp *+3
+
+.segment "PRG5"
+.org $9C8E
+  jmp *+3

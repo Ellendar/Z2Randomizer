@@ -693,13 +693,15 @@ BossJump:
 ; DrawMetasprite lives in PRG0, so we save the current bank, swap in PRG0,
 ; do the draw, then restore the bank to bank5 after
 BOSS_OAM_OFFSET = 48
-
+.export BossGraphicsHandlerForceDraw
 BossGraphicsHandler:
   lda boss_animation
   bne @active
     rts
 @active:
-
+  lda #BOSS_OAM_OFFSET
+  sta CurrentOAMOffset
+BossGraphicsHandlerForceDraw:
   lda NmiBankShadow8
   pha
   lda NmiBankShadowA
@@ -715,20 +717,10 @@ BossGraphicsHandler:
     lsr
     bcs @restore
 @draw:
-    lda #BOSS_OAM_OFFSET
-    sta CurrentOAMOffset
-    ldy #1                    ; sprite slot 1 (Y for DrawMetasprite & SprAttrib,y)
     lda #2                    ; palette 3 attribute (shadow mario palette)
     sta SprObject_SprAttrib,y
     ldx boss_animation
-
-    cpx #SKIDDING
-    bne @nm_no_skid_flip
-      jsr DrawMetasprite
-      jmp @nm_drew
-@nm_no_skid_flip:
-      jsr DrawMetasprite
-@nm_drew:
+    jsr DrawMetasprite
     jsr BossDrawProjectiles   ; shadow fireballs + hammers (palette already set per-slot)
 
 @restore:
