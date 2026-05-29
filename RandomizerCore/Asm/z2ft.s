@@ -26,9 +26,9 @@ UpdateSound = $878c
 
 	jsr UpdateSound
 	; clear out the moa fire work around
-	lda $07fd
-	and #~$40
-	sta $07fd ; Noise channel buffer
+	; lda $07fd
+	; and #~$40
+	; sta $07fd ; Noise channel buffer
 	pla
 	sta NmiBankShadowA
 	sta PrgBankAReg
@@ -58,12 +58,12 @@ UPDATE_REFS SwapToPRG0 @ $c130
 ; Work around how moa fire works. It queues a noise sfx with writing $40 to $eb
 ; but doesn't set a buffer for it. This kept z2ft from knowing that the noise channel
 ; was in use, so we set the value in the buffer and clear it after update.
-.org $95A3
-	jmp FixMoaFireSfx
-.reloc
-FixMoaFireSfx:
-	sta $400C
-	lda $07fd
-	ora #$40
-	sta $07fd ; Noise channel buffer
-	rts
+; .org $95A3
+; 	jmp FixMoaFireSfx
+; .reloc
+; FixMoaFireSfx:
+; 	sta $400C
+; 	lda $07fd
+; 	ora #$40
+; 	sta $07fd ; Noise channel buffer
+; 	rts
