@@ -173,6 +173,7 @@ ContinueTailWag:
 
 @streamEnd:
        lda #$00
+       sta SND_SQUARE1_REG+2
        sta Squ1_SfxLenCounter
        sta Square1SoundBuffer
        rts
