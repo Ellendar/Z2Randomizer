@@ -193,8 +193,27 @@ DrawFallingMarioSprite:
   nop
 
 .segment "PRG7"
-.org $dd1b ; TBird draws a flashing mario sprite here without banking
-  jsr BankPatchLinkDrawRoutine
+.org $dd1b
+  jsr SetMarioShadowFlag
+
+.reloc
+SetMarioShadowFlag:
+  ; Cast the shadow horizontally opposite the boss (the light source). The boss is
+  ; the enemy currently being processed (slot in $10). Boss to Link's left -> shadow
+  ; to the right (+8); boss to the right -> shadow to the left (-8). No Y offset.
+  ldx $10
+  lda LinkXPosition
+  cmp EnemyXPositionLo,x
+  lda LinkXPositionHi
+  sbc EnemyXPositionHi,x
+  bpl @bossLeft            ; Link >= boss -> boss is on the left
+    lda #<(-8)             ; boss on the right -> shadow to the left
+    .byte $2c
+  @bossLeft:
+    lda #8                 ; boss on the left -> shadow to the right
+  @store:
+  sta MarioShadowXOffset
+  rts
 
 .export BankPatchLinkDrawRoutine
 .reloc
@@ -269,6 +288,14 @@ PatchLinkDrawRoutine:
     +
     pla                                 ; restore PlayerFacingDir
     sta PlayerFacingDir
+
+    ; Copy the sprite data from mario into the data for the shadow if
+    ; the flag to draw the shadow was set this frame.
+    lda MarioShadowXOffset
+    beq +
+      jsr BlitMarioShadow
+    +
+
     lda $070f ; nonzero if shield is cast
     beq +
       jsr DrawShieldSprite
@@ -529,6 +556,48 @@ Yhi = R7
 
   jmp MetaspriteRenderLoop
 
+.endproc
+
+.reloc
+; Quick copy the rendered mario and place it behind him to create a shadow mario
+.proc BlitMarioShadow
+  SHADOW_PALETTE = 2
+  SHADOW_OAM = $50 ; shadow is hardcoded to sprite 20 (offset $50)
+    ; Copy the rendered mario sprites (always at OAM offset 4) into the shadow slot.
+    ldx #4
+  @loop:
+      lda Sprite_Y_Position,x
+      sta Sprite_Y_Position + SHADOW_OAM - 4,x
+
+      lda Sprite_Tilenumber,x
+      sta Sprite_Tilenumber + SHADOW_OAM - 4,x
+
+      ; keep H/V flip, force the dark palette
+      lda Sprite_Attributes,x
+      and #%11000000
+      ora #SHADOW_PALETTE
+      sta Sprite_Attributes + SHADOW_OAM - 4,x
+
+      lda Sprite_X_Position,x
+      clc
+      adc MarioShadowXOffset
+      bcs @clear ; check that the shadow doesn't go offscreen
+      sta Sprite_X_Position + SHADOW_OAM - 4,x
+@nextsprite:
+      inx
+      inx
+      inx
+      inx
+      cpx CurrentOAMOffset
+      bcc @loop
+  @done:
+    lda #0
+    sta MarioShadowXOffset
+    rts
+  @clear:
+      lda #$f8
+      sta Sprite_Y_Position + SHADOW_OAM - 4,x
+      bne @nextsprite
 .endproc
 
 .reloc
@@ -1537,16 +1606,15 @@ CheckIfPlayerSmall:
 .assert * = $8f9e
 
 
-; TODO: The following are locations where it draws the "shadow"
-; behind link after defeating a boss, but idgac right now to fix it
-; waaayyyy more work than its worth atm.
-.segment "PRG4"
-.org $978F
-  jmp *+3
+; The following are locations where it draws the explosion
+; after killing a boss
+; .segment "PRG4"
+; .org $978F
+;   jmp *+3
 
-.org $AE08
-  jmp *+3
+; .org $AE08
+;   jmp *+3
 
-.segment "PRG5"
-.org $9C8E
-  jmp *+3
+; .segment "PRG5"
+; .org $9C8E
+;   jmp *+3

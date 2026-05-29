@@ -631,6 +631,11 @@ RESV boss_ChrBank
 RESV boss_transition_delay      ; nonzero = boss is paused mid-state-switch (frames remaining)
 BOSS_RAM_SIZE = RES_OFFSET - CUSTOM_BOSS_START - 1
 
+; After a boss dies, the game renders a shadow during the flashing animation
+; and this is our custom value to say "hey its time to copy the mario sprites"
+; and also doubles as the direction to cast the shadow.
+RESV MarioShadowXOffset
+
 EnemyProjectileOffset = 7
 EnemyProjectileType        = ObjectMetasprite     + EnemyProjectileOffset
 EnemyProjectile_X_Position = SprObject_X_Position + EnemyProjectileOffset
