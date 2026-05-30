@@ -719,10 +719,20 @@ public class CustomTexts
                     .Union(WIZARD_SPELL_TEXTS_BY_COLLECTABLE[collectable]).ToList();
                 int selectedHintIndex = r.Next(possibleWizardHints.Count());
                 return new Text(possibleWizardHints[selectedHintIndex]);
-            } else if (z2MarioMode && collectable == Collectable.JUMP_SPELL)
+            } else if (z2MarioMode)
             {
-                // In Mario Mode, change the JUMP spell hint text to reflect its new ability
-                return new Text("JUMP WONT$HELP YOU.$TRY THIS$INSTEAD.");
+                // In Mario Mode, change a few spell hint text to reflect its new ability
+                switch (collectable)
+                {
+                case Collectable.JUMP_SPELL:
+                    return new Text("JUMP WONT$HELP YOU.$TRY THIS$INSTEAD.");
+                case Collectable.DOWNSTAB:
+                    return new Text("HERE IS$HOW TO$PIERCE$SHIELDS.");
+                case Collectable.UPSTAB:
+                    return new Text("UP B TO$THROW$HAMMER$WHEN SMALL");
+                default:
+                    break;
+                }
             }
             //Non community-text spells use the vanilla text corresponding to the spell you get.
             return new Text(texts[wizardTextIndexesBySpell[collectable]].RawText);
