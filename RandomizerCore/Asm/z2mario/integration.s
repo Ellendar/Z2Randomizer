@@ -953,9 +953,12 @@ SetPlayerDownstabbingHitbox:
   lda HitboxYCoord
   cmp #$f0
   bcc @notstabbing
-  lda Player_State
-  cmp #1
-  bne @notstabbing
+  ; shouldn't need to check for "jumping" state anymore.
+  ; i did that originally cause hitboxes were jank back then, but i think
+  ; i fixed those bugs so we can bring back walk off attacks
+  ; lda Player_State
+  ; cmp #1
+  ; bne @notstabbing
   lda Player_Y_Speed
   bmi @notstabbing
   beq @notstabbing
@@ -1533,22 +1536,22 @@ CheckForDownstab:
 ; on large enemies that have a shield sprite, not bosses and such.
 .segment "PRG7"
 .org $E64F
-  jsr DownstabAwareShieldCollision
+  jsr DownstabPierceShieldCollision
 
 .reloc
-DownstabAwareShieldCollision:
+DownstabPierceShieldCollision:
   ; If you are stomping
   lda PlayerIsDownstabbing
   lsr
   bcc @normal
     ; And you have downstab
     lda HaveStabs
-    and #$04
+    and #HAVE_DOWNSTAB
     beq @normal
       ; check if we want to stab this kinda enemy
       ldx $10
-      lda $0444,x ; enemy vulnerability. type 2 is the boss shield kind like gooma?
-      cmp #2
+      lda $0444,x ; enemy vulnerability.
+      cmp #6 ; type 6 is the type goomas head uses. wanna bounce on him still
       beq @normal
         clc ; downstab on a shield style enemy
         rts

@@ -2509,7 +2509,7 @@ GetProperObjOffset:
   lda PlayerSize ; or are big enough to throw hammers
   beq +
     lda HaveStabs
-    and #$10
+    and #HAVE_UPSTAB
     bne +
       jmp UpdateHammers
   +
