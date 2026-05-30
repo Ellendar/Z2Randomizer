@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using Z2Randomizer.RandomizerCore.Overworld;
 
@@ -213,6 +214,19 @@ internal class MusicRandomizer
 
         WriteLogLine(null);
         WriteLogLine("SELECTED SONGS:");
+        // I want my songs in a particular order for z2mario, so uncomment this when making the romhack
+        if (false)
+        {
+            var regular = usesSongs[Usage.Encounter].Find(x => !x.Title.Contains("Swing"))!;
+            var swing = usesSongs[Usage.Encounter].Find(x => x.Title.Contains("Swing"))!;
+            selUsesSongs[Usage.Encounter] =
+            [
+                regular,
+                regular,
+                swing,
+                swing,
+            ];
+        }
         foreach (var (usage, usageSongs) in selUsesSongs)
         {
             string songNames = string.Join("}, {", usageSongs);
