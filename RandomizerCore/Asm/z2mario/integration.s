@@ -1010,7 +1010,7 @@ SetTailSwingHitbox:
 @done:
   rts
 
-; Prevent recoil and playing the sword sound when hitting a well
+; Prevent recoil and playing the sword sound when hitting a wall
 .org $E268
   BCS $E28B
 .org $E273
@@ -1080,7 +1080,8 @@ PatchFireballHitcheck:
 @CollisionCheck:
   inc ProjectileProcessing
   jsr $E694
-  dec ProjectileProcessing
+  lda #0
+  sta ProjectileProcessing
   bcc @NoCollision
     ldy $11
     lda Fireball_State,y
