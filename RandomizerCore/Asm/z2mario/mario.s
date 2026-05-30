@@ -2505,9 +2505,13 @@ GetProperObjOffset:
   bne +
     jmp UpdateHammers
   +
-  lda PlayerSize ; Have to be big to throw hammers?
+  ; Check if you either have upstab
+  lda PlayerSize ; or are big enough to throw hammers
   beq +
-    jmp UpdateHammers
+    lda HaveStabs
+    and #$10
+    bne +
+      jmp UpdateHammers
   +
     ; and that the player is pushing up + b
     lda SavedJoypadBits
