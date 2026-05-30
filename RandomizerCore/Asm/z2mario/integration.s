@@ -1527,6 +1527,33 @@ CheckForDownstab:
   lsr
   rts
 
+; Update the type of enemies you can stab through to hit shield enemies if you are
+; stomping and you have downstab, then you can pierce shields. I really only want this
+; on large enemies that have a shield sprite, not bosses and such.
+.segment "PRG7"
+.org $E64F
+  jsr DownstabAwareShieldCollision
+
+.reloc
+DownstabAwareShieldCollision:
+  ; If you are stomping
+  lda PlayerIsDownstabbing
+  lsr
+  bcc @normal
+    ; And you have downstab
+    lda HaveStabs
+    and #$04
+    beq @normal
+      ; check if we want to stab this kinda enemy
+      ldx $10
+      lda $0444,x ; enemy vulnerability. type 2 is the boss shield kind like gooma?
+      cmp #2
+      beq @normal
+        clc ; downstab on a shield style enemy
+        rts
+@normal:
+  jmp $E9F9 ; continue the shield collision check
+
 .segment "PRG3"
 .org $9A42
   jmp * + 4 ; skip a hardcoded metasprite update when reading signs
