@@ -272,10 +272,10 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private Biome mazeBiome = Biome.VANILLA;
 
     [Reactive]
-    private ClimateEnum westClimate = ClimateEnum.VANILLA_WEIGHTED_WEST;
+    private ClimateEnum westClimate = ClimateEnum.VANILLA_WEIGHTED;
 
     [Reactive]
-    private ClimateEnum eastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST;
+    private ClimateEnum eastClimate = ClimateEnum.VANILLA_WEIGHTED;
 
     [Reactive]
     private ClimateEnum dmClimate = ClimateEnum.CLASSIC;

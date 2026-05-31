@@ -67,7 +67,7 @@ public static class Climates
             ( Terrain.ROAD, 328 ),
         ]),
         30,
-        ClimateEnum.VANILLA_WEIGHTED_WEST
+        ClimateEnum.VANILLA_WEIGHTED
     );
 
     private static readonly Climate VANILLA_WEIGHTED_EAST = new(
@@ -100,7 +100,7 @@ public static class Climates
             ( Terrain.ROAD, 128 ),
         ]),
         30,
-        ClimateEnum.VANILLA_WEIGHTED_EAST
+        ClimateEnum.VANILLA_WEIGHTED
     );
 
     private static readonly Climate CHAOS = new(
@@ -243,7 +243,7 @@ public static class Climates
             ( Terrain.ROAD, 2 ),
         ]),
         30,
-        ClimateEnum.DM_SCRUBLAND
+        ClimateEnum.SCRUBLAND
     );
 
     private static readonly Climate GREAT_LAKES = new(
@@ -281,18 +281,20 @@ public static class Climates
        ClimateEnum.GREAT_LAKES
    );
 
-    public static Climate Create(ClimateEnum climate)
+    public static Climate Create(Continent continentId, ClimateEnum climate)
     {
         return climate switch
         {
             ClimateEnum.CLASSIC => CLASSIC.CloneWithInvertedDistances(),
-            ClimateEnum.VANILLA_WEIGHTED_WEST => VANILLA_WEIGHTED_WEST.Clone(),
-            ClimateEnum.VANILLA_WEIGHTED_EAST => VANILLA_WEIGHTED_EAST.Clone(),
+            ClimateEnum.VANILLA_WEIGHTED => continentId is Continent.WEST ?
+                                                VANILLA_WEIGHTED_WEST.Clone() :
+                                                VANILLA_WEIGHTED_EAST.Clone(),
             ClimateEnum.CHAOS => CHAOS.CloneWithInvertedDistances(),
             ClimateEnum.WETLANDS => WETLANDS.CloneWithInvertedDistances(),
             ClimateEnum.GREAT_LAKES => GREAT_LAKES.CloneWithInvertedDistances(),
-            ClimateEnum.SCRUBLAND => SCRUBLAND.CloneWithInvertedDistances(),
-            ClimateEnum.DM_SCRUBLAND => DM_SCRUBLAND.CloneWithInvertedDistances(),
+            ClimateEnum.SCRUBLAND => continentId is Continent.DM ?
+                                         DM_SCRUBLAND.CloneWithInvertedDistances() :
+                                         SCRUBLAND.CloneWithInvertedDistances(),
             _ => throw new NotImplementedException()
         };
     }

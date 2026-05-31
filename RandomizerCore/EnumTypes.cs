@@ -414,9 +414,7 @@ public enum ClimateEnum
     [Description("Classic"), DefaultWeight(1)]
     CLASSIC,
     [Description("Vanilla-Weighted"), DefaultWeight(1)]
-    VANILLA_WEIGHTED_WEST,
-    [Description("Vanilla-Weighted"), DefaultWeight(1)]
-    VANILLA_WEIGHTED_EAST,
+    VANILLA_WEIGHTED,
     [Description("Chaos"), DefaultWeight(1)]
     CHAOS,
     [Description("Wetlands"), DefaultWeight(0)]
@@ -425,8 +423,6 @@ public enum ClimateEnum
     GREAT_LAKES,
     [Description("Scrubland"), DefaultWeight(1)]
     SCRUBLAND,
-    [Description("Scrubland"), DefaultWeight(1)]
-    DM_SCRUBLAND,
     [Description("Random"), Metastyle]
     RANDOM
 }
@@ -437,9 +433,7 @@ static class ClimateExtensions
     {
         return climate switch
         {
-            ClimateEnum.VANILLA_WEIGHTED_WEST => true,
-            ClimateEnum.VANILLA_WEIGHTED_EAST => false,
-            ClimateEnum.DM_SCRUBLAND => false,
+            ClimateEnum.VANILLA_WEIGHTED => true,
             _ => true,
         };
     }
@@ -448,9 +442,7 @@ static class ClimateExtensions
     {
         return climate switch
         {
-            ClimateEnum.VANILLA_WEIGHTED_WEST => false,
-            ClimateEnum.VANILLA_WEIGHTED_EAST => true,
-            ClimateEnum.DM_SCRUBLAND => false,
+            ClimateEnum.VANILLA_WEIGHTED => true,
             _ => true,
         };
     }
@@ -459,9 +451,7 @@ static class ClimateExtensions
     {
         return climate switch
         {
-            ClimateEnum.VANILLA_WEIGHTED_WEST => false,
-            ClimateEnum.VANILLA_WEIGHTED_EAST => false,
-            ClimateEnum.SCRUBLAND => false,
+            ClimateEnum.VANILLA_WEIGHTED => false,
             _ => true,
         };
     }
