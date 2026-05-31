@@ -791,7 +791,7 @@ public abstract class World
         //Debug.WriteLine(GetMapDebug());
         int maxBridgeLength = MAXIMUM_BRIDGE_LENGTH[biome];
         //Great lakes and bad boots are more likely to be incompleteable, so extend max bridge length to give them a fighting chance
-        if(canWalkOnWater || climate.Name == Climates.Create(ClimateEnum.GREAT_LAKES).Name)
+        if (!canWalkOnWater || climate.Name == Climates.Create(continentId, ClimateEnum.GREAT_LAKES).Name)
         {
             maxBridgeLength = (int)(maxBridgeLength * 1.5);
         }

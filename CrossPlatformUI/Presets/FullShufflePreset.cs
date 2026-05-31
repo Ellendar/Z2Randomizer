@@ -29,8 +29,8 @@ public static class FullShufflePreset
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
-        WestClimate = ClimateEnum.VANILLA_WEIGHTED_WEST,
-        EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
+        WestClimate = ClimateEnum.VANILLA_WEIGHTED,
+        EastClimate = ClimateEnum.VANILLA_WEIGHTED,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
         //Palaces

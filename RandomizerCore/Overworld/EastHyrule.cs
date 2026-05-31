@@ -363,7 +363,7 @@ public sealed class EastHyrule : World
         hiddenKasutoLocation = townAtNewKasuto;
 
         //Climate filtering
-        climate = Climates.Create(props.EastClimate);
+        climate = Climates.Create(continentId, props.EastClimate);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);

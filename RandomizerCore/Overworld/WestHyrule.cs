@@ -301,7 +301,7 @@ public sealed class WestHyrule : World
         }
 
         //Climate filtering
-        climate = Climates.Create(props.WestClimate);
+        climate = Climates.Create(continentId, props.WestClimate);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);

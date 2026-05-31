@@ -31,8 +31,8 @@ public static class BeginnerPreset
         EastBiome = Biome.VANILLALIKE,
         DmBiome = Biome.VANILLALIKE,
         MazeBiome = Biome.VANILLALIKE,
-        WestClimate = ClimateEnum.VANILLA_WEIGHTED_WEST,
-        EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
+        WestClimate = ClimateEnum.VANILLA_WEIGHTED,
+        EastClimate = ClimateEnum.VANILLA_WEIGHTED,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.VANILLA_WEIGHTED,
