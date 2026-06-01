@@ -2,6 +2,7 @@ using System.Reflection;
 using CrossPlatformUI.Presets;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Flags;
+using Random = Z2Randomizer.RandomizerCore.Random;
 
 namespace Z2Randomizer.Tests;
 
@@ -236,6 +237,90 @@ public class FlagsTests
         RandomizerConfiguration config2 = new(config.SerializeFlags());
 
         Assert.IsTrue(config2.ShareSeedAcrossDifficulty);
+    }
+
+    [TestMethod]
+    public void FlagPasteParserExtractsFlagsAndLongestSeedFromMessage()
+    {
+        var flags = StandardPreset.Preset.SerializeFlags();
+        var input = $"race info, seed 1234. use {flags}, tracking 001234567.";
+
+        Assert.AreEqual(flags, FlagPasteParser.ExtractFlags(input));
+        Assert.AreEqual("001234567", FlagPasteParser.ExtractSeed(input));
+    }
+
+    [TestMethod]
+    public void FlagPasteParserRejectsInvalidCharacters()
+    {
+        Assert.IsFalse(FlagPasteParser.IsValidFlagString("not-a-flag-string"));
+    }
+
+    [TestMethod]
+    public void FlagPasteParserExtractsFlagsFromSeedAndFlagsMessage()
+    {
+        const string flags = "hEAAdgKyAs6WvqAssLJidnf7xJOY+0csos1gnXRs!AAFR+h";
+        var input = $"Seed: 228401255 - Flags: {flags}";
+
+        Assert.AreEqual(flags, FlagPasteParser.ExtractFlags(input));
+        Assert.AreEqual("228401255", FlagPasteParser.ExtractSeed(input));
+    }
+
+    [TestMethod]
+    public void FlagPasteParserExtractsFlagsFromEmbeddedLabels()
+    {
+        const string flags = "hEAAdgKyAs6WvqAssLJidnf7xJOY+0csos1gnXRs!AAFR+h";
+        var input = $"Seed:228401255-Flags:{flags}";
+
+        Assert.AreEqual(flags, FlagPasteParser.ExtractFlags(input));
+        Assert.AreEqual("228401255", FlagPasteParser.ExtractSeed(input));
+    }
+
+    [TestMethod]
+    public void FlagPasteParserDoesNotExtractSeedFromPlainFlagString()
+    {
+        const string flags = "hEAAdgKyAs6WvqAssLJidnf7xJOY+0csos1gnXRs!AAFR+h";
+
+        Assert.AreEqual(flags, FlagPasteParser.ExtractFlags(flags));
+        Assert.IsNull(FlagPasteParser.ExtractSeed(flags));
+    }
+
+    [TestMethod]
+    public void FlagPasteParserRequiresDelimitedSixDigitSeedToken()
+    {
+        const string flags = "hEAAdgKyAs6WvqAssLJidnf7xJOY+0csos1gnXRs!AAFR+h";
+
+        Assert.IsNull(FlagPasteParser.ExtractSeed($"Seed: 12345 - Flags: {flags}"));
+        Assert.AreEqual("228401255", FlagPasteParser.ExtractSeed($"Seed: 228401255 - Flags: {flags}"));
+    }
+
+    [TestMethod]
+    public void OutputFilenameTemplateDefaultsAndReplacesTokens()
+    {
+        var timestamp = new DateTime(2026, 5, 31, 19, 53, 3);
+
+        var formatted = OutputFilenameFormatter.Format("%d-%f-%s-%h.nes", "FLAGS", "0123", "HA SH", timestamp);
+
+        Assert.AreEqual("2026-05-31-1953-FLAGS-0123-HASH.nes", formatted);
+        Assert.AreEqual("Z2-FLAGS-0123-HASH.nes", OutputFilenameFormatter.Format("", "FLAGS", "0123", "HASH", timestamp));
+    }
+
+    [TestMethod]
+    public void OutputFilenameSanitizesCharactersInvalidOnAnyPlatform()
+    {
+        var formatted = OutputFilenameFormatter.Format("%f:%s?.nes", "FL/AGS", "0*123", "HASH");
+
+        Assert.AreEqual("FL_AGS_0_123_.nes", formatted);
+    }
+
+    [TestMethod]
+    public void OutputFilenameTemplateIsIgnoredByFlags()
+    {
+        RandomizerConfiguration config = new();
+        var originalFlags = config.SerializeFlags();
+
+        config.OutputFilenameTemplate = "custom-%s-%h.nes";
+
+        Assert.AreEqual(originalFlags, config.SerializeFlags());
     }
   
     public void TestSgl2025EncodeCycle()

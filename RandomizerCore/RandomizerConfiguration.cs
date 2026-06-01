@@ -740,6 +740,10 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [IgnoreInFlags]
     private string spriteName;
 
+    [Reactive]
+    [IgnoreInFlags]
+    private string outputFilenameTemplate = OutputFilenameFormatter.DefaultTemplate;
+
 
     [Reactive]
     [IgnoreInFlags]
