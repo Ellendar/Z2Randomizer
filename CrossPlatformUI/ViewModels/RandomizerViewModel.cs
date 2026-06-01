@@ -28,21 +28,27 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     [JsonIgnore]
     public BehaviorSubject<bool> FlagsValidSubject = new(true);
 
-    private bool IsFlagStringValid(string flags)
-    {
-        try
-        {
-            _ = new RandomizerConfiguration(flags);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
+    private static bool IsFlagStringValid(string flags) => FlagPasteParser.IsValidFlagString(flags);
+
+    private string flagInput = "";
 
     [JsonIgnore]
-    public string FlagInput { get; set { field = value.Trim(); this.RaisePropertyChanged(); } } = "";
+    public string FlagInput
+    {
+        get => flagInput;
+        set
+        {
+            var trimmedValue = value?.Trim() ?? "";
+            var (extractedFlags, extractedSeed) = FlagPasteParser.Parse(trimmedValue);
+
+            if (Main is not null && !string.IsNullOrEmpty(extractedSeed))
+            {
+                Main.Config.Seed = extractedSeed;
+            }
+
+            this.RaiseAndSetIfChanged(ref flagInput, extractedFlags ?? trimmedValue);
+        }
+    }
 
     [JsonIgnore]
     public string Seed
