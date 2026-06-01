@@ -16,7 +16,7 @@ public static class OutputFilenameFormatter
     private static readonly char[] InvalidFileNameChars =
         ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
 
-    public static string Format(string? template, string flags, string? seed, string hash, DateTime? timestamp = null)
+    public static string Format(string? template, string flags, string? seed, string hash, DateTime? timestamp = null, string? version = null)
     {
         var resolvedTemplate = string.IsNullOrWhiteSpace(template) ? DefaultTemplate : template;
         var resolvedTimestamp = (timestamp ?? DateTime.Now).ToString("yyyy-MM-dd-HHmm", CultureInfo.InvariantCulture);
@@ -26,7 +26,8 @@ public static class OutputFilenameFormatter
             .Replace("%d", resolvedTimestamp, StringComparison.Ordinal)
             .Replace("%f", flags, StringComparison.Ordinal)
             .Replace("%s", seed ?? "", StringComparison.Ordinal)
-            .Replace("%h", normalizedHash, StringComparison.Ordinal);
+            .Replace("%h", normalizedHash, StringComparison.Ordinal)
+            .Replace("%v", version ?? "", StringComparison.Ordinal);
 
         return SanitizeFileName(formatted);
     }

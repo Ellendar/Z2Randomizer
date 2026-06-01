@@ -313,6 +313,14 @@ public class FlagsTests
     }
 
     [TestMethod]
+    public void OutputFilenameTemplateReplacesVersionToken()
+    {
+        var formatted = OutputFilenameFormatter.Format("Z2-%v-%s.nes", "FLAGS", "0123", "HASH", version: "5.1.4");
+
+        Assert.AreEqual("Z2-5.1.4-0123.nes", formatted);
+    }
+
+    [TestMethod]
     public void OutputFilenameTemplateIsIgnoredByFlags()
     {
         RandomizerConfiguration config = new();

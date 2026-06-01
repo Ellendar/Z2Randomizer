@@ -73,11 +73,8 @@
                 assists:TextFieldAssist.Label="Output Filename"
                 Text="{Binding OutputFilenameTemplate}"
             >
-                <ToolTip.Tip><TextBlock Text="%f = flags, %s = seed, %h = hash, %d = date/time"/></ToolTip.Tip>
+                <ToolTip.Tip><TextBlock Text="%f = flags, %s = seed, %h = hash, %d = date/time, %v = version"/></ToolTip.Tip>
             </TextBox>
-            <TextBlock Margin="4 2 0 8"
-                       FontSize="12"
-                       TextWrapping="Wrap">%f = flags, %s = seed, %h = hash, %d = date/time</TextBlock>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Vertical">
             <TextBlock>Sprite Preview</TextBlock>
