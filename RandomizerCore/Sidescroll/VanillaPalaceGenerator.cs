@@ -10,7 +10,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt)
     {
         VanillaRoomPool roomPool = (VanillaRoomPool)rooms;
         if(roomPool.BossRooms.Count != 1

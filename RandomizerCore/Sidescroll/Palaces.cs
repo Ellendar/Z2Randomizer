@@ -91,9 +91,10 @@ public class Palaces
                 roomPool = new(palaceRooms, currentPalace, props);
             }
             Palace palace;
+            int attempts = 0;
             do
             {
-                palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace);
+                palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace, attempts++);
             } while (!palace.IsValid);
             palace.BossRoom!.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
             PalaceGenerator.DebugCheckDuplicates(props, palace);

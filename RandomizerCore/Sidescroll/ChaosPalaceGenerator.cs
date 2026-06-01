@@ -13,7 +13,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
     private const int CONNECTION_ATTEMPT_LIMIT = 200;
     private static int debug = 0;
 
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt)
     {
         debug++;
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);

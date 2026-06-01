@@ -14,8 +14,15 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
     static int debug = 0;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt)
     {
+        if (roomCount > 40 && attempt > 500)
+        {
+            // eventually try smaller palaces to avoid deadlock when
+            // room pool + room count together create unconsolidatable palaces
+            roomCount = Math.Max(40, roomCount - (attempt / 500));
+        }
+
         int tries = 0;
 
         debug++;
@@ -210,8 +217,9 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 /*
                 if(palace.Number == 7 && palace.AllRooms.Count == roomCount && palace.AllRooms.Count(i => i.CountOpenExits() > 0) < 4)
                 {
-                    Debug.WriteLine("");
+                    Debug.WriteLine("Unable to consolidate Reconstructed rooms:");
                     palace.AllRooms.Where(i => i.CountOpenExits() > 0).ToList().ForEach(i => Debug.WriteLine(i.OpenExitsDebug()));
+                    Debug.WriteLine("");
                 }
                 */
                 palace.IsValid = false;

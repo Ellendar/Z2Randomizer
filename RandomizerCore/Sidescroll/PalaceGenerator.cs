@@ -16,7 +16,7 @@ public abstract class PalaceGenerator
 
     protected static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
 
-    internal abstract Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber);
+    internal abstract Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt);
 
     protected static bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
     {
