@@ -1,32 +1,22 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsTrimmable>false</IsTrimmable>
     <!-- Suppress trimming/AOT warnings in tests -->
     <NoWarn>$(NoWarn);IL2026;IL2027</NoWarn>
-
     <IsPackable>false</IsPackable>
-
     <Platforms>AnyCPU;x64</Platforms>
-
     <RootNamespace>Z2Randomizer.Tests</RootNamespace>
-
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
-
     <LangVersion>default</LangVersion>
-
     <Configurations>Debug;Release;Unsafe Debug</Configurations>
   </PropertyGroup>
-
   <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
     <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
     <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
@@ -37,10 +27,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
   </ItemGroup>
-
 </Project>

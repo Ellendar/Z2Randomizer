@@ -1,74 +1,78 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <LangVersion>default</LangVersion>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Z2Randomizer.CrossPlatformUI</RootNamespace>
+    <Configurations>Debug;Release;Unsafe Debug</Configurations>
+    <Platforms>AnyCPU</Platforms>
+    <PublishTrimmed>true</PublishTrimmed>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- ReactiveUserControl<T> ViewModel references cause IL2026 -->
+    <NoWarn>$(NoWarn);IL2026</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
+    <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+    <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Converters\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Fonts.Inter" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" />
+    <PackageReference Include="DialogHost.Avalonia" />
+    <PackageReference Include="Material.Avalonia" />
+    <PackageReference Include="Material.Icons.Avalonia" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="ReactiveUI" />
+    <PackageReference Include="ReactiveUI.Avalonia" />
+    <PackageReference Include="ReactiveUI.Validation" />
+    <PackageReference Include="Aigamo.ResXGenerator">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Xaml.Behaviors.Interactions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
+  </ItemGroup>
+  <Target Name="GenerateGitInfo" BeforeTargets="BeforeBuild">
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <Exec Command="git rev-parse --short HEAD > $(IntermediateOutputPath)git-hash.txt" />
+    <Exec Command="git rev-parse --abbrev-ref HEAD > $(IntermediateOutputPath)git-branch.txt" />
+    <Exec Command="git tag --points-at HEAD > $(IntermediateOutputPath)git-tag.txt" />
+    <Exec Command="git diff --quiet || echo dirty > $(IntermediateOutputPath)git-dirty.txt" IgnoreExitCode="true" />
+    <ReadLinesFromFile File="$(IntermediateOutputPath)git-hash.txt">
+      <Output TaskParameter="Lines" PropertyName="GitHash" />
+    </ReadLinesFromFile>
+    <ReadLinesFromFile File="$(IntermediateOutputPath)git-branch.txt">
+      <Output TaskParameter="Lines" PropertyName="GitBranch" />
+    </ReadLinesFromFile>
+    <ReadLinesFromFile File="$(IntermediateOutputPath)git-tag.txt">
+      <Output TaskParameter="Lines" ItemName="GitTag" />
+    </ReadLinesFromFile>
+    <ReadLinesFromFile File="$(IntermediateOutputPath)git-dirty.txt" Condition="Exists('$(IntermediateOutputPath)git-dirty.txt')">
+      <Output TaskParameter="Lines" PropertyName="GitDirty" />
+    </ReadLinesFromFile>
     <PropertyGroup>
-        <Nullable>enable</Nullable>
-        <LangVersion>default</LangVersion>
-        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
-        <AssemblyName>$(MSBuildProjectName)</AssemblyName>
-        <RootNamespace>Z2Randomizer.CrossPlatformUI</RootNamespace>
-        <Configurations>Debug;Release;Unsafe Debug</Configurations>
-        <Platforms>AnyCPU</Platforms>
-        <PublishTrimmed>true</PublishTrimmed>
+      <IsDirtyValue>false</IsDirtyValue>
     </PropertyGroup>
-
+    <PropertyGroup Condition="'$(GitDirty)' != ''">
+      <IsDirtyValue>true</IsDirtyValue>
+    </PropertyGroup>
+  </Target>
+  <Target Name="WriteGitInfoFile" DependsOnTargets="GenerateGitInfo" BeforeTargets="BeforeBuild">
     <PropertyGroup>
-        <!-- ReactiveUserControl<T> ViewModel references cause IL2026 -->
-        <NoWarn>$(NoWarn);IL2026</NoWarn>
-    </PropertyGroup>
-    
-    <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
-      <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
-      <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <AvaloniaResource Include="Assets\**" />
-        <AvaloniaResource Include="Converters\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Avalonia" />
-        <PackageReference Include="Avalonia.Fonts.Inter" />
-        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Include="AvaloniaUI.DiagnosticsSupport" />
-        <PackageReference Include="DialogHost.Avalonia" />
-        <PackageReference Include="Material.Avalonia" />
-        <PackageReference Include="Material.Icons.Avalonia" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-        <PackageReference Include="ReactiveUI" />
-        <PackageReference Include="ReactiveUI.Avalonia" />
-        <PackageReference Include="ReactiveUI.Validation" />
-        <PackageReference Include="Aigamo.ResXGenerator">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
-        <PackageReference Include="Xaml.Behaviors.Interactions" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
-    </ItemGroup>
-
-    <Target Name="GenerateGitInfo" BeforeTargets="BeforeBuild">
-        <MakeDir Directories="$(IntermediateOutputPath)" />
-        <Exec Command="git rev-parse --short HEAD &gt; $(IntermediateOutputPath)git-hash.txt" />
-        <Exec Command="git rev-parse --abbrev-ref HEAD &gt; $(IntermediateOutputPath)git-branch.txt" />
-        <Exec Command="git tag --points-at HEAD &gt; $(IntermediateOutputPath)git-tag.txt" />
-        <Exec Command="git diff --quiet || echo dirty &gt; $(IntermediateOutputPath)git-dirty.txt" IgnoreExitCode="true" />
-
-        <ReadLinesFromFile File="$(IntermediateOutputPath)git-hash.txt"><Output TaskParameter="Lines" PropertyName="GitHash" /></ReadLinesFromFile>
-        <ReadLinesFromFile File="$(IntermediateOutputPath)git-branch.txt"><Output TaskParameter="Lines" PropertyName="GitBranch" /></ReadLinesFromFile>
-        <ReadLinesFromFile File="$(IntermediateOutputPath)git-tag.txt"><Output TaskParameter="Lines" ItemName="GitTag" /></ReadLinesFromFile>
-        <ReadLinesFromFile File="$(IntermediateOutputPath)git-dirty.txt" Condition="Exists('$(IntermediateOutputPath)git-dirty.txt')"><Output TaskParameter="Lines" PropertyName="GitDirty" /></ReadLinesFromFile>
-        <PropertyGroup><IsDirtyValue>false</IsDirtyValue></PropertyGroup>
-        <PropertyGroup Condition="'$(GitDirty)' != ''"><IsDirtyValue>true</IsDirtyValue></PropertyGroup>
-    </Target>
-
-    <Target Name="WriteGitInfoFile" DependsOnTargets="GenerateGitInfo" BeforeTargets="BeforeBuild">
-        <PropertyGroup>
-            <GitTagsJoined>@(GitTag->'%(Identity)', ',')</GitTagsJoined>
-            <GitInfoText>
+      <GitTagsJoined>@(GitTag-&gt;'%(Identity)', ',')</GitTagsJoined>
+      <GitInfoText>
                 // (auto-generated from .csproj)
                 namespace Z2Randomizer;
 
@@ -83,12 +87,10 @@
                     }
                 }
             </GitInfoText>
-        </PropertyGroup>
-
-        <WriteLinesToFile File="$(IntermediateOutputPath)GitInfo.cs" Overwrite="true" Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
-
-        <ItemGroup>
-            <Compile Include="$(IntermediateOutputPath)GitInfo.cs" />
-        </ItemGroup>
-    </Target>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)GitInfo.cs" Overwrite="true" Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)GitInfo.cs" />
+    </ItemGroup>
+  </Target>
 </Project>

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -15,7 +15,6 @@
     <PublishTrimmed>true</PublishTrimmed>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
     <None Remove="Asm\ExpandedPauseMenu.s" />
@@ -34,12 +33,9 @@
     <None Update="Music\Faxanadu.json5">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-
     <None Update="Music\README.txt" CopyToOutputDirectory="PreserveNewest" />
-
     <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="nlog.config" CopyToOutputDirectory="Always" />
     <Content Include="PalaceRooms.json">
@@ -49,7 +45,6 @@
     </Content>
     <Content Include="js65\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="DynamicData" />
     <PackageReference Include="js65.interop" />
@@ -61,7 +56,6 @@
     <TrimmerRootAssembly Include="FtRandoLib" />
     <TrimmerRootAssembly Include="CoreSourceGenerator" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Asm\*.s" />
     <EmbeddedResource Include="Asm\Graphics\dash.chr" />
