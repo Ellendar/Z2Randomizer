@@ -19,7 +19,6 @@
     <None Remove="nlog.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Desktop.Common\Desktop.Common.csproj" />
     <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
   </ItemGroup>
   <ItemGroup>
