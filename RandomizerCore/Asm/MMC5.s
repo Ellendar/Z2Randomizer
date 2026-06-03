@@ -679,14 +679,15 @@ Bank1f_Nmi:
 .reloc
 GanonLaughingTeeHee:
     lda #0
+    sta $0488 ; clear the default menu selection option
     sta $0726
 	lda #(6*2) | PRG_BANK_ROM
 	sta PrgBank8Reg
     lda #(6*2+1) | PRG_BANK_ROM
 	sta PrgBankAReg
-    ; re-enable rendering
+    ; re-enable bg rendering only
     lda $FE
-    ora #$18
+    ora #$08
     ora $0768
     sta $FE
 @loop:
