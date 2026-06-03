@@ -344,6 +344,13 @@ PatchLinkDrawRoutine:
 .import METASPRITE_BIG_MARIO_CROUCHING
 TANOOKI_FLUTTER_CAP = 1   ; SMB3 PLAYER_TAILWAG_YVEL
 FLUTTER_DURATION    = 16  ; SMB3 Player_WagCount initial value
+
+  lda TailSwingTimer
+  beq @runSuit
+    ; count down the timer if we are already swiping
+    dec TailSwingTimer
+    rts
+@runSuit:
   lda $d0 ; Tanooki suit active?
   beq @done
 
@@ -379,13 +386,6 @@ FLUTTER_DURATION    = 16  ; SMB3 Player_WagCount initial value
     sta Square1SoundQueue
 @noAPress:
 
-  lda TailSwingTimer
-  beq @maybeStart
-    ; count down the timer if we are already swiping
-    dec TailSwingTimer
-    rts
-
-@maybeStart:
   lda A_B_Buttons
   and #B_Button
   beq @done
@@ -669,7 +669,8 @@ OverworldLateInit:
 
 .org $8D61
   ; patches over an unused write for $0727 in sideview init
-  jsr UpdatePlayerPalette
+  ; jsr UpdatePlayerPalette
+
 .segment "PRG7"
 .reloc
 UpdatePlayerPalette:
@@ -684,24 +685,21 @@ UpdatePlayerPalette:
     ldx #7-1
   +
   ; we are still firey so write a palette update for next NMI
-  ldy $301
+  ldy BUFFER_OFF
   dey
   -
     iny
     inx
     lda PlayerRegularPalettePPUCommand,x
-    sta $301+1,y
+    sta PPUADDR_HI,y
     bpl -
-  tya
-  clc
-  adc #6
-  sta $301
+  sty BUFFER_OFF
   ; Check if we are still using shield.
   lda $69de
   cmp #$18 ; Check if the current "user" color is the same as the original color
   beq +
     ; if not, then replace it (this is the right address trust me)
-    sta $301,y
+    sta BUFFER_OFF,y
 +
   pla
   tax
