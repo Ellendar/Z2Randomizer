@@ -956,4 +956,9 @@ Use this only when everyone intentionally wants the same base seed with differen
 <value>For flags set to an indeterminate value (question mark), those flags will be on or off at
 random, at the freqency specified by this flag.</value>
 	</data>
+	<data name="MarioModeToolTip" xml:space="preserve">
+		<value>Play as Mario from SMB1 using 100% authentic Mario physics and controls!
+
+This is a wildly different gameplay experience, so be warned when setting this flag.</value>
+	</data>
 </root>

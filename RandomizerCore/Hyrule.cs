@@ -189,6 +189,7 @@ public class Hyrule
     private static readonly Js65Options assemblerOptions = new()
     {
         // Must exist for the FileResolve callback to be called
+        lineContinuations = true,
         includePaths = [""],
         // debugLevel = 0,
         // debugLevel = 1,
@@ -459,7 +460,7 @@ public class Hyrule
             var rom = await ROMData.ApplyAsm(assembler);
             if (!rom.success)
             {
-                return new RandomizerResult(false, null, null, string.Join(Environment.NewLine, rom.messages));
+                return new RandomizerResult(false, null, null, string.Join(Environment.NewLine, rom.messages.Select(x => x.ToString())));
             }
             ROMData = new ROM(rom.romdata);
 
@@ -556,7 +557,7 @@ public class Hyrule
                     File.WriteAllText("rooms.log", sb.ToString());
                 }
             }*/
-            return new RandomizerResult(true, ROMData.rawdata, rom.debugfile, string.Join(Environment.NewLine, rom.messages));
+            return new RandomizerResult(true, ROMData.rawdata, rom.debugfile, string.Join(Environment.NewLine, rom.messages.Select(x => x.ToString())));
         }
         catch(Exception e)
         {
@@ -2416,9 +2417,46 @@ public class Hyrule
         {
             rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.dash.chr"));
         }
-        rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
-        rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
-        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        if (!props.MarioMode)
+        {
+            // Mario mode sprites and colors are too weird to allow changing it atm 
+            // maybe after we fix the bugs with it...
+            rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
+            rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+        }
+        // Z2Mario, when making the vanilla romhack, change this flag to false
+        const bool isRandomized = false;
+        if (isRandomized)
+            rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        else
+        {
+            // We need to move the "OF" graphics over the unused zelda graphics
+            // to fit the new MARIO text (whether its used or not)
+            rom.Put(ROM.ChrRomOffset + 0x1000, rom.GetBytes(ROM.ChrRomOffset + 0x1380, 0x13e0 - 0x1380));
+        }
+        if (props.MarioMode)
+        {
+            // Overwrite link's downstab animation with fireball explosion sprites
+            var fireballExplosion = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.fireball_explosion.chr");
+            var extra_sprites = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.tanooki_tail.chr");
+            var tanooki_tail = extra_sprites[..0xa0]; // theres an extra unused tail tile in here
+            var oneup = extra_sprites[0xc0..0xe0];
+            var lifecount = extra_sprites[0xe0..0xf0];
+            for (var i = 0; i < 13; i++)
+            {
+                rom.Put(ROM.ChrRomOffset + 0x0400 + (i * 0x2000), fireballExplosion);
+                rom.Put(ROM.ChrRomOffset + 0x0560 + (i * 0x2000), tanooki_tail);
+                rom.Put(ROM.ChrRomOffset + 0x0a80 + (i * 0x2000), oneup);
+                rom.Put(ROM.ChrRomOffset + 0x1960 + (i * 0x2000), lifecount);
+            }
+            rom.Put(ROM.ChrRomOffset + 0x1a800, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.sprites_mario_hammer.chr"));
+            rom.Put(ROM.ChrRomOffset + 0x1b800, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.sprites_mario_tanooki.chr"));
+            var span = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.map_mario.chr");
+            rom.Put(ROM.ChrRomOffset + 0x11a00, span[0..0x220]);
+            var title_graphics = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.mario_title.chr");
+            rom.Put(ROM.ChrRomOffset + 0x1380, title_graphics[0..0x300]);
+            rom.Put(ROM.ChrRomOffset + 0x1840, title_graphics[0x300..0x400]);
+        }
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
@@ -3314,6 +3352,7 @@ CustomFileSelectData:
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
         a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", props.IncludeSpellsInShuffle ? 1 : 0);
+        a.Assign("ENABLE_Z2_MARIO", props.MarioMode ? 1 : 0);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     
@@ -3728,6 +3767,8 @@ EndTileComparisons = $8601
         a.Assign("PressStartStringLen", message.Length);
         AssignRealPalaceLocations(a);
         a.Set("_ALLOW_ITEM_DUPLICATES", props.AllowImportantItemDuplicates ? 1 : 0);
+        if (props.MarioMode)
+            a.Assign("ENABLE_Z2_MARIO", 1);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
 
@@ -3778,21 +3819,32 @@ bank5_Pointer_table_for_End_Credits:
 """, "add_credits.s");
     }
 
-    private void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft)
+
+    private void MarioModeActivate(Assembler asm)
     {
-        var a = asm.Module();
-        a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
-        a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
-        AssignRealPalaceLocations(a);
-        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
+        // "metasprite_engine.s" is included in metasprite.s
+        string[] modules = ["boss.s", "integration.s", "map.s", "mario.s", "metasprite.s", "sfx.s"];
+        foreach (var mod in modules)
+        {
+            var a = asm.Module();
+            a.Assign("ENABLE_Z2_MARIO", 1);
+            a.Code(Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.z2mario.{mod}"), mod);
+        }
+        // Rename JUMP to TANOOKI
+        var m = asm.Module();
+        m.Segment("PRG0");
+        m.Org(0x9c38);
+        m.Byt(Util.ToGameText("TANOOKI"));
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random r, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
+    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
-        ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic); // will make output vary with customize tab options
-        rom.AddRandomizerToTitle(engine);
+        rom.ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic, props.MarioMode); // will make output vary with customize tab options
+        // the second flag determines if we should add the "randomizer" text, but we don't have a "vanilla" option
+        // right now, so this is just always off, except when i manually make an update
+        rom.AddRandomizerToTitle(engine, props.MarioMode, false);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetNonSideviewItemLocations());
@@ -3808,6 +3860,11 @@ bank5_Pointer_table_for_End_Credits:
         rom.FixBigBubbleSplit(engine, randomizedStats);
         StatTracking(props, engine);
         AddCredits(engine);
+
+        if (props.MarioMode)
+        {
+            MarioModeActivate(engine);
+        }
 
         if (props.ShuffleBossHP != EnemyLifeOption.VANILLA)
         {
@@ -3920,9 +3977,46 @@ bank5_Pointer_table_for_End_Credits:
         {
             rom.ApplyIps(
                 Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2rndft.ips"));
+            // really hacky workaround but i don't want to recompile z2ft
+            // z2ft is compiled using an old address for NmiBankShadow8 and NmiBankShadowA so rather than
+            // recompile that, I'm just gonna patch it here...
+            const byte LDA_ABS = 0xAD;
+            const byte STA_ABS = 0x8D;
+            const byte LDX_ABS = 0xAE;
+            const byte STX_ABS = 0x8E;
 
+            void PatchAddress(byte opcode, int before, int after)
+            {
+                var idx = 0;
+                var needle = new ReadOnlySpan<byte>([opcode, (byte)before, (byte)(before >> 8)]);
+                while (rom.rawdata.AsSpan(idx).IndexOf(needle) is var di and >= 0)
+                {
+                    rom.Put(idx + di, opcode, (byte)after, (byte)(after >> 8));
+                    idx += di + 1;
+                }
+            }
+
+            PatchAddress(LDA_ABS, 0x6380, 0x6340);
+            PatchAddress(LDA_ABS, 0x6381, 0x6341);
+            PatchAddress(STA_ABS, 0x6380, 0x6340);
+            PatchAddress(STA_ABS, 0x6381, 0x6341);
+            PatchAddress(LDX_ABS, 0x6380, 0x6340);
+            PatchAddress(LDX_ABS, 0x6381, 0x6341);
+            PatchAddress(STX_ABS, 0x6380, 0x6340);
+            PatchAddress(STX_ABS, 0x6381, 0x6341);
             var asm = engine.Module();
             asm.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.s"), "z2ft.s");
+
+            if (props.MarioMode)
+            {
+                // There is a patch in z2ft to reduce offscreen enemy checking overhead
+                // but for the randomizer, it counters out its own lag reduction by adding
+                // additional forced lag to counterbalance the lag it removed.
+                // For z2mario, there's just so much more stuff going on, and people don't
+                // have the same expectations for the game, so this will "unpatch" the
+                // extra lag routine, so that it uses the lag reduction code.
+                rom.Put(0x1ffec, 0xb4, 0xf2);
+            }
         }
 
         UpdateTexts(engine, texts);

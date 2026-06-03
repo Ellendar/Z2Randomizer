@@ -214,6 +214,7 @@ public class RandomizerProperties
     public bool TownNameHints { get; set; }
 
     //Misc.
+    public bool MarioMode { get; set; }
     public byte BeepFrequency { get; set; }
     public byte BeepThreshold { get; set; }
     public bool JumpAlwaysOn { get; set; }

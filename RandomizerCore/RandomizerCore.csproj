@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -15,7 +15,6 @@
     <PublishTrimmed>true</PublishTrimmed>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
     <None Remove="Asm\ExpandedPauseMenu.s" />
@@ -34,12 +33,9 @@
     <None Update="Music\Faxanadu.json5">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-
     <None Update="Music\README.txt" CopyToOutputDirectory="PreserveNewest" />
-
     <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="nlog.config" CopyToOutputDirectory="Always" />
     <Content Include="PalaceRooms.json">
@@ -49,7 +45,6 @@
     </Content>
     <Content Include="js65\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="DynamicData" />
     <PackageReference Include="js65.interop" />
@@ -61,15 +56,38 @@
     <TrimmerRootAssembly Include="FtRandoLib" />
     <TrimmerRootAssembly Include="CoreSourceGenerator" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Asm\*.s" />
     <EmbeddedResource Include="Asm\Graphics\dash.chr" />
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
     <EmbeddedResource Include="Asm\Graphics\linkedFire.chr" />
     <EmbeddedResource Include="Asm\Graphics\randomizer_text.chr" />
+    <EmbeddedResource Include="Asm\z2mario\fireball_explosion.chr" />
     <EmbeddedResource Include="Asm\ram.inc" />
     <EmbeddedResource Include="Asm\z2r.inc" />
     <EmbeddedResource Include="Asm\z2rndft.ips" />
+    <None Remove="Asm\z2mario\integration.s" />
+    <EmbeddedResource Include="Asm\z2mario\integration.s" />
+    <None Remove="Asm\z2mario\map.s" />
+    <EmbeddedResource Include="Asm\z2mario\map.s" />
+    <None Remove="Asm\z2mario\map_mario.chr" />
+    <EmbeddedResource Include="Asm\z2mario\map_mario.chr" />
+    <None Remove="Asm\z2mario\metasprite.s" />
+    <EmbeddedResource Include="Asm\z2mario\metasprite.s" />
+    <None Remove="Asm\z2mario\sfx.s" />
+    <EmbeddedResource Include="Asm\z2mario\sfx.s" />
+    <None Remove="Asm\z2mario\mario.s" />
+    <EmbeddedResource Include="Asm\z2mario\mario.s" />
+    <None Remove="Asm\z2mario\sprites_mario_hammer.chr" />
+    <EmbeddedResource Include="Asm\z2mario\sprites_mario_hammer.chr" />
+    <None Remove="Asm\z2mario\sprites_mario_tanooki.chr" />
+    <EmbeddedResource Include="Asm\z2mario\sprites_mario_tanooki.chr" />
+    <None Remove="Asm\z2mario\tanooki_tail.chr" />
+    <EmbeddedResource Include="Asm\z2mario\tanooki_tail.chr" />
+    <None Remove="Asm\Graphics\fireball_explosion.chr" />
+    <None Remove="Asm\z2mario\boss.s" />
+    <EmbeddedResource Include="Asm\z2mario\boss.s" />
+    <None Remove="Asm\z2mario\mario_title.chr" />
+    <EmbeddedResource Include="Asm\z2mario\mario_title.chr" />
   </ItemGroup>
 </Project>

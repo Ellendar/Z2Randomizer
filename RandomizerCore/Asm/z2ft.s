@@ -12,6 +12,9 @@ UpdateSound = $878c
 
 .export CallUpdateSound
 .proc CallUpdateSound
+	lda #1
+	sta PendingAudioCall
+
 	; Must preserve these because in Z2R it's possible to be interrupted by NMI that may change banks.
 	lda NmiBankShadow8
 	pha
@@ -19,11 +22,13 @@ UpdateSound = $878c
 	pha
 
 	lda #6
-
 	jsr SwapPRG
 
 	jsr UpdateSound
-
+	; clear out the moa fire work around
+	; lda $07fd
+	; and #~$40
+	; sta $07fd ; Noise channel buffer
 	pla
 	sta NmiBankShadowA
 	sta PrgBankAReg
@@ -31,6 +36,13 @@ UpdateSound = $878c
 	sta NmiBankShadow8
 	sta PrgBank8Reg
 
+	; If a lag-frame NMI decremented PendingAudioCall to 0 while audio was running, re-run now
+	lda PendingAudioCall
+	bne @NoPending
+		jmp CallUpdateSound
+@NoPending:
+	lda #0
+	sta PendingAudioCall
 	rts
 .endproc ; CallUpdateSound
 
@@ -41,3 +53,17 @@ UpdateSound = $878c
 
 ; Get rid of original call to UpdateSound to move it after setting up IRQ
 UPDATE_REFS SwapToPRG0 @ $c130
+
+.segment "PRG6"
+; Work around how moa fire works. It queues a noise sfx with writing $40 to $eb
+; but doesn't set a buffer for it. This kept z2ft from knowing that the noise channel
+; was in use, so we set the value in the buffer and clear it after update.
+; .org $95A3
+; 	jmp FixMoaFireSfx
+; .reloc
+; FixMoaFireSfx:
+; 	sta $400C
+; 	lda $07fd
+; 	ora #$40
+; 	sta $07fd ; Noise channel buffer
+; 	rts

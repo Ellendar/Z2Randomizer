@@ -3,12 +3,6 @@
 
 .import SwapPRG, SwapToSavedPRG
 
-BUFFER_OFF = $0301
-PPUADDR_HI = $0302
-PPUADDR_LO = $0303
-BUFFER_LEN = $0304
-BUFFER_DAT = $0305
-
 DOT = $cf
 SPACE = $f4
 
@@ -19,6 +13,11 @@ CONVERT = $80
 LinkJustDied:
     inc StatDeaths
     inc $0494
+    ; Patch the death routine code to clear the previous/current FT tracks so they restart after death
+    ; I just think it sounds better like that
+    lda #$ff
+    sta $69e5 ; PrevFtTrack
+    sta $69f4 ; SavedFtTrack
     rts
 
 ; Update all locations that sets $0494 - link just died
@@ -44,6 +43,7 @@ SetPreviousFrameAction:
     sta $80
     rts
 
+.ifndef ENABLE_Z2_MARIO
 .org $95FC ; sty $0400
     jsr StatTrackSwordSwipe
 .reloc
@@ -109,7 +109,36 @@ StatTrackDownStab:
 @Exit:
     sta $80
     rts
-    
+.endif
+
+.segment "PRG7"
+
+; These values are exported from the randomizer and map from internal palace number
+; to the "real palace" at this offset. This way if Palace 5 is in the location of Palace 1,
+; then we increment the correct timer for Palace 5
+.reloc
+Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
+.export PalaceMappingTable
+PalaceMappingTable:
+    ; region 0 - east hyrule
+    .byte RealPalaceAtLocation1 * 3 + Palace1Offset
+    .byte RealPalaceAtLocation2 * 3 + Palace1Offset
+    .byte RealPalaceAtLocation3 * 3 + Palace1Offset
+    .byte $ff ; unused 4th palace in region 0
+    ; region 1 - death mountain
+    .byte $ff ; unused 1st palace in region 1
+    .byte $ff ; unused 2nd palace in region 1
+    .byte $ff ; unused 3th palace in region 1
+    .byte $ff ; unused 4th palace in region 1
+    ; region 2 - west hyrule
+    .byte RealPalaceAtLocation5 * 3 + Palace1Offset
+    .byte RealPalaceAtLocation6 * 3 + Palace1Offset
+    .byte RealPalaceAtLocationGP * 3 + Palace1Offset
+    .byte $ff ; unused 4th palace in region 2
+    ; region 3 - maze island
+    .byte RealPalaceAtLocation4 * 3 + Palace1Offset
+    .byte $ff, $ff, $ff ; 3 unused palace locations
+
 
 .segment "PRG4"
 
@@ -134,7 +163,7 @@ PalaceTable:
     .byte RealPalaceAtLocation2 + TsPalace1
     .byte RealPalaceAtLocation3 + TsPalace1
     .byte $ff ; unused 4th palace in region 0
-    ; region 1 - Death Mountain 
+    ; region 1 - Death Mountain
     .byte $ff ; unused 1st palace in region 1
     .byte $ff ; unused 2nd palace in region 1
     .byte $ff ; unused 3th palace in region 1
@@ -323,6 +352,8 @@ StopTimers:
         jsr AddTimestamp
 @AlreadyDoneOnce:
     ; setup and draw the old man over an over
+    lda #$00
+    sta $c9  ; offscreen bits. $Fx means the whole block is offscreen %0000abcd - abcd are bits indicating which tile in the block is offscreen
     lda #$d0
     sta Enemy0XPositionLo
     lda #$50
@@ -765,14 +796,45 @@ UpdateSpritePosition:
     ; link x offset
     lda #$08+4
     sta $cc
+    ; link x hi byte
+    lda #0
+    sta $3b
+    ; clear shield flag
+    sta $070F
+    ; link y hi byte
+    lda #1
+    sta $19
     ; link y offset
     lda #$20
     sta LinkYPos
     ; link metasprite
+.ifdef ENABLE_Z2_MARIO
+; .import BankPatchLinkDrawRoutine, METASPRITE_BIG_MARIO_STANDING
+;     lda #METASPRITE_BIG_MARIO_STANDING
+;     sta $80
+;     lda #1
+;     sta CurrentPRGBank
+;     jmp BankPatchLinkDrawRoutine
+    ;This is wayyy harder than it needs to be, so i'm just gonna draw mario where i want him
+    ; and move on with life
+    ldx #$10-1
+    @loop:
+        lda @PlayerStandingSprite,x
+        sta $200 + $80 + 4,x
+        dex
+        bpl @loop
+    rts
+@PlayerStandingSprite:
+.byte $30, $22, $00, $20
+.byte $30, $20, $00, $18
+.byte $20, $02, $00, $20
+.byte $20, $00, $00, $18
+
+.else
     lda #3
     sta $80
     jmp $EC02 ; Draw Link based on metasprite
-;    rts
+.endif
 
 .reloc
 WaitForStart:
@@ -1326,27 +1388,55 @@ BackgroundData:
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$ca,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$ca,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$dd,$de,$da,$ed,$e1,$ec,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+    .byte $dd,$de,$da,$ed,$e1,$ec ; DEATHS
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$eb,$de,$ec,$de,$ed,$ec,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+    .byte $eb,$de,$ec,$de,$ed,$ec ; RESETS
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$e1,$e2,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+.ifdef ENABLE_Z2_MARIO
+    .byte $e1,$da,$e6,$e6,$de,$eb ; HAMMER
+.else
+    .byte $e1,$e2,$ec,$ed,$da,$db ; HISTAB
+.endif
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$e5,$e8,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+.ifdef ENABLE_Z2_MARIO
+    .byte $df,$e2,$eb,$de,$db,$e5 ; FIREBL
+.else
+    .byte $e5,$e8,$ec,$ed,$da,$db ; LOSTAB
+.endif
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$ee,$e9,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+.ifdef ENABLE_Z2_MARIO
+    .byte $e3,$ee,$e6,$e9,$cf,$cf ; JUMP..
+.else
+    .byte $ee,$e9,$ec,$ed,$da,$db ; UPSTAB
+.endif
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-    .byte $f5,$cc,$dd,$f0,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f5,$cc
+.ifdef ENABLE_Z2_MARIO
+    .byte $ec,$ed,$e8,$e6,$e9,$cf ; STOMP.
+.else
+    .byte $dd,$f0,$ec,$ed,$da,$db ; DWSTAB
+.endif
+    .byte $cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
     .byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$cc,$f4,$f4,$f4
     .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
