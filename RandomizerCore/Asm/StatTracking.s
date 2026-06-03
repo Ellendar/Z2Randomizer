@@ -3,12 +3,6 @@
 
 .import SwapPRG, SwapToSavedPRG
 
-BUFFER_OFF = $0301
-PPUADDR_HI = $0302
-PPUADDR_LO = $0303
-BUFFER_LEN = $0304
-BUFFER_DAT = $0305
-
 DOT = $cf
 SPACE = $f4
 

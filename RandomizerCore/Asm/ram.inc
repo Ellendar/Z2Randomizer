@@ -296,8 +296,12 @@ Sprite_Attributes = $202
 Sprite_X_Position = $203
 Sprite_Data = Sprite_Y_Position
 
-VRAM_Buffer1_Offset = $302
-VRAM_Buffer1 = $303
+
+BUFFER_OFF = $0301
+PPUADDR_HI = $0302
+PPUADDR_LO = $0303
+BUFFER_LEN = $0304
+BUFFER_DAT = $0305
 
 LinkXSubpixel = $03d6
 Enemy0XSubpixel = $03d7
