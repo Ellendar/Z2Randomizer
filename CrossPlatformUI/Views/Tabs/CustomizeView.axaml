@@ -61,52 +61,54 @@
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleSpritePalettesToolTip}"/></ToolTip.Tip>
             </CheckBox>
 
-            <Separator/>
+            <StackPanel Margin="0 0" Orientation="Vertical" IsVisible="{OnPlatform Default=True, Browser=False}">
+                <Separator/>
 
-            <HyperlinkButton
-                Margin="43 0"
-                HorizontalAlignment="Left"
-                Content="[Wiki: Custom Music]"
-                NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Custom-Music"
-                FontSize="12"
-                Foreground="#4557c4"
-                Cursor="Hand"
-            />
+                <HyperlinkButton
+                    Margin="43 0"
+                    HorizontalAlignment="Left"
+                    Content="[Wiki: Custom Music]"
+                    NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Custom-Music"
+                    FontSize="12"
+                    Foreground="#4557c4"
+                    Cursor="Hand"
+                />
 
-            <CheckBox
-                IsChecked="{Binding DisableMusic}"
-                Content="Disable Music"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DisableMusicToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox 
-                IsEnabled="{Binding !DisableMusic}"
-                IsChecked="{Binding RandomizeMusic}"
-                Content="Use Custom Music If Any" 
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.UseCustomMusicIfAnyToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsEnabled="{Binding RandomizeMusicEnabled}"
-                IsChecked="{Binding MixCustomAndOriginalMusic}" 
-                Content="Mix Custom and Original Music"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MixCustomandOriginalMusicToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-              IsEnabled="{Binding RandomizeMusicEnabled}"
-              IsChecked="{Binding IncludeDiverseMusic}"
-              Content="Include Diverse Music"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeDiverseMusicToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsEnabled="{Binding RandomizeMusicEnabled}"
-                IsChecked="{Binding DisableUnsafeMusic}" 
-                Content="Disable Unsafe Music"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DisableUnsafeMusicToolTip}"/></ToolTip.Tip>
-            </CheckBox>
+                <CheckBox
+                    IsChecked="{Binding DisableMusic}"
+                    Content="Disable Music"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DisableMusicToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox 
+                    IsEnabled="{Binding !DisableMusic}"
+                    IsChecked="{Binding RandomizeMusic}"
+                    Content="Use Custom Music If Any" 
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.UseCustomMusicIfAnyToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    IsEnabled="{Binding RandomizeMusicEnabled}"
+                    IsChecked="{Binding MixCustomAndOriginalMusic}" 
+                    Content="Mix Custom and Original Music"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MixCustomandOriginalMusicToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                  IsEnabled="{Binding RandomizeMusicEnabled}"
+                  IsChecked="{Binding IncludeDiverseMusic}"
+                  Content="Include Diverse Music"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeDiverseMusicToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    IsEnabled="{Binding RandomizeMusicEnabled}"
+                    IsChecked="{Binding DisableUnsafeMusic}" 
+                    Content="Disable Unsafe Music"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DisableUnsafeMusicToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+            </StackPanel>
         </StackPanel>
         <tabs:SpritePreviewView Grid.Column="1" DataContext="{Binding SpritePreviewViewModel}" />
     </Grid>
