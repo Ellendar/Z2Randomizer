@@ -63,12 +63,6 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         set { Main.Config.BeamSprite = value; this.RaisePropertyChanged(); }
     }
 
-    public string OutputFilenameTemplate
-    {
-        get => Main.Config.OutputFilenameTemplate;
-        set { Main.Config.OutputFilenameTemplate = value; this.RaisePropertyChanged(); }
-    }
-
     public byte spriteTunicColor { get; private set; }
     public byte spriteSkinTone { get; private set; }
     public byte spriteOutlineColor { get; private set; }

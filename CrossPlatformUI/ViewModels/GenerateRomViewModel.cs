@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
-using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -17,7 +16,6 @@ using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 using CrossPlatformUI.Services;
-using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace CrossPlatformUI.ViewModels;
 
@@ -98,14 +96,8 @@ Seed: {config.Seed}
                     if(!tokenSource.IsCancellationRequested && output.success)
                     {
                         var flags = config.SerializeFlags();
-                        var version = Assembly.GetEntryAssembly()!.GetName().Version!;
-                        var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
-                        var filename = OutputFilenameFormatter.Format(config.OutputFilenameTemplate, flags, config.Seed, randomizer.Hash, version: versionstr);
-                        var basename = Path.GetFileNameWithoutExtension(filename);
-                        if (string.IsNullOrEmpty(basename))
-                        {
-                            basename = filename;
-                        }
+                        var basename = $"Z2_{config.Seed}_{flags}";
+                        var filename = basename + ".nes";
                         await files.SaveGeneratedBinaryFile(filename, output.romdata!, Main.OutputFilePath);
 #if DEBUG
                         var debugfile = basename + ".mlb";

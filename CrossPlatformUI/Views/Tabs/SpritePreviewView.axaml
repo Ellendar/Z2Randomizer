@@ -63,18 +63,6 @@
                       SelectedItem="{Binding BeamSprite, Converter={x:Static ui:Util.EnumConvert}}">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.BeamSpriteToolTip}"/></ToolTip.Tip>
             </ComboBox>
-
-            <Separator Margin="0 8 0 0"/>
-
-            <TextBox
-                Margin="0 8 0 0"
-                UseFloatingPlaceholder="True"
-                PlaceholderText="Z2-%f-%s-%h.nes"
-                assists:TextFieldAssist.Label="Output Filename"
-                Text="{Binding OutputFilenameTemplate}"
-            >
-                <ToolTip.Tip><TextBlock Text="%f = flags, %s = seed, %h = hash, %d = date/time, %v = version"/></ToolTip.Tip>
-            </TextBox>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Vertical">
             <TextBlock>Sprite Preview</TextBlock>

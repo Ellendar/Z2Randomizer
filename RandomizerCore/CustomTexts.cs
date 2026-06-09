@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
-using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -77,16 +76,16 @@ public class CustomTexts
     ];
 
     //Indexes in the hints list
-    private static readonly Dictionary<TownType, int> TOWN_SIGN_INDEXES = new()
+    private static readonly Dictionary<Town, int> TOWN_SIGN_INDEXES = new()
     {
-        {TownType.RAURU, 11},
-        {TownType.RUTO, 20},
-        {TownType.SARIA, 29},
-        {TownType.MIDO, 41},
-        {TownType.NABOORU, 62},
-        {TownType.DARUNIA, 76},
-        {TownType.NEW_KASUTO, 86},
-        {TownType.OLD_KASUTO, 94},
+        {Town.RAURU, 11},
+        {Town.RUTO, 20},
+        {Town.SARIA_NORTH, 29},
+        {Town.MIDO_WEST, 41},
+        {Town.NABOORU, 62},
+        {Town.DARUNIA_WEST, 76},
+        {Town.NEW_KASUTO, 86},
+        {Town.OLD_KASUTO, 94},
     };
 
     public const int WEST_TEXT_COUNT = 52;
@@ -114,16 +113,18 @@ public class CustomTexts
     private const int HELPFUL_HINTS_COUNT = 4;
 
     //private static readonly Dictionary<Town, int> spellTextIndexes = { 15, 24, 35, 46, 70, 81, 93, 96 };
-    private static readonly Dictionary<TownType, int> townWizardTextIndexes = new()
+    private static readonly Dictionary<Town, int> townWizardTextIndexes = new()
     {
-        { TownType.RAURU, 15 },
-        { TownType.RUTO, 24 },
-        { TownType.SARIA, 35 },
-        { TownType.MIDO, 46 },
-        { TownType.NABOORU, 70 },
-        { TownType.DARUNIA, 81 },
-        { TownType.NEW_KASUTO, 93 },
-        { TownType.OLD_KASUTO, 96 },
+        { Town.RAURU, 15 },
+        { Town.RUTO, 24 },
+        { Town.SARIA_NORTH, 35 },
+        { Town.MIDO_WEST, 46 },
+        { Town.MIDO_CHURCH, downstabGuyGotItemTextIndex },
+        { Town.NABOORU, 70 },
+        { Town.DARUNIA_ROOF, upstabGuyGotItemTextIndex },
+        { Town.DARUNIA_WEST, 81 },
+        { Town.NEW_KASUTO, 93 },
+        { Town.OLD_KASUTO, 96 },
     };
 
     private static readonly Dictionary<Collectable, int> wizardTextIndexesBySpell = new()
@@ -386,16 +387,18 @@ public class CustomTexts
         "i wish$i had a$%%$like yours"
     ];
 
-    public static readonly Dictionary<TownType, string[]> WIZARD_SPELL_TEXTS_BY_TOWN = new()
+    public static readonly Dictionary<Town, string[]> WIZARD_SPELL_TEXTS_BY_TOWN = new()
     {
-        { TownType.RAURU, [] },
-        { TownType.RUTO, ["A winner$is you"] },
-        { TownType.SARIA, ["Water$you$doing?"] },
-        { TownType.MIDO, [] },
-        { TownType.NABOORU, ["Do not$drink the$fountain$water here$...$trust me."] },
-        { TownType.DARUNIA, ["You saved$a kid$for this?", "Dont$forget to$get upstab"] },
-        { TownType.NEW_KASUTO, [] },
-        { TownType.OLD_KASUTO, ["Sorry$about the$moas"] }
+        { Town.RAURU, [] },
+        { Town.RUTO, ["A winner$is you"] },
+        { Town.SARIA_NORTH, ["Water$you$doing?"] },
+        { Town.MIDO_WEST, [] },
+        { Town.MIDO_CHURCH, [] },
+        { Town.NABOORU, ["Do not$drink the$fountain$water here$...$trust me."] },
+        { Town.DARUNIA_ROOF, [] },
+        { Town.DARUNIA_WEST, ["You saved$a kid$for this?", "Dont$forget to$get upstab"] },
+        { Town.NEW_KASUTO, [] },
+        { Town.OLD_KASUTO, ["Sorry$about the$moas"] }
     };
 
     public static readonly Dictionary<Collectable, string[]> WIZARD_SPELL_TEXTS_BY_COLLECTABLE = new()
@@ -532,29 +535,26 @@ public class CustomTexts
                 GenerateSpellHints(locations, texts, props);
             }
 
-            Location baguLocation = locations.FirstOrDefault(i => i.Town?.Type == TownType.BAGU)!;
+            Location baguLocation = locations.FirstOrDefault(i => i.ActualTown == Town.BAGU)!;
             if(baguLocation == null)
             {
                 throw new Exception("Bagu location not found while generating text");
             }
-            Text? baguText = GenerateBaguText(baguLocation.GetAllCollectables()[0], nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            Text? baguText = GenerateBaguText(baguLocation.Collectables[0], nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if(baguText != null)
             {
                 texts[baguTextIndex] = baguText;
             }
 
-            Collectable tableColletable = (Collectable)locations.First(i => i.Town?.Type == TownType.SARIA)
-                .Town!.GetTownMap(VanillaTownMap.SARIA_TABLE)!.Collectable!;
-            Text? mirrorText = GenerateMirrorTableText(tableColletable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            Location tableLocation = locations.FirstOrDefault(i => i.ActualTown == Town.SARIA_TABLE)!;
+            Text? mirrorText = GenerateMirrorTableText(tableLocation.Collectables[0], nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if (mirrorText != null)
             {
                 texts[gotMirrorTextIndex] = mirrorText;
             }
 
-
-            Collectable fountainCollectable = (Collectable)locations.First(i => i.Town?.Type == TownType.NABOORU)
-                .Town!.GetTownMap(VanillaTownMap.NABOORU_MID)!.Collectable!;
-            Text? fountainText = GenerateFountainText(fountainCollectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            Location fountainLocation = locations.FirstOrDefault(i => i.ActualTown == Town.NABOORU_FOUNTAIN)!;
+            Text? fountainText = GenerateFountainText(fountainLocation.Collectables[0], nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if (fountainText != null)
             {
                 texts[gotWaterTextIndex] = fountainText;
@@ -571,17 +571,17 @@ public class CustomTexts
 
             if (props.SpellItemHints && props.IncludeSwordTechsInShuffle)
             {
-                var downstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
-                var upstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
+                var downstabLoc = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.DOWNSTAB));
+                var upstabLoc = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.UPSTAB));
                 Text hint;
-                if (props.StartWithDownstab)
+                if (downstabLoc == null)
                 {
                     hint = props.UseCommunityText ? new Text(STARTED_WITH_ITEM_TEXTS.Sample(nonhashRNG)!, Collectable.DOWNSTAB)
                         : new Text(NON_COMMUNITY_STARTED_WITH_TEXT, Collectable.DOWNSTAB);
                 }
                 else
                 {
-                    hint = Text.GenerateHelpfulHint(downstabLoc, Collectable.DOWNSTAB, props.IncludeSpellsInShuffle);
+                    hint = Text.GenerateHelpfulHint(locations.ToList(), downstabLoc, Collectable.DOWNSTAB, props.IncludeSpellsInShuffle);
                 }
                 texts[downstabClosedDoorTextIndex] = hint;
                 if (upstabLoc == null)
@@ -591,7 +591,7 @@ public class CustomTexts
                 }
                 else
                 {
-                    hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
+                    hint = Text.GenerateHelpfulHint(locations.ToList(), upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
                 }
                 texts[upstabClosedDoorTextIndex] = hint;
                 if (props.SwapUpAndDownStab)
@@ -683,9 +683,9 @@ public class CustomTexts
 
     private static void GenerateTownNameHints(List<Text> texts, IEnumerable<Location> locations, bool linkedFire)
     {
-        foreach (Location location in locations.Where(i => i.Town?.GetWizard() != null))
+        foreach (Location location in locations.Where(i => i.ActualTown != null && i.VanillaCollectable.IsSpell()))
         {
-            texts[TOWN_SIGN_INDEXES[(TownType)location.Town!.Type!]] = GenerateTownSignHint((Collectable)location.Town.GetWizard()!.Collectable!, linkedFire);
+            texts[TOWN_SIGN_INDEXES[(Town)location.ActualTown!]] = GenerateTownSignHint(location.Collectables[0], linkedFire);
         }
     }
     private static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
@@ -701,12 +701,12 @@ public class CustomTexts
 
     private static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText)
     {
-        if(location.Town == null)
+        if(location.ActualTown == null)
         {
             throw new Exception("Cannot generate text for Wizard outside of town");
         }
-        TownType town = (TownType)location.Town.Type!;
-        Collectable collectable = (Collectable)location.Town.GetWizard()!.Collectable!;
+        Town town = (Town)location.ActualTown;
+        Collectable collectable = location.Collectables[0];
         if (collectable.IsSpell() 
             || collectable == Collectable.DOWNSTAB 
             || collectable == Collectable.UPSTAB)
@@ -860,7 +860,7 @@ public class CustomTexts
 
         List<int> placedTowns = [];
 
-        List<Collectable> items = locations.SelectMany(i => i.GetAllCollectables()).ToList();
+        List<Collectable> items = locations.SelectMany(i => i.Collectables).ToList();
         items = items.Where(i => !i.IsInternalUse()).ToList();
 
         if (props.SpellItemHints && props.IncludeSwordTechsInShuffle)
@@ -921,7 +921,7 @@ public class CustomTexts
         bool requiredOldKasutoHintPlaced = !OLD_KASUTO_HINT_IS_ALWAYS_GOOD;
         foreach(Collectable hintCollectable in hintCollectables)
         {
-            List<Location> possibleHintLocations = locations.Where(i => i.GetAllCollectables().Contains(hintCollectable)).ToList();
+            List<Location> possibleHintLocations = locations.Where(i => i.Collectables.Contains(hintCollectable)).ToList();
 
             Location hintLocation;
             int town;
@@ -941,9 +941,9 @@ public class CustomTexts
 
             }
             //don't let hints be for items in the same town
-            while ((hintLocation.Town!.Type ?? TownType.INVALID).VanillaTownOrder() - 1 == town
+            while ((hintLocation.ActualTown ?? Town.INVALID).VanillaTownOrder() - 1 == town
              || placedTowns.Contains(town));
-            Text hint = Text.GenerateHelpfulHint(hintLocation, hintCollectable, props.IncludeSpellsInShuffle);
+            Text hint = Text.GenerateHelpfulHint(locations.ToList(), hintLocation, hintCollectable, props.IncludeSpellsInShuffle);
             int index = hintIndexes[town][r.Next(hintIndexes[town].Length)];
             switch (index)
             {
@@ -983,40 +983,40 @@ public class CustomTexts
         {
             Location itemLocation;
 
-            itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.TROPHY))!;
+            itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.TROPHY))!;
             if(itemLocation != null)
             {
-                Text trophyHint = Text.GenerateHelpfulHint(itemLocation, Collectable.TROPHY, props.IncludeSpellsInShuffle);
+                Text trophyHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.TROPHY, props.IncludeSpellsInShuffle);
                 hints[trophySpellHintIndex] = trophyHint;
             }
 
-            itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.MEDICINE))!;
+            itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.MEDICINE))!;
             if (itemLocation != null)
             {
-                Text medHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MEDICINE, props.IncludeSpellsInShuffle);
+                Text medHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.MEDICINE, props.IncludeSpellsInShuffle);
                 hints[medicineSpellHintIndex] = medHint;
             }   
 
-            itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.CHILD))!;
+            itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.CHILD))!;
             if (itemLocation != null)
             {
-                Text kidHint = Text.GenerateHelpfulHint(itemLocation, Collectable.CHILD, props.IncludeSpellsInShuffle);
+                Text kidHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.CHILD, props.IncludeSpellsInShuffle);
                 hints[childSpellHintIndex] = kidHint;
             }
 
             if (props.IncludeQuestItemsInShuffle)
             {
-                itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.MIRROR))!;
+                itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.MIRROR))!;
                 if (itemLocation != null)
                 {
-                    Text mirrorHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MIRROR, props.IncludeSpellsInShuffle);
+                    Text mirrorHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.MIRROR, props.IncludeSpellsInShuffle);
                     hints[mirrorSpellHintIndex] = mirrorHint;
                 }
 
-                itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.WATER))!;
+                itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.WATER))!;
                 if (itemLocation != null)
                 {
-                    Text waterHint = Text.GenerateHelpfulHint(itemLocation, Collectable.WATER, props.IncludeSpellsInShuffle);
+                    Text waterHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.WATER, props.IncludeSpellsInShuffle);
                     hints[waterSpellHintIndex] = waterHint;
                 }
             }
@@ -1027,10 +1027,10 @@ public class CustomTexts
     {
         List<Text> vanillaText = new(texts);
         List<Text> usedWizardTexts = [];
-        List<Location> wizardLocations = itemLocs.Where(i => i.Town?.GetWizard() != null).ToList();
+        List<Location> wizardLocations = itemLocs.Where(i => i.ActualTown != 0 && (i?.ActualTown?.IsWizardTown() ?? false)).ToList();
         foreach (Location location in wizardLocations)
         {
-            if(location.Town == null)
+            if(location.ActualTown == null)
             {
                 throw new Exception("Invalid town that is not a town");
             }
@@ -1041,7 +1041,7 @@ public class CustomTexts
                 wizardHint = GenerateWizardText(vanillaText, r, location, useCommunityText);
             } while (useCommunityText && usedWizardTexts.Contains(wizardHint) && tries++ < 100);
             usedWizardTexts.Add(wizardHint);
-            texts[townWizardTextIndexes[(TownType)location.Town.Type!]] = wizardHint;
+            texts[townWizardTextIndexes[(Town)location.ActualTown]] = wizardHint;
         }
     }
 

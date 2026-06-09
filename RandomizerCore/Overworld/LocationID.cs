@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -277,18 +276,18 @@ public static class LocationIDUtils
 
 public static class LocationIDExtensions
 {
-    static readonly Dictionary<LocationID, TownType> townMap = new()
+    static readonly Dictionary<LocationID, Town> townMap = new()
     {
-        [LocationID.WEST_TOWN_RAURO] = TownType.RAURU,
-        [LocationID.WEST_TOWN_RUTO] = TownType.RUTO,
-        [LocationID.WEST_TOWN_SARIA_NORTH] = TownType.SARIA,
-        [LocationID.WEST_TOWN_SARIA_SOUTH] = TownType.SARIA,
-        [LocationID.WEST_BAGU_HOUSE] = TownType.BAGU,
-        [LocationID.WEST_TOWN_MIDO] = TownType.MIDO,
-        [LocationID.EAST_TOWN_NABOORU] = TownType.NABOORU,
-        [LocationID.EAST_TOWN_DARUNIA] = TownType.DARUNIA,
-        [LocationID.EAST_TOWN_OLD_KASUTO] = TownType.OLD_KASUTO,
-        [LocationID.EAST_TOWN_NEW_KASUTO] = TownType.NEW_KASUTO,
+        [LocationID.WEST_TOWN_RAURO] = Town.RAURU,
+        [LocationID.WEST_TOWN_RUTO] = Town.RUTO,
+        [LocationID.WEST_TOWN_SARIA_NORTH] = Town.SARIA_NORTH,
+        [LocationID.WEST_TOWN_SARIA_SOUTH] = Town.SARIA_SOUTH,
+        [LocationID.WEST_BAGU_HOUSE] = Town.BAGU,
+        [LocationID.WEST_TOWN_MIDO] = Town.MIDO_WEST,
+        [LocationID.EAST_TOWN_NABOORU] = Town.NABOORU,
+        [LocationID.EAST_TOWN_DARUNIA] = Town.DARUNIA_WEST,
+        [LocationID.EAST_TOWN_OLD_KASUTO] = Town.OLD_KASUTO,
+        [LocationID.EAST_TOWN_NEW_KASUTO] = Town.NEW_KASUTO,
     };
 
     public static bool IsNamed(this LocationID lid)
@@ -339,9 +338,9 @@ public static class LocationIDExtensions
     /// </summary>
     /// <param name="lid"></param>
     /// <returns></returns>
-    public static TownType? GetTown(this LocationID lid)
+    public static Town? GetTown(this LocationID lid)
     {
-        if (townMap.TryGetValue(lid, out TownType town))
+        if (townMap.TryGetValue(lid, out Town town))
             return town;
 
         return null;
