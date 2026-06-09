@@ -80,6 +80,12 @@
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MarioModeToolTip}"/></ToolTip.Tip>
             </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.FluteTwisterWarp}"
+                Content="Playing Flute Spawns a Twister"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.FluteTwisterWarpToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
     </Grid>
 </UserControl>

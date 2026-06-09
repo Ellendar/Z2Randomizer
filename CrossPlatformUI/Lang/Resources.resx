@@ -857,6 +857,9 @@ dash, the Dash spell will still appear, but do nothing.</value>
 	<data name="PermanentBeamSwordToolTip" xml:space="preserve">
 <value>Link will always shoot beams from his sword, regardless of life.</value>
 	</data>
+	<data name="FluteTwisterWarpToolTip" xml:space="preserve">
+<value>Flute works like the Zelda 1 flute and spawns a twister you can walk into to warp the player to dungeons that they've already cleared (placed a gem in). If you are facing up or right, then it will take you to the next dungeon in order, if you are facing down or left, it will take you to the previous dungeon in order.</value>
+	</data>
 	<data name="ShuffleStartingItemsToolTip" xml:space="preserve">
 <value>When enabled, your starting items will be randomized.
 

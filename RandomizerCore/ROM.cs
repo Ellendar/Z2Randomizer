@@ -2168,6 +2168,12 @@ ResetRedPalettePayload:
         Put(0x16413, thunderBirdHP);
     }
 
+    public static void FluteTwisterWarp(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.Flute.s"), "flute.s");
+    }
+
     public void DashSpell(Assembler asm)
     {
         var a = asm.Module();

@@ -3951,6 +3951,11 @@ bank5_Pointer_table_for_End_Credits:
             rom.DashSpell(engine);
         }
 
+        if (props.FluteTwisterWarp)
+        {
+            ROM.FluteTwisterWarp(engine);
+        }
+
         if (props.UpARestartsAtPalaces)
         {
             RestartWithPalaceUpA(engine);
