@@ -205,6 +205,17 @@ public class Hyrule
     private readonly NewAssemblerFn NewAssembler;
     private readonly PalaceRooms palaceRooms;
 
+    // HACK: A few places in the app need to check if we are using mario mode, and i didn't feel like refactoring them
+    // to have another bool parameter passed in.
+    public static bool Z2MarioModeEnabled = false;
+    // In general, we will distribute the randomizer app in release mode, so this should always be true for players.
+    // But for z2mario as a romhack, I build in debug mode, so this just removes the "RANDOMIZER" text in the title.
+#if DEBUG
+    const bool IS_RANDOMIZED = false;
+#else
+    const bool IS_RANDOMIZED = true;
+#endif
+
     public string Hash { get; private set; }
 
     //This entire class structure is hot fucking garbage, but refactoring it such that it makes sense is
@@ -223,6 +234,7 @@ public class Hyrule
         {
             Hash = "";
             World.ResetStats();
+            Z2MarioModeEnabled = config.MarioMode;
 
             SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed!)).AsSpan()[..4]);
             r = new Random(SeedHash);
@@ -538,6 +550,10 @@ public class Hyrule
                 SanitizeHashCharacters(z2Hash);
             }
 
+            if (Z2MarioModeEnabled && !IS_RANDOMIZED)
+            {
+                z2Hash = Util.ToGameText("VER. 1.2.0 ");
+            }
             ROMData.Put(0x17C2C, z2Hash);
             Hash = Util.FromGameText(z2Hash);
 
@@ -2424,9 +2440,7 @@ public class Hyrule
             rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
             rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
         }
-        // Z2Mario, when making the vanilla romhack, change this flag to false
-        const bool isRandomized = false;
-        if (isRandomized)
+        if (IS_RANDOMIZED)
             rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
         else
         {
@@ -3844,7 +3858,7 @@ bank5_Pointer_table_for_End_Credits:
         rom.ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic, props.MarioMode); // will make output vary with customize tab options
         // the second flag determines if we should add the "randomizer" text, but we don't have a "vanilla" option
         // right now, so this is just always off, except when i manually make an update
-        rom.AddRandomizerToTitle(engine, props.MarioMode, false);
+        rom.AddRandomizerToTitle(engine, props.MarioMode, IS_RANDOMIZED);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetNonSideviewItemLocations());

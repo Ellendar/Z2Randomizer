@@ -215,7 +215,7 @@ internal class MusicRandomizer
         WriteLogLine(null);
         WriteLogLine("SELECTED SONGS:");
         // I want my songs in a particular order for z2mario, so uncomment this when making the romhack
-        if (true)
+        if (Hyrule.Z2MarioModeEnabled)
         {
             var regular = usesSongs[Usage.Encounter].Find(x => !x.Title.Contains("Swing"))!;
             var swing = usesSongs[Usage.Encounter].Find(x => x.Title.Contains("Swing"))!;
