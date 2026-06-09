@@ -573,6 +573,8 @@ public class CustomTexts
 
             if (props.SpellItemHints && props.IncludeSwordTechsInShuffle)
             {
+                var downstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
+                var upstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
                 Text hint;
                 if (props.StartWithDownstab)
                 {
@@ -581,7 +583,6 @@ public class CustomTexts
                 }
                 else
                 {
-                    var downstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
                     hint = Text.GenerateHelpfulHint(downstabLoc, Collectable.DOWNSTAB, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                 }
                 texts[downstabClosedDoorTextIndex] = hint;
@@ -592,8 +593,7 @@ public class CustomTexts
                 }
                 else
                 {
-                    var upstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
-                    hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
+                    hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
                 }
                 texts[upstabClosedDoorTextIndex] = hint;
                 if (props.SwapUpAndDownStab)

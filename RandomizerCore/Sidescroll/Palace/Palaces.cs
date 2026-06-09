@@ -161,6 +161,7 @@ public class Palaces
                 }
             }
         }
+
         return palaces;
     }
 
