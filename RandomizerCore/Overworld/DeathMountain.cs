@@ -193,7 +193,7 @@ sealed class DeathMountain : World
 
         climate = Climates.Create(props.DmClimate);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
-        SetVanillaCollectables(props.ReplaceFireWithDash);
+        //SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     private void RemoveLocationsDM(ICollection<Location> locations)
@@ -1114,7 +1114,7 @@ sealed class DeathMountain : World
                 if (location.AccessRequirements.AreSatisfiedBy(requireables))
                 {
                     location.Reachable = true;
-                    if (connectionsDM.ContainsKey(location) && location.ConnectionRequirements.AreSatisfiedBy(requireables))
+                    if (connectionsDM.ContainsKey(location) && (location.Town == null || location.Town.CanBeTraversed(requireables)))
                     {
                         foreach (Location connectedLocation in connectionsDM[location])
                         {
@@ -1215,18 +1215,20 @@ sealed class DeathMountain : World
         return requiredLocations.Where(i => i != null);
     }
 
+    /*
     protected override void SetVanillaCollectables(bool useDash)
     {
         hammerCave.VanillaCollectable = Collectable.HAMMER;
         specRock.VanillaCollectable = Collectable.MAGIC_CONTAINER;
     }
+    */
 
     public override string GenerateSpoiler()
     {
         StringBuilder sb = new();
         sb.AppendLine("DEATH MOUNTAIN: ");
-        sb.AppendLine("\tHammer Cave: " + hammerCave.Collectables[0].EnglishText());
-        sb.AppendLine("\tSpec Rock: " + specRock.Collectables[0].EnglishText());
+        sb.AppendLine("\tHammer Cave: " + hammerCave.GetAllCollectables()[0].EnglishText());
+        sb.AppendLine("\tSpec Rock: " + specRock.GetAllCollectables()[0].EnglishText());
 
         sb.AppendLine();
         return sb.ToString();
@@ -1234,17 +1236,25 @@ sealed class DeathMountain : World
 
     public override void DisableDisallowedPassthroughs()
     {
-                        foreach (Location location in Locations[Terrain.CAVE])
-                {
-                    location.IsPassthrough = false;
-                }
-                foreach (Location location in Locations[Terrain.TOWN])
-                {
-                    location.IsPassthrough = false;
-                }
-                foreach (Location location in Locations[Terrain.PALACE])
-                {
-                    location.IsPassthrough = false;
-                }
+        foreach (Location location in Locations[Terrain.CAVE])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.TOWN])
+        {
+            location.IsPassthrough = false;
+        }
+        foreach (Location location in Locations[Terrain.PALACE])
+        {
+            location.IsPassthrough = false;
+        }
+    }
+
+    public override void ResetCollectables(RandomizerProperties props)
+    {
+        hammerCave.SetCollectables([Collectable.HAMMER]);
+        hammerCave.CollectablesAreShufflable = props.ShuffleOverworldItems;
+        specRock.SetCollectables([Collectable.MAGIC_CONTAINER]);
+        specRock.CollectablesAreShufflable = props.ShuffleOverworldItems;
     }
 }

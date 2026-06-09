@@ -1,15 +1,18 @@
-﻿using System;
+﻿using js65;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using js65;
-using NLog;
+using System.Xml.Linq;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -155,6 +158,8 @@ public class ROM
     public static readonly int[] ZeldaOutlinePaletteAddr = { 0x4025, 0x8025, 0x14049, 0x140c7 };
     public static readonly int[] ZeldaFacePaletteAddr =    { 0x4023, 0x8023, 0x14047, 0x140c9 };
     public static readonly int[] ZeldaDressPaletteAddr =   { 0x4024, 0x8024, 0x14048, 0x140c8 };
+
+    public static readonly byte[] DOOR_CONNECTION_BLACKLIST = [0x00, 0xFC, 0xFD, 0xFE, 0xFF];
 
     public byte[] rawdata { get; }
 
@@ -2356,6 +2361,52 @@ ResetRedPalettePayload:
         };
     }
 
+    public Town LoadTown(int startMapNum, int numMaps)
+    {
+        List<TownMap> townMaps = [];
+
+        for (int currentMapNum = startMapNum; currentMapNum - startMapNum < numMaps; currentMapNum++)
+        {
+            townMaps.Add(LoadTownMap(currentMapNum, false));
+
+            var roomDoorConnectionsRomAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x8817 + currentMapNum * 4);
+            var roomDoorConnections = GetBytes(roomDoorConnectionsRomAddr, 4);
+
+            for(int connectionNumber = 0; connectionNumber < 4; connectionNumber++)
+            {
+                byte internalMapNumber = (byte)(roomDoorConnections[connectionNumber] & 0xFC >> 2);
+                if(!DOOR_CONNECTION_BLACKLIST.Contains(internalMapNumber))
+                {
+                    townMaps.Add(LoadTownMap(internalMapNumber, true));
+                }
+            }
+        }
+
+        var romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x871B + startMapNum * 4);
+        var connectionsRaw = GetBytes(romAddr, 4 * numMaps);
+        romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x8817 + startMapNum * 4);
+        var doorConnectionsRaw = GetBytes(romAddr, 4 * numMaps);
+
+        return new Town(townMaps, connectionsRaw, doorConnectionsRaw);
+    }
+
+    public TownMap LoadTownMap(int currentMapNum, bool isInternalMap)
+    {
+        var romPtr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x8523 + 2 * currentMapNum);
+        var nesAddr = GetShort(romPtr + 1, romPtr);
+        var romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, nesAddr);
+        var length = GetByte(romAddr);
+        var sideviewRaw = GetBytes(romAddr, length);
+
+        romPtr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x85a1 + 2 * currentMapNum);
+        nesAddr = GetShort(romPtr + 1, romPtr);
+        romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, nesAddr);
+        length = GetByte(romAddr);
+        byte[] enemiesRaw = GetBytes(romAddr, length);
+
+        return new TownMap(currentMapNum, sideviewRaw, enemiesRaw, isInternalMap);
+    }
+
     public void RemoveUnusedConnectors(World world)
     {
         if (world.raft == null)
@@ -2380,8 +2431,7 @@ ResetRedPalettePayload:
     }
 
     //This was refactored out of EastHyrule. The signature/timing/structure needs work.
-    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, 
-        Location townAtNewKasuto, Location spellTower, bool vanillaShuffleUsesActualTerrain)
+    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, bool vanillaShuffleUsesActualTerrain)
     {
         if (!biome.UsesVanillaMap())
         {
@@ -2395,10 +2445,6 @@ ResetRedPalettePayload:
         Put(0x1ccc0, (byte)pos);
         int connection = hiddenPalaceLocation.MemAddress - 0x862F;
         Put(0x1df76, (byte)connection);
-        if (hiddenPalaceLocation == spellTower)
-        {
-            throw new Exception("Child locations shouldn't be able to be hidden spots");
-        }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
             Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
@@ -2507,7 +2553,7 @@ ResetRedPalettePayload:
 
     }
 
-    public void UpdateKasuto(Location hiddenKasutoLocation, Location townAtNewKasuto, Location spellTower, Biome biome,
+    public void UpdateKasuto(Location hiddenKasutoLocation, Biome biome,
         int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
     {
         Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + (hiddenKasutoLocation.IsExternalWorld ? 0x80 : 0)));
@@ -2517,10 +2563,6 @@ ResetRedPalettePayload:
         Put(0x1ccdb, (byte)hiddenKasutoLocation.YRaw);
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         Put(0x1df77, (byte)connection);
-        if (hiddenKasutoLocation == spellTower)
-        {
-            throw new Exception("Child locations shouldn't be able to be hidden spots");
-        }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
             //Terrain t = terrains[hiddenKasutoLocation.MemAddress];
