@@ -16,6 +16,7 @@ using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 using CrossPlatformUI.Services;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace CrossPlatformUI.ViewModels;
 

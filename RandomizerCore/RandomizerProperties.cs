@@ -246,7 +246,7 @@ public class RandomizerProperties
     [Key]
     public int Id { get; set; }
 
-    public bool StartsWithCollectable(Collectable collectable)
+    public bool StartsWithCollectable(Collectable? collectable)
     {
         return collectable switch
         {

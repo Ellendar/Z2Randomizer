@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
-using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -96,17 +96,6 @@ public class Util
         }
 
         return output.ToString();
-    }
-
-    public static void Swap(Location p1, Location p2)
-    {
-        //(p2.Continent, p1.Continent) = (p1.Continent, p2.Continent);
-        (p2.Map, p1.Map) = (p1.Map, p2.Map);
-        (p2.PalaceNumber, p1.PalaceNumber) = (p1.PalaceNumber, p2.PalaceNumber);
-
-        (p2.ActualTown, p1.ActualTown) = (p1.ActualTown, p2.ActualTown);
-        (p2.Collectables, p1.Collectables) = (p1.Collectables, p2.Collectables);
-        (p2.Name, p1.Name) = (p1.Name, p2.Name);
     }
 
     public static string ByteArrayToHexString(byte[] bytes)

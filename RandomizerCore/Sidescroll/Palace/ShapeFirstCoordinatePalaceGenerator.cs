@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
@@ -16,7 +16,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
-        Palace palace = new(palaceNumber);
+        Palace palace = new(palaceNumber, props.ShufflePalaceItems);
         RoomPool roomPool = new(rooms);
         var itemRoomSelector = GetItemRoomSelectionStrategy();
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
