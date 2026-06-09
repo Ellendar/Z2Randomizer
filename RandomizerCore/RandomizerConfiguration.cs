@@ -703,6 +703,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     private bool marioMode = false;
 
+    [Reactive]
+    private bool fluteTwisterWarp;
+
     //Custom
     [Reactive]
     [IgnoreInFlags]
@@ -1450,6 +1453,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         };
         properties.JumpAlwaysOn = jumpAlwaysOn;
         properties.DashAlwaysOn = dashAlwaysOn;
+        properties.FluteTwisterWarp = fluteTwisterWarp;
         properties.FastCast = fastSpellCasting;
         properties.BeamSprite = beamSprite;
         properties.DisableMusic = disableMusic;
