@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
-using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -80,36 +79,55 @@ public class Text : IEquatable<Text>
         return true;
     }
 
-    public static Text GenerateHelpfulHint(Location location, Collectable collectable, bool useTownSpecificHints)
+    public static Text GenerateHelpfulHint(List<Location> allLocations, Location location, Collectable collectable, bool useTownSpecificHints)
     {
         string? hint = null;
-        if (location.Palace?.Number == 1)
+        if (location.PalaceNumber == 1)
         {
             hint = "horsehead$neighs$with the$%%";
         }
-        else if (location.Palace?.Number == 2)
+        else if (location.PalaceNumber == 2)
         {
             hint = "helmethead$guards the$%%";
         }
-        else if (location.Palace?.Number == 3)
+        else if (location.PalaceNumber == 3)
         {
             hint = "rebonack$rides$with the$%%";
         }
-        else if (location.Palace?.Number == 4)
+        else if (location.PalaceNumber == 4)
         {
             hint = "carock$disappears$with the$%%";
         }
-        else if (location.Palace?.Number == 5)
+        else if (location.PalaceNumber == 5)
         {
             hint = "gooma sits$on the$%%";
         }
-        else if (location.Palace?.Number == 6)
+        else if (location.PalaceNumber == 6)
         {
             hint = "barba$slithers$with the$%%";
         }
-        else if (useTownSpecificHints && location.Town != null)
+        else if (useTownSpecificHints)
         {
-            hint = $"{((TownType)location.Town.Type!).HintName()}$has the$%%";
+            //For now bagu is not a town for hints. Could change in the future.
+            if (location.ActualTown != null && location.ActualTown != Town.BAGU)
+            {
+                hint = $"{((Town)location.ActualTown).HintName()}$has the$%%";
+            }
+            //Saria table
+            if(allLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Children.Contains(location))
+            {
+                hint = $"{Town.SARIA_NORTH.HintName()}$has the$%%";
+            }
+            //Nabooru fountain
+            if (allLocations.First(i => i.ActualTown == Town.NABOORU).Children.Contains(location))
+            {
+                hint = $"{Town.NABOORU.HintName()}$has the$%%";
+            }
+            //Spell Tower / Granny's Basement
+            if (allLocations.First(i => i.ActualTown == Town.NEW_KASUTO).Children.Contains(location))
+            {
+                hint = $"{Town.NEW_KASUTO.HintName()}$has the$%%";
+            }
         }
         if(hint == null)
         {

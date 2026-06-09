@@ -11,7 +11,6 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using Z2Randomizer.RandomizerCore.Overworld;
-using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -373,7 +372,7 @@ internal class MusicRandomizer
                     usage = Usage.Town;
                 else if (loc.TerrainType == Terrain.TOWN)
                 {
-                    if (loc.Town?.Type == TownType.OLD_KASUTO // ??
+                    if (loc.ActualTown == Town.OLD_KASUTO // ??
                         /*|| loc.ActualTown == Town.SARIA_SOUTH*/)
                         continue;
 
@@ -381,10 +380,10 @@ internal class MusicRandomizer
                 }
                 else if (loc.TerrainType == Terrain.PALACE)
                 {
-                    if (loc.Palace?.Number == null)
+                    if (loc.PalaceNumber == null)
                         continue; // North palace
 
-                    usage = (loc.Palace.Number < 7)
+                    usage = (loc.PalaceNumber < 7)
                         ? Usage.Palace
                         : Usage.GreatPalace;
                 }
@@ -408,7 +407,7 @@ internal class MusicRandomizer
             Func<Location, int> GetSongIdx = usage switch
             {
                 // One song per palace
-                Usage.Palace => (loc => (int)loc.Palace!.Number! - 1),
+                Usage.Palace => (loc => (int)loc.PalaceNumber! - 1),
                 Usage.GreatPalace => (loc => 0),
                 // One song per continent
                 _ => (loc => (int)(loc.VanillaContinent ?? loc.Continent)),

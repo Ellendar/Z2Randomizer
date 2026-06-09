@@ -6,7 +6,6 @@ using System.Text.Json;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Sidescroll;
-using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 using static Z2Randomizer.RandomizerCore.Util;
 
 StringBuilder sb = new StringBuilder("");
