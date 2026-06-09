@@ -23,10 +23,12 @@ internal class ByEntranceDirectionItemRoomSelectionStrategy : ItemRoomSelectionS
             if (!roomPool.ItemRoomsByDirection.TryGetValue(itemRoomDirection, out var value))
             {
                 remainingDirections.Remove(itemRoomDirection);
+#pragma warning disable CS0162 // Unreachable code detected
                 if (BREAK_EARLY_ON_FIRST_FAILED_DIRECTION)
                 {
                     return [];
                 }
+#pragma warning restore CS0162 // Unreachable code detected
                 continue;
             }
             Room itemRoom = value.Next(r);

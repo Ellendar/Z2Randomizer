@@ -426,7 +426,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         return true;
     }
 
-    public static string GetLayoutDebug(Dictionary<Coord, RoomExitType> walkGraph, bool includeCoordinateGrid = true, List<Coord> prepopulatedCoordinates = null)
+    public static string GetLayoutDebug(Dictionary<Coord, RoomExitType> walkGraph, bool includeCoordinateGrid = true, List<Coord>? prepopulatedCoordinates = null)
     {
         StringBuilder sb = new();
         if (includeCoordinateGrid)

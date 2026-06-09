@@ -759,6 +759,10 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [IgnoreInFlags]
     private string spriteName = CharacterSprite.LINK.DisplayName;
 
+    [Reactive]
+    [IgnoreInFlags]
+    private string outputFilenameTemplate = OutputFilenameFormatter.DefaultTemplate;
+
 
     [Reactive]
     [IgnoreInFlags]
@@ -892,9 +896,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         // For nullable ints, Enums are our preferred option.
         int extent = maximum - minimum + 1;
         int value = val - minimum ?? minimum;
-        if (value < minimum || value > maximum)
+        if (value < 0 || value >= extent)
         {
-            logger.Warn($"Property ({name}={value}) is out of range.");
+            logger.Warn($"Property ({name}={val}) is out of range.");
         }
         flags.Append(value, extent);
     }

@@ -14,7 +14,7 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
-    <PackageVersion Include="PolySharp" Version="1.15.0" />
+    <PackageVersion Include="PolySharp" Version="1.16.0" />
     <!-- ClearScript -->
     <PackageVersion Include="Microsoft.ClearScript" Version="$(ClearScriptVersion)" />
     <PackageVersion Include="Microsoft.ClearScript.Core" Version="$(ClearScriptVersion)" />
