@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
@@ -14,7 +14,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt)
     {
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
-        Palace palace = new(palaceNumber, props.ShufflePalaceItems);
+        Palace palace = new(palaceNumber);
         RoomPool roomPool = new(rooms);
         var itemRoomSelector = GetItemRoomSelectionStrategy();
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
@@ -426,7 +426,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         return true;
     }
 
-    public static string GetLayoutDebug(Dictionary<Coord, RoomExitType> walkGraph, bool includeCoordinateGrid = true, List<Coord>? prepopulatedCoordinates = null)
+    public static string GetLayoutDebug(Dictionary<Coord, RoomExitType> walkGraph, bool includeCoordinateGrid = true, List<Coord> prepopulatedCoordinates = null)
     {
         StringBuilder sb = new();
         if (includeCoordinateGrid)

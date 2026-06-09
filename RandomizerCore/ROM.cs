@@ -1,18 +1,15 @@
-﻿using js65;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
+using js65;
+using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
-using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
-using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -125,8 +122,6 @@ public class ROM
     public static readonly int[] ZeldaOutlinePaletteAddr = { 0x4025, 0x8025, 0x14049, 0x140c7 };
     public static readonly int[] ZeldaFacePaletteAddr =    { 0x4023, 0x8023, 0x14047, 0x140c9 };
     public static readonly int[] ZeldaDressPaletteAddr =   { 0x4024, 0x8024, 0x14048, 0x140c8 };
-
-    public static readonly byte[] DOOR_CONNECTION_BLACKLIST = [0x00, 0xFC, 0xFD, 0xFE, 0xFF];
 
     public byte[] rawdata { get; }
 
@@ -1246,7 +1241,6 @@ LoadMapData:
     public void UpAController1(Assembler a)
     {
         a.Module().Code("""
-.include "z2r.inc"
 .segment "PRG0"
 .org $a19f
 CheckController1ForUpAUnknown:
@@ -2650,7 +2644,8 @@ ElevatorBossFix:
     }
 
     //This was refactored out of EastHyrule. The signature/timing/structure needs work.
-    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, bool vanillaShuffleUsesActualTerrain)
+    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, 
+        Location townAtNewKasuto, Location spellTower, bool vanillaShuffleUsesActualTerrain)
     {
         if (!biome.UsesVanillaMap())
         {
@@ -2664,6 +2659,10 @@ ElevatorBossFix:
         Put(0x1ccc0, (byte)pos);
         int connection = hiddenPalaceLocation.MemAddress - 0x862F;
         Put(0x1df76, (byte)connection);
+        if (hiddenPalaceLocation == spellTower)
+        {
+            throw new Exception("Child locations shouldn't be able to be hidden spots");
+        }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
             Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
@@ -2772,7 +2771,7 @@ ElevatorBossFix:
 
     }
 
-    public void UpdateKasuto(Location hiddenKasutoLocation, Biome biome,
+    public void UpdateKasuto(Location hiddenKasutoLocation, Location townAtNewKasuto, Location spellTower, Biome biome,
         int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
     {
         Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + (hiddenKasutoLocation.IsExternalWorld ? 0x80 : 0)));
@@ -2782,6 +2781,10 @@ ElevatorBossFix:
         Put(0x1ccdb, (byte)hiddenKasutoLocation.YRaw);
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         Put(0x1df77, (byte)connection);
+        if (hiddenKasutoLocation == spellTower)
+        {
+            throw new Exception("Child locations shouldn't be able to be hidden spots");
+        }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
             //Terrain t = terrains[hiddenKasutoLocation.MemAddress];

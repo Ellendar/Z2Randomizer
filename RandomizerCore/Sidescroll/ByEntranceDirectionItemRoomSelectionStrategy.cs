@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Z2Randomizer.RandomizerCore;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 internal class ByEntranceDirectionItemRoomSelectionStrategy : ItemRoomSelectionStrategy
 {
@@ -23,12 +23,10 @@ internal class ByEntranceDirectionItemRoomSelectionStrategy : ItemRoomSelectionS
             if (!roomPool.ItemRoomsByDirection.TryGetValue(itemRoomDirection, out var value))
             {
                 remainingDirections.Remove(itemRoomDirection);
-#pragma warning disable CS0162 // Unreachable code detected
                 if (BREAK_EARLY_ON_FIRST_FAILED_DIRECTION)
                 {
                     return [];
                 }
-#pragma warning restore CS0162 // Unreachable code detected
                 continue;
             }
             Room itemRoom = value.Next(r);

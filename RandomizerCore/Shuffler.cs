@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using NLog;
-using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore;
 

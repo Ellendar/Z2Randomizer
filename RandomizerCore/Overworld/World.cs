@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
-using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -54,6 +53,8 @@ public abstract class World
     protected Random RNG;
 
     private const int MINIMUM_BRIDGE_LENGTH = 2;
+
+    public static readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new Requirements([RequirementType.FAIRY, RequirementType.KEY]);
 
     private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
     {
@@ -192,6 +193,20 @@ public abstract class World
         (l2.Xpos, l1.Xpos) = (l1.Xpos, l2.Xpos);
         (l2.Y, l1.Y) = (l1.Y, l2.Y);
         (l2.IsPassthrough, l1.IsPassthrough) = (l1.IsPassthrough, l2.IsPassthrough);
+
+        foreach (Location child in l1.Children)
+        {
+            child.Xpos = l1.Xpos;
+            child.Y = l1.Y;
+            child.IsPassthrough = l1.IsPassthrough;
+        }
+
+        foreach (Location child in l2.Children)
+        {
+            child.Xpos = l2.Xpos;
+            child.Y = l2.Y;
+            child.IsPassthrough = l2.IsPassthrough;
+        }
     }
 
     protected void RemoveLocations(ICollection<Location> locationsToRemove)
@@ -290,7 +305,7 @@ public abstract class World
                 //TODO: Doing this off terrain type is a very bad idea for stuff like vanilla shuffle no actual terrain.
                 if (location.TerrainType == Terrain.PALACE 
                     || location.TerrainType == Terrain.TOWN 
-                    || location.GetAllCollectables().Any(i => !i.IsInternalUse()))
+                    || location.Collectables.Any(i => !i.IsInternalUse()))
                 {
                     if (!location.Reachable)
                     {
@@ -470,6 +485,15 @@ public abstract class World
                     location.Xpos = x;
                     location.Y = y;
                     location.CanShuffle = false;
+                }
+            }
+
+            if(location!.TerrainType == Terrain.TOWN)
+            {
+                foreach (Location linkedLocation in AllLocations.Where(
+                    loc => !loc.AppearsOnMap && loc.ActualTown?.GetMasterTown() == location.ActualTown))
+                {
+                    linkedLocation.Pos = location.Pos;
                 }
             }
         }
@@ -692,7 +716,9 @@ public abstract class World
         //Any of the bridge locations that are being placed need to be reset so their vanilla locations aren't avoided.
         if(placeSaria)
         {
-            foreach (Location location in AllLocations.Where(i => i.Town?.Type == TownType.SARIA))
+            foreach (Location location in AllLocations.Where(i => i.ActualTown == Town.SARIA_NORTH 
+                || i.ActualTown == Town.SARIA_SOUTH 
+                || i.ActualTown == Town.SARIA_TABLE))
             {
                 location.Xpos = 0;
                 location.Y = 0;
@@ -1795,8 +1821,6 @@ public abstract class World
         }
     }
 
-    public abstract void ResetCollectables(RandomizerProperties props);
-
     protected bool DrawBridge(Direction direction)
     {
         return DrawBridge(RNG, map, bridge, walkableTerrains, direction);
@@ -2871,7 +2895,7 @@ public abstract class World
 
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 
-    //protected abstract void SetVanillaCollectables(bool useDash);
+    protected abstract void SetVanillaCollectables(bool useDash);
 
     public abstract string GenerateSpoiler();
 

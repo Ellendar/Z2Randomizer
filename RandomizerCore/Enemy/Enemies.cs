@@ -282,50 +282,6 @@ public enum EnemiesEast
 }
 
 /// <summary>
-/// IDs for town "enemies"
-/// </summary>
-public enum EnemiesTown
-{
-    FAIRY = 0x00,
-    CANDLE = 0x01,
-    DOOR = 0x02,
-    PURPLE_KEESE_03 = 0x03,
-    PURPLE_BOT = 0x04,
-    BIT = 0x05,
-    PURPLE_MOA = 0x06,
-    PURPLE_KEESE_07 = 0x07,
-    GOLD_GIRL = 0x08,
-    TOWNPERSON_09 = 0x09,
-    TALKING_ACHE = 0x0A,
-    TALKING_BIT = 0x0B,
-    INVISIBLE_DIALOG = 0x0C,
-    RIVER_MAN = 0x0D,
-    BLUE_LUMBERJACK_0E = 0x0E,
-    WIZARD = 0x0F,
-    KID = 0x10,
-    STATIONARY_BLUE_LADY_WITH_BOWL_11 = 0x11,
-    STATIONARY_RED_GRANNY = 0x12,
-    STATIONARY_RED_LUMBERJACK = 0x13,
-    STATIONARY_BLUE_LADY_WITH_BOWL_14 = 0x14,
-    STATIONARY_BLUE_GRANNY = 0x15,
-    STATIONARY_RED_LADY = 0x16,
-    LIFE_REFILL_LADY = 0x17,
-    MAGIC_REFILL_GRANNY = 0x18,
-    BLUE_LUMBERJACK_19 = 0x19,
-    RED_LADY_WITH_BOWL = 0x1A,
-    RED_GRANNY = 0x1B,
-    BLUE_LADY = 0x1C,
-    BLUE_LUMBERJACK_1D = 0x1D,
-    RED_GUY_1E = 0x1E,
-    RED_GUY_1F = 0x1F,
-    WALKING_LADY = 0x20,
-    MIRROR = 0x21,
-    SIGN = 0x22,
-    BUSY_TOWNSPERSON_GENERATOR = 0x23
-
-}
-
-/// <summary>
 /// IDs that are shared in palace 1-6
 /// 
 /// It's a class of constants and not an enum, so that

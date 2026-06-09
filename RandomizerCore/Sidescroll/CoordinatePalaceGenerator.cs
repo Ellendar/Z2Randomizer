@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using NLog;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public abstract class CoordinatePalaceGenerator : PalaceGenerator
 {

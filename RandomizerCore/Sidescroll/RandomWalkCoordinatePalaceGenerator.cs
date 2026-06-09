@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerator
 {

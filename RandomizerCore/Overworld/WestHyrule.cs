@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
-using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -14,12 +13,11 @@ public sealed class WestHyrule : World
     private readonly new Logger logger = LogManager.GetCurrentClassLogger();
 
     public Location northPalace;
-    public Location rauru;
-    public Location ruto;
-    public Location sariaNorth;
-    public Location sariaSouth;
-    public Location mido;
+    public Location locationAtMido;
     public Location bagu;
+    public Location mirrorTable;
+    public Location midoChurch;
+    public Location locationAtRuto;
     public Location medicineCave;
     public Location trophyCave;
     public Location locationAtPalace1;
@@ -28,6 +26,9 @@ public sealed class WestHyrule : World
     public Location magicContainerCave;
     public Location grassTile;
     public Location heartContainerCave;
+    public Location locationAtSariaNorth;
+    public Location locationAtSariaSouth;
+    public Location locationAtRauru;
 
     private Location bridge1;
     private Location bridge2;
@@ -120,6 +121,9 @@ public sealed class WestHyrule : World
 
         northPalace = GetLocation(LocationID.WEST_NORTH_PALACE); //0x462f
         medicineCave = GetLocation(LocationID.WEST_CAVE_MEDICINE); //0x463e
+        bagu = GetLocation(LocationID.WEST_BAGU_HOUSE); //0x4661
+        bagu.ActualTown = Town.BAGU;
+        bagu.Collectables = [Collectable.BAGUS_NOTE];
         trophyCave = GetLocation(LocationID.WEST_CAVE_TROPHY); //0x00004630
         magicContainerCave = GetLocation(LocationID.WEST_CAVE_MAGIC_CONTAINER);
         grassTile = GetLocation(LocationID.WEST_GRASS);
@@ -127,8 +131,9 @@ public sealed class WestHyrule : World
         pbagCave = GetLocation(LocationID.WEST_CAVE_PBAG);
 
         //Towns
-        bagu = GetLocation(LocationID.WEST_BAGU_HOUSE); //0x4661
-        bagu.Town = Towns.LoadVanillaTown(rom, TownType.BAGU, props.DisableMagicRecs);
+        locationAtRauru = GetLocation(LocationID.WEST_TOWN_RAURO);
+        locationAtRauru.Collectables = [Collectable.SHIELD_SPELL];
+        locationAtRauru.CollectableRequirements = props.DisableMagicRecs ? Requirements.NONE : new Requirements([RequirementType.ONE_CONTAINER]);
 
         rauru = GetLocation(LocationID.WEST_TOWN_RAURU);
         rauru.Town = Towns.LoadVanillaTown(rom, TownType.RAURU, props.DisableMagicRecs);
@@ -148,12 +153,18 @@ public sealed class WestHyrule : World
 
         //Palaces
         locationAtPalace1 = GetLocation(LocationID.WEST_PALACE1);
+        locationAtPalace1.PalaceNumber = 1;
+        locationAtPalace1.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
         locationAtPalace2 = GetLocation(LocationID.WEST_PALACE2);
+        locationAtPalace2.PalaceNumber = 2;
+        locationAtPalace2.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
         locationAtPalace3 = GetLocation(LocationID.WEST_PALACE3);
+        locationAtPalace3.PalaceNumber = 3;
+        locationAtPalace3.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
 
         //Connectors
         fairyCave = GetLocation(LocationID.WEST_FAIRY_CAVE_DROP); //0x4640
-        fairyCave.AccessRequirements = new Requirements([RequirementType.FAIRY]);
+        fairyCave.ConnectionRequirements = new Requirements([RequirementType.FAIRY]);
         jumpCave = GetLocation(LocationID.WEST_CAVE_JUMP_NORTH); //0x463b
         jumpCave.AccessRequirements = new Requirements([RequirementType.JUMP, RequirementType.FAIRY]);
 
@@ -166,6 +177,24 @@ public sealed class WestHyrule : World
 
         bridge1 = GetLocation(LocationID.WEST_BRIDGE_AFTER_DM_WEST); //0x4644
         bridge2 = GetLocation(LocationID.WEST_BRIDGE_AFTER_DM_EAST); //0x4645
+
+        //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
+        mirrorTable = new Location(locationAtSariaNorth);
+        mirrorTable.Collectables = [Collectable.MIRROR];
+        mirrorTable.ActualTown = Town.SARIA_TABLE;
+        mirrorTable.Name = "Saria Mirror Table";
+        mirrorTable.CanShuffle = false;
+        locationAtSariaNorth.Children.Add(mirrorTable);
+        AddLocation(mirrorTable);
+
+        midoChurch = new Location(locationAtMido);
+        midoChurch.Collectables = [Collectable.DOWNSTAB];
+        midoChurch.CollectableRequirements = new Requirements([RequirementType.JUMP, RequirementType.FAIRY]);
+        midoChurch.ActualTown = Town.MIDO_CHURCH;
+        midoChurch.Name = "Mido Church";
+        midoChurch.CanShuffle = false;
+        locationAtMido.Children.Add(midoChurch);
+        AddLocation(midoChurch);
 
         caveConnections = []; // (left,right)
         caveConnections.Add((parapaCave1, parapaCave2));
@@ -325,7 +354,7 @@ public sealed class WestHyrule : World
             GetLocation(LocationID.WEST_BAGU_WOODS5), 
             GetLocation(LocationID.WEST_BAGU_WOODS1)
         ];
-        //SetVanillaCollectables(props.ReplaceFireWithDash);
+        SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
@@ -395,8 +424,8 @@ public sealed class WestHyrule : World
             {
                 AllLocations.ForEach(i => i.CanShuffle = true);
                 Terrain riverTerrain = Terrain.MOUNTAIN;
-                sariaSouth.CanShuffle = false;
-                sariaNorth.CanShuffle = false;
+                locationAtSariaSouth.CanShuffle = false;
+                locationAtSariaNorth.CanShuffle = false;
 
                 map = new OverworldMap(MapRows, MapColumns);
 
@@ -466,8 +495,8 @@ public sealed class WestHyrule : World
                                 rows--;
                             }
                         }
-                        sariaSouth.CanShuffle = false;
-                        sariaNorth.CanShuffle = false;
+                        locationAtSariaSouth.CanShuffle = false;
+                        locationAtSariaNorth.CanShuffle = false;
                         walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
                         //Islands specifically seeds preplaced water instead of normally expandable water to make wetlands less insane
                         randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, 
@@ -556,8 +585,8 @@ public sealed class WestHyrule : World
                                 rows--;
                             }
                         }
-                        sariaSouth.CanShuffle = false;
-                        sariaNorth.CanShuffle = false;
+                        locationAtSariaSouth.CanShuffle = false;
+                        locationAtSariaNorth.CanShuffle = false;
                         break;
                     default:
                         walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
@@ -1438,11 +1467,11 @@ public sealed class WestHyrule : World
         HashSet<Location> requiredLocations =
         [
             northPalace,
-            rauru,
-            mido,
-            ruto,
-            sariaNorth,
-            sariaSouth,
+            locationAtRauru,
+            locationAtMido,
+            locationAtRuto,
+            locationAtSariaNorth,
+            locationAtSariaSouth,
             bagu,
 
             medicineCave,
@@ -1467,17 +1496,16 @@ public sealed class WestHyrule : World
         return requiredLocations.Where(i => i != null);
     }
 
-    /*
     protected override void SetVanillaCollectables(bool useFire)
     {
         locationAtPalace1.VanillaCollectable = Collectable.CANDLE;
         locationAtPalace2.VanillaCollectable = Collectable.GLOVE;
         locationAtPalace3.VanillaCollectable = Collectable.RAFT;
 
-        rauru.VanillaCollectable = Collectable.SHIELD_SPELL;
-        ruto.VanillaCollectable = Collectable.JUMP_SPELL;
-        sariaNorth.VanillaCollectable = Collectable.LIFE_SPELL;
-        mido.VanillaCollectable = Collectable.FAIRY_SPELL;
+        locationAtRauru.VanillaCollectable = Collectable.SHIELD_SPELL;
+        locationAtRuto.VanillaCollectable = Collectable.JUMP_SPELL;
+        locationAtSariaNorth.VanillaCollectable = Collectable.LIFE_SPELL;
+        locationAtMido.VanillaCollectable = Collectable.FAIRY_SPELL;
         midoChurch.VanillaCollectable = Collectable.DOWNSTAB;
         bagu.VanillaCollectable = Collectable.BAGUS_NOTE;
         mirrorTable.VanillaCollectable = Collectable.MIRROR;
@@ -1489,7 +1517,6 @@ public sealed class WestHyrule : World
         trophyCave.VanillaCollectable = Collectable.TROPHY;
         medicineCave.VanillaCollectable = Collectable.MEDICINE;
     }
-    */
 
     public override string GenerateSpoiler()
     {
@@ -1507,17 +1534,14 @@ public sealed class WestHyrule : World
         sb.AppendLine("\tPillar Pbag Cave: " + pbagCave.GetAllCollectables()[0].EnglishText());
         sb.AppendLine("\tMedicine Cave: " + medicineCave.GetAllCollectables()[0].EnglishText());
 
-        List<Collectable> palaceCollectables = locationAtPalace1.GetAllCollectables();
-        sb.Append("\tPalace 1 (" + locationAtPalace1.Palace!.Number + "): ");
-        sb.AppendLine(palaceCollectables.Count == 0 ? "No Items" : string.Join(", ", palaceCollectables.Select(c => c.EnglishText())));
+        sb.Append("\tPalace 1 (" + locationAtPalace1.PalaceNumber + "): ");
+        sb.AppendLine(locationAtPalace1.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace1.Collectables.Select(c => c.EnglishText())));
 
-        palaceCollectables = locationAtPalace2.GetAllCollectables();
-        sb.Append("\tPalace 2 (" + locationAtPalace2.Palace!.Number + "): ");
-        sb.AppendLine(palaceCollectables.Count == 0 ? "No Items" : string.Join(", ", palaceCollectables.Select(c => c.EnglishText())));
+        sb.Append("\tPalace 2 (" + locationAtPalace2.PalaceNumber + "): ");
+        sb.AppendLine(locationAtPalace2.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace2.Collectables.Select(c => c.EnglishText())));
 
-        palaceCollectables = locationAtPalace3.GetAllCollectables();
-        sb.Append("\tPalace 3 (" + locationAtPalace3.Palace!.Number + "): ");
-        sb.AppendLine(palaceCollectables.Count == 0 ? "No Items" : string.Join(", ", palaceCollectables.Select(c => c.EnglishText())));
+        sb.Append("\tPalace 3 (" + locationAtPalace3.PalaceNumber + "): ");
+        sb.AppendLine(locationAtPalace3.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace3.Collectables.Select(c => c.EnglishText())));
 
         sb.AppendLine();
         return sb.ToString();
@@ -1525,6 +1549,10 @@ public sealed class WestHyrule : World
 
     protected override void OnUpdateReachableTrigger()
     {
+        if (AllLocations.Where(i => i.ActualTown == Town.SARIA_NORTH).FirstOrDefault()?.Reachable ?? false)
+        {
+            mirrorTable.Reachable = true;
+        }
     }
 
     public override void DisableDisallowedPassthroughs()

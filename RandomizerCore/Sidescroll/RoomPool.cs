@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public class RoomPool
 {
@@ -274,9 +274,9 @@ public class RoomPool
     {
         //Default stubs are used when no deadend rooms of that direction exist. They are always allowed to
         //be duplicates and should never be removed from the pool.
-        if (DefaultStubsByDirection.TryGetValue(roomThatWasUsed.CategorizeExits(), out Room? directionStub))
+        if (DefaultStubsByDirection.TryGetValue(roomThatWasUsed.CategorizeExits(), out Room directionStub))
         {
-            if (directionStub == roomThatWasUsed)
+            if(directionStub == roomThatWasUsed)
             {
                 return;
             }

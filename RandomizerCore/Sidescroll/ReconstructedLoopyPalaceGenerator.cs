@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public class ReconstructedLoopyPalaceGenerator(CancellationToken ct) : ReconstructedPalaceGenerator(ct)
 {

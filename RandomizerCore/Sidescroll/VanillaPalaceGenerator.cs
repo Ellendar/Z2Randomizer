@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NLog;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public class VanillaPalaceGenerator() : PalaceGenerator
 {
@@ -18,10 +18,14 @@ public class VanillaPalaceGenerator() : PalaceGenerator
         {
             throw new Exception("Invalid vanilla palace room pool");
         }
-        Palace palace = new(palaceNumber, props.ShufflePalaceItems);
+        Palace palace = new(palaceNumber);
+
+        // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
         palace.Entrance = new(roomPool.Entrances.First());
+        // palace.Entrance.PalaceGroup = palaceGroup;
         palace.BossRoom = new(roomPool.BossRooms.First());
+        // palace.BossRoom.PalaceGroup = palaceGroup;
         palace.AllRooms.Add(palace.Entrance);
         palace.ItemRooms = [];
 

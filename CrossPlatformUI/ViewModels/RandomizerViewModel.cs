@@ -35,6 +35,9 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     public string FlagInput { get; set { field = value.Trim(); this.RaisePropertyChanged(); } } = "";
 
     [JsonIgnore]
+    public string FlagInput { get; set { field = value.Trim(); this.RaisePropertyChanged(); } } = "";
+
+    [JsonIgnore]
     public string Seed
     {
         get => Main.Config.Seed ?? "";
