@@ -1296,6 +1296,7 @@ LoadMapData:
     public void UpAController1(Assembler a)
     {
         a.Module().Code("""
+.include "z2r.inc"
 .segment "PRG0"
 .org $a19f
 CheckController1ForUpAUnknown:

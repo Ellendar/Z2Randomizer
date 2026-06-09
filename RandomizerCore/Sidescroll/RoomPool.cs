@@ -246,9 +246,9 @@ public class RoomPool
     {
         //Default stubs are used when no deadend rooms of that direction exist. They are always allowed to
         //be duplicates and should never be removed from the pool.
-        if (DefaultStubsByDirection.TryGetValue(roomThatWasUsed.CategorizeExits(), out Room directionStub))
+        if (DefaultStubsByDirection.TryGetValue(roomThatWasUsed.CategorizeExits(), out Room? directionStub))
         {
-            if(directionStub == roomThatWasUsed)
+            if (directionStub == roomThatWasUsed)
             {
                 return;
             }
