@@ -227,16 +227,27 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
         // flag updates from RandomizerConfiguration always overwrites our flag input
         Main.FlagsObservable
-            .Do(x => FlagsValidSubject.OnNext(true))
-            .Subscribe(flags => FlagInput = flags)
+            .Subscribe(flags =>
+            {
+                FlagInput = flags;
+                FlagsValidSubject.OnNext(true);
+            })
             .DisposeWith(disposables);
 
-        this.WhenAnyValue(x => x.FlagInput)
+        var validatedInputObservable =
+            this.WhenAnyValue(viewModel => viewModel.FlagInput)
             .WithLatestFrom(Main.FlagsObservable,
                 (Input, Current) => (Input, Current, IsValid: Input == Current || IsFlagStringValid(Input)))
-            .Do(x => FlagsValidSubject.OnNext(x.IsValid))
-            .Where(x => x.IsValid && x.Input != x.Current)
-            .Subscribe(x => Main.Config.DeserializeFlags(x.Input))
+            .Replay(1)
+            .RefCount();
+
+        validatedInputObservable
+            .Subscribe(tuple => FlagsValidSubject.OnNext(tuple.IsValid))
+            .DisposeWith(disposables);
+
+        validatedInputObservable
+            .Where(tuple => tuple.IsValid && tuple.Input != tuple.Current)
+            .Subscribe(tuple => Main.Config.DeserializeFlags(tuple.Input))
             .DisposeWith(disposables);
 
         Main.Config.PropertyChanged += (sender, args) =>

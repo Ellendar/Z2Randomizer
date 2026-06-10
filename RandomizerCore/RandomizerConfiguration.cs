@@ -826,9 +826,16 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private string? seed;
     // public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
 
+    [IgnoreInFlags]
+    private bool _inDeserializeFlags = false;
+
     public void DeserializeFlags(string flags)
     {
+        // avoid emitting property changed for Flags during deserialization
+        _inDeserializeFlags = true;
         Deserialize(flags?.Trim() ?? "");
+        _inDeserializeFlags = false;
+        OnPropertyChanged("Flags");
     }
     public String SerializeFlags()
     {
