@@ -9,12 +9,7 @@
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
 
     <TrimMode>partial</TrimMode>
-    <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
 <!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
   </PropertyGroup>
-
-  <ItemGroup>
-    <Workload Include="wasm-tools" />
-  </ItemGroup>
 </Project>
