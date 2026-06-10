@@ -14,8 +14,8 @@
 
 .export GameRoutines, ProcFireball_Bubble, PlayerGfxHandler
 
-.segment "PRG0"
-; .reloc
+.segment "PRG0", "PRG7"
+.reloc
 
 ;-------------------------------------------------------------------------------------
 
@@ -76,7 +76,7 @@
   .word $0000 ; VerticalPipeEntry
   .word $0000 ; FlagpoleSlide
   .word $0000 ; PlayerEndLevel
-  .word PlayerLoseLife
+  .word $0000 ; PlayerLoseLife
   .word $0000 ; PlayerEntrance
   .word PlayerCtrlRoutine
   .word PlayerChangeSize
@@ -85,6 +85,7 @@
   .word PlayerFireFlower
 .endproc
 
+.reloc
 
 ; ;-------------------------------------------------------------------------------------
 ; ; ; .reloc
@@ -167,7 +168,7 @@
 ;-------------------------------------------------------------------------------------
 ;$07 - used to hold upper limit of high byte when player falls down hole
 AutoControlPlayer:
-  sta SavedJoypadBits         ;override controller bits with contents of A if executing here
+  ; sta SavedJoypadBits         ;override controller bits with contents of A if executing here
 
 PlayerCtrlRoutine:
   lda GameEngineSubroutine    ;check task here
@@ -313,9 +314,10 @@ PlayerSubs:
 ;   sta JoypadOverride      ;clear controller override bits if any are set
 ;   jsr SetEntr             ;do sub to set secondary mode
 ;   inc AltEntranceControl  ;set mode of entry to 3
-  rts
+  ; rts
 
-.proc PlayerLoseLife
+; .reloc
+; .proc PlayerLoseLife
   ; inc DisableScreenFlag    ;disable screen and sprite 0 check
   ; lda #$00
   ; sta Sprite0HitDetectFlag
@@ -356,10 +358,11 @@ PlayerSubs:
 ;   sta HalfwayPage          ;store as halfway page for player
 ;   jsr TransposePlayers     ;switch players around if 2-player game
 
-  rts
+  ; rts
 ;   jmp RunGameOver::ContinueGame         ;continue the game
-.endproc
+; .endproc
 
+.reloc
 ;-------------------------------------------------------------------------------------
 ;$00 - used to store player's vertical offscreen bits
 ; .reloc
@@ -372,9 +375,9 @@ PlayerSubs:
 CntPl:
   lda GameEngineSubroutine    ;if executing specific game engine routine,
   cmp #$0b                    ;branch ahead to some other part
-  beq PlayerKilled
+  jeq PlayerKilled
   lda PlayerChangeSizeFlag    ;if grow/shrink flag set
-  bne DoChangeSize            ;then branch to some other code
+  jne DoChangeSize            ;then branch to some other code
 
   jsr FindPlayerAction        ;otherwise jump and return
 
@@ -408,14 +411,15 @@ ClearMarioSprite:
   lda #0
   sta ObjectMetasprite
   rts
-.endproc
-
-FindPlayerAction:
-  jsr ProcessPlayerAction       ;find proper offset to graphics table by player's actions
-  jmp PlayerGfxProcessing       ;draw player, then process for fireball throwing
 
 DoChangeSize:
   jsr HandleChangeSize          ;find proper offset to graphics table for grow/shrink
+  jmp PlayerGfxProcessing       ;draw player, then process for fireball throwing
+.endproc
+
+.reloc
+FindPlayerAction:
+  jsr ProcessPlayerAction       ;find proper offset to graphics table by player's actions
   jmp PlayerGfxProcessing       ;draw player, then process for fireball throwing
 
 PlayerKilled:
@@ -1170,7 +1174,6 @@ OffscrJoypadBitsData:
   .byte $01, $02
 
 ; ------------------------------------------------------------
-.segment "PRG0", "PRG7"
 .reloc
 ProcessPlayerAction:
   lda Player_State      ;get player's state

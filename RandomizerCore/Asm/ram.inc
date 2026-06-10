@@ -81,6 +81,7 @@ VramAddrLo = $28
 LinkYPos = $29
 EnemyYPositionLo = $2a
 Enemy0YPositionLo = $2a
+OverworldEnemyYPosition = $2a            ; [OW] base of overworld demon Y world position array, indexed by slot X
 Enemy1YPositionLo = $2b
 Enemy2YPositionLo = $2c
 Enemy3YPositionLo = $2d
@@ -120,6 +121,7 @@ LinkXPosition   = $4d
 LinkXPositionLo = $4d
 EnemyXPositionLo  = $4e
 Enemy0XPositionLo = $4e
+OverworldEnemyXPosition = $4e            ; [OW] base of overworld demon X world position array, indexed by slot X
 Enemy1XPositionLo = $4f
 Enemy2XPositionLo = $50
 Enemy3XPositionLo = $51
@@ -170,6 +172,7 @@ LinkProjectile0XVelocity = $7d
 LinkProjectile1XVelocity = $7e
 OverworldYScroll = $7f
 LinkAnimationFrame = $80
+OverworldCurrentSlot = $80              ; [OW] current overworld demon slot index during per-frame processing (0-7)
 Enemy0AnimationFrame = $81
 OverworldEnemy0Type = $82                ; [SS] Enemy1AnimationFrame - [OW] OverworldEnemy0Type, 1 = Weak, 2 = Strong, 3 = Fairy
 OverworldEnemy1Type = $83                ; [SS] Enemy2AnimationFrame - [OW] OverworldEnemy1Type
@@ -357,12 +360,17 @@ timer_501 = $0501                        ; $501 through $50d are timers that are
 LinkEntrySlideTime = $0503
 SwordAttackTimer = $050a
 InjuryTimer = $050c
+OverworldDemonTimer = $050e              ; [OW] overworld demon active flag/timer, indexed by slot X; non-zero = active
 EncounterSpawnTimer = $0516
 RNG = $051b
 MapNumber = $0561
+OverworldFacingDirection = $0562         ; [OW] Link's facing direction: $01=right, $02=left, $04=down, $08=up
+OverworldFacingTerrain = $0563           ; [OW] terrain type Link is currently facing
 TownNumber = $056b
 PalaceNumber = $056c
 PalaceRegionIndex = $056c                ; Palace index in continent (0-2)
+OverworldDemonYVelocity = $056d          ; [OW] overworld demon Y velocity, indexed by slot X (signed: $01=down, $FF=up)
+OverworldDemonXVelocity = $0575          ; [OW] overworld demon X velocity, indexed by slot X (signed: $01=right, $FF=left)
 LinkYVelocityHi = $057d
 EnemyYVelocity = $057e
 Enemy0YVelocity = $057e
@@ -553,6 +561,7 @@ RESV BlockBreakColumnOffset, BREAKABLE_BLOCK_COUNT ; Vanilla addr $042E - Offset
 RESV BlockBreakAddrLo, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table lo addr
 RESV BlockBreakAddrHi, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table hi addr
 
+RESV TwisterCurrentPalaceSlot ; palace_code (0-5) of last dungeon Link entered or warped to
 
 .ifdef ENABLE_Z2_MARIO
 
