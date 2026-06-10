@@ -13,11 +13,6 @@
         <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <!-- ReactiveUserControl<T> ViewModel references cause IL2026 -->
-        <NoWarn>$(NoWarn);IL2026</NoWarn>
-    </PropertyGroup>
-    
     <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
       <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
       <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
@@ -35,6 +30,7 @@
         <PackageReference Include="AvaloniaUI.DiagnosticsSupport" />
         <PackageReference Include="DialogHost.Avalonia" />
         <PackageReference Include="Material.Avalonia" />
+        <PackageReference Include="Material.Avalonia.DataGrid" />
         <PackageReference Include="Material.Icons.Avalonia" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="ReactiveUI" />
@@ -44,6 +40,11 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Xaml.Behaviors.Interactions" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <RuntimeHostConfigurationOption Include="MaterialThemeIncludeDataGrid" Value="false"/>
+        <RuntimeHostConfigurationOption Include="MaterialThemeIncludeTreeDataGrid" Value="false"/>
     </ItemGroup>
 
     <ItemGroup>
