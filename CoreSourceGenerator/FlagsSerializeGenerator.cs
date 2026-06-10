@@ -323,7 +323,10 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         sb.AppendLine($"{indent}            {{");
         sb.AppendLine($"{indent}                {field.FieldName} = value;");
         sb.AppendLine($"{indent}                OnPropertyChanged(nameof({field.PropertyName}));");
-        sb.AppendLine($"{indent}                OnPropertyChanged(\"Flags\");");
+        sb.AppendLine($"{indent}                if (!_inDeserializeFlags)");
+        sb.AppendLine($"{indent}                {{");
+        sb.AppendLine($"{indent}                    OnPropertyChanged(\"Flags\");");
+        sb.AppendLine($"{indent}                }}");
         sb.AppendLine($"{indent}            }}");
         sb.AppendLine($"{indent}        }}");
         sb.AppendLine($"{indent}    }}{defaultValue}");
