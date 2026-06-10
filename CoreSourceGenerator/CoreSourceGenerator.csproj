@@ -11,10 +11,7 @@
         <Configurations>Debug;Release;Unsafe Debug</Configurations>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
-    <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">
-        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-        <IsTrimmable>true</IsTrimmable>
-    </PropertyGroup>
+
     <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
       <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
       <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
