@@ -31,25 +31,8 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
     private static bool IsFlagStringValid(string flags) => FlagPasteParser.IsValidFlagString(flags);
 
-    private string flagInput = "";
-
     [JsonIgnore]
-    public string FlagInput
-    {
-        get => flagInput;
-        set
-        {
-            var trimmedValue = value?.Trim() ?? "";
-            var (extractedFlags, extractedSeed) = FlagPasteParser.Parse(trimmedValue);
-
-            if (Main is not null && !string.IsNullOrEmpty(extractedSeed))
-            {
-                Main.Config.Seed = extractedSeed;
-            }
-
-            this.RaiseAndSetIfChanged(ref flagInput, extractedFlags ?? trimmedValue);
-        }
-    }
+    public string FlagInput { get; set { field = value.Trim(); this.RaisePropertyChanged(); } } = "";
 
     [JsonIgnore]
     public string Seed
@@ -229,25 +212,26 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         Main.FlagsObservable
             .Subscribe(flags =>
             {
-                FlagInput = flags;
                 FlagsValidSubject.OnNext(true);
+                FlagInput = flags;
             })
             .DisposeWith(disposables);
 
-        var validatedInputObservable =
-            this.WhenAnyValue(viewModel => viewModel.FlagInput)
-            .WithLatestFrom(Main.FlagsObservable,
-                (Input, Current) => (Input, Current, IsValid: Input == Current || IsFlagStringValid(Input)))
-            .Replay(1)
-            .RefCount();
-
-        validatedInputObservable
-            .Subscribe(tuple => FlagsValidSubject.OnNext(tuple.IsValid))
-            .DisposeWith(disposables);
-
-        validatedInputObservable
-            .Where(tuple => tuple.IsValid && tuple.Input != tuple.Current)
-            .Subscribe(tuple => Main.Config.DeserializeFlags(tuple.Input))
+        this.WhenAnyValue(viewModel => viewModel.FlagInput)
+            .WithLatestFrom(Main.FlagsObservable, (Input, Current) => (Input, Current))
+            .Subscribe(tuple =>
+            {
+                var isNew = tuple.Input != tuple.Current;
+                if (isNew)
+                {
+                    bool isValid = IsFlagStringValid(tuple.Input);
+                    FlagsValidSubject.OnNext(isValid);
+                    if (isValid)
+                    {
+                        Main.Config.DeserializeFlags(tuple.Input);
+                    }
+                }
+            })
             .DisposeWith(disposables);
 
         Main.Config.PropertyChanged += (sender, args) =>
@@ -260,7 +244,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             }
         };
 
-        this.ValidationRule(x => x.FlagInput, FlagsValidSubject, "Invalid Flags");
+        this.ValidationRule(viewModel => viewModel.FlagInput, FlagsValidSubject, "Invalid Flags");
 
         AddValidationRules();
     }
