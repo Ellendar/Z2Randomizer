@@ -9,7 +9,7 @@
     <Grid RowDefinitions="*, Auto">
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Center">
-            <TextBlock Text="Select your Zelda 2 ROM to get started!" />
+            <TextBlock Text="{Binding Message}" />
             <Button Command="{Binding OpenFileCommand}">Choose ROM</Button>
         </StackPanel>
         <StackPanel Grid.Row="1" HorizontalAlignment="Right">
