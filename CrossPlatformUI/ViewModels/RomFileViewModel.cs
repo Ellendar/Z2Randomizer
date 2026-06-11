@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using SD.Tools.BCLExtensions.CollectionsRelated;
+using Z2Randomizer.RandomizerCore;
 using CrossPlatformUI.Services;
 
 namespace CrossPlatformUI.ViewModels;
@@ -23,6 +24,14 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
             this.RaiseAndSetIfChanged(ref romData, value);
             this.RaisePropertyChanged(nameof(HasRomData));
         }
+    }
+
+    private string message { get; set; } = "Select your Zelda 2 ROM to get started!";
+    [JsonIgnore]
+    public string Message
+    {
+        get => message;
+        set { message = value; this.RaisePropertyChanged(); }
     }
 
     [JsonIgnore]
@@ -59,31 +68,36 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
         if (fileprops.Size <= 1024 * 1024 * 1)
         {
             await using var readStream = await file.OpenReadAsync();
-            var tmp = new byte[(uint)fileprops.Size];
-            var read = await readStream.ReadAsync(tmp, token);
-            // TODO: Better validation
-            if (read == 1024 * 256 + 0x10)
+            byte[] fileData = new byte[(uint)fileprops.Size];
+            var read = await readStream.ReadAsync(fileData, token);
+            try
             {
-                RomData = tmp;
-                if (OperatingSystem.IsBrowser())
-                {
-                    // Manually save the state 
-                    await App.PersistState();
-                }
-                else
-                {
-                    // This part crashes if run in the browser build
-                    if ((Main.OutputFilePath ?? "") == "")
-                    {
-                        Main.OutputFilePath = new Uri(file.Path, ".").LocalPath;
-                    }
-                }
-                HostScreen.Router.NavigateBack.Execute();
+                ROM.ValidateVanillaRom(ref fileData);
             }
+            catch (UserFacingException e)
+            {
+                Message = e.Message;
+                return;
+            }
+            RomData = fileData;
+            if (OperatingSystem.IsBrowser())
+            {
+                // Manually save the state 
+                await App.PersistState();
+            }
+            else
+            {
+                // This part crashes if run in the browser build
+                if ((Main.OutputFilePath ?? "") == "")
+                {
+                    Main.OutputFilePath = new Uri(file.Path, ".").LocalPath;
+                }
+            }
+            HostScreen.Router.NavigateBack.Execute();
         }
         else
         {
-            throw new Exception("File exceeded 1MB limit.");
+            Message = "File exceeded 1MB limit. Please provide an unmodified Zelda 2 ROM (US release) with or without header.";
         }
     }
     

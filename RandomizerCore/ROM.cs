@@ -2788,4 +2788,36 @@ ResetRedPalettePayload:
         logger.Warn($"Could not write Collectable {item} to Item room {room.GetDebuggerDisplay()} in palace {room.PalaceNumber}");
         //throw new Exception("Could not write Collectable to Item room in palace " + PalaceNumber);
     }
+
+    /// Validates the ROM. Tries to fix headerless or bad header ROMs.
+    public static void ValidateVanillaRom(ref byte[] vanillaRomData)
+    {
+        int correctVanillaLengthWithHeader = 1024 * 256 + 0x10;
+        byte[] iNesHeader = [0x4e, 0x45, 0x53, 0x1a, 0x08, 0x10, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]; // (gets overriden with ROM expansion)
+        byte[] correctVanillaHash = [0x76, 0x4D, 0x36, 0xFA, 0x8A, 0x24, 0x50, 0x83, 0x4D, 0xA5, 0xE8, 0x19, 0x42, 0x81, 0x03, 0x5A];
+
+        if (vanillaRomData.Length != correctVanillaLengthWithHeader)
+        {
+            if (vanillaRomData.Length == correctVanillaLengthWithHeader - 0x10)
+            {
+                vanillaRomData = [.. iNesHeader, .. vanillaRomData];
+            }
+            else
+            {
+                throw new UserFacingException("Invalid ROM size", "Please provide an unmodified Zelda 2 ROM (US release) with or without header.");
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 0x10; i++)
+            {
+                vanillaRomData[i] = iNesHeader[i];
+            }
+        }
+        var vanillaRomHash = MD5Hash.ComputeHash(vanillaRomData);
+        if (!correctVanillaHash.SequenceEqual(vanillaRomHash))
+        {
+            throw new UserFacingException("Vanilla ROM checksum failure", "Please provide an unmodified Zelda 2 ROM (US release).");
+        }
+    }
 }
