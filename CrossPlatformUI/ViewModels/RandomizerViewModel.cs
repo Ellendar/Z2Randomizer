@@ -7,6 +7,7 @@ using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Controls;
 using ReactiveUI;
@@ -117,9 +118,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
         SaveFolder = ReactiveCommand.CreateFromTask(async () =>
         {
-            var fileDialog = App.Current?.Services?.GetService<IFileDialogService>()!;
-            var folder = await fileDialog.OpenFolderAsync();
-            Main.OutputFilePath = folder?.Path.LocalPath ?? "";
+            Main.OutputFilePath = await SelectSaveFolder() ?? "";
         });
 
         CheckForUpdates = ReactiveCommand.CreateFromTask(async () =>
@@ -201,6 +200,18 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             }
         });
         this.WhenActivated(OnActivate);
+    }
+
+    public static async Task<string?> SelectSaveFolder()
+    {
+        var fileDialog = App.Current?.Services?.GetService<IFileDialogService>()!;
+        var folder = await fileDialog.OpenFolderAsync();
+        Uri? path = folder?.Path;
+        // both LocalPath and TryGetLocalPath() throw for non-absoloute URIs
+        string? localPath = path?.IsAbsoluteUri == true
+            ? path.LocalPath
+            : path?.OriginalString;
+        return localPath;
     }
 
     private void OnActivate(CompositeDisposable disposables)
