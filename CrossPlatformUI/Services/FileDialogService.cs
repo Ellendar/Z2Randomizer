@@ -21,7 +21,7 @@ public class FileDialogService(TopLevel? target) : IFileDialogService
     {
         var files = await target!.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
         {
-            Title = "Open Folder",
+            Title = "Select ROM Output Folder",
             AllowMultiple = false
         });
 
