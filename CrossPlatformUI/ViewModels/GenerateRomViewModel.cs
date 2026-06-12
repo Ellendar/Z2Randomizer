@@ -105,7 +105,30 @@ Seed: {config.Seed}
                         {
                             basename = filename;
                         }
-                        await files.SaveGeneratedBinaryFile(filename, output.romdata!, Main.OutputFilePath);
+                        bool saved = false;
+                        while (!saved)
+                        {
+                            try
+                            {
+                                await files.SaveGeneratedBinaryFile(filename, output.romdata!, Main.OutputFilePath);
+                                saved = true;
+                            }
+                            catch (Exception e)
+                            {
+                                // DirectoryNotFoundException, UnauthorizedAccessException
+                                // We could check for specific exceptions, but it's
+                                // probably fine to do this for all errors while saving
+                                var newFolder = await RandomizerViewModel.SelectSaveFolder();
+                                if (!string.IsNullOrEmpty(newFolder) && newFolder != Main.OutputFilePath)
+                                {
+                                    Main.OutputFilePath = newFolder;
+                                }
+                                else // user did not pick a new save folder
+                                {
+                                    throw new UserFacingException("Unable to save ROM to folder", e.Message);
+                                }
+                            }
+                        }
 #if DEBUG
                         var debugfile = basename + ".mlb";
                         if (!string.IsNullOrEmpty(output.debuginfo))
