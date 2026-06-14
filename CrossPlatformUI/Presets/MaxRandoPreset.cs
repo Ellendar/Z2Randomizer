@@ -120,6 +120,7 @@ public static class MaxRandoPreset
         PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = true,
         AllowImportantItemDuplicates = false,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

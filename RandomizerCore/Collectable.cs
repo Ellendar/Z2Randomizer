@@ -223,6 +223,19 @@ public static class CollectableExtensions
         };
     }
 
+    public static bool IsSpellItem(this Collectable collectable)
+    {
+        return collectable switch
+        {
+            Collectable.TROPHY => true,
+            Collectable.MIRROR => true,
+            Collectable.MEDICINE => true,
+            Collectable.WATER => true,
+            Collectable.CHILD => true,
+            _ => false
+        };
+    }
+
     public static bool IsSwordTech(this Collectable collectable)
     {
         return collectable switch

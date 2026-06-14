@@ -75,6 +75,12 @@
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeTownQuestItemsinShuffleToolTip}"/></ToolTip.Tip>
             </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Main.Config.PreventSpellItemChains}"
+                Content="Prevent Spell Item Chains"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.PreventSpellItemChainsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
         <StackPanel Grid.Column="1">
             <CheckBox

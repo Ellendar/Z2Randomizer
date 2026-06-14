@@ -118,6 +118,7 @@ public static class RandomPercentPreset
         PalacesContainExtraKeys = null,
         RandomizeNewKasutoJarRequirements = true,
         AllowImportantItemDuplicates = false,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,
