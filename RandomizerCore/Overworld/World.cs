@@ -2015,7 +2015,8 @@ public abstract class World
         do
         {
             tries++;
-            if (tries > 100) {
+            if (tries > 100)
+            {
                 return false;
             }
 
@@ -2291,157 +2292,64 @@ public abstract class World
 
     protected void DrawRiver(bool canWalkOnWaterWithBoots)
     {
-        Terrain water = Terrain.WATER;
-        if (canWalkOnWaterWithBoots)
-        {
-            water = Terrain.WALKABLEWATER;
-        }
-        int dirr = RNG.Next(4);
-        int dirr2 = dirr;
-        while (dirr == dirr2)
-        {
-            dirr2 = RNG.Next(4);
-        }
+        Terrain water = canWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
 
-        int deltax = 0;
-        int deltay = 0;
-        int startx = 0;
-        int starty = 0;
-        if (dirr == 0) //north
+        Direction direction1 = DirectionExtensions.RandomCardinal(RNG);
+        Direction direction2;
+        do
         {
-            deltay = 1;
-            startx = RNG.Next(MapColumns / 3, (MapColumns / 3) * 2);
-            starty = 0;
-        }
-        else if (dirr == 1) //east
-        {
-            deltax = -1;
-            startx = MapColumns - 1;
-            starty = RNG.Next(MapRows / 3, (MapRows / 3) * 2);
-        }
-        else if (dirr == 2) //south
-        {
-            deltay = -1;
-            startx = RNG.Next(MapColumns / 3, (MapColumns / 3) * 2);
-            starty = MapRows - 1;
-        }
-        else //west
-        {
-            deltax = 1;
-            startx = 0;
-            starty = RNG.Next(MapRows / 3, (MapRows / 3) * 2);
-        }
+            direction2 = DirectionExtensions.RandomCardinal(RNG);
+        } while (direction1 == direction2);
 
-        int stopping = RNG.Next(MapColumns / 3, (MapColumns / 3) * 2);
-        if (deltay != 0)
+        (IntVector2 Delta, IntVector2 Start) RiverFromDir(Direction direction)
         {
-            stopping = RNG.Next(MapRows / 3, (MapRows / 3) * 2);
-        }
-        int curr = 0;
-        while (curr < stopping)
-        {
-
-            if (map[starty, startx] == Terrain.NONE)
+            int rx = RNG.Next(MapColumns / 3, (MapColumns / 3) * 2);
+            int ry = RNG.Next(MapRows / 3, (MapRows / 3) * 2);
+            IntVector2 start = direction switch
             {
-                map[starty, startx] = water;
-                int adjust = RNG.Next(-1, 2);
-                if ((deltax == 0 && startx == 1) || (deltay == 0 && starty == 1))
-                {
-                    adjust = RNG.Next(0, 2);
-                }
-                else if ((deltax == 0 && startx == MapColumns - 2) || (deltay == 0 && starty == MapRows - 2))
-                {
-                    adjust = RNG.Next(-1, 1);
-                }
+                Direction.SOUTH => new(rx, 0),
+                Direction.WEST => new(MapColumns - 1, ry),
+                Direction.NORTH => new(rx, MapRows - 1),
+                Direction.EAST => new(0, ry),
+                _ => throw new Exception("Invalid Direction")
+            };
+            IntVector2 delta = direction.ToIntVector2();
+            return (start, delta);
+        }
 
-                if (adjust < 0)
-                {
-                    if (deltax != 0)
-                    {
-                        starty--;
-                    }
-                    else
-                    {
-                        startx--;
-                    }
-                }
-                else if (adjust > 0)
-                {
-                    if (deltax != 0)
-                    {
-                        starty++;
-                    }
-                    else
-                    {
-                        startx++;
-                    }
-                }
-                map[starty, startx] = water;
-            }
-
-            startx += deltax;
-            starty += deltay;
-            curr++;
-        }
-        deltay = 0;
-        deltax = 0;
-        if (dirr2 == 0) //north
+        IntVector2 AdjustAndPaint(IntVector2 pos, IntVector2 delta, IntVector2 sideDir)
         {
-            deltay = 1;
-        }
-        else if (dirr2 == 1) //east
-        {
-            deltax = -1;
-        }
-        else if (dirr2 == 2) //south
-        {
-            deltay = -1;
-        }
-        else //west
-        {
-            deltax = 1;
-        }
-        while (startx > 0 && startx < MapColumns && starty > 0 && starty < MapRows)
-        {
-
-            if (map[starty, startx] == Terrain.NONE)
+            if (map[pos] != Terrain.NONE) { return pos; }
+            map[pos] = water;
+            int minAdj = (sideDir.X != 0 && pos.X == 1) || (sideDir.Y != 0 && pos.Y == 1) ? 0 : -1;
+            int maxAdj = (sideDir.X != 0 && pos.X == MapColumns - 2) || (sideDir.Y != 0 && pos.Y == MapRows - 2) ? 0 : 1;
+            int adjust = RNG.Next(minAdj, maxAdj + 1);
+            IntVector2 adjusted = pos + adjust * sideDir;
+            if (WithinMapBounds(adjusted) && !IsReserved(adjusted))
             {
-                map[starty, startx] = water;
-                int adjust = RNG.Next(-1, 2);
-                if ((deltax == 0 && startx == 1) || (deltay == 0 && starty == 1))
-                {
-                    adjust = RNG.Next(0, 2);
-                }
-                else if ((deltax == 0 && startx == MapColumns - 2) || (deltay == 0 && starty == MapRows - 2))
-                {
-                    adjust = RNG.Next(-1, 1);
-                }
-                if (adjust < 0)
-                {
-                    if (deltax != 0)
-                    {
-                        starty--;
-                    }
-                    else
-                    {
-                        startx--;
-                    }
-                }
-                else if (adjust > 0)
-                {
-                    if (deltax != 0)
-                    {
-                        starty++;
-                    }
-                    else
-                    {
-                        startx++;
-                    }
-                }
-                map[starty, startx] = water;
+                map[adjusted] = water;
             }
-            startx += deltax;
-            starty += deltay;
+            return adjusted;
+        }
+
+        var (start, delta) = RiverFromDir(direction1);
+        IntVector2 sideDir = delta.Perpendicular();
+        int stopping = delta.Y != 0 ? RNG.Next(MapRows / 3, (MapRows / 3) * 2) : RNG.Next(MapColumns / 3, (MapColumns / 3) * 2);
+
+        for (int i = 0; i < stopping; i++)
+        {
+            start = AdjustAndPaint(start, delta, sideDir);
+            start += delta;
+        }
+
+        var (_, delta2) = RiverFromDir(direction2);
+        delta = delta2;
+        sideDir = delta.Perpendicular();
+
+        while (WithinMapBounds(start, 0))
+        {
+            start = AdjustAndPaint(start, delta, sideDir);
+            start += delta;
         }
     }
 
@@ -2966,6 +2874,11 @@ public abstract class World
             map[mountainPos.Y, mountainPos.X] = Terrain.MOUNTAIN;
         }
         cave.Pos = newCavePos;
+    }
+
+    protected virtual bool IsReserved(IntVector2 pos)
+    {
+        return false;
     }
 
     /// <summary>
