@@ -239,7 +239,7 @@ sealed class MazeIsland : World
                         }
                     else if (stack.Count > 0)
                     {
-                        if (cave1 != null && cave1.CanShuffle && GetLocationByPos(current) == null)
+                        if (cave1 != null && cave1.CanShuffle && GetLocationAt(current) == null)
                         {
                             map[current] = Terrain.CAVE;
                             cave1.Pos = current;
@@ -248,7 +248,7 @@ sealed class MazeIsland : World
                             SealDeadEnd(current, RNG);
                             placedLocations.Add(cave1);
                         }
-                        else if (cave2 != null && cave2.CanShuffle && GetLocationByPos(current) == null && canPlaceCave)
+                        else if (cave2 != null && cave2.CanShuffle && GetLocationAt(current) == null && canPlaceCave)
                         {
                             map[current] = Terrain.CAVE;
                             cave2.Pos = current;
@@ -269,7 +269,7 @@ sealed class MazeIsland : World
                     if (palace4Pos.X % 2 == 0) { palace4Pos += IntVector2.EAST; }
                     if (palace4Pos.Y % 2 == 0) { palace4Pos += IntVector2.SOUTH; }
                     canPlace = true;
-                    if (GetLocationIn3x3(palace4Pos) != null)
+                    if (GetLocationIn3x3Area(palace4Pos) != null)
                     {
                         canPlace = false;
                     }
@@ -501,7 +501,7 @@ sealed class MazeIsland : World
 
     private void PaintRiverTile(IntVector2 pos, Terrain terrain, IntVector2 perpendicular)
             {
-        if (GetLocationByPos(pos) != null)
+        if (GetLocationAt(pos) != null)
                 {
             return;
                             }

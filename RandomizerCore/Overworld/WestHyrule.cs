@@ -393,7 +393,7 @@ public sealed class WestHyrule : World
                 foreach (Location location in AllLocations)
                 {
                     // section uses tuples with the Y+30 offset
-                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationByPos(location.Pos)!);
+                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationAt(location.Pos)!);
                 }
                 ChooseConn("parapa", connections, true);
                 ChooseConn("lifesouth", connections, true);
