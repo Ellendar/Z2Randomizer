@@ -338,26 +338,34 @@ public abstract class World
     }
 
     /// <summary>
-    /// Returns the first location found within the 3x3 area centered on
+    /// Returns any locations found within the 3x3 area centered on
     /// <paramref name="center"/>, including diagonal neighbors and the
     /// center position itself.
     /// </summary>
-    protected Location? GetLocationIn3x3Area(IntVector2 center)
+    protected IEnumerable<Location> LocationsIn3x3Area(IntVector2 center)
     {
-        return AllLocations.FirstOrDefault(i =>
-                i.Pos.X >= center.X - 1 && i.Pos.X <= center.X + 1 &&
-                i.Pos.Y >= center.Y - 1 && i.Pos.Y <= center.Y + 1);
+        return AllLocations.Where(i => i.Pos.X >= center.X - 1 && i.Pos.X <= center.X + 1 &&
+                                       i.Pos.Y >= center.Y - 1 && i.Pos.Y <= center.Y + 1);
     }
 
     /// <summary>
-    /// Returns the first location found at <paramref name="center"/> or one
-    /// tile away in a cardinal direction. Diagonal positions are not included.
+    /// Returns any locations found at <paramref name="center"/> or one
+    /// tile away in a cardinal direction. (Diagonal positions are not included.)
     ///
     /// TLDR; Finds any location within a "plus sign" formation.
     /// </summary>
-    protected Location? GetLocationAtOrOrthogonalTo(IntVector2 center)
+    protected IEnumerable<Location> LocationsAtOrOrthogonalTo(IntVector2 center)
     {
-        return AllLocations.FirstOrDefault(i => (i.Pos - center).ManhattanLength <= 1);
+        return AllLocations.Where(i => (i.Pos - center).ManhattanLength <= 1);
+    }
+
+    /// <summary>
+    /// Returns any locations found exactly one tile away from <paramref name="center"/>
+    /// in any cardinal direction. (Diagonal positions are not included.)
+    /// </summary>
+    protected IEnumerable<Location> LocationsOrthogonalTo(IntVector2 center)
+    {
+        return AllLocations.Where(i => (i.Pos - center).ManhattanLength == 1);
     }
 
     protected Location? GetLocationByCoordsNoOffset((int, int) coords)
@@ -881,7 +889,7 @@ public abstract class World
             {
                 length = 100;
             }
-            if (GetLocationAtOrOrthogonalTo(pos) != null)
+            if (LocationsAtOrOrthogonalTo(pos).Any())
             {
                 length = 100;
             }
@@ -892,7 +900,7 @@ public abstract class World
             while (WithinMapBounds(pos, 1) && crossingTerrains.Contains(map[pos]))
             {
                 //if we are too close to a location, give up
-                if (GetLocationAtOrOrthogonalTo(pos) != null)
+                if (LocationsAtOrOrthogonalTo(pos).Any())
                 {
                     length = 100;
                     break;
@@ -954,7 +962,7 @@ public abstract class World
             int endMass = 0;
             if (WithinMapBounds(pos, 1))
             {
-                if (GetLocationAtOrOrthogonalTo(pos) != null)
+                if (LocationsAtOrOrthogonalTo(pos).Any())
                 {
                     length = 100;
                 }

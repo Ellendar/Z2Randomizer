@@ -269,7 +269,7 @@ sealed class MazeIsland : World
                     if (palace4Pos.X % 2 == 0) { palace4Pos += IntVector2.EAST; }
                     if (palace4Pos.Y % 2 == 0) { palace4Pos += IntVector2.SOUTH; }
                     canPlace = true;
-                    if (GetLocationIn3x3Area(palace4Pos) != null)
+                    if (LocationsIn3x3Area(palace4Pos).Any())
                     {
                         canPlace = false;
                     }
