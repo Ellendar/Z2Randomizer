@@ -2306,244 +2306,113 @@ public abstract class World
 
     public void DrawCanyon(Terrain riverT)
     {
+        IntVector2 forward = isHorizontal ? IntVector2.EAST : IntVector2.SOUTH;
+        IntVector2 side = isHorizontal ? IntVector2.SOUTH : IntVector2.EAST;
+        int forwardLen = isHorizontal ? MapColumns : MapRows;
+        int sideLen = isHorizontal ? MapRows : MapColumns;
+        int minDist = Math.Min(sideLen / 2 - 1, 15);
         int drawLeft = RNG.Next(0, 5);
         int drawRight = RNG.Next(0, 5);
         Terrain tleft = climate.GetRandomTerrain(RNG, walkableTerrains);
         Terrain tright = climate.GetRandomTerrain(RNG, walkableTerrains);
+        int riverSide = RNG.Next(minDist, sideLen - minDist);
 
-        if (isHorizontal)
+        for (int f = 0; f < forwardLen; f++)
         {
-            int minDistY = Math.Min(MapRows / 2 - 1, 15);
-            int rivery = RNG.Next(minDistY, MapRows - minDistY);
-            for (int x = 0; x < MapColumns; x++)
+            drawLeft++;
+            drawRight++;
+            IntVector2 basePos = f * forward;
+            map[basePos + riverSide * side] = riverT;
+            map[basePos + (riverSide + 1) * side] = riverT;
+
+            int adjust = RNG.Next(-3, isHorizontal ? 3 : 4);
+            int leftM = RNG.Next(14, 17);
+            if (riverSide - leftM > 0)
             {
-                drawLeft++;
-                drawRight++;
-                map[rivery, x] = riverT;
-                map[rivery + 1, x] = riverT;
-                int adjust = RNG.Next(-3, 3);
-                int leftM = RNG.Next(14, 17);
-                if (rivery - leftM > 0)
-                {
-                    map[rivery - leftM + 3, x] = tleft;
-                }
-                if (drawLeft % 5 == 0)
-                {
-                    tleft = climate.GetRandomTerrain(RNG, walkableTerrains); ;
-                }
-                for (int i = rivery - leftM; i >= 0; i--)
-                {
-                    map[i, x] = Terrain.MOUNTAIN;
-                }
-
-                int rightM = RNG.Next(14, 17);
-
-                if (rivery + rightM < MapRows)
-                {
-                    map[rivery + rightM - 3, x] = tright;
-                }
-
-                if (drawRight % 5 == 0)
-                {
-                    tright = climate.GetRandomTerrain(RNG, walkableTerrains); ;
-                }
-                for (int i = rivery + 1 + rightM; i < MapRows; i++)
-                {
-                    map[i, x] = Terrain.MOUNTAIN;
-                }
-                while (rivery + adjust + 1 > MapRows - minDistY || rivery + adjust < minDistY)
-                {
-                    adjust = RNG.Next(-1, 2);
-                }
-                if (adjust > 0)
-                {
-                    int curr = 0;
-                    while (curr < adjust)
-                    {
-                        map[rivery, x] = riverT;
-                        rivery++;
-                        curr++;
-                    }
-                }
-                else
-                {
-                    int curr = 0;
-                    while (curr > adjust)
-                    {
-                        map[rivery, x] = riverT;
-                        rivery--;
-                        curr--;
-                    }
-                }
+                map[basePos + (riverSide - leftM + 3) * side] = tleft;
             }
-        }
-        else
-        {
-            int minDistX = Math.Min(MapColumns / 2 - 1, 15);
-            int riverx = RNG.Next(minDistX, MapColumns - minDistX);
-            for (int y = 0; y < MapRows; y++)
+            if (drawLeft % 5 == 0)
             {
-                drawLeft++;
-                drawRight++;
-                map[y, riverx] = riverT;
-                map[y, riverx + 1] = riverT;
-                int adjust = RNG.Next(-3, 4);
-                int leftM = RNG.Next(14, 17);
-                if (riverx - leftM > 0)
-                {
-                    map[y, riverx - leftM + 3] = tleft;
-                }
-                if (drawLeft % 5 == 0)
-                {
-                    tleft = climate.GetRandomTerrain(RNG, walkableTerrains); ;
-                }
-                for (int i = riverx - leftM; i >= 0; i--)
-                {
-                    map[y, i] = Terrain.MOUNTAIN;
-                }
-
-                int rightM = RNG.Next(14, 17);
-
-                if (riverx + rightM < MapColumns)
-                {
-                    map[y, riverx + rightM - 3] = tright;
-                }
-
-                if (drawRight % 5 == 0)
-                {
-                    tright = climate.GetRandomTerrain(RNG, walkableTerrains);
-                }
-                for (int i = riverx + 1 + rightM; i < MapColumns; i++)
-                {
-                    map[y, i] = Terrain.MOUNTAIN;
-                }
-                while (riverx + adjust + 1 > MapColumns - minDistX || riverx + adjust < minDistX)
-                {
-                    adjust = RNG.Next(-1, 2);
-                }
-                if (adjust > 0)
-                {
-                    int curr = 0;
-                    while (curr < adjust)
-                    {
-                        map[y, riverx] = riverT;
-                        riverx++;
-                        curr++;
-                    }
-                }
-                else
-                {
-                    int curr = 0;
-                    while (curr > adjust)
-                    {
-                        map[y, riverx] = riverT;
-                        riverx--;
-                        curr--;
-                    }
-                }
+                tleft = climate.GetRandomTerrain(RNG, walkableTerrains);
             }
-
+            for (int i = riverSide - leftM; i >= 0; i--)
+            {
+                map[basePos + i * side] = Terrain.MOUNTAIN;
+            }
+            int rightM = RNG.Next(14, 17);
+            if (riverSide + rightM < sideLen)
+            {
+                map[basePos + (riverSide + rightM - 3) * side] = tright;
+            }
+            if (drawRight % 5 == 0)
+            {
+                tright = climate.GetRandomTerrain(RNG, walkableTerrains);
+            }
+            for (int i = riverSide + 1 + rightM; i < sideLen; i++)
+            {
+                map[basePos + i * side] = Terrain.MOUNTAIN;
+            }
+            while (riverSide + adjust + 1 > sideLen - minDist || riverSide + adjust < minDist)
+            {
+                adjust = RNG.Next(-1, 2);
+            }
+            int oldSide = riverSide;
+            riverSide += adjust;
+            for (int s = oldSide; adjust > 0 ? s < riverSide : s > riverSide; s += Math.Sign(adjust))
+            {
+                map[basePos + s * side] = riverT;
+            }
         }
     }
 
     public void DrawCenterMountain()
     {
-        int top = (MapRows - 35) / 2; //20
-        int bottom = MapRows - top; //55
-        if (isHorizontal)
+        IntVector2 forward = isHorizontal ? IntVector2.SOUTH : IntVector2.EAST;
+        IntVector2 side = isHorizontal ? IntVector2.EAST : IntVector2.SOUTH;
+        int forwardLen = isHorizontal ? MapRows : MapColumns;
+        int sideLen = isHorizontal ? MapColumns : MapRows;
+        int top = (forwardLen - 35) / 2;
+        int bottom = forwardLen - top;
+        int sideCenter = sideLen / 2;
+
+        // Block out stripes outside caldera zone
+        for (int f = 0; f < forwardLen; f++)
         {
-            //Block out a stripe of mountains where the caldera is going to be
-            for (int i = 0; i < MapRows; i++)
+            if (f < top || f > bottom)
             {
-                if (i < top || i > bottom)
+                for (int s = 0; s < sideLen; s++)
                 {
-                    for (int j = 0; j < MapColumns; j++)
-                    {
-                        map[i, j] = Terrain.MOUNTAIN;
-                    }
-                }
-            }
-
-            for (int y = 0; y < 8; y++)
-            {
-                int xstart = MapColumns / 2 - (3 + y); //29 to 
-                int xend = MapColumns / 2 + (3 + y);
-                //map[20 + i, jstart - 1] = Terrain.lava;
-                //map[20 + i, jend] = Terrain.lava;
-                for (int x = xstart; x < xend; x++)
-                {
-                    map[top + y, x] = Terrain.MOUNTAIN;
-                }
-            }
-            for (int i = 0; i < 19; i++)
-            {
-                //map[28 + i, MAP_COLS / 2 - 11] = Terrain.lava;
-                //map[28 + i, MAP_COLS / 2 - 10 + 21] = Terrain.lava;
-
-                for (int j = 0; j < 20; j++)
-                {
-                    map[top + 8 + i, MapColumns / 2 - 10 + j] = Terrain.MOUNTAIN;
-                }
-            }
-            for (int i = 0; i < 8; i++)
-            {
-                int jstart = MapColumns / 2 - (3 + (6 - i));
-                int jend = MapColumns / 2 + (3 + (6 - i));
-                //map[47 + i, jstart - 1] = Terrain.lava;
-                //map[47 + i, jend] = Terrain.lava;
-                for (int j = jstart; j < jend; j++)
-                {
-                    map[top + 27 + i, j] = Terrain.MOUNTAIN;
+                    map[f * forward + s * side] = Terrain.MOUNTAIN;
                 }
             }
         }
-        else
+
+        // Top triangle (widening)
+        for (int y = 0; y < 8; y++)
         {
-            top = (MapColumns - 35) / 2;
-            bottom = MapColumns - top;
-            for (int i = 0; i < MapColumns; i++)
+            int half = 3 + y;
+            for (int s = sideCenter - half; s < sideCenter + half; s++)
             {
-                if (i < top || i > bottom)
-                {
-                    for (int j = 0; j < MapRows; j++)
-                    {
-                        map[j, i] = Terrain.MOUNTAIN;
-                    }
-                }
+                map[(top + y) * forward + s * side] = Terrain.MOUNTAIN;
             }
+        }
 
-            for (int i = 0; i < 8; i++)
+        // Middle rectangle
+        for (int i = 0; i < 19; i++)
+        {
+            for (int s = sideCenter - 10; s < sideCenter + 10; s++)
             {
-                int jstart = MapRows / 2 - (3 + i);
-                int jend = MapRows / 2 + (3 + i);
-                //map[20 + i, jstart - 1] = Terrain.lava;
-                //map[20 + i, jend] = Terrain.lava;
-                for (int j = jstart; j < jend; j++)
-                {
-
-                    map[j, top + i] = Terrain.MOUNTAIN;
-                }
+                map[(top + 8 + i) * forward + s * side] = Terrain.MOUNTAIN;
             }
-            for (int i = 0; i < 19; i++)
-            {
-                //map[28 + i, MAP_COLS / 2 - 11] = Terrain.lava;
-                //map[28 + i, MAP_COLS / 2 - 10 + 21] = Terrain.lava;
+        }
 
-                for (int j = 0; j < 20; j++)
-                {
-                    map[MapRows / 2 - 10 + j, top + 8 + i] = Terrain.MOUNTAIN;
-                }
-            }
-            for (int i = 0; i < 8; i++)
+        // Bottom triangle (narrowing)
+        for (int i = 0; i < 8; i++)
+        {
+            int half = 3 + (6 - i);
+            for (int s = sideCenter - half; s < sideCenter + half; s++)
             {
-                int jstart = MapRows / 2 - (3 + (6 - i));
-                int jend = MapRows / 2 + (3 + (6 - i));
-                //map[47 + i, jstart - 1] = Terrain.lava;
-                //map[47 + i, jend] = Terrain.lava;
-                for (int j = jstart; j < jend; j++)
-                {
-                    map[j, top + 27 + i] = Terrain.MOUNTAIN;
-                }
+                map[(top + 27 + i) * forward + s * side] = Terrain.MOUNTAIN;
             }
         }
     }
