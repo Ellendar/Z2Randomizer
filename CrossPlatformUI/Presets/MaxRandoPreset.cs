@@ -16,7 +16,6 @@ public static class MaxRandoPreset
         StartingMagicContainersMax = 8,
         StartingTechniques = StartingTechs.RANDOM,
         StartingLives = StartingLives.LivesRandom,
-        IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
         PalacesCanSwapContinents = true,
@@ -29,7 +28,6 @@ public static class MaxRandoPreset
         EastRocks = null,
         GenerateBaguWoods = null,
         LessImportantLocationsOption = LessImportantLocationsOption.RANDOM,
-        RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,
         HidePalace = null,
@@ -47,17 +45,13 @@ public static class MaxRandoPreset
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_PER_PALACE,
         GpStyle = PalaceStyle.RANDOM,
-        RandomStylesAllowVanilla = false,
         NormalPalaceLength = PalaceLengthOption.RANDOM,
         GpLength = PalaceLengthOption.RANDOM,
-        IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
         Includev5_0Rooms = true,
         IncludeExpertRooms = true,
         TBirdRequired = false,
-        RemoveTBird = false,
         PalacesToCompleteMin = 0,
-        PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
         ReduceDripperVariance = true,
@@ -69,16 +63,12 @@ public static class MaxRandoPreset
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
         PalaceItemRoomCount = PalaceItemRoomCount.RANDOM_INCLUDE_ZERO,
-        DarkLinkMinDistance = BossRoomMinDistance.NONE,
 
         //Levels
         ShuffleAttackExperience = true,
         ShuffleMagicExperience = true,
         ShuffleLifeExperience = true,
 
-        AttackLevelCap = 8,
-        MagicLevelCap = 8,
-        LifeLevelCap = 8,
         AttackEffectiveness = AttackEffectiveness.AVERAGE,
         MagicEffectiveness = MagicEffectiveness.AVERAGE,
         LifeEffectiveness = LifeEffectiveness.AVERAGE,
@@ -88,7 +78,6 @@ public static class MaxRandoPreset
         ShuffleSpellLocations = true,
         DisableMagicContainerRequirements = true,
         RandomizeSpellSpellEnemy = true,
-        SwapUpAndDownStab = false,
         FireOption = FireOption.RANDOM,
 
         //Enemies
@@ -96,7 +85,6 @@ public static class MaxRandoPreset
         ShufflePalaceEnemies = true,
         DripperEnemyOption = DripperEnemyOption.ANY_GROUND_ENEMY,
         MixLargeAndSmallEnemies = true,
-        GeneratorsAlwaysMatch = true,
 
         ShuffleEnemyHP = EnemyLifeOption.MEDIUM,
         ShuffleBossHP = EnemyLifeOption.MEDIUM,
@@ -115,11 +103,8 @@ public static class MaxRandoPreset
         IncludeSpellsInShuffle = true,
 
         ShuffleSmallItems = true,
-        RemoveSpellItems = false,
         ShufflePBagAmounts = true,
-        PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = true,
-        AllowImportantItemDuplicates = false,
 
         //Drops
         ShuffleItemDropFrequency = true,
@@ -131,6 +116,5 @@ public static class MaxRandoPreset
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 
-        RevealWalkthroughWalls = false,
     };
 }

@@ -9,14 +9,6 @@ public static class UpstartsTournamentPreset
     {
         //Start
         StartWithCandle = true,
-        ShuffleStartingItems = false,
-        ShuffleStartingSpells = false,
-        MaxHeartContainers = MaxHeartsOption.EIGHT,
-        StartingHeartContainersMin = 4,
-        StartingHeartContainersMax = 4,
-        StartingTechniques = StartingTechs.NONE,
-        StartingLives = StartingLives.Lives3,
-        IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
         PalacesCanSwapContinents = true,
@@ -25,10 +17,6 @@ public static class UpstartsTournamentPreset
         AllowUnsafePathEncounters = true,
         IncludeLavaInEncounterShuffle = true,
         EncounterRate = EncounterRate.HALF,
-        EastRocks = false,
-        GenerateBaguWoods = true,
-        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
-        RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,
         HidePalace = null,
@@ -39,39 +27,24 @@ public static class UpstartsTournamentPreset
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
         DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
-        WestClimate = ClimateEnum.CLASSIC,
-        EastClimate = ClimateEnum.CLASSIC,
-        DmClimate = ClimateEnum.CLASSIC,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RECONSTRUCTED,
         GpStyle = PalaceStyle.RECONSTRUCTED,
-        NormalPalaceLength = PalaceLengthOption.FULL,
         GpLength = PalaceLengthOption.SHORT,
-        IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
-        Includev5_0Rooms = false,
         IncludeExpertRooms = true,
-        TBirdRequired = true,
-        PalacesToCompleteMin = 6,
-        PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         ChangePalacePallettes = true,
         PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
-        BossRoomsExitType = BossRoomsExitType.OVERWORLD,
-        NoDuplicateRoomsByLayout = false,
         NoDuplicateRoomsByEnemies = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
-        PalaceItemRoomCount = PalaceItemRoomCount.ONE,
 
         //Levels
         ShuffleAttackExperience = true,
         ShuffleMagicExperience = true,
         ShuffleLifeExperience = true,
-        AttackLevelCap = 8,
-        MagicLevelCap = 8,
-        LifeLevelCap = 8,
         AttackEffectiveness = AttackEffectiveness.AVERAGE,
         MagicEffectiveness = MagicEffectiveness.AVERAGE,
         LifeEffectiveness = LifeEffectiveness.AVERAGE,
@@ -80,8 +53,6 @@ public static class UpstartsTournamentPreset
         ShuffleLifeRefillAmount = true,
         ShuffleSpellLocations = true,
         DisableMagicContainerRequirements = true,
-        RandomizeSpellSpellEnemy = false,
-        SwapUpAndDownStab = false,
         FireOption = FireOption.PAIR_WITH_RANDOM,
 
         //Enemies
@@ -89,7 +60,6 @@ public static class UpstartsTournamentPreset
         ShufflePalaceEnemies = true,
         DripperEnemyOption = DripperEnemyOption.ANY_GROUND_ENEMY,
         MixLargeAndSmallEnemies = true,
-        GeneratorsAlwaysMatch = true,
 
         ShuffleEnemyHP = EnemyLifeOption.MEDIUM,
         ShuffleBossHP = EnemyLifeOption.MEDIUM,
@@ -103,16 +73,10 @@ public static class UpstartsTournamentPreset
         ShuffleOverworldItems = true,
         MixOverworldAndPalaceItems = true,
         IncludePBagCavesInItemShuffle = true,
-        IncludeSwordTechsInShuffle = false,
-        IncludeQuestItemsInShuffle = false,
-        IncludeSpellsInShuffle = false,
 
         ShuffleSmallItems = true,
-        RemoveSpellItems = false,
         ShufflePBagAmounts = true,
-        PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = true,
-        AllowImportantItemDuplicates = false,
 
         //Drops
         ShuffleItemDropFrequency = true,
@@ -124,6 +88,5 @@ public static class UpstartsTournamentPreset
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 
-        RevealWalkthroughWalls = false,
     };
 }
