@@ -7,6 +7,7 @@ using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Controls;
 using ReactiveUI;
@@ -28,21 +29,27 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     [JsonIgnore]
     public BehaviorSubject<bool> FlagsValidSubject = new(true);
 
-    private bool IsFlagStringValid(string flags)
-    {
-        try
-        {
-            _ = new RandomizerConfiguration(flags);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
+    private static bool IsFlagStringValid(string flags) => FlagPasteParser.IsValidFlagString(flags);
+
+    private string flagInput = "";
 
     [JsonIgnore]
-    public string FlagInput { get; set { field = value.Trim(); this.RaisePropertyChanged(); } } = "";
+    public string FlagInput
+    {
+        get => flagInput;
+        set
+        {
+            var trimmedValue = value?.Trim() ?? "";
+            var (extractedFlags, extractedSeed) = FlagPasteParser.Parse(trimmedValue);
+
+            if (Main is not null && !string.IsNullOrEmpty(extractedSeed))
+            {
+                Main.Config.Seed = extractedSeed;
+            }
+
+            this.RaiseAndSetIfChanged(ref flagInput, extractedFlags ?? trimmedValue);
+        }
+    }
 
     [JsonIgnore]
     public string Seed
@@ -111,9 +118,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
         SaveFolder = ReactiveCommand.CreateFromTask(async () =>
         {
-            var fileDialog = App.Current?.Services?.GetService<IFileDialogService>()!;
-            var folder = await fileDialog.OpenFolderAsync();
-            Main.OutputFilePath = folder?.Path.LocalPath ?? "";
+            Main.OutputFilePath = await SelectSaveFolder() ?? "";
         });
 
         CheckForUpdates = ReactiveCommand.CreateFromTask(async () =>
@@ -195,6 +200,18 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             }
         });
         this.WhenActivated(OnActivate);
+    }
+
+    public static async Task<string?> SelectSaveFolder()
+    {
+        var fileDialog = App.Current?.Services?.GetService<IFileDialogService>()!;
+        var folder = await fileDialog.OpenFolderAsync();
+        Uri? path = folder?.Path;
+        // both LocalPath and TryGetLocalPath() throw for non-absoloute URIs
+        string? localPath = path?.IsAbsoluteUri == true
+            ? path.LocalPath
+            : path?.OriginalString;
+        return localPath;
     }
 
     private void OnActivate(CompositeDisposable disposables)

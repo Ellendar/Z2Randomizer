@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -96,9 +97,38 @@ Seed: {config.Seed}
                     if(!tokenSource.IsCancellationRequested && output.success)
                     {
                         var flags = config.SerializeFlags();
-                        var basename = $"Z2_{config.Seed}_{flags}";
-                        var filename = basename + ".nes";
-                        await files.SaveGeneratedBinaryFile(filename, output.romdata!, Main.OutputFilePath);
+                        var version = Assembly.GetEntryAssembly()!.GetName().Version!;
+                        var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
+                        var filename = OutputFilenameFormatter.Format(config.OutputFilenameTemplate, flags, config.Seed, randomizer.Hash, version: versionstr);
+                        var basename = Path.GetFileNameWithoutExtension(filename);
+                        if (string.IsNullOrEmpty(basename))
+                        {
+                            basename = filename;
+                        }
+                        bool saved = false;
+                        while (!saved)
+                        {
+                            try
+                            {
+                                await files.SaveGeneratedBinaryFile(filename, output.romdata!, Main.OutputFilePath);
+                                saved = true;
+                            }
+                            catch (Exception e)
+                            {
+                                // DirectoryNotFoundException, UnauthorizedAccessException
+                                // We could check for specific exceptions, but it's
+                                // probably fine to do this for all errors while saving
+                                var newFolder = await RandomizerViewModel.SelectSaveFolder();
+                                if (!string.IsNullOrEmpty(newFolder) && newFolder != Main.OutputFilePath)
+                                {
+                                    Main.OutputFilePath = newFolder;
+                                }
+                                else // user did not pick a new save folder
+                                {
+                                    throw new UserFacingException("Unable to save ROM to folder", e.Message);
+                                }
+                            }
+                        }
 #if DEBUG
                         var debugfile = basename + ".mlb";
                         if (!string.IsNullOrEmpty(output.debuginfo))

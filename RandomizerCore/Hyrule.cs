@@ -265,13 +265,7 @@ public class Hyrule
             reachableAreas = new HashSet<string>();
             //areasByLocation = new SortedDictionary<string, List<Location>>();
 
-            byte[] correctVanillaHash = [0x76, 0x4D, 0x36, 0xFA, 0x8A, 0x24, 0x50, 0x83, 0x4D, 0xA5, 0xE8, 0x19, 0x42, 0x81, 0x03, 0x5A];
-            var vanillaRomHash = MD5Hash.ComputeHash(vanillaRomData);
-            if (!correctVanillaHash.SequenceEqual(vanillaRomHash))
-            {
-                throw new UserFacingException("Vanilla ROM checksum failure", "Please provide an unmodified Zelda 2 ROM (US release).");
-            }
-
+            ROM.ValidateVanillaRom(ref vanillaRomData);
             // Make a copy of the vanilla data to prevent seed bleed
             ROMData = new ROM(vanillaRomData.ToArray(), true);
 
@@ -2744,12 +2738,9 @@ public class Hyrule
         ROMData.Put(RomMap.MI_MAGIC_CONTAINER_DROP_COLLECTABLE, (byte)mazeIsland.magicContainerDrop.Collectables[0]);
         ROMData.Put(RomMap.MI_CHILD_DROP_COLLECTABLE, (byte)mazeIsland.childDrop.Collectables[0]);
 
-        if (props.PbagItemShuffle)
-        {
-            ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, (byte)westHyrule.pbagCave.Collectables[0]);
-            ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, (byte)eastHyrule.pbagCave1.Collectables[0]);
-            ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, (byte)eastHyrule.pbagCave2.Collectables[0]);
-        }
+        ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, (byte)westHyrule.pbagCave.Collectables[0]);
+        ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, (byte)eastHyrule.pbagCave1.Collectables[0]);
+        ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, (byte)eastHyrule.pbagCave2.Collectables[0]);
 
         foreach (Location location in pbagHearts)
         {

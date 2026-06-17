@@ -239,6 +239,11 @@ public class StatRandomizer
 
     protected static int[] RandomizeExperienceToLevel(int[] baseExpTable, Random r, bool[] shuffleStat, int[] levelCap, bool scaleLevels)
     {
+        if (!shuffleStat[0] && !shuffleStat[1] && !shuffleStat[2] && levelCap[0] == 8 && levelCap[1] == 8 && levelCap[2] == 8)
+        {
+            return baseExpTable;
+        }
+
         const int STAT_COUNT = 3;
         const int LEVELS_PER_STAT = 8;
         const int TABLE_SIZE = STAT_COUNT * LEVELS_PER_STAT;
