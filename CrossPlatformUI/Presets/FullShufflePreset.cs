@@ -119,6 +119,7 @@ public static class FullShufflePreset
         PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = true,
         AllowImportantItemDuplicates = false,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

@@ -122,6 +122,7 @@ public static class Sgl2025Preset
         PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = false,
         AllowImportantItemDuplicates = false,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = false,
