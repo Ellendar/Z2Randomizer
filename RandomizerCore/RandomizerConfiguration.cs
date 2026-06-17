@@ -10,6 +10,8 @@ using System.Runtime.CompilerServices;
 using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+// ReSharper disable InconsistentNaming
+// ReSharper disable RedundantDefaultMemberInitializer
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -30,13 +32,13 @@ public class ReactiveAttribute : Attribute
 
 
 [FlagSerialize]
-public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
+public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 {
     [IgnoreInFlags]
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     [IgnoreInFlags]
-    private readonly static Collectable[] POSSIBLE_STARTING_ITEMS = [
+    private static readonly Collectable[] POSSIBLE_STARTING_ITEMS = [
         Collectable.CANDLE,
         Collectable.GLOVE,
         Collectable.RAFT,
@@ -48,7 +50,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     ];
 
     [IgnoreInFlags]
-    private readonly static Collectable[] POSSIBLE_SHARED_STARTING_ITEMS = [
+    private static readonly Collectable[] POSSIBLE_SHARED_STARTING_ITEMS = [
         Collectable.GLOVE,
         Collectable.RAFT,
         Collectable.BOOTS,
@@ -58,13 +60,13 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     ];
 
     [IgnoreInFlags]
-    private readonly static Collectable[] POSSIBLE_DIFFICULTY_STARTING_ITEMS = [
+    private static readonly Collectable[] POSSIBLE_DIFFICULTY_STARTING_ITEMS = [
         Collectable.CANDLE,
         Collectable.CROSS
     ];
 
     [IgnoreInFlags]
-    private readonly static Collectable[] POSSIBLE_STARTING_SPELLS = [
+    private static readonly Collectable[] POSSIBLE_STARTING_SPELLS = [
         Collectable.SHIELD_SPELL,
         Collectable.JUMP_SPELL,
         Collectable.LIFE_SPELL,
@@ -78,211 +80,211 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     //Start Configuration
     [Reactive]
-    private bool shuffleStartingItems;
+    private bool shuffleStartingItems = false;
 
     [Reactive]
     [DifficultyOnly]
-    private bool startWithCandle;
+    private bool startWithCandle = false;
 
     [Reactive]
-    private bool startWithGlove;
+    private bool startWithGlove = false;
 
     [Reactive]
-    private bool startWithRaft;
+    private bool startWithRaft = false;
 
     [Reactive]
-    private bool startWithBoots;
+    private bool startWithBoots = false;
 
     [Reactive]
-    private bool startWithFlute;
+    private bool startWithFlute = false;
 
     [Reactive]
     [DifficultyOnly]
-    private bool startWithCross;
+    private bool startWithCross = false;
 
     [Reactive]
-    private bool startWithHammer;
+    private bool startWithHammer = false;
 
     [Reactive]
-    private bool startWithMagicKey;
+    private bool startWithMagicKey = false;
 
     [Reactive]
-    private bool shuffleStartingSpells;
+    private bool shuffleStartingSpells = false;
 
     [Reactive]
-    private StartingResourceLimit startItemsLimit;
+    private StartingResourceLimit startItemsLimit = StartingResourceLimit.NO_LIMIT;
 
     [Reactive]
-    private bool startWithShield;
+    private bool startWithShield = false;
 
     [Reactive]
-    private bool startWithJump;
+    private bool startWithJump = false;
 
     [Reactive]
-    private bool startWithLife;
+    private bool startWithLife = false;
 
     [Reactive]
-    private bool startWithFairy;
+    private bool startWithFairy = false;
 
     [Reactive]
-    private bool startWithFire;
+    private bool startWithFire = false;
 
     [Reactive]
-    private bool startWithReflect;
+    private bool startWithReflect = false;
 
     [Reactive]
-    private bool startWithSpellSpell;
+    private bool startWithSpellSpell = false;
 
     [Reactive]
-    private bool startWithThunder;
+    private bool startWithThunder = false;
 
     [Reactive]
-    private StartingResourceLimit startSpellsLimit;
+    private StartingResourceLimit startSpellsLimit = StartingResourceLimit.NO_LIMIT;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
-    private int? startingHeartContainersMin;
+    private int? startingHeartContainersMin = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
-    private int? startingHeartContainersMax;
+    private int? startingHeartContainersMax = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
-    private int? startingMagicContainersMin;
+    private int? startingMagicContainersMin = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
-    private int? startingMagicContainersMax;
+    private int? startingMagicContainersMax = 4;
 
     [Reactive]
-    private MaxHeartsOption maxHeartContainers;
+    private MaxHeartsOption maxHeartContainers = MaxHeartsOption.EIGHT;
 
     [Reactive]
     [DifficultyOnly]
-    private StartingTechs startingTechniques;
+    private StartingTechs startingTechniques = StartingTechs.NONE;
 
     [Reactive]
     [DifficultyOnly]
-    private StartingLives startingLives;
-
-    [Reactive]
-    [DifficultyOnly]
-    [Minimum(1)]
-    [Maximum(8)]
-    private int startingAttackLevel;
+    private StartingLives startingLives = StartingLives.Lives3;
 
     [Reactive]
     [DifficultyOnly]
     [Minimum(1)]
     [Maximum(8)]
-    private int startingMagicLevel;
+    private int startingAttackLevel = 1;
 
     [Reactive]
     [DifficultyOnly]
     [Minimum(1)]
     [Maximum(8)]
-    private int startingLifeLevel;
+    private int startingMagicLevel = 1;
 
     [Reactive]
-    private IndeterminateOptionRate indeterminateOptionRate;
+    [DifficultyOnly]
+    [Minimum(1)]
+    [Maximum(8)]
+    private int startingLifeLevel = 1;
+
+    [Reactive]
+    private IndeterminateOptionRate indeterminateOptionRate = IndeterminateOptionRate.HALF;
 
     //Overworld
     [Reactive]
-    private bool? palacesCanSwapContinents;
+    private bool? palacesCanSwapContinents = false;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool? shuffleGP;
+    private bool? shuffleGP = false;
     public bool shuffleGPIncluded() => palacesCanSwapContinents != false;
 
     [Reactive]
-    private EncounterRate encounterRate;
+    private EncounterRate encounterRate = EncounterRate.NORMAL;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool? shuffleEncounters;
+    private bool? shuffleEncounters = false;
     public bool shuffleEncountersIncluded() => encounterRate != EncounterRate.NONE;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool allowUnsafePathEncounters;
+    private bool allowUnsafePathEncounters = false;
     public bool allowUnsafePathEncountersIncluded() => shuffleEncountersIncluded() && shuffleEncounters != false;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool includeLavaInEncounterShuffle;
+    private bool includeLavaInEncounterShuffle = false;
     public bool includeLavaInEncounterShuffleIncluded() => shuffleEncountersIncluded() && shuffleEncounters != false;
 
     [Reactive]
-    private bool? hidePalace;
+    private bool? hidePalace = true;
 
     [Reactive]
-    private bool? hideKasuto;
+    private bool? hideKasuto = true;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool? shuffleWhichLocationIsHidden;
+    private bool? shuffleWhichLocationIsHidden = false;
     public bool shuffleWhichLocationIsHiddenIncluded() => hidePalace != false || hideKasuto != false;
 
     [Reactive]
-    private LessImportantLocationsOption lessImportantLocationsOption;
+    private LessImportantLocationsOption lessImportantLocationsOption = LessImportantLocationsOption.HIDE;
 
     [Reactive]
-    private bool? restrictConnectionCaveShuffle;
+    private bool? restrictConnectionCaveShuffle = true;
 
     [Reactive]
-    private bool allowConnectionCavesToBeBlocked;
+    private bool allowConnectionCavesToBeBlocked = false;
 
     [Reactive]
-    private bool? goodBoots;
+    private bool? goodBoots = false;
 
     [Reactive]
-    private bool? generateBaguWoods;
+    private bool? generateBaguWoods = true;
 
     [Reactive]
-    private ContinentConnectionType continentConnectionType;
+    private ContinentConnectionType continentConnectionType = ContinentConnectionType.NORMAL;
 
     [Reactive]
-    private OverworldSizeOption westSize;
+    private OverworldSizeOption westSize = OverworldSizeOption.LARGE;
 
     [Reactive]
-    private OverworldSizeOption eastSize;
+    private OverworldSizeOption eastSize = OverworldSizeOption.LARGE;
 
     [Reactive]
-    private DmSizeOption dmSize;
+    private DmSizeOption dmSize = DmSizeOption.LARGE;
 
     [Reactive]
-    private MazeSizeOption mazeSize;
+    private MazeSizeOption mazeSize = MazeSizeOption.LARGE;
 
     [Reactive]
-    private Biome westBiome;
+    private Biome westBiome = Biome.VANILLA;
 
     [Reactive]
-    private Biome eastBiome;
+    private Biome eastBiome = Biome.VANILLA;
 
     [Reactive]
-    private Biome dmBiome;
+    private Biome dmBiome = Biome.VANILLA;
 
     [Reactive]
-    private Biome mazeBiome;
+    private Biome mazeBiome = Biome.VANILLA;
 
     [Reactive]
-    private ClimateEnum westClimate;
+    private ClimateEnum westClimate = ClimateEnum.CLASSIC;
 
     [Reactive]
-    private ClimateEnum eastClimate;
+    private ClimateEnum eastClimate = ClimateEnum.CLASSIC;
 
     [Reactive]
-    private ClimateEnum dmClimate;
+    private ClimateEnum dmClimate = ClimateEnum.CLASSIC;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool legacyVanillaShuffledLocations;
+    private bool legacyVanillaShuffledLocations = false;
     public bool legacyVanillaShuffledLocationsIncluded() {
         foreach (var biome in (List<Biome>)[westBiome, eastBiome, dmBiome, mazeBiome])
         {
@@ -299,10 +301,10 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     //Palaces
     [Reactive]
-    private PalaceStyle normalPalaceStyle;
+    private PalaceStyle normalPalaceStyle = PalaceStyle.VANILLA;
 
     [Reactive]
-    private PalaceStyle gpStyle;
+    private PalaceStyle gpStyle = PalaceStyle.VANILLA;
 
     private bool palaceStylesAreNotAllVanilla()
     {
@@ -349,390 +351,390 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool randomStylesAllowVanilla;
+    private bool randomStylesAllowVanilla = false;
     public bool randomStylesAllowVanillaIncluded() => palaceStylesAnyMetastyleSelected();
 
     [Reactive]
-    private bool? includeVanillaRooms;
+    private bool? includeVanillaRooms = true;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool? includev4_0Rooms;
+    private bool? includev4_0Rooms = false;
     public bool includev4_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool? includev5_0Rooms;
+    private bool? includev5_0Rooms = false;
     public bool includev5_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool blockingRoomsInAnyPalace;
+    private bool blockingRoomsInAnyPalace = false;
     public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
-    private PalaceDropStyle palaceDropStyle;
+    private PalaceDropStyle palaceDropStyle = PalaceDropStyle.ENTRANCE;
     public bool palaceDropStyleIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool removeLongDeadEnds;
+    private bool removeLongDeadEnds = false;
     public bool removeLongDeadEndsIncluded() => includev5_0RoomsIncluded() && includev5_0Rooms is not false;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool includeExpertRooms;
+    private bool includeExpertRooms = false;
     public bool includeExpertRoomsIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private BossRoomsExitType bossRoomsExitType;
+    private BossRoomsExitType bossRoomsExitType = BossRoomsExitType.OVERWORLD;
     public bool bossRoomsExitTypeIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool? tBirdRequired;
+    private bool? tBirdRequired = true;
     public bool tBirdRequiredIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool removeTBird;
+    private bool removeTBird = false;
     public bool removeTBirdIncluded() => tBirdRequiredIncluded() && tBirdRequired != true;
 
     [Reactive]
-    private bool restartAtPalacesOnGameOver;
+    private bool restartAtPalacesOnGameOver = false;
 
     [Reactive]
     private bool? global5050JarDrop = false;
 
     [Reactive]
-    private bool reduceDripperVariance;
+    private bool reduceDripperVariance = false;
 
     [Reactive]
-    private bool changePalacePallettes;
+    private bool changePalacePallettes = false;
 
     [Reactive]
-    private bool randomizeBossItemDrop;
+    private bool randomizeBossItemDrop = false;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private BossRoomMinDistance darkLinkMinDistance;
+    private BossRoomMinDistance darkLinkMinDistance = BossRoomMinDistance.NONE;
     public bool darkLinkMinDistanceIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
-    private PalaceItemRoomCount palaceItemRoomCount;
+    private PalaceItemRoomCount palaceItemRoomCount = PalaceItemRoomCount.ONE;
 
     [Reactive]
     [Minimum(0)]
     [Maximum(6)]
-    private int palacesToCompleteMin;
+    private int palacesToCompleteMin = 6;
 
     [Reactive]
     [Minimum(0)]
     [Maximum(6)]
     [ConditionallyIncludeInFlags]
     [DefaultValue(6)]
-    private int palacesToCompleteMax;
+    private int palacesToCompleteMax = 6;
     public bool palacesToCompleteMaxIncluded() => palacesToCompleteMin != 6;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool noDuplicateRoomsByLayout;
+    private bool noDuplicateRoomsByLayout = false;
     public bool noDuplicateRoomsByLayoutIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool noDuplicateRoomsByEnemies;
+    private bool noDuplicateRoomsByEnemies = false;
     public bool noDuplicateRoomsByEnemiesIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
-    private bool hardBosses;
+    private bool hardBosses = false;
 
     [Reactive]
-    private bool aggressiveTbird;
+    private bool aggressiveTbird = false;
 
     //Levels
     [Reactive]
-    private bool shuffleAttackExperience;
+    private bool shuffleAttackExperience = false;
 
     [Reactive]
-    private bool shuffleMagicExperience;
+    private bool shuffleMagicExperience = false;
 
     [Reactive]
-    private bool shuffleLifeExperience;
-
-    [Reactive]
-    [DifficultyOnly]
-    [Minimum(1)]
-    [Maximum(8)]
-    private int attackLevelCap;
+    private bool shuffleLifeExperience = false;
 
     [Reactive]
     [DifficultyOnly]
     [Minimum(1)]
     [Maximum(8)]
-    private int magicLevelCap;
+    private int attackLevelCap = 8;
 
     [Reactive]
     [DifficultyOnly]
     [Minimum(1)]
     [Maximum(8)]
-    private int lifeLevelCap;
+    private int magicLevelCap = 8;
+
+    [Reactive]
+    [DifficultyOnly]
+    [Minimum(1)]
+    [Maximum(8)]
+    private int lifeLevelCap = 8;
 
     [Reactive]
     [DifficultyOnly]
     [ConditionallyIncludeInFlags]
-    private bool scaleLevelRequirementsToCap;
+    private bool scaleLevelRequirementsToCap = false;
     public bool scaleLevelRequirementsToCapIncluded() => attackLevelCap < 8 || magicLevelCap < 8 || lifeLevelCap < 8;
 
     [Reactive]
     [DifficultyOnly]
-    private AttackEffectiveness attackEffectiveness;
+    private AttackEffectiveness attackEffectiveness = AttackEffectiveness.VANILLA;
 
     [Reactive]
-    private MagicEffectiveness magicEffectiveness;
+    private MagicEffectiveness magicEffectiveness = MagicEffectiveness.VANILLA;
 
     [Reactive]
     [DifficultyOnly]
-    private LifeEffectiveness lifeEffectiveness;
+    private LifeEffectiveness lifeEffectiveness = LifeEffectiveness.VANILLA;
 
     //Spells
     [Reactive]
-    private bool shuffleLifeRefillAmount;
+    private bool shuffleLifeRefillAmount = false;
 
     [Reactive]
-    private bool? shuffleSpellLocations;
+    private bool? shuffleSpellLocations = false;
 
     [Reactive]
-    private bool? disableMagicContainerRequirements;
+    private bool? disableMagicContainerRequirements = false;
 
     [Reactive]
-    private bool? randomizeSpellSpellEnemy;
+    private bool? randomizeSpellSpellEnemy = false;
 
     [Reactive]
-    private bool? swapUpAndDownStab;
+    private bool? swapUpAndDownStab = false;
 
     [Reactive]
-    private FireOption fireOption;
+    private FireOption fireOption = FireOption.NORMAL;
 
     //Enemies
     [Reactive]
-    private bool? shuffleOverworldEnemies;
+    private bool? shuffleOverworldEnemies = false;
 
     [Reactive]
-    private bool? shufflePalaceEnemies;
+    private bool? shufflePalaceEnemies = false;
 
     private bool anyEnemiesAreShuffled() => shuffleOverworldEnemies != false || shufflePalaceEnemies != false;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private DripperEnemyOption dripperEnemyOption;
+    private DripperEnemyOption dripperEnemyOption = DripperEnemyOption.ONLY_BOTS;
     public bool dripperEnemyOptionIncluded() => anyEnemiesAreShuffled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool? mixLargeAndSmallEnemies;
+    private bool? mixLargeAndSmallEnemies = false;
     public bool mixLargeAndSmallEnemiesIncluded() => anyEnemiesAreShuffled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool generatorsAlwaysMatch;
+    private bool generatorsAlwaysMatch = true;
     public bool generatorsAlwaysMatchIncluded() => anyEnemiesAreShuffled();
 
     [Reactive]
     [DifficultyOnly]
-    private EnemyLifeOption shuffleEnemyHP;
+    private EnemyLifeOption shuffleEnemyHP = EnemyLifeOption.VANILLA;
 
     [Reactive]
     [DifficultyOnly]
-    private EnemyLifeOption shuffleBossHP;
+    private EnemyLifeOption shuffleBossHP = EnemyLifeOption.VANILLA;
 
     [Reactive]
-    private bool shuffleXPStealers;
+    private bool shuffleXPStealers = false;
 
     [Reactive]
-    private bool shuffleXPStolenAmount;
+    private bool shuffleXPStolenAmount = false;
 
     [Reactive]
-    private bool shuffleSwordImmunity;
+    private bool shuffleSwordImmunity = false;
 
     [Reactive]
     [DifficultyOnly]
-    private XPEffectiveness enemyXPDrops;
+    private XPEffectiveness enemyXPDrops = XPEffectiveness.VANILLA;
 
     //Items
     [Reactive]
-    private bool? shufflePalaceItems;
+    private bool? shufflePalaceItems = false;
 
     [Reactive]
-    private bool? shuffleOverworldItems;
+    private bool? shuffleOverworldItems = false;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool? mixOverworldAndPalaceItems;
+    private bool? mixOverworldAndPalaceItems = false;
     public bool mixOverworldAndPalaceItemsIncluded() => shufflePalaceItems != false && shuffleOverworldItems != false;
 
     [Reactive]
     [ConditionallyIncludeInFlags]
-    private bool? includePBagCavesInItemShuffle;
+    private bool? includePBagCavesInItemShuffle = false;
     public bool includePBagCavesInItemShuffleIncluded() => shuffleOverworldItems != false;
 
     [Reactive]
-    private bool shuffleSmallItems;
+    private bool shuffleSmallItems = false;
 
     [Reactive]
-    private bool? palacesContainExtraKeys;
+    private bool? palacesContainExtraKeys = false;
 
     [Reactive]
-    private bool randomizeNewKasutoJarRequirements;
+    private bool randomizeNewKasutoJarRequirements = false;
 
     [Reactive]
-    private bool allowImportantItemDuplicates;
+    private bool allowImportantItemDuplicates = false;
 
     [Reactive]
-    private bool? removeSpellItems;
+    private bool? removeSpellItems = false;
 
     [Reactive]
-    private bool? shufflePBagAmounts;
+    private bool? shufflePBagAmounts = false;
 
     [Reactive]
-    private bool? includeSpellsInShuffle;
+    private bool? includeSpellsInShuffle = false;
 
     [Reactive]
-    private bool? includeSwordTechsInShuffle;
+    private bool? includeSwordTechsInShuffle = false;
 
     [Reactive]
-    private bool? includeQuestItemsInShuffle;
+    private bool? includeQuestItemsInShuffle = false;
 
     //Drops
     [Reactive]
-    private bool shuffleItemDropFrequency;
+    private bool shuffleItemDropFrequency = false;
 
     [Reactive]
-    private bool randomizeDrops;
+    private bool randomizeDrops = false;
 
     [Reactive]
-    private bool standardizeDrops;
+    private bool standardizeDrops = false;
 
     [Reactive]
-    private bool smallEnemiesCanDropBlueJar;
+    private bool smallEnemiesCanDropBlueJar = false;
 
     [Reactive]
-    private bool smallEnemiesCanDropRedJar;
+    private bool smallEnemiesCanDropRedJar = false;
 
     [Reactive]
-    private bool smallEnemiesCanDropSmallBag;
+    private bool smallEnemiesCanDropSmallBag = false;
 
     [Reactive]
-    private bool smallEnemiesCanDropMediumBag;
+    private bool smallEnemiesCanDropMediumBag = false;
 
     [Reactive]
-    private bool smallEnemiesCanDropLargeBag;
+    private bool smallEnemiesCanDropLargeBag = false;
 
     [Reactive]
-    private bool smallEnemiesCanDropXLBag;
+    private bool smallEnemiesCanDropXLBag = false;
 
     [Reactive]
-    private bool smallEnemiesCanDrop1up;
+    private bool smallEnemiesCanDrop1up = false;
 
     [Reactive]
-    private bool smallEnemiesCanDropKey;
+    private bool smallEnemiesCanDropKey = false;
 
     [Reactive]
-    private bool largeEnemiesCanDropBlueJar;
+    private bool largeEnemiesCanDropBlueJar = false;
 
     [Reactive]
-    private bool largeEnemiesCanDropRedJar;
+    private bool largeEnemiesCanDropRedJar = false;
 
     [Reactive]
-    private bool largeEnemiesCanDropSmallBag;
+    private bool largeEnemiesCanDropSmallBag = false;
 
     [Reactive]
-    private bool largeEnemiesCanDropMediumBag;
+    private bool largeEnemiesCanDropMediumBag = false;
 
     [Reactive]
-    private bool largeEnemiesCanDropLargeBag;
+    private bool largeEnemiesCanDropLargeBag = false;
 
     [Reactive]
-    private bool largeEnemiesCanDropXLBag;
+    private bool largeEnemiesCanDropXLBag = false;
 
     [Reactive]
-    private bool largeEnemiesCanDrop1up;
+    private bool largeEnemiesCanDrop1up = false;
 
     [Reactive]
-    private bool largeEnemiesCanDropKey;
+    private bool largeEnemiesCanDropKey = false;
 
     //Misc
     [Reactive]
-    private bool? enableHelpfulHints;
+    private bool? enableHelpfulHints = false;
 
     [Reactive]
-    private bool? enableSpellItemHints;
+    private bool? enableSpellItemHints = false;
 
     [Reactive]
-    private bool? enableTownNameHints;
+    private bool? enableTownNameHints = false;
 
     [Reactive]
-    private bool jumpAlwaysOn;
+    private bool jumpAlwaysOn = false;
 
     [Reactive]
-    private bool dashAlwaysOn;
+    private bool dashAlwaysOn = false;
 
     [Reactive]
-    private bool permanentBeamSword;
+    private bool permanentBeamSword = false;
 
     //Custom
     [Reactive]
     [IgnoreInFlags]
-    private bool useCommunityText;
+    private bool useCommunityText = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private BeepFrequency beepFrequency;
+    private BeepFrequency beepFrequency = BeepFrequency.Normal;
 
     [Reactive]
     [IgnoreInFlags]
-    private BeepThreshold beepThreshold;
+    private BeepThreshold beepThreshold = BeepThreshold.Normal;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool disableMusic;
+    private bool disableMusic = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool randomizeMusic;
+    private bool randomizeMusic = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool mixCustomAndOriginalMusic;
+    private bool mixCustomAndOriginalMusic = false;
     
     [Reactive]
     [IgnoreInFlags]
-    private bool includeDiverseMusic;
+    private bool includeDiverseMusic = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool disableUnsafeMusic;
+    private bool disableUnsafeMusic = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool fastSpellCasting;
+    private bool fastSpellCasting = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool upAOnController1;
+    private bool upAOnController1 = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool removeFlashing;
+    private bool removeFlashing = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private CharacterSprite sprite;
+    private CharacterSprite sprite = CharacterSprite.LINK;
 
     [Reactive]
     [IgnoreInFlags]
-    private string spriteName;
+    private string spriteName = CharacterSprite.LINK.DisplayName;
 
     [Reactive]
     [IgnoreInFlags]
@@ -741,64 +743,64 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     [IgnoreInFlags]
-    private bool changeItemSprites;
+    private bool changeItemSprites = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private NesColor tunic;
+    private NesColor tunic = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
-    private NesColor skinTone;
+    private NesColor skinTone = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
-    private NesColor tunicOutline;
+    private NesColor tunicOutline = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
-    private NesColor shieldTunic;
+    private NesColor shieldTunic = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool shuffleSpritePalettes;
+    private bool shuffleSpritePalettes = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private BeamSprites beamSprite;
+    private BeamSprites beamSprite = BeamSprites.DEFAULT;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool useCustomRooms;
+    private bool useCustomRooms = false;
 
     [Reactive]
     [IgnoreInFlags]
-    private bool disableHUDLag;
+    private bool disableHUDLag = false;
 
     [Reactive]
-    private bool randomizeKnockback;
+    private bool randomizeKnockback = false;
 
     [Reactive]
-    private PalaceLengthOption gpLength;
+    private PalaceLengthOption gpLength = PalaceLengthOption.FULL;
 
     [Reactive]
-    private PalaceLengthOption normalPalaceLength;
+    private PalaceLengthOption normalPalaceLength = PalaceLengthOption.FULL;
 
 
     [Reactive]
-    private RiverDevilBlockerOption riverDevilBlockerOption;
+    private RiverDevilBlockerOption riverDevilBlockerOption = RiverDevilBlockerOption.PATH;
 
     [Reactive]
-    private bool? eastRocks;
+    private bool? eastRocks = false;
 
     [Reactive]
-    private bool generateSpoiler;
+    private bool generateSpoiler = false;
 
     [Reactive]
-    private bool revealWalkthroughWalls;
+    private bool revealWalkthroughWalls = false;
 
     [Reactive]
-    private bool shareSeedAcrossDifficulty;
+    private bool shareSeedAcrossDifficulty = false;
 
     //Meta
     [Reactive]
@@ -819,49 +821,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     public string SerializeSharedSeedFlags()
     {
         return SerializeSharedSeed();
-    }
-
-    public RandomizerConfiguration()
-    {
-        startingAttackLevel = 1;
-        startingMagicLevel = 1;
-        startingLifeLevel = 1;
-
-        maxHeartContainers = MaxHeartsOption.EIGHT;
-        startingHeartContainersMin = 4;
-        startingHeartContainersMax = 4;
-        startingMagicContainersMin = 4;
-        startingMagicContainersMax = 4;
-
-        attackLevelCap = 8;
-        magicLevelCap = 8;
-        lifeLevelCap = 8;
-
-        disableMusic = false;
-        randomizeMusic = false;
-        mixCustomAndOriginalMusic = true;
-        disableUnsafeMusic = true;
-        fastSpellCasting = false;
-        shuffleSpritePalettes = false;
-        permanentBeamSword = false;
-        upAOnController1 = false;
-        removeFlashing = true;
-        sprite = CharacterSprite.LINK;
-        spriteName = CharacterSprite.LINK.DisplayName!;
-        westClimate = ClimateEnum.CLASSIC;
-        eastClimate = ClimateEnum.CLASSIC;
-        dmClimate = ClimateEnum.CLASSIC;
-        if (sprite == null)
-        {
-            throw new ImpossibleException();
-        }
-        tunic = NesColor.Default;
-        skinTone = NesColor.Default;
-        tunicOutline = NesColor.Default;
-        shieldTunic = NesColor.Default;
-        beamSprite = BeamSprites.DEFAULT;
-        useCustomRooms = false;
-        disableHUDLag = false;
     }
 
     public RandomizerConfiguration(string flagstring) : this()
