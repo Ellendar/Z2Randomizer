@@ -112,6 +112,11 @@
 <value>Prevents the HUD from flying all over the place when lag happens. Does not actually reduce
 the amount of lag.</value>
 	</data>
+	<data name="UpdatedHudToolTip" xml:space="preserve">
+<value>The updated HUD shows your current lives, key count and crystal count without having to go
+into the spell menu. This can be good for people watching you play as it'll be easier to follow along.
+</value>
+	</data>
 	<data name="FastSpellCastingToolTip" xml:space="preserve">
 <value>If selected, you can press select to cast a spell multiple times without re-entering the
 menu.</value>

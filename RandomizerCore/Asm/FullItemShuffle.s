@@ -285,6 +285,7 @@ GetItemReturn:
     lda #0
     sta DontKillEnemyFlag
     rts
+.export GetItemReturn
 
 ; If the item is a PBag, and there is no enemy, then we need custom
 ; pbag handling so that it puts the experience in the right spot.
