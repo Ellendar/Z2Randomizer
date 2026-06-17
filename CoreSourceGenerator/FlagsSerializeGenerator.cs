@@ -277,6 +277,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
 
         GenerateSerializeMethod(sb, classInfo.SerializedFields, indent);
         GenerateDeserializeMethod(sb, classInfo.SerializedFields, indent);
+        GenerateWithMethod(sb, classInfo.ClassName, classInfo.ReactiveFields, indent);
 
         // Generate helper methods for enum serialization
         GenerateSerializerList(sb, classInfo.SerializedFields, indent);
@@ -397,6 +398,24 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             }
         }
         sb.AppendLine();
+        sb.AppendLine($"{indent}    }}");
+    }
+
+    private static void GenerateWithMethod(StringBuilder sb, string className, List<ReactiveFieldInfo> fields, string indent)
+    {
+        sb.AppendLine();
+        sb.AppendLine($"{indent}    public {className} With({className} other)");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        {className} result = new();");
+        sb.AppendLine();
+
+        foreach (var field in fields)
+        {
+            sb.AppendLine($"{indent}        result.{field.PropertyName} = !Equals(other.{field.PropertyName}, this.{field.PropertyName}) ? other.{field.PropertyName} : this.{field.PropertyName};");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine($"{indent}        return result;");
         sb.AppendLine($"{indent}    }}");
     }
 
