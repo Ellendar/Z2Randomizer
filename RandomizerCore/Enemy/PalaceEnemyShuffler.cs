@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace Z2Randomizer.RandomizerCore.Enemy;
 
