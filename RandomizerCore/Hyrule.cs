@@ -2744,7 +2744,7 @@ public class Hyrule
         {
             // Use the old spell menu behavior where the spells are placed in the menu in the location it came from
             var wizardCollectables = AllLocations()
-                .Where(l => l.Town?.GetWizard() != null)
+                .Where(l => l.Town?.GetWizard() != null && l != westHyrule.sariaSouth && l != westHyrule.bagu)
                 .Select(l => (Collectable)l.Town!.GetWizard()!.Collectable!).ToList();
             
             for (int i = 0; i < magFunction.Length; i++)

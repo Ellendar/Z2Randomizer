@@ -124,6 +124,7 @@ public class CustomTexts
         { TownType.DARUNIA, 81 },
         { TownType.NEW_KASUTO, 93 },
         { TownType.OLD_KASUTO, 96 },
+        { TownType.BAGU, baguTextIndex }
     };
 
     private static readonly Dictionary<Collectable, int> wizardTextIndexesBySpell = new()

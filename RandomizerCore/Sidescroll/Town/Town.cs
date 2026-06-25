@@ -186,6 +186,7 @@ public class Town
             TownType.DARUNIA => VanillaTownMap.DARUNIA_WIZARD,
             TownType.NEW_KASUTO => VanillaTownMap.NEW_KASUTO_WIZARD,
             TownType.OLD_KASUTO => VanillaTownMap.OLD_KASUTO_WIZARD,
+            TownType.BAGU => VanillaTownMap.BAGU_INDOORS,
             _ => throw new ImpossibleException("Unrecognized town type in GetWizard()")
         };
         return GetTownMap(map);
