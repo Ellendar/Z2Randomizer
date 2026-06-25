@@ -117,7 +117,7 @@ internal class SpritePatcher
                 else
                 {
                     byte oldValue = romData[tgtOffs + i];
-                    logger.Error($"Moderating IPS patch at address: 0x{addr.ToString("x5")} from 0x{oldValue.ToString("x2")} to 0x{newValue.ToString("x2")}");
+                    logger.Trace($"Moderating IPS patch at address: 0x{addr.ToString("x5")} from 0x{oldValue.ToString("x2")} to 0x{newValue.ToString("x2")}");
                 }
             }
             if (fillValue is null)
