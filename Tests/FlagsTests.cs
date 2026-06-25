@@ -208,7 +208,7 @@ public class FlagsTests
             EnemyXPDrops = XPEffectiveness.NONE
         };
 
-        RandomizerProperties properties = config.Export(new Random(1234), includeDifficulty: false);
+        RandomizerProperties properties = config.Export(new RandomizerCore.Random(1234), includeDifficulty: false);
 
         Assert.IsFalse(properties.StartCandle);
         Assert.IsFalse(properties.StartCross);

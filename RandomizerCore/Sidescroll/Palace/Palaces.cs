@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NLog;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public enum PalaceGrouping
 {
@@ -156,6 +156,7 @@ public class Palaces
                 }
             }
         }
+
         return palaces;
     }
 

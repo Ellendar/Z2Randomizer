@@ -6,6 +6,7 @@ using System.Linq;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace Z2Randomizer.Statistics;
 

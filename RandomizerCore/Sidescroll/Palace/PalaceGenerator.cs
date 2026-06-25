@@ -5,7 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public abstract class PalaceGenerator
 {

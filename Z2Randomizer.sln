@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33530.505
+# Visual Studio Version 18
+VisualStudioVersion = 18.7.11911.148 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RandomizerCore", "RandomizerCore\RandomizerCore.csproj", "{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -60,8 +60,8 @@ Global
 		{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}.Release|Any CPU.Build.0 = Release|Any CPU
 		{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}.Release|x64.ActiveCfg = Release|x64
 		{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}.Release|x64.Build.0 = Release|x64
-		{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}.Unsafe Debug|Any CPU.ActiveCfg = Unsafe Debug|Any CPU
-		{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}.Unsafe Debug|Any CPU.Build.0 = Unsafe Debug|Any CPU
+		{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}.Unsafe Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}.Unsafe Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}.Unsafe Debug|x64.ActiveCfg = Unsafe Debug|Any CPU
 		{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}.Unsafe Debug|x64.Build.0 = Unsafe Debug|Any CPU
 		{45FE0E64-60F2-47CF-AE93-FD5A41FF8F52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -180,8 +180,8 @@ Global
 		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Release|x64.ActiveCfg = Release|Any CPU
 		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Release|x64.Build.0 = Release|Any CPU
-		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Unsafe Debug|Any CPU.ActiveCfg = Unsafe Debug|Any CPU
-		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Unsafe Debug|Any CPU.Build.0 = Unsafe Debug|Any CPU
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Unsafe Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Unsafe Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Unsafe Debug|x64.ActiveCfg = Unsafe Debug|Any CPU
 		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Unsafe Debug|x64.Build.0 = Unsafe Debug|Any CPU
 		{27087DD8-40ED-60F9-0765-BA784D146BAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

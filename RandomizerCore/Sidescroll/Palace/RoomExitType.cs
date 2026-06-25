@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public enum RoomExitType
 {

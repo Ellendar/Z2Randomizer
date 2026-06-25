@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using js65;
 using NLog;
-using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace Z2Randomizer.RandomizerCore;
 
