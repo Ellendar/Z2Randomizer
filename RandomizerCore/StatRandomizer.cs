@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore;
@@ -764,5 +765,88 @@ public class StatRandomizer
         var spellIndex = spell.VanillaSpellOrder();
         int index = spellIndex * 8 + level - 1;
         return MagicEffectivenessTable[index];
+    }
+
+    public string GenerateSpoiler()
+    {
+        StringBuilder sb = new();
+
+        string fireSpellText = "FIRE";
+        if (props.ReplaceFireWithDash)
+        {
+            fireSpellText = "DASH";
+        }
+        else if (props.LinkedFireSpell != null)
+        {
+            fireSpellText = "FIRE/" + props.LinkedFireSpell.Value.SingleLineText();
+        }
+
+        string[] spellNames = { "SHIELD", "JUMP", "LIFE", "FAIRY", fireSpellText, "REFLECT", "SPELL", "THUNDER" };
+        int spellNameLength = spellNames.Max(s => s.Length);
+        sb.AppendLine("SPELL COST");
+        sb.AppendLine(new string('=', spellNameLength * 2 + 42));
+        for (int spell = 0; spell < 8; spell++)
+        {
+            sb.Append($"{spellNames[spell].PadRight(spellNameLength)}  ");
+            for (int level = 0; level < 8; level++)
+            {
+                int value = MagicEffectivenessTable[spell * 8 + level] >> 1;
+                sb.Append($"{value,3}  ");
+            }
+            sb.AppendLine(spellNames[spell]);
+        }
+        sb.AppendLine(new string('-', spellNameLength * 2 + 42));
+        sb.AppendLine($"{"LEVEL".PadRight(spellNameLength)}    1    2    3    4    5    6    7    8");
+        sb.AppendLine();
+        sb.AppendLine();
+
+        string[] statNames = { "ATTACK", "MAGIC", "LIFE" };
+        sb.AppendLine("EXPERIENCE");
+        sb.AppendLine("======================================================");
+        for (int stat = 0; stat < 3; stat++)
+        {
+            sb.Append($"{statNames[stat],-6}");
+            for (int level = 0; level < 8; level++)
+            {
+                sb.Append($"  {ExperienceToLevelTable[stat * 8 + level],4}");
+            }
+            sb.AppendLine();
+        }
+        sb.AppendLine("------------------------------------------------------");
+        sb.AppendLine("LEVEL      2     3     4     5     6     7     8     9");
+        sb.AppendLine();
+        sb.AppendLine();
+
+        sb.AppendLine("ATTACK EFFECTIVENESS");
+        sb.AppendLine("======================================");
+        sb.Append("DAMAGE");
+        for (int level = 0; level < 8; level++)
+        {
+            sb.Append($"  {AttackEffectivenessTable[level],2}");
+        }
+        sb.AppendLine();
+        sb.AppendLine("--------------------------------------");
+        sb.AppendLine("LEVEL    1   2   3   4   5   6   7   8");
+        sb.AppendLine();
+        sb.AppendLine();
+
+        string[] damageTypeEnemyText = { "Ache", "Myu", "Orange Ironknuckle", "Red/Blue Ironknuckle", "Red/Blue Geru", "Gooma, Barba", "Thunderbird" };
+        sb.AppendLine("LIFE EFFECTIVENESS");
+        sb.AppendLine("================================================");
+        for (int damageCode = 0; damageCode < LIFE_EFFECTIVENESS_ROWS; damageCode++)
+        {
+            sb.Append($"DAMAGE-{Convert.ToChar('A' + damageCode)}");
+            for (int level = 0; level < 8; level++)
+            {
+                int value = LifeEffectivenessTable[damageCode * 8 + level] >> 1;
+                sb.Append($"  {value,3}");
+            }
+            sb.Append($"    ({damageTypeEnemyText[damageCode]})");
+            sb.AppendLine();
+        }
+        sb.AppendLine("------------------------------------------------");
+        sb.AppendLine("LEVEL       1    2    3    4    5    6    7    8");
+
+        return sb.ToString();
     }
 }
