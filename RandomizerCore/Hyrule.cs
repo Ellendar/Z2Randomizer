@@ -131,6 +131,7 @@ public class Hyrule
     public List<World> worlds;
     public List<Palace> palaces;
     public List<Room> rooms;
+    public StatRandomizer randomizedStats;
 
     //DEBUG/STATS
 #pragma warning disable CS0414 // Field is assigned but its value is never used
@@ -426,7 +427,7 @@ public class Hyrule
             UpdateProgress(progress, ProgressEnum.GENERATING_HINTS);
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
-            StatRandomizer randomizedStats = new(ROMData, props);
+            randomizedStats = new(ROMData, props);
             randomizedStats.Randomize(r, skipDifficultyOnly: shareSeedAcrossDifficulty);
 
             // Apply difficulty after shared randomization, then let ApplyAsmPatches see full
@@ -3193,7 +3194,10 @@ public class Hyrule
         sb.AppendLine("\nGP:\n");
         sb.AppendLine(palaces[6].GetLayoutDebug(props.PalaceStyles[6], false));
 
-        sb.AppendLine("DETAILS: ");
+        sb.AppendLine("\nSTATS:\n");
+        sb.AppendLine(randomizedStats.GenerateSpoiler());
+
+        sb.AppendLine("\nDETAILS: ");
         sb.Append(JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties));
 
         return sb.ToString().Replace('$', ' ');
