@@ -3658,6 +3658,7 @@ bank5_Pointer_table_for_End_Credits:
         rom.FixItemPickup(engine);
         rom.FixMinibossGlitchyAppearance(engine);
         rom.FixBossKillPaletteGlitch(engine);
+        rom.ThunderbirdEnterLeftFix(engine);
         rom.FixBigBubbleSplit(engine, randomizedStats);
         StatTracking(props, engine);
         AddCredits(engine);

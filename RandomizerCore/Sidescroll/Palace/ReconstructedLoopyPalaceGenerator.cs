@@ -18,14 +18,6 @@ public class ReconstructedLoopyPalaceGenerator(CancellationToken ct) : Reconstru
 
     public override void Consolidate(List<Room> openRooms, RandomizerProperties props, int palaceNumber)
     {
-        if (palaceNumber == 7 && !props.RequireTbird && !props.RemoveTbird)
-        {
-            // Connecting rooms at maximum distance increases the likelihood that Thunderbird
-            // will be required by too much. (Dark Link is the only dead-end possible.)
-            // Lets use old Reconstructed loops for this case.
-            base.Consolidate(openRooms, props, palaceNumber);
-            return;
-        }
         Room[] openCopy = new Room[openRooms.Count];
         openRooms.CopyTo(openCopy); // shallow copy 
         foreach (Room r2 in openCopy)
@@ -42,5 +34,10 @@ public class ReconstructedLoopyPalaceGenerator(CancellationToken ct) : Reconstru
                 }
             }
         }
+    }
+
+    public override bool AllReachable(Palace palace)
+    {
+        return palace.AllReachable(allowBossEnterLeft: palace.Number == 7);
     }
 }
