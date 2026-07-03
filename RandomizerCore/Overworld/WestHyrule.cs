@@ -89,7 +89,7 @@ public sealed class WestHyrule : World
             //{ 0x4659, terrain.cave }, // Cave to DM
             //{ 0x465A, terrain.cave }, // Cave from DM
             { LocationID.WEST_KINGS_TOMB, Terrain.GRAVE }, //44: King's tomb
-            { LocationID.WEST_TOWN_RAURO, Terrain.TOWN },
+            { LocationID.WEST_TOWN_RAURU, Terrain.TOWN },
             { LocationID.WEST_TOWN_RUTO, Terrain.TOWN },
             { LocationID.WEST_TOWN_SARIA_SOUTH, Terrain.TOWN },
             { LocationID.WEST_TOWN_SARIA_NORTH, Terrain.TOWN },
@@ -130,7 +130,7 @@ public sealed class WestHyrule : World
         bagu = GetLocation(LocationID.WEST_BAGU_HOUSE); //0x4661
         bagu.Town = Towns.LoadVanillaTown(rom, TownType.BAGU, props.DisableMagicRecs);
 
-        rauru = GetLocation(LocationID.WEST_TOWN_RAURO);
+        rauru = GetLocation(LocationID.WEST_TOWN_RAURU);
         rauru.Town = Towns.LoadVanillaTown(rom, TownType.RAURU, props.DisableMagicRecs);
 
         ruto = GetLocation(LocationID.WEST_TOWN_RUTO); //0x465e
@@ -1409,6 +1409,8 @@ public sealed class WestHyrule : World
             }
             visitedCoordinates[y, x] = true;
             //if there is a location at this coordinate
+            List<Location> locationsAtCoord = unreachedLocations.Where(location => location.Y == y && location.Xpos == x).ToList();
+            Debug.Assert(locationsAtCoord.Count <= 1);
             Location? here = unreachedLocations.FirstOrDefault(location => location.Y == y && location.Xpos == x);
             if (here != null)
             {
@@ -1510,11 +1512,11 @@ public sealed class WestHyrule : World
     {
         StringBuilder sb = new();
         sb.AppendLine("WEST: ");
-        sb.AppendLine("Rauru: " + rauru.Town!.GenerateSpoiler());
-        sb.AppendLine("Ruto: " + ruto.Town!.GenerateSpoiler());
-        sb.AppendLine("Saria: " + sariaNorth.Town!.GenerateSpoiler());
-        sb.AppendLine("Mido: " + mido.Town!.GenerateSpoiler());
-        sb.AppendLine("Bagu: " + bagu.Town!.GenerateSpoiler());
+        sb.AppendLine("Rauru: \n" + rauru.Town!.GenerateSpoiler());
+        sb.AppendLine("Ruto: \n" + ruto.Town!.GenerateSpoiler());
+        sb.AppendLine("Saria: \n" + sariaNorth.Town!.GenerateSpoiler());
+        sb.AppendLine("Mido: \n" + mido.Town!.GenerateSpoiler());
+        sb.AppendLine("Bagu: \n" + bagu.Town!.GenerateSpoiler());
 
         sb.AppendLine("\tMagic Container Cave: " + magicContainerCave.GetAllCollectables()[0].EnglishText());
         sb.AppendLine("\tTrophy Cave: " + trophyCave.GetAllCollectables()[0].EnglishText());

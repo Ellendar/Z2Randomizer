@@ -307,18 +307,21 @@ public class Location
         return AccessRequirements.AreSatisfiedBy(requireables) ? NonPalaceTownCollectables : [];
     }
 
-    public void SetCollectables(IEnumerable<Collectable> collectables) 
+    public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false) 
     {
         Debug.Assert(Town == null || Palace == null);
         if (Town != null)
         {
-            Town.SetCollectables(collectables);
+            Town.SetCollectables(collectables, shufflableOnly);
         }
         else if (Palace != null)
         {
-            Palace.SetCollectables(collectables);
+            Palace.SetCollectables(collectables, shufflableOnly);
         }
-        else NonPalaceTownCollectables = [.. collectables];
+        else if (!shufflableOnly || CollectablesAreShufflable)
+        {
+            NonPalaceTownCollectables = [.. collectables];
+        }
     }
 
     /// <summary>
@@ -344,5 +347,18 @@ public class Location
             return true;
         }
         return false;
+    }
+
+    public int GetCollectableCount(bool shufflableOnly = false)
+    {
+        if (Town != null)
+        {
+            return Town.TownMaps.Count(i => i.Collectable != null && (!shufflableOnly || i.CollectableIsShufflable));
+        }
+        else if (Palace != null)
+        {
+            return Palace.ItemRooms.Count;
+        }
+        return NonPalaceTownCollectables.Count;
     }
 }

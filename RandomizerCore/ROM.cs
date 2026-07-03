@@ -16,39 +16,6 @@ using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore;
 
-/*
-Classes Needed:
-
-* Location - Represents entry from overworld
-    * Terrain type
-    * Requires Jump
-    * Requires Fairy
-    * Requires Hammer
-    * X Position
-    * Y Position
-    * Exit Location?
-    * Contains Item
-    * Enter from right
-    * Map Number
-
-* World - Represent a single map
-    * Location Tree
-        * Root of tree is starting position, children are areas directly accessible from position
-    * Lists of locations broken down by terrain
-    * Entry / Exit Points
-
-* Hyrule
-    * Does the randomization
-    * Checks for Sanity
-    * Contains links to all World objects
-
-* Room - Palace only?
-
-* Palace
-    * Pallette
-    * Enemies?
-    * Rooms
-*/
 public class ROM
 {
     public const int RomHdrSize = 0x10;
@@ -576,29 +543,6 @@ TitleEnd:
 
     public void UpdateSprite(CharacterSprite charSprite, bool sanitize, bool changeItems)
     {
-        /*
-         * Dear future digshake,
-         * 
-         * This method is garbage.
-         * 
-         * The first entry in sprite info contains non-sprite data.
-         * My lazy ass just skips it.
-         * 
-         * If you update the sprite structures in Graphics.cs, you could refactor this:
-         * 
-         * Make lists of all the ROM locations for sprites
-         * Iterate through each sprite array, putting the data at the ROM locations
-         * 
-         * -Past digshake (who is still too lazy to fix this method)
-         */
-        /*
-         * Dear future Ellendar,
-         * This method is still garbage, but better.
-         * Eventually we need to create a data structure that represents the individual properies of things like sprites
-         * that we can save in external files so they can be imported from a simple format people can use to customize all
-         * the cosmetics.
-         */
-
         if (charSprite.Patch != null) {
             if (sanitize)
             {

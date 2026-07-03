@@ -506,7 +506,6 @@ public class CustomTexts
 
     public static List<Text> GenerateTexts(
         IEnumerable<Location> locations,
-        IEnumerable<Location> itemLocations,
         List<Text> texts,
         RandomizerProperties props,
         Random hashRNG)
@@ -603,7 +602,7 @@ public class CustomTexts
 
             if (props.HelpfulHints)
             {
-                List<int> placedIndexes = GenerateHelpfulHints(texts, itemLocations, hashRNG, props);
+                List<int> placedIndexes = GenerateHelpfulHints(texts, locations, hashRNG, props);
                 GenerateKnowNothings(texts, placedIndexes, nonhashRNG, props.BagusWoods, props.UseCommunityText);
             }
 
@@ -686,7 +685,10 @@ public class CustomTexts
     {
         foreach (Location location in locations.Where(i => i.Town?.GetWizard() != null))
         {
-            texts[TOWN_SIGN_INDEXES[(TownType)location.Town!.Type!]] = GenerateTownSignHint((Collectable)location.Town.GetWizard()!.Collectable!, linkedFire);
+            if(location?.Town?.Type != null && TOWN_SIGN_INDEXES.TryGetValue((TownType)location?.Town?.Type!, out int index))
+            {
+                texts[index] = GenerateTownSignHint((Collectable)location.Town.GetWizard()!.Collectable!, linkedFire);
+            }
         }
     }
     private static Text GenerateTownSignHint(Collectable spell, bool linkedFire)

@@ -2004,9 +2004,9 @@ public sealed class EastHyrule : World
         StringBuilder sb = new();
         sb.AppendLine("EAST: ");
         sb.AppendLine("Nabooru: \n" + nabooru.Town!.GenerateSpoiler());
-        sb.AppendLine("Darunia: \n" + nabooru.Town!.GenerateSpoiler());
-        sb.AppendLine("New Kasuto: \n" + nabooru.Town!.GenerateSpoiler());
-        sb.AppendLine("Old Kasuto: \n" + nabooru.Town!.GenerateSpoiler());
+        sb.AppendLine("Darunia: \n" + darunia.Town!.GenerateSpoiler());
+        sb.AppendLine("New Kasuto: \n" + newKasuto.Town!.GenerateSpoiler());
+        sb.AppendLine("Old Kasuto: \n" + oldKasuto.Town!.GenerateSpoiler());
 
         sb.AppendLine("\tRisen Pbag Cave: " + pbagCave2.GetAllCollectables()[0].EnglishText());
         sb.AppendLine("\tSunken Pbag Cave: " + pbagCave1.GetAllCollectables()[0].EnglishText());

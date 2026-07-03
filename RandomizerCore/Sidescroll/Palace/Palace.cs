@@ -1191,8 +1191,9 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return gettableItems;
     }
 
-    public void SetCollectables(IEnumerable<Collectable> collectables)
+    public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false)
     {
+        //Shufflable marking NYI for palaces (and probably not needed) so it's NOP for now
         Debug.Assert(collectables.Count() == ItemRooms.Count);
         int i = 0;
         foreach (Collectable collectable in collectables)
