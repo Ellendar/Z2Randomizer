@@ -2541,8 +2541,6 @@ public class Hyrule
         ROMData.Put(RomMap.EAST_WATER_TILE_COLLECTABLE, (byte)eastHyrule.waterTile.GetAllCollectables()[0]);
         ROMData.Put(RomMap.EAST_DESERT_TILE_COLLECTABLE, (byte)eastHyrule.desertTile.GetAllCollectables()[0]);
 
-        ROMData.ElevatorBossFix(props.BossItem);
-
         // Update item rooms and entrances for all palaces
         Location[] palaceLocations = [
             westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3,
@@ -3644,6 +3642,7 @@ bank5_Pointer_table_for_End_Credits:
         FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine);
         rom.DontCountExpDuringTalking(engine);
+        rom.ElevatorBossFix(engine, props.BossItem);
         rom.FixElevatorPositionInFallRooms(engine);
         rom.AllowForChangingDoorYPosition(engine);
         rom.AllowForChangingElevatorYPosition(engine);
