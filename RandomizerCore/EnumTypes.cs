@@ -124,6 +124,8 @@ public enum AttackEffectiveness
     LOW,
     [Description("Randomize (Low)"), RandomRangeDouble(Low = .5, High = 1.0)]
     AVERAGE_LOW,
+    [Description("Balanced"),    FixedBytes(3, 3, 4, 6,  8, 12, 16, 18)]
+    BALANCED,
     [Description("Randomize"), RandomRangeDouble(Low = .667, High = 1.5)]
     AVERAGE,
     [Description("Randomize (High)"), RandomRangeDouble(Low = 1.0, High = 1.5)]
@@ -139,12 +141,14 @@ public enum MagicEffectiveness
 {
     [Description("Vanilla")]
     VANILLA,
-    [Description("High Spell Cost"), RandomRangeDouble(Low = 1.5, High = 1.5)]
-    HIGH_COST,
+    //[Description("High Spell Cost"), RandomRangeDouble(Low = 1.5, High = 1.5)]
+    //HIGH_COST,
     [Description("Randomize (High Cost)"), RandomRangeDouble(Low = 1.0, High = 1.5)]
     AVERAGE_HIGH_COST,
     [Description("Randomize"), RandomRangeDouble(Low = .5, High = 1.5)]
     AVERAGE,
+    [Description("Randomize (Controlled)"), RandomRangeDouble(Low = .6, High = 1.4)]
+    AVERAGE_CONTROLLED,
     [Description("Randomize (Low Cost)"), RandomRangeDouble(Low = .5, High = 1.0)]
     AVERAGE_LOW_COST,
     [Description("Low Spell Cost"), RandomRangeDouble(Low = .5, High = .5)]
@@ -197,16 +201,20 @@ public enum EnemyLifeOption
 {
     [Description("Vanilla; (No Randomization)")]
     VANILLA,
+
     [Description("Narrow; [-25% to +25%]"), RandomRangeDouble(Low = 0.75, High = 1.25)]
     NARROW,
     [Description("Medium; [-50% to +50%]"), RandomRangeDouble(Low = 0.5, High = 1.5)]
     MEDIUM,
     [Description("Wide; [-75% to +200%]"), RandomRangeDouble(Low = 0.25, High = 3.0)]
     WIDE,
-    [Description("Medium High; [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
-    MEDIUM_HIGH,
-    [Description("High; [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
+
+    [Description("Slightly High; [-0% to +33%]"), RandomRangeDouble(Low = 1.0, High = 1.33)]
+    SLIGHTLY_HIGH,
+    [Description("High; [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
     HIGH,
+    [Description("Very High; [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
+    VERY_HIGH,
 }
 
 [DefaultValue(ONLY_BOTS)]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,18 @@ public class StatRandomizer
 {
     public const int LIFE_EFFECTIVENESS_ROWS = 7;
     public const int MAGIC_EFFECTIVENESS_ROWS = 8;
+
+    // Nerfed Linked Fire spell costs to not trivialize late game
+    // FIRE:    120	80	60	30	16	16	16	16
+    // LIFE:    70	70	60	60	50	50	50	50
+    private static ReadOnlyCollection<byte> BASE_FIRE_LIFE_COST = [120, 80, 60, 60, 50, 50, 50, 50];
+    // FAIRY:   80	80	60	60	40	40	40	40
+    private static ReadOnlyCollection<byte> BASE_FIRE_FAIRY_COST = [120, 80, 60, 48, 40, 40, 40, 40];
+    // SPELL:   120	112	96	80	48	32	24	16
+    private static ReadOnlyCollection<byte> BASE_FIRE_SPELL_COST = [120, 96, 96, 80, 48, 32, 24, 16];
+    // THUNDER: 120	120	120	120	120	120	100	64
+    private static ReadOnlyCollection<byte> BASE_FIRE_THUNDER_COST = [120, 120, 120, 120, 120, 120, 100, 64];
+
     public byte[] AttackEffectivenessTable { get; private set; } = null!;
     public byte[] LifeEffectivenessTable { get; private set; } = null!;
     public byte[] MagicEffectivenessTable { get; private set; } = null!;
@@ -494,10 +507,121 @@ public class StatRandomizer
                 int index = spellIndex * 8 + level;
                 byte nextVal;
                 byte baseVal = (byte)(MagicEffectivenessTable[index] >> 1);
-                int min = (int)(baseVal * range.Low);
-                int max = (int)(baseVal * range.High);
-                nextVal = (byte)r.Next(min, max);
+
+                int logicalSpellIndex = spellIndex;
+                if (spellIndex == 4 && props.LinkedFireSpell != null)
+                {
+                    logicalSpellIndex = props.LinkedFireSpell.Value.VanillaSpellOrder();
+                }
+                if (statEffectiveness == MagicEffectiveness.AVERAGE_CONTROLLED)
+                {
+                    if (spellIndex == 4 && props.LinkedFireSpell != null)
+                    {
+                        switch (props.LinkedFireSpell)
+                        {
+                            case Collectable.LIFE_SPELL:
+                                baseVal = BASE_FIRE_LIFE_COST[level];
+                                break;
+                            case Collectable.FAIRY_SPELL:
+                                baseVal = BASE_FIRE_FAIRY_COST[level];
+                                break;
+                            case Collectable.SPELL_SPELL:
+                                baseVal = BASE_FIRE_SPELL_COST[level];
+                                break;
+                            case Collectable.THUNDER_SPELL:
+                                baseVal = BASE_FIRE_THUNDER_COST[level];
+                                break;
+                        }
+                    }
+                }
+
+                int min = (int)Math.Round(baseVal * range.Low);
+                int max = (int)Math.Round(baseVal * range.High);
+                nextVal = (byte)r.Next(min, max + 1);
                 nextVal = Math.Min(nextVal, (byte)120);
+
+                if (statEffectiveness == MagicEffectiveness.AVERAGE_CONTROLLED)
+                {
+                    switch (spellIndex + 1) // 1-indexed for sanity
+                    {
+                        case 2: // Jump max cost 48 (32 when Dash is in play)
+                            nextVal = Math.Min(nextVal, (byte)48);
+                            if (props.ReplaceFireWithDash)
+                            {
+                                nextVal = Math.Min(nextVal, (byte)32);
+                            }
+                            break;
+                        case 3: // LIFE
+                            switch (level + 1) // also 1-indexed for sanity
+                            {
+                                case 1:
+                                    nextVal = Math.Min(nextVal, (byte)64); // Life max cost 64 at lvl 1
+                                    break;
+                                case 3:
+                                    nextVal = Math.Min(nextVal, (byte)48); // Life max cost 48 at lvl 3 (1:1 ratio HP for MP)
+                                    break;
+                            }
+                            break;
+                        case 4: // Fairy max cost 80 (64 on lvl 3)
+                            switch (level + 1) // also 1-indexed for sanity
+                            {
+                                case 1:
+                                    nextVal = Math.Min(nextVal, (byte)80);
+                                    break;
+                                case 3:
+                                    nextVal = Math.Min(nextVal, (byte)64);
+                                    break;
+                                case 6:
+                                    nextVal = Math.Min(nextVal, (byte)48);
+                                    break;
+                            }
+                            break;
+                        case 5: // Dash max cost 48 (32 on lvl 3) - this is in case you have to jump across Saria early
+                            if (props.ReplaceFireWithDash)
+                            {
+                                nextVal = Math.Min(nextVal, (byte)48);
+                                if (level >= 2)
+                                {
+                                    nextVal = Math.Min(nextVal, (byte)32);
+                                }
+                            }
+                            break;
+                        case 6: // Reflect max cost 80 at lvl 3
+                            if (level >= 2)
+                            {
+                                nextVal = Math.Min(nextVal, (byte)80);
+                            }
+                            break;
+                        case 7: // Spell max cost 64 at lvl 4
+                            if (level >= 3)
+                            {
+                                nextVal = Math.Min(nextVal, (byte)64);
+                            }
+                            break;
+                    }
+
+                    switch (logicalSpellIndex + 1) // this includes Fire-linked spells; 1-indexed for sanity
+                    {
+                        case 8: // THUNDER (+ linked Thunder)
+                            nextVal = Math.Max(nextVal, (byte)72); // Thunder and linked Thunder min cost 72
+                            switch (level + 1) // also 1-indexed for sanity
+                            {
+                                case 5:
+                                    nextVal = Math.Min(nextVal, (byte)96); // Thunder max cost 96 at lvl 5
+                                    break;
+                                case 6:
+                                    nextVal = Math.Min(nextVal, (byte)80); // Thunder max cost 80 at lvl 6
+                                    break;
+                                case 7:
+                                    nextVal = 72;
+                                    break;
+                                case 8:
+                                    nextVal = 64;
+                                    break;
+                            }
+                            break;
+                    }
+                }
 
                 if (level > 0)
                 {

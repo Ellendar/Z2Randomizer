@@ -248,7 +248,7 @@ public class FlagsTests
             AttackEffectiveness = AttackEffectiveness.OHKO,
             LifeEffectiveness = LifeEffectiveness.INVINCIBLE,
             ShuffleEnemyHP = EnemyLifeOption.WIDE,
-            ShuffleBossHP = EnemyLifeOption.MEDIUM_HIGH,
+            ShuffleBossHP = EnemyLifeOption.HIGH,
             EnemyXPDrops = XPEffectiveness.NONE
         };
 
@@ -273,7 +273,7 @@ public class FlagsTests
             AttackEffectiveness = AttackEffectiveness.OHKO,
             LifeEffectiveness = LifeEffectiveness.INVINCIBLE,
             ShuffleEnemyHP = EnemyLifeOption.WIDE,
-            ShuffleBossHP = EnemyLifeOption.MEDIUM_HIGH,
+            ShuffleBossHP = EnemyLifeOption.HIGH,
             EnemyXPDrops = XPEffectiveness.NONE
         };
 
