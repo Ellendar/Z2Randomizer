@@ -222,14 +222,17 @@ public class Shuffler
         ROMData.Put(0x1de29, (byte)(drop - 0x80));
 
         a.Module().Code("""
+.include "z2r.inc"
+.import ElevatorBossFix
+
 .segment "PRG7"
-.org $E79A
+.org $e79a
     ; Branch if scroll frozen
-    lda $0728
+    lda ScrollFrozen
     beq +
         ; freeze scroll
         lda #0
-        sta $0728
+        jsr ElevatorBossFix
         ; branch if the music is already playing
         lda $07fb
         bne +
@@ -239,13 +242,13 @@ public class Shuffler
     +
     ; Write the "grab item" sound effect to the sfx queue
     lda #8
-    sta $ef
+    sta Z2Square1SoundQueue
     ; Branch if the item we are getting is NOT a key
     cpy #8
     bne +
         ; increment number of keys and carry on
-        inc $0793
-        jmp $e797
+        inc Keys
+        jmp $e797  ; always overwritten by full_item_shuffle anyway
     +
     ; Otherwise continue to $E7BB which is the start of the get item code
     .assert * = $E7BB

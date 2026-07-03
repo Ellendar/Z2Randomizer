@@ -2086,67 +2086,51 @@ ResetRedPalettePayload:
         Put(0x11af5, new byte[] { 0x47, 0x9b, 0x56, 0x9b, 0x35, 0x9b });
     }
 
-    public void ElevatorBossFix(bool bossItem)
+    public void ElevatorBossFix(Assembler asm, bool randomBossItem)
     {
-        /*
-         * Notes:
-         * 
-         * Screen lock set at bank 4 BE99 (0x13ea9)
-         * Screen lock tbird set at bank 5 A363 (0x16373) 
-         * Screen lock released at bank 7 E7A9 (0x1e7b9)
-         * 
-         * Jump to subroutine at all three locations above:
-         * 
-         * 20 40 F3
-         * 
-         * Subroutine at 1F350:
-         * 
-         * Load accumulator with 1 (A9 01)
-         * EOR 728 (4D 28 07)
-         * store 728 (8D 28 07)
-         * load accumulator with 13 (A9 13)
-         * compare a2 with 0x13 (C5 A2)
-         * branch if not equal to the end (D0 0A)
-         * Load accumulator with 1 (a9 01)
-         * EOR b6 (45 b6)
-         * store b6 (85 b6)
-         * load accumulator with a0 (a9 a0)
-         * Set 2a to 0xa0 (85 2a)
-         * return (60)
-         */
+        var a = asm.Module();
+        a.Assign("RANDOM_BOSS_ITEM", randomBossItem ? 1 : 0);
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
 
-        // jsr $f340
-        var jsrF340 = new byte[] { 0x20, 0x40, 0xF3 };
-        Put(0x13ea9, jsrF340);
-        Put(0x16373, jsrF340);
-        Put(0x13230, jsrF340);
+.segment "PRG4"
+.org $b220
+    jsr ElevatorBossFix
 
-        if (!bossItem)
-        {
-            Put(0x1e7b9, jsrF340);
-        }
-        else
-        {
-            Put(0x1e7b1, jsrF340);
-        }
+.org $be99 ; Screen lock set at bank 4 BE99 (0x13ea9)
+    jsr ElevatorBossFix
 
-        /*
-         * Patched function at $f340
-         * lda #1
-         * eor $0728   ; _728_FreezeScrolling un freeze scrolling if frozen, otherwise freeze it.
-         * sta $0728   ; _728_FreezeScrolling
-         * lda #$13     ; check if the enemy id is 0x13
-         * cmp $a1     ; enemy slot "6" (index 0) current ID
-         * bne + ; * + 10
-         * lda #1      ; if it is equal, then flip $b6 (holds the enemy status?)
-         * eor $b6
-         * sta $b6
-         * lda #$a0    ; and set the enemy y position to 0xa0
-         * sta $2a
-         * +
-         * rts
-         */
-        Put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
+; Screen lock tbird set at bank 5 A363 (0x16373)
+.segment "PRG5"
+.org $a363
+    jsr ElevatorBossFix
+
+.segment "PRG7"
+
+; Screen lock released at bank 7 E7A9 (0x1e7b9)
+.if !RANDOM_BOSS_ITEM
+    .org $e7a9
+        jsr ElevatorBossFix
+.endif
+
+.org $f340  ; this should probably be free'd and realloc'd
+ElevatorBossFix:
+    lda #$01
+    eor ScrollFrozen  ; unfreeze scrolling if frozen, otherwise freeze it
+    sta ScrollFrozen
+    lda #$13
+    cmp Enemy0Type
+    bne @Exit
+        lda #$01
+        eor Enemy0Status
+        sta Enemy0Status
+        lda #$a0
+        sta Enemy0YPositionLo
+    @Exit:
+        rts
+.export ElevatorBossFix
+
+""");
     }
 
     public void AdjustGpProjectileDamage()
