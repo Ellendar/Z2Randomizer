@@ -50,7 +50,7 @@ public enum LocationID
     WEST_DM_ENTRANCE,                            // 42: (10, 95)
     WEST_DM_EXIT,                                // 43: (21, 96)
     WEST_KINGS_TOMB,                             // 44: (50, 88)
-    WEST_TOWN_RAURO,                             // 45: (46, 54)
+    WEST_TOWN_RAURU,                             // 45: (46, 54)
     WEST_TOWN_RUTO = 47,                         // 47: ( 2, 36)
     WEST_TOWN_SARIA_SOUTH,                       // 48: ( 8, 91)
     WEST_TOWN_SARIA_NORTH,                       // 49: ( 8, 89)
@@ -279,7 +279,7 @@ public static class LocationIDExtensions
 {
     static readonly Dictionary<LocationID, TownType> townMap = new()
     {
-        [LocationID.WEST_TOWN_RAURO] = TownType.RAURU,
+        [LocationID.WEST_TOWN_RAURU] = TownType.RAURU,
         [LocationID.WEST_TOWN_RUTO] = TownType.RUTO,
         [LocationID.WEST_TOWN_SARIA_NORTH] = TownType.SARIA,
         [LocationID.WEST_TOWN_SARIA_SOUTH] = TownType.SARIA,

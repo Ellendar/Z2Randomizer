@@ -425,7 +425,7 @@ public abstract class World
                     location.Y = y;
                     location.CanShuffle = false;
                 }
-                else if (location.Town == null)
+                else
                 {
                     Terrain t;
                     do
@@ -3178,4 +3178,16 @@ public abstract class World
     //protected abstract void SetVanillaCollectables(bool useDash);
 
     public abstract string GenerateSpoiler();
+
+    public bool HasCollidingLocations()
+    {
+        foreach(Location location in AllLocations)
+        {
+            if(AllLocations.Any(i => location != i && location.CoordsY30Offset == i.CoordsY30Offset))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }

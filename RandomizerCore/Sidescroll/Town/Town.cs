@@ -150,9 +150,9 @@ public class Town
         throw new ImpossibleException("Too many non-looping maps in town traversal check");
     }
 
-    public void SetCollectables(IEnumerable<Collectable> collectables)
+    public void SetCollectables(IEnumerable<Collectable> collectables, bool collectableOnly = false)
     {
-        List<TownMap> collectableMaps = TownMaps.Where(i => i.Collectable != null).ToList();
+        List<TownMap> collectableMaps = TownMaps.Where(i => i.Collectable != null && (!collectableOnly || i.CollectableIsShufflable)).ToList();
         Debug.Assert(collectables.Count() == collectableMaps.Count);
         int i = 0;
         foreach(Collectable collectable in collectables)
