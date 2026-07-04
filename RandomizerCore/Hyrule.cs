@@ -131,12 +131,12 @@ public class Hyrule
     private MazeIsland mazeIsland;
     private DeathMountain deathMountain;
 
-    private Shuffler shuffler;
     private RandomizerProperties props;
     public List<World> worlds;
     public List<Palace> palaces;
     public List<Room> rooms;
     public StatRandomizer randomizedStats;
+    public DropRandomizer randomizedDrops;
 
     //DEBUG/STATS
 #pragma warning disable CS0414 // Field is assigned but its value is never used
@@ -248,7 +248,6 @@ public class Hyrule
             using Assembler assembler = CreateAssemblyEngine();
             logger.Info($"Started generation for flags: {Flags} sharedseedflags: {sharedSeedFlags} seed: {config.Seed} seedhash: {SeedHash}");
             //character = new Character(props);
-            shuffler = new Shuffler(props);
 
             palaces = [];
             ItemGet = [];
@@ -321,8 +320,9 @@ public class Hyrule
             ROMData.DoHackyFixes();
             ROMData.AdjustGpProjectileDamage();
 
-            shuffler.ShuffleDrops(ROMData, r);
-            shuffler.ShufflePbagAmounts(ROMData, r);
+            randomizedDrops = new(ROMData, props);
+            randomizedDrops.Randomize(r);
+            randomizedDrops.Write(ROMData);
 
             ROMData.DisableTurningPalacesToStone();
             ROMData.UpdateMapPointers();
@@ -2311,7 +2311,6 @@ public class Hyrule
         }
         if (props.BossItem)
         {
-            shuffler.ShuffleBossDrop(rom, r);
             rom.HandleRandomBossDrop(a);
         }
 
@@ -2445,15 +2444,11 @@ public class Hyrule
 
         if (props.ShufflePalacePalettes)
         {
-            shuffler.ShufflePalacePalettes(rom, r);
+            Shuffler.ShufflePalacePalettes(rom, r);
         }
 
-        if (props.ShuffleItemDropFrequency)
-        {
-            int drop = r.Next(5) + 4;
-            rom.Put(0x1E8B0, (byte)drop);
+ 
         }
-    }
 
     private static void ApplyBeepSettings(RandomizerProperties props, ROM rom)
     {
@@ -2983,6 +2978,9 @@ public class Hyrule
 
         sb.AppendLine("\nGP:\n");
         sb.AppendLine(palaces[6].GetLayoutDebug(props.PalaceStyles[6], false));
+
+        sb.AppendLine("\nDROPS:\n");
+        sb.AppendLine(randomizedDrops.GenerateSpoiler());
 
         sb.AppendLine("\nSTATS:\n");
         sb.AppendLine(randomizedStats.GenerateSpoiler());
