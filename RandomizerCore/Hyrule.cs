@@ -2310,7 +2310,8 @@ public class Hyrule
         }
         if (props.BossItem)
         {
-            shuffler.ShuffleBossDrop(rom, r, a);
+            shuffler.ShuffleBossDrop(rom, r);
+            rom.HandleRandomBossDrop(a);
         }
 
         //neither of these starting item handlings really belong here, but this is good enough.
