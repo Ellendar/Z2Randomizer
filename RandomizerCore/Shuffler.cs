@@ -20,10 +20,6 @@ public class Shuffler
     private static readonly List<int> bossRooms2 = new List<int> { 14, 28, 58 }; //break this up by palace group
     private static readonly List<int> bossRooms3 = new List<int> { 53, 54 };
 
-    private readonly int[] drops = { 0x8a, 0x8b, 0x8c, 0x8d, 0x90, 0x91, 0x92, 0x88 };//items that can be dropped
-
-
-
     //instance variables
     private RandomizerProperties props;
     //private ROM ROMData;
@@ -72,73 +68,73 @@ public class Shuffler
 
     public void ShuffleDrops(ROM ROMData, Random r)
     {
-        List<int> small = [];
-        List<int> large = [];
-
+        List<DropCollectable> small = [];
+        List<DropCollectable> large = [];
 
         if (props.Smallbluejar)
         {
-            small.Add(0x90);
+            small.Add(DropCollectable.BLUE_JAR);
         }
         if (props.Smallredjar)
         {
-            small.Add(0x91);
+            small.Add(DropCollectable.RED_JAR);
         }
         if (props.Small50)
         {
-            small.Add(0x8a);
+            small.Add(DropCollectable.SMALL_BAG);
         }
         if (props.Small100)
         {
-            small.Add(0x8b);
+            small.Add(DropCollectable.MEDIUM_BAG);
         }
         if (props.Small200)
         {
-            small.Add(0x8c);
+            small.Add(DropCollectable.LARGE_BAG);
         }
         if (props.Small500)
         {
-            small.Add(0x8d);
+            small.Add(DropCollectable.XL_BAG);
         }
         if (props.Small1up)
         {
-            small.Add(0x92);
+            small.Add(DropCollectable.ONEUP);
         }
         if (props.Smallkey)
         {
-            small.Add(0x88);
+            small.Add(DropCollectable.KEY);
         }
+
         if (props.Largebluejar)
         {
-            large.Add(0x90);
+            large.Add(DropCollectable.BLUE_JAR);
         }
         if (props.Largeredjar)
         {
-            large.Add(0x91);
+            large.Add(DropCollectable.RED_JAR);
         }
         if (props.Large50)
         {
-            large.Add(0x8a);
+            large.Add(DropCollectable.SMALL_BAG);
         }
         if (props.Large100)
         {
-            large.Add(0x8b);
+            large.Add(DropCollectable.MEDIUM_BAG);
         }
         if (props.Large200)
         {
-            large.Add(0x8c);
+            large.Add(DropCollectable.LARGE_BAG);
         }
         if (props.Large500)
         {
-            large.Add(0x8d);
+            large.Add(DropCollectable.XL_BAG);
         }
         if (props.Large1up)
         {
-            large.Add(0x92);
+            large.Add(DropCollectable.ONEUP);
         }
         if (props.Largekey)
         {
-            large.Add(0x88);
+            large.Add(DropCollectable.KEY);
         }
 
         // drops are kept vanilla if nothing is selected & RandomizeDrops is off
@@ -217,7 +213,8 @@ public class Shuffler
 
     public void ShuffleBossDrop(ROM ROMData, Random r)
     {
-        int drop = drops[r.Next(drops.Count())];
+        var options = Enum.GetValues<DropCollectable>();
+        var drop = options.Sample(r);
         ROMData.Put(0x1de29, (byte)(drop - 0x80));
     }
 }
