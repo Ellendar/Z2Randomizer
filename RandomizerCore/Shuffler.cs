@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using js65;
 using NLog;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -216,70 +215,9 @@ public class Shuffler
         }
     }
 
-    public void ShuffleBossDrop(ROM ROMData, Random r, Assembler a)
+    public void ShuffleBossDrop(ROM ROMData, Random r)
     {
         int drop = drops[r.Next(drops.Count())];
         ROMData.Put(0x1de29, (byte)(drop - 0x80));
-
-        a.Module().Code("""
-.include "z2r.inc"
-.import ElevatorBossFix
-
-.segment "PRG7"
-.org $e79a
-    ; Branch if scroll frozen
-    lda ScrollFrozen
-    beq +
-        ; freeze scroll
-        lda #0
-        jsr ElevatorBossFix
-        ; branch if the music is already playing
-        lda $07fb
-        bne +
-            ; otherwise resume the previous track (palace theme)
-            lda #2
-            sta $eb
-    +
-    ; Write the "grab item" sound effect to the sfx queue
-    lda #8
-    sta Z2Square1SoundQueue
-    ; Branch if the item we are getting is NOT a key
-    cpy #8
-    bne +
-        ; increment number of keys and carry on
-        inc Keys
-        jmp $e797  ; always overwritten by full_item_shuffle anyway
-    +
-    ; Otherwise continue to $E7BB which is the start of the get item code
-    .assert * = $E7BB
-
-; Patch a few locations to make sure the music returns to normal after getting an item
-.org $e80c
-    jsr DontSwitchMusicIfInPalace1
-    nop
-
-.org $e84b
-    jsr DontSwitchMusicIfInPalace2
-    nop
-
-.reloc
-DontSwitchMusicIfInPalace1:
-    lda $eb
-    cmp #$02
-    beq +
-        ; Restore track 16
-        lda #$10
-        sta $eb
-+   rts
-
-DontSwitchMusicIfInPalace2:
-    lda $eb
-    cmp #$02
-    beq +
-        ; Restore track 0
-        lda #$00
-        sta $eb
-+   rts
-""");
     }
 }
