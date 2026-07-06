@@ -3041,45 +3041,49 @@ public class Hyrule
         }
     }
 
-    public void RandomizeSmallItems(int world, bool first)
+    public void RandomizeSmallItems(int bank, bool firstTable)
     {
-        logger.Debug("World: " + world);
-        List<int> addresses = new List<int>();
-        List<int> items = new List<int>();
+        logger.Debug("Bank: " + bank);
+        List<int> visited = [];
+        List<int> items = [];
         int startAddr;
-        if (first)
+        if (firstTable) // West/East
         {
-            startAddr = 0x8523 - 0x8000 + (world * 0x4000) + 0x10;
+            startAddr = 0x8523 - 0x8000 + (bank * 0x4000) + 0x10;
         }
-        else
+        else // DM/Maze
         {
-            startAddr = 0xA000 - 0x8000 + (world * 0x4000) + 0x10;
+            startAddr = 0xa000 - 0x8000 + (bank * 0x4000) + 0x10;
         }
         int map = 0;
         for (int i = startAddr; i < startAddr + 126; i = i + 2)
         {
 
             map++;
-            int low = ROMData.GetByte(i);
-            int hi = ROMData.GetByte(i + 1) * 256;
-            int numBytes = ROMData.GetByte(hi + low + 16 - 0x8000 + (world * 0x4000));
+            int ptr = ROMData.GetShort(i + 1, i);
+            int offset = 16 - 0x8000 + (bank * 0x4000);
+            int numBytes = ROMData.GetByte(ptr + offset);
             for (int j = 4; j < numBytes; j = j + 2)
             {
-                int yPos = ROMData.GetByte(hi + low + j + 16 - 0x8000 + (world * 0x4000)) & 0xF0;
+                int yPos = ROMData.GetByte(ptr + j + offset) & 0xF0;
                 yPos = yPos >> 4;
-                if (ROMData.GetByte(hi + low + j + 1 + 16 - 0x8000 + (world * 0x4000)) == 0x0F && yPos < 13)
+                if (ROMData.GetByte(ptr + j + 1 + offset) == 0x0F && yPos < 13)
                 {
-                    int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
-                    int item = ROMData.GetByte(addr);
-                    if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
+                    int addr = ptr + j + 2 + offset;
+                    if (!visited.Contains(addr))
                     {
-#if UNSAFE_DEBUG
-                        logger.Debug("Map: " + map);
-                        logger.Debug("Item: " + item);
-                        logger.Debug($"Address: {addr:X}");
-#endif
-                        addresses.Add(addr);
-                        items.Add(item);
+                        int item = ROMData.GetByte(addr);
+                        Collectable collectable = (Collectable)item;
+                        if (collectable.IsMinorItem())
+                        {
+    #if UNSAFE_DEBUG
+                            logger.Debug("Map: " + map);
+                            logger.Debug("Item: " + item);
+                            logger.Debug($"Address: {addr:X}");
+    #endif
+                            visited.Add(addr);
+                            items.Add(item);
+                        }
                     }
                     j++;
                 }
@@ -3091,9 +3095,9 @@ public class Hyrule
             int swap = r.Next(i, items.Count);
             (items[swap], items[i]) = (items[i], items[swap]);
         }
-        for (int i = 0; i < addresses.Count; i++)
+        for (int i = 0; i < visited.Count; i++)
         {
-            ROMData.Put(addresses[i], (byte)items[i]);
+            ROMData.Put(visited[i], (byte)items[i]);
         }
     }
 
