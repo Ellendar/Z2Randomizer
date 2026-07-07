@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 using Random = Z2Randomizer.RandomizerCore.Random;
 
@@ -92,6 +93,74 @@ public class RoomPoolTests
         ]);
         return new PalaceRooms(allRooms);
     }
+
+    #region Test Spec Presets
+
+    [TestMethod]
+    public void Test_Presets()
+    {
+        var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
+        var palaceRooms = new PalaceRooms(roomsJson, false);
+        var roomPoolYaml = Util.ReadAllTextFromFile("CustomRoomPool.yaml");
+        var roomPoolSpec = RoomPoolSpecDeserializer.FromString(roomPoolYaml);
+
+        var props = CreateMockProps(blockersAnywhere: true);
+
+        var specV4 = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA", "V4_0"]
+        };
+        var poolV4 = new RoomPool(palaceRooms, 1, props, specV4);
+
+        poolV4.NormalRooms.Select(room => room.Name).Distinct().Count().Should().Be(poolV4.NormalRooms.Count);
+        poolV4.ItemRooms.Should().Contain(r => r.Name == "rightOpenItemRooms M102");
+        poolV4.ItemRoomsByDirection[Direction.NORTH].Keys().Should().Contain(r => r.Name == "rightOpenItemRooms M102");
+        poolV4.ItemRoomsByDirection[Direction.EAST].Keys().Should().Contain(r => r.Name == "rightOpenItemRooms M102");
+        poolV4.GetItemRoomsForShape(RoomExitType.NE_L).Should().Contain(r => r.Name == "rightOpenItemRooms M102");
+
+        var specV4Minus = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA", "V4_0"],
+            RoomsExclude = ["rightOpenItemRooms M102"],
+        };
+        var poolV4Minus = new RoomPool(palaceRooms, 1, props, specV4Minus);
+
+        poolV4Minus.NormalRooms.Select(room => room.Name).Distinct().Count().Should().Be(poolV4.NormalRooms.Count);
+        poolV4Minus.ItemRooms.Should().NotContain(r => r.Name == "rightOpenItemRooms M102");
+        poolV4Minus.ItemRoomsByDirection[Direction.NORTH].Keys().Should().NotContain(r => r.Name == "rightOpenItemRooms M102");
+        poolV4Minus.ItemRoomsByDirection[Direction.EAST].Keys().Should().NotContain(r => r.Name == "rightOpenItemRooms M102");
+        poolV4Minus.GetItemRoomsForShape(RoomExitType.NE_L).Should().NotContain(r => r.Name == "rightOpenItemRooms M102");
+
+        var specConditionalGroup = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA"],
+            Groups = [
+                new GroupOverride() { Name = "V4_0" },
+                new GroupOverride() { Name = "V5_0" },
+            ],
+        };
+        var poolConditionalGroup = new RoomPool(palaceRooms, 4, props, specConditionalGroup);
+        poolConditionalGroup.NormalRooms.Select(room => room.Name).Distinct().Count().Should().Be(poolConditionalGroup.NormalRooms.Count);
+
+        var specRoomsOverride = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA"],
+            Groups = [
+                new GroupOverride() { Name = "V4_0" },
+            ],
+            Rooms = [
+                new RoomOverride() { Name = "triforceOfCourage M5", ItemPresenceBits = 0b1110 },
+            ],
+        };
+        var poolRoomsOverride = new RoomPool(palaceRooms, 4, props, specRoomsOverride);
+        poolRoomsOverride.NormalRooms.Select(room => room.Name).Distinct().Count().Should().Be(poolRoomsOverride.NormalRooms.Count);
+
+        // try actual current cfg
+        var poolForSpec = new RoomPool(palaceRooms, 4, props, roomPoolSpec);
+        poolForSpec.NormalRooms.Select(room => room.Name).Distinct().Count().Should().Be(poolForSpec.NormalRooms.Count);
+    }
+
+    #endregion
 
     #region Constructor - Props-based
 
@@ -214,6 +283,188 @@ public class RoomPoolTests
         var pool = new RoomPool(mockPalaceRooms, 1, props);
 
         pool.Entrances.Should().Contain(r => r.Name == "VanillaEntrance");
+    }
+
+    #endregion
+
+    #region Constructor - Spec-based
+
+    [TestMethod]
+    public void Constructor_Spec_IncludesSpecifiedGroups()
+    {
+        var vanillaRoom = CreateMockRoom("Vanilla1", RoomGroup.VANILLA, palaceNumber: 1);
+        var v4Room = CreateMockRoom("V4Room", RoomGroup.V4_0, palaceNumber: 1);
+        var bossRoom = CreateMockRoom("Boss1", RoomGroup.VANILLA, isBossRoom: true, palaceNumber: 1);
+
+        var mockPalaceRooms = CreateMockPalaceRooms([vanillaRoom, bossRoom], [v4Room]);
+        var props = CreateMockProps();
+        var spec = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA", "V4_0"]
+        };
+        var pool = new RoomPool(mockPalaceRooms, 1, props, spec);
+
+        pool.NormalRooms.Should().Contain(r => r.Name == "Vanilla1");
+        pool.NormalRooms.Should().Contain(r => r.Name == "V4Room");
+    }
+
+    [TestMethod]
+    public void Constructor_Spec_ExcludesRoomsByTag()
+    {
+        var taggedRoom = CreateMockRoom("Tagged1", RoomGroup.VANILLA, palaceNumber: 1, tags: ["ExcludeMe"]);
+        var normalRoom = CreateMockRoom("Normal1", RoomGroup.VANILLA, palaceNumber: 1);
+        var bossRoom = CreateMockRoom("Boss1", RoomGroup.VANILLA, isBossRoom: true, palaceNumber: 1);
+
+        var mockPalaceRooms = CreateMockPalaceRooms([taggedRoom, normalRoom, bossRoom]);
+        var props = CreateMockProps();
+        var spec = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA"],
+            TagsExclude = ["ExcludeMe"]
+        };
+        var pool = new RoomPool(mockPalaceRooms, 1, props, spec);
+
+        pool.NormalRooms.Should().NotContain(r => r.Name == "Tagged1");
+        pool.NormalRooms.Should().Contain(r => r.Name == "Normal1");
+    }
+
+    [TestMethod]
+    public void Constructor_Spec_ExcludesRoomsByName()
+    {
+        var excludedRoom = CreateMockRoom("ExcludedRoom", RoomGroup.VANILLA, palaceNumber: 1);
+        var normalRoom = CreateMockRoom("Normal1", RoomGroup.VANILLA, palaceNumber: 1);
+        var bossRoom = CreateMockRoom("Boss1", RoomGroup.VANILLA, isBossRoom: true, palaceNumber: 1);
+
+        var mockPalaceRooms = CreateMockPalaceRooms([excludedRoom, normalRoom, bossRoom]);
+        var props = CreateMockProps();
+        var spec = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA"],
+            RoomsExclude = ["ExcludedRoom"]
+        };
+        var pool = new RoomPool(mockPalaceRooms, 1, props, spec);
+
+        pool.NormalRooms.Should().NotContain(r => r.Name == "ExcludedRoom");
+        pool.NormalRooms.Should().Contain(r => r.Name == "Normal1");
+    }
+
+    [TestMethod]
+    public void Constructor_Spec_IncludesRoomsByTag()
+    {
+        var taggedRoom = CreateMockRoom("Tagged1", RoomGroup.VANILLA, palaceNumber: 1, tags: ["IncludeMe"]);
+        var bossRoom = CreateMockRoom("Boss1", RoomGroup.VANILLA, isBossRoom: true, palaceNumber: 1);
+
+        var mockPalaceRooms = CreateMockPalaceRooms([taggedRoom, bossRoom]);
+        var props = CreateMockProps();
+        var spec = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA"],
+            TagsInclude = ["IncludeMe"]
+        };
+        var pool = new RoomPool(mockPalaceRooms, 1, props, spec);
+
+        pool.NormalRooms.Should().Contain(r => r.Name == "Tagged1");
+    }
+
+    [TestMethod]
+    public void Constructor_Spec_ThrowsOnUnrecognizedGroup()
+    {
+        var bossRoom = CreateMockRoom("Boss1", RoomGroup.VANILLA, isBossRoom: true, palaceNumber: 1);
+
+        var mockPalaceRooms = CreateMockPalaceRooms([bossRoom]);
+        var props = CreateMockProps();
+        var spec = new RoomPoolSpec
+        {
+            GroupsInclude = ["INVALID_GROUP"]
+        };
+        var act = () => new RoomPool(mockPalaceRooms, 1, props, spec);
+        act.Should().Throw<UserFacingException>()
+            .WithMessage("*unrecognized group*");
+    }
+
+    [TestMethod]
+    public void Constructor_Spec_ThrowsOnMissingRoomName()
+    {
+        var bossRoom = CreateMockRoom("Boss1", RoomGroup.VANILLA, isBossRoom: true, palaceNumber: 1);
+
+        var mockPalaceRooms = CreateMockPalaceRooms([bossRoom]);
+        var props = CreateMockProps();
+        var spec = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA"],
+            Rooms =
+            [
+                new RoomOverride
+                {
+                    Name = "NonExistentRoom",
+                    Enabled = true,
+                    Sideview = "",
+                    Enemies = "",
+                    ItemPresenceBits = null
+                }
+            ]
+        };
+        var act = () => new RoomPool(mockPalaceRooms, 1, props, spec);
+        act.Should().Throw<UserFacingException>()
+            .WithMessage("*not found*");
+    }
+
+    [TestMethod]
+    public void Constructor_Spec_AddsIndividualRooms()
+    {
+        var addedRoom = CreateMockRoom("AddedRoom", RoomGroup.NONE, palaceNumber: 1);
+        var bossRoom = CreateMockRoom("Boss1", RoomGroup.VANILLA, isBossRoom: true, palaceNumber: 1);
+
+        var mockPalaceRooms = CreateMockPalaceRooms([addedRoom, bossRoom]);
+        var props = CreateMockProps();
+        var spec = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA"],
+            Rooms =
+            [
+                new RoomOverride
+                {
+                    Name = "AddedRoom",
+                    Enabled = true,
+                    Sideview = "",
+                    Enemies = "",
+                    ItemPresenceBits = null
+                }
+            ]
+        };
+        var pool = new RoomPool(mockPalaceRooms, 1, props, spec);
+
+        pool.NormalRooms.Should().Contain(r => r.Name == "AddedRoom");
+    }
+
+    [TestMethod]
+    public void Constructor_Spec_CanOverrideRoomProperties()
+    {
+        var overridableRoom = CreateMockRoom("Overridable", RoomGroup.NONE, palaceNumber: 1);
+        var bossRoom = CreateMockRoom("Boss1", RoomGroup.VANILLA, isBossRoom: true, palaceNumber: 1);
+
+        var mockPalaceRooms = CreateMockPalaceRooms([overridableRoom, bossRoom]);
+        var props = CreateMockProps();
+        var spec = new RoomPoolSpec
+        {
+            GroupsInclude = ["VANILLA"],
+            Rooms =
+            [
+                new RoomOverride
+                {
+                    Name = "Overridable",
+                    Enabled = true,
+                    Sideview = "",
+                    Enemies = "00",
+                    ItemPresenceBits = 5
+                }
+            ]
+        };
+        var pool = new RoomPool(mockPalaceRooms, 1, props, spec);
+
+        var room = pool.NormalRooms.Find(r => r.Name == "Overridable");
+        room.Should().NotBeNull();
+        room!.ItemPresenceBits.Should().Equal([5]);
     }
 
     #endregion

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -51,7 +51,7 @@ public record struct Coord(int X, int Y) : IComparable<Coord>
 public partial class RoomSerializationContext : JsonSerializerContext { }
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
-public class Room : IJsonOnDeserialized
+public class Room : IJsonOnDeserialized, IDeterministicHash
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -1113,6 +1113,35 @@ public class Room : IJsonOnDeserialized
             _ => throw new NotImplementedException(),
         };
         return basePtr + Map * 2;
+    }
+
+    public int GetDeterministicHash()
+    {
+        int hash = DeterministicHash.Seed;
+        hash = DeterministicHash.Combine(hash, Name);
+        hash = DeterministicHash.Combine(hash, Author);
+        hash = DeterministicHash.Combine(hash, (int)Group);
+        hash = DeterministicHash.Combine(hash, ItemPresenceBits);
+        hash = DeterministicHash.Combine(hash, Connections);
+        hash = DeterministicHash.Combine(hash, HasDrop);
+        hash = DeterministicHash.Combine(hash, ElevatorScreen);
+        hash = DeterministicHash.Combine(hash, LinkRequirements);
+        hash = DeterministicHash.Combine(hash, MarioRequirements);
+        hash = DeterministicHash.Combine(hash, IsDropZone);
+        hash = DeterministicHash.Combine(hash, HasItem);
+        hash = DeterministicHash.Combine(hash, Enemies);
+        hash = DeterministicHash.Combine(hash, SideView);
+        hash = DeterministicHash.Combine(hash, HasBoss);
+        hash = DeterministicHash.Combine(hash, IsBossRoom);
+        hash = DeterministicHash.Combine(hash, IsThunderBirdRoom);
+        hash = DeterministicHash.Combine(hash, Enabled);
+        hash = DeterministicHash.Combine(hash, IsEntrance);
+        hash = DeterministicHash.Combine(hash, PalaceNumber);
+        hash = DeterministicHash.Combine(hash, LinkedRoomName);
+        hash = DeterministicHash.Combine(hash, IsUpDownReversed);
+        hash = DeterministicHash.Combine(hash, Priority);
+        hash = DeterministicHash.Combine(hash, Tags);
+        return hash;
     }
 }
 

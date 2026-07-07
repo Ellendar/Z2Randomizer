@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.WebAssembly">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net10.0-browser</TargetFramework>
@@ -56,18 +56,28 @@
         <WasmExtraFilesToDeploy Include="wwwroot\**" />
     </ItemGroup>
     <Target Name="CopyAssetsToLocalWwwRoot" BeforeTargets="BeforeBuild;AssignTargetPaths">
-    <ItemGroup>
-      <!-- Define the external source items -->
-      <ExternalSprites Include="..\RandomizerCore\Sprites\**" />
-      <ExternalJson Include="..\RandomizerCore\PalaceRooms.json" />
-      <ExternalAsm Include="..\RandomizerCore\Asm\**" />
-      <!-- Tell Visual Studio to watch them for changes -->
-      <UpToDateCheckInput Include="@(ExternalSprites);@(ExternalJson);@(ExternalAsm)" />
-    </ItemGroup>
-    <Copy SourceFiles="@(ExternalSprites)" DestinationFiles="@(ExternalSprites -> 'wwwroot\Sprites\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(ExternalJson)" DestinationFiles="wwwroot\PalaceRooms.json" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(ExternalAsm)" DestinationFiles="@(ExternalAsm -> 'wwwroot\Asm\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-  </Target>
+        <ItemGroup>
+            <!-- Define the external source items -->
+            <ExternalSprites Include="..\RandomizerCore\Sprites\**" />
+            <ExternalJson Include="..\RandomizerCore\PalaceRooms.json" />
+            <ExternalJson Include="..\RandomizerCore\CustomRoomPool.yaml" />
+            <ExternalAsm Include="..\RandomizerCore\Asm\**" />
+
+            <!-- Tell Visual Studio to watch them for changes -->
+            <UpToDateCheckInput Include="@(ExternalSprites);@(ExternalJson);@(ExternalAsm)" />
+        </ItemGroup>
+
+        <Copy SourceFiles="@(ExternalSprites)"
+              DestinationFiles="@(ExternalSprites -> 'wwwroot\Sprites\%(RecursiveDir)%(Filename)%(Extension)')"
+              SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(ExternalJson)"
+              DestinationFiles="wwwroot\%(Filename)%(Extension)"
+              SkipUnchangedFiles="true" />
+        <Copy SourceFiles="@(ExternalAsm)"
+              DestinationFiles="@(ExternalAsm -> 'wwwroot\Asm\%(RecursiveDir)%(Filename)%(Extension)')"
+              SkipUnchangedFiles="true" />
+    </Target>
+
   <ItemGroup>
     <IpsFiles Include="..\RandomizerCore\Sprites\*.ips" />
   </ItemGroup>

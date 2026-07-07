@@ -31,6 +31,30 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
     [RUISG.Reactive]
     public partial bool FlagsValid { get; set; } = true;
 
+    private string customRoomPoolText = "Use predefined room pool";
+    [JsonIgnore]
+    public string CustomRoomPoolText
+    {
+        get => customRoomPoolText;
+        private set
+        {
+            customRoomPoolText = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
+    private string palaceRoomsText = "";
+    [JsonIgnore]
+    public string PalaceRoomsText
+    {
+        get => palaceRoomsText;
+        private set
+        {
+            palaceRoomsText = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
     private static bool IsFlagStringValid(string flags) => FlagPasteParser.IsValidFlagString(flags);
 
     [JsonIgnore]
@@ -164,7 +188,20 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             }
         });
 
+        _ = InitializeAsync();
+
         this.WhenActivated(OnActivate);
+    }
+
+    public async Task InitializeAsync()
+    {
+        var roomLoaderService = App.Current?.Services?.GetService<RoomLoaderService>();
+
+        var palaceRooms = await roomLoaderService!.GetPalaceRooms();
+        PalaceRoomsText = $"Palace rooms hash: {palaceRooms.Hash}";
+
+        var spec = await roomLoaderService!.GetRoomPoolSpec();
+        CustomRoomPoolText = spec != null ? $"Use {spec.Name} ({spec.Hash})" : "No Custom Room Pool Found";
     }
 
     public static async Task<string?> SelectSaveFolder()

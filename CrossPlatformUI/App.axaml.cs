@@ -70,6 +70,7 @@ public sealed partial class App : Application // , IDisposable
     {
         ServiceContainer ??= new();
         ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel));
+        ServiceContainer.AddSingleton<RoomLoaderService>();
         ServiceContainer.AddSingleton<SpriteLoaderService>();
         Services = ServiceContainer.BuildServiceProvider();
         var files = FileSystemService!;

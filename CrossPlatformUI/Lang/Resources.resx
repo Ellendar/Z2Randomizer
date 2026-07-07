@@ -873,6 +873,15 @@ requires it.</value>
 will be removed and bypassed. For generated styles, one additional normal room will appear
 instead.</value>
 	</data>
+    <data name="CustomRoomPool" xml:space="preserve">
+<value>Use Custom Room Pool</value>
+	</data>
+	<data name="CustomRoomPoolToolTip" xml:space="preserve">
+<value>If selected, a customized selection of rooms will be used that overrides the
+room pool options below.
+
+(The pool is defined in the file CustomRoomPool.yaml)</value>
+	</data>
 	<data name="UseCustomRoomsToolTip" xml:space="preserve">
 <value>If selected, rooms will be based on the file CustomRooms.json instead of PalaceRooms.json
 . You may edit this file to control which rooms you want to use, or create your own rooms

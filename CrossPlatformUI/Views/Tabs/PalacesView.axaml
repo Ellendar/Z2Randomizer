@@ -60,6 +60,11 @@
 
             <StackPanel Grid.Column="1" Margin="0 0">
                 <!-- room pool -->
+                <z:Z2CheckBox Flag="CustomRoomPool"
+                              CaptionOverride="{Binding RandomizerViewModel.CustomRoomPoolText}" />
+
+                <!-- <TextBlock Margin="48 8 0 8" Text="{Binding RandomizerViewModel.PalaceRoomsText}"/> -->
+
                 <z:Z2CheckBox Flag="IncludeVanillaRooms" Classes="DisabledMeansChecked" />
                 <z:Z2CheckBox Flag="Includev4_0Rooms" />
                 <z:Z2CheckBox Flag="Includev5_0Rooms" />

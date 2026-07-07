@@ -55,7 +55,7 @@ public class Palaces
 
     public static Dictionary<RoomExitType, int> itemRoomCounts = [];
 
-    public async Task<List<Palace>> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired, CancellationToken ct)
+    public async Task<List<Palace>> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, RoomPoolSpec? roomPoolConfig, bool raftIsRequired, CancellationToken ct)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
@@ -93,7 +93,18 @@ public class Palaces
             }
             else
             {
-                roomPool = new(palaceRooms, currentPalace, props);
+                if (props.CustomRoomPool)
+                {
+                    if (roomPoolConfig == null)
+                    {
+                        throw new UserFacingException("Custom Room Pool Issue", "Property enabled but CustomRoomPool.yaml file is not provided.");
+                    }
+                    roomPool = new(palaceRooms, currentPalace, props, roomPoolConfig);
+                }
+                else
+                {
+                    roomPool = new(palaceRooms, currentPalace, props);
+                }
             }
             Palace palace;
             int attempts = 0;

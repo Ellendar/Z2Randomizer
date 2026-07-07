@@ -40,6 +40,9 @@ public partial class BrowserFileService : IFileSystemService
     [JSImport("globalThis.window.FetchPalaces")]
     private static partial Task<string> FetchPalaces();
 
+    [JSImport("globalThis.window.FetchRoomPool")]
+    private static partial Task<string> FetchRoomPool();
+
     [JSImport("globalThis.window.FetchPreloadedSprites")]
     [return: JSMarshalAs<JSType.Promise<JSType.String>>]
     private static partial Task<string> FetchPreloadedSprites();
@@ -52,6 +55,8 @@ public partial class BrowserFileService : IFileSystemService
 
     private readonly Task<SpriteFile[]> preloadedSprites;
     private readonly Task<string> preloadedPalaces;
+    private readonly Task<string> preloadedRoomPool;
+
     public BrowserFileService()
     {
         var tsk = FetchPreloadedSprites();
@@ -65,6 +70,7 @@ public partial class BrowserFileService : IFileSystemService
         });
 
         preloadedPalaces = FetchPalaces();
+        preloadedRoomPool = FetchRoomPool();
     }
 
     // This is terrible. But I'm not about to make a full filesystem abstraction
@@ -85,6 +91,8 @@ public partial class BrowserFileService : IFileSystemService
             return "";
         case IFileSystemService.RandomizerPath.Palaces:
             return await preloadedPalaces;
+        case IFileSystemService.RandomizerPath.RoomPool:
+            return await preloadedRoomPool;
         case IFileSystemService.RandomizerPath.Settings:
             return GetItem(filename) ?? "";
         default:

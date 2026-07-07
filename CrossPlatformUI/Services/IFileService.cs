@@ -10,6 +10,7 @@ public interface IFileSystemService
         Sprites,
         Settings,
         Palaces,
+        RoomPool,
     }
     Task<string> OpenFile(RandomizerPath path, string filename);
     string OpenFileSync(RandomizerPath path, string filename);

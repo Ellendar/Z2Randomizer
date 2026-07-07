@@ -17,6 +17,7 @@ using FtRandoLib.Importer;
 using Z2Randomizer.RandomizerCore.Diagnostics;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
@@ -155,6 +156,7 @@ public class Hyrule
 
     private readonly NewAssemblerFn NewAssembler;
     private readonly PalaceRooms palaceRooms;
+    private readonly RoomPoolSpec? roomPool;
 
     // HACK: A few places in the app need to check if we are using mario mode, and i didn't feel like refactoring them
     // to have another bool parameter passed in.
@@ -173,11 +175,12 @@ public class Hyrule
     //going to be a massive project, so for now we're just ignoring the fact that basically every property
     //is not guaranteed to initialize to the analyzer
 #pragma warning disable CS8618
-    public Hyrule(NewAssemblerFn createAsm, PalaceRooms rooms)
+    public Hyrule(NewAssemblerFn createAsm, PalaceRooms rooms, RoomPoolSpec? roomPoolSpec)
 #pragma warning restore CS8618
     {
         NewAssembler = createAsm;
         palaceRooms = rooms;
+        roomPool = roomPoolSpec;
         reachability = new(ItemLocations);
     }
     public async Task<RandomizerResult> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Func<string, Task> progress, CancellationToken ct)
@@ -188,7 +191,7 @@ public class Hyrule
             World.ResetStats();
             Z2MarioModeEnabled = config.MarioMode;
 
-            SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed!)).AsSpan()[..4]);
+            SeedHash = MD5Hash.ComputeHashInt(Encoding.UTF8.GetBytes(config.Seed!));
             r = new Random(SeedHash);
             bool shareSeedAcrossDifficulty = config.ShareSeedAcrossDifficulty;
             Random? difficultyRng = shareSeedAcrossDifficulty ? CreateDifficultyRng(config.Seed) : null;
@@ -258,7 +261,7 @@ public class Hyrule
 #endif
                 freeBanks = new(ROM.FreeRomBanks);
                 var palaceGenerator = new Palaces();
-                palaces = await palaceGenerator.CreatePalaces(r, props, palaceRooms, raftIsRequired, ct);
+                palaces = await palaceGenerator.CreatePalaces(r, props, palaceRooms, roomPool, raftIsRequired, ct);
 
                 if (palaces.Count == 0)
                 {
@@ -601,7 +604,7 @@ public class Hyrule
 
     private static Random CreateDifficultyRng(string? seed)
     {
-        int difficultySeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes($"{seed}:difficulty")).AsSpan()[..4]);
+        int difficultySeedHash = MD5Hash.ComputeHashInt(Encoding.UTF8.GetBytes($"{seed}:difficulty"));
         return new Random(difficultySeedHash);
     }
 

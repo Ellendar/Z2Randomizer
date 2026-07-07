@@ -21,7 +21,15 @@ public record RequirementRoute(
     Direction[]? From,
     /// Exit directions. Null or empty matches all exit directions.
     Direction[]? To
-);
+) : IDeterministicHash
+{
+    public int GetDeterministicHash()
+    {
+        int hash = DeterministicHash.Combine(DeterministicHash.Seed, From, direction => (int)direction);
+        hash = DeterministicHash.Combine(hash, To, direction => (int)direction);
+        return hash;
+    }
+}
 
 public record ComplexRequirement(
     RequirementTarget Target,
@@ -34,7 +42,18 @@ public record ComplexRequirement(
     /// If present, only applies when both enterFrom and exitTo match one of the routes.
     /// Null enterFrom or exitTo matches everything.
     RequirementRoute[]? Routes = null
-);
+) : IDeterministicHash
+{
+    public int GetDeterministicHash()
+    {
+        int hash = DeterministicHash.Combine(DeterministicHash.Seed, (int)Target);
+        hash = DeterministicHash.Combine(hash, IndividualRequirements, requirement => (int)requirement);
+        hash = DeterministicHash.Combine(hash, CompositeRequirements,
+            inner => DeterministicHash.Combine(DeterministicHash.Seed, inner, requirement => (int)requirement));
+        hash = DeterministicHash.Combine(hash, Routes);
+        return hash;
+    }
+}
 
 /// Requirements in Disjunctive Normal Form (DNF): a disjunction (OR) of conjunctions (AND).
 ///
@@ -118,6 +137,15 @@ public class Requirements : IDeterministicHash
     public Requirements? Deserialize(string? json)
     {
         return JsonSerializer.Deserialize(json ?? "[]", RoomSerializationContext.Default.Requirements);
+    }
+
+    public int GetDeterministicHash()
+    {
+        int hash = DeterministicHash.Combine(DeterministicHash.Seed, IndividualRequirements, requirement => (int)requirement);
+        hash = DeterministicHash.Combine(hash, CompositeRequirements,
+            inner => DeterministicHash.Combine(DeterministicHash.Seed, inner, requirement => (int)requirement));
+        hash = DeterministicHash.Combine(hash, ComplexRequirements);
+        return hash;
     }
 
     /// Check if a requirement is included in any way, composite or individually
