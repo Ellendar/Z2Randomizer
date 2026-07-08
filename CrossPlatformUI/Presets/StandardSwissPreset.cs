@@ -9,27 +9,16 @@ public static class StandardSwissPreset
     {
         //Start
         StartWithCandle = true,
-        ShuffleStartingItems = false,
-        ShuffleStartingSpells = false,
-        MaxHeartContainers = MaxHeartsOption.EIGHT,
-        StartingHeartContainersMin = 4,
-        StartingHeartContainersMax = 4,
-        StartingTechniques = StartingTechs.NONE,
-        StartingLives = StartingLives.Lives3,
-        IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
         PalacesCanSwapContinents = true,
         ShuffleGP = true,
         ShuffleEncounters = true,
         AllowUnsafePathEncounters = true,
-        IncludeLavaInEncounterShuffle = false,
         EncounterRate = EncounterRate.HALF,
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = true,
         GenerateBaguWoods = false,
-        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
-        RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,
         HidePalace = null,
@@ -39,31 +28,20 @@ public static class StandardSwissPreset
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
         DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
-        WestClimate = ClimateEnum.CLASSIC,
-        EastClimate = ClimateEnum.CLASSIC,
-        DmClimate = ClimateEnum.CLASSIC,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
         GpStyle = PalaceStyle.RANDOM_WALK,
-        NormalPalaceLength = PalaceLengthOption.FULL,
         GpLength = PalaceLengthOption.SHORT,
-        IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
         Includev5_0Rooms = true,
         IncludeExpertRooms = true,
-        TBirdRequired = true,
-        RemoveTBird = false,
-        PalacesToCompleteMin = 6,
-        PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
-        RandomizeBossItemDrop = false,
         PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
-        BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
@@ -75,19 +53,14 @@ public static class StandardSwissPreset
         ShuffleMagicExperience = true,
         ShuffleLifeExperience = true,
 
-        AttackLevelCap = 8,
-        MagicLevelCap = 8,
-        LifeLevelCap = 8,
         AttackEffectiveness = AttackEffectiveness.AVERAGE,
         MagicEffectiveness = MagicEffectiveness.AVERAGE,
         LifeEffectiveness = LifeEffectiveness.AVERAGE,
 
         //Spells
-        ShuffleLifeRefillAmount = false,
         ShuffleSpellLocations = true,
         DisableMagicContainerRequirements = true,
         RandomizeSpellSpellEnemy = true,
-        SwapUpAndDownStab = false,
         FireOption = FireOption.PAIR_WITH_RANDOM,
 
         //Enemies
@@ -95,7 +68,6 @@ public static class StandardSwissPreset
         ShufflePalaceEnemies = true,
         DripperEnemyOption = DripperEnemyOption.ANY_GROUND_ENEMY,
         MixLargeAndSmallEnemies = true,
-        GeneratorsAlwaysMatch = true,
 
         ShuffleEnemyHP = EnemyLifeOption.MEDIUM,
         ShuffleBossHP = EnemyLifeOption.MEDIUM,
@@ -109,16 +81,11 @@ public static class StandardSwissPreset
         ShuffleOverworldItems = true,
         MixOverworldAndPalaceItems = true,
         IncludePBagCavesInItemShuffle = true,
-        IncludeSwordTechsInShuffle = false,
         IncludeQuestItemsInShuffle = true,
         IncludeSpellsInShuffle = true,
 
         ShuffleSmallItems = true,
-        RemoveSpellItems = false,
-        ShufflePBagAmounts = false,
-        PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = true,
-        AllowImportantItemDuplicates = false,
 
         //Drops
         ShuffleItemDropFrequency = true,
@@ -130,7 +97,6 @@ public static class StandardSwissPreset
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 
-        GenerateSpoiler = false,
         RevealWalkthroughWalls = true,
     };
 }

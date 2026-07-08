@@ -41,6 +41,8 @@
                                               CommandParameter="{Binding Source={x:Static presets:MaxRandoPreset.Preset}}"/>
 
                                     <MenuItem Header="More Presets">
+                                        <MenuItem Header="Vanilla Preset" Command="{Binding LoadPreset}"
+                                                  CommandParameter="{Binding Source={x:Static presets:VanillaPreset.Preset}}"/>
                                         <MenuItem Header="SGL 2025 Preset" Command="{Binding LoadPreset}"
                                                   CommandParameter="{Binding Source={x:Static presets:Sgl2025Preset.Preset}}"/>
                                         <MenuItem Header="Upstarts Tournament 2025 Preset" Command="{Binding LoadPreset}"
