@@ -1206,6 +1206,51 @@ public class Hyrule
                 }
             }
         }
+
+        if (props.PreventSpellItemChains)
+        {
+            PreventSpellItemChains();
+        }
+    }
+
+    // Disallow old men from holding other spell items, preventing long
+    // item chains
+    private void PreventSpellItemChains()
+    {
+        List<Town> chainTowns = [Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
+            Town.NABOORU, Town.DARUNIA_WEST];
+
+        bool IsChainLocation(Location l) =>
+            l.ActualTown != null && chainTowns.Contains((Town)l.ActualTown);
+
+        List<Location> chainLocations = itemLocs.Where(IsChainLocation).ToList();
+        foreach (Location chainLocation in chainLocations)
+        {
+            for (int i = 0; i < chainLocation.Collectables.Count; i++)
+            {
+                if (!chainLocation.Collectables[i].IsSpellItem())
+                {
+                    continue;
+                }
+
+                // Town wizard locations are always single-collectable overworld
+                // locations, so restrict swap targets to other non-chain overworld
+                // locations to avoid desyncing palace item room bookkeeping.
+                Location? target = itemLocs
+                    .Where(l => l.PalaceNumber == null && !IsChainLocation(l))
+                    .Where(l => l.Collectables.Any(c => !c.IsSpellItem()))
+                    .ToList()
+                    .Sample(r);
+                if (target == null)
+                {
+                    continue;
+                }
+
+                int targetIndex = target.Collectables.FindIndex(c => !c.IsSpellItem());
+                (chainLocation.Collectables[i], target.Collectables[targetIndex]) =
+                    (target.Collectables[targetIndex], chainLocation.Collectables[i]);
+            }
+        }
     }
 
     private void DoShuffle(List<Collectable> itemsToShuffle, List<Location> itemShuffleLocations)

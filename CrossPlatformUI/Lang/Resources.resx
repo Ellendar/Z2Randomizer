@@ -354,6 +354,9 @@ What is duplicated, in order (and if they are in the pool) is:
 Glove, Downstab, Fairy, Thunder, Reflect, Magic key, Hammer, Raft, Flute, Jump, Upstab,
 Boots</value>
 	</data>
+	<data name="PreventSpellItemChainsToolTip" xml:space="preserve">
+    <value>When checked, a spell item can never be required to obtain another town item.</value>
+	</data>
 	<data name="ShuffleAllExperienceToolTip" xml:space="preserve">
 <value>Shuffles the experience required to gain each level of the selected attribute. The new EXP
 requirement is +/- up to 25% of the vanilla requirement.

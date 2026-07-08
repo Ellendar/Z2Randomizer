@@ -604,6 +604,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     private bool? includeQuestItemsInShuffle;
 
+    [Reactive]
+    private bool preventSpellItemChains;
+
     //Drops
     [Reactive]
     private bool shuffleItemDropFrequency;
@@ -1367,6 +1370,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.StartWithSpellItems = removeSpellItems ?? GetIndeterminateFlagValue(r);
         properties.ShufflePbagXp = shufflePBagAmounts ?? GetIndeterminateFlagValue(r);
         properties.IncludeQuestItemsInShuffle = includeQuestItemsInShuffle ?? GetIndeterminateFlagValue(r);
+        properties.PreventSpellItemChains = preventSpellItemChains;
         properties.IncludeSpellsInShuffle = includeSpellsInShuffle ?? GetIndeterminateFlagValue(r);
         properties.IncludeSwordTechsInShuffle = includeSwordTechsInShuffle ?? GetIndeterminateFlagValue(r);
 
