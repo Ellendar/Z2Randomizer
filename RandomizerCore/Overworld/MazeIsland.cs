@@ -1056,6 +1056,7 @@ sealed class MazeIsland : World
         magicContainerDrop.SetCollectables([Collectable.MAGIC_CONTAINER]);
         magicContainerDrop.CollectablesAreShufflable = props.ShuffleOverworldItems;
 
-        locationAtPalace4.SetCollectables(locationAtPalace4.Palace!.GetVanillaCollectables());
+        locationAtPalace4.SetCollectables(locationAtPalace4.Palace!
+            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace4.Palace!.Number - 1]));
     }
 }

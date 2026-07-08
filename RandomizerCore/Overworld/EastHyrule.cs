@@ -2110,8 +2110,11 @@ public sealed class EastHyrule : World
         pbagCave2.CollectablesAreShufflable = props.ShuffleOverworldItems && props.PbagItemShuffle;
 
 
-        locationAtPalace5.SetCollectables(locationAtPalace5.Palace!.GetVanillaCollectables());
-        locationAtPalace6.SetCollectables(locationAtPalace6.Palace!.GetVanillaCollectables());
-        locationAtGP.SetCollectables(locationAtGP.Palace!.GetVanillaCollectables());
+        locationAtPalace5.SetCollectables(locationAtPalace5.Palace!
+            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace5.Palace!.Number - 1]));
+        locationAtPalace6.SetCollectables(locationAtPalace6.Palace!
+            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace6.Palace!.Number - 1]));
+        locationAtGP.SetCollectables(locationAtGP.Palace!
+            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtGP.Palace!.Number - 1]));
     }
 }

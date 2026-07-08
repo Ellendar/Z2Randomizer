@@ -1146,6 +1146,11 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             while (pendingRooms.Count > 0)
             {
                 Room room = pendingRooms.First();
+                if (coveredRooms.Contains(room))
+                {
+                    pendingRooms.Remove(room);
+                    continue;
+                }
                 if (ItemRooms.Contains(room))
                 {
                     if (room.Collectable == null)
@@ -1153,19 +1158,11 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         throw new Exception("Unable to assess gettability of item room with no item");
                     }
                     Collectable roomCollectable = room.Collectable ?? Collectable.DO_NOT_USE;
-                    if(!gettableItems.Contains(roomCollectable))
+                    gettableItems.Add(roomCollectable);
+                    if (roomCollectable.AsRequirement() != null)
                     {
-                        gettableItems.Add(roomCollectable);
-                        if (roomCollectable.AsRequirement() != null)
-                        {
-                            requireables.Add(roomCollectable.AsRequirement() ?? RequirementType.JUMP);
-                        }
+                        requireables.Add(roomCollectable.AsRequirement() ?? RequirementType.JUMP);
                     }
-                }
-                if (coveredRooms.Contains(room))
-                {
-                    pendingRooms.Remove(room);
-                    continue;
                 }
                 coveredRooms.Add(room);
                 pendingRooms.Remove(room);
@@ -1376,17 +1373,12 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         AllRooms.Add(newRoom);
     }
 
-    public Collectable GetVanillaCollectable()
+    public List<Collectable> GetVanillaCollectables(int itemCount)
     {
-        return Number switch
+        if(itemCount == 0)
         {
-            7 => Collectable.DO_NOT_USE,
-            _ => GetVanillaCollectables()[0]
-        };
-    }
-
-    public List<Collectable> GetVanillaCollectables()
-    {
+            return [];
+        }
         List<Collectable>[] vanillaCollectables = [
             [Collectable.CANDLE],
             [Collectable.GLOVE],
@@ -1400,7 +1392,12 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         {
             throw new Exception("Invalid palace number");
         }
-        return vanillaCollectables[Number - 1];
+        List<Collectable> collectables = vanillaCollectables[Number - 1];
+        for(int i = 1; i < itemCount; i++)
+        {
+            collectables.Add(Collectable.LARGE_BAG);
+        }
+        return collectables;
     }
 
     public RoomExitType GetCoordinateRoomShape(int x, int y)

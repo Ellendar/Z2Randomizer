@@ -1603,8 +1603,11 @@ public sealed class WestHyrule : World
         grassTile.SetCollectables([Collectable.HEART_CONTAINER]);
         grassTile.CollectablesAreShufflable = props.ShuffleOverworldItems;
 
-        locationAtPalace1.SetCollectables(locationAtPalace1.Palace!.GetVanillaCollectables());
-        locationAtPalace2.SetCollectables(locationAtPalace2.Palace!.GetVanillaCollectables());
-        locationAtPalace3.SetCollectables(locationAtPalace3.Palace!.GetVanillaCollectables());
+        locationAtPalace1.SetCollectables(locationAtPalace1.Palace!
+            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace1.Palace!.Number - 1]));
+        locationAtPalace2.SetCollectables(locationAtPalace2.Palace!
+            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace2.Palace!.Number - 1]));
+        locationAtPalace3.SetCollectables(locationAtPalace3.Palace!
+            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace3.Palace!.Number - 1]));
     }
 }
