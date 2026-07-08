@@ -1634,6 +1634,8 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 }
             }
         }
+        //for ease of some calculations, add a count in for GP that is always 0
+        properties.PalaceItemRoomCounts[6] = 0;
     }
 
     /// Note: this value can be limited by other things, like the style being Vanilla

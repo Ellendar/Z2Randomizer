@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DynamicData;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
@@ -396,7 +397,8 @@ public class CustomTexts
         { TownType.NABOORU, ["Do not$drink the$fountain$water here$...$trust me."] },
         { TownType.DARUNIA, ["You saved$a kid$for this?", "Dont$forget to$get upstab"] },
         { TownType.NEW_KASUTO, [] },
-        { TownType.OLD_KASUTO, ["Sorry$about the$moas"] }
+        { TownType.OLD_KASUTO, ["Sorry$about the$moas"] },
+        { TownType.BAGU, BAGU_TEXTS }
     };
 
     public static readonly Dictionary<Collectable, string[]> WIZARD_SPELL_TEXTS_BY_COLLECTABLE = new()
@@ -571,8 +573,6 @@ public class CustomTexts
 
             if (props.SpellItemHints && props.IncludeSwordTechsInShuffle)
             {
-                var downstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
-                var upstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
                 Text hint;
                 if (props.StartWithDownstab)
                 {
@@ -581,22 +581,25 @@ public class CustomTexts
                 }
                 else
                 {
+                    var downstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
                     hint = Text.GenerateHelpfulHint(downstabLoc, Collectable.DOWNSTAB, props.IncludeSpellsInShuffle);
                 }
                 texts[downstabClosedDoorTextIndex] = hint;
-                if (upstabLoc == null)
+                if (props.StartWithUpstab)
                 {
-                    hint = props.UseCommunityText ? new Text(STARTED_WITH_ITEM_TEXTS.Sample(nonhashRNG)!, Collectable.DOWNSTAB)
-                        : new Text(NON_COMMUNITY_STARTED_WITH_TEXT, Collectable.DOWNSTAB);
+                    hint = props.UseCommunityText ? new Text(STARTED_WITH_ITEM_TEXTS.Sample(nonhashRNG)!, Collectable.UPSTAB)
+                        : new Text(NON_COMMUNITY_STARTED_WITH_TEXT, Collectable.UPSTAB);
                 }
                 else
                 {
+                    var upstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
                     hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
                 }
                 texts[upstabClosedDoorTextIndex] = hint;
                 if (props.SwapUpAndDownStab)
                 {
-                    (texts[upstabClosedDoorTextIndex], texts[downstabClosedDoorTextIndex]) = (texts[downstabClosedDoorTextIndex], texts[upstabClosedDoorTextIndex]);
+                    (texts[upstabClosedDoorTextIndex], texts[downstabClosedDoorTextIndex]) 
+                        = (texts[downstabClosedDoorTextIndex], texts[upstabClosedDoorTextIndex]);
                 }
             }
 
@@ -717,9 +720,11 @@ public class CustomTexts
             //If it's a spell, use the old behavior
             if(useCommunityText)
             {
-                List<string> possibleWizardHints = GENERIC_WIZARD_TEXTS
-                    .Union(WIZARD_SPELL_TEXTS_BY_TOWN[town])
-                    .Union(WIZARD_SPELL_TEXTS_BY_COLLECTABLE[collectable]).ToList();
+                List<string> possibleWizardHints =  WIZARD_SPELL_TEXTS_BY_TOWN[town].Union(WIZARD_SPELL_TEXTS_BY_COLLECTABLE[collectable]).ToList();
+                if(town != TownType.BAGU)
+                {
+                    possibleWizardHints.Add(GENERIC_WIZARD_TEXTS);
+                }
                 int selectedHintIndex = r.Next(possibleWizardHints.Count());
                 return new Text(possibleWizardHints[selectedHintIndex]);
             }
@@ -859,7 +864,7 @@ public class CustomTexts
     {
         List<int> placedIndex = [];
 
-        List<Collectable> placedItems = [];
+         List<Collectable> placedItems = [];
 
         List<int> placedTowns = [];
 
@@ -908,7 +913,7 @@ public class CustomTexts
             {
                 var collectableSpell = criticalSpells.Sample(r);
                 hintCollectables.Remove(collectableSpell);
-                hintCollectables.Insert(0, collectableSpell); // move important spell to the front
+                hintCollectables.Insert(0, collectableSpell); // move important spell to the front so it's always in the taken subset
                 hintsCount++;
             }
         }
@@ -944,7 +949,7 @@ public class CustomTexts
 
             }
             //don't let hints be for items in the same town
-            while ((hintLocation.Town!.Type ?? TownType.INVALID).VanillaTownOrder() - 1 == town
+            while ((hintLocation.Town != null && hintLocation.Town?.Type?.VanillaTownOrder() - 1 == town)
              || placedTowns.Contains(town));
             Text hint = Text.GenerateHelpfulHint(hintLocation, hintCollectable, props.IncludeSpellsInShuffle);
             int index = hintIndexes[town][r.Next(hintIndexes[town].Length)];

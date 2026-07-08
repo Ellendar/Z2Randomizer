@@ -294,7 +294,7 @@ public class Palaces
                 return false;
             }
         }
-        return CanGetGlove(props, palaces[1])
+        return CanGetGlove(props, palaces)
             && CanGetRaft(props, raftIsRequired, palaces[1], palaces[2])
             && AtLeastOnePalaceCanHaveGlove(props, palaces);
     }
@@ -326,28 +326,34 @@ public class Palaces
         return false;
     }
 
-    private static bool CanGetGlove(RandomizerProperties props, Palace palace2)
+    private static bool CanGetGlove(RandomizerProperties props, IEnumerable<Palace> palaces)
     {
+        List<RequirementType> requireables = [.. RequirementTypeExtensions.UpToXContainers(props.StartMagicContainers)];
+        //If shuffle overworld items is on, we assume you can get all the items / spells
+        //as all progression items will eventually shuffle into spots that work
+        if (props.ShuffleOverworldItems)
+        {
+            requireables = [RequirementType.KEY, .. RequirementTypeExtensions.UpToXContainers(8)];
+        }
+        //Otherwise if it's vanilla items we can't get the magic key, because we could need glove for boots for flute to get to new kasuto
+        requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
+        requireables.Add(RequirementType.JUMP);
+        requireables.Add(RequirementType.FAIRY);
+
+
         if (!props.ShufflePalaceItems)
         {
-            List<RequirementType> requireables = [..RequirementTypeExtensions.UpToXContainers(props.StartMagicContainers)];
-            //If shuffle overworld items is on, we assume you can get all the items / spells
-            //as all progression items will eventually shuffle into spots that work
-            if (props.ShuffleOverworldItems)
-            {
-                requireables = [RequirementType.KEY, ..RequirementTypeExtensions.UpToXContainers(8)];
-
-            }
-            //Otherwise if it's vanilla items we can't get the magic key, because we could need glove for boots for flute to get to new kasuto
-            requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
-            requireables.Add(RequirementType.JUMP);
-            requireables.Add(RequirementType.FAIRY);
-
             //If we can't clear 2 without the items available, we can never get the glove, so the palace is unbeatable
+            Palace palace2 = palaces.FirstOrDefault(i => i.Number == 2)!;
             if (!palace2.CanReachAnItemRoom(requireables))
             {
                 return false;
             }
+        }
+        else if(!props.MixOverworldPalaceItems)
+        {
+            //If palace items are shuffled, but not mixed, we have to be able to get to at least one item room without the glove
+            return palaces.Any(palace => palace.CanReachAnItemRoom(requireables));
         }
         return true;
     }
