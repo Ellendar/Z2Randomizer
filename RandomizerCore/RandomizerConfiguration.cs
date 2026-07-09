@@ -345,6 +345,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         return false;
     }
 
+    private bool roomSelectionEnabled()
+    {
+        return palaceStylesAreNotAllVanillaOrShuffled();
+    }
+
     private bool palaceStylesAnyMetastyleSelected()
     {
         foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
@@ -363,26 +368,28 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     public bool randomStylesAllowVanillaIncluded() => palaceStylesAnyMetastyleSelected();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? includeVanillaRooms = true;
+    public bool includeVanillaRoomsIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool? includev4_0Rooms = false;
-    public bool includev4_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    public bool includev4_0RoomsIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool? includev5_0Rooms = false;
-    public bool includev5_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    public bool includev5_0RoomsIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool blockingRoomsInAnyPalace = false;
-    public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
     private PalaceDropStyle palaceDropStyle = PalaceDropStyle.ANY_EXIT;
-    public bool palaceDropStyleIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    public bool palaceDropStyleIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
@@ -392,12 +399,12 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool includeExpertRooms = false;
-    public bool includeExpertRoomsIncluded() => palaceStylesAreNotAllVanilla();
+    public bool includeExpertRoomsIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
     private BossRoomsExitType bossRoomsExitType = BossRoomsExitType.OVERWORLD;
-    public bool bossRoomsExitTypeIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    public bool bossRoomsExitTypeIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]

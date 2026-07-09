@@ -766,8 +766,10 @@ considered duplicates of each other. Has no effect on vanilla palaces. Does not 
 prevent duplicates for Random Walk generated palaces.</value>
 	</data>
 	<data name="BlockingRoomsinAnyPalaceToolTip" xml:space="preserve">
-<value>Allows rooms that require an item or spell to traverse to appear in any palace. Otherwise,
-palaces can only contain blocks according to the following table.</value>
+<value>Allows rooms that cannot be passed without a specific item or spell to appear in any palace.
+Otherwise, the allowed requirements for rooms in palaces are based on the items and spells
+needed to pass through every room in that palace in vanilla (from either direction).
+See the Wiki for the full table.</value>
 	</data>
 	<data name="RemoveLongDeadEndsToolTip" xml:space="preserve">
 <value>Removes dead-end rooms from the room pool. This helps newer players who are not yet
