@@ -20,22 +20,25 @@ public class Palaces
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = [
         RequirementType.KEY, ..RequirementTypeExtensions.UpToXContainers(5)];
-    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(6) ];
-    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(6) ];
-    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, ..RequirementTypeExtensions.UpToXContainers(7) ];
-    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, ..RequirementTypeExtensions.UpToXContainers(7) ];
-    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8) ];
-    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = [
         RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8)];
 
-    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = [ 
+    public static readonly RequirementType[] ALL_PALACE_ALLOWED_BLOCKERS = [
+        RequirementType.JUMP, RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.KEY, RequirementType.DASH, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8)];
+
+    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = [
         VANILLA_P1_ALLOWED_BLOCKERS,
         VANILLA_P2_ALLOWED_BLOCKERS,
         VANILLA_P3_ALLOWED_BLOCKERS,

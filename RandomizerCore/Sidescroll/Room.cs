@@ -423,6 +423,24 @@ public class Room : IJsonOnDeserialized
         SideView = edit.Finalize();
     }
 
+    public bool HasTag(string tag) => Tags != null && Tags.Contains(tag);
+
+    /// Aggregating PalaceNumber matching logic to determine if this room is appropriate for palaceNumber.
+    public bool InPoolForPalace(int palaceNumber)
+    {
+        if (PalaceNumber == null)
+        {
+            if (IsBossRoom)
+            {
+                return palaceNumber < 6; // Barba room is not generic
+            }
+            Debug.Assert(!IsThunderBirdRoom, "Thunderbird rooms must have palaceNumber=7");
+            return palaceNumber < 7; // Any non-GP palace is the default meaning of null
+        }
+
+        return PalaceNumber == palaceNumber;
+    }
+
     public string DebugString()
     {
         StringBuilder sb = new();
@@ -742,6 +760,15 @@ public class Room : IJsonOnDeserialized
             || HasUpExit && Up == null
             || HasDownExit && Down == null;
     }
+
+    public bool HasExitInDirection(Direction direction) => direction switch
+    {
+        Direction.NORTH => HasUpExit,
+        Direction.SOUTH => HasDownExit,
+        Direction.WEST => HasLeftExit,
+        Direction.EAST => HasRightExit,
+        _ => false
+    };
 
     public void UpdateSideviewItem(Collectable collectable)
     {

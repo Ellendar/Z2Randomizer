@@ -10,7 +10,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 public partial class PalaceRooms
 {
     private readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new();
-
+    public IReadOnlyList<Room> RoomsByGroup(RoomGroup group) => roomsByGroup.GetValueOrDefault(group, []);
     private readonly Dictionary<string, Room> roomsByName = new();
 
     public static readonly string roomsMD5 = "JCa3OsnJhIe/fZ5yrx/+mA==";
