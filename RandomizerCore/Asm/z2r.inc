@@ -217,6 +217,7 @@ RESV StatTimeInPalace4, 3
 RESV StatTimeInPalace5, 3
 RESV StatTimeInPalace6, 3
 RESV StatTimeInPalaceGP, 3
+Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
 
 ; All of these timestamps are checkpointed such that if you game over,
 ; we restore from the most recent version of the checkpoint. So for any stats

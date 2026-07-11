@@ -561,7 +561,7 @@ public class Hyrule
 
     private Assembler CreateAssemblyEngine()
     {
-        var asm = NewAssembler(assemblerOptions, true);
+        var asm = NewAssembler(assemblerOptions, false);
         asm.Callbacks = new Js65Callbacks
         {
             OnFileReadText = AsmFileReadTextCallback,

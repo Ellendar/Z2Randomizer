@@ -375,10 +375,12 @@ PlayerSubs:
 CntPl:
   lda GameEngineSubroutine    ;if executing specific game engine routine,
   cmp #$0b                    ;branch ahead to some other part
-  jeq PlayerKilled
-  lda PlayerChangeSizeFlag    ;if grow/shrink flag set
-  jne DoChangeSize            ;then branch to some other code
-
+  bne +
+    jmp PlayerKilled
++  lda PlayerChangeSizeFlag    ;if grow/shrink flag set
+  beq +
+   jmp DoChangeSize            ;then branch to some other code
++
   jsr FindPlayerAction        ;otherwise jump and return
 
   lda SwimmingFlag
