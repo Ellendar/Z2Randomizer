@@ -49,6 +49,7 @@ public class Palaces
     ];
 
     public static readonly ImmutableArray<int> VANILLA_LENGTHS = [14, 21, 15, 21, 28, 27, 55];
+    public const int REGULAR_PALACE_MEAN_LENGTH = 21;
     public static readonly ImmutableArray<int> VANILLA_MIN_PALACE_LENGTHS = [11, 16, 10, 19, 23, 20, 31];
 
     public static Dictionary<RoomExitType, int> itemRoomCounts = [];
@@ -191,6 +192,7 @@ public class Palaces
     public static int[] RollPalaceLengths(RandomizerConfiguration conf, RandomizerProperties props, Random r)
     {
         int[] sizes = [.. VANILLA_LENGTHS];
+        double[] rollBase = [.. VANILLA_LENGTHS];
 
         // Full + Vanilla (Shuffled) palaces should not change length
         bool ShouldRollForNormalPalace(int i) => conf.NormalPalaceLength != PalaceLengthOption.FULL || !props.PalaceStyles[i].UsesVanillaRoomPool();
@@ -200,27 +202,47 @@ public class Palaces
         int LowerLimit(int i) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_MIN_PALACE_LENGTHS[i] : 2;
         int UpperLimit(int i, int limit = 63) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_LENGTHS[i] : limit;
 
+        // when shortening, remove proportionally more rooms from longer palaces
+        // I do this be equalizing the lengths before rolling (the factor should
+        // be low enough that it could never roll up beyond its vanilla length).
+        var equalizationFactor = conf.NormalPalaceLength switch
+        {
+            PalaceLengthOption.SHORT => 0.45,
+            PalaceLengthOption.MEDIUM => 0.3,
+            _ => 0.0,
+        };
+        if (equalizationFactor > 0.0)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                int vanillaLength = sizes[i];
+                int lengthDiff = REGULAR_PALACE_MEAN_LENGTH - vanillaLength;
+                double baseLength = vanillaLength + equalizationFactor * lengthDiff;
+                rollBase[i] = baseLength;
+            }
+        }
+
         //1-4 first, then 5-6 because they're dependant
         for (int i = 0; i < 4; i++)
         {
             if (ShouldRollForNormalPalace(i))
             {
-                sizes[i] = RollPalaceLength(r, sizes[i], conf.NormalPalaceLength, LowerLimit(i), UpperLimit(i));
+                sizes[i] = RollPalaceLength(r, rollBase[i], conf.NormalPalaceLength, LowerLimit(i), UpperLimit(i));
             }
         }
         if (ShouldRollForNormalPalace(4))
         {
             int upperLimitP5 = Math.Min(63 - sizes[0] - sizes[1], UpperLimit(4));
-            sizes[4] = RollPalaceLength(r, sizes[4], conf.NormalPalaceLength, LowerLimit(4), upperLimitP5);
+            sizes[4] = RollPalaceLength(r, rollBase[4], conf.NormalPalaceLength, LowerLimit(4), upperLimitP5);
         }
         if (ShouldRollForNormalPalace(5))
         {
             int upperLimitP6 = Math.Min(63 - sizes[2] - sizes[3], UpperLimit(5));
-            sizes[5] = RollPalaceLength(r, sizes[5], conf.NormalPalaceLength, LowerLimit(5), upperLimitP6);
+            sizes[5] = RollPalaceLength(r, rollBase[5], conf.NormalPalaceLength, LowerLimit(5), upperLimitP6);
         }
         if (ShouldRollForGP())
         {
-            sizes[6] = RollPalaceLength(r, sizes[6], conf.GpLength, LowerLimit(6), UpperLimit(6, 61));
+            sizes[6] = RollPalaceLength(r, rollBase[6], conf.GpLength, LowerLimit(6), UpperLimit(6, 61));
         }
 
         //If P5/6 is vanilla, it's possible the previous palace(s) rolled up and the vanilla palace took us beyond the limit
@@ -286,11 +308,11 @@ public class Palaces
         return sizes;
     }
 
-    public static int RollPalaceLength(Random random, int vanillaLength, PalaceLengthOption length, int hardMin = 2, int hardMax = 61)
+    public static int RollPalaceLength(Random random, double baseLength, PalaceLengthOption length, int hardMin = 2, int hardMax = 61)
     {
         var rr = length.GetRandomRangeDouble()!;
-        int intMin = (int)Math.Round(rr.Low * vanillaLength);
-        int intMax = (int)(Math.Round(rr.High * vanillaLength) + 1);
+        int intMin = (int)Math.Round(rr.Low * baseLength);
+        int intMax = (int)(Math.Round(rr.High * baseLength) + 1);
         return Math.Min(Math.Max(random.Next(intMin, intMax), hardMin), hardMax);
     }
 
