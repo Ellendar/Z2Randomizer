@@ -4,7 +4,7 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <RoslynVersion>5.3.0</RoslynVersion>
     <ClearScriptVersion>7.5.1</ClearScriptVersion>
-    <Js65Version>1.0.7</Js65Version>
+    <Js65Version>1.0.9</Js65Version>
     <AvaloniaVersion>12.0.4</AvaloniaVersion>
     <SkiaSharpVersion>3.119.4</SkiaSharpVersion>
   </PropertyGroup>
@@ -14,6 +14,8 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
     <PackageVersion Include="PolySharp" Version="1.16.0" />
+    <PackageVersion Include="Microsoft.JSInterop" Version="10.0.8" />
+
     <!-- ClearScript -->
     <PackageVersion Include="Microsoft.ClearScript" Version="$(ClearScriptVersion)" />
     <PackageVersion Include="Microsoft.ClearScript.Core" Version="$(ClearScriptVersion)" />
@@ -71,5 +73,7 @@
     <PackageVersion Include="System.Data.SQLite" Version="2.0.3" />
     <PackageVersion Include="Xaml.Behaviors.Interactions" Version="12.0.0.1" />
     <PackageVersion Include="YamlDotNet" Version="16.3.0" />
+    <PackageVersion Include="FluentAssertions" Version="8.7.1" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
   </ItemGroup>
 </Project>

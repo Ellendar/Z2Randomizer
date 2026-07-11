@@ -369,6 +369,8 @@ EntryFacing = $0701                      ; Sideview entry facing direction. 0=Fa
 EnterFromElevatorAbove = $0704           ; >0 Link enters the room from the top
 EnterCentered = $0705                    ; >0 Link enters centered; like at North Palace, taking an elevator exit or entering a random encounter
 RegionNumber = $0706                     ; 0=West, 1=Death Mountain, 2=East, 3=Maze Island
+GoingOutsideFlag = $0709                 ; non-zero routes game mode 0 (load area data) out to the overworld via go_outside
+PreviousRegion = $070a                   ; RegionNumber Link came from
 WorldNumber = $0707                      ; 0=Caves & enemy encounters, 1=West towns, 2=East towns, 3=Palace 1/2/5, 4=Palace 3/4/6, 5=Great Palace
 ScrollDirection = $071f                  ; Current scroll direction. 1=Scrolling right, 2=Scrolling left
 ColumnScrollDirection = $0720            ; Scroll direction that is updated only when scrolling crosses a column boundary
@@ -515,7 +517,8 @@ RESV BlockBreakColumnOffset, BREAKABLE_BLOCK_COUNT ; Vanilla addr $042E - Offset
 RESV BlockBreakAddrLo, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table lo addr
 RESV BlockBreakAddrHi, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table hi addr
 
-RESV TwisterCurrentPalaceSlot ; palace_code (0-5) of last dungeon Link entered or warped to
+RESV TwisterCurrentPalaceSlot ; global palace slot (RegionNumber*4 + within-region palace code) of last dungeon Link entered or warped to
+RESV TwisterPendingPalaceLocation ; flute cross-continent warp: non-zero = palace LocationNumber to enter once the destination region's overworld has been reloaded
 
 .ifdef ENABLE_Z2_MARIO
 

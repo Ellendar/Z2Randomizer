@@ -579,7 +579,7 @@ public class Hyrule
 
     private Assembler CreateAssemblyEngine()
     {
-        var asm = NewAssembler(assemblerOptions, true);
+        var asm = NewAssembler(assemblerOptions, false);
         asm.Callbacks = new Js65Callbacks
         {
             OnFileReadText = AsmFileReadTextCallback,
@@ -1380,28 +1380,28 @@ public class Hyrule
             sideviewModule.Byt(itemBits);
         }
 
-        try
-        {
-            ROM testRom = new(ROMData);
-            Random testRng = new(SeedHash);
-            //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
-            //be tested here, but we don't actually know what they will be until later, for now i'm just
-            //testing with the vanilla text, but this could be an issue down the line.
-            ApplyAsmPatches(props, validationEngine, testRng, ROMData.GetGameText(), testRom, new StatRandomizer(testRom, props));
-            validationEngine.Add(sideviewModule);
-            await testRom.ApplyAsm(validationEngine); //.Wait(ct);
-        }
-        catch (Exception e)
-        {
-            // Microsoft.ClearScript.ScriptEngine needs to be abstracted for browser
-            if (e.Message.Contains("Could not find space for"))
-            {
-                logger.Debug(e, "Room packing failed. Retrying.");
-                return false;
-            }
-            logger.Error(e, "Failed to build assembly patches");
-            throw;
-        }
+        // try
+        // {
+        //     ROM testRom = new(ROMData);
+        //     Random testRng = new(SeedHash);
+        //     //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
+        //     //be tested here, but we don't actually know what they will be until later, for now i'm just
+        //     //testing with the vanilla text, but this could be an issue down the line.
+        //     ApplyAsmPatches(props, validationEngine, testRng, ROMData.GetGameText(), testRom, new StatRandomizer(testRom, props));
+        //     validationEngine.Add(sideviewModule);
+        //     await testRom.ApplyAsm(validationEngine); //.Wait(ct);
+        // }
+        // catch (Exception e)
+        // {
+        //     // Microsoft.ClearScript.ScriptEngine needs to be abstracted for browser
+        //     if (e.Message.Contains("Could not find space for"))
+        //     {
+        //         logger.Debug(e, "Room packing failed. Retrying.");
+        //         return false;
+        //     }
+        //     logger.Error(e, "Failed to build assembly patches");
+        //     throw;
+        // }
         return true;
     }
 

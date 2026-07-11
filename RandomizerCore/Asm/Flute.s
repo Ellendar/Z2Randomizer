@@ -1,21 +1,16 @@
 .include "z2r.inc"
 
-; Flute Twister Warp
-; When Link plays the flute on the overworld and neither a river-devil tile
-; (OverworldFacingTerrain==$0F) nor the three-eye-rock tile is adjacent, a twister
-; spawns at the left screen edge and travels rightward. Touching it
-; warps Link into the next or previous gem-placed dungeon in sequence.
-; Face right/up = next palace; face left/down = previous palace.
-; The anchor is the last dungeon Link entered or warped to (TwisterCurrentPalaceSlot).
-
-TWISTER_TILE = $E0   ; tile ID for frame 0; frame 1 uses TWISTER_TILE+1
+TWISTER_TILE = $b5   ; tile IDs for frame 0; frame 1 uses TWISTER_TILE+2
 TWISTER_PAL  = $02   ; OAM palette attribute (bits 0-1)
 
 .segment "PRG0", "PRG7"
 
+.import PalaceMappingTable
+
 ProcessNextOverworldEnemy = $842F
 UpdateOverworldSpritePosition = $8397
 AreaLoadTrigger = $85eb
+OverworldPostLoad = $C72F
 
 ; Patches the place where the enemy graphics data is loaded
 ; so we can draw a custom tornado
@@ -34,9 +29,36 @@ AreaLoadTrigger = $85eb
 .org $85A9
   jsr RecordPalaceEntry
 
+; When taking a cross continent flute, we load the overworld and then the dungeon.
+; Hook right before we reveal the overworld and teleport to the dungeon
+.org OverworldPostLoad
+  jsr OverworldPostLoadFluteCheck
+
+.segment "PRG7"
+
+.reloc
+OverworldPostLoadFluteCheck:
+  lda TwisterPendingPalaceLocation
+  bne @enter
+    ; just a regular overworld load
+    lda #$00
+    sta $0726
+    rts
+@enter:
+  sta LocationNumber          ; restore the palace area index ($34 + palace code)
+  lda #$00
+  sta TwisterPendingPalaceLocation
+  ; skip the main overworld game mode and move to the side view loading
+  lda #5
+  sta GameMode
+  rts
+
+
+.segment "PRG0", "PRG7"
+
 .reloc
 TwisterDrawCheck:
-  lda OverworldEnemy0Type, x  ; reproduce overwritten LDA $82,x
+  lda OverworldEnemy0Type, x
   cmp #$04
   beq @twister
     tax ; do the original 
@@ -44,11 +66,14 @@ TwisterDrawCheck:
 @twister:
   ; type 4: write twister tile and palette
   ; Y = slot*16 (OAM base), set before this hook
-  lda R7                      ; animation frame (0 or 1)
-  clc
+  lda FrameCounter
+  and #$10
+  lsr
+  lsr
   adc #TWISTER_TILE
-  sta $0281, y                ; left sprite tile
-  sta $0285, y                ; right sprite tile
+  sta $0281, y ; left sprite tile
+  adc #2 ; carry is clear
+  sta $0285, y ; right sprite tile
   lda #TWISTER_PAL
   sta $0282, y
   sta $0286, y
@@ -87,74 +112,127 @@ TwisterHitCheck:
 
 .reloc
 TwisterWarp:
-  ; Direction: OverworldFacingDirection bits: $01=right, $08=up = NEXT; $02=left, $04=down = PREV
+  ; Direction: OverworldFacingDirection bits
+  ; next     $01=right $08=up
+  ; previous $02=left $04=down 
   lda OverworldFacingDirection
   ; right ($01) or up ($08)
   and #$09
   bne @go_next
-  lda #$05 ; add 5 to wrap around and go backwards in the list
+  lda #$0f ; add $0f (== -1 mod 16) to walk the slot list backwards
   bne @scan ; unconditional
 @go_next:
-  lda #$01 ; add 1 to go forward in the list
+  lda #$01 ; add 1 to walk the slot list forwards
 @scan:
   sta R7
-  ; a = current palace slot we want to check
+  ; scan each of the possible palace global spots in the PalaceMappingTable
   lda TwisterCurrentPalaceSlot
-  ; x = 6 is the loop counter for the number of palaces to check
-  ldx #$06
+  ldx #$10
 @next_palace:
-  ; increment or decrement the list but clamp the result between 0 and 5
   clc
   adc R7
-  bmi @below_zero
-  cmp #$06
-  bcc @no_wrap
-  sec
-  sbc #$06
-  jmp @no_wrap
-@below_zero:
-  clc
-  adc #$06
-@no_wrap:
-  pha                         ; save candidate palace_code
+  ; wrap within the 0-15 global slot space
+  and #$0f
+  tay
+  lda PalaceMappingTable, y
+  cmp #$ff ; $ff is a place holder indicating no palace at this slot in the world
+  beq @advance
+    ; Palace exists here. Check whether its gem has been placed.
+    sty R6
+    ; This table layout was optimized for updating stats (since thats done every frame)
+    ; and this doesn't matter how long it takes pretty much
+    sec
+    sbc #Palace1Offset
+    ; div by 3 to get the palace number 0 - 6
+    sta R5
+    lsr
+    lsr
+    adc R5
+    ror
+    lsr
+    adc R5
+    ror
+    lsr
+    adc R5
+    ror
+    lsr
+    adc R5
+    ror
+    lsr
+    ; Check for great palace ID and skip it (palace 6)
+    cmp #6
+    bcs @advance
+    ; A = CrystalPlaced index 0-5
     tay
-    lda CrystalPlaced, y        ; gem placed at this palace?
-    bne @found
-  pla
+    lda CrystalPlaced, y
+    bne @crystalPlacedAtPalace
+    ; Check next palace slot in the real locations table
+    ldy R6
+@advance:
+  tya
   dex
   bne @next_palace
-  rts ; there should always be a valid palace?? the twister shouldn't spawn otherwise
-@found:
-  pla ; A = target palace_code
+    rts ; this shouldn't happen. tornado should only spawn if a gem is placed
+@crystalPlacedAtPalace:
+  ; R6 = target global slot
+  lda R6
   sta TwisterCurrentPalaceSlot
   ; clear the twister slot
-  ldx OverworldCurrentSlot    ; slot index saved at $80 by LDX $80 / STX $80 in L8332
+  ldx OverworldCurrentSlot
   lda #$00
   sta OverworldEnemy0Type, x
   sta OverworldDemonTimer, x
-  ; set LocationNumber to palace area index ($34 + palace_code)
-  lda TwisterCurrentPalaceSlot
+  ; LocationNumber = $34 + within-region palace code
+  lda R6
+  and #$03
   clc
   adc #$34
   sta LocationNumber
-  
+  ; target region = global slot >> 2
+  lda R6
+  lsr
+  lsr
+  cmp RegionNumber
+  ; already in the right continent so we don't need to switch continents
+  beq @same_region
+    ; Different continent so we need to reload the continent
+    ldx RegionNumber
+    stx PreviousRegion
+    sta RegionNumber
+    ; the new game mode will load the WorldNumber
+    lda #$00
+    sta WorldNumber
+    lda #$01
+    sta GoingOutsideFlag
+    lda LocationNumber
+    sta TwisterPendingPalaceLocation
+    ; AreaLoadTrigger does `inc GameMode` and we want mode 0 so set it to $ff
+    lda #$ff
+    sta GameMode
+@same_region:
   pla
   pla
   jmp AreaLoadTrigger
 
 .reloc
 RecordPalaceEntry:
-  ; reproduce overwritten STX $0748
   stx LocationNumber
-  ; update anchor when entering a palace (area index $34-$39 = palace codes 0-5)
+  ; update anchor when Link enters a palace. Palace area indices are $34-$36
+  ; (within-region palace codes 0-2). Combine with the region for a global slot.
   txa
-  ; negative: not a palace
   sec
   sbc #$34
-  bcc @done
-    ; >= 6: not a valid palace code
-    cmp #$06
-    bcs @done
+  bcc @done                   ; below $34: not a palace
+    cmp #$03
+    bcs @done                 ; $37+: not a palace entrance
+      ; A = within-region palace code (0-2); global slot = region*4 + code
+      pha
+      lda RegionNumber
+      asl
+      asl
+      sta TwisterCurrentPalaceSlot
+      pla
+      ora TwisterCurrentPalaceSlot
       sta TwisterCurrentPalaceSlot
 @done:
   rts
@@ -193,16 +271,16 @@ free_slot:
 init_slot:
   lda #$04
   sta OverworldEnemy0Type, x      ; type 4 = twister
-  lda #$01
-  sta OverworldDemonTimer, x      ; any non-zero value keeps slot active
+  lda #$40
+  sta OverworldDemonTimer, x      ;
   lda OverworldScrollY            ; camera Y
   clc
-  adc #$70                        ; center-screen height
+  adc #$6c                        ; center-screen height
   sta OverworldEnemyYPosition, x  ; world Y
   lda ScrollPosShadow             ; camera X
   sta OverworldEnemyXPosition, x  ; world X = left screen edge (OAM X = 0)
-  lda #$01
-  sta OverworldDemonXVelocity, x  ; +1/frame rightward
+  lda #$02
+  sta OverworldDemonXVelocity, x  ; +2/frame rightward
   lda #$00
   sta OverworldDemonYVelocity, x  ; no vertical movement
   ; Twister spawned. Return from flute dispatch (don't fall into L838F).
@@ -216,8 +294,11 @@ spider:
 
 .segment "PRG1"
 
-; Hook: Replace BEQ L838F; RTS (3 bytes at $838C) with JSR TwisterSpawnPRG1.
-; JSR pushes PC+2 = $838E; RTS inside TwisterSpawnPRG1 returns to $838F = L838F.
+; Skip east continent check
+.org $8368
+  jmp $836f
+FREE_UNTIL $836f
+
 .org $838C
   jsr TwisterSpawnPRG1
 ; The code after the patch point is where it normally branches to if the flute
@@ -231,6 +312,11 @@ spider:
 
 
 .segment "PRG2"
+
+; Skip east continent check
+.org $8368
+  jmp $836f
+FREE_UNTIL $836f
 
 ; Same hook at the same address.
 .org $838C

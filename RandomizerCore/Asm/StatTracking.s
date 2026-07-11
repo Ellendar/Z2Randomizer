@@ -117,7 +117,6 @@ StatTrackDownStab:
 ; to the "real palace" at this offset. This way if Palace 5 is in the location of Palace 1,
 ; then we increment the correct timer for Palace 5
 .reloc
-Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
 .export PalaceMappingTable
 PalaceMappingTable:
     ; region 0 - east hyrule

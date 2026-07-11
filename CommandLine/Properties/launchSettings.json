@@ -2,7 +2,7 @@
   "profiles": {
     "CommandLine": {
       "commandName": "Project",
-      "commandLineArgs": "-f AAABvvyhAmLAAAAAAAAAEuPi+yAAAAAAAAAAAAAWAA -r ../Zelda2.nes -s 123456789 -o ..",
+      "commandLineArgs": "-f AAABvvyhAmLAAAAAAAAAEuPi+yAAAAAAAAAAAAAbhA -r ../Zelda2.nes -s mario -o ..",
       "workingDirectory": "../build/"
     }
   }
