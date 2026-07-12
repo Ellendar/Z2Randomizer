@@ -700,8 +700,8 @@ sealed class DeathMountain : World
                 location2.CanShuffle = false;
                 location2.Xpos = otherx;
                 location2.Y = othery;
-                PlaceCave(x, y, direction, s);
-                PlaceCave(otherx, othery, direction.Reverse(), s);
+                PlaceCave(new IntVector2(x, y), direction, s);
+                PlaceCave(new IntVector2(otherx, othery), direction.Reverse(), s);
                 AlignCavePositionsLeftToRight(direction, location, location2);
             }
             else //4-way caves
@@ -756,8 +756,8 @@ sealed class DeathMountain : World
                 location2.CanShuffle = false;
                 location2.Xpos = otherx;
                 location2.Y = othery;
-                PlaceCave(x, y, direction, s);
-                PlaceCave(otherx, othery, direction.Reverse(), s);
+                PlaceCave(new IntVector2(x, y), direction, s);
+                PlaceCave(new IntVector2(otherx, othery), direction.Reverse(), s);
                 AlignCavePositionsLeftToRight(direction, location, location2);
 
                 int newx = 0;
@@ -778,7 +778,7 @@ sealed class DeathMountain : World
                 location3.CanShuffle = false;
                 location3.Xpos = newx;
                 location3.Y = newy;
-                PlaceCave(newx, newy, direction, s);
+                PlaceCave(new IntVector2(newx, newy), direction, s);
 
                 y = newy;
                 x = newx;
@@ -824,13 +824,13 @@ sealed class DeathMountain : World
                 location4.CanShuffle = false;
                 location4.Xpos = otherx;
                 location4.Y = othery;
-                PlaceCave(otherx, othery, direction.Reverse(), s);
+                PlaceCave(new IntVector2(otherx, othery), direction.Reverse(), s);
                 AlignCavePositionsLeftToRight(direction, location3, location4);
             }
         }
         else
         {
-            PlaceCave(x, y, direction, s);
+            PlaceCave(new IntVector2(x, y), direction, s);
         }
         return true;
     }
