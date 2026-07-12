@@ -430,29 +430,23 @@ public abstract class World
                 //If the location is a cave, connect it
                 if (location.TerrainType == Terrain.CAVE)
                 {
-                    List<Direction> caveDirections = new() { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
-                    Direction direction = caveDirections[RNG.Next(4)];
                     Terrain entranceTerrain = climate.GetRandomTerrain(RNG, walkableTerrains);
 
                     if (saneCaves && connections.ContainsKey(location))
                     {
                         PlaceCaveCount++;
                         map[y, x] = Terrain.NONE;
-                        while (!PlaceSaneCave(direction, riverTerrain, location))
+                        while (!PlaceSaneCave(riverTerrain, location))
                         {
-                            caveDirections.Remove(direction);
-                            if (caveDirections.Count == 0)
-                            {
-                                //Debug.WriteLine(GetMapDebug());
-                                return false;
-                            }
-                            direction = caveDirections[RNG.Next(caveDirections.Count)];
+                            return false;
                         }
                     }
                     else
                     {
+                        List<Direction> caveDirections = new() { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
+                        Direction direction = caveDirections[RNG.Next(4)];
                         PlaceCaveCount++;
-                        PlaceCave(x, y, direction, entranceTerrain);
+                        PlaceCave(new IntVector2(x, y), direction, entranceTerrain);
                         location.Xpos = x;
                         location.Y = y;
                         location.CanShuffle = false;
@@ -540,194 +534,105 @@ public abstract class World
     /// Places a cave onto the map, setting the tile to the cave, and ensuring the 3 tiles facing the entrance are
     /// the passable type indicated by entranceTerrain
     /// </summary>
-    /// <param name="x">X coordinate of the cave entrance</param>
-    /// <param name="y">Y coordinate of the cave entrance</param>
-    /// <param name="direction">Direction the cave's entrance is facing. 
-    ///     i.e. the direction you enter from, not the direction you press to enter it.</param>
-    /// <param name="entranceTerrain">Terrain type to create for the approach.</param>
-    protected void PlaceCave(int x, int y, Direction direction, Terrain entranceTerrain)
+    /// <param name="pos">X,Y coordinate of the cave entrance</param>
+    /// <param name="forward">The direction you press to enter the cave.</param>
+    /// <param name="entranceTerrain">Walkable Terrain type to set in front of the entrance.</param>
+    protected void PlaceCave(IntVector2 pos, IntVector2 forward, Terrain entranceTerrain)
     {
-        map[y, x] = Terrain.CAVE;
-        if (direction == Direction.NORTH)
+        IntVector2 side = forward.Perpendicular();
+
+        foreach (var d in IntVector2.DIRECTIONS)
         {
-            map[y + 1, x] = entranceTerrain;
-            map[y + 1, x + 1] = entranceTerrain;
-            map[y + 1, x - 1] = entranceTerrain;
-            map[y, x - 1] = Terrain.MOUNTAIN;
-            map[y, x + 1] = Terrain.MOUNTAIN;
-            map[y - 1, x - 1] = Terrain.MOUNTAIN;
-            map[y - 1, x] = Terrain.MOUNTAIN;
-            map[y - 1, x + 1] = Terrain.MOUNTAIN;
+            map[pos + d] = Terrain.MOUNTAIN;
         }
-        else if (direction == Direction.EAST)
-        {
-            map[y + 1, x] = Terrain.MOUNTAIN;
-            map[y + 1, x + 1] = Terrain.MOUNTAIN;
-            map[y + 1, x - 1] = entranceTerrain;
-            map[y, x - 1] = entranceTerrain;
-            map[y, x + 1] = Terrain.MOUNTAIN;
-            map[y - 1, x - 1] = entranceTerrain;
-            map[y - 1, x] = Terrain.MOUNTAIN;
-            map[y - 1, x + 1] = Terrain.MOUNTAIN;
-        }
-        else if (direction == Direction.SOUTH)
-        {
-            map[y + 1, x] = Terrain.MOUNTAIN;
-            map[y + 1, x + 1] = Terrain.MOUNTAIN;
-            map[y + 1, x - 1] = Terrain.MOUNTAIN;
-            map[y, x - 1] = Terrain.MOUNTAIN;
-            map[y, x + 1] = Terrain.MOUNTAIN;
-            map[y - 1, x - 1] = entranceTerrain;
-            map[y - 1, x] = entranceTerrain;
-            map[y - 1, x + 1] = entranceTerrain;
-        }
-        else if (direction == Direction.WEST)
-        {
-            map[y + 1, x] = Terrain.MOUNTAIN;
-            map[y + 1, x + 1] = entranceTerrain;
-            map[y + 1, x - 1] = Terrain.MOUNTAIN;
-            map[y, x - 1] = Terrain.MOUNTAIN;
-            map[y, x + 1] = entranceTerrain;
-            map[y - 1, x - 1] = Terrain.MOUNTAIN;
-            map[y - 1, x] = Terrain.MOUNTAIN;
-            map[y - 1, x + 1] = entranceTerrain;
-        }
+
+        map[pos - forward] = entranceTerrain;
+        map[pos - forward + side] = entranceTerrain;
+        map[pos - forward - side] = entranceTerrain;
+
+        map[pos] = Terrain.CAVE;
     }
 
-    protected bool PlaceSaneCave(Direction direction, Terrain riverTerrain, Location location)
+    protected void PlaceCave(IntVector2 pos, Direction forward, Terrain entranceTerrain)
     {
-        int x, y;
-        if ((location.MapPage == 0 || location.IsFallInHole) && !location.ForceEnterRight)
-        {
-            if (direction == Direction.NORTH)
-            {
-                direction = Direction.SOUTH;
-            }
+        PlaceCave(pos, forward.ToIntVector2(), entranceTerrain);
+    }
 
-            if (direction == Direction.WEST)
-            {
-                direction = Direction.EAST;
-            }
-        }
-        else
-        {
-            if (direction == Direction.SOUTH)
-            {
-                direction = Direction.NORTH;
-            }
-
-            if (direction == Direction.EAST)
-            {
-                direction = Direction.WEST;
-            }
-        }
-
-        //Place the exit cave less than 5 rows or columns from the edge of the map, on an unoccupied square 
-        //That is also not adjacent to any other location.
+    protected bool PlaceSaneCave(Terrain riverTerrain, Location location)
+    {
+        IntVector2 pos = IntVector2.ZERO;
         do
         {
-            x = RNG.Next(MapColumns - 2) + 1;
-            y = RNG.Next(MapRows - 2) + 1;
-        } while (x < 5 || y < 5 || x > MapColumns - 5 || y > MapRows - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE);
+            pos = IntVector2.Random(RNG, 5, MapColumns - 5, 5, MapRows - 5);
+        } while (!AllTerrainIn3x3Equals(pos, Terrain.NONE));
 
-        int minDistX = Math.Min(MapColumns / 2 - 1, 15);
-        int minDistY = Math.Min(MapRows / 2 - 1, 15);
-        while ((direction == Direction.NORTH && y < minDistY) || (direction == Direction.EAST && x > MapColumns - minDistX) || (direction == Direction.SOUTH && y > MapRows - minDistY) || (direction == Direction.WEST && x < minDistX))
+        int minDistToEdgeX = Math.Min(MapColumns / 2 - 1, 15);
+        int minDistToEdgeY = Math.Min(MapRows / 2 - 1, 15);
+
+        IntVector2 dir = IntVector2.ZERO;
+        do
         {
-            direction = (Direction)RNG.Next(4);
-        }
-        int otherx, othery;
+            dir = IntVector2.CARDINALS.Sample(RNG);
+            // check if the cave is too close to the edge in the direction it's going
+        } while (!WithinMapBounds(pos + dir.ComponentMultiply(new(minDistToEdgeX, minDistToEdgeY))));
+
+        IntVector2 side = dir.Perpendicular();
+
+        IntVector2 otherPos;
         int tries = 0;
         bool crossing;
         do
         {
-            //6-18
-            int range = 12;
-            int offset = 6;
-            if (biome == Biome.ISLANDS || biome == Biome.MOUNTAINOUS)
+            var forwardSteps = biome switch
             {
-                //10-20
-                range = 10;
-                offset = 10;
-            }
-            else if (biome == Biome.VOLCANO || biome == Biome.CALDERA)
-            {
-                //5-20
-                range = 15;
-                offset = 5;
-            }
+                Biome.ISLANDS or Biome.MOUNTAINOUS => RNG.Next(10, 20),
+                Biome.VOLCANO or Biome.CALDERA => RNG.Next(5, 20),
+                _ => RNG.Next(6, 18),
+            };
+            int lateralSteps = RNG.Next(-3, 4);
+            otherPos = pos + forwardSteps * dir + lateralSteps * side;
+
             crossing = true;
-            if (direction == Direction.NORTH)
-            {
-                otherx = x + (RNG.Next(7) - 3);
-                othery = y - (RNG.Next(range) + offset);
-            }
-            else if (direction == Direction.EAST)
-            {
-                otherx = x + (RNG.Next(range) + offset);
-                othery = y + (RNG.Next(7) - 3);
-            }
-            else if (direction == Direction.SOUTH)
-            {
-                otherx = x + (RNG.Next(7) - 3);
-                othery = y + (RNG.Next(range) + offset);
-            }
-            else //west
-            {
-                otherx = x - (RNG.Next(range) + offset);
-                othery = y + (RNG.Next(7) - 3);
-            }
             if (biome != Biome.VOLCANO)
             {
-                if (!CrossingWater(x, otherx, y, othery, riverTerrain))
+                if (!CrossingWater(pos.X, otherPos.X, pos.Y, otherPos.Y, riverTerrain))
                 {
                     crossing = false;
                 }
             }
             if (tries++ >= 100)
             {
-                //Debug.WriteLine(GetMapDebug());
                 return false;
             }
-        } while (
-            !crossing
-            || otherx <= 1
-            || otherx >= MapColumns - 1
-            || othery <= 1
-            || othery >= MapRows - 1
-            || map[othery, otherx] != Terrain.NONE
-            || map[othery - 1, otherx] != Terrain.NONE
-            || map[othery + 1, otherx] != Terrain.NONE
-            || map[othery + 1, otherx + 1] != Terrain.NONE
-            || map[othery, otherx + 1] != Terrain.NONE
-            || map[othery - 1, otherx + 1] != Terrain.NONE
-            || map[othery + 1, otherx - 1] != Terrain.NONE
-            || map[othery, otherx - 1] != Terrain.NONE
-            || map[othery - 1, otherx - 1] != Terrain.NONE);
+        } while (!crossing || !WithinMapBounds(otherPos, 1) || !AllTerrainIn3x3Equals(otherPos, Terrain.NONE));
 
         Location location2 = connections[location];
         location.CanShuffle = false;
-        location.Xpos = x;
-        location.Y = y;
+        location.Pos = pos;
         location2.CanShuffle = false;
-        location2.Xpos = otherx;
-        location2.Y = othery;
-        PlaceCave(x, y, direction, climate.GetRandomTerrain(RNG, walkableTerrains));
-        PlaceCave(otherx, othery, direction.Reverse(), climate.GetRandomTerrain(RNG, walkableTerrains));
+        location2.Pos = otherPos;
+        PlaceCave(pos, dir, climate.GetRandomTerrain(RNG, walkableTerrains));
+        PlaceCave(otherPos, -dir, climate.GetRandomTerrain(RNG, walkableTerrains));
+        AlignCavePositionsLeftToRight(dir, location, location2);
         return true;
     }
 
     /// swaps the positions of two caves if the cave that is going East/South
     /// in the Overworld is not the cave that enters the sideview from the left
-    protected static void AlignCavePositionsLeftToRight(Direction location1Direction, Location location1, Location location2)
+    protected static void AlignCavePositionsLeftToRight(IntVector2 location1Direction, Location location1, Location location2)
     {
-        bool overworldGoingRight = location1Direction == Direction.EAST || location1Direction == Direction.SOUTH;
+        bool overworldGoingRight = location1Direction == IntVector2.EAST || location1Direction == IntVector2.SOUTH;
         bool sideviewGoingRight = location1.MapPage < location2.MapPage;
         if (overworldGoingRight != sideviewGoingRight)
         {
             // should swap the entrances so left-to-right aligns
             (location1.Pos, location2.Pos) = (location2.Pos, location1.Pos);
         }
+    }
+
+    protected static void AlignCavePositionsLeftToRight(Direction location1Direction, Location location1, Location location2)
+    {
+        AlignCavePositionsLeftToRight(location1Direction.ToIntVector2(), location1, location2);
     }
 
     public void PlaceHiddenLocations(LessImportantLocationsOption lessImportantLocationsOption)
@@ -1554,16 +1459,12 @@ public abstract class World
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected bool AllTerrainIn3x3Equals(int x, int y, Terrain t)
     {
-        return
-            map[y - 1, x - 1] == t &&
-            map[y - 1, x    ] == t &&
-            map[y - 1, x + 1] == t &&
-            map[y,     x - 1] == t &&
-            map[y,     x    ] == t &&
-            map[y,     x + 1] == t &&
-            map[y + 1, x - 1] == t &&
-            map[y + 1, x    ] == t &&
-            map[y + 1, x + 1] == t;
+        return AllTerrainIn3x3Equals(new IntVector2(x, y), t);
+    }
+
+    protected bool AllTerrainIn3x3Equals(IntVector2 pos, Terrain t)
+    {
+        return IntVector2.DIRECTIONS.All(d => map[pos + d] == t) && map[pos] == t;
     }
 
     protected void PlaceRandomTerrain(Climate climate, int seedCountMaximum = 500)

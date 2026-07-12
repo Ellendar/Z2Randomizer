@@ -1062,7 +1062,7 @@ public sealed class WestHyrule : World
             startx += deltax;
             starty += deltay;
         }
-        int caveCount = RNG.Next(2) + 1;
+        int caveCount = RNG.Next(2) + 1; // 1 = one-way Caldera, 2 = passthru Caldera
         Location cave1l, cave1r;
         Location? cave2l = null, cave2r = null;
 
