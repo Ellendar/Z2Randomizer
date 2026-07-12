@@ -389,7 +389,7 @@ public abstract class World
     {
         return PlaceLocations(riverTerrain, saneCaves, null, -1);
     }
-    protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location? hiddenKasutoLocation, int hiddenPalaceX)
+    protected bool PlaceLocations(Terrain crossingTerrain, bool saneCaves, Location? hiddenKasutoLocation, int hiddenPalaceX)
     {
         int placementAttempt = 0;
         foreach (Location location in AllLocations.Where(loc => loc.AppearsOnMap))
@@ -436,7 +436,7 @@ public abstract class World
                     {
                         PlaceCaveCount++;
                         map[y, x] = Terrain.NONE;
-                        while (!PlaceSaneCave(riverTerrain, location))
+                        if (!PlaceSaneCave(location, crossingTerrain))
                         {
                             return false;
                         }
@@ -446,7 +446,7 @@ public abstract class World
                         List<Direction> caveDirections = new() { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
                         Direction direction = caveDirections[RNG.Next(4)];
                         PlaceCaveCount++;
-                        PlaceCave(new IntVector2(x, y), direction, entranceTerrain);
+                        PlaceCave(new IntVector2(x, y), direction.ToIntVector2(), entranceTerrain);
                         location.Xpos = x;
                         location.Y = y;
                         location.CanShuffle = false;
@@ -502,26 +502,20 @@ public abstract class World
     }
 
     /// <summary>
-    /// Returns true iff 
+    /// Returns true iff there is any crossingTerrain in the rectangle with corners (x1,y1) and (x2,y2)
     /// </summary>
-    /// <param name="x1"></param>
-    /// <param name="x2"></param>
-    /// <param name="y1"></param>
-    /// <param name="y2"></param>
-    /// <param name="riverT"></param>
-    /// <returns></returns>
-    protected bool CrossingWater(int x1, int x2, int y1, int y2, Terrain riverTerrain)
+    protected bool CrossingTerrainInArea(IntVector2 p1, IntVector2 p2, Terrain crossingTerrain)
     {
-        int smallx = Math.Min(x1, x2);
-        int largex = Math.Max(x1, x2);
-
-        int smally = Math.Min(y1, y2);
-        int largey = Math.Max(y1, y2);
-        for (int y = smally; y < largey; y++)
+        int minX = Math.Min(p1.X, p2.X);
+        int maxX = Math.Max(p1.X, p2.X);
+        int minY = Math.Min(p1.Y, p2.Y);
+        int maxY = Math.Max(p1.Y, p2.Y);
+        for (int y = minY; y <= maxY; y++)
         {
-            for (int x = smallx; x < largex; x++)
+            for (int x = minX; x <= maxX; x++)
             {
-                if (y > 0 && y < MapRows && x > 0 && x < MapColumns && map[y, x] == riverTerrain)
+                var pos = new IntVector2(x, y);
+                if (WithinMapBounds(pos, 0) && map[pos] == crossingTerrain)
                 {
                     return true;
                 }
@@ -553,67 +547,91 @@ public abstract class World
         map[pos] = Terrain.CAVE;
     }
 
-    protected void PlaceCave(IntVector2 pos, Direction forward, Terrain entranceTerrain)
-    {
-        PlaceCave(pos, forward.ToIntVector2(), entranceTerrain);
-    }
-
-    protected bool PlaceSaneCave(Terrain riverTerrain, Location location)
+    public (IntVector2 pos, IntVector2 directionIn)? PickCavePositionAndDirection()
     {
         IntVector2 pos = IntVector2.ZERO;
-        do
+        for (int tries = 0; ; tries++)
         {
             pos = IntVector2.Random(RNG, 5, MapColumns - 5, 5, MapRows - 5);
-        } while (!AllTerrainIn3x3Equals(pos, Terrain.NONE));
+            if (AllTerrainIn3x3Equals(pos, Terrain.NONE))
+            {
+                break;
+            }
+            if (tries == 1000) { return null; }
+        }
 
-        int minDistToEdgeX = Math.Min(MapColumns / 2 - 1, 15);
-        int minDistToEdgeY = Math.Min(MapRows / 2 - 1, 15);
-
-        IntVector2 dir = IntVector2.ZERO;
-        do
+        IntVector2 minDistToEdge = new(Math.Min(MapColumns / 2 - 1, 15),
+                                       Math.Min(MapRows / 2 - 1, 15));
+        IntVector2 directionIn = IntVector2.ZERO;
+        for (int tries = 0; ; tries++)
         {
-            dir = IntVector2.CARDINALS.Sample(RNG);
+            directionIn = IntVector2.CARDINALS.Sample(RNG);
             // check if the cave is too close to the edge in the direction it's going
-        } while (!WithinMapBounds(pos + dir.ComponentMultiply(new(minDistToEdgeX, minDistToEdgeY))));
+            if (WithinMapBounds(pos + directionIn.ComponentMultiply(minDistToEdge)))
+            {
+                break;
+            }
+            if (tries == 1000) { return null; }
+        }
 
-        IntVector2 side = dir.Perpendicular();
+        return (pos, directionIn);
+    }
 
-        IntVector2 otherPos;
-        int tries = 0;
-        bool crossing;
-        do
+    protected IntVector2? PickMatchingSaneCavePosition(IntVector2 cave1pos, IntVector2 direction, Func<int> rollSpacing, Func<IntVector2, bool> additionalCheck)
+    {
+        IntVector2 pos;
+        IntVector2 perp = direction.Perpendicular();
+        for (int tries = 0; tries < 100; tries++)
         {
-            var forwardSteps = biome switch
-            {
-                Biome.ISLANDS or Biome.MOUNTAINOUS => RNG.Next(10, 20),
-                Biome.VOLCANO or Biome.CALDERA => RNG.Next(5, 20),
-                _ => RNG.Next(6, 18),
-            };
+            var forwardSteps = rollSpacing();
             int lateralSteps = RNG.Next(-3, 4);
-            otherPos = pos + forwardSteps * dir + lateralSteps * side;
+            pos = cave1pos + forwardSteps * direction + lateralSteps * perp;
+            if (!WithinMapBounds(pos, 1) || !AllTerrainIn3x3Equals(pos, Terrain.NONE))
+            {
+                continue;
+            }
+            if (!additionalCheck(pos))
+            {
+                continue;
+            }
 
-            crossing = true;
-            if (biome != Biome.VOLCANO)
-            {
-                if (!CrossingWater(pos.X, otherPos.X, pos.Y, otherPos.Y, riverTerrain))
-                {
-                    crossing = false;
-                }
-            }
-            if (tries++ >= 100)
-            {
-                return false;
-            }
-        } while (!crossing || !WithinMapBounds(otherPos, 1) || !AllTerrainIn3x3Equals(otherPos, Terrain.NONE));
+            return pos;
+        }
+
+        return null;
+    }
+
+    protected bool PlaceSaneCave(Location location, Terrain crossingTerrain)
+    {
+        if (!(PickCavePositionAndDirection() is var (cave1pos, cave1dir)))
+        {
+            return false;
+        }
+
+        Func<int> rollSpacing = biome switch
+        {
+            Biome.ISLANDS or Biome.MOUNTAINOUS => () => RNG.Next(10, 20),
+            Biome.VOLCANO or Biome.CALDERA => () => RNG.Next(5, 20),
+            _ => () => RNG.Next(6, 18),
+        };
+        Func<IntVector2, bool> crossingCheck = biome switch
+        {
+            Biome.VOLCANO => (_) => true,
+            _ => (IntVector2 pos) => CrossingTerrainInArea(cave1pos, pos, crossingTerrain)
+        };
+        if (!(PickMatchingSaneCavePosition(cave1pos, cave1dir, rollSpacing, crossingCheck) is IntVector2 cave2pos))
+        {
+            return false;
+        }
 
         Location location2 = connections[location];
         location.CanShuffle = false;
-        location.Pos = pos;
+        location.Pos = cave1pos;
         location2.CanShuffle = false;
-        location2.Pos = otherPos;
-        PlaceCave(pos, dir, climate.GetRandomTerrain(RNG, walkableTerrains));
-        PlaceCave(otherPos, -dir, climate.GetRandomTerrain(RNG, walkableTerrains));
-        AlignCavePositionsLeftToRight(dir, location, location2);
+        location2.Pos = cave2pos;
+        PlaceCave(cave1pos, cave1dir, climate.GetRandomTerrain(RNG, walkableTerrains));
+        PlaceCave(cave2pos, -cave1dir, climate.GetRandomTerrain(RNG, walkableTerrains));
+        AlignCavePositionsLeftToRight(cave1dir, location, location2);
         return true;
     }
 
@@ -628,11 +646,6 @@ public abstract class World
             // should swap the entrances so left-to-right aligns
             (location1.Pos, location2.Pos) = (location2.Pos, location1.Pos);
         }
-    }
-
-    protected static void AlignCavePositionsLeftToRight(Direction location1Direction, Location location1, Location location2)
-    {
-        AlignCavePositionsLeftToRight(location1Direction.ToIntVector2(), location1, location2);
     }
 
     public void PlaceHiddenLocations(LessImportantLocationsOption lessImportantLocationsOption)
