@@ -335,6 +335,16 @@ public abstract class World
         return AllLocations.FirstOrDefault(i => i.Pos == pos);
     }
 
+    /// <summary>
+    /// Find any location within a 3x3 area centered on `pos`.
+    /// </summary>
+    protected Location? GetLocationIn3x3(IntVector2 center)
+    {
+        return AllLocations.FirstOrDefault(i =>
+                i.Pos.X >= center.X - 1 && i.Pos.X <= center.X + 1 &&
+                i.Pos.Y >= center.Y - 1 && i.Pos.Y <= center.Y + 1);
+    }
+
     protected Location? GetLocationByCoordsNoOffset((int, int) coords)
     {
         IntVector2 pos = new(coords.Item2, coords.Item1); // y,x -> x,y
@@ -2691,8 +2701,8 @@ public abstract class World
     }
 
     /// <summary>
-    /// Useful variant to test if something is too close to the
-    /// edge of the map.
+    /// Useful variant to verify that a coordinate is some margin away
+    /// from the edge of the map.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected bool WithinMapBounds(IntVector2 pos, int margin)
@@ -3005,6 +3015,46 @@ public abstract class World
         }
 
         return dir;
+    }
+
+    /// <summary>
+    /// Check if the position is suitable as a MI drop tile. It should<br/>
+    /// - Be on a walkable path.<br/>
+    /// - There must be no adjacent special locations.<br/>
+    /// - At most 2 adjacent tiles should be passable.
+    /// </summary>
+    public bool ValidMazeDropPosition(IntVector2 pos)
+    {
+        bool isPassable(IntVector2 pos) => TRAP_PATH_VALID_TERRAIN.Contains(map[pos.Y, pos.X]);
+
+        if (!WithinMapBounds(pos, 1)) { return false; }
+        if (!isPassable(pos)) { return false; }
+
+        var dx = IntVector2.EAST;
+        var dy = IntVector2.SOUTH;
+        bool h1 = isPassable(pos + dx);
+        bool h2 = isPassable(pos - dx);
+        bool v1 = isPassable(pos + dy);
+        bool v2 = isPassable(pos - dy);
+        int passableCount = (h1 ? 1 : 0) + (h2 ? 1 : 0) + (v1 ? 1 : 0) + (v2 ? 1 : 0);
+
+        if (passableCount == 0 || passableCount > 2)
+        {
+            return false;
+        }
+
+        // expensive Location check last
+        foreach (var dir in IntVector2.CARDINALS)
+        {
+            var adjacent = pos + dir;
+            var l = GetLocationByPos(adjacent);
+            if (l != null)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public string GetGlobDebug(int[,] globs)
