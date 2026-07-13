@@ -78,17 +78,17 @@ public static class StartingTechsExtensions
 [DefaultValue(VANILLA)]
 public enum AttackEffectiveness
 {
-    [Description("Vanilla")]
+    [Description("Vanilla"),     FixedBytes(2, 3, 4, 6,  9, 12, 18, 24)]
     VANILLA,
-    [Description("Low Attack")]
+    [Description("Low Attack"),  FixedBytes(1, 2, 3, 4,  5,  6,  9, 12)]
     LOW,
-    [Description("Randomize (Low)")]
+    [Description("Randomize (Low)"), RandomRangeDouble(Low = .5, High = 1.0)]
     AVERAGE_LOW,
-    [Description("Randomize")]
+    [Description("Randomize"), RandomRangeDouble(Low = .667, High = 1.5)]
     AVERAGE,
-    [Description("Randomize (High)")]
+    [Description("Randomize (High)"), RandomRangeDouble(Low = 1.0, High = 1.5)]
     AVERAGE_HIGH,
-    [Description("High Attack")]
+    [Description("High Attack"), FixedBytes(3, 4, 6, 9, 13, 18, 27, 36)]
     HIGH,
     [Description("Instant Kill")]
     OHKO
@@ -99,15 +99,15 @@ public enum MagicEffectiveness
 {
     [Description("Vanilla")]
     VANILLA,
-    [Description("High Spell Cost")]
+    [Description("High Spell Cost"), RandomRangeDouble(Low = 1.5, High = 1.5)]
     HIGH_COST,
-    [Description("Randomize (High Cost)")]
+    [Description("Randomize (High Cost)"), RandomRangeDouble(Low = 1.0, High = 1.5)]
     AVERAGE_HIGH_COST,
-    [Description("Randomize")]
+    [Description("Randomize"), RandomRangeDouble(Low = .5, High = 1.5)]
     AVERAGE,
-    [Description("Randomize (Low Cost)")]
+    [Description("Randomize (Low Cost)"), RandomRangeDouble(Low = .5, High = 1.0)]
     AVERAGE_LOW_COST,
-    [Description("Low Spell Cost")]
+    [Description("Low Spell Cost"), RandomRangeDouble(Low = .5, High = .5)]
     LOW_COST,
     [Description("Free Spells")]
     FREE
@@ -120,13 +120,13 @@ public enum LifeEffectiveness
     VANILLA,
     [Description("OHKO Link")]
     OHKO,
-    [Description("Randomize (Low)")]
+    [Description("Randomize (Low)"), RandomRangeDouble(Low = 1.0, High = 1.5)]
     AVERAGE_LOW,
-    [Description("Randomize")]
+    [Description("Randomize"), RandomRangeDouble(Low = .75, High = 1.5)]
     AVERAGE,
-    [Description("Randomize (High)")]
+    [Description("Randomize (High)"), RandomRangeDouble(Low = .5, High = 1.0)]
     AVERAGE_HIGH,
-    [Description("High Defense")]
+    [Description("High Defense"), RandomRangeDouble(Low = .5, High = .5)]
     HIGH,
     [Description("Invincible")]
     INVINCIBLE
@@ -157,14 +157,16 @@ public enum EnemyLifeOption
 {
     [Description("Vanilla; (No Randomization)")]
     VANILLA,
+    [Description("Narrow; [-25% to +25%]"), RandomRangeDouble(Low = 0.75, High = 1.25)]
+    NARROW,
     [Description("Medium; [-50% to +50%]"), RandomRangeDouble(Low = 0.5, High = 1.5)]
     MEDIUM,
-    [Description("High; [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
-    HIGH,
-    [Description("Medium High; [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
-    MEDIUM_HIGH,
     [Description("Wide; [-75% to +200%]"), RandomRangeDouble(Low = 0.25, High = 3.0)]
     WIDE,
+    [Description("Medium High; [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
+    MEDIUM_HIGH,
+    [Description("High; [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
+    HIGH,
 }
 
 [DefaultValue(ONLY_BOTS)]
@@ -880,6 +882,17 @@ public class DefaultWeightAttribute(int weight) : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Field)]
+public class FixedBytesAttribute : Attribute
+{
+    public byte[] Values { get; }
+
+    public FixedBytesAttribute(params byte[] values)
+    {
+        Values = values;
+    }
+}
+
+[AttributeUsage(AttributeTargets.Field)]
 public class RandomRangeDoubleAttribute : Attribute
 {
     /// <summary>
@@ -1047,6 +1060,16 @@ public static class Enums
             .Where(i => !i.IsMetastyle())
             .SelectMany(i => Enumerable.Repeat(i, i.GetWeight()))
             .ToList();
+    }
+
+    public static FixedBytesAttribute? GetFixedBytes(this Enum self)
+    {
+        Type type = self.GetType();
+        string? name = Enum.GetName(type, self);
+        if (name == null) { return null; }
+        FieldInfo? fieldInfo = type.GetField(name);
+        if (fieldInfo == null) { return null; }
+        return fieldInfo.GetCustomAttribute<FixedBytesAttribute>(inherit: false);
     }
 
     public static RandomRangeDoubleAttribute? GetRandomRangeDouble(this Enum self)

@@ -366,58 +366,55 @@ public class StatRandomizer
         }
 
         byte[] newTable = new byte[8];
-        for (int i = 0; i < 8; i++)
+
+        FixedBytesAttribute? fixedBytes = attackEffectiveness.GetFixedBytes();
+        if (fixedBytes != null)
         {
-            int nextVal;
-            byte vanilla = AttackEffectivenessTable[i];
-            switch (attackEffectiveness)
+            Debug.Assert(fixedBytes.Values.Length == 8);
+            newTable = fixedBytes.Values;
+        }
+        else
+        {
+            RandomRangeDoubleAttribute? range = attackEffectiveness.GetRandomRangeDouble();
+            Debug.Assert(range != null);
+
+            for (int i = 0; i < 8; i++)
             {
-                case AttackEffectiveness.LOW:
-                    //the naieve approach here gives a curve of 1,2,2,4,5,6 which is weird, or a different
-                    //irregular curve in digshake's old approach. Just use a linear increase for the first 6 levels on low
-                    if (i < 6)
-                    {
-                        nextVal = i + 1;
-                    }
-                    else
-                    {
-                        nextVal = (int)Math.Round(vanilla * .5, MidpointRounding.ToPositiveInfinity);
-                    }
-                    break;
-                case AttackEffectiveness.AVERAGE_LOW:
-                    nextVal = RandomInRange(r, vanilla * .5, vanilla);
+                int nextVal;
+                byte vanilla = AttackEffectivenessTable[i];
+
+                int min = (int)(vanilla * range.Low);
+                int max = (int)(vanilla * range.High);
+                nextVal = r.Next(min, max);
+
+                if (attackEffectiveness == AttackEffectiveness.AVERAGE_LOW)
+                {
                     if (i == 1)
                     {
                         nextVal = Math.Max(nextVal, 2); // set minimum 2 damage at level 2
                     }
-                    break;
-                case AttackEffectiveness.AVERAGE:
-                    nextVal = RandomInRange(r, vanilla * .667, vanilla * 1.5);
+                }
+                else if (attackEffectiveness == AttackEffectiveness.AVERAGE)
+                {
                     if (i == 0)
                     {
                         nextVal = Math.Max(nextVal, 2); // set minimum 2 damage at start
                     }
-                    break;
-                case AttackEffectiveness.AVERAGE_HIGH:
-                    nextVal = RandomInRange(r, vanilla, vanilla * 1.5);
-                    break;
-                case AttackEffectiveness.HIGH:
-                    nextVal = (int)Math.Round(vanilla * 1.5);
-                    break;
-                default:
-                    throw new NotImplementedException("Invalid Attack Effectiveness");
-            }
-            if (i > 0)
-            {
-                byte lastValue = newTable[i - 1];
-                if (nextVal < lastValue)
-                {
-                    nextVal = lastValue; // levelling up should never be worse
                 }
-            }
 
-            newTable[i] = (byte)nextVal;
+                if (i > 0)
+                {
+                    byte lastValue = newTable[i - 1];
+                    if (nextVal < lastValue)
+                    {
+                        nextVal = lastValue; // levelling up should never be worse
+                    }
+                }
+
+                newTable[i] = (byte)nextVal;
+            }
         }
+
         AttackEffectivenessTable = newTable;
     }
 
@@ -438,6 +435,9 @@ public class StatRandomizer
             return;
         }
 
+        RandomRangeDoubleAttribute? range = statEffectiveness.GetRandomRangeDouble();
+        Debug.Assert(range != null);
+
         byte[] newTable = new byte[LIFE_EFFECTIVENESS_ROWS * 8];
 
         // The values we are randomizing are actually *enemy damage* values
@@ -448,25 +448,11 @@ public class StatRandomizer
                 int index = damageCode * 8 + level;
                 byte nextVal;
                 byte vanilla = (byte)(LifeEffectivenessTable[index] >> 1);
-                int min = (int)(vanilla * .75);
-                int max = Math.Min((int)(vanilla * 1.5), 120);
-                switch (statEffectiveness)
-                {
-                    case LifeEffectiveness.AVERAGE_LOW:
-                        nextVal = (byte)r.Next(vanilla, max);
-                        break;
-                    case LifeEffectiveness.AVERAGE:
-                        nextVal = (byte)r.Next(min, max);
-                        break;
-                    case LifeEffectiveness.AVERAGE_HIGH:
-                        nextVal = (byte)r.Next(min, vanilla);
-                        break;
-                    case LifeEffectiveness.HIGH:
-                        nextVal = (byte)(vanilla * .5);
-                        break;
-                    default:
-                        throw new NotImplementedException("Invalid Life Effectiveness");
-                }
+                int min = (int)(vanilla * range.Low);
+                int max = (int)(vanilla * range.High);
+                nextVal = (byte)r.Next(min, max);
+                nextVal = Math.Min(nextVal, (byte)120);
+
                 if (level > 0)
                 {
                     byte lastVal = (byte)(newTable[index - 1] >> 1);
@@ -494,6 +480,9 @@ public class StatRandomizer
             return;
         }
 
+        RandomRangeDoubleAttribute? range = statEffectiveness.GetRandomRangeDouble();
+        Debug.Assert(range != null);
+
         byte[] newTable = new byte[MAGIC_EFFECTIVENESS_ROWS * 8];
 
         for (int level = 0; level < 8; level++)
@@ -502,29 +491,12 @@ public class StatRandomizer
             {
                 int index = spellIndex * 8 + level;
                 byte nextVal;
-                byte vanilla = (byte)(MagicEffectivenessTable[index] >> 1);
-                int min = (int)(vanilla * .5);
-                int max = Math.Min((int)(vanilla * 1.5), 120);
-                switch (statEffectiveness)
-                {
-                    case MagicEffectiveness.HIGH_COST:
-                        nextVal = (byte)max;
-                        break;
-                    case MagicEffectiveness.AVERAGE_HIGH_COST:
-                        nextVal = (byte)r.Next(vanilla, max);
-                        break;
-                    case MagicEffectiveness.AVERAGE:
+                byte baseVal = (byte)(MagicEffectivenessTable[index] >> 1);
+                int min = (int)(baseVal * range.Low);
+                int max = (int)(baseVal * range.High);
                         nextVal = (byte)r.Next(min, max);
-                        break;
-                    case MagicEffectiveness.AVERAGE_LOW_COST:
-                        nextVal = (byte)r.Next(min, vanilla);
-                        break;
-                    case MagicEffectiveness.LOW_COST:
-                        nextVal = (byte)min;
-                        break;
-                    default:
-                        throw new Exception("Invalid Magic Effectiveness");
-                }
+                nextVal = Math.Min(nextVal, (byte)120);
+
                 if (level > 0)
                 {
                     byte lastVal = (byte)(newTable[index - 1] >> 1);
