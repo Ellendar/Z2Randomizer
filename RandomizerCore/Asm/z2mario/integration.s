@@ -1507,6 +1507,14 @@ SkipEnemyRecoilIfThrowingHammer:
 @skip:
 .assert * = $E723
 
+; During fairy-swim Mario's Link animation frame ($80) sits at $08, which vanilla
+; reads as an up-stab. The up-stab special-case at $E6F3 then discards any hit where
+; Link is above the enemy (LDA $29; CMP $2A,x; BCC no-hit) which causes the fairy stomp
+; to just phase through enemies sometimes. Just skip this dumb check >:(
+.org $E6F3
+  jmp $E708
+FREE_UNTIL $E708
+
 .reloc
 SetDownstabStatTracking:
   ;set recoil to -4 to bounce up
