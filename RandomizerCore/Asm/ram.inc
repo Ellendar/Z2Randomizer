@@ -62,12 +62,12 @@ zp_15 = $15
 zp_16 = $16
 LinkStanding = $17                       ; 0 = Link in ducked shield position, 1 = Link standing
 DarkLinkStanding = $18                   ; 0 = Dark Link ducking, 1 = Dark Link standing
-LinkYPositionHi = $19                    ; [SS] 0 = Invisible, 1 = Normal, 2-FF = Fall in hole   - [FILE] Cursor position
-Enemy0YPositionHi = $1a                  ; [SS] 0 = Enemy0 off the top of the screen, 1 = Normal - [FILE] Save file presence bits
+LinkYPositionHi = $19                    ; 0 = Invisible, 1 = Normal, 2-FF = Fall in hole   - [FILE] Cursor position
+Enemy0YPositionHi = $1a                  ; 0 = Enemy0 off the top of the screen, 1 = Normal - [FILE] Save file presence bits
 Enemy1YPositionHi = $1b
 Enemy2YPositionHi = $1c
 Enemy3YPositionHi = $1d
-Enemy4YPositionHi = $1e                  ; [SS] 0 = Enemy4 off the top of the screen, 1 = Normal - [FILE] File selection cursor
+Enemy4YPositionHi = $1e                  ; 0 = Enemy4 off the top of the screen, 1 = Normal - [FILE] File selection cursor
 Enemy5YPositionHi = $1f
 Enemy0Condition = $20
 Enemy1Condition = $21
@@ -81,7 +81,7 @@ zp_28 = $28
 LinkYPos = $29
 EnemyYPositionLo = $2a
 Enemy0YPositionLo = $2a
-OverworldEnemyYPosition = $2a            ; [OW] base of overworld demon Y world position array, indexed by slot X
+OverworldEnemyYPosition = $2a            ; base of overworld demon Y world position array, indexed by slot X
 Enemy1YPositionLo = $2b
 Enemy2YPositionLo = $2c
 Enemy3YPositionLo = $2d
@@ -122,7 +122,7 @@ LinkXPosition   = $4d
 LinkXPositionLo = $4d
 EnemyXPositionLo  = $4e
 Enemy0XPositionLo = $4e
-OverworldEnemyXPosition = $4e            ; [OW] base of overworld demon X world position array, indexed by slot X
+OverworldEnemyXPosition = $4e            ; base of overworld demon X world position array, indexed by slot X
 Enemy1XPositionLo = $4f
 Enemy2XPositionLo = $50
 Enemy3XPositionLo = $51
@@ -159,10 +159,10 @@ zp_6f = $6f
 LinkXVelocity = $70
 Enemy0XVelocity = $71
 Enemy1XVelocity = $72
-OverworldYPosition = $73                 ; [SS] Enemy2XVelocity - [OW] OverworldYPosition
-OverworldXPosition = $74                 ; [SS] Enemy3XVelocity - [OW] OverworldXPosition
-OverworldLinkYPosition = $75             ; [SS] Enemy4XVelocity - [OW] OverworldLinkYPosition
-OverworldLinkXPosition = $76             ; [SS] Enemy5XVelocity - [OW] OverworldLinkXPosition
+OverworldYPosition = $73                 ; Enemy2XVelocity / OverworldYPosition
+OverworldXPosition = $74                 ; Enemy3XVelocity / OverworldXPosition
+OverworldLinkYPosition = $75             ; Enemy4XVelocity / OverworldLinkYPosition
+OverworldLinkXPosition = $76             ; Enemy5XVelocity / OverworldLinkXPosition
 Projectile0XVelocity = $77
 Projectile1XVelocity = $78
 Projectile2XVelocity = $79
@@ -172,20 +172,20 @@ Projectile5XVelocity = $7c
 LinkProjectile0XVelocity = $7d
 LinkProjectile1XVelocity = $7e
 zp_7f = $7f
-OverworldScrollY = $7f                   ; [OW] camera Y scroll offset; OAM_Y = world_Y - OverworldScrollY
+OverworldScrollY = $7f                   ; camera Y scroll offset; screen Y = world_Y - OverworldScrollY
 LinkAnimationFrame = $80
-OverworldCurrentSlot = $80              ; [OW] current overworld demon slot index during per-frame processing (0-7)
+OverworldCurrentSlot = $80              ; current overworld demon slot index during per-frame processing (0-7)
 Enemy0AnimationFrame = $81
-OverworldEnemy0Type = $82                ; [SS] Enemy1AnimationFrame - [OW] OverworldEnemy0Type, 1 = Weak, 2 = Strong, 3 = Fairy
-OverworldEnemy1Type = $83                ; [SS] Enemy2AnimationFrame - [OW] OverworldEnemy1Type
-OverworldEnemy2Type = $84                ; [SS] Enemy3AnimationFrame - [OW] OverworldEnemy2Type
-OverworldEnemy3Type = $85                ; [SS] Enemy4AnimationFrame - [OW] OverworldEnemy3Type
-OverworldEnemy4Type = $86                ; [SS] Enemy5AnimationFrame - [OW] OverworldEnemy4Type
+OverworldEnemy0Type = $82                ; Enemy1AnimationFrame / OverworldEnemy0Type, 1 = Weak, 2 = Strong, 3 = Fairy
+OverworldEnemy1Type = $83                ; Enemy2AnimationFrame / OverworldEnemy1Type
+OverworldEnemy2Type = $84                ; Enemy3AnimationFrame / OverworldEnemy2Type
+OverworldEnemy3Type = $85                ; Enemy4AnimationFrame / OverworldEnemy3Type
+OverworldEnemy4Type = $86                ; Enemy5AnimationFrame / OverworldEnemy4Type
 ProjectileType = $87
 Enemy_Flag = ProjectileType
-Projectile0Type = $87                    ; [SS] Projectile0Type - [OW] OverworldEnemy5Type
-Projectile1Type = $88                    ; [SS] Projectile1Type - [OW] OverworldEnemy6Type
-Projectile2Type = $89                    ; [SS] Projectile2Type - [OW] OverworldEnemy7Type
+Projectile0Type = $87                    ; Projectile0Type / OverworldEnemy5Type
+Projectile1Type = $88                    ; Projectile1Type / OverworldEnemy6Type
+Projectile2Type = $89                    ; Projectile2Type / OverworldEnemy7Type
 Projectile3Type = $8a
 Projectile4Type = $8b
 Projectile5Type = $8c
@@ -340,17 +340,17 @@ timer_501 = $0501                        ; $501 through $50d are timers that are
 LinkEntrySlideTime = $0503
 SwordAttackTimer = $050a
 InjuryTimer = $050c
-OverworldDemonTimer = $050e              ; [OW] overworld demon active flag/timer, indexed by slot X; non-zero = active
+OverworldDemonTimer = $050e              ; overworld demon active flag/timer, indexed by slot X; non-zero = active
 EncounterSpawnTimer = $0516
 RNG = $051b
 MapNumber = $0561
-OverworldFacingDirection = $0562         ; [OW] Link's facing direction: $01=right, $02=left, $04=down, $08=up
-OverworldFacingTerrain = $0563           ; [OW] terrain type Link is currently facing
+OverworldFacingDirection = $0562         ; Link's facing direction: $01=right, $02=left, $04=down, $08=up
+OverworldFacingTerrain = $0563           ; terrain type Link is currently facing
 TownNumber = $056b
 PalaceNumber = $056c
 PalaceRegionIndex = $056c                ; Palace index in continent (0-2)
-OverworldDemonYVelocity = $056d          ; [OW] overworld demon Y velocity, indexed by slot X (signed: $01=down, $FF=up)
-OverworldDemonXVelocity = $0575          ; [OW] overworld demon X velocity, indexed by slot X (signed: $01=right, $FF=left)
+OverworldDemonYVelocity = $056d          ; overworld demon Y velocity, indexed by slot X (signed: $01=down, $FF=up)
+OverworldDemonXVelocity = $0575          ; overworld demon X velocity, indexed by slot X (signed: $01=right, $FF=left)
 LinkYVelocityHi = $057d
 EnemyYVelocity = $057e
 Enemy0YVelocity = $057e
@@ -467,6 +467,10 @@ SavedDoorExit1ScrollX = $69b1            ; accessed as $69ac,X with X = 5
 SavedDoorExit2ScrollPage = $69ab         ; used for New Kasuto fireplace
 SavedDoorExit2ScrollX = $69b2
 
+; LocationNumber will later be changed to the side-scrolling location
+; index. z2ft needs this, at this specific address.
+AreaEntranceIndex = $69ff
+
 ; All Timestamp types listed below for reference
 TS_COUNT .set 0
 .macro TimestampId name
@@ -517,8 +521,10 @@ RESV BlockBreakColumnOffset, BREAKABLE_BLOCK_COUNT ; Vanilla addr $042E - Offset
 RESV BlockBreakAddrLo, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table lo addr
 RESV BlockBreakAddrHi, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table hi addr
 
-RESV TwisterCurrentPalaceSlot ; global palace slot (RegionNumber*4 + within-region palace code) of last dungeon Link entered or warped to
-RESV TwisterPendingPalaceLocation ; flute cross-continent warp: non-zero = palace LocationNumber to enter once the destination region's overworld has been reloaded
+; global palace slot of last dungeon Link entered or warped to
+RESV TwisterCurrentPalaceSlot
+; Nonzero if we are changing continents with the warp and need to reload it
+RESV TwisterPendingPalaceLocation
 
 .ifdef ENABLE_Z2_MARIO
 

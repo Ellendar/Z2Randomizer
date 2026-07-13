@@ -3657,17 +3657,13 @@ World0:
 ; This is currently true for vanilla and Z2R
 RAFT_TILE_INDEX = $29
 
-; LocationNumber will later be changed to the side-scrolling location
-; index. z2ft needs this, at this specific address.
-AREA_ENTRANCE_INDEX = $69ff
-
 .org $8528 ; we don't use this data anymore
 FREE_UNTIL $8553 ; remove unused data here
 ; bridge connector coordinates are at $8553
 
 .org $8599
     stx LocationNumber  ; X stashed away like in the original code
-    stx AREA_ENTRANCE_INDEX
+    stx AreaEntranceIndex
     cpx #RAFT_TILE_INDEX
     bne NotRaftTileProceed
     lda HaveRaft
