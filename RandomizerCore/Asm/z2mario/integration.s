@@ -1698,6 +1698,20 @@ CheckIfPlayerSmall:
 .byte $23,$14,$0b,$ee,$e7,$e5,$e2,$e4,$de,$f4,$e5,$e2,$e7,$e4,$ff
 .assert * = $8f9e
 
+.segment "PRG7"
+; play the 1-up sound from mario instead of from zelda when grabbing a link doll
+.org $E818
+  jsr PlayMario1UpSfx
+
+.reloc
+PlayMario1UpSfx:
+  inc NumberofLives
+  lda #0
+  sta $eb ; cancel the regular z2 music change
+  lda #Sfx_ExtraLife
+  sta Square2SoundQueue        ;and play the 1-up sound
+  rts
+
 
 ; The following are locations where it draws the explosion
 ; after killing a boss
