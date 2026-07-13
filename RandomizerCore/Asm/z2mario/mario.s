@@ -442,21 +442,32 @@ PlayerGfxProcessing:
       sta FireballThrowingTimer     ;otherwise store animation timer into fireball throw timer
 
       ; Change the Mario sprite to the fire version
-      lda ObjectMetasprite
-      clc
-      adc #FIRE_MARIO_OFFSET
-      sta ObjectMetasprite
+      ; but only if fire is cast or you are big mario
+      lda PlayerSize
+      eor #1 
+      ora FireSpellActive
+      beq NotSmallFireProbably
+        lda ObjectMetasprite
+        clc
+        adc #FIRE_MARIO_OFFSET
+        sta ObjectMetasprite
+NotSmallFireProbably:
 
       lda Player_X_Speed
       ora Left_Right_Buttons        ;check for horizontal speed or left/right button press
       bne SUpdR                     ;if no speed or button press, branch using set value in Y
-        ; Use the glitchy version of the sprite
+        ; Use the glitchy version of the sprite if you are small and fire mario
         lda PlayerSize
         bne SmallFireMario
           lda #METASPRITE_FIRE_MARIO_SWIMMING_STILL_1
           bne SetFrame
         SmallFireMario:
-          lda #METASPRITE_SMALL_FIRE_SWIMMING_STILL_1
+          lda FireSpellActive
+          beq SmallOnlyProbablyHammer
+            lda #METASPRITE_SMALL_FIRE_SWIMMING_STILL_1
+            bne SetFrame
+        SmallOnlyProbablyHammer:
+          lda #METASPRITE_SMALL_MARIO_SWIMMING_1_KICK
       SetFrame:
         sta ObjectMetasprite
 SUpdR:
@@ -2511,13 +2522,13 @@ GetProperObjOffset:
     jmp UpdateHammers
   +
   ; Check if you either have upstab
-  lda PlayerSize ; or are big enough to throw hammers
-  beq +
-    lda HaveStabs
-    and #HAVE_UPSTAB
-    bne +
-      jmp UpdateHammers
-  +
+  ; lda PlayerSize ; or are big enough to throw hammers
+  ; beq +
+  ;   lda HaveStabs
+  ;   and #HAVE_UPSTAB
+  ;   bne +
+  ;     jmp UpdateHammers
+  ; +
     ; and that the player is pushing up + b
     lda SavedJoypadBits
     and #B_Button | Up_Dir     ;check for up + b button pressed
