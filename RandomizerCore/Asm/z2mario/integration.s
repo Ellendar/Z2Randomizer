@@ -1518,10 +1518,11 @@ SetDownstabStatTracking:
 @Exit:
   rts
 
-.org $E9C0
+; This check for upstab/downstab and we can just check for downstab in mario instead
+.org $e9ba
   jsr InyIfDownstabbing
-  nop
-  nop
+  jmp $e9c5
+FREE_UNTIL $e9c5
 
 .reloc
 InyIfDownstabbing:
