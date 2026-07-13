@@ -1,7 +1,16 @@
 .include "z2r.inc"
 
+TWISTER_ENEMY_ID = $04
 TWISTER_TILE = $b5   ; tile IDs for frame 0; frame 1 uses TWISTER_TILE+2
 TWISTER_PAL  = $02   ; OAM palette attribute (bits 0-1)
+
+; Overworld "Area Byte 0" (Y position + flags) table in work RAM, indexed by
+; LocationNumber. Bit 7 set marks the slot as a palace/town entrance; when it's
+; clear the sideview loader treats the slot as a generic/random-battle area.
+OverworldAreaTable = $6a00
+; UpdateHiddenPalaceSpot() stores the flute-hidden palace's *revealed* Area Data
+; The palace is index 0 at $df68 and the town is index 1 at $df69
+HiddenPalaceRevealedAreaUpdate = $df68
 
 .segment "PRG0", "PRG7"
 
@@ -46,11 +55,21 @@ OverworldPostLoadFluteCheck:
     rts
 @enter:
   sta LocationNumber          ; restore the palace area index ($34 + palace code)
+  sta AreaEntranceIndex
   lda #$00
   sta TwisterPendingPalaceLocation
   ; skip the main overworld game mode and move to the side view loading
   lda #5
   sta GameMode
+  ; the destination continent's area byte table was just reloaded from ROM, so
+  ; reveal the hidden palace now (if that's where we're headed)
+RevealHiddenPalaceIfNeeded:
+  ldy LocationNumber
+  lda OverworldAreaTable, y
+  bmi @done
+    lda HiddenPalaceRevealedAreaUpdate
+    sta OverworldAreaTable, y
+@done:
   rts
 
 
@@ -112,84 +131,20 @@ TwisterHitCheck:
 
 .reloc
 TwisterWarp:
-  ; Direction: OverworldFacingDirection bits
-  ; next     $01=right $08=up
-  ; previous $02=left $04=down 
-  lda OverworldFacingDirection
-  ; right ($01) or up ($08)
-  and #$09
-  bne @go_next
-  lda #$0f ; add $0f (== -1 mod 16) to walk the slot list backwards
-  bne @scan ; unconditional
-@go_next:
-  lda #$01 ; add 1 to walk the slot list forwards
-@scan:
-  sta R7
-  ; scan each of the possible palace global spots in the PalaceMappingTable
-  lda TwisterCurrentPalaceSlot
-  ldx #$10
-@next_palace:
-  clc
-  adc R7
-  ; wrap within the 0-15 global slot space
-  and #$0f
-  tay
-  lda PalaceMappingTable, y
-  cmp #$ff ; $ff is a place holder indicating no palace at this slot in the world
-  beq @advance
-    ; Palace exists here. Check whether its gem has been placed.
-    sty R6
-    ; This table layout was optimized for updating stats (since thats done every frame)
-    ; and this doesn't matter how long it takes pretty much
-    sec
-    sbc #Palace1Offset
-    ; div by 3 to get the palace number 0 - 6
-    sta R5
-    lsr
-    lsr
-    adc R5
-    ror
-    lsr
-    adc R5
-    ror
-    lsr
-    adc R5
-    ror
-    lsr
-    adc R5
-    ror
-    lsr
-    ; Check for great palace ID and skip it (palace 6)
-    cmp #6
-    bcs @advance
-    ; A = CrystalPlaced index 0-5
-    tay
-    lda CrystalPlaced, y
-    bne @crystalPlacedAtPalace
-    ; Check next palace slot in the real locations table
-    ldy R6
-@advance:
-  tya
-  dex
-  bne @next_palace
-    rts ; this shouldn't happen. tornado should only spawn if a gem is placed
-@crystalPlacedAtPalace:
-  ; R6 = target global slot
-  lda R6
-  sta TwisterCurrentPalaceSlot
   ; clear the twister slot
   ldx OverworldCurrentSlot
   lda #$00
   sta OverworldEnemy0Type, x
   sta OverworldDemonTimer, x
   ; LocationNumber = $34 + within-region palace code
-  lda R6
+  lda TwisterCurrentPalaceSlot
   and #$03
   clc
   adc #$34
   sta LocationNumber
+  sta AreaEntranceIndex
   ; target region = global slot >> 2
-  lda R6
+  lda TwisterCurrentPalaceSlot
   lsr
   lsr
   cmp RegionNumber
@@ -209,7 +164,14 @@ TwisterWarp:
     ; AreaLoadTrigger does `inc GameMode` and we want mode 0 so set it to $ff
     lda #$ff
     sta GameMode
+    ; the area byte table isn't loaded for the destination continent yet, so the
+    ; hidden palace reveal is deferred to OverworldPostLoadFluteCheck
+    bne @load ; unconditional
 @same_region:
+  ; still in the destination continent, so its area byte table is already live.
+  ; reveal the palace destination if we are warping there
+  jsr RevealHiddenPalaceIfNeeded
+@load:
   pla
   pla
   jmp AreaLoadTrigger
@@ -217,6 +179,7 @@ TwisterWarp:
 .reloc
 RecordPalaceEntry:
   stx LocationNumber
+  stx AreaEntranceIndex
   ; update anchor when Link enters a palace. Palace area indices are $34-$36
   ; (within-region palace codes 0-2). Combine with the region for a global slot.
   txa
@@ -237,58 +200,129 @@ RecordPalaceEntry:
 @done:
   rts
 
-
+; Put the twister spawning into a macro so it can be copied between bank 1 and 2
 .macro TwisterSpawnBody
-.local crystal_check, crystal_found, active_check, not_active, free_slot, init_slot, spider, doublereturn
-  ; instruction before was CMP #$0F
-  beq spider
-  ; Check if at least one gem is placed ($078D + palace_code, palace_code = 0-5).
-  ldx #$05
-crystal_check:
-  lda CrystalPlaced, x
-  bne crystal_found
-  dex
-  bpl crystal_check
-  bmi doublereturn ; unconditionally exit
-crystal_found:
   ; Refuse to spawn a second twister if one is already active.
   ldx #$07
-active_check:
+@active_check:
   lda OverworldEnemy0Type, x
   cmp #$04
   ; already have a twister so skip processing it
-  beq doublereturn
+  bne @skip
+    jmp @exit
+@skip:
   dex
-  bpl active_check
-  ; Find a free demon slot (type == 0).
-  ldx #$07
-free_slot:
-  lda OverworldEnemy0Type, x
-  beq init_slot
-  dex
-  bpl free_slot
-  inx ; set x = 0 and just overwrite slot 0 if all else fails
-init_slot:
-  lda #$04
-  sta OverworldEnemy0Type, x      ; type 4 = twister
-  lda #$40
-  sta OverworldDemonTimer, x      ;
-  lda OverworldScrollY            ; camera Y
+  bpl @active_check
+
+  ; Check the player direction and find a valid palace to warp to
+  ; Direction: OverworldFacingDirection bits
+  ; next     $01=right $08=up
+  ; previous $02=left $04=down 
+  lda OverworldFacingDirection
+  ; right ($01) or up ($08)
+  and #$09
+  bne @go_next
+  lda #$ff ; add -1 to walk the list backwards
+  bne @scan ; unconditional
+@go_next:
+  lda #$01 ; add 1 to walk the slot list forwards
+@scan:
+  sta R7
+
+  ; skip through the list of crystals placed to find the next palace to go to
+  ldy TwisterCurrentPalaceSlot
+  lda PalaceMappingTable,y
+  jsr @ConvertPalaceIdToMapping
+  ldx #5
+@next_palace:
   clc
-  adc #$6c                        ; center-screen height
-  sta OverworldEnemyYPosition, x  ; world Y
-  lda ScrollPosShadow             ; camera X
-  sta OverworldEnemyXPosition, x  ; world X = left screen edge (OAM X = 0)
+  adc R7
+  and #7
+  cmp #6 ; skip over the great palace
+  bcs @next_palace
+  tay
+  lda CrystalPlaced, y
+  bne @crystalplaced
+  tya
+  dex
+  bpl @next_palace
+    ; We haven't placed any crystals, so leave
+    jmp @exit
+@crystalplaced:
+  sty R7 ; use this as a temp storage for the target palace to warp to
+  ; store the next palace idx that we will warp to
+  ; now that we know what palace we want to go to, loop through the palace mapping table to find the
+  ; actual location for it.
+  ldy #$0f
+@next_mapping_entry:
+  lda PalaceMappingTable, y
+  cmp #$ff ; $ff is a place holder indicating no palace at this slot in the world
+  beq @advance
+  jsr @ConvertPalaceIdToMapping
+  ; Check if this palace number == the actual palace we are looking for
+  cmp R7
+  beq @foundPalaceToWarpTo
+  ; haven't found the palace mapping table entry for this palace yet, so loop again
+@advance:
+  dey
+  bpl @next_mapping_entry
+    ; we couldn't find the mapping? that doesn't seem possible...
+    jmp @exit
+@foundPalaceToWarpTo:
+  sty TwisterCurrentPalaceSlot
+
+  ; Find a free encounter slot
+  ldx #$07
+@free_slot:
+  lda OverworldEnemy0Type, x
+  beq @init_slot
+  dex
+  bpl @free_slot
+  inx ; set x = 0 and just overwrite slot 0 if all else fails
+@init_slot:
+  lda #TWISTER_ENEMY_ID
+  sta OverworldEnemy0Type, x
+  lda #$40
+  sta OverworldDemonTimer, x
+  lda OverworldScrollY
+  clc
+  ; center-screen height where the player is
+  adc #$6c
+  sta OverworldEnemyYPosition, x
+  ; spawn it at the left edge of the screen
+  lda ScrollPosShadow
+  sta OverworldEnemyXPosition, x
+  ; horizontally move at 2px right a frame
   lda #$02
-  sta OverworldDemonXVelocity, x  ; +2/frame rightward
+  sta OverworldDemonXVelocity, x
   lda #$00
-  sta OverworldDemonYVelocity, x  ; no vertical movement
-  ; Twister spawned. Return from flute dispatch (don't fall into L838F).
-doublereturn:
-  pla
-  pla
-spider:
-  rts                             ; returns to L838F: spider/rock encounter
+  sta OverworldDemonYVelocity, x
+@exit:
+  ; And also check if its time to do spider/3 eye rock encounter
+  lda OverworldFacingTerrain
+  rts
+@ConvertPalaceIdToMapping:
+  ; This table layout was optimized for updating stats (since thats done every frame)
+  ; and this doesn't matter how long it takes pretty much. So we need to convert
+  sec
+  sbc #Palace1Offset
+  ; div by 3 to get the palace number 0 - 6
+  sta R5
+  lsr
+  lsr
+  adc R5
+  ror
+  lsr
+  adc R5
+  ror
+  lsr
+  adc R5
+  ror
+  lsr
+  adc R5
+  ror
+  lsr
+  rts
 .endmacro
 
 
@@ -299,11 +333,8 @@ spider:
   jmp $836f
 FREE_UNTIL $836f
 
-.org $838C
+.org $8387
   jsr TwisterSpawnPRG1
-; The code after the patch point is where it normally branches to if the flute
-; is removing a spider or spawning 3 eyed rock
-.assert * = $838f
 
 .reloc
 .proc TwisterSpawnPRG1
@@ -319,9 +350,8 @@ FREE_UNTIL $836f
 FREE_UNTIL $836f
 
 ; Same hook at the same address.
-.org $838C
+.org $8387
   jsr TwisterSpawnPRG2
-.assert * = $838f
 
 .reloc
 .proc TwisterSpawnPRG2

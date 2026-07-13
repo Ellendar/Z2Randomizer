@@ -144,6 +144,12 @@ SwimStompEnvelopeData:
 ;   $01-$7F - note index ($7E is "rest")
 ;   $80-$FF - CTL1 latch, does NOT consume a new note this frame
 ; -----------------------------------------------------------------------------
+PlaySMB3Flute:
+       lda #SMB3FluteSong - SndLev1_DataLongWag
+       sta Squ1_SfxLenCounter
+       lda #$90
+       sta TailWag_CtlHold
+       jmp ContinueTailWag
 PlayTailWag:
        lda #$00
        sta Squ1_SfxLenCounter
@@ -281,7 +287,9 @@ Square1SfxHandler:
        lsr Square1SoundQueue
        bcs PlaySwimStomp       ;swim/stomp
        lsr Square1SoundQueue
-       bcs PlaySmackEnemy      ;smack enemy
+       bcc +
+         jmp PlaySMB3Flute
+       + ; was PlaySmackEnemy      ;smack enemy
        lsr Square1SoundQueue
        bcc +
         jmp PlayPipeDownInj    ;pipedown/injury
@@ -686,3 +694,10 @@ SndLev1_DataLongWag:
 	.byte $90, $7E, $7E, $97 ; $A5BB - $A5CA
 	.byte $4C, $4E, $90, $7E, $7E, $95, $52, $54, $56, $58, $94, $52, $54, $56, $58, $93 ; $A5CB - $A5DA
 	.byte $52, $54, $56, $58, $00
+
+SMB3FluteSong:
+	.byte $98, $7E, $28, $22, $7E, $98, $20 ; $ACF9 - $AD08
+	.byte $94, $20, $22, $88, $7E, $7E, $00, $98, $7E, $1E, $18, $7E, $98, $16, $94, $16 ; $AD09 - $AD18
+	.byte $18, $88, $7E, $7E, $A8, $3A, $84, $7E, $88, $3A, $A4, $30, $36, $38, $A8, $3A ; $AD19 - $AD28
+	.byte $84, $7E, $88, $3A, $A4, $30, $36, $38, $94, $04, $02, $00, $94, $0A, $0B, $07 ; $AD29 - $AD38
+	.byte $07, $00
