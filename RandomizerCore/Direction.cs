@@ -20,6 +20,18 @@ static class DirectionExtensions
         };
     }
 
+    public static IntVector2 ToIntVector2(this Direction direction)
+    {
+        return direction switch
+        {
+            Direction.NORTH => IntVector2.NORTH,
+            Direction.SOUTH => IntVector2.SOUTH,
+            Direction.EAST => IntVector2.EAST,
+            Direction.WEST => IntVector2.WEST,
+            _ => throw new ArgumentException("Invalid direction: " + direction)
+        };
+    }
+
     public static int DeltaX(this Direction direction)
     {
         return direction switch
