@@ -87,6 +87,7 @@ public static class StandardPreset
 
         ShuffleSmallItems = true,
         RandomizeNewKasutoJarRequirements = true,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

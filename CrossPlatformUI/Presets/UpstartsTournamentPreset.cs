@@ -77,6 +77,7 @@ public static class UpstartsTournamentPreset
         ShuffleSmallItems = true,
         ShufflePBagAmounts = true,
         RandomizeNewKasutoJarRequirements = true,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

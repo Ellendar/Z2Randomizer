@@ -72,6 +72,7 @@ public static class BeginnerPreset
         ShuffleSmallItems = true,
         PalacesContainExtraKeys = true,
         RandomizeNewKasutoJarRequirements = true,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

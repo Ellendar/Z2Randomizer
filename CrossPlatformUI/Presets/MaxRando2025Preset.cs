@@ -94,6 +94,7 @@ public static class MaxRando2025Preset
         ShuffleSmallItems = true,
         ShufflePBagAmounts = true,
         RandomizeNewKasutoJarRequirements = true,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

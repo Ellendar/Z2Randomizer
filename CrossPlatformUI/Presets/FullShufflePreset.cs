@@ -91,6 +91,7 @@ public static class FullShufflePreset
 
         ShuffleSmallItems = true,
         RandomizeNewKasutoJarRequirements = true,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

@@ -86,6 +86,7 @@ public static class StandardSwissPreset
 
         ShuffleSmallItems = true,
         RandomizeNewKasutoJarRequirements = true,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

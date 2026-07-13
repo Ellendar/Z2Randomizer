@@ -73,6 +73,7 @@ public static class Sgl2025Preset
         ShuffleOverworldItems = true,
         MixOverworldAndPalaceItems = true,
 
+        PreventSpellItemChains = false,
 
         //Drops
         StandardizeDrops = true,

@@ -105,6 +105,7 @@ public static class RandomPercentPreset
         ShufflePBagAmounts = null,
         PalacesContainExtraKeys = null,
         RandomizeNewKasutoJarRequirements = true,
+        PreventSpellItemChains = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

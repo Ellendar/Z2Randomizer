@@ -176,6 +176,8 @@ public class RandomizerProperties
     public bool IncludeSwordTechsInShuffle { get; set; }
     //Bagu's note / fountain water / saria mirror
     public bool IncludeQuestItemsInShuffle { get; set; }
+    //Spell items may not be required to obtain another spell item
+    public bool PreventSpellItemChains { get; set; }
     public bool RandomizeSmallItems { get; set; }
     public bool ExtraKeys { get; set; }
     public bool AllowImportantItemDuplicates { get; set; }
