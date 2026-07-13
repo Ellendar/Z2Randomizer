@@ -1647,9 +1647,13 @@ DrawMapMario:
   jsr ClearExtraRAMOnScreenTransition
 .reloc
 ClearExtraRAMOnScreenTransition:
-  ; original patched code
   lda #0
-  tax
+  ; Run through the stack ram and clear some stuff.
+  ldx #CrouchingFlag - CurrentOAMOffset 
+-
+    sta CurrentOAMOffset, x
+    dex
+    bne -
   ; also clear custom projectile state
   sta Fireball_State+0
   sta Fireball_State+1
