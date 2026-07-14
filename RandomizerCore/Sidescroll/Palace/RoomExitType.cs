@@ -68,6 +68,17 @@ public static class RoomExitTypeExtensions
     {
         return ((int)exitType & LEFT) == LEFT;
     }
+    public static bool Contains(this RoomExitType exitType, IntVector2 exit)
+    {
+        return exit switch
+        {
+            { X: 1,  Y: 0  } => exitType.ContainsRight(),
+            { X: -1, Y: 0  } => exitType.ContainsLeft(),
+            { X: 0,  Y: 1  } => exitType.ContainsDown(),
+            { X: 0,  Y: -1 } => exitType.ContainsUp(),
+            _ => false
+        };
+    }
 
     public static RoomExitType AddUp(this RoomExitType exitType)
     {
@@ -141,5 +152,15 @@ public static class RoomExitTypeExtensions
     public static RoomExitType Merge(this RoomExitType exitType, RoomExitType toMerge)
     {
         return exitType | toMerge;
+    }
+
+    public static RoomExitType Mirror(this RoomExitType exitType)
+    {
+        var mirrored = exitType;
+        var hasLeft = mirrored.ContainsLeft();
+        var hasRight = mirrored.ContainsRight();
+        mirrored = hasLeft ? mirrored.AddRight() : mirrored.RemoveRight();
+        mirrored = hasRight ? mirrored.AddLeft() : mirrored.RemoveLeft();
+        return mirrored;
     }
 }

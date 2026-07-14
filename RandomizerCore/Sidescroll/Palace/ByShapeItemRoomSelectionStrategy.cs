@@ -69,7 +69,7 @@ internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy, IIt
         return [];
     }
 
-    public Room[] SelectItemRoomsInShape(RoomPool roomPool, int itemRoomCount, bool avoidDuplicates, Random r, Dictionary<Coord, RoomExitType> shape, IEnumerable<RoomExitType> itemRoomShapes, List<Coord> preplacedCoords)
+    public Room[] SelectItemRoomsInShape(RoomPool roomPool, int itemRoomCount, bool avoidDuplicates, Random r, Dictionary<Coord, RoomExitType> shape, IEnumerable<RoomExitType> itemRoomShapes, Coord entrance, List<Coord> preplacedCoords)
     {
         List<RoomExitType> possibleItemRoomExitTypes = ShuffleItemRoomShapes(itemRoomShapes, r);
         List<Room> itemRooms = [], originalItemRooms = [];
@@ -97,6 +97,14 @@ internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy, IIt
                     RoomExitType candidate = pair.Value;
                     bool mustBeDropZone = shape.TryGetValue(upCoord, out var exit) && exit.ContainsDrop();
                     if (mustBeDropZone && !itemRoomCandidate.IsDropZone) { continue; }
+
+                    if (!string.IsNullOrWhiteSpace(itemRoomCandidate.LinkedRoomName))
+                    {
+                        if (!ShapeFirstCoordinatePalaceGenerator.LinkedRoomFitInShape(roomPool, shape, entrance, coord, itemRoomCandidate))
+                        {
+                            continue;
+                        }
+                    }
 
                     Room itemRoom = CreateItemRoom(itemRoomCandidate, coord, roomPool);
                     replacedCoords.Add(coord);

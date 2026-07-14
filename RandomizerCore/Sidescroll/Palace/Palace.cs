@@ -1524,7 +1524,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         }
                         else if (room.HasItem)
                         {
-                            sb.Append('I');
+                            sb.Append(room.LinkedRoomName == null ? 'I' : 'i');
                         }
                         else if (room.IsBossRoom)
                         {
@@ -1536,7 +1536,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         }
                         else
                         {
-                            sb.Append('X');
+                            sb.Append(room.LinkedRoomName == null ? 'X' : 'x');
                         }
                         sb.Append(room.HasRightExit ? '-' : ' ');
                     }

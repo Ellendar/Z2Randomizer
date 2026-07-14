@@ -77,6 +77,7 @@ public class Palaces
                 PalaceStyle.RANDOM_WALK => new RandomWalkCoordinatePalaceGenerator(),
                 PalaceStyle.VANILLA_WEIGHTED => new VanillaWeightedPalaceGenerator(),
                 PalaceStyle.TOWER => new TowerCoordinatePalaceGenerator(),
+                PalaceStyle.MIRROR => new MirrorPalaceGenerator(),
                 PalaceStyle.RECONSTRUCTED => new ReconstructedPalaceGenerator(ct),
                 PalaceStyle.RECONSTRUCTED_LOOPY => new ReconstructedLoopyPalaceGenerator(ct),
                 PalaceStyle.CHAOS => new ChaosPalaceGenerator(),

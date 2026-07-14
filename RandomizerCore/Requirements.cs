@@ -64,6 +64,12 @@ public class Requirements
         return JsonSerializer.Deserialize(json ?? "[]", RoomSerializationContext.Default.Requirements);
     }
 
+    /// Check if a requirement is included in any way, composite or individually
+    public bool Contains(RequirementType requirement)
+    {
+        return IndividualRequirements.Contains(requirement) || CompositeRequirements.Any(reqs => reqs.Contains(requirement));
+    }
+
     public string Serialize()
     {
         StringBuilder sb = new();

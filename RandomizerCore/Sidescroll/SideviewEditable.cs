@@ -18,7 +18,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 /// 
 /// <see cref="Finalize"/> must be called after editing to retrieve the updated bytes for the room.
 /// </summary>
-public class SideviewEditable<T> where T : Enum
+public class SideviewEditable<T> where T : struct, Enum
 {
     private byte[] Header;
     public List<SideviewMapCommand<T>> Commands { get; set; } 
@@ -162,6 +162,11 @@ public class SideviewEditable<T> where T : Enum
         Commands.Add(command);
     }
 
+    public void Add(SideviewMapCommand<T>[] commands)
+    {
+        Commands.AddRange(commands);
+    }
+
     public void Remove(SideviewMapCommand<T> item)
     {
         Commands.Remove(item);
@@ -243,6 +248,48 @@ public class SideviewEditable<T> where T : Enum
         return bytes;
     }
 
+    public void Mirror()
+    {
+        List<SideviewMapCommand<T>> floors = FindAll(o => o.IsNewFloor());
+        if (floors.Count > 0)
+        {
+            // shift floor param to the next object (since they go left->right)
+            var startFloor = SideviewMapCommand<T>.CreateNewFloor(0, FloorHeader);
+            byte nextFloorParam = startFloor.Bytes[1];
+            for (int i = 0; i < floors.Count; i++)
+            {
+                var floor = floors[i];
+                byte oldFloorParam = floor.Bytes[1];
+                floor.Bytes[1] = nextFloorParam;
+                nextFloorParam = oldFloorParam;
+            }
+            FloorHeader = (byte)((FloorHeader & 0b01110000) + (nextFloorParam & 0b10001111));
+        }
+
+        foreach (var cmd in Commands.Where(o => o.Y < 13))
+        {
+            switch (cmd)
+            {
+                case SideviewMapCommand<PalaceObject>:
+                    var cmd1 = cmd as SideviewMapCommand<PalaceObject>;
+                    if (cmd1!.Id == PalaceObject.DRAGON_HEAD)
+                    {
+                        cmd1.Id = PalaceObject.WOLF_HEAD;
+                    }
+                    else if (cmd1!.Id == PalaceObject.WOLF_HEAD)
+                    {
+                        cmd1.Id = PalaceObject.DRAGON_HEAD;
+                    }
+                    break;
+            }
+        }
+
+        foreach (var cmd in Commands)
+        {
+            cmd.AbsX = 63 - cmd.AbsX - (cmd.Width - 1);
+        }
+    }
+
     public String DebugString()
     {
         StringBuilder sb = new StringBuilder("");
@@ -280,11 +327,11 @@ public class SideviewEditable<T> where T : Enum
         {
             if (cmd.IsSolid)
             {
-                int w = Math.Min(width, cmd.AbsX + cmd.Width);
-                int h = Math.Min(height, cmd.Y + cmd.Height);
-                for (var x = cmd.AbsX; x < w; x++)
+                int endX = Math.Min(width, cmd.AbsX + cmd.Width);
+                int endY = Math.Min(height, cmd.Y + cmd.Height);
+                for (var x = cmd.AbsX; x < endX; x++)
                 {
-                    for (int y = cmd.Y; y < h; y++)
+                    for (int y = cmd.Y; y < endY; y++)
                     {
                         result[x, y] = cmd.IsSolidAt(x, y);
                     }
@@ -292,11 +339,11 @@ public class SideviewEditable<T> where T : Enum
             }
             else if (cmd.IsPit)
             {
-                int w = Math.Min(width, cmd.AbsX + cmd.Width);
-                int h = Math.Min(height, cmd.Y + cmd.Height);
-                for (var x = cmd.AbsX; x < w; x++)
+                int endX = Math.Min(width, cmd.AbsX + cmd.Width);
+                int endY = Math.Min(height, cmd.Y + cmd.Height);
+                for (var x = cmd.AbsX; x < endX; x++)
                 {
-                    for (int y = cmd.Y; y < h; y++)
+                    for (int y = cmd.Y; y < endY; y++)
                     {
                         result[x, y] = false;
                     }
@@ -304,6 +351,52 @@ public class SideviewEditable<T> where T : Enum
             }
         }
         return result;
+    }
+
+    public SideviewEditable<O> ConvertTo<O>() where O : struct, Enum
+    {
+        SideviewEditable<O> converted = new([4, ..Header[1..4]]);
+        foreach (var cmd in Commands)
+        {
+            var iId = cmd.Id.ToString();
+
+            if (cmd.IsItem())
+            {
+                converted.Add(new SideviewMapCommand<O>(cmd.Bytes, cmd.AbsX));
+            }
+            else if (cmd.IsNewFloor()) {
+                converted.Add(new SideviewMapCommand<O>(cmd.Bytes, cmd.AbsX));
+            }
+            else if (cmd.IsXSkip()) {
+                continue;
+            }
+            else if (cmd.IsLava()) {
+                converted.Add(SideviewMapCommand<O>.CreateLava(cmd.AbsX, cmd.Param));
+            }
+            else if (cmd.IsElevator())
+            {
+                converted.Add(new SideviewMapCommand<O>(cmd.Bytes, cmd.AbsX));
+            }
+            else if (Enum.TryParse(iId, out O oId))
+            {
+                var convertedCmd = new SideviewMapCommand<O>(cmd.AbsX, cmd.Y, oId);
+                if (cmd.HasParam()) { convertedCmd.Param = cmd.Param; }
+                converted.Add(convertedCmd);
+            }
+            else
+            {
+                var convetedCmds = cmd.ConvertTo<O>();
+                if (convetedCmds.Length > 0)
+                {
+                    converted.Add(convetedCmds);
+                }
+                else
+                {
+                    // Console.WriteLine($"{iId} could not be converted");
+                }
+            }
+        }
+        return converted;
     }
 }
 

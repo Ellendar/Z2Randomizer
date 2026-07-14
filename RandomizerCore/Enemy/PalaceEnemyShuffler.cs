@@ -33,7 +33,7 @@ public class PalaceEnemyShuffler
     private static byte[] RandomizeEnemiesInner<T>(Room room, GroupedEnemies<T> groupedEnemies, EnemiesEditable<T> ee, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG) where T : Enum
     {
         bool[,]? solidGridLazy = null; // lazily instanced if needed
-        bool[,] GetSolidGrid<P>() where P : Enum
+        bool[,] GetSolidGrid<P>() where P : struct, Enum
         {
             if (solidGridLazy == null)
             {
@@ -42,7 +42,7 @@ public class PalaceEnemyShuffler
             }
             return solidGridLazy;
         }
-        bool AreaIsOpen<P>(ref bool? cachedResult, int x, int y, int w, int h) where P : Enum
+        bool AreaIsOpen<P>(ref bool? cachedResult, int x, int y, int w, int h) where P : struct, Enum
         {
             if (cachedResult == null)
             {
