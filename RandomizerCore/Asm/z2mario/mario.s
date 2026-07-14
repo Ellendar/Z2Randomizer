@@ -1951,7 +1951,12 @@ BHalf:
       bne SideCheckLoop         ;run code until both sides of player are checked
 ExSCH:
   rts                       ;leave
-
+CheckForBreakableBlock:
+  cmp #$4c
+  bne @skip
+@skip:
+  clc
+  rts
 CheckSideMTiles:
   ; for now just always block movement
   jmp StopPlayerMove
@@ -2158,6 +2163,7 @@ PlayerHeadCollision:
   ; lda SprDataOffset_Ctrl   ;invert control bit used by block objects
   ; eor #$01                 ;and floatey numbers
   ; sta SprDataOffset_Ctrl
+
 
   lda #$00
   sta Player_Y_Speed      ;init player's vertical speed
