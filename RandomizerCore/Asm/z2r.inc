@@ -127,6 +127,7 @@ Left_Dir              = %00000010
 Right_Dir             = %00000001
 
 ;sound effects constants
+;sq1 sfx
 Sfx_SmallJump         = %10000000
 Sfx_TailWag           = %01000000
 Sfx_Fireball          = %00100000
@@ -136,6 +137,7 @@ Sfx_EnemyStomp        = %00000100
 Sfx_Bump              = %00000010
 Sfx_BigJump           = %00000001
 
+;sq2 sfx
 Sfx_BowserFall        = %10000000
 Sfx_ExtraLife         = %01000000
 Sfx_PowerUpGrab       = %00100000
@@ -144,6 +146,8 @@ Sfx_Blast             = %00001000
 Sfx_GrowVine          = %00000100
 Sfx_GrowPowerUp       = %00000010
 Sfx_CoinGrab          = %00000001
+; noise sfx
+Sfx_BrickShatter      = %00000001
 
 ;music constants
 Silence               = %10000000
