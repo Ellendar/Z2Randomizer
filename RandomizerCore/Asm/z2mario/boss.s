@@ -9,8 +9,6 @@
 .import METASPRITE_FIREBALL_FRAME_1, METASPRITE_FIREBALL_FRAME_2
 .import METASPRITE_HAMMER_FRAME_1, METASPRITE_HAMMER_FRAME_2
 
-.export InjuredBoss
-
 .import METASPRITE_BIG_MARIO_CROUCHING
 CROUCHING = METASPRITE_BIG_MARIO_CROUCHING
 SKIDDING = METASPRITE_BIG_MARIO_SKIDDING
@@ -47,6 +45,11 @@ RIGHT_EDGE_TARGET = 10*16
 BOSS_MAX_RUN_SPEED  = $50
 BOSS_DECEL_DISTANCE = 3 * 16 ; in metatiles
 
+; Damage for stomping/hammer/tail swing
+BOSS_HP_INIT = 80
+STOMP_DAMAGE = 5
+HAMMER_DAMAGE = 5
+FIREBALL_DAMAGE = 1
 
 .segment "PRG7"
 ; patch the vanilla enemy projectile check to prevent it from trying to run our hammer/fireball
@@ -91,6 +94,7 @@ BossLandedInCutscene:
   sta $2a ; force the boss to land at the right height on the ground
   lda #2
   sta Enemy_MovingDir ; force the boss to start by facing left
+  sta EnemyFacingDir
   rts
 
 .segment "PRG5"
@@ -116,7 +120,7 @@ InitShadowBoss:
       bpl @loop
       ldx #0               ; Dark Link entity is always at enemy slot 0
       ; Set HP
-      lda #60
+      lda #BOSS_HP_INIT
       sta EnemyHP,x
       lda #JUMPING
       sta boss_animation
@@ -128,6 +132,7 @@ InitShadowBoss:
       ldx #0
       lda #2
       sta Enemy_MovingDir,x
+      sta EnemyFacingDir,x
       rts
 
 
@@ -181,8 +186,8 @@ RunBoss:
     lda #0
     sta $de ; unfreeze link
 
-    ; Display boss HP bar with a divisor of 7 (close enough to 60 HP)
-    lda #7
+    ; Display boss HP bar with a divisor of 10
+    lda #80 / 8
     jsr $A4E9
 
     lda boss_freeze
@@ -201,6 +206,10 @@ RunBoss:
       rts
 
   @notfreezed:
+      ; keep player projectiles running even while the boss is dying
+      ldx #0
+      jsr BossUpdateProjectiles
+
       lda EnemyHP,x
       bmi AnimateKilledBoss     ; HP < 0: boss is fully dead
       bne @alive
@@ -224,8 +233,6 @@ RunBoss:
   @nodraw:
       ldx #0
 
-      jsr BossUpdateProjectiles
-
       lda TimerControl
       bne @nograv               ; skip movement if timer frozen
 
@@ -240,16 +247,17 @@ RunBoss:
       lda #JUMPING
       sta boss_animation
   @nograv:
-
-      ; Collision detection (only when not invincible).  While invincible:
-      ;   1. Skip BossPlayerCollision entirely so the boss body cannot register
-      ;      either a stomp re-hit or contact damage on Mario.
-      ;   2. Force-clear bit 4 of $A8,x (the enemy-contacted-link flag) so any
-      ;      contact that registered right before the boss took damage can't
-      ;      fire bank7_LinkCollision later in the frame.
       lda boss_invincibility_timer
       bne @decrement_timer
-        jmp BossPlayerCollision
+        jsr BossWeaponCollision
+        ; If a weapon hit just landed, boss_invincibility_timer was just set.
+        ; Skip BossPlayerCollision so the same frame can't also register body
+        ; contact.
+        lda boss_invincibility_timer
+        bne @done
+          jmp BossPlayerCollision
+    @done:
+        rts
 
   @decrement_timer:
       lda $a8,x
@@ -471,6 +479,7 @@ MovChangeState:
       lda Enemy_MovingDir,x
       eor #%00000011
       sta Enemy_MovingDir,x
+      sta EnemyFacingDir,x
       rts
 
 .reloc
@@ -717,12 +726,19 @@ BossGraphicsHandlerForceDraw:
     lsr
     bcs @restore
 @draw:
+    ; boss is offset by 8 px and i dunno how much i care to fix it?
+    lda SprObject_X_Position+1
+    pha
+    sec
+    sbc #8
+    sta SprObject_X_Position+1
     lda #2                    ; palette 3 attribute (shadow mario palette)
     sta SprObject_SprAttrib,y
     ldx boss_animation
     jsr DrawMetasprite
     jsr BossDrawProjectiles   ; shadow fireballs + hammers (palette already set per-slot)
-
+    pla
+    sta SprObject_X_Position+1
 @restore:
   pla
   sta NmiBankShadowA
@@ -1031,12 +1047,6 @@ KillBoss:
         sta Enemy_Y_Speed,x
         lda #0
         sta Enemy_X_Speed,x
-        sta EnemyProjectileType+0
-        sta EnemyProjectileType+1
-        sta EnemyProjectileType+2
-        sta EnemyProjectileType+3
-        sta EnemyProjectileType+4
-        sta EnemyProjectileType+5
         lda #$7f
         sta boss_counter
         ; vanilla boss kill behavior
@@ -1063,31 +1073,6 @@ KillBoss:
       rts
 
 .reloc
-StompedBoss:
-      lda Player_Y_Position
-      clc
-      adc #10
-      cmp Enemy_Y_Position,x
-      bcc @valid_stomp
-        jmp DamagePlayer
-  @valid_stomp:
-      lda #$fd
-      sta Player_Y_Speed        ; bounce player upward
-      lda boss_state
-      bne InjuredBoss           ; if not in state 0, just take damage
-      lda #0
-      sta boss_state_timer      ; if in idle state, also reset timer
-
-InjuredBoss:
-      lda boss_invincibility_timer
-      bne @done                 ; already invincible, no damage
-      inc boss_screech          ; track hit count
-      dec EnemyHP,x       ; reduce HP
-      lda #80
-      sta boss_invincibility_timer  ; 80 frames of invincibility
-  @done:
-      rts
-.reloc
 DamagePlayer:
   lda $a8,x
   ora #$10 ; set flag indicating link was hit by this enemy?
@@ -1095,31 +1080,27 @@ DamagePlayer:
   rts
 
 ; Vanilla hitbox primitive addresses (all in fixed PRG7, callable from anywhere)
-bank7_LoadObjectHitbox    = $E942  ; loads enemy hitbox into ZP $04-$07 using Enemy_X/Y_Position,x
+bank7_LoadObjectHitbox    = $E942  ; loads enemy hitbox into ZP $04-$07 using Enemy_X/Y_Position
 bank7_LoadLinkHitbox      = $E975  ; loads Link/Mario body hitbox into ZP $00-$03
-bank7_CollisionTest       = $E9F9  ; rectangle intersection; Carry set = overlap
-bank7_LinkCollision       = $D6C1  ; processes $A8,x enemy-hit flags -> calls link hurt routine
+bank7_CollisionTest       = $E9F9  ; rectangle intersection check
+bank7_LinkCollision       = $D6C1  ; processes $A8,x enemy-hit flags and calls link hurt routine to damage you
 .reloc
 ; Check contact between Mario and the boss each frame.
 BossPlayerCollision:
     ldx #0
-
-    jsr bank7_LoadObjectHitbox    ; boss body hitbox into ZP $04-$07
-
-    ; Stomp detection: Mario must be falling (Player_Y_Speed > 0 in SMB1 convention).
-    ; $00 = on the ground, $80-$FF = ascending, $01-$7F = falling.
+    jsr bank7_LoadObjectHitbox
+    ; Run the regular stomp detection code because too lazy to hook the right spot which
+    ; would've already had all this crap :p
     lda Player_Y_Speed
-    beq @try_body_contact         ; standing – not a stomp
-    bmi @try_body_contact         ; going up – not a stomp
-    ; Mario is falling: check body overlap for stomp
-    jsr bank7_LoadLinkHitbox      ; Mario body hitbox into ZP $00-$03
-    jsr bank7_CollisionTest       ; carry set = overlap
+    beq @try_body_contact
+    bmi @try_body_contact
+    ; Mario is falling so check if we overlap
+    jsr bank7_LoadLinkHitbox
+    jsr bank7_CollisionTest
     bcc @no_contact
-    jsr InjuredBossJump
-    lda #$fd
-    sta Player_Y_Speed            ; bounce Mario up
-    rts
-
+      lda #$fd
+      sta Player_Y_Speed            ; bounce Mario up
+      jmp InjuredBossJump
 @try_body_contact:
     jsr bank7_LoadLinkHitbox      ; Mario body hitbox into ZP $00-$03
     jsr bank7_CollisionTest
@@ -1130,42 +1111,156 @@ BossPlayerCollision:
 @contact_damage:
     ; Mario touched boss without stomping: hurt Mario via vanilla damage system
     lda $a8,x
-    ora #$10                      ; enemy-contacted-link flag
+    ora #$10
     sta $a8,x
-    jmp bank7_LinkCollision       ; processes $A8 flag to damage Mario; returns to RunBoss caller
+    jmp bank7_LinkCollision
 
 .reloc
-; Variant of InjuredBoss that subtracts 5 HP at once (jump attack damage).
-; HP is floored at 0 so the KillBoss death-countdown path runs normally.
-InjuredBossJump:
+BossWeaponCollision:
+    ldy #0
+@proj_loop:
+    sty $11
+    lda Fireball_State,y
+    beq @proj_next
+    and #%10000000
+    bne @proj_next
+    ; we have an actual fireball thats still running
+    lda Fireball_X_Position,y
+    sec
+    sbc ScreenLeft_X_Pos
+    sta $00
+    lda Fireball_PageLoc,y
+    sbc ScreenLeft_PageLoc
+    bne @proj_next
+    ; and its not offscreen so load its collision
+    lda Fireball_Y_Position,y
+    clc
+    adc #4
+    sta $01
+    lda #8
+    sta $02
+    sta $03
+
+    ldx #0
+    jsr bank7_LoadObjectHitbox
+    jsr bank7_CollisionTest
+    ldx #0
+    ldy $11
+    bcc @proj_next
+    ; if it hit the boss
+
+    lda Fireball_State,y
+    and #%01000000
+    beq @proj_fireball
+      ; and its a hammer deal 5
+      lda #HAMMER_DAMAGE
+      jsr BossTakeDamage
+      jmp @proj_next
+@proj_fireball:
+      ; fireballs apply 1 damage but don't trigger invincibility frames
+      lda #FIREBALL_DAMAGE
+      jsr BossApplyDamage
+      ; and then blow up
+      lda #%10000000
+      sta Fireball_State,y
+@proj_next:
+    ldy $11
+    iny
+    cpy #2
+    bcc @proj_loop
+
+    ; check if hitting with the tanooki tail (copy pastaed from the other place because lazy)
+    lda $d0
+    beq @done
+    lda TailSwingTimer
+    cmp #9
+    bcc @done
+    cmp #13
+    bcs @done
+
+    lda Player_Y_Position
+    clc
+    adc #$10
+    sta $01
+    lda PlayerFacingDir
+    cmp #1
+    bne @faceLeft
+      lda LinkXScreenPosition
+      clc
+      adc #30
+      jmp @writeX
+@faceLeft:
+      lda LinkXScreenPosition
+      sec
+      sbc #10
+@writeX:
+    sta $00
+    lda #$0E
+    sta $02
+    lda #$08
+    sta $03
+
+    ldx #0
+    jsr bank7_LoadObjectHitbox
+    jsr bank7_CollisionTest
+    ldx #0
+    bcc @done
+      ; Tail swipes deal 5 damage and act like a stomp
+      jmp InjuredBossJump
+@done:
+    rts
+
+.reloc
+; Core damage code that runs for all types of damage
+BossApplyDamage:
+    sta $00
     lda boss_invincibility_timer
-    bne @done             ; already invincible, no damage (caller still bounces Mario)
+    beq +
+      clc
+      rts
++
     inc boss_screech
     lda EnemyHP,x
     sec
-    sbc #5
+    sbc $00
     bcs +
     lda #0              ; floor at 0
 +
     sta EnemyHP,x
     beq +
-        ; don't play sfx for last hit. works around a weird bug i didn't bother to fix
-        lda #$10 ; Sword stab SFX
-        sta Z2NoiseSoundQueue ; stab SFX
+      ; play stab sfx except for last hit. works around a weird bug i didn't bother to fix
+      lda #$10
+      sta Z2NoiseSoundQueue
     +
-    lda #60               ; 1 second of invincibility at 60 fps
-    sta boss_invincibility_timer
-    ; A successful stomp should also short-circuit any standing pause the boss
-    ; was in - if the player can land a hit, the boss should react / counter
-    ; immediately rather than continuing to wind down from the previous state.
-    lda #0
-    sta boss_transition_delay
-    ; Reset state timer if currently idle (mirrors InjuredBoss behavior)
-    lda boss_state
-    bne @done
-    sta boss_state_timer        ; A is already 0 here
+    sec
+    rts
+
+.reloc
+; Applies damage and also sets iframes for the boss
+BossTakeDamage:
+    jsr BossApplyDamage
+    bcc @done
+      lda #60
+      sta boss_invincibility_timer
+      sec
 @done:
     rts
+
+.reloc
+; Deals 5 damage and also cancels the current action the boss is taking
+InjuredBossJump:
+  lda #STOMP_DAMAGE
+  jsr BossTakeDamage
+  bcc @done
+    ; We hit the boss, so reduce the transition delay 0 to make the boss get going immediately
+    lda #0
+    sta boss_transition_delay
+    ; and clears the boss state timer if we are doing something
+    lda boss_state
+    bne @done
+      sta boss_state_timer
+@done:
+  rts
 
 .segment "PRG7"
 .reloc
