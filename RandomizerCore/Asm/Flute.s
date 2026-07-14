@@ -35,9 +35,6 @@ OverworldPostLoad = $C72F
 .org $83CE
   jsr TwisterHitCheck
 
-.org $85A9
-  jsr RecordPalaceEntry
-
 ; When taking a cross continent flute, we load the overworld and then the dungeon.
 ; Hook right before we reveal the overworld and teleport to the dungeon
 .org OverworldPostLoad
@@ -175,30 +172,6 @@ TwisterWarp:
   pla
   pla
   jmp AreaLoadTrigger
-
-.reloc
-RecordPalaceEntry:
-  stx LocationNumber
-  stx AreaEntranceIndex
-  ; update anchor when Link enters a palace. Palace area indices are $34-$36
-  ; (within-region palace codes 0-2). Combine with the region for a global slot.
-  txa
-  sec
-  sbc #$34
-  bcc @done                   ; below $34: not a palace
-    cmp #$03
-    bcs @done                 ; $37+: not a palace entrance
-      ; A = within-region palace code (0-2); global slot = region*4 + code
-      pha
-      lda RegionNumber
-      asl
-      asl
-      sta TwisterCurrentPalaceSlot
-      pla
-      ora TwisterCurrentPalaceSlot
-      sta TwisterCurrentPalaceSlot
-@done:
-  rts
 
 ; Put the twister spawning into a macro so it can be copied between bank 1 and 2
 .macro TwisterSpawnBody
