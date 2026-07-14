@@ -1029,6 +1029,10 @@ SetTailSwingHitbox:
 
 .segment "PRG7"
 
+; Make keys hitboxes wider to reduce some jank in mario
+.org $e936
+  .byte $00, $0D, $08, $07
+
 LoadProjectileCollisionBox = $e4bc
 SwordCollisionCheck = $E677
 BreakBlockCollisionCheck = $e1e6
@@ -1209,9 +1213,11 @@ AddSariaBridgeToMarioCollision:
 .org $A700
   jmp ClearSpotInCollisionRam
 .reloc
-.proc ClearSpotInCollisionRam
+.export ClearSpotInCollisionRamJustOneSpot
+ClearSpotInCollisionRam:
   ; A is always #$42 here?
   sta ($00),y
+ClearSpotInCollisionRamJustOneSpot:
   lda $00
   clc
   adc #<(COLLISION_TILES - $6000)
@@ -1222,7 +1228,6 @@ AddSariaBridgeToMarioCollision:
   lda #0 ; Clear out the collision tile
   sta ($00),y
   rts
-.endproc
 
 ; Patch clearing out the ram for sideviews to also clear our new ram block
 .org $C58F

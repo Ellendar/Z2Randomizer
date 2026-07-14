@@ -1825,7 +1825,7 @@ HeadChk:
         cpy #$04                    ;from collision detection routine
         bcc DoFootCheck             ;if low nybble < 4, branch
           ; we can't check solid type here since its banked out
-          ; jsr CheckForSolidMTiles     ;check to see what player's head bumped on
+          jsr CheckForNonBreakableBlocks     ;check to see what player's head bumped on
           bcs SolidOrClimb            ;if player collided with solid metatile, branch
           ; ldy AreaType                ;otherwise check area type
           ; beq NYSpd                   ;if water level, branch ahead
@@ -1951,16 +1951,19 @@ BHalf:
       bne SideCheckLoop         ;run code until both sides of player are checked
 ExSCH:
   rts                       ;leave
-CheckForBreakableBlock:
-  cmp #$4c
-  bne @skip
-@skip:
-  clc
-  rts
 CheckSideMTiles:
   ; for now just always block movement
   jmp StopPlayerMove
+CheckForNonBreakableBlocks:
 
+  ldx CurrentPrgBank
+  cmp BankSpecificBreakableBlock-4,x
+  beq @Breakable
+  sec
+  rts
+@Breakable:
+  clc
+  rts
   ; jsr ChkInvisibleMTiles     ;check for hidden or coin 1-up blocks
   ; beq ExSCH                  ;branch to leave if either found
     ; jsr CheckForClimbMTiles    ;check for climbable metatiles
@@ -2081,95 +2084,61 @@ ExIPM:
 ;$05 - used to store metatile stored in A at beginning of PlayerHeadCollision
 ;$06-$07 - used as block buffer address indirect
 .reloc
-BlockYPosAdderData:
-;     Big, Small
-  .byte $04, $12
+bank7_Generic_Collision_Test_with_Level_Objects = $EAE8
+bank7_stab_brick_at_0E_with_A_and_does_draw = $E23A
+bank7_upstab_downstab_brick_break = $E1F7
 
+BankSpecificBreakableBlock:
+  .byte $4c, $4e
 PlayerHeadCollision:
-  ; pha                      ;store metatile number to stack
-;     lda #$11                 ;load unbreakable block object state by default
-;     ldx SprDataOffset_Ctrl   ;load offset control bit here
-;     ldy PlayerSize           ;check player's size
-;     bne :+            ;if small, branch
-;       lda #$12                 ;otherwise load breakable block object state
-; :
-;     sta Block_State,x        ;store into block object buffer
-    ; farcall DestroyBlockMetatile ;store blank metatile in vram buffer to write to name table
-    ; ldx SprDataOffset_Ctrl   ;load offset control bit
-    ; lda R2                   ;get vertical high nybble offset used in block buffer routine
-    ; sta Block_Orig_YPos,x    ;set as vertical coordinate for block object
-    ; tay
-    ; lda R6                   ;get low byte of block buffer address used in same routine
-    ; sta Block_BBuf_Low,x     ;save as offset here to be used later
-    ; lda (R6),y              ;get contents of block buffer at old address at $06, $07
-    ; jsr BlockBumpedChk       ;do a sub to check which block player bumped head on
-    ; sta R0                   ;store metatile here
-;     ldy PlayerSize           ;check player's size
-;     bne :+             ;if small, use metatile itself as contents of A
-;       tya                      ;otherwise init A (note: big = 0)
-; :
-;     bcc PutMTileB            ;if no match was found in previous sub, skip ahead
-;       ; ldy #$11                 ;otherwise load unbreakable state into block object buffer
-;       ; sty Block_State,x        ;note this applies to both player sizes
-;       lda #$c4                 ;load empty block metatile into A for now
-;       ldy R0                   ;get metatile from before
-;       cpy #$58                 ;is it brick with coins (with line)?
-;       beq StartBTmr            ;if so, branch
-;         cpy #$5d                 ;is it brick with coins (without line)?
-;         bne PutMTileB            ;if not, branch ahead to store empty block metatile
-; StartBTmr:
-;       lda BrickCoinTimerFlag   ;check brick coin timer flag
-;       bne :+             ;if set, timer expired or counting down, thus branch
-;         lda #$0b
-;         sta BrickCoinTimer       ;if not set, set brick coin timer
-;         inc BrickCoinTimerFlag   ;and set flag linked to it
-; :
-;       lda BrickCoinTimer       ;check brick coin timer
-;       bne :+             ;if not yet expired, branch to use current metatile
-;         ldy #$c4                 ;otherwise use empty block metatile
-; :
-;       tya                      ;put metatile into A
-; PutMTileB:
-;     sta Block_Metatile,x     ;store whatever metatile be appropriate here
-;     jsr InitBlock_XY_Pos     ;get block object horizontal coordinates saved
-;     ldy R2                   ;get vertical high nybble offset
-;     lda #$23
-;     sta (R6),y               ;write blank metatile $23 to block buffer
-;     lda #$10
-;     sta BlockBounceTimer     ;set block bounce timer
-;   pla                      ;pull original metatile from stack
-;   sta R5                   ;and save here
-;   ldy #$00                 ;set default offset
-;   lda CrouchingFlag        ;is player crouching?
-;   bne SmallBP              ;if so, branch to increment offset
-;     lda PlayerSize           ;is player big?
-;     beq BigBP                ;if so, branch to use default offset
-; SmallBP:
-;     iny                      ;increment for small or big and crouching
-; BigBP:
-;   lda Player_Y_Position    ;get player's vertical coordinate
-;   clc
-;   adc BlockYPosAdderData,y ;add value determined by size
-;   and #$f0                 ;mask out low nybble to get 16-pixel correspondence
-;   sta Block_Y_Position,x   ;save as vertical coordinate for block object
-;   ldy Block_State,x        ;get block object state
-;   cpy #$11
-;   beq :+                   ;if set to value loaded for unbreakable, branch
-;     jsr BrickShatter         ;execute code for breakable brick
-;     jmp InvOBit              ;skip subroutine to do last part of code here
-; :
-;   jsr BumpBlock            ;execute code for unbreakable brick or question block
-; InvOBit:
-  ; lda SprDataOffset_Ctrl   ;invert control bit used by block objects
-  ; eor #$01                 ;and floatey numbers
-  ; sta SprDataOffset_Ctrl
+  ; small can't break with head
+  lda PlayerSize
+  bne ExitBackToBump
+  
+  ; put a hitbox check for the player right above the head... i guess?
+  lda LinkXScreenPosition
+  clc
+  adc #$0a
+  ldy LinkFacingDirection
+  dey
+  adc $e1db,y
+  clc
+  adc #$04
+  adc ScrollX
+  sta LinkProjectileXPositionLoRelated
+  lda ScrollPage
+  adc #$00
+  sta LinkProjectileXPositionHiRelated
 
-
-  lda #$00
+  lda CrouchingFlag ; 4 if crouching
+  asl
+  asl
+  adc Player_Y_Position
+  sta LinkProjectileYPositionRelated
+  ldx #$10 ; use the hitboxes we just set
+  ldy #$1c ; tell it we are stabbing?
+  jsr bank7_Generic_Collision_Test_with_Level_Objects
+  ldy CurrentPrgBank
+  cmp BankSpecificBreakableBlock-4,y
+  bne ExitBackToBump
+  lda $e
+  clc
+  adc #<(COLLISION_TILES - $6000)
+  sta $c
+  lda $f
+  adc #>(COLLISION_TILES - $6000)
+  sta $d
+  lda #0 ; Clear out the collision tile
+  ldy $2
+  sta ($c),y
   sta Player_Y_Speed      ;init player's vertical speed
+  jmp bank7_stab_brick_at_0E_with_A_and_does_draw
 ExitFireballNearby:
   rts                      ;leave!
-
+ExitBackToBump:
+  pla
+  pla
+  jmp SolidOrClimb
 ProcFireball_Bubble:
 ;  lda PlayerStatus           ;check player's status
 ;  cmp #$02
