@@ -599,7 +599,7 @@ public class CustomTexts
                 }
             }
 
-            if (props.HelpfulHints != HelpfulHintOption.NONE)
+            if (props.HelpfulHints != HelpfulHintOption.NONE || props.MarioMode)
             {
                 List<int> placedIndexes = GenerateHelpfulHints(texts, locations, hashRNG, props);
                 GenerateKnowNothings(texts, placedIndexes, nonhashRNG, props.BagusWoods, props.UseCommunityText);
@@ -734,6 +734,10 @@ public class CustomTexts
                     return new Text("HERE IS$HOW TO$PIERCE$SHIELDS.");
                 case Collectable.UPSTAB:
                     return new Text("UP B TO$THROW$HAMMER$WHEN SMALL");
+                case Collectable.FIRE_SPELL:
+                    return new Text("THIS MAGIC$WILL MAKE$YOUR HAND$THROW FIRE");
+                case Collectable.SPELL_SPELL:
+                    return new Text("SAY THE$MAGIC WORD$AND FEEL$THE POWER");
                 default:
                     break;
                 }
