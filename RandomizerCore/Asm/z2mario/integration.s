@@ -246,13 +246,6 @@ PatchGoingDownChimney:
 .org $e07f
   jmp *+3
 
-; Patch the flute sound to use the mario 3 music instead
-;   -- not happening right now. SMB3 flute is MUSIC instead of sfx, and i aint porting
-; that right now. Music data is bank 28 at $a990 (M12ASegData03 in the disassembly)
-; .segment "PRG0"
-; .org $851d
-;   lda #Sfx_EnemySmack
-;   sta Square1SoundQueue
 
 .segment "PRG7"
 
