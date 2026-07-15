@@ -330,3 +330,18 @@ FREE_UNTIL $836f
 .proc TwisterSpawnPRG2
   TwisterSpawnBody
 .endproc
+
+; patch the flute SFX to play the warp whistle tune
+.segment "PRG6"
+; note durations. the note lasts for the difference between two entries.
+; So the first note lasts for $7f - $70 == $0f frames. These are read from
+; right to left.
+; when the next value >= current value then it doesn't process any more notes
+.org $9644
+.byte $24, $24, $2C, $34, $60, $70, $7F
+; list of pitch index. The pitches in the table aren't in a particular order,
+; so look around in it or just replace unused ones if you want to fix the tuning :p
+.byte $30, $3c, $4a, $4c, $4e, $30, $2c
+; volume table (in the lower nybble). Make the sound fade a little less than vanilla
+.org $9670
+.byte $51, $51, $52, $52, $53, $55
