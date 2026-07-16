@@ -359,6 +359,6 @@ public class Location
         {
             return Palace.ItemRooms.Count;
         }
-        return NonPalaceTownCollectables.Count;
+        return (CollectablesAreShufflable || !shufflableOnly) ? NonPalaceTownCollectables.Count : 0;
     }
 }

@@ -1607,7 +1607,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 properties.UsePalaceItemRoomCountIndicator = true;
                 break;
             default:
-                properties.PalaceItemRoomCounts = Enumerable.Repeat((int)palaceItemRoomCount, 6).ToArray();
+                properties.PalaceItemRoomCounts = Enumerable.Repeat((int)palaceItemRoomCount, 7).ToArray();
                 properties.UsePalaceItemRoomCountIndicator = false;
                 break;
         }

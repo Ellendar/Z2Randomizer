@@ -106,6 +106,7 @@ public class Hyrule
     //private Character character;
 
     public Dictionary<Collectable, bool> ItemGet { get; set; }
+    private List<Collectable> spellListOrder { get; set; }
     //private bool[] spellGet;
 
     public WestHyrule westHyrule;
@@ -366,12 +367,7 @@ public class Hyrule
 
             if (props.CombineFire)
             {
-                List<Collectable>? customSpellOrder = props.IncludeSpellsInShuffle
-                    ? null
-                    : ItemLocations()
-                        .Where(l => l.Town?.GetWizard() != null && l != westHyrule.bagu && l != westHyrule.sariaSouth)
-                        .Select(l => (Collectable)l.Town!.GetWizard()!.Collectable!).ToList();
-                ROMData.CombineFireSpell(assembler, customSpellOrder, r);
+                ROMData.CombineFireSpell(assembler, spellListOrder, r);
             }
 
             if (props.StartsWithCollectable(westHyrule.ruto.Town?.GetWizard()?.Collectable))
@@ -685,6 +681,10 @@ public class Hyrule
         List<Location> possibleItemLocations = ItemLocations().ToList();
         IEnumerable<Location> palaceLocations = AllLocations().Where(i => i.Palace != null);
 
+        spellListOrder = [Collectable.SHIELD_SPELL, Collectable.JUMP_SPELL, Collectable.LIFE_SPELL, Collectable.FAIRY_SPELL,
+            props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL, Collectable.SPELL_SPELL, Collectable.REFLECT_SPELL,
+            Collectable.THUNDER_SPELL];
+
         //Non-pbag, non-wizard, non-palace items are inherently in the global shuffle pool
         List<Collectable> shufflableItems = [Collectable.TROPHY, Collectable.MEDICINE, Collectable.HEART_CONTAINER, Collectable.MAGIC_CONTAINER,
             Collectable.HEART_CONTAINER, Collectable.HAMMER, Collectable.MAGIC_CONTAINER, Collectable.HEART_CONTAINER, Collectable.HEART_CONTAINER,
@@ -718,6 +718,8 @@ public class Hyrule
             eastHyrule.pbagCave2.SetCollectables([Collectable.XL_BAG]);
         }
 
+        //For now this is just for classic spell shuffle. Maybe this is extended later
+        bool canReplaceStartingSpellsWithMinorItems = !props.ShuffleSpellLocations;
         if (props.IncludeSpellsInShuffle)
         {
             shufflableItems.Add(Collectable.SHIELD_SPELL);
@@ -734,7 +736,12 @@ public class Hyrule
         else if (props.ShuffleSpellLocations)
         {
             ShuffleSpells();
+            spellListOrder = possibleItemLocations.Where(i => i.Town != null && i?.Town?.Type != TownType.BAGU)
+                .OrderBy(i => (int)i.Town!.Type!)
+                .Select(i => (Collectable)i.Town!.GetWizard()!.Collectable!)
+                .ToList();
         }
+
 
         if (props.IncludeQuestItemsInShuffle)
         {
@@ -888,7 +895,7 @@ public class Hyrule
 
         foreach (Collectable item in possibleStartItems)
         {
-            if (props.StartsWithCollectable(item))
+            if (props.StartsWithCollectable(item) && (canReplaceStartingSpellsWithMinorItems || !item.IsSpell()))
             {
                 int index = shufflableItems.IndexOf(item);
                 if (index > -1)
@@ -1008,7 +1015,7 @@ public class Hyrule
             {
                 itemsToActuallyShuffle = [];
                 shufflableItemLocations = [];
-                foreach (Location palaceLocation in globalShuffleLocations.Where(i => i.Palace != null))
+                foreach (Location palaceLocation in possibleItemLocations.Where(i => i.Palace != null))
                 {
                     shufflableItemLocations.Add(palaceLocation);
                     itemsToActuallyShuffle.Add(palaceLocation.GetAllCollectables());
@@ -1021,8 +1028,13 @@ public class Hyrule
                 foreach (Location palaceLocation in possibleItemLocations.Where(i => i.Palace != null && i.Palace.Number < 7))
                 {
                     int palaceNumber = palaceLocation.Palace!.Number;
-                    List<Collectable> vanillaCollectables = palaceLocation.Palace!.GetVanillaCollectables(palaceLocation.Palace!.ItemRooms.Count);
-                    palaceLocation.SetCollectables(vanillaCollectables);
+                    List<Collectable> collectables = palaceLocation.Palace!.GetVanillaCollectables(palaceLocation.Palace!.ItemRooms.Count);
+
+                    for (int i = 0; i < collectables.Count; i++)
+                    {
+                        collectables[i] = props.StartsWithCollectable(collectables[i]) ? minorItems.Sample(r) : collectables[i];
+                    }
+                    palaceLocation.SetCollectables(collectables);
                 }
             }
 
@@ -1035,7 +1047,9 @@ public class Hyrule
                     shufflableItemLocations.Add(nonPalaceLocation);
                     foreach(Collectable collectable in nonPalaceLocation.GetShufflableCollectables())
                     {
-                        itemsToActuallyShuffle.Add(shufflableItems.Contains(collectable) ? collectable : minorItems.Sample(r));
+                        itemsToActuallyShuffle.Add(
+                            props.StartsWithCollectable(collectable) && (!collectable.IsSpell() || canReplaceStartingSpellsWithMinorItems) 
+                                ? minorItems.Sample(r) : collectable);
                     }
                 }
                 duplicateItemPlacementCandidates.AddRange(shufflableItemLocations);
@@ -1048,7 +1062,7 @@ public class Hyrule
                     List<Collectable> collectables = nonPalaceLocation.GetAllCollectables();
                     for(int i = 0; i < collectables.Count; i++)
                     {
-                        collectables[i] = shufflableItems.Contains(collectables[i]) ? collectables[i] : minorItems.Sample(r);
+                        collectables[i] = props.StartsWithCollectable(collectables[i]) ? minorItems.Sample(r) : collectables[i];
                     }
                     nonPalaceLocation.SetCollectables(collectables);
                 }
@@ -1419,7 +1433,7 @@ public class Hyrule
                     //Debug.WriteLine(GenerateSpoiler());
                     //Debug.WriteLine(westHyrule.GetMapDebug());
                     //XXX:
-                    return palaces[2].ItemRooms[0].Collectable == Collectable.GLOVE;
+                    return false;
                 }
 //#endif
                 return false;
@@ -2649,31 +2663,32 @@ public class Hyrule
         else
         {
             // Use the old spell menu behavior where the spells are placed in the menu in the location it came from
-            var wizardCollectables = ItemLocations()
+            /*var wizardCollectables = ItemLocations()
                 .Where(l => l.Town?.GetWizard() != null && l != westHyrule.sariaSouth && l != westHyrule.bagu)
                 .Select(l => (Collectable)l.Town!.GetWizard()!.Collectable!).ToList();
+            */
             
             for (int i = 0; i < magFunction.Length; i++)
             {
-                magFunction[i] = ROMData.GetByte(functionBase + wizardCollectables[i].VanillaSpellOrder());
+                magFunction[i] = ROMData.GetByte(functionBase + spellListOrder[i].VanillaSpellOrder());
             }
 
             for (int i = 0; i < magEffects.Length; i = i + 2)
             {
-                magEffects[i] = ROMData.GetByte(effectBase + wizardCollectables[i / 2].VanillaSpellOrder() * 2);
-                magEffects[i + 1] = ROMData.GetByte(effectBase + wizardCollectables[i / 2].VanillaSpellOrder() * 2 + 1);
+                magEffects[i] = ROMData.GetByte(effectBase + spellListOrder[i / 2].VanillaSpellOrder() * 2);
+                magEffects[i + 1] = ROMData.GetByte(effectBase + spellListOrder[i / 2].VanillaSpellOrder() * 2 + 1);
             }
 
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    magLevels[i, j] = ROMData.GetByte(spellCostBase + (wizardCollectables[i].VanillaSpellOrder() * 8 + j));
+                    magLevels[i, j] = ROMData.GetByte(spellCostBase + (spellListOrder[i].VanillaSpellOrder() * 8 + j));
                 }
 
                 for (int j = 0; j < 8; j++)
                 {
-                    magNames[i, j] = ROMData.GetByte(spellNameBase + (wizardCollectables[i].VanillaSpellOrder() * 0xe + j));
+                    magNames[i, j] = ROMData.GetByte(spellNameBase + (spellListOrder[i].VanillaSpellOrder() * 0xe + j));
                 }
             }
 
@@ -2703,7 +2718,7 @@ public class Hyrule
 
             for (int i = 0; i < 8; i++)
             {
-                ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i, props.StartsWithCollectable(wizardCollectables[i]) ? (byte)1 : (byte)0);
+                ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i, props.StartsWithCollectable(spellListOrder[i]) ? (byte)1 : (byte)0);
             }
         }
         //fix for rope graphical glitch
@@ -3050,7 +3065,8 @@ CustomFileSelectData:
         bool itemWasMissing = false;
         foreach (Location location in ItemLocations().Where(l => l.GetAllCollectables().Any(i => !i.IsMinorItem() && !ItemGet[i])))
         {
-            sb.AppendLine($"{location.Name} / [{String.Join(", ", location.GetAllCollectables()
+            string name = location.Name + (location.Palace == null ? String.Empty : $"({location?.Palace?.Number})");
+            sb.AppendLine($"{name} / [{String.Join(", ", location!.GetAllCollectables()
                 .Where(i => !i.IsMinorItem() && !ItemGet[i])
                 .Select(i => Enum.GetName(i)))}]");
             itemWasMissing = true;
