@@ -286,6 +286,24 @@ public static class PalaceStyleExtensions
             _ => false
         };
     }
+    public static bool NormalPalaceStyle(this PalaceStyle style)
+    {
+        return style switch
+        {
+            PalaceStyle.RANDOM => false,
+            _ => true
+        };
+}
+    public static bool IsGpStyle(this PalaceStyle style)
+    {
+        return style switch
+        {
+            PalaceStyle.VANILLA_WEIGHTED => false,
+            PalaceStyle.RANDOM_ALL => false,
+            PalaceStyle.RANDOM_PER_PALACE => false,
+            _ => true
+        };
+    }
 }
 
 public enum PalaceDropStyle
@@ -989,9 +1007,9 @@ public static class Enums
     public static IEnumerable<EnumDescription> PalaceLengthOptionList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
-        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM);
+        = ToDescriptions<PalaceStyle>(i => i.NormalPalaceStyle());
     public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
-        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);
+        = ToDescriptions<PalaceStyle>(i => i.IsGpStyle());
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();
     public static IEnumerable<EnumDescription> PalaceDropStyleList { get; } = ToDescriptions<PalaceDropStyle>();
 
