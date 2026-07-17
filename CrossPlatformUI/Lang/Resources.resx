@@ -858,7 +858,13 @@ dash, the Dash spell will still appear, but do nothing.</value>
 <value>Link will always shoot beams from his sword, regardless of life.</value>
 	</data>
 	<data name="FluteTwisterWarpToolTip" xml:space="preserve">
-<value>Flute works like the Zelda 1 flute and spawns a twister you can walk into to warp the player to dungeons that they've already cleared (placed a gem in). If you are facing up or right, then it will take you to the next dungeon in order, if you are facing down or left, it will take you to the previous dungeon in order.</value>
+<value>Flute works like the Zelda 1 flute and spawns a twister you can walk into to warp the player.
+Facing up or right takes you to the next destination in order; facing down or left takes you to the previous one.
+Available Modes:
+  • No Flute Warp - disables the feature.
+  • Cleared Palaces - warps to palaces you've already cleared (placed a gem in).
+  • Visited Palaces - warps to any palace you've entered, including the Great Palace.
+  • Visited Towns - warps to any town you've entered.</value>
 	</data>
 	<data name="ShuffleStartingItemsToolTip" xml:space="preserve">
 <value>When enabled, your starting items will be randomized.

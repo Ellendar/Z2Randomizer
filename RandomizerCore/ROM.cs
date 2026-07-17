@@ -2168,10 +2168,48 @@ ResetRedPalettePayload:
         Put(0x16413, thunderBirdHP);
     }
 
-    public static void FluteTwisterWarp(Assembler asm)
+    public static void FluteTwisterWarp(Assembler asm, FluteWarpMode mode)
     {
         var a = asm.Module();
+        // Exactly one mode define is set so Flute.s only assembles that mode's code paths.
+        switch (mode)
+        {
+            case FluteWarpMode.CLEARED_PALACES:
+                a.Assign("FLUTE_WARP_CLEARED_PALACES", 1);
+                break;
+            case FluteWarpMode.VISITED_PALACES:
+                a.Assign("FLUTE_WARP_VISITED_PALACES", 1);
+                break;
+            case FluteWarpMode.VISITED_TOWNS:
+                a.Assign("FLUTE_WARP_VISITED_TOWNS", 1);
+                AssignTownWarpLocations(a);
+                break;
+            case FluteWarpMode.NONE:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(mode), mode, "NONE must not assemble Flute.s");
+        }
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.Flute.s"), "flute.s");
+    }
+
+    // Similar to the real palace location table, this is a map of town ID to the real town ID
+    private static void AssignTownWarpLocations(AsmModule a)
+    {
+        LocationID[] townWarpLocations =
+        [
+            LocationID.WEST_TOWN_RAURO,
+            LocationID.WEST_TOWN_RUTO,
+            LocationID.WEST_TOWN_SARIA_NORTH,
+            LocationID.WEST_TOWN_MIDO,
+            LocationID.EAST_TOWN_NABOORU,
+            LocationID.EAST_TOWN_DARUNIA,
+            LocationID.EAST_TOWN_NEW_KASUTO,
+            LocationID.EAST_TOWN_OLD_KASUTO,
+        ];
+        for (int i = 0; i < townWarpLocations.Length; i++)
+        {
+            var (_, locIdx) = townWarpLocations[i].GetIndices();
+            a.Assign($"RealTownAtLocation{i}", locIdx);
+        }
     }
 
     public void DashSpell(Assembler asm)

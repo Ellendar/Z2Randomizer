@@ -138,6 +138,19 @@ PalaceMappingTable:
     .byte RealPalaceAtLocation4 * 3 + Palace1Offset
     .byte $ff, $ff, $ff ; 3 unused palace locations
 
+.reloc
+; Same as the above table but not optimized for stat tracking
+.export RealPalaceNumberTable
+RealPalaceNumberTable:
+    ; region 0 - east hyrule
+    .byte RealPalaceAtLocation1, RealPalaceAtLocation2, RealPalaceAtLocation3, $ff
+    ; region 1 - death mountain (no palaces)
+    .byte $ff, $ff, $ff, $ff
+    ; region 2 - west hyrule
+    .byte RealPalaceAtLocation5, RealPalaceAtLocation6, RealPalaceAtLocationGP, $ff
+    ; region 3 - maze island
+    .byte RealPalaceAtLocation4, $ff, $ff, $ff
+
 
 .segment "PRG4"
 
@@ -152,6 +165,12 @@ SaveTimestampForPalace:
     asl
     adc PalaceRegionIndex
     tay
+.ifdef FLUTE_WARP_CLEARED_PALACES
+.import PowersOfTwo
+    lda FluteWarpFlags
+    ora PowersOfTwo,y
+    sta FluteWarpFlags
+.endif
     lda PalaceTable,y
     jmp AddTimestamp
 

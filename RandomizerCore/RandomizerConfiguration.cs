@@ -685,7 +685,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool marioMode;
 
     [Reactive]
-    private bool fluteTwisterWarp;
+    private FluteWarpMode fluteWarpMode;
 
     //Custom
     [Reactive]
@@ -1465,7 +1465,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         };
         properties.JumpAlwaysOn = jumpAlwaysOn;
         properties.DashAlwaysOn = dashAlwaysOn;
-        properties.FluteTwisterWarp = fluteTwisterWarp;
+        properties.FluteWarpMode = fluteWarpMode;
         properties.FastCast = fastSpellCasting;
         properties.BeamSprite = beamSprite;
         properties.DisableMusic = disableMusic;
