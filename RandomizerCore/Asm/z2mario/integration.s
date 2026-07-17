@@ -2,7 +2,7 @@
 .include "z2r.inc"
 
 .import GameRoutines, ProcFireball_Bubble, PlayerGfxHandler, DrawMetasprite
-.import ProcHammerTime
+.import ProcHammerTime, ProcStarPower
 .import Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
 .import SwapToSavedPRG, SwapToPRG0
 .export SlightlyModifiedCollisionRoutine
@@ -12,6 +12,12 @@ FREE "PRG0" [$92BF, $962D)
 
 ; Clear out the old flame / sword projectile code
 FREE "PRG0" [$9815, $9924)
+
+STATUE_DURATION      = $C0
+STATUE_CHANGE_DURATION = $17
+STATUE_BOUNCE_FORCE  = $60
+STATUE_FALL_RESTORE  = $70
+STAR_DURATION        = 180  ; 3 seconds arbitrarily chosen because i like it
 
 .segment "PRG7"
 SpellCastingRoutine = $8DC3 ; Link Main
@@ -163,8 +169,17 @@ ApplySpellEffectButPreventBothFireAndJump:
     rts
 @notFire:
   cpy #1 ; jump/tanooki spell bit?
-  bne @apply
+  bne @notJump
     and #~$10 ; clear the fire bit
+    rts
+@notJump:
+  ; casting SPELL spell, so lets give the player a little star power time.
+  cpy #6
+  bne @apply
+    pha
+      lda #STAR_DURATION
+      sta StarInvincibleTimer
+    pla
 @apply:
   rts
 
@@ -187,12 +202,17 @@ DrawFallingMarioSprite:
 .org $8fee
   jsr DrawFallingMarioSprite
 
+.segment "PRG7"
+
 ; patch the link draw routine to skip drawing him with the vanilla code
 .org $EC02 ; ldx $11 lda $29,x
   jsr PatchLinkDrawRoutine
-  nop
+; due to weird design decisions i made early on, the above patch double returns
+; and it probably doesnt need to but whatever.
+ ; this guts drawing all the different link animation frames
+FREE_UNTIL $ecea ; skip over the hitbox loading code for downstab
+FREE "PRG7" [$ED02,$EE51)
 
-.segment "PRG7"
 .org $dd1b
   jsr SetMarioShadowFlag
 
@@ -267,11 +287,12 @@ CheckIfAboveScreenForFallingFairyCheck:
 .segment "PRG0", "PRG7"
 .reloc
 PatchLinkDrawRoutine:
-  ldx $11
-  beq + ; link is slot 0
-    lda $29,x
-    rts
-+
+; TODO: check if this is still needed for dark link or mario's shadow after killing a boss
+;   ldx $11
+;   beq + ; link is slot 0
+;     lda $29,x
+;     rts
+; +
   ; put the player in slot 4 always
   lda #4
   sta CurrentOAMOffset
@@ -283,10 +304,18 @@ PatchLinkDrawRoutine:
     pha
     jsr ApplySwingOverrides
     ldx ObjectMetasprite                ; reload after override
+    ; Replace the metasprite we loaded in X with the poof animation frame
+    lda StatueChangeTimer
+    beq @noPoof
+      jsr GetStatuePoofFrame
+    @noPoof:
     ldy #0
     jsr DrawMetasprite
     lda $D0 ; nonzero if Tanooki is active
     beq +
+      ; if we are poofing, hide both mario and the tail sprite
+      lda StatueChangeTimer
+      bne +
       jsr DrawTailSprite
     +
     pla                                 ; restore PlayerFacingDir
@@ -339,6 +368,108 @@ PatchLinkDrawRoutine:
   ; double return to skip the OG drawing code
   pla
   pla
+  rts
+
+.reloc
+.import METASPRITE_POOF_FRAME_1, METASPRITE_POOF_FRAME_2, METASPRITE_POOF_FRAME_3, METASPRITE_POOF_FRAME_4
+StatuePoofFrames:
+; the poof animation timer counts DOWN so the frames are not like i expected them to be :p
+  .byte METASPRITE_POOF_FRAME_2, METASPRITE_POOF_FRAME_1
+  .byte METASPRITE_POOF_FRAME_4, METASPRITE_POOF_FRAME_3
+.reloc
+; SMB3 cycles four poof patterns, one every four frames, its not perfect, but its good enough...
+GetStatuePoofFrame:
+  lda StatueChangeTimer
+  lsr
+  lsr
+  and #$03
+  tay
+  ldx StatuePoofFrames,y
+  rts
+
+.reloc
+; Check for the right input to start a statue and then carry 
+.proc ProcTanookiStatue
+  ; The change poof runs on its own clock: it overlaps the statue when entering
+  ; and outlives it when leaving, so it can't just hang off StatueTimer.
+  lda StatueChangeTimer
+  beq @noPoof
+    dec StatueChangeTimer
+    bne @noPoof
+      dec ScrollLock          ; balances the inc in StartStatueChange
+@noPoof:
+
+  lda StatueTimer
+  bne @active
+
+  ; skip statue check if we can statue
+  lda JumpSpellActive
+  beq @runSwing
+  lda GameEngineSubroutine
+  cmp #8
+  bne @runSwing
+  lda FairyState
+  bne @runSwing
+
+  ; check our inputs to see if its time to start statueing
+  lda SavedJoypadBits
+  and #Down_Dir
+  beq @runSwing
+  lda A_B_Buttons
+  and #B_Button
+  beq @runSwing
+  and PreviousA_B_Buttons
+  bne @runSwing
+    ; start the statue! kill our x momentum and swap colors
+    lda #STATUE_DURATION
+    sta StatueTimer
+    jsr StartStatueChange
+    lda #0
+    sta Player_X_Speed
+    sta Player_X_MoveForce
+    sta TailSwingTimer
+    sta TailWagCount
+    jmp UpdatePlayerPalette
+@runSwing:
+  jmp ProcTanookiSwing
+
+@active:
+  ; continue statue
+  dec StatueTimer
+  cmp #1
+  beq @end
+  ; check if the player wants to cancel it
+  lda SavedJoypadBits
+  and #Down_Dir
+  beq @end
+  ; or if they manage to cast fairy while in a statue, cancel it
+  lda FairyState
+  bne @end
+  ; not cancelling it so just return
+  rts
+@end:
+  lda #0
+  sta StatueTimer
+  lda #STATUE_FALL_RESTORE
+  sta VerticalForceDown
+  jsr StartStatueChange
+  jmp UpdatePlayerPalette
+.endproc
+
+.reloc
+; SMB3 plays the poof sfx on both edges of the statue change.
+StartStatueChange:
+  ; prevent the screen from scroll away because we suddenly stopped moving
+  ; and lock mario in place during the POOF
+  lda StatueChangeTimer
+  bne @alreadyLocked
+    inc ScrollLock
+@alreadyLocked:
+  lda #STATUE_CHANGE_DURATION
+  sta StatueChangeTimer
+  lda Square2SoundQueue
+  ora #Sfx_StatuePoof
+  sta Square2SoundQueue
   rts
 
 .reloc
@@ -465,9 +596,10 @@ Xhi = R5
 Ylo = R6
 Yhi = R7
 
-  ; If a swing is in progress, the tail is forced to TAIL_STRAIGHT for the
-  ; entire animation regardless of Mario's body pose.
+  ; Force the metasprite for the tail if we are either swinging the tail or
+  ; are a statue
   lda TailSwingTimer
+  ora StatueTimer
   beq @noSwing
     ldx #METASPRITE_TAIL_STRAIGHT
     jmp @havePose
@@ -550,7 +682,13 @@ Yhi = R7
 @flipRight:
     lda #0
   sta Atr
-  
+
+  ; If we are stone mario, bring in the stone palette from mario
+  lda Player_SprAttrib
+  and #$03
+  ora Atr
+  sta Atr
+
   ; if stuck in mud/swamp copy over the render behind flag
   lda $0752
   and #$20
@@ -680,14 +818,20 @@ UpdatePlayerPalette:
   inc ReloadCHRBank ; Just reload the CHR bank to be safe here
   txa
   pha
-  ; Check fire state and update the palette if we are fire still
   ldx #255
+  ; The statue's gray wins over fire
+  lda StatueTimer
+  beq @notStatue
+    ldx #14-1
+    bne @writeCommand ; unconditionall
+@notStatue:
+  ; Check fire state and update the palette if we are fire still
   lda $76f
   and #$10
-  beq +
+  beq @writeCommand
     ldx #7-1
-  +
-  ; we are still firey so write a palette update for next NMI
+@writeCommand:
+  ; write a palette update for next NMI
   ldy BUFFER_OFF
   dey
   -
@@ -707,10 +851,13 @@ UpdatePlayerPalette:
   pla
   tax
   rts
+.reloc
 PlayerRegularPalettePPUCommand:
   .byte $3f, $11, $03, $16, $27, $18, $ff
 PlayerFirePalettePPUCommand:
   .byte $3f, $11, $03, $37, $27, $16, $ff
+PlayerStatuePalettePPUCommand:
+  .byte $3f, $11, $03, $00, $10, $2D, $ff
 
 .segment "PRG0", "PRG7"
 ; Don't clear fire state when transitioning to side views
@@ -752,6 +899,82 @@ SetupMarioControl:
 
 
 .segment "PRG7"
+; Hook the link hit routine to check if we are doing star power. If we are
+; then we want to ZAP ZAP them with a thunder attack.
+.org $E2F1
+  jsr PatchLinkHitDispatch ; replaces lda $0518
+.reloc
+; X = enemy slot, $10 = slot
+PatchLinkHitDispatch:
+  lda StarInvincibleTimer
+  beq @notStar
+    lda EnemyState,x
+    and #~$10
+    sta EnemyState,x
+    ; The custom boss has its own invincibility window that 50 damage a frame
+    ; would blow straight through, so star only blocks its hits.
+    lda boss_animation
+    bne @skiphit
+    ; check if the enemy is currently already hit by us
+    lda Enemy0HitState,x
+    bne @skiphit
+    ; copy of the code at $9215 which is where thunder damages enemies
+    ldy EnemyType,x
+    ; check the attributes for the monster id
+    lda $6E41,y
+    ; index for the damage value. 9 is the default thunder strike for 50 damage
+    ldy #9
+    ; bit 7 is thunder immune (ie: they don't die to star either which is fine by me)
+    and #$A0
+    bmi @skiphit
+    beq @damage
+      ; thunder bird has an extra bit 6 to say that we should use a weak hit instead
+      ldy #$01
+@damage:
+    ; double return since we didn't get hit
+    pla
+    pla
+    ; Run the deal damage routine with the "projectile attack" flag ($0B) set,
+    ; otherwise a surviving enemy recoils mario like a melee sword hit would.
+    ; $0B doubles as mario's Up_Down_Buttons, so save and restore it.
+    lda $0B
+    pha
+    lda #1
+    sta $0B
+    jsr $E726
+    pla
+    sta $0B
+    rts
+@notStar:
+  lda StatueTimer
+  ora StatueChangeTimer
+  beq @normal
+    lda EnemyState,x
+    and #~$10
+    sta EnemyState,x
+@skiphit:
+    clc
+    ; double return since we didn't get hit winky face
+    pla
+    pla
+    rts
+@normal:
+  jmp CheckLinkInvulnerable
+
+; Patch where the game checks links immunity frames, and add in all of the rest of the new ones
+; that way we can fake being immune with all our other timers in one go.
+.org $E457
+  jsr CheckLinkInvulnerable
+.reloc
+CheckLinkInvulnerable:
+  ; slam all of the immunity timers together if any are running, then we are immune 
+  lda $0518
+  ora StarInvincibleTimer
+  ora StatueTimer
+  ora StatueChangeTimer
+@done:
+  rts
+
 ; Has to be in fixed bank
 .org $e337
   jsr LinkTookDamage
@@ -909,10 +1132,12 @@ NoDecTimers:
   ; This has to come before the A/B buttons are switched over
   jsr ProcHammerTime
   jsr ProcFireball_Bubble    ;process fireballs and air bubbles
-  jsr ProcTanookiSwing
+  jsr ProcStarPower
+  jsr ProcTanookiStatue
 
-  lda A_B_Buttons            ;save current A and B button
-  sta PreviousA_B_Buttons    ;into temp variable to be used on next frame
+  lda SavedJoypadBits        ;save the real A and B buttons for next frame.
+  and #%11000000             ;A_B_Buttons is zeroed while statued, so using it here
+  sta PreviousA_B_Buttons    ;made B look freshly pressed when the statue ended
   lda #$00
   sta Left_Right_Buttons     ;nullify left and right buttons temp variable
 
@@ -1279,16 +1504,6 @@ SlightlyModifiedCollisionRoutine:
   jsr $E079 ; skip ahead to near the end of the collision check
   jmp SwapToPRG0
 
-; .org $E073
-  ; jsr PatchCollisionCheck
-  
-
-; .segment "PRG7"
-; .reloc
-; PatchCollisionCheck:
-  ; lda PlayerStandingMetatile
-  ; sta $03 ; will be checked to see what metatile you stepped on
-  ; jmp $E095 ; in collision but after the metatile collider
 
 ; Recenter mario's bg collision hitbox when checking what position he is at.
 ; This changes where marios "center" metatile to match better with his visuals
@@ -1299,26 +1514,28 @@ SlightlyModifiedCollisionRoutine:
 .org $ee7b
 .byte $40, $40
 
-; In vanilla, when link goes off screen to the left, it will go to page $ff, so the
-; game has code that bumps the player up a page to counter that offset
-; .org $e177 ; inc Player_PageLoc
-  ; nop
-  ; nop
-
 .segment "PRG0", "PRG7"
 .org $92A5
   jmp PatchFinishPlayerPaletteCycle
 .reloc
 PatchFinishPlayerPaletteCycle:
-  sta $0301 ; write player flash counter
+  sta $0301
   ldy $074B ; flash frame counter ; If its the last frame of the spell cycle
   bne +
-    lda $69DE ; and we aren't using shield spell
-    cmp #$02
-    beq +
-      ; then update our colors
-      stx $0301 ; reset the position of the vram buffer write so we don't double write colors
-      jmp UpdatePlayerPalette ; And then update the player palette appropriately
+    ; reset the position of the vram buffer write so we don't double write colors
+    stx $0301
+    jmp UpdatePlayerPalette
+  +
+  rts
+
+.org $9241
+  jmp PatchFlashDecorEnd
+.reloc
+PatchFlashDecorEnd:
+  sta $074B
+  bcc +
+    ; carry is set when the cycle ends so bring back in our original palette
+    jmp UpdatePlayerPalette
   +
   rts
 
@@ -1457,9 +1674,7 @@ SkipRecoilForStabs:
 .org $E65E
   jsr CheckForDownstab
   bcc $E66A
-  LDA      #$fc
-  STA      $057D
-  rts
+  jmp SetStompBounce
 .assert * <= $E66A
 
 ; Disable recoil when hitting enemy with hammers
@@ -1517,6 +1732,7 @@ FREE_UNTIL $E708
 SetDownstabStatTracking:
   ;set recoil to -4 to bounce up
   sta $057D
+  jsr ApplyStatueBounceForce
   ; stomped an enemy so inc stats as well
   inc StatDownStabCount+0
   bne @Exit
@@ -1537,6 +1753,23 @@ InyIfDownstabbing:
     iny
   +
   rts
+
+.reloc
+; Stomp physics between SMB1 and SMB3 are quite different, so add extra bounce force
+; to make it feel better. i just like it mmmkay
+ApplyStatueBounceForce:
+  lda StatueTimer
+  beq @done
+    lda #STATUE_BOUNCE_FORCE
+    sta VerticalForceDown
+@done:
+  rts
+
+.reloc
+SetStompBounce:
+  lda #$fc
+  sta Player_Y_Speed
+  jmp ApplyStatueBounceForce
 
 .reloc
 CheckForDownstab:

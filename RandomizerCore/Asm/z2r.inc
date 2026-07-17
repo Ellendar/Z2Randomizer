@@ -138,7 +138,7 @@ Sfx_Bump              = %00000010
 Sfx_BigJump           = %00000001
 
 ;sq2 sfx
-Sfx_BowserFall        = %10000000
+Sfx_StatuePoof        = %10000000
 Sfx_ExtraLife         = %01000000
 Sfx_PowerUpGrab       = %00100000
 Sfx_TimerTick         = %00010000
