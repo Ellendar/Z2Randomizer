@@ -217,6 +217,7 @@ Enemy3Type = $a4
 Enemy4Type = $a5
 Enemy5Type = $a6                         ; Enemy (Boss) slot
 LinkCollisionBits = $a7                  ; 0000ABLR (above, below, left, right)
+EnemyState = $a8
 Enemy0State = $a8
 Enemy1State = $a9
 Enemy2State = $aa
@@ -599,9 +600,9 @@ RESV JumpSwimTimer
 RESV RunningTimer
 RESV SideCollisionTimer
 ; RESV BlockBounceTimer
-FRAME_TIMER_COUNT = SideCollisionTimer - Timers
-; RESV StarInvincibleTimer
-ALL_TIMER_COUNT = SideCollisionTimer - Timers ; StarInvincibleTimer - Timers
+RESV StarInvincibleTimer
+FRAME_TIMER_COUNT = StarInvincibleTimer - Timers
+ALL_TIMER_COUNT = StarInvincibleTimer - Timers
 
 RESV SpriteShuffleOffset
 ;RESV CurrentCHRBank
@@ -627,15 +628,19 @@ RESV Noise_SfxLenCounter
 RESV TailWag_CtlHold
 RESV TailWag_FreqLo
 RESV TailWag_FreqHi
+; have to keep this separate from the tail wag since they can proc at the same time
+RESV Poof_CtlHold
 
 RESV JustThrownHammer
 RESV TailSwingTimer
-; SMB3 raccoon flutter: nonzero = Y-velocity cap active
 RESV TailWagCount
-; Per-enemy "hit by hammer" flag. Persistent across the enemy's hit-flash so
-; later per-enemy recoil setters ($9AF9 etc., which run after ProjectileProcessing
-; is cleared) can still know to suppress the knockback. Cleared when the flash
-; timer at $040E,x decrements to zero (see bank7_Display patch).
+; Not in the standard timer place so we can tick it down manually
+RESV StatueTimer
+; duration for specifically the poof effect timer
+RESV StatueChangeTimer
+; We need to surpress enemy knockback when they are hit by a hammer
+; but the place we process the knockback is way later, so this stores "hits"
+; on a per-enemy basis so that we can avoid knockback.
 RESV HammerHitFlag, 6
 
 ; Shadow Mario Boss RAM

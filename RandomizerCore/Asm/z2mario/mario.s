@@ -2,19 +2,21 @@
 .include "z2r.inc"
 
 .import SlightlyModifiedCollisionRoutine
-.import PlayerBankTable
 .import METASPRITE_SMALL_MARIO_DEATH, FIRE_MARIO_OFFSET, METASPRITE_FIRE_MARIO_SWIMMING_STILL_1, METASPRITE_SMALL_FIRE_SWIMMING_STILL_1
 .import METASPRITE_BIG_MARIO_JUMPING, METASPRITE_BIG_MARIO_SWIMMING_1_KICK, METASPRITE_BIG_MARIO_STANDING, METASPRITE_BIG_MARIO_SKIDDING
-.import METASPRITE_BIG_MARIO_WALKING_1, METASPRITE_BIG_MARIO_CLIMBING_1, METASPRITE_BIG_MARIO_CROUCHING, METASPRITE_FIRE_MARIO_STANDING
+.import METASPRITE_BIG_MARIO_WALKING_1, METASPRITE_BIG_MARIO_CROUCHING, METASPRITE_FIRE_MARIO_STANDING
 .import METASPRITE_SMALL_MARIO_JUMPING, METASPRITE_SMALL_MARIO_SWIMMING_1_KICK, METASPRITE_SMALL_MARIO_STANDING, METASPRITE_SMALL_MARIO_SKIDDING
-.import METASPRITE_SMALL_MARIO_WALKING_1, METASPRITE_SMALL_MARIO_CLIMBING_1, METASPRITE_SMALL_MARIO_GROW_STANDING, METASPRITE_FIREBALL_FRAME_1
+.import METASPRITE_SMALL_MARIO_WALKING_1, METASPRITE_SMALL_MARIO_GROW_STANDING, METASPRITE_FIREBALL_FRAME_1
 .import METASPRITE_FIREBALL_FRAME_2, METASPRITE_EXPLOSION_FRAME_1, METASPRITE_EXPLOSION_FRAME_2, METASPRITE_EXPLOSION_FRAME_3
 .import METASPRITE_HAMMER_FRAME_1, METASPRITE_HAMMER_FRAME_2
 .import SWIMMING_ANIMATION_FRAME_COUNT
 
-.export GameRoutines, ProcFireball_Bubble, PlayerGfxHandler
+.export GameRoutines, ProcFireball_Bubble, PlayerGfxHandler, ProcStarPower
 
 .segment "PRG0", "PRG7"
+STATUE_FLICKER_START = $60  ; warning flicker once this many frames remain
+STAR_WARNING_FRAMES  = 32   ; palette cycle slows down below this
+
 .reloc
 
 ;-------------------------------------------------------------------------------------
@@ -197,6 +199,18 @@ SaveJoyp:
   and #%00001100
   sta Up_Down_Buttons
 
+  ; If we are in a statue pose, then clear the player input to prevent any other
+  ; mario actions from happening.
+  lda StatueTimer
+  ora StatueChangeTimer
+  beq @notStatue
+    lda #$00
+    sta A_B_Buttons
+    sta Left_Right_Buttons
+    sta Up_Down_Buttons
+@notStatue:
+
+  lda Up_Down_Buttons
   and #%00000100              ;check for pressing down
   beq SizeChk                 ;if not, branch
     lda Player_State            ;check player's state
@@ -207,10 +221,14 @@ SaveJoyp:
         sta Left_Right_Buttons      ;if pressing down while on the ground,
         sta Up_Down_Buttons         ;nullify directional bits
 SizeChk:
-  lda $a7   ; flip collision bits to match mario style
+  lda LinkCollisionBits   ; flip collision bits to match mario style
   eor #$ff
-  sta $a7
-  jsr PlayerMovementSubs      ;run movement subroutines
+  sta LinkCollisionBits
+  ; force mario to freeze while changing
+  lda StatueChangeTimer
+  bne @frozen
+    jsr PlayerMovementSubs      ;run movement subroutines
+@frozen:
   ldy #$01                    ;is player small?
   lda PlayerSize
   bne ChkMoveDir
@@ -238,9 +256,9 @@ PlayerSubs:
   ; jsr BoundingBoxCore     ;get player's bounding box coordinates
   jsr PlayerBGCollision       ;do collision detection and process
 
-  lda $a7   ; flip collision bits to match z2 style
+  lda LinkCollisionBits   ; flip collision bits to match z2 style
   eor #$ff
-  sta $a7
+  sta LinkCollisionBits
 
   ; This is the offset for the table that holds the Y add val for link
   ldy #$1d
@@ -377,7 +395,18 @@ CntPl:
   cmp #$0b                    ;branch ahead to some other part
   bne +
     jmp PlayerKilled
-+  lda PlayerChangeSizeFlag    ;if grow/shrink flag set
++ lda StatueTimer
+  beq @notInStatue
+    cmp #STATUE_FLICKER_START
+    bcs @statueDraw             ;plenty of time left, so draw solid
+    and #$02                    ;SMB3 warning: 2 frames drawn, 2 frames hidden
+    bne ClearMarioSprite
+  @statueDraw:
+    lda #METASPRITE_BIG_MARIO_STANDING
+    sta ObjectMetasprite
+    jmp PlayerOffscreenChk      ;keep the scroll position fresh, skip anim/swim
+@notInStatue:
+  lda PlayerChangeSizeFlag    ;if grow/shrink flag set
   beq +
    jmp DoChangeSize            ;then branch to some other code
 +
@@ -489,7 +518,7 @@ PlayerGfxTblOffsets:
   .byte METASPRITE_BIG_MARIO_STANDING
   .byte METASPRITE_BIG_MARIO_SKIDDING
   .byte METASPRITE_BIG_MARIO_WALKING_1
-  .byte METASPRITE_BIG_MARIO_CLIMBING_1
+  .byte $00 ; METASPRITE_BIG_MARIO_CLIMBING_1
   .byte METASPRITE_BIG_MARIO_CROUCHING
   .byte METASPRITE_FIRE_MARIO_STANDING
   ; .byte $80, $88, $b8, $78, $60, $a0, $b0, $b8
@@ -498,7 +527,7 @@ PlayerGfxTblOffsets:
   .byte METASPRITE_SMALL_MARIO_STANDING
   .byte METASPRITE_SMALL_MARIO_SKIDDING
   .byte METASPRITE_SMALL_MARIO_WALKING_1
-  .byte METASPRITE_SMALL_MARIO_CLIMBING_1
+  .byte $00 ; METASPRITE_SMALL_MARIO_CLIMBING_1
   .byte METASPRITE_SMALL_MARIO_DEATH
 GrowAnimation = * - PlayerGfxTblOffsets
   .byte METASPRITE_SMALL_MARIO_GROW_STANDING
@@ -645,6 +674,28 @@ ResetPalStar:
   and #%11111100        ;mask out palette bits to force palette 0
   sta Player_SprAttrib  ;store as new player attributes
   rts                   ;and leave
+
+.reloc
+; The SPELL spell's star power. The metasprite engine ORs Player_SprAttrib into
+; every player tile, so we just do the same style palette cycle mario 1 does
+.proc ProcStarPower
+  lda StarInvincibleTimer
+  bne @active
+    lda Player_SprAttrib
+    and #%11111100
+    sta Player_SprAttrib
+    rts
+@active:
+  cmp #STAR_WARNING_FRAMES
+  lda FrameCounter
+  bcs @fast
+    ; every 8 frames
+    lsr
+    lsr
+@fast:
+  lsr ; every other frame
+  jmp CyclePlayerPalette
+.endproc
 
 ;-------------------------------------------------------------------------------------
 .reloc
@@ -1190,8 +1241,8 @@ OffscrJoypadBitsData:
 .reloc
 ProcessPlayerAction:
   lda Player_State      ;get player's state
-  cmp #$03
-  beq ActionClimbing    ;if climbing, branch here
+  ; cmp #$03
+  ; beq ActionClimbing    ;if climbing, branch here
   cmp #$02
   beq ActionFalling     ;if falling, branch here
   cmp #$01
@@ -1250,12 +1301,12 @@ ActionWalkRun:
   jsr GetGfxOffsetAdder  ;get offset to graphics table
   jmp FourFrameExtent    ;execute instructions for normal state
 
-ActionClimbing:
-  ldy #$05               ;load offset for climbing
-  lda Player_Y_Speed     ;check player's vertical speed
-  beq NonAnimatedActs    ;if no speed, branch, use offset as-is
-  jsr GetGfxOffsetAdder  ;otherwise get offset for graphics table
-  jmp ThreeFrameExtent   ;then skip ahead to more code
+; ActionClimbing:
+;   ldy #$05               ;load offset for climbing
+;   lda Player_Y_Speed     ;check player's vertical speed
+;   beq NonAnimatedActs    ;if no speed, branch, use offset as-is
+;   jsr GetGfxOffsetAdder  ;otherwise get offset for graphics table
+;   jmp ThreeFrameExtent   ;then skip ahead to more code
 
 ActionSwimming:
   ldy #$01               ;load offset for swimming

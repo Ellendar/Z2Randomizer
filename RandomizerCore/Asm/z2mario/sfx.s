@@ -225,6 +225,76 @@ Square1_Table_Notes:
        .word $1AB8, $1938, $17CC, $1678, $1534, $1404
        .word $12E4, $11D4, $10D4, $0FE0, $0EFC, $0E24
 
+PlayStatuePoof:
+       lda #SndLev1_DataPoof - SndLev1_DataLongWag
+       sta Squ2_SfxLenCounter
+       lda #$9F
+       sta Poof_CtlHold
+       ; fall through into ContinueStatuePoof for the first frame
+
+ContinueStatuePoof:
+       inc Squ2_SfxLenCounter
+@fetch:
+       ldy Squ2_SfxLenCounter
+       lda SndLev1_DataLongWag-1,y
+       beq @streamEnd
+       bpl @playNote
+       sta Poof_CtlHold
+       inc Squ2_SfxLenCounter
+       bne @fetch
+
+@playNote:
+       tay
+       lda Poof_CtlHold
+       sta SND_SQUARE2_REG
+       lda #$7F
+       sta SND_SQUARE2_REG+1
+       tya
+       jmp Poof_PokeNote
+
+@streamEnd:
+       lda #$00
+       sta SND_SQUARE2_REG+2
+       sta Squ2_SfxLenCounter
+       sta Square2SoundBuffer
+       rts
+
+; Square 2 twin of TailWag_PokeNote (SMB3 PRG31 $E7C1)
+Poof_PokeNote:
+       cmp #$7E
+       beq @rest
+       pha
+       ldx #$01
+@octLoop:
+       inx
+       sec
+       sbc #24
+       bpl @octLoop
+       clc
+       adc #24
+       tay
+       lda Square1_Table_Notes,y
+       sta TailWag_FreqLo
+       lda Square1_Table_Notes+1,y
+       sta TailWag_FreqHi
+@octShift:
+       lsr TailWag_FreqHi
+       ror TailWag_FreqLo
+       dex
+       bne @octShift
+       pla
+       cmp #56
+       bcc @noAdjust
+         dec TailWag_FreqLo
+@noAdjust:
+       lda TailWag_FreqLo
+       sta SND_SQUARE2_REG+2
+       lda TailWag_FreqHi
+       ora #%00001000
+       sta SND_SQUARE2_REG+3
+@rest:
+       rts
+
 PlaySmallJump:
        lda #$26               ;branch here for small mario jumping sound
        bne JumpRegContents
@@ -488,7 +558,9 @@ Square2SfxHandler:
         ldy Square2SoundQueue  ;check for sfx in queue
         beq CheckSfx2Buffer
         sty Square2SoundBuffer ;if found, put in buffer and check for the following
-        bmi PlayBowserFall     ;bowser fall
+        bpl +
+           jmp PlayStatuePoof     ;tanooki statue change (was bowser fall)
+        +
         lsr Square2SoundQueue
         bcs PlayCoinGrab       ;coin grab
         lsr Square2SoundQueue
@@ -509,8 +581,9 @@ Square2SfxHandler:
 CheckSfx2Buffer:
         lda Square2SoundBuffer   ;check for sfx in buffer
         beq ExS2H                ;if not found, exit sub
-        bmi ContinueBowserFall   ;bowser fall
-        lsr
+        bpl +
+          jmp ContinueStatuePoof   ;tanooki statue change (was bowser fall)
+      + lsr
         bcs Cont_CGrab_TTick     ;coin grab
         lsr
         bcs ContinueGrowItems    ;power-up reveal
@@ -701,3 +774,11 @@ SMB3FluteSong:
 	.byte $18, $88, $7E, $7E, $A8, $3A, $84, $7E, $88, $3A, $A4, $30, $36, $38, $A8, $3A ; $AD19 - $AD28
 	.byte $84, $7E, $88, $3A, $A4, $30, $36, $38, $94, $04, $02, $00, $94, $0A, $0B, $07 ; $AD29 - $AD38
 	.byte $07, $00
+
+; SMB3 SndLev1_DataPoof from $A57B
+SndLev1_DataPoof:
+	.byte $9F
+	.byte $2E, $2A, $26, $22, $9D, $2E, $2A, $7E, $7E, $9F, $30, $2E, $2A, $28, $9D, $30 ; $A57B - $A58A
+	.byte $2E, $7E, $7E, $9F, $38, $34, $32, $30, $9D, $38, $34, $32, $30, $9A, $38, $34 ; $A58B - $A59A
+	.byte $32, $30, $9C, $38, $34, $32, $30, $97, $38, $34, $32, $30, $98, $38, $34, $32 ; $A59B - $A5AA
+	.byte $30, $94, $38, $34, $32, $30, $00

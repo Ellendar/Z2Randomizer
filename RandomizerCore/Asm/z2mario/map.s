@@ -22,6 +22,7 @@
 
 .org $8728
   jmp DrawMarioMap
+FREE_UNTIL $87A2
 .reloc
 DrawMarioMap:
   sec
