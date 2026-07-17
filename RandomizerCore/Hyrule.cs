@@ -3746,6 +3746,8 @@ EndTileComparisons = $8601
         a.Set("_ALLOW_ITEM_DUPLICATES", props.AllowImportantItemDuplicates ? 1 : 0);
         if (props.MarioMode)
             a.Assign("ENABLE_Z2_MARIO", 1);
+        if (props.FluteWarpMode == FluteWarpMode.CLEARED_PALACES)
+            a.Assign("FLUTE_WARP_CLEARED_PALACES", 1);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
 
@@ -3913,9 +3915,9 @@ bank5_Pointer_table_for_End_Credits:
             rom.DashSpell(engine);
         }
 
-        if (props.FluteTwisterWarp)
+        if (props.FluteWarpMode != FluteWarpMode.NONE)
         {
-            ROM.FluteTwisterWarp(engine);
+            ROM.FluteTwisterWarp(engine, props.FluteWarpMode);
         }
 
         if (props.UpARestartsAtPalaces)

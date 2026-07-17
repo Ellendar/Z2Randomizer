@@ -4,6 +4,13 @@ TWISTER_ENEMY_ID = $04
 TWISTER_TILE = $b5   ; tile IDs for frame 0; frame 1 uses TWISTER_TILE+2
 TWISTER_PAL  = $02   ; OAM palette attribute (bits 0-1)
 
+; Exactly one of the following is defined by ROM.FluteTwisterWarp() to select the mode:
+;   FLUTE_WARP_CLEARED_PALACES - warp to palaces whose crystal has been placed
+;   FLUTE_WARP_VISITED_PALACES - warp to any palace entered (incl. Great Palace)
+;   FLUTE_WARP_VISITED_TOWNS   - warp to any town entered
+; The "visited" modes track destinations in the FluteWarpFlags bitfield
+; and if none of them are defined, then this file isn't getting built at all.
+
 ; Overworld "Area Byte 0" (Y position + flags) table in work RAM, indexed by
 ; LocationNumber. Bit 7 set marks the slot as a palace/town entrance; when it's
 ; clear the sideview loader treats the slot as a generic/random-battle area.
@@ -11,10 +18,23 @@ OverworldAreaTable = $6a00
 ; UpdateHiddenPalaceSpot() stores the flute-hidden palace's *revealed* Area Data
 ; The palace is index 0 at $df68 and the town is index 1 at $df69
 HiddenPalaceRevealedAreaUpdate = $df68
+.ifdef FLUTE_WARP_VISITED_TOWNS
+; In towns mode the hidden destination is a town (New Kasuto), so reveal $df69 instead
+; TODO: test what happens if a town is behind 3 eye rock
+HiddenRevealAddr = HiddenPalaceRevealedAreaUpdate + 1
+.else
+HiddenRevealAddr = HiddenPalaceRevealedAreaUpdate
+.endif
+
+; Weirdly the game doesn't have a power of two table except in bank 0 and 3
+.segment "PRG7"
+.reloc
+PowersOfTwo:
+  .byte $01, $02, $04, $08, $10, $20, $40, $80
 
 .segment "PRG0", "PRG7"
 
-.import PalaceMappingTable
+.import RealPalaceNumberTable
 
 ProcessNextOverworldEnemy = $842F
 UpdateOverworldSpritePosition = $8397
@@ -51,7 +71,7 @@ OverworldPostLoadFluteCheck:
     sta $0726
     rts
 @enter:
-  sta LocationNumber          ; restore the palace area index ($34 + palace code)
+  sta LocationNumber          ; restore the destination area index
   sta AreaEntranceIndex
   lda #$00
   sta TwisterPendingPalaceLocation
@@ -59,12 +79,12 @@ OverworldPostLoadFluteCheck:
   lda #5
   sta GameMode
   ; the destination continent's area byte table was just reloaded from ROM, so
-  ; reveal the hidden palace now (if that's where we're headed)
-RevealHiddenPalaceIfNeeded:
+  ; reveal the hidden destination now (if that's where we're headed)
+RevealHiddenDestIfNeeded:
   ldy LocationNumber
   lda OverworldAreaTable, y
   bmi @done
-    lda HiddenPalaceRevealedAreaUpdate
+    lda HiddenRevealAddr
     sta OverworldAreaTable, y
 @done:
   rts
@@ -77,7 +97,7 @@ TwisterDrawCheck:
   lda OverworldEnemy0Type, x
   cmp #$04
   beq @twister
-    tax ; do the original 
+    tax ; do the original
     rts
 @twister:
   ; type 4: write twister tile and palette
@@ -96,7 +116,6 @@ TwisterDrawCheck:
   pla
   pla
   jmp UpdateOverworldSpritePosition
-  
 
 .reloc
 TwisterVelocityCheck:
@@ -133,6 +152,22 @@ TwisterWarp:
   lda #$00
   sta OverworldEnemy0Type, x
   sta OverworldDemonTimer, x
+.ifdef FLUTE_WARP_VISITED_TOWNS
+  ; TwisterCurrentPalaceSlot holds a town code (0-7). Look up the overworld area-table
+  ; index of that town's primary entrance from TownWarpLocationTable which is built
+  ; and exported by the C# randomizer code.
+  ldy TwisterCurrentPalaceSlot
+  lda TownWarpLocationTable, y
+  sta LocationNumber
+  sta AreaEntranceIndex
+  ; target region: codes 0-3 = West (region 0), 4-7 = East (region 2)
+  tya
+  and #$04
+  beq @have_region
+    lda #$02
+@have_region:
+.else
+  ; TwisterCurrentPalaceSlot holds a global palace slot (0-15).
   ; LocationNumber = $34 + within-region palace code
   lda TwisterCurrentPalaceSlot
   and #$03
@@ -144,6 +179,7 @@ TwisterWarp:
   lda TwisterCurrentPalaceSlot
   lsr
   lsr
+.endif
   cmp RegionNumber
   ; already in the right continent so we don't need to switch continents
   beq @same_region
@@ -162,12 +198,12 @@ TwisterWarp:
     lda #$ff
     sta GameMode
     ; the area byte table isn't loaded for the destination continent yet, so the
-    ; hidden palace reveal is deferred to OverworldPostLoadFluteCheck
+    ; hidden reveal is deferred to OverworldPostLoadFluteCheck
     bne @load ; unconditional
 @same_region:
   ; still in the destination continent, so its area byte table is already live.
-  ; reveal the palace destination if we are warping there
-  jsr RevealHiddenPalaceIfNeeded
+  ; reveal the hidden destination if we are warping there
+  jsr RevealHiddenDestIfNeeded
 @load:
   pla
   pla
@@ -181,16 +217,16 @@ TwisterWarp:
   lda OverworldEnemy0Type, x
   cmp #$04
   ; already have a twister so skip processing it
-  bne @skip
+  bne @skip_active
     jmp @exit
-@skip:
+@skip_active:
   dex
   bpl @active_check
 
-  ; Check the player direction and find a valid palace to warp to
+  ; Check the player direction to decide which way to walk the destination list.
   ; Direction: OverworldFacingDirection bits
   ; next     $01=right $08=up
-  ; previous $02=left $04=down 
+  ; previous $02=left $04=down
   lda OverworldFacingDirection
   ; right ($01) or up ($08)
   and #$09
@@ -198,52 +234,71 @@ TwisterWarp:
   lda #$ff ; add -1 to walk the list backwards
   bne @scan ; unconditional
 @go_next:
-  lda #$01 ; add 1 to walk the slot list forwards
+  lda #$01 ; add 1 to walk the list forwards
 @scan:
   sta R7
 
-  ; skip through the list of crystals placed to find the next palace to go to
   ldy TwisterCurrentPalaceSlot
-  lda PalaceMappingTable,y
-  jsr @ConvertPalaceIdToMapping
-  ldx #5
-@next_palace:
+.ifdef FLUTE_WARP_VISITED_TOWNS
+  ; Visited towns: walk town codes 0-7.
+  ; TwisterCurrentPalaceSlot is already the town slot
+  tya
+.else
+  ; Palace modes: walk palace numbers 0-5/6, then map back to a global slot
+  lda RealPalaceNumberTable,y
+.endif
+  and #7
+  sta R6
+  ldx #7
+
+@next_dst:
+  lda R6
   clc
   adc R7
   and #7
-  cmp #6 ; skip over the great palace
-  bcs @next_palace
+  sta R6
+  ; Make sure that we don't warp to something unavailable in the slots
+  ; when using a palace warp not all bits are used in the FluteWarpFlags
+.ifndef FLUTE_WARP_VISITED_TOWNS
+.ifdef FLUTE_WARP_CLEARED_PALACES
+  cmp #6 ; skip gp (#6 since theres no crystal) and the unused value 7
+.else ; FLUTE_WARP_VISITED_PALACES
+  cmp #7 ; only skip the unused value 7
+.endif
+  bcs @skip_dst
+.endif ; .ifndef FLUTE_WARP_VISITED_TOWNS
   tay
-  lda CrystalPlaced, y
-  bne @crystalplaced
-  tya
+  lda FluteWarpFlags
+  and PowersOfTwo,y
+  bne @found_dst
   dex
-  bpl @next_palace
-    ; We haven't placed any crystals, so leave
+  bpl @next_dst
+    ; nothing visited yet, so leave
     jmp @exit
-@crystalplaced:
-  sty R7 ; use this as a temp storage for the target palace to warp to
-  ; store the next palace idx that we will warp to
-  ; now that we know what palace we want to go to, loop through the palace mapping table to find the
-  ; actual location for it.
+@found_dst:
+.ifdef FLUTE_WARP_VISITED_TOWNS
+  ; town code is used directly as the slot
+  lda R6
+  sta TwisterCurrentPalaceSlot
+.else
+  ; R6 = target palace number. Loop the mapping table to find its global slot.
   ldy #$0f
 @next_mapping_entry:
-  lda PalaceMappingTable, y
-  cmp #$ff ; $ff is a place holder indicating no palace at this slot in the world
+  lda RealPalaceNumberTable, y
+  cmp #$ff ; $ff means no palace at this slot
   beq @advance
-  jsr @ConvertPalaceIdToMapping
-  ; Check if this palace number == the actual palace we are looking for
-  cmp R7
-  beq @foundPalaceToWarpTo
-  ; haven't found the palace mapping table entry for this palace yet, so loop again
+  cmp R6
+  beq @foundSlot
 @advance:
   dey
   bpl @next_mapping_entry
-    ; we couldn't find the mapping? that doesn't seem possible...
+    ; we couldn't find the mapping? that shouldn't be possible...
     jmp @exit
-@foundPalaceToWarpTo:
+@foundSlot:
   sty TwisterCurrentPalaceSlot
+.endif
 
+@spawn:
   ; Find a free encounter slot
   ldx #$07
 @free_slot:
@@ -274,29 +329,62 @@ TwisterWarp:
   ; And also check if its time to do spider/3 eye rock encounter
   lda OverworldFacingTerrain
   rts
-@ConvertPalaceIdToMapping:
-  ; This table layout was optimized for updating stats (since thats done every frame)
-  ; and this doesn't matter how long it takes pretty much. So we need to convert
-  sec
-  sbc #Palace1Offset
-  ; div by 3 to get the palace number 0 - 6
-  sta R5
-  lsr
-  lsr
-  adc R5
-  ror
-  lsr
-  adc R5
-  ror
-  lsr
-  adc R5
-  ror
-  lsr
-  adc R5
-  ror
-  lsr
-  rts
 .endmacro
+
+
+; If our flute mode needs to save visited locations, then include the following code
+.if .defined(FLUTE_WARP_VISITED_PALACES) .or .defined(FLUTE_WARP_VISITED_TOWNS)
+.segment "PRG7"
+
+.ifdef FLUTE_WARP_VISITED_TOWNS
+.reloc
+; Maps from vanilla town ID to the "actual" town present at this spot.
+TownWarpLocationTable:
+  .byte RealTownAtLocation0, RealTownAtLocation1, RealTownAtLocation2, RealTownAtLocation3
+  .byte RealTownAtLocation4, RealTownAtLocation5, RealTownAtLocation6, RealTownAtLocation7
+.endif
+
+.org $CBB4
+  jsr FluteMarkVisited
+
+.reloc
+FluteMarkVisited:
+  sta GameMode ; the store we replaced (A == 0 here)
+.ifdef FLUTE_WARP_VISITED_TOWNS
+  ; 1 = West town, 2 = East town, >=3 = palace
+  lda WorldNumber
+  cmp #1
+  beq @town
+  cmp #2
+  bne @done
+@town:
+  ; already region-adjusted to 0-7
+  ldy TownNumber
+  lda PowersOfTwo,y
+  ora FluteWarpFlags
+  sta FluteWarpFlags
+@done:
+  rts
+.else ; FLUTE_WARP_VISITED_PALACES
+  lda WorldNumber
+  cmp #3
+  bcc @done ; < 3 means we entered a town/cave, not a palace
+    lda RegionNumber
+    asl
+    asl
+    adc PalaceRegionIndex
+    tay
+    lda RealPalaceNumberTable,y
+    cmp #7 ; guard against an unexpected empty slot
+    bcs @done
+    tay
+    lda PowersOfTwo,y
+    ora FluteWarpFlags
+    sta FluteWarpFlags
+@done:
+  rts
+.endif
+.endif
 
 
 .segment "PRG1"

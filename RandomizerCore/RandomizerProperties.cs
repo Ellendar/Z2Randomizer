@@ -221,7 +221,7 @@ public class RandomizerProperties
     public byte BeepThreshold { get; set; }
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
-    public bool FluteTwisterWarp { get; set; }
+    public FluteWarpMode FluteWarpMode { get; set; }
     public bool FastCast { get; set; }
 
     public BeamSprites BeamSprite { get; set; }

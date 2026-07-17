@@ -478,7 +478,7 @@ HaveFlute = $0789
 HaveCross = $078a
 HaveHammer = $078b
 HaveMagicKey = $078c
-Crystal1Placed = $078d
+Crystal1Placed = $078d                   ; crystal-placed flags, unused in randomizer
 Crystal2Placed = $078e
 Crystal3Placed = $078f
 Crystal4Placed = $0790
@@ -493,6 +493,8 @@ HaveBagusNoteAndMedicine = $079a         ; 0x08 = Bagu's Note | 0x40 = Medicine
 HaveWater = $079b                        ; 1 = Have Water
 HaveChild = $079c                        ; 0x20 = Have Child
 HaveBasementAccess = $079d               ; 0x08 = Have New Kasuto Basement access
+; Bitlist of palaces cleared/towns visited/etc for flute warp mode
+FluteWarpFlags = $079e
 ContinuesUsed = $079f
 
 ; New variables that use free memory
