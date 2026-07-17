@@ -26,7 +26,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
     private int palaceNumber;
     private RoomPool? roomPool;
     
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNum)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNum, int attempt)
     {
         this.roomCount = roomCount;
         this.palaceNumber = palaceNum;

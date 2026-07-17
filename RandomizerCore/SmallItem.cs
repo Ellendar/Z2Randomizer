@@ -1,36 +1,36 @@
 ﻿using System;
 
-namespace Z2Randomizer.RandomizerCore
-{
-    //private readonly int[] drops = { 0x8a, 0x8b, 0x8c, 0x8d, 0x90, 0x91, 0x92, 0x88 }
-    public enum SmallItem
-    {
-        BLUE_JAR = 0x90, 
-        RED_JAR = 0x91, 
-        SMALL_BAG = 0x8a, 
-        MEDIUM_BAG = 0x8b, 
-        LARGE_BAG = 0x8c, 
-        XL_BAG = 0x8d, 
-        ONE_UP = 0x92, 
-        KEY = 0x88
-    }
+namespace Z2Randomizer.RandomizerCore;
 
-    static class SmallItemExtensions
+/// Subset of Collectables that can be used as enemy drops. The enum
+/// values match their Collectable counterparts with 7th bit set.
+public enum SmallItem : byte
+{
+    KEY = 0x88,
+    SMALL_BAG = 0x8a,   // 50 P
+    MEDIUM_BAG = 0x8b,  // 100 P
+    LARGE_BAG = 0x8c,   // 200 P
+    XL_BAG = 0x8d,      // 500 P
+    BLUE_JAR = 0x90,
+    RED_JAR = 0x91,
+    ONEUP = 0x92,
+}
+
+public static class SmallItemExtensions
+{
+    public static Collectable ToCollectable(this SmallItem drop)
     {
-        public static SmallItem Random(this SmallItem s, Random random)
+        return drop switch
         {
-            return random.Next(8) switch
-            {
-                0 => SmallItem.BLUE_JAR,
-                1 => SmallItem.RED_JAR,
-                2 => SmallItem.SMALL_BAG,
-                3 => SmallItem.MEDIUM_BAG,
-                4 => SmallItem.LARGE_BAG,
-                5 => SmallItem.XL_BAG,
-                6 => SmallItem.ONE_UP,
-                7 => SmallItem.KEY,
-                _ => throw new ArgumentException("Invalid smallItem")
-            };
-        }
+            SmallItem.KEY => Collectable.KEY,
+            SmallItem.SMALL_BAG => Collectable.SMALL_BAG,
+            SmallItem.MEDIUM_BAG => Collectable.MEDIUM_BAG,
+            SmallItem.LARGE_BAG => Collectable.LARGE_BAG,
+            SmallItem.XL_BAG => Collectable.XL_BAG,
+            SmallItem.BLUE_JAR => Collectable.BLUE_JAR,
+            SmallItem.RED_JAR => Collectable.RED_JAR,
+            SmallItem.ONEUP => Collectable.ONEUP,
+            _ => throw new ArgumentOutOfRangeException(nameof(drop), drop, null),
+        };
     }
 }

@@ -65,7 +65,7 @@ public static class UpstartsTournamentPreset
         ShuffleBossHP = EnemyLifeOption.MEDIUM,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,
-        ShuffleSwordImmunity = true,
+        SwordImmunityOption = SwordImmunityOption.SHUFFLE,
         EnemyXPDrops = XPEffectiveness.RANDOM,
 
         //Items

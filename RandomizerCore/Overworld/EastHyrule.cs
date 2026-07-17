@@ -363,7 +363,7 @@ public sealed class EastHyrule : World
         hiddenKasutoLocation = townAtNewKasuto;
 
         //Climate filtering
-        climate = Climates.Create(props.EastClimate);
+        climate = Climates.Create(continentId, props.EastClimate);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);
@@ -406,7 +406,7 @@ public sealed class EastHyrule : World
         {
             Debug.Assert(MapRows == 75);
             Debug.Assert(MapColumns == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
+            map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
 
             if (biome == Biome.VANILLA_SHUFFLE)
             {
@@ -426,7 +426,7 @@ public sealed class EastHyrule : World
                 foreach (Location location in AllLocations)
                 {
                     // section uses tuples with the Y+30 offset
-                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationByPos(location.Pos)!);
+                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationAt(location.Pos)!);
                 }
 
                 ChooseConn("kasuto", connections, true);
@@ -511,7 +511,7 @@ public sealed class EastHyrule : World
                     };
                 }
 
-                map = new Terrain[MapRows, MapColumns];
+                map = new OverworldMap(MapRows, MapColumns);
 
                 for (int i = 0; i < MapRows; i++)
                 {
@@ -894,7 +894,11 @@ public sealed class EastHyrule : World
 
     public bool MakeValleyOfDeath()
     {
-        //DM passthrough locations
+        bool isCanyon = biome is Biome.CANYON or Biome.DRY_CANYON;
+        bool isCalderaLike = biome is Biome.CANYON or Biome.DRY_CANYON or Biome.VOLCANO;
+        bool horizontalPath = isHorizontal ^ isCanyon;
+
+        // VoD passthrough locations
         List<Location> passthroughLocations = [
             GetLocation(LocationID.EAST_TRAP_LAVA1),
             GetLocation(LocationID.EAST_TRAP_LAVA2),
@@ -903,7 +907,7 @@ public sealed class EastHyrule : World
         //Clean them up in case of data leakage (this is not hypothetical)
         passthroughLocations.ForEach(i => i.YRaw = 0);
 
-        //Pick a spot for the center of the GP hole
+        // Pick a spot for the center of the GP hole
         int xmin, xmax, ymin, ymax;
         if (biome == Biome.VOLCANO)
         {
@@ -921,136 +925,61 @@ public sealed class EastHyrule : World
             xmax = MapColumns - 6;
             ymax = MapColumns - 6;
         }
-        int palacex = RNG.Next(xmin, xmax);
-        int palacey = RNG.Next(ymin, ymax);
+        IntVector2 palacePos = new(RNG.Next(xmin, xmax), RNG.Next(ymin, ymax));
 
-        //Ensure there is enough unallocated space to draw the whole opening
-        //Why does this happen only for caldera-shaped biomes?
-        if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
+        // Ensure there is enough unallocated space to draw the whole opening
+        if (isCalderaLike)
         {
             int tries = 0;
-            bool placeable;
+            var offsets =
+                Enumerable.Range(-4, 9)
+                .SelectMany(dy => Enumerable.Range(-4, 9)
+                .Select(dx => new IntVector2(dx, dy)));
+
+            bool allMountains;
             do
             {
-                palacex = RNG.Next(xmin, xmax);
-                palacey = RNG.Next(ymin, ymax);
-                placeable = true;
-                for (int i = palacey - 4; i < palacey + 5; i++)
-                {
-                    for (int j = palacex - 4; j < palacex + 5; j++)
-                    {
-                        if (map[i, j] != Terrain.MOUNTAIN)
-                        {
-                            placeable = false;
-                            break; // end inner for
-                        }
-                        if (!placeable) {
-                            break; // end outer for
-                        }
-                    }
-                }
-                if (++tries == 1000)
-                {
-                    return false;
-                }
-            } while (!placeable);
+                if (tries++ == 1000) { return false; }
+                palacePos = IntVector2.Random(RNG, xmin, xmax, ymin, ymax);
+                allMountains = offsets.All(offset => map[palacePos + offset] == Terrain.MOUNTAIN);
+            } while (!allMountains);
         }
 
-        //Actually draw the center of the GP pocket
-        for (int i = 0; i < 7; i++)
+        // VoD center
+        for (int y = -3; y <= 3; y++)
         {
-            for (int j = 0; j < 7; j++)
+            for (int x = -3; x <= 3; x++)
             {
-                if (!((i == 0 && j == 0) || (i == 0 && j == 6) || (i == 6 && j == 0) || (i == 6 && j == 6) || (i == 3 && j == 3)))
-                {
-                    map[palacey - 3 + i, palacex - 3 + j] = Terrain.LAVA;
-                }
-                else
-                {
-                    map[palacey - 3 + i, palacex - 3 + j] = Terrain.MOUNTAIN;
-                }
-                if (i == 0)
-                {
-                    map[palacey - 4, palacex - 3 + j] = Terrain.MOUNTAIN;
-                }
-                if (i == 6)
-                {
-                    map[palacey + 4, palacex - 3 + j] = Terrain.MOUNTAIN;
-                }
-                if (j == 0)
-                {
-                    map[palacey - 3 + i, palacex - 4] = Terrain.MOUNTAIN;
-                }
-                if (j == 6)
-                {
-                    map[palacey - 3 + i, palacex + 4] = Terrain.MOUNTAIN;
-                }
+                map[palacePos + new IntVector2(x, y)] = Terrain.LAVA;
             }
         }
-        map[palacey, palacex] = Terrain.PALACE;
-        locationAtGP.Xpos = palacex;
-        locationAtGP.Y = palacey;
+        List<IntVector2> vodBorderPositions = [
+            .. Enumerable.Range(0, 9).Select(i => palacePos + new IntVector2(-4, -4) + i * IntVector2.EAST),
+            .. Enumerable.Range(1, 7).Select(i => palacePos + new IntVector2(4, -4) + i * IntVector2.SOUTH),
+            .. Enumerable.Range(0, 9).Select(i => palacePos + new IntVector2(-4, 4) + i * IntVector2.EAST),
+            .. Enumerable.Range(1, 7).Select(i => palacePos + new IntVector2(-4, -4) + i * IntVector2.SOUTH),
+            .. new IntVector2[] { new(-3, -3), new(3, -3), new(-3, 3), new(3, 3) }.Select(p => palacePos + p)
+        ];
+        foreach (var borderPos in vodBorderPositions)
+        {
+            map[borderPos] = Terrain.MOUNTAIN;
+        }
+        map[palacePos] = Terrain.PALACE;
+        locationAtGP.Pos = palacePos;
         locationAtGP.CanShuffle = false;
 
-        int length = 20;
-        if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.VOLCANO)
-        {
-            length = RNG.Next(5, 16);
-        }
-        int deltax = 1;
-        int deltay = 0;
-        int starty = palacey;
-        int startx = palacex + 4;
+        int length = isCalderaLike ? 20 : RNG.Next(5, 16);
 
 
-        if (biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-        {
-            if (palacex > MapColumns / 2)
-            {
-                deltax = -1;
-                startx = palacex - 4;
-            }
-            if (!isHorizontal)
-            {
-                deltax = 0;
-                deltay = 1;
-                starty = palacey + 4;
-                startx = palacex;
-                if (palacey > MapRows / 2)
-                {
-                    deltay = -1;
-                    starty = palacey - 4;
-                }
-            }
-        }
-        else
-        {
-            if (isHorizontal)
-            {
-                if (palacey < MapRows / 2)
-                {
-                    deltay = 1;
-                    deltax = 0;
-                    starty = palacey + 4;
-                    startx = palacex;
-                }
-                else
-                {
-                    deltay = -1;
-                    deltax = 0;
-                    starty = palacey - 4;
-                    startx = palacex;
-                }
-            }
-            else
-            {
-                if (palacex > MapColumns / 2)
-                {
-                    deltax = -1;
-                    startx = palacex - 4;
-                }
-            }
-        }
+        // Initial delta direction.
+        // Non-canyon: horizontalPath uses X axis, !horizontalPath uses Y axis with >
+        // Canyon: horizontalPath uses X axis,     !horizontalPath uses Y axis with >=
+        IntVector2 delta = horizontalPath
+            ? (palacePos.X > MapColumns / 2 ? IntVector2.WEST : IntVector2.EAST)
+            : ((isCanyon ? palacePos.Y >= MapRows / 2 : palacePos.Y > MapRows / 2) // TODO: verify that these can be the same
+                ? IntVector2.NORTH : IntVector2.SOUTH);
+
+        IntVector2 currentPos = palacePos + 4 * delta;
         bool cavePlaced = false;
         Location? vodcave1, vodcave2, vodcave3, vodcave4;
         canyonShort = RNG.NextDouble() > .5;
@@ -1069,469 +998,297 @@ public sealed class EastHyrule : World
             vodcave4 = GetLocation(LocationID.EAST_CAVE_VOD_PASSTHROUGH2_END);
         }
 
-        int forced = 0;
-        int vodRoutes = RNG.Next(1, 3);
+        int traps = 0;
+        int vodRoutes = biome == Biome.VOLCANO ? RNG.Next(1, 3) : 1;
+        IntVector2 forwardDir = horizontalPath ? IntVector2.EAST : IntVector2.SOUTH;
+        IntVector2 sideDir = horizontalPath ? IntVector2.SOUTH : IntVector2.EAST;
 
-        bool horizontalPath = isHorizontal ^ (biome == Biome.CANYON || biome == Biome.DRY_CANYON);
-
-        if (biome != Biome.VOLCANO)
+        void TerraformVodCave(IntVector2 p, IntVector2 delta)
         {
-            vodRoutes = 1;
+            map[p] = Terrain.CAVE;
+            map[p + delta] = Terrain.MOUNTAIN;
+            map[p - sideDir] = Terrain.MOUNTAIN;
+            map[p + sideDir] = Terrain.MOUNTAIN;
         }
-        for (int k = 0; k < vodRoutes; k++)
+
+        void TerraformVodCavePair(IntVector2 first, IntVector2 second, IntVector2 delta)
         {
-            int forcedPlaced = 3;
-            if (vodRoutes == 2)
+            if (WithinMapBounds(vodcave1.Pos))
             {
-                if (k == 0)
+                map[vodcave1.Pos] = Terrain.MOUNTAIN;
+            }
+            if (WithinMapBounds(vodcave2.Pos))
+            {
+                map[vodcave2.Pos] = Terrain.MOUNTAIN;
+            }
+            TerraformVodCave(first, delta);
+            vodcave1.Pos = first;
+            vodcave1.CanShuffle = false;
+            TerraformVodCave(second, -delta);
+            vodcave2.Pos = second;
+            vodcave2.CanShuffle = false;
+        }
+
+        // Rolls a zig-zag offset that stays within map bounds (1-tile margin).
+        int RollAdjust(IntVector2 pos, IntVector2 d, int minA, int maxA)
+        {
+            int adj;
+            do
+            {
+                adj = RNG.Next(minA, maxA);
+            }
+            while (!WithinMapBounds(pos + adj * d, 1));
+            return adj;
+        }
+
+        // Draws a perpendicular lava segment (when zig-zagging), bordered by mountains.
+        // Returns false if a non-shuffleable location blocks the segment.
+        bool DrawPerpendicularLavaSegment(IntVector2 movement)
+        {
+            IntVector2 step = movement.Normalize();
+            int steps = movement.ManhattanLength;
+
+            if (!isCalderaLike)
+            {
+                map[currentPos - step] = Terrain.MOUNTAIN;
+            }
+
+            for (int i = 0; i <= steps; i++)
+            {
+                IntVector2 pos = currentPos + i * step;
+                if (!WithinMapBounds(pos)) { break; }
+
+                map[pos] = Terrain.LAVA;
+
+                if (!isCalderaLike)
                 {
-                    forcedPlaced = 2;
+                    foreach (IntVector2 wallPos in new[] { pos - forwardDir, pos + forwardDir })
+                    {
+                        var terrain = map[wallPos];
+                        if (terrain != Terrain.LAVA && terrain != Terrain.CAVE)
+                        {
+                            map[wallPos] = Terrain.MOUNTAIN;
+                        }
+                    }
                 }
-                else
+
+                if (GetLocationAt(pos) is Location loc && !loc.CanShuffle) { return false; }
+            }
+
+            if (!isCalderaLike)
+            {
+                var capPos = currentPos + (steps + 1) * step;
+                if (WithinMapBounds(capPos))
                 {
-                    forcedPlaced = 1;
+                    map[capPos] = Terrain.MOUNTAIN;
                 }
             }
-            int minadjust = -1;
-            int maxadjust = 2;
-            int c = 0;
-            while (startx > 1
-                && startx < MapColumns - 1
-                && starty > 1
-                && starty < MapRows - 1
-                && (((biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON) && map[starty, startx] == Terrain.MOUNTAIN) || (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON && c < length)))
-            {
-                c++;
-                map[starty, startx] = Terrain.LAVA;
-                int adjust = RNG.Next(minadjust, maxadjust);
-                while ((deltax != 0 && (starty + adjust < 1 || starty + adjust > MapRows - 2)) || (deltay != 0 && (startx + adjust < 1 || startx + adjust > MapColumns - 2)))
-                {
-                    adjust = RNG.Next(minadjust, maxadjust);
-                }
-                if (adjust > 0)
-                {
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                    {
-                        if (deltax != 0)
-                        {
-                            map[starty - 1, startx] = Terrain.MOUNTAIN;
-                        }
-                        else
-                        {
-                            map[starty, startx - 1] = Terrain.MOUNTAIN;
-                        }
-                    }
-                    for (int i = 0; i <= adjust; i++)
-                    {
-                        if (horizontalPath)
-                        {
-                            map[starty + i, startx] = Terrain.LAVA;
-                            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                            {
-                                if (map[starty + i, startx - 1] != Terrain.LAVA && map[starty + i, startx - 1] != Terrain.CAVE)
-                                {
-                                    map[starty + i, startx - 1] = Terrain.MOUNTAIN;
-                                }
-                                if (map[starty + i, startx + 1] != Terrain.LAVA && map[starty + i, startx + 1] != Terrain.CAVE)
-                                {
-                                    map[starty + i, startx + 1] = Terrain.MOUNTAIN;
-                                }
-                            }
-                            Location? location = GetLocationByCoordsNoOffset((starty + i, startx));
-                            if (location != null && !location.CanShuffle)
-                            {
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            map[starty, startx + i] = Terrain.LAVA;
-                            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                            {
-                                if (map[starty - 1, startx + i] != Terrain.LAVA && map[starty - 1, startx + i] != Terrain.CAVE)
-                                {
-                                    map[starty - 1, startx + i] = Terrain.MOUNTAIN;
-                                }
-                                if (map[starty + 1, startx + i] != Terrain.LAVA && map[starty + 1, startx + i] != Terrain.CAVE)
-                                {
-                                    map[starty + 1, startx + i] = Terrain.MOUNTAIN;
-                                }
-                            }
-                            Location? location = GetLocationByCoordsNoOffset((starty, startx + i));
-                            if (location != null && !location.CanShuffle)
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                    {
-                        if (deltax != 0)
-                        {
-                            map[starty + adjust + 1, startx] = Terrain.MOUNTAIN;
-                        }
-                        else
-                        {
-                            map[starty, startx + adjust + 1] = Terrain.MOUNTAIN;
-                        }
-                    }
-                }
-                else if (adjust < 0)
-                {
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                    {
-                        if (deltax != 0)
-                        {
-                            map[starty + 1, startx] = Terrain.MOUNTAIN;
-                        }
-                        else
-                        {
-                            map[starty, startx + 1] = Terrain.MOUNTAIN;
-                        }
-                    }
-                    if (horizontalPath)
-                    {
-                        for (int i = 0; i <= Math.Abs(adjust); i++)
-                        {
-                            map[starty - i, startx] = Terrain.LAVA;
-                            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                            {
-                                if (map[starty - i, startx - 1] != Terrain.LAVA && map[starty - i, startx - 1] != Terrain.CAVE)
-                                {
-                                    map[starty - i, startx - 1] = Terrain.MOUNTAIN;
-                                }
-                                if (map[starty - i, startx + 1] != Terrain.LAVA && map[starty - i, startx + 1] != Terrain.CAVE)
-                                {
-                                    map[starty - i, startx + 1] = Terrain.MOUNTAIN;
-                                }
-                            }
-                            Location? l = GetLocationByCoordsNoOffset((starty - i, startx));
-                            if (l != null && !l.CanShuffle)
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                    else
-                    {
 
-                        for (int i = 0; i <= Math.Abs(adjust); i++)
-                        {
-                            map[starty, startx - i] = Terrain.LAVA;
-                            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                            {
-                                if (map[starty - 1, startx - i] != Terrain.LAVA && map[starty - 1, startx - i] != Terrain.CAVE)
-                                {
-                                    map[starty - 1, startx - i] = Terrain.MOUNTAIN;
-                                }
-                                if (map[starty + 1, startx - i] != Terrain.LAVA && map[starty + 1, startx - i] != Terrain.CAVE)
-                                {
-                                    map[starty + 1, startx - i] = Terrain.MOUNTAIN;
-                                }
-                            }
-                            Location? l = GetLocationByCoordsNoOffset((starty, startx - i));
-                            if (l != null && !l.CanShuffle)
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                    {
-                        if (deltax != 0)
-                        {
-                            map[starty + adjust - 1, startx] = Terrain.MOUNTAIN;
-                        }
-                        else
-                        {
-                            map[starty, startx + adjust - 1] = Terrain.MOUNTAIN;
-                        }
-                    }
+            return true;
+        }
+
+        // tries to place a enemy trap
+        bool TryPlaceTrap(IntVector2 trapPos, ref int trapsToPlaceRemaining, ref int trapIndex)
+        {
+            var trap = passthroughLocations[trapIndex];
+            if (ValidTrapTilePosition(trapPos) != null)
+            {
+                trap.Pos = trapPos;
+                trap.CanShuffle = false;
+                trapsToPlaceRemaining--;
+                trapIndex++;
+                return true;
+            }
+            return false;
+        }
+
+        // given a successful trap placement, narrows the zig-zag range to steer away.
+        // Returns null when adjust == 0 (no range change needed).
+        (int, int)? AdjustRangeAfterTrap(int adjust)
+        {
+            return adjust switch
+            {
+                > 0 => (0, 4),
+                < 0 => (-3, 1),
+                _ => null
+            };
+        }
+
+        for (int k = 0; k < vodRoutes; k++)
+        {
+            int trapsPlaced = vodRoutes == 2 ? (k == 0 ? 2 : 1) : 3;
+            int minAdjust = -1;
+            int maxAdjust = 2;
+            int tilesPlaced = 0;
+
+            while (WithinMapBounds(currentPos, 1))
+            {
+                if (isCalderaLike)
+                {
+                    if (map[currentPos] != Terrain.MOUNTAIN) { break; }
                 }
                 else
                 {
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
+                    if (tilesPlaced >= length) { break; }
+                }
+
+                tilesPlaced++;
+                map[currentPos] = Terrain.LAVA;
+
+                // roll potential zig-zag offset
+                int adjust = RollAdjust(currentPos, delta, minAdjust, maxAdjust);
+
+                if (adjust != 0)
+                {
+                    IntVector2 movement = adjust * sideDir;
+                    if (!DrawPerpendicularLavaSegment(movement))
                     {
-                        if (deltax != 0)
-                        {
-                            map[starty - 1, startx] = Terrain.MOUNTAIN;
-                            map[starty + 1, startx] = Terrain.MOUNTAIN;
-                        }
-                        else
-                        {
-                            map[starty, startx - 1] = Terrain.MOUNTAIN;
-                            map[starty, startx + 1] = Terrain.MOUNTAIN;
-                        }
+                        return false;
                     }
-                    if (map[starty, startx] != Terrain.CAVE)
+                }
+                else // moving straight forward
+                {
+                    if (map[currentPos] != Terrain.CAVE)
                     {
-                        map[starty, startx] = Terrain.LAVA;
-                        if (GetLocationByCoordsNoOffset((starty + deltay, startx + deltax)) != null)
+                        if (!isCalderaLike)
+                        {
+                            map[currentPos - sideDir] = Terrain.MOUNTAIN;
+                            map[currentPos + sideDir] = Terrain.MOUNTAIN;
+                        }
+                        map[currentPos] = Terrain.LAVA;
+                        if (GetLocationAt(currentPos + delta) != null)
                         {
                             return false;
                         }
                     }
                 }
 
-                if (horizontalPath)
-                {
-                    starty += adjust;
-                }
-                else
-                {
-                    startx += adjust;
-                }
-                if (((cavePlaced && adjust == 0) || adjust > 1 || adjust < -1) && forcedPlaced > 0)
-                {
-                    Location f = GetLocation(LocationID.EAST_TRAP_LAVA1)!;
-                    if (forced == 1)
-                    {
-                        f = GetLocation(LocationID.EAST_TRAP_LAVA2)!;
-                    }
-                    else if (forced == 2)
-                    {
-                        f = GetLocation(LocationID.EAST_TRAP_LAVA3)!;
-                    }
+                currentPos += adjust * sideDir;
 
-                    if (adjust == 0)
+                // try to place trap locations
+                bool shouldPlaceTrap = (cavePlaced && adjust == 0) || Math.Abs(adjust) > 1;
+                if (shouldPlaceTrap && trapsPlaced > 0)
+                {
+                    var rotate = isCanyon ^ isHorizontal;
+                    IntVector2 trapDir = rotate ? -sideDir : -forwardDir;
+                    if (adjust < 0)
                     {
-                        if (ValidTrapTilePosition(new IntVector2(startx, starty)) != null)
-                        {
-                                f.Xpos = startx;
-                                f.Y = starty;
-                                f.CanShuffle = false;
-                                forcedPlaced--;
-                                forced++;
-                            }
-                        }
-                    else if (adjust > 0)
-                    {
-                        bool isCanyon = biome == Biome.CANYON || biome == Biome.DRY_CANYON;
-                        if (isHorizontal != isCanyon) // exactly one of isHorizontal or isCanyon is true
-                        {
-                            if (ValidTrapTilePosition(new IntVector2(startx, starty - 1)) != null)
-                            {
-                                f.Xpos = startx;
-                                f.Y = starty - 1;
-                                f.CanShuffle = false;
-                                forcedPlaced--;
-                                forced++;
-                            }
-                        }
-                        else
-                        {
-                            if (ValidTrapTilePosition(new IntVector2(startx - 1, starty)) != null)
-                            {
-                                f.Xpos = startx - 1;
-                                f.Y = starty;
-                                f.CanShuffle = false;
-                                forcedPlaced--;
-                                forced++;
-                            }
-                        }
-                        minadjust = 0;
-                        maxadjust = 4;
+                        // not sure why negative adjusts would not rotate like positive adjustment,
+                        // but it was the old behavior. (probably always fails placement?)
+                        trapDir = sideDir;
                     }
-                    else if (adjust < 0)
+                    //new behavior: if multiple steps along the zig-zag path would work as trap tiles, pick one at random
+                    var trapStep = adjust switch
                     {
-                        if (horizontalPath)
+                        0 => 0,
+                        >3 => RNG.Next(adjust - 3) + 1,
+                        _ => 1,
+                    };
+                    IntVector2 trapTilePos = currentPos + trapStep * trapDir;
+                    if (TryPlaceTrap(trapTilePos, ref trapsPlaced, ref traps))
+                    {
+                        if (AdjustRangeAfterTrap(adjust) is ValueTuple<int, int> newRange)
                         {
-                            if (ValidTrapTilePosition(new IntVector2(startx, starty + 1)) != null)
-                            {
-                                f.Xpos = startx;
-                                f.Y = starty + 1;
-                                f.CanShuffle = false;
-                                forcedPlaced--;
-                                forced++;
-                            }
+                            (minAdjust, maxAdjust) = newRange;
                         }
-                        else
-                        {
-                            if (ValidTrapTilePosition(new IntVector2(startx + 1, starty)) != null)
-                            {
-                                f.Xpos = startx + 1;
-                                f.Y = starty;
-                                f.CanShuffle = false;
-                                forcedPlaced--;
-                                forced++;
-                            }
-                        }
-                        minadjust = -3;
-                        maxadjust = 1;
                     }
-
                 }
                 else if (adjust == 0 && !cavePlaced)
                 {
+                    // place cave pair, then set pos to cave exit position
                     if (k != 0)
                     {
                         vodcave1 = vodcave3;
                         vodcave2 = vodcave4;
                     }
-                    if (vodcave1.Y < MapRows && vodcave1.Xpos < MapColumns)
-                    {
-                        map[vodcave1.Y, vodcave1.Xpos] = Terrain.MOUNTAIN;
-                    }
-                    map[starty, startx] = Terrain.CAVE;
-                    map[starty + deltay, startx + deltax] = Terrain.MOUNTAIN;
-                    if (deltax != 0)
-                    {
-                        map[starty + 1, startx] = Terrain.MOUNTAIN;
-                        map[starty - 1, startx] = Terrain.MOUNTAIN;
-                    }
-                    else
-                    {
-                        map[starty, startx + 1] = Terrain.MOUNTAIN;
-                        map[starty, startx - 1] = Terrain.MOUNTAIN;
-                    }
-                    vodcave1.Xpos = startx;
-                    vodcave1.Y = starty;
 
                     if (RNG.NextDouble() > .5 && vodRoutes != 2 && biome == Biome.VOLCANO)
                     {
-                        if (isHorizontal)
-                        {
-                            deltax = -deltax;
-                        }
-                        else
-                        {
-                            deltay = -deltay;
-                        }
+                        delta = -delta;
                     }
 
+                    int caveOffset;
                     if (horizontalPath)
                     {
-                        if (starty > MapRows / 2)
-                        {
-                            starty += RNG.Next(-9, -4);
-                        }
-                        else
-                        {
-                            starty += RNG.Next(5, 10);
-                        }
+                        caveOffset = currentPos.Y > MapRows / 2 ? RNG.Next(-9, -4) : RNG.Next(5, 10);
                     }
                     else
                     {
-                        if (startx > MapColumns / 2)
-                        {
-                            startx += RNG.Next(-9, -4);
-                        }
-                        else
-                        {
-                            startx += RNG.Next(5, 10);
-                        }
+                        caveOffset = currentPos.X > MapColumns / 2 ? RNG.Next(-9, -4) : RNG.Next(5, 10);
                     }
-                    if (map[starty, startx] != Terrain.MOUNTAIN && (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON))
+                    IntVector2 cave2Pos = currentPos + caveOffset * sideDir;
+
+                    if (isCalderaLike && map[cave2Pos] != Terrain.MOUNTAIN)
                     {
                         return false;
                     }
-                    if (vodcave2.Y < MapRows && vodcave2.Xpos < MapColumns)
-                    {
-                        map[vodcave2.Y, vodcave2.Xpos] = Terrain.MOUNTAIN;
-                    }
-                    map[starty - deltay, startx - deltax] = Terrain.MOUNTAIN;
-                    map[starty, startx] = Terrain.CAVE;
-                    if (deltax != 0)
-                    {
-                        map[starty + 1, startx] = Terrain.MOUNTAIN;
-                        map[starty - 1, startx] = Terrain.MOUNTAIN;
-                    }
-                    else
-                    {
-                        map[starty, startx + 1] = Terrain.MOUNTAIN;
-                        map[starty, startx - 1] = Terrain.MOUNTAIN;
-                    }
-                    vodcave2.Xpos = startx;
-                    vodcave2.Y = starty;
+
+                    TerraformVodCavePair(currentPos, cave2Pos, delta);
+                    currentPos = cave2Pos;
                     cavePlaced = true;
-                    vodcave1.CanShuffle = false;
-                    vodcave2.CanShuffle = false;
-                    //startx += deltax;
                 }
                 else
                 {
-                    minadjust = -3;
-                    maxadjust = 4;
-                }
-                if (horizontalPath)
-                {
-                    if (GetLocationByCoordsNoOffset((starty, startx + deltax)) != null)
-                    {
-                        map[starty, startx] = Terrain.MOUNTAIN;
-                        startx -= deltax;
-                    }
-                    else
-                    {
-                        startx += deltax;
-                    }
-                }
-                else
-                {
-                    if (GetLocationByCoordsNoOffset((starty + deltay, startx)) != null)
-                    {
-                        map[starty, startx] = Terrain.MOUNTAIN;
-                        starty -= deltay;
-                    }
-                    else
-                    {
-                        starty += deltay;
-                    }
+                    (minAdjust, maxAdjust) = (-3, 4);
                 }
 
+                // advance forward (or retreat if an existing location blocks the path)
+                if (GetLocationAt(currentPos + delta) != null)
+                {
+                    map[currentPos] = Terrain.MOUNTAIN;
+                    currentPos -= delta;
+                }
+                else
+                {
+                    currentPos += delta;
+                }
             }
 
-            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
+            // finally, open up VoD entrance
+            if (!isCalderaLike)
             {
-                map[starty, startx] = Terrain.LAVA;
-                if (deltax != 0)
+                // since this code is changing the terrain *after* the
+                // trap tiles have been validated, we must check again
+                // to avoid adding unwanted entrances to trap tiles
+                List<IntVector2> newLavaTilePositions = [
+                    currentPos,
+                    currentPos + sideDir,
+                    currentPos - sideDir,
+                    currentPos + forwardDir,
+                    currentPos + forwardDir + sideDir,
+                    currentPos + forwardDir - sideDir
+                ];
+                foreach (var pos in newLavaTilePositions)
                 {
-                    map[starty + 1, startx] = Terrain.LAVA;
-                    map[starty - 1, startx] = Terrain.LAVA;
-                    map[starty + 1, startx + deltax] = Terrain.LAVA;
-                    map[starty - 1, startx + deltax] = Terrain.LAVA;
-                    map[starty, startx + deltax] = Terrain.LAVA;
+                    if (!WithinMapBounds(pos)) { continue; }
+                    bool illegalTrapTileEntrance = false;
+                    foreach (var loc in LocationsOrthogonalTo(pos))
+                    {
+                        var posBehind = pos + 2 * (loc.Pos - pos);
+                        if (!WithinMapBounds(posBehind))
+                        {
+                            illegalTrapTileEntrance = true;
+                            break;
+                        }
+                        var terrainBehind = map[posBehind];
+                        if (!terrainBehind.IsWalkable())
+                        {
+                            illegalTrapTileEntrance = true;
+                            break;
+                        }
+                    }
+                    if (!illegalTrapTileEntrance)
+                    {
+                        map[pos] = Terrain.LAVA;
+                    }
                 }
-                else
-                {
-                    map[starty, startx + 1] = Terrain.LAVA;
-                    map[starty, startx - 1] = Terrain.LAVA;
-                    map[starty + deltay, startx + 1] = Terrain.LAVA;
-                    map[starty + deltay, startx - 1] = Terrain.LAVA;
-                    map[starty + deltay, startx] = Terrain.LAVA;
+            }
 
-                }
-            }
-            if (horizontalPath)
-            {
-
-                if (deltax < 0)
-                {
-                    startx = palacex + 4;
-                    starty = palacey;
-                }
-                else
-                {
-                    startx = palacex - 4;
-                    starty = palacey;
-                }
-            }
-            else
-            {
-                if (deltay < 0)
-                {
-                    startx = palacex;
-                    starty = palacey + 4;
-                }
-                else
-                {
-                    startx = palacex;
-                    starty = palacey - 4;
-                }
-            }
-            deltax = -deltax;
-            deltay = -deltay;
-            minadjust = -1;
-            maxadjust = 2;
+            // set to opposite side of palace for 2nd VoD entrance
+            currentPos = palacePos - 4 * delta;
+            delta = -delta;
+            minAdjust = -1;
+            maxAdjust = 2;
             cavePlaced = false;
         }
 
@@ -1665,28 +1422,6 @@ public sealed class EastHyrule : World
             if (!hiddenPalaceLocation.Reachable || !hiddenKasutoLocation.Reachable || !spellTower.Reachable)
             {
                 AllReached = false;
-            }
-        }
-    }
-
-    public override void UpdateVisit(List<RequirementType> requireables)
-    {
-        UpdateReachable(requireables);
-
-        foreach (Location location in AllLocations)
-        {
-            if (location.Y > 0 && visitation[location.Y, location.Xpos])
-            {
-                if(location.AccessRequirements.AreSatisfiedBy(requireables))
-                {
-                    location.Reachable = true;
-                    if (connections.ContainsKey(location) && location.ConnectionRequirements.AreSatisfiedBy(requireables))
-                    {
-                        Location connectedLocation = connections[location];
-                        connectedLocation.Reachable = true;
-                        visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
-                    }
-                }
             }
         }
     }
@@ -1924,6 +1659,15 @@ public sealed class EastHyrule : World
                 }
             }
         }
+    }
+
+    protected override bool IsReserved(IntVector2 pos)
+    {
+        if ((locationAtGP.Pos - pos).Abs().MinComponent() < 4)
+        {
+            return true;
+        }
+        return false;
     }
 
     protected override List<Location> GetPathingStarts()

@@ -58,7 +58,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             .Select(f =>
             {
                 // Look up the source code for the declaration to find if it has a default value
-                var equalsSyntax = f.DeclaringSyntaxReferences[0].GetSyntax() switch
+                var equalsSyntax = f.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() switch
                 {
                     PropertyDeclarationSyntax property => property.Initializer,
                     VariableDeclaratorSyntax variable => variable.Initializer,
@@ -81,18 +81,32 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         var serializeFields = classSymbol.GetMembers()
             .OfType<IFieldSymbol>()
             .Where(f => !HasIgnoreInFlagsAttribute(f))
-            .Select(f => new SerializedFieldInfo()
+            .Select(f =>
             {
-                FieldName = f.Name,
-                FieldType = f.Type.ToDisplayString(),
-                IsDifficultyOnly = HasDifficultyOnlyAttribute(f),
-                IsConditionallyIncluded = HasConditionallyIncludedInFlagsAttribute(f),
-                DefaultValue = GetDefaultValue(f),
-                IsEnum = f.Type.TypeKind == TypeKind.Enum,
-                EnumSymbol = f.Type.TypeKind == TypeKind.Enum ? f.Type as INamedTypeSymbol : null,
-                Minimum = GetCustomMinimum(f),
-                Maximum = GetCustomMaximum(f),
-                CustomSerializerName = GetCustomFlagSerializer(f),
+                var dictionaryInterface = f.Type.AllInterfaces
+                    .FirstOrDefault(i => i.OriginalDefinition.ToDisplayString().StartsWith("System.Collections.Generic.IDictionary"));
+                var innerType = dictionaryInterface != null ? dictionaryInterface.TypeArguments[0] : f.Type;
+
+                var equalsSyntax = f.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() switch
+                {
+                    PropertyDeclarationSyntax property => property.Initializer,
+                    VariableDeclaratorSyntax variable => variable.Initializer,
+                    _ => null
+                };
+
+                return new SerializedFieldInfo()
+                {
+                    FieldName = f.Name,
+                    FieldType = f.Type.ToDisplayString(),
+                    IsDifficultyOnly = HasDifficultyOnlyAttribute(f),
+                    IsConditionallyIncluded = HasConditionallyIncludedInFlagsAttribute(f),
+                    DefaultValue = equalsSyntax?.Value.ToString(),
+                    IsEnum = f.Type.TypeKind == TypeKind.Enum,
+                    EnumSymbol = f.Type.TypeKind == TypeKind.Enum ? f.Type as INamedTypeSymbol : null,
+                    Minimum = GetCustomMinimum(f),
+                    Maximum = GetCustomMaximum(f),
+                    CustomSerializerName = GetCustomFlagSerializer(f),
+                };
             }).ToList();
 
         classInfo.SerializedFields.AddRange(serializeFields);
@@ -138,14 +152,6 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
     {
         return field.GetAttributes()
             .Any(attr => attr.AttributeClass?.Name.StartsWith("DifficultyOnly") ?? false);
-    }
-
-    private static string GetDefaultValue(IFieldSymbol f)
-    {
-        var defaultAttr = f.GetAttributes()
-            .FirstOrDefault(a => a.AttributeClass?.ToDisplayString() == "System.ComponentModel.DefaultValueAttribute");
-        var arg = defaultAttr?.ConstructorArguments[0];
-        return arg != null ? FormatArgument(arg.Value) : "default";
     }
 
     private static bool HasIgnoreInFlagsAttribute(IFieldSymbol field)
@@ -317,7 +323,10 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         sb.AppendLine($"{indent}            {{");
         sb.AppendLine($"{indent}                {field.FieldName} = value;");
         sb.AppendLine($"{indent}                OnPropertyChanged(nameof({field.PropertyName}));");
-        sb.AppendLine($"{indent}                OnPropertyChanged(\"Flags\");");
+        sb.AppendLine($"{indent}                if (!_inDeserializeFlags)");
+        sb.AppendLine($"{indent}                {{");
+        sb.AppendLine($"{indent}                    OnPropertyChanged(\"Flags\");");
+        sb.AppendLine($"{indent}                }}");
         sb.AppendLine($"{indent}            }}");
         sb.AppendLine($"{indent}        }}");
         sb.AppendLine($"{indent}    }}{defaultValue}");

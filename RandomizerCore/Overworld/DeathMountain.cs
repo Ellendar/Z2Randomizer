@@ -191,7 +191,7 @@ sealed class DeathMountain : World
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
 
-        climate = Climates.Create(props.DmClimate);
+        climate = Climates.Create(continentId, props.DmClimate);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
@@ -226,7 +226,7 @@ sealed class DeathMountain : World
         {
             Debug.Assert(MapRows == 75);
             Debug.Assert(MapColumns == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
+            map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
@@ -245,7 +245,7 @@ sealed class DeathMountain : World
             int bytesWritten = 2000;
             while (bytesWritten > MAP_SIZE_BYTES)
             {
-                map = new Terrain[MapRows, MapColumns];
+                map = new OverworldMap(MapRows, MapColumns);
                 Terrain riverT = Terrain.MOUNTAIN;
                 if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA && biome != Biome.ISLANDS)
                 {
@@ -470,7 +470,7 @@ sealed class DeathMountain : World
                         location.Y = y;
                         if (location.TerrainType == Terrain.CAVE)
                         {
-                            var f = TerraformCaveExpansion(props, ref x, ref y, location);
+                            var f = TerraformCaveExpansion(props, location);
                             if (!f)
                             {
                                 logger.LogDebug($"TerraformCaveExpansion failed for {location.Name}");
@@ -592,245 +592,84 @@ sealed class DeathMountain : World
         return true;
     }
 
-    private bool TerraformCaveExpansion(RandomizerProperties props, ref int x, ref int y, Location location)
+    private bool TerraformCaveExpansion(RandomizerProperties props, Location location)
     {
-        Direction direction = (Direction)RNG.Next(4);
-
-        Terrain s = biome == Biome.VANILLALIKE ? Terrain.ROAD : climate.GetRandomTerrain(RNG, walkableTerrains);
-        int tries;
+        // Entrance terrain will be the same for all connecting caves (!)
+        Terrain entranceTerrain = biome == Biome.VANILLALIKE ? Terrain.ROAD : climate.GetRandomTerrain(RNG, walkableTerrains);
 
         if (props.SaneCaves && connectionsDM.ContainsKey(location))
         {
-            if ((location.MapPage == 0 || location.IsFallInHole) && !location.ForceEnterRight)
-            {
-                if (direction == Direction.NORTH)
-                {
-                    direction = Direction.SOUTH;
-                }
+            map[location.Pos] = Terrain.NONE;
 
-                if (direction == Direction.WEST)
-                {
-                    direction = Direction.EAST;
-                }
+            if (!(PickCavePositionAndDirection() is var (cave1pos, cave1dir)))
+            {
+                return false;
             }
-            else
-            {
-                if (direction == Direction.SOUTH)
-                {
-                    direction = Direction.NORTH;
-                }
 
-                if (direction == Direction.EAST)
-                {
-                    direction = Direction.WEST;
-                }
+            Func<int> rollSpacing = biome switch
+            {
+                Biome.ISLANDS => () => RNG.Next(5, 12),
+                _ => () => RNG.Next(3, 10),
+            };
+            if (!(PickMatchingSaneCavePosition(cave1pos, cave1dir, rollSpacing, (_) => true) is IntVector2 cave2pos))
+            {
+                return false;
             }
-            map[y, x] = Terrain.NONE;
 
-            tries = 0;
-            do
-            {
-                x = RNG.Next(MapColumns - 2) + 1;
-                y = RNG.Next(MapRows - 2) + 1;
-                if (++tries >= 100)
-                {
-                    return false;
-                }
-            } while (x < 5 || x > MapColumns - 5
-                  || y < 5 || y > MapRows - 5
-                  || !AllTerrainIn3x3Equals(x, y, Terrain.NONE));
-
-            int minDistX = Math.Min(MapColumns / 2 - 1, 15);
-            int minDistY = Math.Min(MapRows / 2 - 1, 15);
-
-            while ((direction == Direction.NORTH && y < minDistY)
-                || (direction == Direction.EAST && x > MapColumns - minDistX)
-                || (direction == Direction.SOUTH && y > MapRows - minDistY)
-                || (direction == Direction.WEST && x < minDistX))
-            {
-                direction = (Direction)RNG.Next(4);
-            }
             if (connectionsDM[location].Count == 1)
             {
-                int otherx = 0;
-                int othery = 0;
-                tries = 0;
-                do
-                {
-                    int range = 7;
-                    int offset = 3;
-                    if (biome == Biome.ISLANDS)
-                    {
-                        range = 7;
-                        offset = 5;
-                    }
-                    if (direction == Direction.NORTH)
-                    {
-                        otherx = x + (RNG.Next(7) - 3);
-                        othery = y - (RNG.Next(range) + offset);
-                    }
-                    else if (direction == Direction.EAST)
-                    {
-                        otherx = x + (RNG.Next(range) + offset);
-                        othery = y + (RNG.Next(7) - 3);
-                    }
-                    else if (direction == Direction.SOUTH)
-                    {
-                        otherx = x + (RNG.Next(7) - 3);
-                        othery = y + (RNG.Next(range) + offset);
-                    }
-                    else //west
-                    {
-                        otherx = x - (RNG.Next(range) + offset);
-                        othery = y + (RNG.Next(7) - 3);
-                    }
-                    if (++tries >= 100)
-                    {
-                        return false;
-                    }
-                } while (otherx <= 1 || otherx >= MapColumns - 1
-                      || othery <= 1 || othery >= MapRows - 1
-                      || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
-
-                List<Location> l2 = connectionsDM[location];
-                var location2 = l2[0];
+                var location2 = connectionsDM[location][0];
                 location.CanShuffle = false;
-                location.Xpos = x;
-                location.Y = y;
+                location.Pos = cave1pos;
                 location2.CanShuffle = false;
-                location2.Xpos = otherx;
-                location2.Y = othery;
-                PlaceCave(x, y, direction, s);
-                PlaceCave(otherx, othery, direction.Reverse(), s);
-                AlignCavePositionsLeftToRight(direction, location, location2);
+                location2.Pos = cave2pos;
+                PlaceCave(cave1pos, cave1dir, entranceTerrain);
+                PlaceCave(cave2pos, -cave1dir, entranceTerrain);
+                AlignCavePositionsLeftToRight(cave1dir, location, location2);
             }
-            else //4-way caves
+            else // 4-way cave
             {
-                int otherx = 0;
-                int othery = 0;
-                tries = 0;
-                do
-                {
-                    int range = 7;
-                    int offset = 3;
-                    if (biome == Biome.ISLANDS)
-                    {
-                        range = 7;
-                        offset = 5;
-                    }
-                    if (direction == Direction.NORTH)
-                    {
-                        otherx = x + (RNG.Next(7) - 3);
-                        othery = y - (RNG.Next(range) + offset);
-                    }
-                    else if (direction == Direction.EAST)
-                    {
-                        otherx = x + (RNG.Next(range) + offset);
-                        othery = y + (RNG.Next(7) - 3);
-                    }
-                    else if (direction == Direction.SOUTH)
-                    {
-                        otherx = x + (RNG.Next(7) - 3);
-                        othery = y + (RNG.Next(range) + offset);
-                    }
-                    else //west
-                    {
-                        otherx = x - (RNG.Next(range) + offset);
-                        othery = y + (RNG.Next(7) - 3);
-                    }
-                    if (++tries >= 100)
-                    {
-                        return false;
-                    }
-                } while (otherx <= 1 || otherx >= MapColumns - 1
-                      || othery <= 1 || othery >= MapRows - 1
-                      || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
-
-                List<Location> caveExits = connectionsDM[location];
+                var caveExits = connectionsDM[location];
                 var location2 = caveExits[0];
                 var location3 = caveExits[1];
                 var location4 = caveExits[2];
                 location.CanShuffle = false;
-                location.Xpos = x;
-                location.Y = y;
+                location.Pos = cave1pos;
                 location2.CanShuffle = false;
-                location2.Xpos = otherx;
-                location2.Y = othery;
-                PlaceCave(x, y, direction, s);
-                PlaceCave(otherx, othery, direction.Reverse(), s);
-                AlignCavePositionsLeftToRight(direction, location, location2);
+                location2.Pos = cave2pos;
+                PlaceCave(cave1pos, cave1dir, entranceTerrain);
+                PlaceCave(cave2pos, -cave1dir, entranceTerrain);
+                AlignCavePositionsLeftToRight(cave1dir, location, location2);
 
-                int newx = 0;
-                int newy = 0;
-                tries = 0;
-                do
+                IntVector2 cave3pos;
+                for (int tries = 0; ; tries++)
                 {
-                    newx = x + RNG.Next(7) - 3;
-                    newy = y + RNG.Next(7) - 3;
-                    if (++tries >= 100)
+                    if (tries == 100) { return false; }
+                    cave3pos = cave1pos + new IntVector2(RNG.Next(-3, 4), RNG.Next(-3, 4));
+                    if (WithinMapBounds(cave3pos, 1) && AllTerrainIn3x3Equals(cave3pos, Terrain.NONE))
                     {
-                        return false;
+                        break;
                     }
-                } while (newx > 2 && newx < MapColumns - 2
-                      && newy > 2 && newy < MapRows - 2
-                      && !AllTerrainIn3x3Equals(newx, newy, Terrain.NONE));
+                }
+
+                if (!(PickMatchingSaneCavePosition(cave3pos, cave1dir, rollSpacing, (_) => true) is IntVector2 cave4pos))
+                {
+                    return false;
+                }
 
                 location3.CanShuffle = false;
-                location3.Xpos = newx;
-                location3.Y = newy;
-                PlaceCave(newx, newy, direction, s);
-
-                y = newy;
-                x = newx;
-                tries = 0;
-                do
-                {
-                    int range = 7;
-                    int offset = 3;
-                    if (biome == Biome.ISLANDS)
-                    {
-                        range = 7;
-                        offset = 5;
-                    }
-
-                    if (direction == Direction.NORTH)
-                    {
-                        otherx = x + (RNG.Next(7) - 3);
-                        othery = y - (RNG.Next(range) + offset);
-                    }
-                    else if (direction == Direction.EAST)
-                    {
-                        otherx = x + (RNG.Next(range) + offset);
-                        othery = y + (RNG.Next(7) - 3);
-                    }
-                    else if (direction == Direction.SOUTH)
-                    {
-                        otherx = x + (RNG.Next(7) - 3);
-                        othery = y + (RNG.Next(range) + offset);
-                    }
-                    else //west
-                    {
-                        otherx = x - (RNG.Next(range) + offset);
-                        othery = y + (RNG.Next(7) - 3);
-                    }
-                    if (++tries >= 100)
-                    {
-                        return false;
-                    }
-                } while (otherx <= 1 || otherx >= MapColumns - 1
-                      || othery <= 1 || othery >= MapRows - 1
-                      || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
-
+                location3.Pos = cave3pos;
                 location4.CanShuffle = false;
-                location4.Xpos = otherx;
-                location4.Y = othery;
-                PlaceCave(otherx, othery, direction.Reverse(), s);
-                AlignCavePositionsLeftToRight(direction, location3, location4);
+                location4.Pos = cave4pos;
+                PlaceCave(cave3pos, cave1dir, entranceTerrain);
+                PlaceCave(cave4pos, -cave1dir, entranceTerrain);
+                AlignCavePositionsLeftToRight(cave1dir, location3, location4);
             }
         }
-        else
+        else // non-sane caves
         {
-            PlaceCave(x, y, direction, s);
+            IntVector2 dir = IntVector2.CARDINALS.Sample(RNG);
+            PlaceCave(location.Pos, dir, entranceTerrain);
         }
         return true;
     }
@@ -1103,7 +942,7 @@ sealed class DeathMountain : World
     /// <summary>
     /// Updates the visitation matrix and location reachability 
     /// </summary>
-    public override void UpdateVisit(List<RequirementType> requireables)
+    public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
         UpdateReachable(requireables);
 

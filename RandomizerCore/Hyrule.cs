@@ -23,6 +23,23 @@ public readonly record struct RandomizerResult(
     string? debuginfo = null,
     string? messages = null);
 
+public enum ProgressEnum
+{
+    GENERATING_PALACES = 1,
+    PROCESSING_OVERWORLD,
+    GENERATING_WEST_HYRULE,
+    GENERATING_DEATH_MOUNTAIN,
+    GENERATING_EAST_HYRULE,
+    GENERATING_MAZE_ISLAND,
+    SHUFFLING_ITEMS_AND_SPELLS,
+    RUNNING_COMPLETABILITY_CHECKS,
+    SHUFFLING_ENEMIES,
+    GENERATING_HINTS,
+    APPLYING_PATCHES,
+    LINKING_ASSEMBLY,
+    FINISHING_UP,
+}
+
 public class Hyrule
 {
     public delegate Assembler NewAssemblerFn(Js65Options? options = null, bool debugJavaScript = false);
@@ -109,11 +126,12 @@ public class Hyrule
     private MazeIsland mazeIsland;
     private DeathMountain deathMountain;
 
-    private Shuffler shuffler;
     private RandomizerProperties props;
     public List<World> worlds;
     public List<Palace> palaces;
     public List<Room> rooms;
+    public StatRandomizer randomizedStats;
+    public DropRandomizer randomizedDrops;
 
     //DEBUG/STATS
 #pragma warning disable CS0414 // Field is assigned but its value is never used
@@ -249,7 +267,6 @@ public class Hyrule
             using Assembler assembler = CreateAssemblyEngine();
             logger.Info($"Started generation for flags: {Flags} sharedseedflags: {sharedSeedFlags} seed: {config.Seed} seedhash: {SeedHash}");
             //character = new Character(props);
-            shuffler = new Shuffler(props);
 
             palaces = [];
             ItemGet = [];
@@ -273,7 +290,7 @@ public class Hyrule
             bool passedValidation = false;
             HashSet<int> freeBanks = [];
             if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
-            UpdateProgress(progress, 1);
+            UpdateProgress(progress, ProgressEnum.GENERATING_PALACES);
 
             while (palaces.Count != 7 || passedValidation == false)
             {
@@ -325,8 +342,9 @@ public class Hyrule
             ROMData.DoHackyFixes();
             ROMData.AdjustGpProjectileDamage();
 
-            shuffler.ShuffleDrops(ROMData, r);
-            shuffler.ShufflePbagAmounts(ROMData, r);
+            randomizedDrops = new(ROMData, props);
+            randomizedDrops.Randomize(r);
+            randomizedDrops.Write(ROMData);
 
             ROMData.DisableTurningPalacesToStone();
             ROMData.UpdateMapPointers();
@@ -347,7 +365,7 @@ public class Hyrule
             firstProcessOverworldTimestamp = DateTime.Now;
             await ProcessOverworld(progress, ct);
             if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
-            UpdateProgress(progress, 8);
+            UpdateProgress(progress, ProgressEnum.SHUFFLING_ENEMIES);
 
             if (props.ShuffleOverworldEnemies)
             {
@@ -356,7 +374,7 @@ public class Hyrule
                 OverworldEnemyShuffler.Shuffle(worlds, assembler, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
             }
 
-            if (props.CombineFire)
+            if (props.LinkedFireSpell != null)
             {
                 List<Collectable>? customSpellOrder = props.IncludeSpellsInShuffle
                     ? null
@@ -365,7 +383,7 @@ public class Hyrule
                         //This makes the assumption that is currently true that each "town" has exactly one item.
                         //If we later restructure towns to be omni-towns to get rid of fake towns, this will be untrue
                         .Select(l => l.Collectables[0]).ToList();
-                ROMData.CombineFireSpell(assembler, customSpellOrder, r);
+                ROMData.CombineFireSpell(assembler, props.LinkedFireSpell.Value, customSpellOrder);
             }
 
             Dictionary<Town, Collectable> spellMap = new()
@@ -406,10 +424,10 @@ public class Hyrule
             }
 
             if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
-            UpdateProgress(progress, 9);
+            UpdateProgress(progress, ProgressEnum.GENERATING_HINTS);
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
-            StatRandomizer randomizedStats = new(ROMData, props);
+            randomizedStats = new(ROMData, props);
             randomizedStats.Randomize(r, skipDifficultyOnly: shareSeedAcrossDifficulty);
 
             // Apply difficulty after shared randomization, then let ApplyAsmPatches see full
@@ -448,13 +466,16 @@ public class Hyrule
                 randomizeMusic = props.RandomizeMusic;
             }
 
+            UpdateProgress(progress, ProgressEnum.APPLYING_PATCHES);
             ApplyAsmPatches(props, assembler, r, texts, ROMData, randomizedStats);
 
+            UpdateProgress(progress, ProgressEnum.LINKING_ASSEMBLY);
             var rom = await ROMData.ApplyAsm(assembler);
             if (!rom.success)
             {
                 return new RandomizerResult(false, null, null, string.Join(Environment.NewLine, rom.messages));
             }
+            UpdateProgress(progress, ProgressEnum.FINISHING_UP);
             ROMData = new ROM(rom.romdata);
 
             if (randomizeMusic)
@@ -718,7 +739,7 @@ public class Hyrule
         else
         {
             westHyrule.pbagCave.Collectables = [Collectable.LARGE_BAG];
-            eastHyrule.pbagCave1.Collectables = [Collectable.LARGE_BAG];
+            eastHyrule.pbagCave1.Collectables = [Collectable.XL_BAG];
             eastHyrule.pbagCave2.Collectables = [Collectable.XL_BAG];
         }
 
@@ -1408,6 +1429,7 @@ public class Hyrule
             sideviewModule.Byt(itemBits);
         }
 
+        /* this shouldn't be needed anymore
         try
         {
             ROM testRom = new(ROMData);
@@ -1430,6 +1452,7 @@ public class Hyrule
             logger.Error(e, "Failed to build assembly patches");
             throw;
         }
+        */
         return true;
     }
 
@@ -1455,7 +1478,7 @@ public class Hyrule
             previousReachableLocationsCount = reachableLocationsCount;
             previousGettableItemsCount = gettableItemsCount;
             gettableItemsCount = UpdateItemGets(props);
-            List<RequirementType> requireables = GetRequireables(props);
+            IReadOnlySet<RequirementType> requireables = GetRequireables(props);
             westHyrule.UpdateVisit(requireables);
             deathMountain.UpdateVisit(requireables);
             eastHyrule.UpdateVisit(requireables);
@@ -1640,7 +1663,7 @@ public class Hyrule
     /// <returns>Whether any items were marked accessable</returns>
     private int UpdateItemGets(RandomizerProperties props)
     {
-        List<RequirementType> requireables;
+        IReadOnlySet<RequirementType> requireables;
         accessibleMagicContainers = props.StartMagicContainers;
         accessibleHeartContainers = props.StartHearts;
         Location newKasuto = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO);
@@ -1705,9 +1728,9 @@ public class Hyrule
         return gottenItems.Count;
     }
 
-    public List<RequirementType> GetRequireables(RandomizerProperties props)
+    public IReadOnlySet<RequirementType> GetRequireables(RandomizerProperties props)
     {
-        List<RequirementType> requireables = [];
+        HashSet<RequirementType> requireables = [];
 
         foreach(Collectable item in ItemGet.Keys)
         {
@@ -1758,6 +1781,7 @@ public class Hyrule
 
     private async Task ProcessOverworld(Func<string, Task> progress, CancellationToken ct)
     {
+        UpdateProgress(progress, ProgressEnum.PROCESSING_OVERWORLD);
         if (props.RandomizeSmallItems)
         {
             RandomizeSmallItems(1, true);
@@ -2003,7 +2027,7 @@ public class Hyrule
             {
                 //GENERATE WEST
                 if (ct.IsCancellationRequested) { return; }
-                UpdateProgress(progress, 2);
+                UpdateProgress(progress, ProgressEnum.GENERATING_WEST_HYRULE);
                 nonContinentGenerationAttempts++;
                 timestamp = DateTime.Now;
                 if (!westHyrule.AllReached)
@@ -2022,7 +2046,7 @@ public class Hyrule
 
                 //GENERATE DM
                 if (ct.IsCancellationRequested) { return; }
-                UpdateProgress(progress, 3);
+                UpdateProgress(progress, ProgressEnum.GENERATING_DEATH_MOUNTAIN);
                 timestamp = DateTime.Now;
                 if (!deathMountain.AllReached)
                 {
@@ -2040,7 +2064,7 @@ public class Hyrule
 
                 //GENERATE EAST
                 if (ct.IsCancellationRequested) { return; }
-                UpdateProgress(progress, 4);
+                UpdateProgress(progress, ProgressEnum.GENERATING_EAST_HYRULE);
                 timestamp = DateTime.Now;
                 if (!eastHyrule.AllReached)
                 {
@@ -2058,7 +2082,7 @@ public class Hyrule
 
                 //GENERATE MAZE ISLAND
                 if (ct.IsCancellationRequested) { return; }
-                UpdateProgress(progress, 5);
+                UpdateProgress(progress, ProgressEnum.GENERATING_MAZE_ISLAND);
                 timestamp = DateTime.Now;
                 if (!mazeIsland.AllReached)
                 {
@@ -2078,7 +2102,7 @@ public class Hyrule
                 worlds.ForEach(i => i.SynchronizeLinkedLocations());
 
                 if (ct.IsCancellationRequested) { return; }
-                UpdateProgress(progress, 6);
+                UpdateProgress(progress, ProgressEnum.SHUFFLING_ITEMS_AND_SPELLS);
 
                 //Then perform non-terrain shuffles looking for one that works.
                 nonTerrainShuffleAttempt = 0;
@@ -2133,35 +2157,47 @@ public class Hyrule
         } while (!IsEverythingReachable(ItemGet));
     }
 
-    private async void UpdateProgress(Func<string, Task> progress, int v)
+    private async void UpdateProgress(Func<string, Task> progress, ProgressEnum v)
     {
         switch (v)
         {
-            case 1:
+            case ProgressEnum.GENERATING_PALACES:
                 await progress.Invoke("Generating Palaces");
                 break;
-            case 2:
+            case ProgressEnum.PROCESSING_OVERWORLD:
+                await progress.Invoke("Processing Overworld");
+                break;
+            case ProgressEnum.GENERATING_WEST_HYRULE:
                 await progress.Invoke("Generating Western Hyrule");
                 break;
-            case 3:
+            case ProgressEnum.GENERATING_DEATH_MOUNTAIN:
                 await progress.Invoke("Generating Death Mountain");
                 break;
-            case 4:
+            case ProgressEnum.GENERATING_EAST_HYRULE:
                 await progress.Invoke("Generating East Hyrule");
                 break;
-            case 5:
+            case ProgressEnum.GENERATING_MAZE_ISLAND:
                 await progress.Invoke("Generating Maze Island");
                 break;
-            case 6:
+            case ProgressEnum.SHUFFLING_ITEMS_AND_SPELLS:
                 await progress.Invoke("Shuffling Items and Spells");
                 break;
-            case 7:
+            case ProgressEnum.RUNNING_COMPLETABILITY_CHECKS:
                 await progress.Invoke("Running Seed Completability Checks");
                 break;
-            case 8:
+            case ProgressEnum.SHUFFLING_ENEMIES:
+                await progress.Invoke("Shuffling Enemies");
+                break;
+            case ProgressEnum.GENERATING_HINTS:
                 await progress.Invoke("Generating Hints");
                 break;
-            case 9:
+            case ProgressEnum.APPLYING_PATCHES:
+                await progress.Invoke("Applying Patches");
+                break;
+            case ProgressEnum.LINKING_ASSEMBLY:
+                await progress.Invoke("Linking Assembly");
+                break;
+            case ProgressEnum.FINISHING_UP:
                 await progress.Invoke("Finishing up");
                 break;
         }
@@ -2429,7 +2465,7 @@ public class Hyrule
         }
         if (props.BossItem)
         {
-            shuffler.ShuffleBossDrop(rom, r, a);
+            rom.HandleRandomBossDrop(a);
         }
 
         if (props.StartWithSpellItems)
@@ -2447,7 +2483,7 @@ public class Hyrule
 
         rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.item_sprites.chr"));
         //Linked fire/dash custom sprites replace fire's sprite. This lets us free up c7 for future use.
-        if(props.CombineFire)
+        if(props.LinkedFireSpell != null)
         {
             rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.linkedFire.chr"));
         }
@@ -2458,43 +2494,6 @@ public class Hyrule
         rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
         rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
         rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
-
-        if (props.EncounterRates == EncounterRate.NONE)
-        {
-            rom.Put(0x294, 0x60); //skips the whole routine
-        }
-
-        if (props.EncounterRates == EncounterRate.HALF)
-        {
-            //terrain timers
-            rom.Put(0x250, 0x40); // grass
-            rom.Put(0x251, 0x30); // desert
-            rom.Put(0x252, 0x30); // forest
-            rom.Put(0x253, 0x40);
-            rom.Put(0x254, 0x12);
-            rom.Put(0x255, 0x06);
-
-            //initial overworld timer
-            rom.Put(0x88A, 0x10);
-
-            /*
-             * insert jump to a8aa at 2a3 (4c AA A8)
-             * 
-             * At a8aa
-             * Load $26 (A5 26)
-             * bne to end (2 bytes) (D0 0D)
-             * inc new step counter (where?) EE E0 06
-             * Load 1 to accumulator (A9 01)
-             * xor new step counter with 1 (2D E0 06)
-             * bne to end (D0 03)
-             * jump to encounter spawn 8298 (4C 98 82)
-             * jump to rts 829f (4C 93 82)
-             */
-            rom.Put(0x29f, new byte[] { 0x4C, 0xAA, 0xA8 });
-
-            rom.Put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
-        }
-
 
         if (props.ShuffleLifeRefill)
         {
@@ -2590,15 +2589,11 @@ public class Hyrule
 
         if (props.ShufflePalacePalettes)
         {
-            shuffler.ShufflePalacePalettes(rom, r);
+            Shuffler.ShufflePalacePalettes(rom, r);
         }
 
-        if (props.ShuffleItemDropFrequency)
-        {
-            int drop = r.Next(5) + 4;
-            rom.Put(0x1E8B0, (byte)drop);
+ 
         }
-    }
 
     private static void ApplyBeepSettings(RandomizerProperties props, ROM rom)
     {
@@ -2750,8 +2745,6 @@ public class Hyrule
         ROMData.Put(RomMap.EAST_WATER_TILE_COLLECTABLE, (byte)eastHyrule.waterTile.Collectables[0]);
         ROMData.Put(RomMap.EAST_DESERT_TILE_COLLECTABLE, (byte)eastHyrule.desertTile.Collectables[0]);
 
-        ROMData.ElevatorBossFix(props.BossItem);
-
         // Update item rooms and entrances for all palaces
         Location[] locations = [
             westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3,
@@ -2864,7 +2857,7 @@ public class Hyrule
         //ROMData.UpdateWizardText(WizardCollectables);
 
         // Add marker for linked fire. Do this before old spell name shuffle so this gets shuffled in there too
-        if (props.CombineFire)
+        if (props.LinkedFireSpell != null)
         {
             ROMData.Put(0x1c72, [..ROM.StringToZ2Bytes("FIRE"), 0xFC]);
         }
@@ -3048,45 +3041,49 @@ public class Hyrule
         }
     }
 
-    public void RandomizeSmallItems(int world, bool first)
+    public void RandomizeSmallItems(int bank, bool firstTable)
     {
-        logger.Debug("World: " + world);
-        List<int> addresses = new List<int>();
-        List<int> items = new List<int>();
+        logger.Debug("Bank: " + bank);
+        List<int> visited = [];
+        List<int> items = [];
         int startAddr;
-        if (first)
+        if (firstTable) // West/East
         {
-            startAddr = 0x8523 - 0x8000 + (world * 0x4000) + 0x10;
+            startAddr = 0x8523 - 0x8000 + (bank * 0x4000) + 0x10;
         }
-        else
+        else // DM/Maze
         {
-            startAddr = 0xA000 - 0x8000 + (world * 0x4000) + 0x10;
+            startAddr = 0xa000 - 0x8000 + (bank * 0x4000) + 0x10;
         }
         int map = 0;
         for (int i = startAddr; i < startAddr + 126; i = i + 2)
         {
 
             map++;
-            int low = ROMData.GetByte(i);
-            int hi = ROMData.GetByte(i + 1) * 256;
-            int numBytes = ROMData.GetByte(hi + low + 16 - 0x8000 + (world * 0x4000));
+            int ptr = ROMData.GetShort(i + 1, i);
+            int offset = 16 - 0x8000 + (bank * 0x4000);
+            int numBytes = ROMData.GetByte(ptr + offset);
             for (int j = 4; j < numBytes; j = j + 2)
             {
-                int yPos = ROMData.GetByte(hi + low + j + 16 - 0x8000 + (world * 0x4000)) & 0xF0;
+                int yPos = ROMData.GetByte(ptr + j + offset) & 0xF0;
                 yPos = yPos >> 4;
-                if (ROMData.GetByte(hi + low + j + 1 + 16 - 0x8000 + (world * 0x4000)) == 0x0F && yPos < 13)
+                if (ROMData.GetByte(ptr + j + 1 + offset) == 0x0F && yPos < 13)
                 {
-                    int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
-                    int item = ROMData.GetByte(addr);
-                    if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
+                    int addr = ptr + j + 2 + offset;
+                    if (!visited.Contains(addr))
                     {
-#if UNSAFE_DEBUG
-                        logger.Debug("Map: " + map);
-                        logger.Debug("Item: " + item);
-                        logger.Debug($"Address: {addr:X}");
-#endif
-                        addresses.Add(addr);
-                        items.Add(item);
+                        int item = ROMData.GetByte(addr);
+                        Collectable collectable = (Collectable)item;
+                        if (collectable.IsMinorItem())
+                        {
+    #if UNSAFE_DEBUG
+                            logger.Debug("Map: " + map);
+                            logger.Debug("Item: " + item);
+                            logger.Debug($"Address: {addr:X}");
+    #endif
+                            visited.Add(addr);
+                            items.Add(item);
+                        }
                     }
                     j++;
                 }
@@ -3098,9 +3095,9 @@ public class Hyrule
             int swap = r.Next(i, items.Count);
             (items[swap], items[i]) = (items[i], items[swap]);
         }
-        for (int i = 0; i < addresses.Count; i++)
+        for (int i = 0; i < visited.Count; i++)
         {
-            ROMData.Put(addresses[i], (byte)items[i]);
+            ROMData.Put(visited[i], (byte)items[i]);
         }
     }
 
@@ -3196,7 +3193,13 @@ public class Hyrule
         sb.AppendLine("\nGP:\n");
         sb.AppendLine(palaces[6].GetLayoutDebug(props.PalaceStyles[6], false));
 
-        sb.AppendLine("DETAILS: ");
+        sb.AppendLine("\nDROPS:\n");
+        sb.AppendLine(randomizedDrops.GenerateSpoiler());
+
+        sb.AppendLine("\nSTATS:\n");
+        sb.AppendLine(randomizedStats.GenerateSpoiler());
+
+        sb.AppendLine("\nDETAILS: ");
         sb.Append(JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties));
 
         return sb.ToString().Replace('$', ' ');
@@ -3830,9 +3833,11 @@ bank5_Pointer_table_for_End_Credits:
         ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic); // will make output vary with customize tab options
         rom.AddRandomizerToTitle(engine);
         AddCropGuideBoxesToFileSelect(engine);
+        rom.SetEncounterRate(engine, props, r);
         FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetNonSideviewItemLocations());
         rom.DontCountExpDuringTalking(engine);
+        rom.ElevatorBossFix(engine, props.BossItem);
         rom.FixElevatorPositionInFallRooms(engine);
         rom.AllowForChangingDoorYPosition(engine);
         rom.AllowForChangingElevatorYPosition(engine);

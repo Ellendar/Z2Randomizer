@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Z2Randomizer.RandomizerCore.Overworld;
 
@@ -10,64 +9,26 @@ namespace Z2Randomizer.RandomizerCore;
 
 public class Spoiler
 {
-    public readonly Dictionary<Terrain, int> terrainTileChrAddrs = new()
-    {
-        { Terrain.TOWN, 0x115c0 },
-        { Terrain.CAVE, 0x11f40 },
-        { Terrain.PALACE, 0x11600 },
-        { Terrain.BRIDGE, 0x115a0 },
-        { Terrain.DESERT, 0x116c0 },
-        { Terrain.GRASS, 0x116d0 },
-        { Terrain.FOREST, 0x11680 },
-        { Terrain.SWAMP, 0x116f0 },
-        { Terrain.GRAVE, 0x11700 },
-        { Terrain.ROAD, 0x11fe0},
-        { Terrain.LAVA, 0x116e0 },
-        { Terrain.MOUNTAIN, 0x11640 },
-        { Terrain.WATER, 0x116e0 },
-        { Terrain.PREPLACED_WATER, 0x116e0 },
-        { Terrain.WALKABLEWATER, 0x116e0 },
-        { Terrain.PREPLACED_WATER_WALKABLE, 0x116e0 },
-        { Terrain.ROCK, 0x11560 },
-        { Terrain.RIVER_DEVIL, 0x11400 },
-    };
-
-    public readonly Dictionary<Terrain, int> terrainPalettePrgAddrs = new()
-    {
-        { Terrain.TOWN, 0x1c463 },
-        { Terrain.CAVE, 0x1c45f },
-        { Terrain.PALACE, 0x1c463 },
-        { Terrain.BRIDGE, 0x1c45f },
-        { Terrain.DESERT, 0x1c467 },
-        { Terrain.GRASS, 0x1c45b },
-        { Terrain.FOREST, 0x1c45b },
-        { Terrain.SWAMP, 0x1c45b },
-        { Terrain.GRAVE, 0x1c45f },
-        { Terrain.ROAD, 0x1c45f },
-        { Terrain.LAVA, 0x1c45f },
-        { Terrain.MOUNTAIN, 0x1c45f },
-        { Terrain.WATER, 0x100aa },
-        { Terrain.PREPLACED_WATER, 0x100aa },
-        { Terrain.WALKABLEWATER, 0x1c467 },
-        { Terrain.PREPLACED_WATER_WALKABLE, 0x1c467 },
-        { Terrain.ROCK, 0x1c45f },
-        { Terrain.RIVER_DEVIL, 0x1c45f },
-    };
-
+    private ROM rom;
+    private byte[] itemPalette;
     public Dictionary<Terrain, SKBitmap> terrainTiles;
 
     public Spoiler(ROM rom)
     {
+        this.rom = rom;
+        itemPalette = rom.GetBytes(Palettes.ORANGE, 4);
+        itemPalette[0] = 0x00;
+
         Dictionary<Terrain, byte[]> palettes = new();
         terrainTiles = new();
 
-        foreach (var kvp in terrainTileChrAddrs)
+        foreach (var kvp in CHR.TERRAIN_TILE_ADDRS)
         {
             Terrain t = kvp.Key;
             var chrAddr = kvp.Value;
             if (!palettes.TryGetValue(t, out var palette))
             {
-                palette = rom.GetBytes(ROM.RomHdrSize + terrainPalettePrgAddrs[t], 4);
+                palette = rom.GetBytes(ROM.RomHdrSize + Palettes.TERRAIN_ADDRS[t], 4);
                 palette[0] = 0x0f;
                 palettes[t] = palette;
             }
@@ -97,8 +58,8 @@ public class Spoiler
                     break;
                 case Terrain.GRAVE:
                     // we need to combine the grave 8x16 tile and two 8x8 road tiles
-                    byte[] tileData1 = rom.ReadSprite(ROM.ChrRomOffset + terrainTileChrAddrs[Terrain.GRAVE], 1, 2, palette);
-                    byte[] tileData2 = rom.ReadSprite(ROM.ChrRomOffset + terrainTileChrAddrs[Terrain.ROAD], 1, 1, palette);
+                    byte[] tileData1 = rom.ReadSprite(ROM.ChrRomOffset + CHR.TERRAIN_TILE_ADDRS[Terrain.GRAVE], 1, 2, palette);
+                    byte[] tileData2 = rom.ReadSprite(ROM.ChrRomOffset + CHR.TERRAIN_TILE_ADDRS[Terrain.ROAD], 1, 1, palette);
                     byte[] fullTileData = new byte[16 * 16 * 4];
                     InsertTile(fullTileData, 16, 16, tileData1, 8, 16, 0, 0);
                     InsertTile(fullTileData, 16, 16, tileData2, 8, 8, 8, 0);
@@ -163,6 +124,18 @@ public class Spoiler
                 canvas.DrawBitmap(tile, (startDrawX - offsetX) * 16 + x * 16, startDrawY * 16 + y * 16);
             }
         }
+
+        int[,] itemCountAtPos = new int[world.MapColumns, world.MapRows];
+        foreach (var loc in world.AllLocations)
+        {
+            foreach (var col in loc.Collectables)
+            {
+                var parts = CHR.COLLECTABLE_TILES[col];
+                var itemCount = itemCountAtPos[loc.Xpos, loc.Y];
+                DrawSpriteParts(rom, canvas, parts, (startDrawX - offsetX) * 16 + loc.Xpos * 16 + itemCount * 8, startDrawY * 16 + loc.Y * 16 + itemCount * 8, itemPalette);
+                itemCountAtPos[loc.Xpos, loc.Y]++;
+            }
+        }
     }
 
     public static SKBitmap LoadChr(ROM rom, int chrAddr, int tilesWide, int tilesHigh, byte[] palette)
@@ -171,10 +144,21 @@ public class Spoiler
         return MakeSpriteBitmap(tileData, tilesWide * 8, tilesHigh * 8);
     }
 
+    public static SKBitmap LoadChrTransparent(ROM rom, int chrAddr, int tilesWide, int tilesHigh, byte[] palette)
+    {
+        int stride = tilesWide * 8 * 4;
+        byte[] tileData = rom!.ReadSprite(ROM.ChrRomOffset + chrAddr, tilesWide, tilesHigh, palette);
+        for (var i = 3; i < tileData.Length; i += 4)
+        {
+            tileData[i] = 0xff;
+        }
+        return MakeSpriteBitmap(tileData, tilesWide * 8, tilesHigh * 8);
+    }
+
     public static SKBitmap LoadChrFillPattern(ROM rom, int chrAddr,
-                                               int tilesWide, int tilesHigh,
-                                               int targetTileWidth, int targetTileHeight,
-                                               byte[] palette)
+                                              int tilesWide, int tilesHigh,
+                                              int targetTileWidth, int targetTileHeight,
+                                              byte[] palette)
     {
         const int tileSize = 8; // Each tile is 8x8 pixels
         const int colorDepthBytes = 4; // RGBA
@@ -241,6 +225,23 @@ public class Spoiler
         }
     }
 
+    public static void DrawSpriteParts(ROM rom, SKCanvas canvas, SpriteTile[] parts, int startX, int startY, byte[] palette)
+    {
+        foreach (var part in parts)
+        {
+            /*
+            SKBitmap tile = part.Alpha ? LoadChrTransparent(rom, part.Addr, part.W, part.H, palette)
+                                       : LoadChr(rom, part.Addr, part.W, part.H, palette);
+            */
+            SKBitmap tile = LoadChr(rom, part.Addr, part.W, part.H, palette);
+            foreach (var p in part.Placement)
+            {
+                SKBitmap drawTile = p.FlipH ? FlipTileHorizontally(tile) : tile;
+                canvas.DrawBitmap(drawTile, startX + p.X * 8, startY + p.Y * 8);
+            }
+        }
+    }
+
     public static SKBitmap MakeSpriteBitmap(byte[] tileData, int w, int h)
     {
         SKBitmap tile = new SKBitmap(w, h, SKColorType.Rgba8888, SKAlphaType.Unpremul);
@@ -256,5 +257,19 @@ public class Spoiler
             return tile.Copy();
         }
         finally { handle.Free(); }
+    }
+
+    public static SKBitmap FlipTileHorizontally(SKBitmap tile)
+    {
+        SKBitmap res = new SKBitmap(tile.Width, tile.Height);
+        for (int x = 0; x < tile.Width; x++)
+        {
+            var mirrorX = tile.Width - x - 1;
+            for (int y = 0; y < tile.Height; y++)
+            {
+                res.SetPixel(mirrorX, y, tile.GetPixel(x, y));
+            }
+        }
+        return res;
     }
 }

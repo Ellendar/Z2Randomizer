@@ -924,17 +924,18 @@ NameNotEmpty:
     nop
 LoadNewLevelCapReturn:        ; $9F7F
 
-.org $A89E
+.reloc
 LoadNewLevelCap:
     lda $0777,X               ; the instruction we overwrote with jmp
     cmp LevelCaps,X
     jmp LoadNewLevelCapReturn
 """);
-        a.Org(0xa8a7);
+        a.Reloc();
         a.Label("LevelCaps");
         a.Byt((byte)atkMax);
         a.Byt((byte)magicMax);
         a.Byt((byte)lifeMax);
+        a.Export("LevelCaps");
     }
 
     /// <summary>
@@ -953,6 +954,8 @@ LoadNewLevelCap:
         a.Code("""
 ; This is called when the game checks if it should skip the cancel option
 ; in the level up menu or not. It runs once for each stat (X).
+.import LevelCaps
+
 .segment "PRG0"
 .org $A0D4
     jmp CheckIfStatMaxed
@@ -976,8 +979,6 @@ ReturnNormally:
     asl a
     jmp CheckStatNormally
 """);
-        a.Org(0xa8a7);
-        a.Label("LevelCaps");
     }
 
     public void UseExtendedBanksForPalaceRooms(Assembler a)
@@ -2048,7 +2049,7 @@ ResetRedPalettePayload:
         a.Byt(dash);
     }
 
-    public void CombineFireSpell(Assembler asm, List<Collectable>? customSpellOrder, Random RNG)
+    public void CombineFireSpell(Assembler asm, Collectable linkedSpell, List<Collectable>? customSpellOrder)
     {
         // These are the bit flags for each spell.  The old implementation
         // changed this table directly. However as this table is also used in
@@ -2058,8 +2059,7 @@ ResetRedPalettePayload:
         byte[] spellBytes = GetBytes(0xdcb, 8);
 
         int fireSpellIndex = 4;
-        int r = RNG.Next(7);
-        int linkedSpellIndex = r > 3 ? r + 1 : r;
+        int linkedSpellIndex = linkedSpell.VanillaSpellOrder();
 
         byte combinedSpellBits = (byte)(spellBytes[linkedSpellIndex] | spellBytes[fireSpellIndex]);
         spellBytes[fireSpellIndex] = combinedSpellBits;
@@ -2086,67 +2086,116 @@ ResetRedPalettePayload:
         Put(0x11af5, new byte[] { 0x47, 0x9b, 0x56, 0x9b, 0x35, 0x9b });
     }
 
-    public void ElevatorBossFix(bool bossItem)
+    public void HandleRandomBossDrop(Assembler asm)
     {
-        /*
-         * Notes:
-         * 
-         * Screen lock set at bank 4 BE99 (0x13ea9)
-         * Screen lock tbird set at bank 5 A363 (0x16373) 
-         * Screen lock released at bank 7 E7A9 (0x1e7b9)
-         * 
-         * Jump to subroutine at all three locations above:
-         * 
-         * 20 40 F3
-         * 
-         * Subroutine at 1F350:
-         * 
-         * Load accumulator with 1 (A9 01)
-         * EOR 728 (4D 28 07)
-         * store 728 (8D 28 07)
-         * load accumulator with 13 (A9 13)
-         * compare a2 with 0x13 (C5 A2)
-         * branch if not equal to the end (D0 0A)
-         * Load accumulator with 1 (a9 01)
-         * EOR b6 (45 b6)
-         * store b6 (85 b6)
-         * load accumulator with a0 (a9 a0)
-         * Set 2a to 0xa0 (85 2a)
-         * return (60)
-         */
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import ElevatorBossFix
 
-        // jsr $f340
-        var jsrF340 = new byte[] { 0x20, 0x40, 0xF3 };
-        Put(0x13ea9, jsrF340);
-        Put(0x16373, jsrF340);
-        Put(0x13230, jsrF340);
+.segment "PRG7"
+.org $e79a
+    ; Branch if scroll frozen
+    lda ScrollFrozen
+    beq +
+        ; freeze scroll
+        lda #0
+        jsr ElevatorBossFix
+        ; branch if the music is already playing
+        lda $07fb
+        bne +
+            ; otherwise resume the previous track (palace theme)
+            lda #2
+            sta $eb
+    +
+    ; Write the "grab item" sound effect to the sfx queue
+    lda #8
+    sta Z2Square1SoundQueue
+    ; Branch if the item we are getting is NOT a key
+    cpy #8
+    bne +
+        ; increment number of keys and carry on
+        inc Keys
+        jmp $e797  ; always overwritten by full_item_shuffle anyway
+    +
+    ; Otherwise continue to $E7BB which is the start of the get item code
+    .assert * = $E7BB
 
-        if (!bossItem)
-        {
-            Put(0x1e7b9, jsrF340);
-        }
-        else
-        {
-            Put(0x1e7b1, jsrF340);
-        }
+; Patch a few locations to make sure the music returns to normal after getting an item
+.org $e80c
+    jsr DontSwitchMusicIfInPalace1
+    nop
 
-        /*
-         * Patched function at $f340
-         * lda #1
-         * eor $0728   ; _728_FreezeScrolling un freeze scrolling if frozen, otherwise freeze it.
-         * sta $0728   ; _728_FreezeScrolling
-         * lda #$13     ; check if the enemy id is 0x13
-         * cmp $a1     ; enemy slot "6" (index 0) current ID
-         * bne + ; * + 10
-         * lda #1      ; if it is equal, then flip $b6 (holds the enemy status?)
-         * eor $b6
-         * sta $b6
-         * lda #$a0    ; and set the enemy y position to 0xa0
-         * sta $2a
-         * +
-         * rts
-         */
-        Put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
+.org $e84b
+    jsr DontSwitchMusicIfInPalace2
+    nop
+
+.reloc
+DontSwitchMusicIfInPalace1:
+    lda $eb
+    cmp #$02
+    beq +
+        ; Restore track 16
+        lda #$10
+        sta $eb
++   rts
+
+DontSwitchMusicIfInPalace2:
+    lda $eb
+    cmp #$02
+    beq +
+        ; Restore track 0
+        lda #$00
+        sta $eb
++   rts
+""");
+    }
+
+    public void ElevatorBossFix(Assembler asm, bool randomBossItem)
+    {
+        var a = asm.Module();
+        a.Assign("RANDOM_BOSS_ITEM", randomBossItem ? 1 : 0);
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+.segment "PRG4"
+.org $b220
+    jsr ElevatorBossFix
+
+.org $be99 ; Screen lock set at bank 4 BE99 (0x13ea9)
+    jsr ElevatorBossFix
+
+; Screen lock tbird set at bank 5 A363 (0x16373)
+.segment "PRG5"
+.org $a363
+    jsr ElevatorBossFix
+
+.segment "PRG7"
+
+; Screen lock released at bank 7 E7A9 (0x1e7b9)
+.if !RANDOM_BOSS_ITEM
+    .org $e7a9
+        jsr ElevatorBossFix
+.endif
+
+.org $f340  ; this should probably be free'd and realloc'd
+ElevatorBossFix:
+    lda #$01
+    eor ScrollFrozen  ; unfreeze scrolling if frozen, otherwise freeze it
+    sta ScrollFrozen
+    lda #$13
+    cmp Enemy0Type
+    bne @Exit
+        lda #$01
+        eor Enemy0Status
+        sta Enemy0Status
+        lda #$a0
+        sta Enemy0YPositionLo
+    @Exit:
+        rts
+.export ElevatorBossFix
+
+""");
     }
 
     public void AdjustGpProjectileDamage()
@@ -2617,6 +2666,169 @@ ResetRedPalettePayload:
                 Put(0x1dfc5, 0x5F);
             }
         }
+    }
+
+    public void SetEncounterRate(Assembler asm, RandomizerProperties props, Random r)
+    {
+        List<EncounterRate> encounterRates = [props.EncounterRates, props.EncounterRates, props.EncounterRates, props.EncounterRates];
+        List<EncounterRate> randomCandidates = Enums.GetShufflableList<EncounterRate>();
+        encounterRates = [.. encounterRates.Select(val => val is EncounterRate.RANDOM ? randomCandidates.Sample(r) : val)];
+
+        bool allNoEncounters = encounterRates.All(val => val is EncounterRate.NONE);
+        bool anyHalfEncounters = encounterRates.Any(val => val is EncounterRate.HALF);
+        bool allNormalEncounters = encounterRates.All(val => val is EncounterRate.NORMAL);
+        bool differentRates = encounterRates.Distinct().Count() > 1;
+        Debug.Assert(allNoEncounters || anyHalfEncounters || allNormalEncounters || differentRates);
+
+        var a = asm.Module();
+        a.Set("NO_ENCOUNTERS", allNoEncounters ? 1 : 0);
+        a.Set("HAS_HALF_ENCOUNTERS", anyHalfEncounters ? 1 : 0);
+        a.Set("NORMAL_ENCOUNTERS", allNormalEncounters ? 1 : 0);
+        a.Set("VANILLA_WEST", props.WestBiome.UsesVanillaMap() ? 1 : 0);
+        a.Set("ENCOUNTER_RATE_PER_CONTINENT", differentRates ? 1 : 0);
+
+        if (differentRates)
+        {
+            byte[] encounterTable = [.. encounterRates.Select(o => o.GetAsmByte())];
+            a.Segment("PRG0");
+            a.Reloc();
+            a.Label("EncounterRateRegionTable");
+            a.Byt(encounterTable);
+        }
+
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+.segment "PRG0"
+
+EncounterTerrainTimerTable = $823f
+OverworldEncounterTick = $8284
+VanillaRegionCheck = $8287
+CheckStepCounter = $828f
+CheckTimer = $8293
+SpawnEncounter = $8298
+SetTerrainEncounterTimer = $82b4
+HammerTileTable = $84ad
+OverworldMainJsr = $8563
+SetInitialEncounterTimer = $8879
+
+.if NO_ENCOUNTERS
+    .org OverworldEncounterTick
+        rts
+        FREE_UNTIL HammerTileTable
+.endif
+
+.if ENCOUNTER_RATE_PER_CONTINENT
+    .org OverworldEncounterTick
+        jmp OverworldEncounterTickHook
+
+    .reloc
+    OverworldEncounterTickHook:
+        ldy RegionNumber
+        lda EncounterRateRegionTable,y
+        cmp #1
+        beq @none    ; A == 1
+        bcc @normal  ; A < 1
+        @half:       ; A > 1
+        .if HAS_HALF_ENCOUNTERS
+            jmp ExtraEncounterStepCheck
+        .endif
+        @normal:
+            .if VANILLA_WEST
+                tya
+                jmp VanillaRegionCheck  ; preserve special vanilla West behavior where steps are not counted in the north
+            .else
+                jmp CheckStepCounter
+            .endif
+        @none:
+        rts
+
+    .org SetInitialEncounterTimer + 2
+        jsr SetInitialEncounterTimerHook
+
+    .reloc
+    SetInitialEncounterTimerHook:
+        ldx RegionNumber
+        lda EncounterRateRegionTable,x
+        beq @normal
+        @half:
+            lda #02
+            sta OverworldStepCounterHi
+            lda #$10
+            bne @done
+        @normal:
+            lda #$08
+        @done:
+            sta EncounterSpawnTimer
+            rts
+
+    .org SetTerrainEncounterTimer
+        jsr SetTerrainEncounterTimerHook
+
+    .reloc
+    SetTerrainEncounterTimerHook:
+        ldx RegionNumber
+        lda EncounterRateRegionTable,x
+        beq @normal
+        @half:
+            lda EncounterTerrainTimerTable,y
+            asl  ; multiply timer duration by 2
+            rts
+        @normal:
+            lda EncounterTerrainTimerTable,y
+            rts
+.else  ; not EncounterRatePerContinent
+    .if NORMAL_ENCOUNTERS
+        .if !VANILLA_WEST
+            .org OverworldEncounterTick
+                FREE_UNTIL CheckStepCounter
+            .org OverworldMainJsr
+                jsr CheckStepCounter  ; overwriting jsr OverworldEncounterTick
+        .endif
+    .endif
+
+    .if HAS_HALF_ENCOUNTERS
+        .org EncounterTerrainTimerTable + 1
+            .byt $40  ; grass
+            .byt $30  ; desert
+            .byt $30  ; forest
+            .byt $40  ; swamp
+            .byt $12  ; graveyard
+            .byt $06  ; lava
+
+        .org OverworldEncounterTick
+            FREE_UNTIL CheckTimer
+        .org OverworldMainJsr
+            jsr ExtraEncounterStepCheck  ; overwriting jsr OverworldEncounterTick
+
+        .org SetInitialEncounterTimer
+            lda #$10
+            jsr SetInitialEncounterTimerHook2
+
+        .reloc
+        SetInitialEncounterTimerHook2:
+            sta EncounterSpawnTimer
+            lda #02
+            sta OverworldStepCounterHi
+            rts
+    .endif
+.endif
+
+.if HAS_HALF_ENCOUNTERS
+    .reloc
+    ExtraEncounterStepCheck:
+        lda OverworldStepCounter
+        bne @exit
+        dec OverworldStepCounterHi
+        bne @exit
+            lda #02
+            sta OverworldStepCounterHi
+            jmp SpawnEncounter
+        @exit:
+            jmp CheckTimer
+.endif
+
+""");
     }
 
     public void UpdateItem(Collectable item, Room room)

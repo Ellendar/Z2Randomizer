@@ -1037,7 +1037,7 @@ public partial class Palace
         }
     }
 
-    public bool CanClearAllRooms(IEnumerable<RequirementType> requireables, Collectable palaceItem)
+    public bool CanClearAllRooms(IReadOnlySet<RequirementType> requireables, Collectable palaceItem)
     {
         //If the palace's item can be reached with the current items, it can be used to clear the rest of the palace.
         RequirementType? palaceItemRequirement = palaceItem.AsRequirement();
@@ -1047,8 +1047,8 @@ public partial class Palace
             //the shuffle will eventually put the item into the reachable place.
             if (CanReachAnItemRoom(requireables))
             {
-                requireables = new List<RequirementType>(requireables);
-                ((List<RequirementType>)requireables).Add((RequirementType)palaceItemRequirement);
+                HashSet<RequirementType> palaceRequireables = [.. requireables, palaceItemRequirement.Value];
+                requireables = palaceRequireables;
             }
             else return false;
         }
@@ -1135,7 +1135,7 @@ public partial class Palace
         return false;
     }
 
-    public bool CanReachAnItemRoom(IEnumerable<RequirementType> requireables)
+    public bool CanReachAnItemRoom(IReadOnlySet<RequirementType> requireables)
     {
         List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
         List<Room> coveredRooms = new();
@@ -1175,10 +1175,9 @@ public partial class Palace
         return false;
     }
 
-    public List<Collectable> GetGettableItems(IEnumerable<RequirementType> initialRequireables)
+    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> initialRequireables)
     {
-        List<RequirementType> requireables = [];
-        requireables.AddRange(initialRequireables);
+        HashSet<RequirementType> requireables = new(initialRequireables);
         List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
         List<Room> coveredRooms = [];
         List<Collectable> previousGettableItems = [];

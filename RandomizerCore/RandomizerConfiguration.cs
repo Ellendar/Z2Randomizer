@@ -4,8 +4,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
@@ -77,6 +75,16 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         Collectable.THUNDER_SPELL
     ];
 
+    [IgnoreInFlags]
+    private readonly static Collectable[] POSSIBLE_LINKED_FIRE_SPELLS = [
+        Collectable.SHIELD_SPELL,
+        Collectable.JUMP_SPELL,
+        Collectable.LIFE_SPELL,
+        Collectable.FAIRY_SPELL,
+        Collectable.REFLECT_SPELL,
+        Collectable.SPELL_SPELL,
+        Collectable.THUNDER_SPELL
+    ];
 
     //Start Configuration
     [Reactive]
@@ -274,10 +282,10 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private Biome mazeBiome = Biome.VANILLA;
 
     [Reactive]
-    private ClimateEnum westClimate = ClimateEnum.CLASSIC;
+    private ClimateEnum westClimate = ClimateEnum.VANILLA_WEIGHTED;
 
     [Reactive]
-    private ClimateEnum eastClimate = ClimateEnum.CLASSIC;
+    private ClimateEnum eastClimate = ClimateEnum.VANILLA_WEIGHTED;
 
     [Reactive]
     private ClimateEnum dmClimate = ClimateEnum.CLASSIC;
@@ -337,6 +345,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         return false;
     }
 
+    private bool roomSelectionEnabled()
+    {
+        return palaceStylesAreNotAllVanillaOrShuffled();
+    }
+
     private bool palaceStylesAnyMetastyleSelected()
     {
         foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
@@ -355,26 +368,28 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     public bool randomStylesAllowVanillaIncluded() => palaceStylesAnyMetastyleSelected();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? includeVanillaRooms = true;
+    public bool includeVanillaRoomsIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool? includev4_0Rooms = false;
-    public bool includev4_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    public bool includev4_0RoomsIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool? includev5_0Rooms = false;
-    public bool includev5_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    public bool includev5_0RoomsIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool blockingRoomsInAnyPalace = false;
-    public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
-    private PalaceDropStyle palaceDropStyle = PalaceDropStyle.ENTRANCE;
-    public bool palaceDropStyleIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    private PalaceDropStyle palaceDropStyle = PalaceDropStyle.ANY_EXIT;
+    public bool palaceDropStyleIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
@@ -384,12 +399,12 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool includeExpertRooms = false;
-    public bool includeExpertRoomsIncluded() => palaceStylesAreNotAllVanilla();
+    public bool includeExpertRoomsIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
     private BossRoomsExitType bossRoomsExitType = BossRoomsExitType.OVERWORLD;
-    public bool bossRoomsExitTypeIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
+    public bool bossRoomsExitTypeIncluded() => roomSelectionEnabled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
@@ -433,7 +448,6 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Minimum(0)]
     [Maximum(6)]
     [ConditionallyIncludeInFlags]
-    [DefaultValue(6)]
     private int palacesToCompleteMax = 6;
     public bool palacesToCompleteMaxIncluded() => palacesToCompleteMin != 6;
 
@@ -556,7 +570,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool shuffleXPStolenAmount = false;
 
     [Reactive]
-    private bool shuffleSwordImmunity = false;
+    private SwordImmunityOption swordImmunityOption = SwordImmunityOption.VANILLA;
 
     [Reactive]
     [DifficultyOnly]
@@ -729,7 +743,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
     [Reactive]
     [IgnoreInFlags]
-    private bool removeFlashing = false;
+    private bool removeFlashing = true;
 
     [Reactive]
     [IgnoreInFlags]
@@ -794,7 +808,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private RiverDevilBlockerOption riverDevilBlockerOption = RiverDevilBlockerOption.PATH;
 
     [Reactive]
-    private bool? eastRocks = false;
+    private bool? eastRocks = true;
 
     [Reactive]
     private bool generateSpoiler = false;
@@ -812,9 +826,16 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private string? seed;
     // public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
 
+    [IgnoreInFlags]
+    private bool _inDeserializeFlags = false;
+
     public void DeserializeFlags(string flags)
     {
+        // avoid emitting property changed for Flags during deserialization
+        _inDeserializeFlags = true;
         Deserialize(flags?.Trim() ?? "");
+        _inDeserializeFlags = false;
+        OnPropertyChanged("Flags");
     }
     public String SerializeFlags()
     {
@@ -991,38 +1012,43 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         } while (!properties.HasEnoughSpaceToAllocateItems());
 
         //Handle Fire
+        Collectable RollLinkedFireSpell()
+        {
+            return POSSIBLE_LINKED_FIRE_SPELLS[r.Next(POSSIBLE_LINKED_FIRE_SPELLS.Length)];
+        }
         switch (fireOption)
         {
             case FireOption.NORMAL:
-                properties.CombineFire = false;
+                properties.LinkedFireSpell = null;
                 properties.ReplaceFireWithDash = false;
                 break;
             case FireOption.PAIR_WITH_RANDOM:
-                properties.CombineFire = true;
+                properties.LinkedFireSpell = RollLinkedFireSpell();
                 properties.ReplaceFireWithDash = false;
                 break;
             case FireOption.REPLACE_WITH_DASH:
-                properties.CombineFire = false;
+                properties.LinkedFireSpell = null;
                 properties.ReplaceFireWithDash = true;
                 break;
             case FireOption.RANDOM:
                 switch (r.Next(3))
                 {
                     case 0:
-                        properties.CombineFire = false;
+                        properties.LinkedFireSpell = null;
                         properties.ReplaceFireWithDash = false;
                         break;
                     case 1:
-                        properties.CombineFire = true;
+                        properties.LinkedFireSpell = RollLinkedFireSpell();
                         properties.ReplaceFireWithDash = false;
                         break;
                     case 2:
-                        properties.CombineFire = false;
+                        properties.LinkedFireSpell = null;
                         properties.ReplaceFireWithDash = true;
                         break;
-
                 }
                 break;
+            default:
+                throw new Exception("Illegal Fire option");
         }
 
         ResolveStartingTechniques(properties, r, includeDifficulty);
@@ -1294,7 +1320,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.ShuffleBossHP = includeDifficulty ? shuffleBossHP : EnemyLifeOption.VANILLA;
         properties.ShuffleEnemyStealExp = shuffleXPStealers;
         properties.ShuffleStealExpAmt = shuffleXPStolenAmount;
-        properties.ShuffleSwordImmunity = shuffleSwordImmunity;
+        properties.SwordImmunityOption = swordImmunityOption;
         properties.ShuffleOverworldEnemies = shuffleOverworldEnemies ?? GetIndeterminateFlagValue(r);
         properties.ShufflePalaceEnemies = shufflePalaceEnemies ?? GetIndeterminateFlagValue(r);
         properties.MixLargeAndSmallEnemies = mixLargeAndSmallEnemies ?? GetIndeterminateFlagValue(r);
@@ -1507,7 +1533,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         if (properties.ReplaceFireWithDash)
         {
-            properties.CombineFire = false;
+            Debug.Assert(properties.LinkedFireSpell == null);
         }
 
         //If spells are in the shuffle pool, shuffle spells means nothing, so diable it
@@ -1961,29 +1987,5 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    /// <summary>
-    /// Should be called with the field to reset as the expression body:
-    /// SetFieldToDefault(() => SettingToReset);
-    /// </summary>
-    public void SetFieldToDefault<T>(Expression<Func<T>> fieldExpr)
-    {
-        if (fieldExpr.Body is not MemberExpression member || member.Member is not FieldInfo field)
-        {
-            throw new ArgumentException("Expression must reference a field");
-        }
-
-        var target = ((ConstantExpression)member.Expression!).Value;
-
-        var attr = field.GetCustomAttribute<DefaultValueAttribute>();
-        if (attr != null)
-        {
-            field.SetValue(target, attr.Value);
-        }
-        else
-        {
-            field.SetValue(target, default);
-        }
     }
 }

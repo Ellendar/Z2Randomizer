@@ -3,18 +3,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
-    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-    <EnableWorkloadRestore>true</EnableWorkloadRestore>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
-
     <TrimMode>partial</TrimMode>
-    <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
 <!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
+    <EnableWorkloadRestore>true</EnableWorkloadRestore>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Workload Include="wasm-tools" />
-  </ItemGroup>
 </Project>

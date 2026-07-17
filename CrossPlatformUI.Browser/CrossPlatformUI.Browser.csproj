@@ -22,7 +22,13 @@
 
         <CompressionEnabled>false</CompressionEnabled>
         <BlazorEnableCompression>false</BlazorEnableCompression>
+        <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
+        <EnableWorkloadRestore>true</EnableWorkloadRestore>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Workload Include="wasm-tools" />
+    </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <RunAOTCompilation>true</RunAOTCompilation>

@@ -48,7 +48,7 @@ public class RandomizerProperties
     public bool StartReflect { get; set; }
     public bool StartSpell { get; set; }
     public bool StartThunder { get; set; }
-    public bool CombineFire { get; set; }
+    public Collectable? LinkedFireSpell { get; set; }
     public bool ReplaceFireWithDash { get; set; }
     public StartingResourceLimit StartSpellsLimit { get; set; }
 
@@ -144,7 +144,7 @@ public class RandomizerProperties
     public EnemyLifeOption ShuffleBossHP { get; set; }
     public bool ShuffleEnemyStealExp { get; set; }
     public bool ShuffleStealExpAmt { get; set; }
-    public bool ShuffleSwordImmunity { get; set; }
+    public SwordImmunityOption SwordImmunityOption;
     public bool ShuffleOverworldEnemies { get; set; }
     public bool ShufflePalaceEnemies { get; set; }
     public bool MixLargeAndSmallEnemies { get; set; }
@@ -221,6 +221,7 @@ public class RandomizerProperties
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
     public bool FastCast { get; set; }
+
     public BeamSprites BeamSprite { get; set; }
     public bool DisableMusic { get; set; }
     public bool RandomizeMusic { get; set; }

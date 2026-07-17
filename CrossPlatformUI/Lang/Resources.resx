@@ -231,9 +231,20 @@ group is the same as the number in that group that steal EXP in vanilla.</value>
 <value>If selected, the amount of EXP each stealer steals is between 50% and 150% of the vanilla
 amount.</value>
 	</data>
-	<data name="ShuffleSwordImmunityToolTip" xml:space="preserve">
-<value>Randomly reassigns which enemies are immune to stabs. The number of enemies that are
-immune in each group is the same as the number in that group that are immune in vanilla.</value>
+	<data name="SwordImmunityOptionToolTip" xml:space="preserve">
+<value>Vanilla:
+Uses the game's original sword immunities. (Tektites and Zoras)
+
+Shuffle:
+Randomly reassigns which enemies are immune to sword attacks and require the Fire spell
+to damage. On average, the same number of enemies are immune as in the vanilla game.
+
+Shuffle/None if Fire unusable:
+Uses Shuffle if the Fire spell is usable (not replaced by Dash nor linked with Fairy).
+Otherwise, removes all sword immunities.
+
+None:
+Removes all sword immunities.</value>
 	</data>
 	<data name="ShuffleSpritePalettesToolTip" xml:space="preserve">
 <value>Randomizes the color palettes of enemies and NPCs. Health bar color is also randomized.
@@ -692,9 +703,9 @@ linear.</value>
    make room.
 
 Random Item Rooms Per Palace:
+ • Each palace gets 0–3 item rooms (varies by palace length/style).
  • Clouds in the entrance screen and Ironknuckle statues by the entrance elevator
    indicate how many items there are in the palace.</value>
- • Each palace gets 0–3 item rooms (varies by palace length/style).
 	</data>
 	<data name="IncludeVanillaRoomsToolTip" xml:space="preserve">
 <value>If selected, the normal zelda 2 rooms will be available for palace generation. Note that
@@ -766,8 +777,10 @@ considered duplicates of each other. Has no effect on vanilla palaces. Does not 
 prevent duplicates for Random Walk generated palaces.</value>
 	</data>
 	<data name="BlockingRoomsinAnyPalaceToolTip" xml:space="preserve">
-<value>Allows rooms that require an item or spell to traverse to appear in any palace. Otherwise,
-palaces can only contain blocks according to the following table.</value>
+<value>Allows rooms that cannot be passed without a specific item or spell to appear in any palace.
+Otherwise, the allowed requirements for rooms in palaces are based on the items and spells
+needed to pass through every room in that palace in vanilla (from either direction).
+See the Wiki for the full table.</value>
 	</data>
 	<data name="RemoveLongDeadEndsToolTip" xml:space="preserve">
 <value>Removes dead-end rooms from the room pool. This helps newer players who are not yet

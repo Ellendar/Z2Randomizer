@@ -5,7 +5,9 @@ on:
     branches-ignore:
     - main
     - testing
-    - '5.1'
+    - extras
+    - sgl
+    - '5.2'
   pull_request:
 
 env:

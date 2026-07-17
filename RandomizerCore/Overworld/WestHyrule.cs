@@ -301,7 +301,7 @@ public sealed class WestHyrule : World
         }
 
         //Climate filtering
-        climate = Climates.Create(props.WestClimate);
+        climate = Climates.Create(continentId, props.WestClimate);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);
@@ -375,7 +375,7 @@ public sealed class WestHyrule : World
         {
             Debug.Assert(MapRows == 75);
             Debug.Assert(MapColumns == 64);
-            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns);
+            map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
             if (biome == Biome.VANILLA_SHUFFLE)
             {
                 areasByLocation = new SortedDictionary<string, List<Location>>
@@ -393,7 +393,7 @@ public sealed class WestHyrule : World
                 foreach (Location location in AllLocations)
                 {
                     // section uses tuples with the Y+30 offset
-                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationByPos(location.Pos)!);
+                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationAt(location.Pos)!);
                 }
                 ChooseConn("parapa", connections, true);
                 ChooseConn("lifesouth", connections, true);
@@ -433,7 +433,7 @@ public sealed class WestHyrule : World
                 locationAtSariaSouth.CanShuffle = false;
                 locationAtSariaNorth.CanShuffle = false;
 
-                map = new Terrain[MapRows, MapColumns];
+                map = new OverworldMap(MapRows, MapColumns);
 
                 //blank the whole map to start
                 for (int i = 0; i < MapRows; i++)
@@ -1062,7 +1062,7 @@ public sealed class WestHyrule : World
             startx += deltax;
             starty += deltay;
         }
-        int caveCount = RNG.Next(2) + 1;
+        int caveCount = RNG.Next(2) + 1; // 1 = one-way Caldera, 2 = passthru Caldera
         Location cave1l, cave1r;
         Location? cave2l = null, cave2r = null;
 
@@ -1385,27 +1385,10 @@ public sealed class WestHyrule : World
     }
 
 
-    public override void UpdateVisit(List<RequirementType> requireables)
+    public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
         visitation[northPalace.Y, northPalace.Xpos] = true;
-        UpdateReachable(requireables);
-
-        foreach (Location location in AllLocations)
-        {
-            if (location.Y > 0 && visitation[location.Y, location.Xpos])
-            {
-                if (location.AccessRequirements.AreSatisfiedBy(requireables))
-                {
-                    location.Reachable = true;
-                    if (connections.ContainsKey(location) && location.ConnectionRequirements.AreSatisfiedBy(requireables))
-                    {
-                        Location connectedLocation = connections[location];
-                        connectedLocation.Reachable = true;
-                        visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
-                    }
-                }
-            }
-        }
+        base.UpdateVisit(requireables);
     }
 
     protected override List<Location> GetPathingStarts()

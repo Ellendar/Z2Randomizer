@@ -5,9 +5,9 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public class VanillaShufflePalaceGenerator() : VanillaPalaceGenerator()
 {
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber) 
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt) 
     {
-        Palace palace = await base.GeneratePalace(props, rooms, r, roomCount, palaceNumber);
+        Palace palace = await base.GeneratePalace(props, rooms, r, roomCount, palaceNumber, attempt);
 
         palace.ResetRooms();
         palace.ShuffleRooms(r);

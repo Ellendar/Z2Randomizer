@@ -20,22 +20,25 @@ public class Palaces
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = [
         RequirementType.KEY, ..RequirementTypeExtensions.UpToXContainers(5)];
-    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(6) ];
-    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(6) ];
-    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, ..RequirementTypeExtensions.UpToXContainers(7) ];
-    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, ..RequirementTypeExtensions.UpToXContainers(7) ];
-    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8) ];
-    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = [
         RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8)];
 
-    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = [ 
+    public static readonly RequirementType[] ALL_PALACE_ALLOWED_BLOCKERS = [
+        RequirementType.JUMP, RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.KEY, RequirementType.DASH, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8)];
+
+    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = [
         VANILLA_P1_ALLOWED_BLOCKERS,
         VANILLA_P2_ALLOWED_BLOCKERS,
         VANILLA_P3_ALLOWED_BLOCKERS,
@@ -91,9 +94,10 @@ public class Palaces
                 roomPool = new(palaceRooms, currentPalace, props);
             }
             Palace palace;
+            int attempts = 0;
             do
             {
-                palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace);
+                palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace, attempts++);
             } while (!palace.IsValid);
             palace.BossRoom!.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
             PalaceGenerator.DebugCheckDuplicates(props, palace);
@@ -304,7 +308,7 @@ public class Palaces
         {
             return true;
         }
-        List<RequirementType> requireables =
+        HashSet<RequirementType> requireables =
         [
             RequirementType.KEY,
             RequirementType.UPSTAB,
@@ -329,12 +333,12 @@ public class Palaces
     {
         if (!props.ShufflePalaceItems)
         {
-            List<RequirementType> requireables = [..RequirementTypeExtensions.UpToXContainers(props.StartMagicContainers)];
+            HashSet<RequirementType> requireables = [.. RequirementTypeExtensions.UpToXContainers(props.StartMagicContainers)];
             //If shuffle overworld items is on, we assume you can get all the items / spells
             //as all progression items will eventually shuffle into spots that work
             if (props.ShuffleOverworldItems)
             {
-                requireables = [RequirementType.KEY, ..RequirementTypeExtensions.UpToXContainers(8)];
+                requireables = [RequirementType.KEY, .. RequirementTypeExtensions.UpToXContainers(8)];
 
             }
             //Otherwise if it's vanilla items we can't get the magic key, because we could need glove for boots for flute to get to new kasuto
@@ -357,7 +361,7 @@ public class Palaces
         //or it will send the logic into an uinrecoverable nosedive since the palaces can't re-generate
         if (!props.ShufflePalaceItems && raftIsRequired)
         {
-            List<RequirementType> requireables;
+            HashSet<RequirementType> requireables;
             //If shuffle overworld items is on, we assume you can get all the items / spells
             //as all progression items will eventually shuffle into spots that work
             if (props.ShuffleOverworldItems)

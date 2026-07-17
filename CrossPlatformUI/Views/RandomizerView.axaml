@@ -124,7 +124,7 @@
             </StackPanel>
 
             <StackPanel Grid.Column="1">
-                <TextBox UseFloatingPlaceholder="True" PlaceholderText="Paste Seed Here" p1:TextFieldAssist.Label="Seed" Text="{Binding Seed}">
+                <TextBox Name="SeedInputTextBox" UseFloatingPlaceholder="True" PlaceholderText="Paste Seed Here" p1:TextFieldAssist.Label="Seed" Text="{Binding Seed}">
                     <TextBox.InnerRightContent>
                         <Button ToolTip.Tip="Generate a random number as your Seed" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}"
                                 Content="{avalonia:MaterialIconExt Kind=DiceMultiple, IconSize=32}" Command="{Binding RerollSeed}" />
@@ -193,7 +193,7 @@
                 <tabs:LevelsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Spells">
-                <tabs:SpellsView DataContext="{Binding Main}"/>
+                <tabs:SpellsView DataContext="{Binding SpellsViewModel}"/>
             </TabItem>
             <TabItem Header="Enemies">
                 <tabs:EnemiesView DataContext="{Binding Main}"/>
