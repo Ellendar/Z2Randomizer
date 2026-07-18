@@ -128,7 +128,7 @@ public class Spoiler
         int[,] itemCountAtPos = new int[world.MapColumns, world.MapRows];
         foreach (var loc in world.AllLocations)
         {
-            foreach (var col in loc.Collectables)
+            foreach (var col in loc.GetAllCollectables())
             {
                 var parts = CHR.COLLECTABLE_TILES[col];
                 var itemCount = itemCountAtPos[loc.Xpos, loc.Y];

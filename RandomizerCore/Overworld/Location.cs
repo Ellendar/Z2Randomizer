@@ -285,12 +285,12 @@ public class Location
         return GetGettableItems(RequirementTypeExtensions.ALL, ForceEnterRight ? Direction.EAST : Direction.WEST, true);
     }
 
-    public List<Collectable> GetGettableItems(List<RequirementType> requireables)
+    public List<Collectable> GetGettableItems(IReadOnlyCollection<RequirementType> requireables)
     {
         return GetGettableItems(requireables, ForceEnterRight ? Direction.EAST : Direction.WEST);
     }
 
-    public List<Collectable> GetGettableItems(List<RequirementType> requireables, Direction entranceDirection, bool shufflableItemsOnly = false)
+    public List<Collectable> GetGettableItems(IReadOnlyCollection<RequirementType> requireables, Direction entranceDirection, bool shufflableItemsOnly = false)
     {
         if (Town != null)
         {
@@ -307,7 +307,7 @@ public class Location
         return AccessRequirements.AreSatisfiedBy(requireables) ? NonPalaceTownCollectables : [];
     }
 
-    public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false) 
+    public void SetCollectables(IReadOnlyList<Collectable> collectables, bool shufflableOnly = false) 
     {
         Debug.Assert(Town == null || Palace == null);
         if (Town != null)

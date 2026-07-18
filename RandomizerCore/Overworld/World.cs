@@ -2679,7 +2679,7 @@ public abstract class World
         }
 
         // expensive Location check last
-        foreach (var dir in IntVector2.CARDINALS)
+        foreach (var dir in IntVector2.CARDINALS.Append(new(0, 0)))
         {
             var adjacent = pos + dir;
             var l = GetLocationAt(adjacent);
@@ -2855,8 +2855,6 @@ public abstract class World
         return true;
     }
 
-    public abstract void UpdateVisit(List<RequirementType> requireables);
-
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 
     //protected abstract void SetVanillaCollectables(bool useDash);
@@ -2888,7 +2886,7 @@ public abstract class World
                 if (location.AccessRequirements.AreSatisfiedBy(requireables))
                 {
                     location.Reachable = true;
-                    if (connections.ContainsKey(location) && location.ConnectionRequirements.AreSatisfiedBy(requireables))
+                    if (connections.ContainsKey(location) && (location.Town == null || location.Town.CanBeTraversed(requireables)))
                     {
                         Location connectedLocation = connections[location];
                         connectedLocation.Reachable = true;

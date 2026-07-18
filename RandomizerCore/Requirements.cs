@@ -103,7 +103,7 @@ public class Requirements
         return Serialize();
     }
 
-    public bool AreSatisfiedBy(IReadOnlySet<RequirementType> requireables, bool enforceImplicitRequirements = true)
+    public bool AreSatisfiedBy(IReadOnlyCollection<RequirementType> requireables, bool enforceImplicitRequirements = true)
     {
         if(IndividualRequirements.Length + CompositeRequirements.Length == 0)
         {

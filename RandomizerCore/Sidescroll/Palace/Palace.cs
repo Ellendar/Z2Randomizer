@@ -1087,7 +1087,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false;
     }
 
-    public bool CanReachAnItemRoom(IReadOnlySet<RequirementType> requireables)
+    public bool CanReachAnItemRoom(IReadOnlyCollection<RequirementType> requireables)
     {
         List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
         List<Room> coveredRooms = new();
@@ -1127,7 +1127,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false;
     }
 
-    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> initialRequireables, bool shufflableItemsOnly)
+    public List<Collectable> GetGettableItems(IReadOnlyCollection<RequirementType> initialRequireables, bool shufflableItemsOnly)
     {
 
         if(shufflableItemsOnly && !PalaceItemsAreShufflable)
