@@ -1,5 +1,9 @@
 .include "z2r.inc"
 
+.import GameRoutines, PlayerGfxHandler, DrawMetasprite, PlayerBankTable
+.import SwapToPRG0, SwapToSavedPRG
+.import ClearExtraRAMOnScreenTransition, ClearCollisionRAM, BankSwitchMarioCHR
+
 ;; Custom title screen for z2 mario
 ; Removes the sword sprite
 ; adds a pipe and mario animation
@@ -35,6 +39,10 @@ TitleIrqNametableLo = $6704
 
 
 TITLE_SPLIT_IRQ_LINE = 142
+
+; Spawn mario here for testing for now.
+TITLE_MARIO_X = $78
+TITLE_MARIO_Y = $30
 
 FREE "PRG5" [$A7C1, $A932)
 
@@ -94,13 +102,11 @@ SetTitleSplitIrq:
 .reloc
 TitleSplitIrqBody:
     pha
-        ; burn some cycles to hide the scroll split
-        pha
-        pla
-        pha
-        pla
-        pha
-        pla
+        ; burn some cycles to hide the scroll split - 29 cycles for 6 bytes
+        clc
+        lda #$2a
+        nop
+        bcc *-2
         lda TitleIrqPpuCtrl
         sta PpuCtrlShadow
         sta PPUCTRL
@@ -121,6 +127,24 @@ TitleSplitIrqBody:
 ; New palette for the stars
 .org $AF51
     .byte $10, $30, $21
+.org $AF59
+    .byte $16, $27, $18
+; The vanilla title screen uses Player_Y_Position ($29) to hold part of the scroll
+; so relocate all of those to use $3a instead.
+.org $AD09
+    .byte $3A
+.org $AD2B
+    .byte $3A
+.org $AD2F
+    .byte $3A
+.org $AD47
+    .byte $3A
+.org $AD53
+    .byte $3A
+.org $AD59
+    .byte $3A
+.org $ADE7
+    .byte $3A
 
 
 .reloc
@@ -132,13 +156,13 @@ RockOamTable:
     .byte $5F, $EE, $E8
     .byte $5F, $F0, $F0
     .byte $5F, $F0, $F8
-    .byte $6F, $EE, $D0
+    ; .byte $6F, $EE, $D0
     .byte $6F, $F0, $D8
     .byte $6F, $F4, $E0
     .byte $6F, $F2, $E8
     .byte $6F, $F6, $F0
     .byte $6F, $F0, $F8
-    .byte $7F, $F0, $D0
+    ; .byte $7F, $F0, $D0
     .byte $7F, $F2, $D8
     .byte $7F, $F4, $E0
     .byte $7F, $F0, $E8
@@ -214,7 +238,6 @@ InitTitleStars:
     cpx #NUM_STARS
     bne @WaterLoop
 
-    ; Shooting star: starting position copied from vanilla entry 27.
     lda #$07
     sta ShootingStarY
     lda #$28
@@ -222,7 +245,87 @@ InitTitleStars:
     lda #0
     sta ShootingStarActive
     sta TitleIrqActive
-    rts
+
+    ; clear z2 collision ram
+    ldy #$d0
+    lda #$11 ; value chosen to not match any "lava" or other weird tiles
+@loop:
+    sta $6000-1,y
+    sta $6000-1+$d0,y
+    sta $6000-1+$d0*2,y
+    sta $6000-1+$d0*3,y
+    dey
+    bne @loop
+
+    jmp SetupTitleMario
+
+.reloc
+SetupTitleMario:
+    ; wipes timers, size/state flags, boss ram, etc
+    jsr ClearExtraRAMOnScreenTransition
+    jsr ClearCollisionRAM
+
+    lda #8 ; PlayerCtrlRoutine index in the GameRoutines jump table
+    sta GameEngineSubroutine
+    lda #$28                    ;store value here
+    sta VerticalForceDown       ;for fractional movement downwards
+    ; Set our custom floor bytes
+    ldx #0
+    stx Player_State
+    stx PlayerSize        ; big mario
+    stx SwimmingFlag
+    stx CrouchingFlag
+    stx Player_X_Speed
+    stx Player_Y_Speed
+    stx Player_Y_MoveForce
+    stx LinkCollisionBits
+    inx
+    stx Player_Y_HighPos  ; page 1 == onscreen
+    stx PlayerFacingDir
+    stx Player_MovingDir
+    stx Player_PageLoc
+    stx ScreenLeft_X_Pos
+    stx ScreenLeft_PageLoc
+    inx
+    stx Player_SprAttrib
+
+    lda #TITLE_MARIO_X
+    sta Player_X_Position
+    lda #TITLE_MARIO_Y
+    sta Player_Y_Position
+
+    ldx #8
+@collisionLoop:
+        sta $63d7,x
+        sta $63e7+$d0,x
+        sta $64b0+$d0,x
+        dex
+        bpl @collisionLoop
+    ; setup pipe collision
+    sta $63c7+$d0
+    sta $63c8+$d0
+    sta $63d7+$d0
+    sta $63d8+$d0
+    sta $64e2 ; tiny baby rock on the left
+    ldx #16 * 6
+    @loop2:
+        ; do a left side rock as well.
+        sta $63c0+$d0,x
+        sta $63c1+$d0,x
+        ; and walls off the screen
+        sta $6377,x
+        sta $6457+$d0,x
+        txa
+        sec
+        sbc #16
+        tax
+        bpl @loop2
+
+
+    lda #CHR_BIGMARIO
+    sta PlayerChrBank
+    inc ReloadCHRBank
+    jmp BankSwitchMarioCHR
 
 .reloc
 UpdateTitleSprites:
@@ -259,11 +362,33 @@ DrawTitlePipe:
     ; TODO: the pipe itself.
     rts
 
+.segment "PRG7"
 .reloc
 DrawTitleMario:
-    ; TODO: mario's title screen sprite
-    rts
+    lda #5
+    sta CurrentPrgBank
+    jsr SwapToPRG0
+        .import DecrementMarioTimers, ProcessMarioInput
+        jsr DecrementMarioTimers
+        jsr GameRoutines
+        jsr PlayerGfxHandler
+        jsr ProcessMarioInput
 
+        ldy ObjectMetasprite
+        lda PlayerBankTable,y
+        cmp PlayerChrBank
+        beq @SameBank
+            sta PlayerChrBank
+            inc ReloadCHRBank
+            jsr BankSwitchMarioCHR
+        @SameBank:
+
+        ldx ObjectMetasprite
+        ldy #0
+        jsr DrawMetasprite
+    jmp SwapToSavedPRG
+
+.segment "PRG5"
 .reloc
 DrawTitleRocks:
     ldx CurrentOAMOffset

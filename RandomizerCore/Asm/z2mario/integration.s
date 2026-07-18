@@ -6,6 +6,7 @@
 .import Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
 .import SwapToSavedPRG, SwapToPRG0
 .export SlightlyModifiedCollisionRoutine
+.export BankSwitchMarioCHR, ClearExtraRAMOnScreenTransition, ClearCollisionRAM
 
 ; Remove unused code after we gutted link's movement
 FREE "PRG0" [$92BF, $962D)
@@ -1105,27 +1106,7 @@ PatchLinkMain:
 ;     lda $93b5,y
 ;     rts
 ; @notmoving:
-  ; decrement timers here cause lazy
-  ; Move the timers ahead by a frame as well
-  lda TimerControl          ;if master timer control not set, decrement
-  beq DecTimers             ;all frame and interval timers
-    dec TimerControl
-    bne NoDecTimers
-  DecTimers:
-    ldx #FRAME_TIMER_COUNT    ;load end offset for end of frame timers
-    dec IntervalTimerControl  ;decrement interval timer control,
-    bpl DecTimersLoop         ;if not expired, only frame timers will decrement
-    lda #$14
-    sta IntervalTimerControl  ;if control for interval timers expired,
-    ldx #ALL_TIMER_COUNT      ;interval timers will decrement along with frame timers
-  DecTimersLoop:
-      lda Timers,x              ;check current timer
-      beq SkipExpTimer          ;if current timer expired, branch to skip,
-        dec Timers,x              ;otherwise decrement the current timer
-    SkipExpTimer:
-      dex                       ;move onto next timer
-      bpl DecTimersLoop         ;do this until all timers are dealt with
-NoDecTimers:
+  jsr DecrementMarioTimers
 
   ; Now do a few checks to see what state mario is in.
   jsr $903A ; link main
@@ -1136,11 +1117,7 @@ NoDecTimers:
   jsr ProcStarPower
   jsr ProcTanookiStatue
 
-  lda SavedJoypadBits        ;save the real A and B buttons for next frame.
-  and #%11000000             ;A_B_Buttons is zeroed while statued, so using it here
-  sta PreviousA_B_Buttons    ;made B look freshly pressed when the statue ended
-  lda #$00
-  sta Left_Right_Buttons     ;nullify left and right buttons temp variable
+  jsr ProcessMarioInput
 
   ; Check scroll lock. If we are locked in, then prevent leaving the screen
   lda ScrollLock
@@ -1171,6 +1148,41 @@ NoDecTimers:
   ; jsr CheckSideviewTransition ; this is already run during collision detection
   jmp PlayerGfxHandler
   ; rts
+.reloc
+.export DecrementMarioTimers
+.proc DecrementMarioTimers
+  ; decrement timers here cause lazy
+  ; Move the timers ahead by a frame as well
+  lda TimerControl          ;if master timer control not set, decrement
+  beq DecTimers             ;all frame and interval timers
+    dec TimerControl
+    bne NoDecTimers
+  DecTimers:
+    ldx #FRAME_TIMER_COUNT    ;load end offset for end of frame timers
+    dec IntervalTimerControl  ;decrement interval timer control,
+    bpl DecTimersLoop         ;if not expired, only frame timers will decrement
+    lda #$14
+    sta IntervalTimerControl  ;if control for interval timers expired,
+    ldx #ALL_TIMER_COUNT      ;interval timers will decrement along with frame timers
+  DecTimersLoop:
+      lda Timers,x              ;check current timer
+      beq SkipExpTimer          ;if current timer expired, branch to skip,
+        dec Timers,x              ;otherwise decrement the current timer
+    SkipExpTimer:
+      dex                       ;move onto next timer
+      bpl DecTimersLoop         ;do this until all timers are dealt with
+NoDecTimers:
+  rts
+.endproc
+.export ProcessMarioInput
+.proc ProcessMarioInput
+  lda SavedJoypadBits        ;save the real A and B buttons for next frame.
+  and #%11000000             ;A_B_Buttons is zeroed while statued, so using it here
+  sta PreviousA_B_Buttons    ;made B look freshly pressed when the statue ended
+  lda #$00
+  sta Left_Right_Buttons     ;nullify left and right buttons temp variable
+  rts
+.endproc
 
 .reloc
 SetPlayerDownstabbingHitbox:
