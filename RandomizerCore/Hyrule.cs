@@ -2464,6 +2464,8 @@ public class Hyrule
             var title_graphics = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.mario_title.chr");
             rom.Put(ROM.ChrRomOffset + 0x1380, title_graphics[0..0x300]);
             rom.Put(ROM.ChrRomOffset + 0x1840, title_graphics[0x300..0x400]);
+            // The title graphics also include a pipe now, place that somewhere we can use it.
+            rom.Put(ROM.ChrRomOffset + 0x0ae0, title_graphics[0x400..0x500]);
             // I rewrote the star sparkle animation on the title screen to use different star sprites instead
             // I build them from copying the existing star sprite
             var starSpriteTile = rom.GetBytes(ROM.ChrRomOffset + 0x0e80, 0x20);
@@ -2480,38 +2482,6 @@ public class Hyrule
         {
             rom.Put(0x294, 0x60); //skips the whole routine
         }
-
-        if (props.EncounterRates == EncounterRate.HALF)
-        {
-            //terrain timers
-            rom.Put(0x250, 0x40); // grass
-            rom.Put(0x251, 0x30); // desert
-            rom.Put(0x252, 0x30); // forest
-            rom.Put(0x253, 0x40);
-            rom.Put(0x254, 0x12);
-            rom.Put(0x255, 0x06);
-
-            //initial overworld timer
-            rom.Put(0x88A, 0x10);
-
-            /*
-             * insert jump to a8aa at 2a3 (4c AA A8)
-             * 
-             * At a8aa
-             * Load $26 (A5 26)
-             * bne to end (2 bytes) (D0 0D)
-             * inc new step counter (where?) EE E0 06
-             * Load 1 to accumulator (A9 01)
-             * xor new step counter with 1 (2D E0 06)
-             * bne to end (D0 03)
-             * jump to encounter spawn 8298 (4C 98 82)
-             * jump to rts 829f (4C 93 82)
-             */
-            rom.Put(0x29f, new byte[] { 0x4C, 0xAA, 0xA8 });
-
-            rom.Put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
-        }
-
 
         if (props.ShuffleLifeRefill)
         {
@@ -3913,6 +3883,11 @@ bank5_Pointer_table_for_End_Credits:
                 var dripperHp = randomizedStats.Palace125EnemyHpTable[dripperId];
                 rom.SetDripperHp(engine, dripperHp);
             }
+        }
+
+        if (props.EncounterRates == EncounterRate.HALF)
+        {
+            rom.HalfEncounterRate(engine);
         }
 
         if (props.AttackEffectiveness == AttackEffectiveness.OHKO)

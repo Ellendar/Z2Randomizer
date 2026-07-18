@@ -2006,6 +2006,37 @@ SetDripperHp:
         a.Byt(splitHp);
     }
 
+    public void HalfEncounterRate(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.segment "PRG0"
+; Update terrain timers
+.org $8240
+    ; grass, desert, forset, ... etc
+    .byte $40, $30, $30, $40, $12, $06
+; Initial overworld timer
+.org $887a
+    .byte $10
+; Update some new whatever this is
+.org $828f
+    jmp PatchEncounterRate
+FREE_UNTIL $8293
+.reloc
+PatchEncounterRate:
+    lda $26
+    bne @end
+    inc HalfEncounterRateStepCounter
+    lda #1
+    eor HalfEncounterRateStepCounter
+    bne @end
+    jmp $8298
+@end:
+    jmp $8293
+""");
+    }
+
     public void FixItemPickup(Assembler asm)
     {
         // In Z2R, Link never holds items above his head. So,

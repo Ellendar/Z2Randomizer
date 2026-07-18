@@ -184,6 +184,9 @@ ApplySpellEffectButPreventBothFireAndJump:
 @apply:
   rts
 
+.org $8E8A
+  rts ; Disable the vanilla spell spell behavior that turns everything to bots
+
 .org $8fe3
   jmp *+3 ; Skip duplicate draw???
 .reloc

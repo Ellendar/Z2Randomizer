@@ -364,6 +364,7 @@ SavedDoorExit2X = $05d9
 SmallDropCount = $05df
 LargeDropCount = $05e0
 
+HalfEncounterRateStepCounter = $06e0
 Lives = $0700
 NumberofLives = $0700
 EntryFacing = $0701                      ; Sideview entry facing direction. 0=Facing right (enter from the left), 1=Facing left (enter from the right)

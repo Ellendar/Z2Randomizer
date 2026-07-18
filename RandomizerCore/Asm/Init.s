@@ -33,7 +33,7 @@
 
 ; FREE "PRG0" [$AA40, $c000)
 ;FREE "PRG0" [$A89E, $A980)
-FREE "PRG0" [$A89E, $A970) ; Reserve some space for z2ft
+; FREE "PRG0" [$A89E, $A970) ; Reserve some space for z2ft
 FREE "PRG0" [$AB00, $c000) ; give room for z2edit to patch $aa40
 
 FREE "PRG1" [$87c6, $88a0)
