@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
-using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -1615,7 +1615,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 properties.UsePalaceItemRoomCountIndicator = true;
                 break;
             default:
-                properties.PalaceItemRoomCounts = Enumerable.Repeat((int)palaceItemRoomCount, 6).ToArray();
+                properties.PalaceItemRoomCounts = Enumerable.Repeat((int)palaceItemRoomCount, 7).ToArray();
                 properties.UsePalaceItemRoomCountIndicator = false;
                 break;
         }
@@ -1642,6 +1642,8 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 }
             }
         }
+        //for ease of some calculations, add a count in for GP that is always 0
+        properties.PalaceItemRoomCounts[6] = 0;
     }
 
     /// Note: this value can be limited by other things, like the style being Vanilla

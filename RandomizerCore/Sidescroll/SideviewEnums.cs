@@ -177,6 +177,39 @@ public enum GreatPalaceObject
     PILLAR = 0xF0
 }
 
+public enum TownObject
+{
+    CLOSED_DOOR = 0x00,
+    OPEN_DOOR1 = 0x01,
+    OPEN_DOOR2 = 0x02,
+    OPEN_DOOR3 = 0x03,
+    STONEHENGE = 0x04, //???
+    CHAIR = 0x05,
+    LARGE_CLOUD = 0x06,
+    SMALL_CLOUD_07 = 0x07,
+    TABLE = 0x08,
+    BENCH = 0x09,
+    CROSS = 0x0A,
+    CHIMNEY_ENTRANCE = 0x0B,
+    CHIMNEY_NON_ENTRANCE = 0x0C,
+    CHURCH_CROSS = 0x0D,
+    SMALL_CLOUD_OE = 0x0E,
+    COLLECTABLE = 0x0F,
+    CROSS_HASH_ROOF = 0x20,
+    GREY_ROOF = 0x30,
+    GREEN_ROOF = 0x40,
+    BRICK_BUILDING = 0x50,
+    WHITE_BRICK_BUILDING = 0x60,
+    GRASS_COLOR_BUILDING = 0x70,
+    WHITE_WALL = 0x80,
+    LOG_BUILDING = 0x90,
+    SQUARE_WINDOW = 0xA0,
+    GRAY_WINDOW = 0xB0,
+    BROWN_WINDOWS = 0xC0,
+    UNDERGROUND_BRICKS = 0xD0,
+    PILLAR = 0xE0,
+}
+
 public static class ForestObjectExtensions
 {
     public static int Width(SideviewMapCommand<ForestObject> command)

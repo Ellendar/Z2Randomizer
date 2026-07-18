@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGenerator
 {
@@ -33,7 +33,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
 
         debug++;
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
-        Palace palace = new(palaceNumber);
+        Palace palace = new(palaceNumber, props.ShufflePalaceItems);
         openCoords = new();
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
         roomPool = new(rooms);

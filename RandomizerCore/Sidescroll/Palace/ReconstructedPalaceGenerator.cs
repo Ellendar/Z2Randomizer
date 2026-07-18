@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerator
 {
@@ -21,7 +21,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
         debug++;
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
-        Palace palace = new(palaceNumber);
+        Palace palace = new(palaceNumber, props.ShufflePalaceItems);
         do // while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
         {
             await Task.Yield();
@@ -37,7 +37,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
             //No longer a loop since the room pool can't (and would need to be) regenerated after each attempt.
             //Now we just fail and restart if we can't place enough rooms
-            palace = new(palaceNumber);
+            palace = new(palaceNumber, props.ShufflePalaceItems);
             palace.Entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
             {
                 IsRoot = true,

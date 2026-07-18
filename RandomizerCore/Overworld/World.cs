@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
+using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 //using System.Runtime.InteropServices.WindowsRuntime;
 
@@ -55,8 +56,6 @@ public abstract class World
     protected Random RNG;
 
     private const int MINIMUM_BRIDGE_LENGTH = 2;
-
-    public static readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new Requirements([RequirementType.FAIRY, RequirementType.KEY]);
 
     private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
     {
@@ -195,20 +194,6 @@ public abstract class World
         (l2.Xpos, l1.Xpos) = (l1.Xpos, l2.Xpos);
         (l2.Y, l1.Y) = (l1.Y, l2.Y);
         (l2.IsPassthrough, l1.IsPassthrough) = (l1.IsPassthrough, l2.IsPassthrough);
-
-        foreach (Location child in l1.Children)
-        {
-            child.Xpos = l1.Xpos;
-            child.Y = l1.Y;
-            child.IsPassthrough = l1.IsPassthrough;
-        }
-
-        foreach (Location child in l2.Children)
-        {
-            child.Xpos = l2.Xpos;
-            child.Y = l2.Y;
-            child.IsPassthrough = l2.IsPassthrough;
-        }
     }
 
     protected void RemoveLocations(ICollection<Location> locationsToRemove)
@@ -307,7 +292,7 @@ public abstract class World
                 //TODO: Doing this off terrain type is a very bad idea for stuff like vanilla shuffle no actual terrain.
                 if (location.TerrainType == Terrain.PALACE 
                     || location.TerrainType == Terrain.TOWN 
-                    || location.Collectables.Any(i => !i.IsInternalUse()))
+                    || location.GetAllCollectables().Any(i => !i.IsInternalUse()))
                 {
                     if (!location.Reachable)
                     {
@@ -440,8 +425,7 @@ public abstract class World
                     location.Y = y;
                     location.CanShuffle = false;
                 }
-                else if (location.TerrainType != Terrain.TOWN || 
-                    (location.ActualTown > 0 && (location?.ActualTown?.AppearsOnMap() ?? false)))
+                else
                 {
                     Terrain t;
                     do
@@ -459,15 +443,6 @@ public abstract class World
                     location.Xpos = x;
                     location.Y = y;
                     location.CanShuffle = false;
-                }
-            }
-
-            if(location!.TerrainType == Terrain.TOWN)
-            {
-                foreach (Location linkedLocation in AllLocations.Where(
-                    loc => !loc.AppearsOnMap && loc.ActualTown?.GetMasterTown() == location.ActualTown))
-                {
-                    linkedLocation.Pos = location.Pos;
                 }
             }
         }
@@ -758,9 +733,7 @@ public abstract class World
         //Any of the bridge locations that are being placed need to be reset so their vanilla locations aren't avoided.
         if(placeSaria)
         {
-            foreach (Location location in AllLocations.Where(i => i.ActualTown == Town.SARIA_NORTH 
-                || i.ActualTown == Town.SARIA_SOUTH 
-                || i.ActualTown == Town.SARIA_TABLE))
+            foreach (Location location in AllLocations.Where(i => i.Town?.Type == TownType.SARIA))
             {
                 location.Xpos = 0;
                 location.Y = 0;
@@ -1960,6 +1933,8 @@ public abstract class World
         }
     }
 
+    public abstract void ResetCollectables(RandomizerProperties props);
+
     protected bool DrawBridge(Direction direction)
     {
         return DrawBridge(RNG, map, bridge, walkableTerrains, direction);
@@ -2287,6 +2262,19 @@ public abstract class World
         }
     }
 
+    public void DebugVisitation()
+    {
+        StringBuilder sb = new();
+        for(int y = 0; y < MapRows; y++) 
+        { 
+            for(int x = 0; x < MapColumns; x++)
+            {
+                sb.Append(visitation[y, x] ? 'x' : ' ');
+            }
+            sb.AppendLine();
+        }
+        Debug.WriteLine(sb.ToString());
+    }
     public List<Location> GetContinentConnections()
     {
         return new List<Location>() { cave1!, cave2!, bridge!, raft! }.Where(i => i != null).ToList();
@@ -3183,42 +3171,23 @@ public abstract class World
         return true;
     }
 
-    /*
-    public bool PassthroughsIntersectRaftCoordinates(IEnumerable<(int, int)> raftCoordinates)
+    public abstract void UpdateVisit(List<RequirementType> requireables);
+
+    public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
+
+    //protected abstract void SetVanillaCollectables(bool useDash);
+
+    public abstract string GenerateSpoiler();
+
+    public bool HasCollidingLocations()
     {
-        foreach (Location location in AllLocations.Where(i => i.PassThrough != 0))
+        foreach(Location location in AllLocations)
         {
-            if (raftCoordinates.Any(i => location.Xpos == i.Item2 && location.YRaw == i.Item1))
+            if(AllLocations.Any(i => location != i && location.CoordsY30Offset == i.CoordsY30Offset))
             {
                 return true;
             }
         }
         return false;
     }
-    */
-
-    //Short term fix, right now linked locations aren't shuffled, and they are counted as reachable when
-    //their parent location is reachable, but the original location remains in the location list, creating
-    //a phantom reachability spot at the vanilla location.
-    //What _should_ happen is there should be a unified interface for updating locations that automicatically
-    //updates the coordinates, map, linked locations, etc. But that's more work than I want to do, so here's this lazy hack
-    public void SynchronizeLinkedLocations()
-    {
-        foreach (Location parent in AllLocations)
-        {
-            foreach (Location child in parent.Children)
-            {
-                child.Xpos = parent.Xpos;
-                child.Y = parent.Y;
-            }
-        }
-    }
-
-    public abstract void UpdateVisit(List<RequirementType> requireables);
-
-    public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
-
-    protected abstract void SetVanillaCollectables(bool useDash);
-
-    public abstract string GenerateSpoiler();
 }

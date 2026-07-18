@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 internal class ChaosPalaceGenerator : PalaceGenerator
 {
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -18,7 +18,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         debug++;
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         RoomPool roomPool = new(rooms);
-        Palace palace = new(palaceNumber);
+        Palace palace = new(palaceNumber, props.ShufflePalaceItems);
         var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
         palace.Entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
