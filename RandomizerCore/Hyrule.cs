@@ -2464,6 +2464,16 @@ public class Hyrule
             var title_graphics = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.mario_title.chr");
             rom.Put(ROM.ChrRomOffset + 0x1380, title_graphics[0..0x300]);
             rom.Put(ROM.ChrRomOffset + 0x1840, title_graphics[0x300..0x400]);
+            // I rewrote the star sparkle animation on the title screen to use different star sprites instead
+            // I build them from copying the existing star sprite
+            var starSpriteTile = rom.GetBytes(ROM.ChrRomOffset + 0x0e80, 0x20);
+            // Make a palette 1 and 2 version
+            var starSpriteTilePalette1 = starSpriteTile.ToArray();
+            var starSpriteTilePalette2 = starSpriteTile.ToArray();
+            starSpriteTilePalette1[3] = 0;
+            starSpriteTilePalette2[3+8] = 0;
+            rom.Put(ROM.ChrRomOffset + 0x0ea0, starSpriteTilePalette1);
+            rom.Put(ROM.ChrRomOffset + 0x0ec0, starSpriteTilePalette2);
         }
 
         if (props.EncounterRates == EncounterRate.NONE)
@@ -3826,7 +3836,7 @@ bank5_Pointer_table_for_End_Credits:
     private void MarioModeActivate(Assembler asm)
     {
         // "metasprite_engine.s" is included in metasprite.s
-        string[] modules = ["boss.s", "integration.s", "map.s", "mario.s", "metasprite.s", "sfx.s"];
+        string[] modules = ["boss.s", "integration.s", "map.s", "mario.s", "metasprite.s", "sfx.s", "CustomTitleScreen.s"];
         foreach (var mod in modules)
         {
             var a = asm.Module();

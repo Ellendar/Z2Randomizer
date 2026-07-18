@@ -474,6 +474,12 @@ SavedDoorExit2ScrollX = $69b2
 ; index. z2ft needs this, at this specific address.
 AreaEntranceIndex = $69ff
 
+; We need a horizontal IRQ for gameplay and a vertical IRQ for the title screen
+; so we manage to keep both by making a small `jmp Irq` in sram
+IRQTrampoline = $7ffd
+IRQTrampolineAddrLo = $7ffe
+IRQTrampolineAddrHi = $7fff
+
 ; All Timestamp types listed below for reference
 TS_COUNT .set 0
 .macro TimestampId name
