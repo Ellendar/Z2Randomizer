@@ -1191,6 +1191,7 @@ public sealed class EastHyrule : World
                 {
                     if (!WithinMapBounds(pos)) { continue; }
                     bool illegalTrapTileEntrance = false;
+                    if (GetLocationAt(pos) != null) { continue; }
                     foreach (var loc in LocationsOrthogonalTo(pos))
                     {
                         var posBehind = pos + 2 * (loc.Pos - pos);
