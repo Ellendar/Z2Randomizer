@@ -22,29 +22,6 @@ STAR_WARNING_FRAMES  = 32   ; palette cycle slows down below this
 ;-------------------------------------------------------------------------------------
 
 .proc GameRoutines
-;.ifdef DEMO_CODE
-  ; lda #1
-  ; sta $0785 ;candle
-  ; sta $078c ;key
-  ; sta $078b ;hammer
-  ; sta $0788 ;boots
-  ; sta $0787 ;raft
-  ; sta $077b ; shield spell
-  ; sta $077c ; jump spell
-  ; sta $077d ; life spell
-  ; sta $077e ; fairy spell
-  ; sta $077f ; fire spell
-  ; sta $0780 ; reflect spell
-  ; sta $0781 ; spell spell
-  ; sta $0782 ; thunder spell
-  ; lda #8
-  ; sta $0783 ; magic jar count
-  ; sta $0778 ; magic level
-
-;   lda #$ff
-;   sta $0773 ;infinite magic
-;   sta $0774 ;infinite health
-;.endif
 
 ; check for going down the chimney in darunia
     lda $070E ; chimney sinking state (0 == not sinking non zero == sink away)

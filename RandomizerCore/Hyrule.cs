@@ -2442,6 +2442,8 @@ public class Hyrule
             var title_graphics = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.mario_title.chr");
             rom.Put(ROM.ChrRomOffset + 0x1380, title_graphics[0..0x300]);
             rom.Put(ROM.ChrRomOffset + 0x1840, title_graphics[0x300..0x400]);
+            // The title graphics also include a pipe now, place that somewhere we can use it.
+            rom.Put(ROM.ChrRomOffset + 0x0ae0, title_graphics[0x400..0x500]);
             // I rewrote the star sparkle animation on the title screen to use different star sprites instead
             // I build them from copying the existing star sprite
             var starSpriteTile = rom.GetBytes(ROM.ChrRomOffset + 0x0e80, 0x20);
@@ -3888,6 +3890,11 @@ bank5_Pointer_table_for_End_Credits:
                 var dripperHp = randomizedStats.Palace125EnemyHpTable[dripperId];
                 rom.SetDripperHp(engine, dripperHp);
             }
+        }
+
+        if (props.EncounterRates == EncounterRate.HALF)
+        {
+            rom.HalfEncounterRate(engine);
         }
 
         if (props.AttackEffectiveness == AttackEffectiveness.OHKO)
