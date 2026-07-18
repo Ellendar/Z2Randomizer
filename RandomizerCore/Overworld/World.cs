@@ -2691,7 +2691,7 @@ public abstract class World
         }
 
         // expensive Location check last
-        foreach (var dir in IntVector2.CARDINALS)
+        foreach (var dir in IntVector2.CARDINALS.Append(new(0, 0)))
         {
             var adjacent = pos + dir;
             var l = GetLocationAt(adjacent);
