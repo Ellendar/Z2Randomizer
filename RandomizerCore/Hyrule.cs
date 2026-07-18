@@ -1188,11 +1188,13 @@ public class Hyrule
     // item chains
     private void PreventSpellItemChains()
     {
-        List<Town> chainTowns = [Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
-            Town.NABOORU, Town.DARUNIA_WEST];
+        //Temporarily disabled while I figure out this refactor
+        /*
+        List<TownType> chainTowns = [TownType.RUTO, TownType.SARIA, TownType.MIDO,
+            TownType.NABOORU, TownType.DARUNIA];
 
         bool IsChainLocation(Location l) =>
-            l.ActualTown != null && chainTowns.Contains((Town)l.ActualTown);
+            l.Town != null && chainTowns.Contains((Town)l.ActualTown);
 
         List<Location> chainLocations = itemLocs.Where(IsChainLocation).ToList();
         foreach (Location chainLocation in chainLocations)
@@ -1222,6 +1224,7 @@ public class Hyrule
                     (target.Collectables[targetIndex], chainLocation.Collectables[i]);
             }
         }
+        */
     }
 
     private void DoShuffle(List<Collectable> itemsToShuffle, List<Location> itemShuffleLocations)
