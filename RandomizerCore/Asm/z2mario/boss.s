@@ -103,6 +103,26 @@ BossLandedInCutscene:
   jmp $9a77
 FREE_UNTIL $9a0f
 
+; Patch the cutscene movement state and run it ourselves
+.org $9864
+  jsr BossCutsceneFall
+
+; Free the "cutscene" movement routine
+FREE "PRG5" [$9A0F, $9A77)
+; Free the sword collision code
+FREE "PRG5" [$9A85, $9B3A)
+
+.reloc
+BossCutsceneFall:
+  ; Launch dark mario using the X movement/speed already set
+  ldx #0
+  jsr $DEB8   ; Simple_Horizontal_Movement
+  lda #$3C
+  sta $00
+  lda #$04
+  sta $02
+  jmp $DECE   ; applyGravityMotion
+
 ; Make dark mario use a different hitbox (vanilla has a jank $0e hitbox, switch
 ; to a simple tall enemy hitbox with $00)
 .org $9540

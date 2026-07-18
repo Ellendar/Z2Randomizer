@@ -89,5 +89,7 @@
     <EmbeddedResource Include="Asm\z2mario\boss.s" />
     <None Remove="Asm\z2mario\mario_title.chr" />
     <EmbeddedResource Include="Asm\z2mario\mario_title.chr" />
+    <None Remove="Asm\z2mario\CustomTitleScreen.s" />
+    <EmbeddedResource Include="Asm\z2mario\CustomTitleScreen.s" />
   </ItemGroup>
 </Project>

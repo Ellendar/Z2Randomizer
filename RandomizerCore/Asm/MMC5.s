@@ -23,7 +23,7 @@ FREE "PRG7" [$FEDE, $FFDC)
 .org $fffa
     .word Nmi
 .org $fffe
-	.word IrqHdlr
+	.word IRQTrampoline
 
 bank7_code0 = $c000
 bank7_Remove_All_Sprites = $d24c
@@ -106,7 +106,6 @@ SetupScanlineIRQ:
 .proc IrqHdlr
 	pha
 	lda LineIrqStatusReg
-	
 	lda PpuCtrlForIrq
 	sta PPUCTRL
 	sta PpuCtrlShadow ; Not sure about this
@@ -119,6 +118,24 @@ SetupScanlineIRQ:
 	rti
 .endproc ; IrqHdlr
 
+; We have two different IRQ routines, one for the X only split, and one for the Y only split
+; when loading into a save file, setup the X only split for gameplay.
+.segment "PRG5"
+.org $b2b6
+    jsr LoadMainIRQRoutineHandler
+.reloc
+LoadMainIRQRoutineHandler:
+    sta $0772
+    ; write JMP IrqHdlr to RAM
+    lda #$4c
+    sta IRQTrampoline
+    lda #<IrqHdlr
+    sta IRQTrampolineAddrLo
+    lda #>IrqHdlr
+    sta IRQTrampolineAddrHi
+    rts
+
+.segment "PRG7"
 ; Summary of the bug
 ; On a lag frame NMI is skipped, which means the hud scroll value of 0 isn't set
 ; We can work around this by never disabling NMI and using a soft disable instead
@@ -612,6 +629,8 @@ ClearStackRAM:
 ;;;;; Fix sword flashing on title screen bug
 ; Switch the OAM position of an unused sprite and the glitchy sword tile
 ; and move that just off to the left. This sprite just doesn't seem to glitch?
+; We have an entire custom title screen in z2mario so just ignore this whole thing
+.ifndef ENABLE_Z2_MARIO
 
 .org $A7C1 + 22 * 4
     .byte $80,$E8,$20,$70
@@ -627,6 +646,8 @@ ClearStackRAM:
     lda $0267 + 4,x
     and #$23
     sta $0267 + 4,x
+
+.endif ; ENABLE_Z2_MARIO
 
 .segment "PRG7"
 ; Update the pointers to the bank switches
@@ -823,7 +844,6 @@ LoadAreaBGMetatile:
         bcc @Loop
     ; switch back to 0 just in case
     jmp SwapToPRG0
-
 
 ; Move sprites out of the last fixed bank
 ; Instead of using the blank tile sprites to cover the right 8px on the overworld, just use
