@@ -75,8 +75,6 @@ sealed class MazeIsland : World
         childDrop = GetLocation(LocationID.MI_CHILD_DROP);
         magicContainerDrop = GetLocation(LocationID.MI_MAGIC_CONTAINER_DROP);
         locationAtPalace4 = GetLocation(LocationID.MI_PALACE4);
-        locationAtPalace4.PalaceNumber = 4;
-        locationAtPalace4.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
 
         continentId = Continent.MAZE;
         baseAddr = RomMap.ContinentLocationBases[continentId];
@@ -111,7 +109,7 @@ sealed class MazeIsland : World
                 trapLocations.Remove(removeLoc);
             }
         }
-        SetVanillaCollectables(props.ReplaceFireWithDash);
+        //SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
@@ -236,7 +234,7 @@ sealed class MazeIsland : World
                         map[current + delta] = Terrain.ROAD;
                         current = next;
                         visited[current.Y, current.X] = true;
-                        }
+                    }
                     else if (stack.Count > 0)
                     {
                         if (cave1 != null && cave1.CanShuffle && GetLocationAt(current) == null)
@@ -592,6 +590,7 @@ sealed class MazeIsland : World
             }
         }
 
+        //DebugVisitation();
         foreach (Location location in AllLocations)
         {
             if (visitation[location.Y, location.Xpos])
@@ -630,22 +629,25 @@ sealed class MazeIsland : World
         return requiredLocations.Where(i => i != null);
     }
 
+    /*
     protected override void SetVanillaCollectables(bool useDash)
     {
         locationAtPalace4.VanillaCollectable = Collectable.BOOTS;
         childDrop.VanillaCollectable = Collectable.CHILD;
         magicContainerDrop.VanillaCollectable = Collectable.MAGIC_CONTAINER;
     }
+    */
 
     public override string GenerateSpoiler()
     {
         StringBuilder sb = new();
         sb.AppendLine("MAZE ISLAND: ");
-        sb.AppendLine("\tMagic Container Drop: " + magicContainerDrop.Collectables[0].EnglishText());
-        sb.AppendLine("\tChild Drop: " + childDrop.Collectables[0].EnglishText());
+        sb.AppendLine("\tMagic Container Drop: " + magicContainerDrop.GetAllCollectables()[0].EnglishText());
+        sb.AppendLine("\tChild Drop: " + childDrop.GetAllCollectables()[0].EnglishText());
 
-        sb.Append("\tPalace 4 (" + locationAtPalace4.PalaceNumber + "): ");
-        sb.AppendLine(locationAtPalace4.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace4.Collectables.Select(c => c.EnglishText())));
+        sb.Append("\tPalace 4 (" + locationAtPalace4.Palace!.Number + "): ");
+        List<Collectable> palaceCollectables = locationAtPalace4.GetAllCollectables();
+        sb.AppendLine(palaceCollectables.Count == 0 ? "No Items" : string.Join(", ", palaceCollectables.Select(c => c.EnglishText())));
 
         sb.AppendLine();
         return sb.ToString();
@@ -671,5 +673,16 @@ sealed class MazeIsland : World
         }
         magicContainerDrop.IsPassthrough = false;
         childDrop.IsPassthrough = false;
+    }
+
+    public override void ResetCollectables(RandomizerProperties props)
+    {
+        childDrop.SetCollectables([Collectable.CHILD]);
+        childDrop.CollectablesAreShufflable = props.ShuffleOverworldItems;
+        magicContainerDrop.SetCollectables([Collectable.MAGIC_CONTAINER]);
+        magicContainerDrop.CollectablesAreShufflable = props.ShuffleOverworldItems;
+
+        locationAtPalace4.SetCollectables(locationAtPalace4.Palace!
+            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace4.Palace!.Number - 1]));
     }
 }

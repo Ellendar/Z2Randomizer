@@ -140,4 +140,5 @@ class RomMap
     public const int PALACE_PALETTE_TABLE_ENTRANCES = 0x10480;
     public const int PALACE_PALETTE_TABLE_PER_PALACE = 0x13f10;
     public const int GP_PALETTE_TABLE_MAJOR = 0x1401e;
+
 }

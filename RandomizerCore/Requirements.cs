@@ -6,12 +6,15 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace Z2Randomizer.RandomizerCore;
 
 public class Requirements
 {
     public static readonly Requirements NONE = new();
+    public static readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new([RequirementType.FAIRY, RequirementType.KEY]);
+
 
     private static readonly Dictionary<RequirementType, RequirementType[]> ImplicitRequirements = new()
     {

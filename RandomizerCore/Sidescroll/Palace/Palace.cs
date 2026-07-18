@@ -1,24 +1,25 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
+using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 using static Z2Randomizer.RandomizerCore.Util;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
-public partial class Palace
+public partial class Palace(int number, bool palaceItemsAreShufflable)
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private const double DROPS_CAN_LEAD_TO_BOSS_CHANCE = 0.4;
 
     //private const bool DROPS_ARE_BLOCKERS = false;
     private const byte OUTSIDE_ROOM_EXIT = 0b11111100;
-    private readonly SortedDictionary<int, List<Room>> rooms;
+    private readonly SortedDictionary<int, List<Room>> rooms = [];
     internal bool IsValid { get; set; } = false;
 
     public static readonly ReadOnlyCollection<Collectable> SHUFFLABLE_SMALL_ITEMS = [
@@ -32,34 +33,19 @@ public partial class Palace
         Collectable.ONEUP
     ];
 
-    public List<Room> AllRooms { get; private set; }
+    public List<Room> AllRooms { get; private set; } = [];
 
-    public Room? Entrance { get; set; }
-    public List<Room> ItemRooms { get; set; }
+    public Room? Entrance { get; set; } = null;
+    public List<Room> ItemRooms { get; set; } = [];
+    public bool PalaceItemsAreShufflable { get; set; } = palaceItemsAreShufflable;
     public Room? BossRoom { get; set; }
-    public int Number { get; set; }
+    public int Number { get; set; } = number;
     internal Room? TbirdRoom { get; set; }
 
     //DEBUG
     public int Generations { get; set; }
     
     public PalaceGrouping PalaceGroup => Util.AsPalaceGrouping(Number) ?? throw new Exception("Palace number out of range");
-
-    public Palace(int number)
-    {
-        Number = number;
-        Entrance = null;
-        rooms = [];
-        AllRooms = [];
-        ItemRooms = [];
-    }
-
-    /*
-    public void UpdateRomItem(Collectable collectable, ROM ROMData)
-    {
-        ItemRoom?.UpdateRomItem(collectable, ROMData);
-    }
-    */
 
     public bool RequiresThunderbird()
     {
@@ -961,40 +947,6 @@ public partial class Palace
             }
         }
     }
-
-    /*
-    public List<Room> CheckBlocks()
-    {
-        return CheckBlocksHelper([], [], Entrance!);
-    }
-
-    private List<Room> CheckBlocksHelper(List<Room> c, List<Room> blockers, Room r)
-    {
-        if (c.Contains(ItemRoom!))
-        {
-            return c;
-        }
-        c.Add(r);
-        if (r.Up != null && !c.Contains(r.Up))
-        {
-            CheckBlocksHelper(c, blockers, r.Up);
-        }
-        if (r.Down != null && !c.Contains(r.Down))
-        {
-            CheckBlocksHelper(c, blockers, r.Down);
-        }
-        if (r.Left != null && !c.Contains(r.Left))
-        {
-            CheckBlocksHelper(c, blockers, r.Left);
-        }
-        if (r.Right != null && !c.Contains(r.Right))
-        {
-            CheckBlocksHelper(c, blockers, r.Right);
-        }
-        return c;
-    }
-    */
-
     public void ResetRooms()
     {
         foreach (Room r in AllRooms)
@@ -1175,8 +1127,13 @@ public partial class Palace
         return false;
     }
 
-    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> initialRequireables)
+    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> initialRequireables, bool shufflableItemsOnly)
     {
+
+        if(shufflableItemsOnly && !PalaceItemsAreShufflable)
+        {
+            return [];
+        }
         HashSet<RequirementType> requireables = new(initialRequireables);
         List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
         List<Room> coveredRooms = [];
@@ -1189,6 +1146,11 @@ public partial class Palace
             while (pendingRooms.Count > 0)
             {
                 Room room = pendingRooms.First();
+                if (coveredRooms.Contains(room))
+                {
+                    pendingRooms.Remove(room);
+                    continue;
+                }
                 if (ItemRooms.Contains(room))
                 {
                     if (room.Collectable == null)
@@ -1196,19 +1158,11 @@ public partial class Palace
                         throw new Exception("Unable to assess gettability of item room with no item");
                     }
                     Collectable roomCollectable = room.Collectable ?? Collectable.DO_NOT_USE;
-                    if(!gettableItems.Contains(roomCollectable))
+                    gettableItems.Add(roomCollectable);
+                    if (roomCollectable.AsRequirement() != null)
                     {
-                        gettableItems.Add(roomCollectable);
-                        if (roomCollectable.AsRequirement() != null)
-                        {
-                            requireables.Add(roomCollectable.AsRequirement() ?? RequirementType.JUMP);
-                        }
+                        requireables.Add(roomCollectable.AsRequirement() ?? RequirementType.JUMP);
                     }
-                }
-                if (coveredRooms.Contains(room))
-                {
-                    pendingRooms.Remove(room);
-                    continue;
                 }
                 coveredRooms.Add(room);
                 pendingRooms.Remove(room);
@@ -1232,6 +1186,28 @@ public partial class Palace
         } while (gettableItems.Count != previousGettableItems.Count);
 
         return gettableItems;
+    }
+
+    public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false)
+    {
+        //Shufflable marking NYI for palaces (and probably not needed) so it's NOP for now
+        Debug.Assert(collectables.Count() == ItemRooms.Count);
+        int i = 0;
+        foreach (Collectable collectable in collectables)
+        {
+            ItemRooms[i++].Collectable = collectable;
+        }
+    }
+
+    public bool ReplaceCollectable(Collectable toReplace, Collectable replacement)
+    {
+        Room? room = ItemRooms.FirstOrDefault(i => i.Collectable == toReplace);
+        if (room == null)
+        {
+            return false;
+        }
+        room.Collectable = replacement;
+        return true;
     }
 
     [Conditional("DEBUG")]
@@ -1397,22 +1373,31 @@ public partial class Palace
         AllRooms.Add(newRoom);
     }
 
-
-    public static Collectable GetVanillaCollectable(int? palaceNum)
+    public List<Collectable> GetVanillaCollectables(int itemCount)
     {
-        Collectable[] vanillaCollectables = [
-            Collectable.CANDLE,
-            Collectable.GLOVE,
-            Collectable.RAFT,
-            Collectable.BOOTS,
-            Collectable.FLUTE,
-            Collectable.CROSS
+        if(itemCount == 0)
+        {
+            return [];
+        }
+        List<Collectable>[] vanillaCollectables = [
+            [Collectable.CANDLE],
+            [Collectable.GLOVE],
+            [Collectable.RAFT],
+            [Collectable.BOOTS],
+            [Collectable.FLUTE],
+            [Collectable.CROSS],
+            []
         ];
-        if (palaceNum == null || (int)palaceNum > 6 || (int)palaceNum < 1)
+        if (Number > 7 || Number < 1)
         {
             throw new Exception("Invalid palace number");
         }
-        return vanillaCollectables[(int)palaceNum - 1];
+        List<Collectable> collectables = vanillaCollectables[Number - 1];
+        for(int i = 1; i < itemCount; i++)
+        {
+            collectables.Add(Collectable.LARGE_BAG);
+        }
+        return collectables;
     }
 
     public RoomExitType GetCoordinateRoomShape(int x, int y)

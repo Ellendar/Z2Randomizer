@@ -135,7 +135,7 @@ public class RandomizerProperties
     public bool HardBosses { get; set; }
     public bool AggressiveTbird { get; set; }
     [NotMapped]
-    public int[] PalaceItemRoomCounts { get; set; } = new int[6];
+    public int[] PalaceItemRoomCounts { get; set; } = new int[7];
     public bool UsePalaceItemRoomCountIndicator { get; set; }
     public bool RevealWalkthroughWalls { get; set; }
 
@@ -247,7 +247,7 @@ public class RandomizerProperties
     [Key]
     public int Id { get; set; }
 
-    public bool StartsWithCollectable(Collectable collectable)
+    public bool StartsWithCollectable(Collectable? collectable)
     {
         return collectable switch
         {

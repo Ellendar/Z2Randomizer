@@ -3,6 +3,9 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
+using Z2Randomizer.RandomizerCore.Sidescroll.Town;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+using DynamicData;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -13,13 +16,14 @@ public class Location
 
     public LocationID ID { get; set; }
 
-    public List<Collectable> Collectables { get; set; }
-    public Collectable VanillaCollectable { get; set; }
+    private List<Collectable> NonPalaceTownCollectables { get; set; }
+    public bool CollectablesAreShufflable { get; set; }
     public bool AppearsOnMap { get; set; }
     public bool Reachable { get; set; }
-    public int? PalaceNumber { get; set; }
 
-    public Town? ActualTown { get; set; }
+    public Town? Town { get; set; }
+    public Palace? Palace { get; set; }
+    //public TownEnum? ActualTown { get; set; }
     public Continent Continent { get; set; }
     public Continent? VanillaContinent { get; set; }
     public Continent? ConnectedContinent { get; set; }
@@ -27,7 +31,6 @@ public class Location
     public Terrain TerrainType { get; set; }
 
     //public byte[] LocationBytes { get; set; }
-    public List<Location> Children { get; set; } = [];
 
     public int MemAddress { get; set; }
 
@@ -81,11 +84,6 @@ public class Location
     //List of requirements to access this location. Required before the other requirements are evaluated,
     //and to pass through the location on the map, even if the collectable is not gettable.
     public Requirements AccessRequirements;
-    //Requirements to get the thing(s) here. For palaces, this does not (yet) consider the layout of the palace or the rooms in it
-    //only the general "need fairy or key" requirements for palaces generally
-    public Requirements CollectableRequirements;
-    //If this location is a connector, these are the requirements for the other side of the connection to be reached
-    public Requirements ConnectionRequirements;
 
     //This does 2 things and should only do 1. It both tracks whether the location is a location that should be possible to shuffle,
     //and tracks whether this location has actually been shuffled already. This persistence doesn't always get reset properly,
@@ -151,20 +149,21 @@ public class Location
         MemAddress = lid.GetRomOffset();
         EntranceNumber = 0;
         CanShuffle = true;
-        Collectables = [];
+        NonPalaceTownCollectables = [];
         Reachable = false;
-        PalaceNumber = null;
+        Palace = null;
         Continent = continent;
         VanillaContinent = lid.GetContinent();
         ConnectedContinent = null;
         AccessRequirements = Requirements.NONE;
-        CollectableRequirements = Requirements.NONE;
-        ConnectionRequirements = Requirements.NONE;
         IsPassthrough = isPassthrough;
         WasPassthrough = isPassthrough;
 
         Name = ID.GetName() ?? "Unknown (" + Continent.GetName(Continent) + ")";
-        ActualTown = ID.GetTown();
+        if (Town != null)
+        {
+            Town.Type = ID.GetTown();
+        }
 
         if (Name.StartsWith("Unknown") && Xpos != 0 && YRaw != 0)
         {
@@ -212,7 +211,7 @@ public class Location
             + " " + Name
             + " (" + (Y) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
-            + '[' + string.Join(", ", Collectables.Select(i => i.ToString())) + ']';
+            + '[' + string.Join(", ", GetAllCollectables().Select(i => i.ToString())) + ']';
     }
 
     public void ResetCoords()
@@ -223,7 +222,7 @@ public class Location
     public int GetWorld()
     {
         //Towns reference their banks
-        if (ActualTown != null)
+        if (Town?.Type != null)
         {
             return Continent == Continent.WEST ? 4 : 10;
         }
@@ -246,12 +245,10 @@ public class Location
         }
         //Palaces... have world numbers that kind... of... make sense?
         //This is what they are.
-        if (PalaceNumber != null)
+        if (Palace != null)
         {
-            return PalaceNumber switch
+            return Palace.Number switch
             {
-                //North palace
-                null => 0,
                 1 => 0b00001100 + (int)Continent, //12,
                 2 => 0b00001100 + (int)Continent, //12,
                 3 => 0b00010000 + (int)Continent, //16,
@@ -276,5 +273,92 @@ public class Location
         Xpos = 0;
         EntranceNumber = 0;
         CanShuffle = false;
+    }
+
+    public List<Collectable> GetAllCollectables()
+    {
+        return GetGettableItems(RequirementTypeExtensions.ALL);
+    }
+
+    public List<Collectable> GetShufflableCollectables()
+    {
+        return GetGettableItems(RequirementTypeExtensions.ALL, ForceEnterRight ? Direction.EAST : Direction.WEST, true);
+    }
+
+    public List<Collectable> GetGettableItems(List<RequirementType> requireables)
+    {
+        return GetGettableItems(requireables, ForceEnterRight ? Direction.EAST : Direction.WEST);
+    }
+
+    public List<Collectable> GetGettableItems(List<RequirementType> requireables, Direction entranceDirection, bool shufflableItemsOnly = false)
+    {
+        if (Town != null)
+        {
+            return Town.GetGettableItems(entranceDirection, requireables, shufflableItemsOnly);
+        }
+        if (Palace != null)
+        {
+            return Palace.GetGettableItems(requireables, shufflableItemsOnly);
+        }
+        if(shufflableItemsOnly && !CollectablesAreShufflable)
+        {
+            return [];
+        }
+        return AccessRequirements.AreSatisfiedBy(requireables) ? NonPalaceTownCollectables : [];
+    }
+
+    public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false) 
+    {
+        Debug.Assert(Town == null || Palace == null);
+        if (Town != null)
+        {
+            Town.SetCollectables(collectables, shufflableOnly);
+        }
+        else if (Palace != null)
+        {
+            Palace.SetCollectables(collectables, shufflableOnly);
+        }
+        else if (!shufflableOnly || CollectablesAreShufflable)
+        {
+            NonPalaceTownCollectables = [.. collectables];
+        }
+    }
+
+    /// <summary>
+    /// Replaces the first instance of a given collectable at a location with the indicated collectable.
+    /// Intended to be used to replace unique items, and "first" is currently undefined in order so be careful (or fix this)
+    /// </summary>
+    /// <param name="toReplace"></param>
+    /// <param name="replacement"></param>
+    public bool ReplaceCollectable(Collectable toReplace, Collectable replacement)
+    {
+        Debug.Assert(Town == null || Palace == null);
+        if (Town != null)
+        {
+            return Town.ReplaceCollectable(toReplace, replacement);
+        }
+        else if (Palace != null)
+        {
+            return Palace.ReplaceCollectable(toReplace, replacement);
+        }
+        else if (NonPalaceTownCollectables.Contains(toReplace))
+        {
+            NonPalaceTownCollectables.Replace(toReplace, replacement);
+            return true;
+        }
+        return false;
+    }
+
+    public int GetCollectableCount(bool shufflableOnly = false)
+    {
+        if (Town != null)
+        {
+            return Town.TownMaps.Count(i => i.Collectable != null && (!shufflableOnly || i.CollectableIsShufflable));
+        }
+        else if (Palace != null)
+        {
+            return Palace.ItemRooms.Count;
+        }
+        return (CollectablesAreShufflable || !shufflableOnly) ? NonPalaceTownCollectables.Count : 0;
     }
 }

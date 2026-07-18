@@ -1,51 +1,21 @@
-﻿using System;
+﻿using js65;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using js65;
-using NLog;
+using System.Xml.Linq;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore;
 
-/*
-Classes Needed:
-
-* Location - Represents entry from overworld
-    * Terrain type
-    * Requires Jump
-    * Requires Fairy
-    * Requires Hammer
-    * X Position
-    * Y Position
-    * Exit Location?
-    * Contains Item
-    * Enter from right
-    * Map Number
-
-* World - Represent a single map
-    * Location Tree
-        * Root of tree is starting position, children are areas directly accessible from position
-    * Lists of locations broken down by terrain
-    * Entry / Exit Points
-
-* Hyrule
-    * Does the randomization
-    * Checks for Sanity
-    * Contains links to all World objects
-
-* Room - Palace only?
-
-* Palace
-    * Pallette
-    * Enemies?
-    * Rooms
-*/
 public class ROM
 {
     public const int RomHdrSize = 0x10;
@@ -155,6 +125,8 @@ public class ROM
     public static readonly int[] ZeldaOutlinePaletteAddr = { 0x4025, 0x8025, 0x14049, 0x140c7 };
     public static readonly int[] ZeldaFacePaletteAddr =    { 0x4023, 0x8023, 0x14047, 0x140c9 };
     public static readonly int[] ZeldaDressPaletteAddr =   { 0x4024, 0x8024, 0x14048, 0x140c8 };
+
+    public static readonly byte[] DOOR_CONNECTION_BLACKLIST = [0x00, 0xFC, 0xFD, 0xFE, 0xFF];
 
     public byte[] rawdata { get; }
 
@@ -571,29 +543,6 @@ TitleEnd:
 
     public void UpdateSprite(CharacterSprite charSprite, bool sanitize, bool changeItems)
     {
-        /*
-         * Dear future digshake,
-         * 
-         * This method is garbage.
-         * 
-         * The first entry in sprite info contains non-sprite data.
-         * My lazy ass just skips it.
-         * 
-         * If you update the sprite structures in Graphics.cs, you could refactor this:
-         * 
-         * Make lists of all the ROM locations for sprites
-         * Iterate through each sprite array, putting the data at the ROM locations
-         * 
-         * -Past digshake (who is still too lazy to fix this method)
-         */
-        /*
-         * Dear future Ellendar,
-         * This method is still garbage, but better.
-         * Eventually we need to create a data structure that represents the individual properies of things like sprites
-         * that we can save in external files so they can be imported from a simple format people can use to customize all
-         * the cosmetics.
-         */
-
         if (charSprite.Patch != null) {
             if (sanitize)
             {
@@ -2406,6 +2355,62 @@ ElevatorBossFix:
         };
     }
 
+    public Town LoadTown(int startMapNum, int numMaps)
+    {
+        List<TownMap> townMaps = [];
+        Dictionary<int, byte[]> connections = [];
+        Dictionary<int, byte[]> doorConnections = [];
+        for (int currentMapNum = startMapNum; currentMapNum - startMapNum < numMaps; currentMapNum++)
+        {
+            townMaps.Add(LoadTownMap(currentMapNum, false));
+
+            var roomDoorConnectionsRomAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x8817 + currentMapNum * 4);
+            var roomDoorConnections = GetBytes(roomDoorConnectionsRomAddr, 4);
+
+            for(int connectionNumber = 0; connectionNumber < 4; connectionNumber++)
+            {
+                byte internalMapNumber = (byte)((roomDoorConnections[connectionNumber] & 0xFC) >> 2);
+                if(!DOOR_CONNECTION_BLACKLIST.Contains(internalMapNumber) && !townMaps.Any(i => i.Map == internalMapNumber))
+                {
+                    townMaps.Add(LoadTownMap(internalMapNumber, true));
+                }
+            }
+        }
+
+        foreach(TownMap townMap in townMaps)
+        {
+
+            var romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x871B + townMap.Map * 4);
+            var connectionsRaw = GetBytes(romAddr, 4);
+            connections.Add(townMap.Map, connectionsRaw);
+            romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x8817 + townMap.Map * 4);
+            var doorConnectionsRaw = GetBytes(romAddr, 4);
+            doorConnections.Add(townMap.Map, doorConnectionsRaw);
+        }
+
+
+        return new Town(townMaps, connections, doorConnections);
+    }
+
+    public TownMap LoadTownMap(int currentMapNum, bool isInternalMap)
+    {
+        var romPtr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x8523 + 2 * currentMapNum);
+        var nesAddr = GetShort(romPtr + 1, romPtr);
+        var romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, nesAddr);
+        var length = GetByte(romAddr);
+        var sideviewRaw = GetBytes(romAddr, length);
+
+        romPtr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x85a1 + 2 * currentMapNum);
+        //Enemy pointer points to the ram location base enemy data is copied from
+        //18A0 is the offset to reach the base enemy data
+        nesAddr = GetShort(romPtr + 1, romPtr) + 0x18A0;
+        romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, nesAddr);
+        length = GetByte(romAddr);
+        byte[] enemiesRaw = GetBytes(romAddr, length);
+
+        return new TownMap(currentMapNum, sideviewRaw, enemiesRaw, isInternalMap);
+    }
+
     public void RemoveUnusedConnectors(World world)
     {
         if (world.raft == null)
@@ -2430,8 +2435,7 @@ ElevatorBossFix:
     }
 
     //This was refactored out of EastHyrule. The signature/timing/structure needs work.
-    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, 
-        Location townAtNewKasuto, Location spellTower, bool vanillaShuffleUsesActualTerrain)
+    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, bool vanillaShuffleUsesActualTerrain)
     {
         if (!biome.UsesVanillaMap())
         {
@@ -2445,10 +2449,6 @@ ElevatorBossFix:
         Put(0x1ccc0, (byte)pos);
         int connection = hiddenPalaceLocation.MemAddress - 0x862F;
         Put(0x1df76, (byte)connection);
-        if (hiddenPalaceLocation == spellTower)
-        {
-            throw new Exception("Child locations shouldn't be able to be hidden spots");
-        }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
             Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
@@ -2557,7 +2557,7 @@ ElevatorBossFix:
 
     }
 
-    public void UpdateKasuto(Location hiddenKasutoLocation, Location townAtNewKasuto, Location spellTower, Biome biome,
+    public void UpdateKasuto(Location hiddenKasutoLocation, Biome biome,
         int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
     {
         Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + (hiddenKasutoLocation.IsExternalWorld ? 0x80 : 0)));
@@ -2567,10 +2567,6 @@ ElevatorBossFix:
         Put(0x1ccdb, (byte)hiddenKasutoLocation.YRaw);
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         Put(0x1df77, (byte)connection);
-        if (hiddenKasutoLocation == spellTower)
-        {
-            throw new Exception("Child locations shouldn't be able to be hidden spots");
-        }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
             //Terrain t = terrains[hiddenKasutoLocation.MemAddress];
