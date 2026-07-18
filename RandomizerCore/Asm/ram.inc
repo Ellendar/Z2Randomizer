@@ -646,6 +646,11 @@ RESV TailWagCount
 RESV StatueTimer
 ; duration for specifically the poof effect timer
 RESV StatueChangeTimer
+; Mario-only scroll freeze for shrinking/growing and tanooki statue.
+; Originally I used the Z2 scroll freeze, but that meant that turning into a
+; statue could cause a boss to start attacking since bosses start once the
+; screen is locked lol
+RESV MarioScrollFreeze
 ; We need to surpress enemy knockback when they are hit by a hammer
 ; but the place we process the knockback is way later, so this stores "hits"
 ; on a per-enemy basis so that we can avoid knockback.
