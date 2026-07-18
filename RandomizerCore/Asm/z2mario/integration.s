@@ -396,7 +396,7 @@ GetStatuePoofFrame:
   beq @noPoof
     dec StatueChangeTimer
     bne @noPoof
-      dec ScrollLock          ; balances the inc in StartStatueChange
+      dec MarioScrollFreeze   ; balances the inc in StartStatueChange
 @noPoof:
 
   lda StatueTimer
@@ -459,11 +459,12 @@ GetStatuePoofFrame:
 .reloc
 ; SMB3 plays the poof sfx on both edges of the statue change.
 StartStatueChange:
-  ; prevent the screen from scroll away because we suddenly stopped moving
-  ; and lock mario in place during the POOF
+  ; prevent the screen from scrolling away because we suddenly stopped moving.
+  ; Use the mario-only freeze so we don't clamp mario into the arena bounds or
+  ; wake up a boss that is on-screen but not yet activated.
   lda StatueChangeTimer
   bne @alreadyLocked
-    inc ScrollLock
+    inc MarioScrollFreeze
 @alreadyLocked:
   lda #STATUE_CHANGE_DURATION
   sta StatueChangeTimer
@@ -1008,8 +1009,8 @@ CheckIfTurningSmall:
         sta GameEngineSubroutine
 ;        lda #8
 ;        sta InjuryTimer
-        ; we will unlock the scroll lock after the size change animation finishes
-        inc ScrollLock
+        ; we will unlock the scroll freeze after the size change animation finishes
+        inc MarioScrollFreeze
         lda #1
         sta Player_State
   ;      sta PlayerChangeSizeFlag
@@ -1063,9 +1064,9 @@ CheckIfWeAreBig:
           ; Set player routine to ChangeSize
           lda #$0a
           sta GameEngineSubroutine
-          ; we will unlock the scroll lock after the size change animation finishes
+          ; we will unlock the scroll freeze after the size change animation finishes
 ;          lda #1
-          inc ScrollLock
+          inc MarioScrollFreeze
           lda #0
           sta ScrollAmount
           sta Player_State

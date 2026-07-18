@@ -585,17 +585,17 @@ PlayerChangeSize:
 EndChgSize:
   cmp #$c4            ;check again for another specific moment
   bne ExitChgSize     ;and branch to leave if before or after that point
-  ; Z2Mario - clear scroll lock after you change size
+  ; Z2Mario - clear the mario scroll freeze after you change size
 ;  lda #0
-  dec ScrollLock
+  dec MarioScrollFreeze
   jmp DonePlayerTask  ;otherwise do sub to init timer control and set routine
 ExitChgSize:
   rts ; TODO check this RTS can be removed                 ;and then leave
 
 FinishedInjuryBlink:
-  ; Z2Mario - clear scroll lock after you change size
+  ; Z2Mario - clear the mario scroll freeze after you change size
 ;  lda #0
-  dec ScrollLock
+  dec MarioScrollFreeze
   ; and also reset the injurytimer to extend your invincibility
   lda #$20
   sta InjuryTimer
@@ -1156,7 +1156,8 @@ ScrollHandler:
   ; clc
   ; adc Platform_X_Scroll     ;add value used by left/right platforms
   ; sta Player_X_Scroll       ;save as new value here to impose force on scroll
-  lda ScrollLock            ;check scroll lock flag
+  lda ScrollLock            ;check boss-arena scroll lock flag
+  ora MarioScrollFreeze     ;...or the mario shrink/grow/tanooki freeze
   bne InitScrlAmt           ;skip a bunch of code here if set
   lda Player_Pos_ForScroll
   cmp #$50                  ;check player's horizontal screen position
