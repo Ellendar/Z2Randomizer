@@ -2537,22 +2537,25 @@ GetProperObjOffset:
     lda SavedJoypadBits
     and #B_Button | Up_Dir     ;check for up + b button pressed
     cmp #B_Button | Up_Dir
-    bne UpdateHammers          ;branch if not pressed
+    bne @UpdateHammersLocal          ;branch if not pressed
     and #B_Button              ;check if b button just pressed
     and PreviousA_B_Buttons
-    bne UpdateHammers          ;if button pressed in previous frame, branch
+    bne @UpdateHammersLocal          ;if button pressed in previous frame, branch
       ldy Player_Y_HighPos       ;if player too high or too low, branch
       dey
-      bne UpdateHammers
+      bne @UpdateHammersLocal
 
       ldx #0
       ; Check to see if we have an open fireball spot to put the hammer in
       lda Fireball_State,x       ;load fireball state
-      beq SpawnHammer          ;if not inactive, branch
+      beq @SpawnHammer          ;if not inactive, branch
       inx
       lda Fireball_State,x       ;load fireball state
-      bne UpdateHammers          ;if not inactive, branch
-SpawnHammer:
+      beq @SpawnHammer
+        ;if not inactive, branch
+@UpdateHammersLocal:
+        jmp UpdateHammers
+@SpawnHammer:
 ; stat tracking consider a hammer a HiStab
         inc StatHiStabCount+0
         bne @Skip
@@ -2578,6 +2581,18 @@ SpawnHammer:
         lda Player_PageLoc           ;get player's page location
         adc #0
         sta Fireball_PageLoc,x
+        ; adjust offset for small mario
+        lda PlayerSize
+        beq @big
+          lda Player_Y_Position        ;get player's vertical position and store
+          clc
+          adc #$08
+          sta Fireball_Y_Position,x
+          lda #$01                     ;set high byte of vertical position
+          adc #0
+          sta Fireball_Y_HighPos,x
+          jmp @next
+      @big:
         lda Player_Y_Position        ;get player's vertical position and store
         sec
         sbc #$08
@@ -2585,6 +2600,7 @@ SpawnHammer:
         lda #$01                     ;set high byte of vertical position
         sbc #0
         sta Fireball_Y_HighPos,x
+      @next:
         tya ; Z2 needs a value set for the knockback value in $6d
         sta Fireball_MovingDir,x
         dey                          ;decrement to use as offset here
