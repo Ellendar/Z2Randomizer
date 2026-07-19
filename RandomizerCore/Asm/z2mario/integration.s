@@ -18,7 +18,7 @@ STATUE_DURATION      = $C0
 STATUE_CHANGE_DURATION = $17
 STATUE_BOUNCE_FORCE  = $60
 STATUE_FALL_RESTORE  = $70
-STAR_DURATION        = 180  ; 3 seconds arbitrarily chosen because i like it
+STAR_DURATION        = 240  ; 4 seconds arbitrarily chosen because i like it
 
 .segment "PRG7"
 SpellCastingRoutine = $8DC3 ; Link Main
@@ -1200,6 +1200,9 @@ SetPlayerDownstabbingHitbox:
   ; i fixed those bugs so we can bring back walk off attacks
   ; lda Player_State
   ; cmp #1
+  ; bne @notstabbing
+  ; don't stomp on things while star power is running
+  ; lda StarInvincibleTimer
   ; bne @notstabbing
   lda Player_Y_Speed
   bmi @notstabbing
