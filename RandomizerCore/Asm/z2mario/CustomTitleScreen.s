@@ -41,9 +41,7 @@ RESV TitleTempIndex
 RESV TitleIrqActive
 
 ; Copies of the scroll data that will be written during IRQ this frame
-RESV TitleIrqPpuCtrl
-RESV TitleIrqNametableHi
-RESV TitleIrqNametableLo
+RESV TitleIrqYPosition
 
 RESV TitleState
 RESV PipeYPositionLo
@@ -698,14 +696,9 @@ DrawTitleStars:
 ; IRQ handler
 .reloc
 SetTitleSplitIrq:
-    lda PpuCtrlShadow
-    and #$FC
-    ora $36
-    sta TitleIrqPpuCtrl
     lda $27
-    sta TitleIrqNametableHi
-    lda $28
-    sta TitleIrqNametableLo
+    and #$0f
+    sta TitleIrqYPosition
 
     ; write JMP IrqHdlr to RAM
     lda #$4c
@@ -732,13 +725,13 @@ RockOamTable:
     .byte $5F, $EE, $E8
     .byte $5F, $F0, $F0
     .byte $5F, $F0, $F8
-    ; .byte $6F, $EE, $D0
+    .byte $6F, $EE, $D0
     .byte $6F, $F0, $D8
     .byte $6F, $F4, $E0
     .byte $6F, $F2, $E8
     .byte $6F, $F6, $F0
     .byte $6F, $F0, $F8
-    ; .byte $7F, $F0, $D0
+    .byte $7F, $F0, $D0
     .byte $7F, $F2, $D8
     .byte $7F, $F4, $E0
     .byte $7F, $F0, $E8
@@ -763,26 +756,32 @@ TileForColor:
 .reloc
 TitleSplitIrqBody:
     pha
-        ; burn some cycles to hide the scroll split - 29 cycles for 6 bytes
-        clc
-        lda #$2a
-        nop
-        bcc *-2
-        lda TitleIrqPpuCtrl
-        sta PpuCtrlShadow
-        sta PPUCTRL
-        lda TitleIrqNametableHi
-        sta PPUADDR
-        lda TitleIrqNametableLo
-        sta PPUADDR
-        lda PPUDATA
-        lda PPUDATA
-        lda PPUSTATUS
-        lda #0
+; the vanilla z2 split is EXTREMELY CURSED
+; if i put emojis in my source code i would surround that with skull emojis.
+; it does two PPUDATA *reads* which destroys the mmc5.
+lda TitleIrqYPosition
+sta $2006
+
+lda #43
+jsr delay_a_27_clocks
+lda #0
+sta $2006
+
         sta TitleIrqActive
         sta LineIrqStatusReg
     pla
 	rti
+delay_a_27_clocks:
+        sec     
+@L:     sbc #5  
+        bcs @L  ;  6 6 6 6 6  FB FC FD FE FF
+        adc #3  ;  2 2 2 2 2  FE FF 00 01 02
+        bcc @4  ;  3 3 2 2 2  FE FF 00 01 02
+        lsr     ;  - - 2 2 2  -- -- 00 00 01
+        beq @5  ;  - - 3 3 2  -- -- 00 00 01
+@4:     lsr     ;  2 2 - - 2  7F 7F -- -- 00
+@5:     bcs @6  ;  2 3 2 3 2  7F 7F 00 00 00
+@6:     rts     ;
 
 .segment "PRG5"
 
