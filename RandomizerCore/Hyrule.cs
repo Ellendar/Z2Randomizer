@@ -546,7 +546,7 @@ public class Hyrule
 
             if (Z2MarioModeEnabled && !IS_RANDOMIZED)
             {
-                z2Hash = Util.ToGameText("VER. 1.2.0 ");
+                z2Hash = Util.ToGameText("VER. 2.0.0 ");
             }
             ROMData.Put(0x17C2C, z2Hash);
             Hash = Util.FromGameText(z2Hash);
