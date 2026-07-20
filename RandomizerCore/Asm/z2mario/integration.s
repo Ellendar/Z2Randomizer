@@ -361,7 +361,7 @@ PatchLinkDrawRoutine:
 @skipplayer:
   ; While we are here, lets draw the fireball/hammer sprites too
   ldy #ProjectileOffset
-  sty $02
+  sty R2
 @fireballLoop:
     ldx ObjectMetasprite,y
     beq @nofireball

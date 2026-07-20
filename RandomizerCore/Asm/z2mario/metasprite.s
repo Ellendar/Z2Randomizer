@@ -428,6 +428,11 @@ SetYOffset:
   ora SprObject_SprAttrib,y
   sta Atr
 
+  ; Remember the OAM offset before drawing so we can tell exactly how many
+  ; sprites this metasprite actually wrote. Needed for swamp handling later.
+  lda CurrentOAMOffset
+  sta $0b ; $0b is unused in the metasprite rendering so its safe here
+
   txa
   pha
   tya
@@ -470,9 +475,13 @@ SetYOffset:
     ; stuck in the mud/swamp, so update bottom two sprite
     ; x = next oam sprite id, so we can offset by 8 to hit bottom two sprites
     ldx CurrentOAMOffset
-    ; if we are small then its the most recent two sprites. if we are big then its 4 sprites back
-    lda PlayerSize
-    beq + ; If we are large
+    ; if we draw more than 16 sprites then we need to hide the bottom two rows
+    ; else we hide the previous two.
+    txa
+    sec
+    sbc $0b
+    cmp #16
+    bcs @bigmario
       lda Sprite_Attributes - 8, x
       ora #$20
       sta Sprite_Attributes - 8, x
@@ -480,7 +489,7 @@ SetYOffset:
       ora #$20
       sta Sprite_Attributes - 4, x
       rts
-    +
+    @bigmario:
       lda Sprite_Attributes - 16, x
       ora #$20
       sta Sprite_Attributes - 16, x
