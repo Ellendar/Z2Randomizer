@@ -2,8 +2,54 @@
 .include "z2r.inc"
 
 .export Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
+.export ResetSquare1Sfx, ResetSquare2Sfx, ResetMarioSfxState
+.export ReleaseSquare1Sfx, ReleaseSquare2Sfx
 
 .segment "PRG6"
+
+; These are all additions made to the vanilla smb1 sfx engine to make it play better with
+; the z2 sound engine. `Release` funcions clear just the buffer state without touching registers
+; while `Reset` also touches the registers to clear the sweep state.
+
+; The only way we can disable sweep from smb1 with how the engine is setup is through
+; setting the negate flag here
+SWEEP_OFF = $08
+
+ReleaseSquare1Sfx:
+      lda #$00
+      sta Square1SoundBuffer
+      sta Squ1_SfxLenCounter
+      rts
+
+ReleaseSquare2Sfx:
+      lda #$00
+      sta Square2SoundBuffer
+      sta Squ2_SfxLenCounter
+      sta Sfx_SecondaryCounter
+      rts
+
+ResetSquare1Sfx:
+      jsr ReleaseSquare1Sfx
+      lda #SWEEP_OFF
+      sta SND_SQUARE1_REG+1
+      rts
+
+ResetSquare2Sfx:
+      jsr ReleaseSquare2Sfx
+      lda #SWEEP_OFF
+      sta SND_SQUARE2_REG+1
+      rts
+
+ResetMarioSfxState:
+      jsr ResetSquare1Sfx
+      jsr ResetSquare2Sfx
+      lda #$00
+      sta NoiseSoundBuffer
+      sta Noise_SfxLenCounter
+      sta Square1SoundQueue
+      sta Square2SoundQueue
+      sta NoiseSoundQueue
+      rts
 
 ;-------------------------------------------------------------------------------------
 .reloc
@@ -180,9 +226,8 @@ ContinueTailWag:
 @streamEnd:
        lda #$00
        sta SND_SQUARE1_REG+2
-       sta Squ1_SfxLenCounter
-       sta Square1SoundBuffer
-       rts
+       ; jroweboy: full clear the sfx
+       jmp StopSquare1Sfx
 
 ; Ported from SMB3 in PRG31 $E7C1
 TailWag_PokeNote:
@@ -255,9 +300,7 @@ ContinueStatuePoof:
 @streamEnd:
        lda #$00
        sta SND_SQUARE2_REG+2
-       sta Squ2_SfxLenCounter
-       sta Square2SoundBuffer
-       rts
+       jmp EmptySfx2Buffer ; jroweboy full clear the sfx
 
 ; Square 2 twin of TailWag_PokeNote (SMB3 PRG31 $E7C1)
 Poof_PokeNote:
@@ -440,10 +483,11 @@ DecrementSfx1Length:
 StopSquare1Sfx:
         ldx #$00                ;if end of sfx reached, clear buffer
         stx Square1SoundBuffer  ;and stop making the sfx
-        ; ldx #$0e
-        ; stx SND_MASTERCTRL_REG
-        ; ldx #$0f
-        ; stx SND_MASTERCTRL_REG
+        ; vanilla stopped sfx through $4015 but we can't be sure we can do that, so
+        ; jroweboy: added this bit to fully clear the sfx when it ends
+        stx Squ1_SfxLenCounter
+        ldx #SWEEP_OFF
+        stx SND_SQUARE1_REG+1
 ExSfx1: rts
 
 PlayPipeDownInj:  
@@ -543,12 +587,14 @@ DecrementSfx2Length:
 EmptySfx2Buffer:
         ldx #$00                ;initialize square 2's sound effects buffer
         stx Square2SoundBuffer
+        stx Squ2_SfxLenCounter
 
 StopSquare2Sfx:
-        ; ldx #$0d                ;stop playing the sfx
-        ; stx SND_MASTERCTRL_REG 
-        ; ldx #$0f
-        ; stx SND_MASTERCTRL_REG
+        ; vanilla stopped sfx through $4015 but we can't be sure we can do that, so
+        ; just clear the sweep
+        ; jroweboy: fully clear the sfx state when a sfx ends
+        ldx #SWEEP_OFF
+        stx SND_SQUARE2_REG+1
 ExSfx2: rts
 
 Square2SfxHandler:

@@ -4,6 +4,8 @@
 .import GameRoutines, ProcFireball_Bubble, PlayerGfxHandler, DrawMetasprite
 .import ProcHammerTime, ProcStarPower
 .import Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
+.import ResetSquare1Sfx, ResetSquare2Sfx, ResetMarioSfxState
+.import ReleaseSquare1Sfx, ReleaseSquare2Sfx
 .import SwapToSavedPRG, SwapToPRG0
 .export SlightlyModifiedCollisionRoutine
 .export BankSwitchMarioCHR, ClearExtraRAMOnScreenTransition, ClearCollisionRAM
@@ -16,7 +18,7 @@ FREE "PRG0" [$9815, $9924)
 
 STATUE_DURATION      = $C0
 STATUE_CHANGE_DURATION = $17
-STATUE_BOUNCE_FORCE  = $60
+STATUE_BOUNCE_FORCE  = $bf
 STATUE_FALL_RESTORE  = $70
 STAR_DURATION        = 240  ; 4 seconds arbitrarily chosen because i like it
 
@@ -1582,6 +1584,17 @@ UPDATE_BYTE $02 @ $0e9e
 
 ;-------------------------------------------------------------------------------------
 .segment "PRG6"
+
+; Patch the "Silent" sound effect so that we clear any of the existing mario sound effects
+; when it starts. When silent, the z2 engine stops clocking the sweeps, leading to all sorts
+; of buggy sounds, so this just cuts it so we don't get the bad sfx
+.org $9006
+  jmp MarioSoundOff
+.reloc
+MarioSoundOff:
+  sta $4015
+  jmp ResetMarioSfxState
+
 .org $9016
   jsr CheckMarioSq1Sfx
   jsr CheckMarioSq2Sfx
@@ -1592,50 +1605,81 @@ UPDATE_BYTE $02 @ $0e9e
   nop
 .reloc
 ClearQueues:
+  ; Clear the original Z2 queue we patched over
   lda #0
+  sta Z2Square1SoundQueue
+  ; and also the mario queues
   sta Square1SoundQueue
   sta Square2SoundQueue
   sta NoiseSoundQueue
   rts
 
+; Implements a small priority queue for sfx on sq 1.
 .reloc
 CheckMarioSq1Sfx:
-  lda $07E1             ; L990B active effect type (non-zero = L990B is driving Square 1)
-  bne @ActualZ1Sfx
-  jsr Square1SfxHandler
-  lda Square1SoundBuffer
-  beq @PlayingZ2
-    lda #$ff
-    sta Z2Square1SoundBuffer
-    rts
-@PlayingZ2:
-  lda #$ff
-  cmp Z2Square1SoundBuffer
-  bne @ActualZ1Sfx
-    ; this is the fake sfx id we used to signal that this was a mario buffer
-    ; but now we can clear it.
+  ; $ff in the Z2 buffer is our own "mario owned square 1 last frame" marker,
+  ; if its set, then we don't want z2 to run any sfx processing, so we clear the z2 buffer here.
+  lda Z2Square1SoundBuffer
+  cmp #$ff
+  bne +
     lda #0
     sta Z2Square1SoundBuffer
-    rts
+  +
+  ; Check for "active" effects like the spell cast sound which are in $7e1 instead.
+  ; We want these to take priority over mario noises.
+  lda $07E1
+  bne @LoseToEffect
+  ; z2 is wanting to start a sfx this frame, and we aren't playing anything, so let it happen.
+  ; this keeps mario sfx from cutting off important things like item drop noises.
+  lda Z2Square1SoundQueue
+  bne @YieldToZ2
+
+  ; We already have a z2 sfx running on the sq1 channel, so don't let a mario sfx start
+  lda Z2Square1SoundBuffer
+  bne @ActualZ1Sfx
+    ; check to see if we have anything to start for mario sfx
+    jsr Square1SfxHandler
+    lda Square1SoundBuffer
+    beq @ActualZ1Sfx
+      ; and if we did get something started, set the flag to prevent z2 sfx next frame
+      lda #$ff
+      sta Z2Square1SoundBuffer
+      rts
+@LoseToEffect:
+  ; A z2 active effect is starting, so cancel the smb1 sfx and run the z2 sfx code
+  jsr ReleaseSquare1Sfx
+  jmp @ActualZ1Sfx
+@YieldToZ2:
+  ; nothing of ours to tear down? then leave smb1 alone
+  lda Square1SoundBuffer
+  beq @ActualZ1Sfx
+    jsr ResetSquare1Sfx
 @ActualZ1Sfx:
   jmp $92F4 ; Original square 1 sfx from z2
+
 .reloc
 CheckMarioSq2Sfx:
+  ; We don't need as complicated of a structure for smb1 square 2 sfx since we run almost all
+  ; sfx on square 1. We still do some juggling, but we don't have active effects here.
+  lda Z2Square2SoundBuffer
+  cmp #$ff
+  bne +
+    lda #0
+    sta Z2Square2SoundBuffer
+  +
+  lda Z2Square2SoundQueue
+  bne @YieldToZ2
   jsr Square2SfxHandler
   lda Square2SoundBuffer
-  beq @PlayingZ2
+  beq @ActualZ2Sfx
     lda #$ff
     sta Z2Square2SoundBuffer
     rts
-@PlayingZ2:
-  lda #$ff
-  cmp Z2Square2SoundBuffer
-  bne @ActualZ2Sfx
-    ; this is the fake sfx id we used to signal that this was a mario buffer
-    ; but now we can clear it.
-    lda #0
-    sta Z2Square2SoundBuffer
-    rts
+@YieldToZ2:
+  ; Clear the mario sfx if something is happening
+  lda Square2SoundBuffer
+  beq @ActualZ2Sfx
+    jsr ResetSquare2Sfx
 @ActualZ2Sfx:
   jmp $9408 ; Original square 2 sfx from z2
 .reloc
@@ -1775,7 +1819,7 @@ InyIfDownstabbing:
 
 .reloc
 ; Stomp physics between SMB1 and SMB3 are quite different, so add extra bounce force
-; to make it feel better. i just like it mmmkay
+; to make it feel better. the statue is "heavier" so you bounce less.
 ApplyStatueBounceForce:
   lda StatueTimer
   beq @done
