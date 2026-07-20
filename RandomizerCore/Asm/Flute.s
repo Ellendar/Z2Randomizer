@@ -271,6 +271,7 @@ TwisterWarp:
   lda FluteWarpFlags
   and PowersOfTwo,y
   bne @found_dst
+@skip_dst:
   dex
   bpl @next_dst
     ; nothing visited yet, so leave
