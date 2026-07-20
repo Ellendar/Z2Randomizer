@@ -1188,43 +1188,45 @@ public class Hyrule
     // item chains
     private void PreventSpellItemChains()
     {
-        //Temporarily disabled while I figure out this refactor
-        /*
-        List<TownType> chainTowns = [TownType.RUTO, TownType.SARIA, TownType.MIDO,
-            TownType.NABOORU, TownType.DARUNIA];
-
-        bool IsChainLocation(Location l) =>
-            l.Town != null && chainTowns.Contains((Town)l.ActualTown);
-
-        List<Location> chainLocations = itemLocs.Where(IsChainLocation).ToList();
-        foreach (Location chainLocation in chainLocations)
+        //child, trophy, medicine, mirror, water
+        List<Location> locationsThatContainWizards = [eastHyrule.darunia, westHyrule.ruto, westHyrule.mido, westHyrule.sariaNorth, eastHyrule.nabooru];
+        if(!props.IncludeQuestItemsInShuffle)
         {
-            for (int i = 0; i < chainLocation.Collectables.Count; i++)
+            locationsThatContainWizards.RemoveRange(3, 2);
+        }
+
+        List<Location> possibleReplacementLocations = ItemLocations().ToList();
+        foreach (Location wizardLocation in locationsThatContainWizards)
+        {
+            bool replaced = false;
+            Collectable wizardCollectable = (Collectable)wizardLocation.Town?.GetWizard()?.Collectable!;
+            if (!wizardCollectable.IsSpellItem())
             {
-                if (!chainLocation.Collectables[i].IsSpellItem())
+                continue;
+            }
+            possibleReplacementLocations.FisherYatesShuffle(r);
+            foreach (Location replacementLocation in possibleReplacementLocations)
+            {
+                if (!replacementLocation.GetShufflableCollectables().Any(i => !i.IsSpellItem())) { continue; }
+                List<Collectable> replacementCollectables = replacementLocation.GetShufflableCollectables();
+                replacementCollectables.FisherYatesShuffle(r);
+                foreach (Collectable replacementCollectable in replacementCollectables)
                 {
-                    continue;
+                    if (!replacementCollectable.IsSpellItem())
+                    {
+                        replacementLocation.ReplaceCollectable(replacementCollectable, wizardCollectable, r);
+                        wizardLocation.ReplaceCollectable(wizardCollectable, replacementCollectable, r);
+                        //WTB C# 15 labeled continue
+                        replaced = true;
+                        break;
+                    }
                 }
-
-                // Town wizard locations are always single-collectable overworld
-                // locations, so restrict swap targets to other non-chain overworld
-                // locations to avoid desyncing palace item room bookkeeping.
-                Location? target = itemLocs
-                    .Where(l => l.PalaceNumber == null && !IsChainLocation(l))
-                    .Where(l => l.Collectables.Any(c => !c.IsSpellItem()))
-                    .ToList()
-                    .Sample(r);
-                if (target == null)
+                if(replaced)
                 {
-                    continue;
+                    break;
                 }
-
-                int targetIndex = target.Collectables.FindIndex(c => !c.IsSpellItem());
-                (chainLocation.Collectables[i], target.Collectables[targetIndex]) =
-                    (target.Collectables[targetIndex], chainLocation.Collectables[i]);
             }
         }
-        */
     }
 
     private void DoShuffle(List<Collectable> itemsToShuffle, List<Location> itemShuffleLocations)

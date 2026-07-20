@@ -325,25 +325,38 @@ public class Location
     }
 
     /// <summary>
-    /// Replaces the first instance of a given collectable at a location with the indicated collectable.
-    /// Intended to be used to replace unique items, and "first" is currently undefined in order so be careful (or fix this)
+    /// Replaces an instance of a given collectable at a location with the indicated collectable.
+    /// If random is specified, replaces a random indicated collectable at the location if multiple exist
+    /// otherwise, replaces the "first" such collectable, where first is defined separately for each location type
     /// </summary>
     /// <param name="toReplace"></param>
     /// <param name="replacement"></param>
-    public bool ReplaceCollectable(Collectable toReplace, Collectable replacement)
+    /// <param name="r"></param>
+    public bool ReplaceCollectable(Collectable toReplace, Collectable replacement, Random? r = null)
     {
         Debug.Assert(Town == null || Palace == null);
         if (Town != null)
         {
-            return Town.ReplaceCollectable(toReplace, replacement);
+            return Town.ReplaceCollectable(toReplace, replacement, r);
         }
         else if (Palace != null)
         {
-            return Palace.ReplaceCollectable(toReplace, replacement);
+            return Palace.ReplaceCollectable(toReplace, replacement, r);
         }
         else if (NonPalaceTownCollectables.Contains(toReplace))
         {
-            NonPalaceTownCollectables.Replace(toReplace, replacement);
+            List<int> replacementIndexCandidates = 
+                Enumerable.Range(0, NonPalaceTownCollectables.Count)
+                .Where(i => NonPalaceTownCollectables[i] == toReplace).ToList();
+            if (replacementIndexCandidates.Count == 0)
+            {
+                return false;
+            }
+            if(r != null)
+            {
+                replacementIndexCandidates.FisherYatesShuffle(r);
+            }
+            NonPalaceTownCollectables[replacementIndexCandidates[0]] = replacement;
             return true;
         }
         return false;

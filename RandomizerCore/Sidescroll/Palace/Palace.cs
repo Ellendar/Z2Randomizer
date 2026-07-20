@@ -1199,14 +1199,20 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         }
     }
 
-    public bool ReplaceCollectable(Collectable toReplace, Collectable replacement)
+    public bool ReplaceCollectable(Collectable toReplace, Collectable replacement, Random? r = null)
     {
-        Room? room = ItemRooms.FirstOrDefault(i => i.Collectable == toReplace);
-        if (room == null)
+        List<int> replacementIndexCandidates =
+            Enumerable.Range(0, ItemRooms.Count)
+            .Where(i => ItemRooms[i].Collectable == toReplace).ToList();
+        if (replacementIndexCandidates.Count == 0)
         {
             return false;
         }
-        room.Collectable = replacement;
+        if (r != null)
+        {
+            replacementIndexCandidates.FisherYatesShuffle(r);
+        }
+        ItemRooms[replacementIndexCandidates[0]].Collectable = replacement;
         return true;
     }
 

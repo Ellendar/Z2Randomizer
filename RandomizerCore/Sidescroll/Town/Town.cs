@@ -161,14 +161,20 @@ public class Town
         }
     }
 
-    public bool ReplaceCollectable(Collectable toReplace, Collectable replacement)
+    public bool ReplaceCollectable(Collectable toReplace, Collectable replacement, Random? r = null)
     {
-        TownMap? map = TownMaps.FirstOrDefault(i => i.Collectable == toReplace);
-        if(map == null)
+        List<int> replacementIndexCandidates =
+            Enumerable.Range(0, TownMaps.Count)
+            .Where(i => TownMaps[i].Collectable == toReplace).ToList();
+        if (replacementIndexCandidates.Count == 0)
         {
             return false;
         }
-        map.Collectable = replacement;
+        if (r != null)
+        {
+            replacementIndexCandidates.FisherYatesShuffle(r);
+        }
+        TownMaps[replacementIndexCandidates[0]].Collectable = replacement;
         return true;
     }
 
