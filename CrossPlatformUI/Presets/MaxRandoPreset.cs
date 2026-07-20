@@ -128,7 +128,7 @@ public static class MaxRandoPreset
         StandardizeDrops = true,
 
         //Hints
-        EnableHelpfulHints = true,
+        HelpfulHints = HelpfulHintOption.TOWNS_SEPARATE,
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 

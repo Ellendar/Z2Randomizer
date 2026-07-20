@@ -255,11 +255,20 @@ the minimum XP it could give is 20 and the maximum is 100.
 Also note that XP values are randomized per enemy table and can differ in a single seed. For example
 Red Iron Knuckle XP in P1/P2/P5 could roll down while Red Iron Knuckle XP in P3/P4/P6 rolls up.</value>
 	</data>
-	<data name="EnableHelpfulHintsToolTip" xml:space="preserve">
+	<data name="HelpfulHintsToolTip" xml:space="preserve">
 <value>When enabled, helpful hints are scattered throughout the world. These hints are provided
 either by townspeople (stationary NPCs only) or by written text on walls. All hint
 locations correspond to places where readable text appears in the vanilla game. See the
-Wiki for more details.</value>
+Wiki for more details.
+
+None:
+No helpful hints are added.
+
+By Continent:
+Hints will display the palace number an item is in, or the continent the item is on.
+
+Towns Separate:
+Hints for items in towns will display the name of that town instead of the continent the town is on.</value>
 	</data>
 	<data name="EnableSpellItemHintsToolTip" xml:space="preserve">
 <value>When enabled, if visiting a spell location without the required quest item:

@@ -242,7 +242,7 @@ public sealed class WestHyrule : World
             unimportantLocs.Add(GetLocation(LocationID.WEST_BAGU_WOODS5));
             unimportantLocs.Add(GetLocation(LocationID.WEST_MINOR_ROAD));
             unimportantLocs.Add(GetLocation(LocationID.WEST_MINOR_DESERT));
-            if(!props.HelpfulHints)
+            if(props.HelpfulHints == HelpfulHintOption.NONE)
             {
                 unimportantLocs.Add(GetLocation(LocationID.WEST_KINGS_TOMB));
             }

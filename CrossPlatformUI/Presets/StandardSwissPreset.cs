@@ -127,7 +127,7 @@ public static class StandardSwissPreset
         StandardizeDrops = true,
 
         //Hints
-        EnableHelpfulHints = true,
+        HelpfulHints = HelpfulHintOption.TOWNS_SEPARATE,
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 

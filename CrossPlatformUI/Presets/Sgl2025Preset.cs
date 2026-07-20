@@ -133,7 +133,7 @@ public static class Sgl2025Preset
         LargeEnemiesCanDropLargeBag = true,
 
         //Hints
-        EnableHelpfulHints = false,
+        HelpfulHints = HelpfulHintOption.CONTINENT_ONLY,
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 

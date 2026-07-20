@@ -212,7 +212,7 @@ public class RandomizerProperties
 
     //Hints
     public bool SpellItemHints { get; set; }
-    public bool HelpfulHints { get; set; }
+    public HelpfulHintOption HelpfulHints { get; set; }
     public bool TownNameHints { get; set; }
 
     //Misc.

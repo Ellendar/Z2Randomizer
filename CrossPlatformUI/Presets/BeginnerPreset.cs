@@ -123,7 +123,7 @@ public static class BeginnerPreset
         StandardizeDrops = true,
 
         //Hints
-        EnableHelpfulHints = true,
+        HelpfulHints = HelpfulHintOption.CONTINENT_ONLY,
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 

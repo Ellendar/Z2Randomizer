@@ -193,6 +193,17 @@ public enum FireOption
     RANDOM
 }
 
+[DefaultValue(TOWNS_SEPARATE)]
+public enum HelpfulHintOption
+{
+    [Description("None")]
+    NONE,
+    [Description("By Continent")]
+    CONTINENT_ONLY,
+    [Description("Towns Separate")]
+    TOWNS_SEPARATE,
+}
+
 
 [DefaultValue(VANILLA)]
 public enum PalaceStyle
@@ -923,6 +934,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> MagicEffectivenessList { get; } = ToDescriptions<MagicEffectiveness>();
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
+    public static IEnumerable<EnumDescription> HelpfulHintsOptionList { get; } = ToDescriptions<HelpfulHintOption>();
     public static IEnumerable<EnumDescription> DripperEnemyOptionList { get; } = ToDescriptions<DripperEnemyOption>();
     public static IEnumerable<EnumDescription> EnemyLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>();
     public static IEnumerable<EnumDescription> BossLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>(i => i != EnemyLifeOption.WIDE);

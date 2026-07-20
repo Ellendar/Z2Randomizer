@@ -126,7 +126,7 @@ public static class RandomPercentPreset
         StandardizeDrops = true,
 
         //Hints
-        EnableHelpfulHints = null,
+        HelpfulHints = HelpfulHintOption.TOWNS_SEPARATE,
         EnableSpellItemHints = null,
         EnableTownNameHints = null,
 

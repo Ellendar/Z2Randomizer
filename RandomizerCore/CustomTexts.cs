@@ -582,7 +582,7 @@ public class CustomTexts
                 else
                 {
                     var downstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
-                    hint = Text.GenerateHelpfulHint(downstabLoc, Collectable.DOWNSTAB, props.IncludeSpellsInShuffle);
+                    hint = Text.GenerateHelpfulHint(downstabLoc, Collectable.DOWNSTAB, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                 }
                 texts[downstabClosedDoorTextIndex] = hint;
                 if (props.StartWithUpstab)
@@ -593,7 +593,7 @@ public class CustomTexts
                 else
                 {
                     var upstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
-                    hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
+                    hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                 }
                 texts[upstabClosedDoorTextIndex] = hint;
                 if (props.SwapUpAndDownStab)
@@ -603,7 +603,7 @@ public class CustomTexts
                 }
             }
 
-            if (props.HelpfulHints)
+            if (props.HelpfulHints != HelpfulHintOption.NONE)
             {
                 List<int> placedIndexes = GenerateHelpfulHints(texts, locations, hashRNG, props);
                 GenerateKnowNothings(texts, placedIndexes, nonhashRNG, props.BagusWoods, props.UseCommunityText);
@@ -951,7 +951,7 @@ public class CustomTexts
             //don't let hints be for items in the same town
             while ((hintLocation.Town != null && hintLocation.Town?.Type?.VanillaTownOrder() - 1 == town)
              || placedTowns.Contains(town));
-            Text hint = Text.GenerateHelpfulHint(hintLocation, hintCollectable, props.IncludeSpellsInShuffle);
+            Text hint = Text.GenerateHelpfulHint(hintLocation, hintCollectable, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
             int index = hintIndexes[town][r.Next(hintIndexes[town].Length)];
             switch (index)
             {
@@ -994,21 +994,21 @@ public class CustomTexts
             itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.TROPHY))!;
             if(itemLocation != null)
             {
-                Text trophyHint = Text.GenerateHelpfulHint(itemLocation, Collectable.TROPHY, props.IncludeSpellsInShuffle);
+                Text trophyHint = Text.GenerateHelpfulHint(itemLocation, Collectable.TROPHY, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                 hints[trophySpellHintIndex] = trophyHint;
             }
 
             itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.MEDICINE))!;
             if (itemLocation != null)
             {
-                Text medHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MEDICINE, props.IncludeSpellsInShuffle);
+                Text medHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MEDICINE, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                 hints[medicineSpellHintIndex] = medHint;
             }   
 
             itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.CHILD))!;
             if (itemLocation != null)
             {
-                Text kidHint = Text.GenerateHelpfulHint(itemLocation, Collectable.CHILD, props.IncludeSpellsInShuffle);
+                Text kidHint = Text.GenerateHelpfulHint(itemLocation, Collectable.CHILD, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                 hints[childSpellHintIndex] = kidHint;
             }
 
@@ -1017,14 +1017,14 @@ public class CustomTexts
                 itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.MIRROR))!;
                 if (itemLocation != null)
                 {
-                    Text mirrorHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MIRROR, props.IncludeSpellsInShuffle);
+                    Text mirrorHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MIRROR, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                     hints[mirrorSpellHintIndex] = mirrorHint;
                 }
 
                 itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.WATER))!;
                 if (itemLocation != null)
                 {
-                    Text waterHint = Text.GenerateHelpfulHint(itemLocation, Collectable.WATER, props.IncludeSpellsInShuffle);
+                    Text waterHint = Text.GenerateHelpfulHint(itemLocation, Collectable.WATER, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                     hints[waterSpellHintIndex] = waterHint;
                 }
             }

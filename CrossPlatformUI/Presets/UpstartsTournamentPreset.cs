@@ -121,7 +121,7 @@ public static class UpstartsTournamentPreset
         StandardizeDrops = true,
 
         //Hints
-        EnableHelpfulHints = true,
+        HelpfulHints = HelpfulHintOption.CONTINENT_ONLY,
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 
