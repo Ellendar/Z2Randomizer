@@ -904,6 +904,45 @@ SetupMarioControl:
 .org $9041
   .word (GameRoutines)
 
+.reloc
+.export PowShockwaveCheck
+.proc PowShockwaveCheck
+  lda HaveStabs
+  and #HAVE_UPSTAB
+  beq @skip
+    ; We have upstab and we just broke a block through a head bump
+    ; So trigger a screen wide thunder-style effect that hits all enemies
+    ldx #1
+    stx $0B
+    ldx #5
+  @loop:
+    lda Enemy0Status,x
+    cmp #1
+    bne @next
+      ldy EnemyType,x
+      lda $6E41,y
+      and #$A0
+      bmi @next
+        ; Killing enemies reloads X from $10 so we need update it.
+        stx $10
+        jsr $E723 ; damage code but with the current attack level
+
+  @next:
+    dex
+    bpl @loop
+  ldx $10
+  beq @nothingHit
+    ; something was hit so use the pow (blast) sfx instead
+    lda #Sfx_Blast
+    sta Square2SoundQueue
+    ldx #0
+    stx Z2NoiseSoundQueue
+@nothingHit:
+  ; restore $10 just in case we need that
+  stx $10
+@skip:
+  rts
+.endproc
 
 .segment "PRG7"
 ; Hook the link hit routine to check if we are doing star power. If we are
@@ -915,13 +954,13 @@ SetupMarioControl:
 PatchLinkHitDispatch:
   lda StarInvincibleTimer
   beq @notStar
-    lda EnemyState,x
-    and #~$10
-    sta EnemyState,x
     ; The custom boss has its own invincibility window that 50 damage a frame
     ; would blow straight through, so star only blocks its hits.
     lda boss_animation
     bne @skiphit
+    lda EnemyState,x
+    and #~$10
+    sta EnemyState,x
     ; check if the enemy is currently already hit by us
     lda Enemy0HitState,x
     bne @skiphit
@@ -943,14 +982,9 @@ PatchLinkHitDispatch:
     pla
     ; Run the deal damage routine with the "projectile attack" flag ($0B) set,
     ; otherwise a surviving enemy recoils mario like a melee sword hit would.
-    ; $0B doubles as mario's Up_Down_Buttons, so save and restore it.
-    lda $0B
-    pha
     lda #1
     sta $0B
     jsr $E726
-    pla
-    sta $0B
     rts
 @notStar:
   lda StatueTimer

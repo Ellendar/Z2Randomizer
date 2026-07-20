@@ -2161,7 +2161,9 @@ PlayerHeadCollision:
   ldy $2
   sta ($c),y
   sta Player_Y_Speed      ;init player's vertical speed
-  jmp bank7_stab_brick_at_0E_with_A_and_does_draw
+  jsr bank7_stab_brick_at_0E_with_A_and_does_draw
+.import PowShockwaveCheck
+  jmp PowShockwaveCheck
 ExitFireballNearby:
   rts                      ;leave!
 ExitBackToBump:
