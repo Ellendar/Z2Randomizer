@@ -13,7 +13,7 @@ public interface IWeightedSampler<T> where T : notnull
     int Weight(T t);
     /// Note: This returns a new copy of the class. This is pretty slow,
     /// but also needing this should be avoided in the first place.
-    IWeightedSampler<T> Subtract(T keyToRemove);
+    IWeightedSampler<T>? Subtract(T keyToRemove);
     /// This should not really be necessary since all members should be read-only. Might remove later.
     IWeightedSampler<T> Clone();
 }
@@ -68,7 +68,7 @@ public class TableWeightedRandom<T> : IWeightedSampler<T> where T : notnull
         return new TableWeightedRandom<T>(_keys, _table, _totalWeight, _weights);
     }
 
-    public IWeightedSampler<T> Subtract(T keyToRemove)
+    public IWeightedSampler<T>? Subtract(T keyToRemove)
     {
         var keys = Keys();
         if (!keys.Contains(keyToRemove))
@@ -77,6 +77,7 @@ public class TableWeightedRandom<T> : IWeightedSampler<T> where T : notnull
         }
 
         var newEntries = keys.Where(k => !k.Equals(keyToRemove)).Select(k => (k, Weight(k))).ToList();
+        if (newEntries.Count == 0) { return null; }
         return new TableWeightedRandom<T>(newEntries);
     }
 
@@ -147,7 +148,7 @@ public class LinearWeightedRandom<T> : IWeightedSampler<T> where T : notnull
         return new LinearWeightedRandom<T>(_keys, _cumulativeWeights, _totalWeight, _weights);
     }
 
-    public IWeightedSampler<T> Subtract(T keyToRemove)
+    public IWeightedSampler<T>? Subtract(T keyToRemove)
     {
         var keys = Keys();
         if (!keys.Contains(keyToRemove))
@@ -156,6 +157,7 @@ public class LinearWeightedRandom<T> : IWeightedSampler<T> where T : notnull
         }
 
         var newEntries = keys.Where(k => !k.Equals(keyToRemove)).Select(k => (k, Weight(k))).ToList();
+        if (newEntries.Count == 0) { return null; }
         return new LinearWeightedRandom<T>(newEntries);
     }
 
