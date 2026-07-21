@@ -136,13 +136,13 @@ public class Town
             {
                 return false;
             }
+            if (currentMap.RightExitIsOutside)
+            {
+                return true;
+            }
             if (currentMap.Right == null) 
             {
                 return false;
-            }
-            if(currentMap.RightExitIsOutside)
-            {
-                return true;
             }
             coveredMaps.Add(currentMap);
             currentMap = currentMap.Right;

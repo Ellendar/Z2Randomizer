@@ -150,30 +150,6 @@ public class Hyrule
     public int debug = 0;
     public int totalReachableCheck = 0;
 
-    /*
-    private readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
-    {
-        {1, 0x1072B},
-        {2, 0x1072B},
-        {3, 0x12208},
-        {4, 0x12208},
-        {5, 0x1072B},
-        {6, 0x12208},
-        {7, 0x1472B},
-    };
-
-    private readonly Dictionary<int, int> palaceAddr = new Dictionary<int, int>
-    {
-        {1, 0x4663 },
-        {2, 0x4664 },
-        {3, 0x4665 },
-        {4, 0xA140 },
-        {5, 0x8663 },
-        {6, 0x8664 },
-        {7, 0x8665 }
-    };
-    */
-
     public ROM ROMData { get; set; }
     public RandomizerCore.Random r { get; set; }
     public string Flags { get; private set; }
