@@ -35,7 +35,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
     public List<Room> AllRooms { get; private set; } = [];
 
-    public Room? Entrance { get; set; } = null;
+    public Room? Entrance { get; set; }
     public List<Room> ItemRooms { get; set; } = [];
     public bool PalaceItemsAreShufflable { get; set; } = palaceItemsAreShufflable;
     public Room? BossRoom { get; set; }
@@ -44,7 +44,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
     //DEBUG
     public int Generations { get; set; }
-    
+
     public PalaceGrouping PalaceGroup => Util.AsPalaceGrouping(Number) ?? throw new Exception("Palace number out of range");
 
     public bool RequiresThunderbird()
@@ -86,7 +86,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
     public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false)
     {
-        if(Entrance == null)
+        if (Entrance == null)
         {
             throw new Exception("Palace Entrance is missing");
         }
@@ -104,7 +104,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         {
             var (room, originDirection) = roomsToCheck.Pop();
             //For required thunderbird, you can't path backwards into tbird room
-            if ((Number == 7 && room.IsThunderBirdRoom) 
+            if ((Number == 7 && room.IsThunderBirdRoom)
                 || (Number < 7 && room.IsBossRoom))
             {
                 if (originDirection == Direction.EAST)
@@ -151,7 +151,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         while (roomsToCheck.Count > 0)
         {
             var (room, stepsToRoom) = roomsToCheck.Dequeue();
-            if (stepsToRoom >= minSteps) {
+            if (stepsToRoom >= minSteps)
+            {
                 return true;
             }
             if (room.IsBossRoom)
@@ -200,7 +201,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
     public static bool BossRoomMinDistanceShape(Dictionary<Coord, RoomExitType> shape, Coord bossRoom, int minSteps)
     {
         // quick check on (non-diagonal) orthogonal distance alone
-        if (Math.Abs(bossRoom.X) + Math.Abs(bossRoom.Y) >= minSteps) {
+        if (Math.Abs(bossRoom.X) + Math.Abs(bossRoom.Y) >= minSteps)
+        {
             return true;
         }
         HashSet<Coord> reachedRooms = [];
@@ -222,7 +224,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             if (!reachedRooms.Add(coord)) { continue; }
 
             int stepsToNextRoom = stepsToRoom + 1;
-            if (exitType.ContainsLeft()) { roomsToCheck.Enqueue((coord with { X = coord.X - 1}, stepsToNextRoom)); }
+            if (exitType.ContainsLeft()) { roomsToCheck.Enqueue((coord with { X = coord.X - 1 }, stepsToNextRoom)); }
             if (exitType.ContainsRight()) { roomsToCheck.Enqueue((coord with { X = coord.X + 1 }, stepsToNextRoom)); }
             if (exitType.ContainsUp()) { roomsToCheck.Enqueue((coord with { Y = coord.Y + 1 }, stepsToNextRoom)); }
             if (exitType.ContainsDown()) { roomsToCheck.Enqueue((coord with { Y = coord.Y - 1 }, stepsToNextRoom)); }
@@ -243,7 +245,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
         Room Entrance = AllRooms.First(i => i.IsEntrance);
 
-        if(Entrance.Down != null)
+        if (Entrance.Down != null)
         {
             reachable.Add(Entrance.Down);
             roomsToCheck.Push(Entrance.Down);
@@ -381,7 +383,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             if (room.LinkedRoomName != null && room.Enabled && room.LinkedRoom != null)
             {
                 Room linkedRoom = room.LinkedRoom;
-                if(room.IsUpDownReversed != linkedRoom.IsUpDownReversed)
+                if (room.IsUpDownReversed != linkedRoom.IsUpDownReversed)
                 {
                     throw new Exception("Inconsistent IsUpDownReversed in linked rooms");
                 }
@@ -581,7 +583,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                     {
                         r.Up = r2;
                     }
-                    else if (r2.Map == ((r.IsUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) / 4 && r2.IsDropZone) {
+                    else if (r2.Map == ((r.IsUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) / 4 && r2.IsDropZone)
+                    {
                         r.Up = r2;
                     }
                 }
@@ -602,7 +605,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                     }
                 }
             }
-            if (((r.IsUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) == 0 
+            if (((r.IsUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) == 0
                 && ((Entrance!.IsUpDownReversed ? Entrance.Connections[2] : Entrance.Connections[1]) & 0xFC) / 4 == r.Map)
             {
                 r.Up = Entrance;
@@ -610,7 +613,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         }
         if (removeTbird)
         {
-            if(TbirdRoom!.Left == null || TbirdRoom.Right == null)
+            if (TbirdRoom!.Left == null || TbirdRoom.Right == null)
             {
                 throw new Exception("Invalid vanilla tbird room");
             }
@@ -636,9 +639,9 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         {
             //remove rooms without bias
             //don't remove important rooms
-            Room remove = AllRooms.Where(i => !i.IsEntrance 
-                && !i.HasItem 
-                && !i.IsBossRoom 
+            Room remove = AllRooms.Where(i => !i.IsEntrance
+                && !i.HasItem
+                && !i.IsBossRoom
                 && !i.IsThunderBirdRoom
                 && !i.HasDrop).ToArray().Sample(random)!;
 
@@ -688,7 +691,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             //In angled pairs, we could remove the vertically or horizonally oriented room. In order to prevent 
             //a directional bias in shortening, only attempt a random direction each time
             bool removeVerticalRoom = random.Next(2) == 0;
-            
+
             //If the room is an angled room, we can only remove it as a pair with one of its adjacent rooms.
             //example, if this is left + down, remove this, and the room on the left, and connect the room above the
             //left room to the room below this one (only if the room on the left has a room above it).
@@ -699,8 +702,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                 if (hasLeft)
                 {
                     //also remove the left room
-                    if (!removeVerticalRoom 
-                        && remove.Left?.Up != null 
+                    if (!removeVerticalRoom
+                        && remove.Left?.Up != null
                         && remove.Left.CountExits() == 2
                         && !AllRooms.Any(i => i.Up == remove)
                         && remove.Left.Up.HasDrop == remove.HasDrop)
@@ -715,8 +718,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         //ValidateRoomConnections();
                     }
                     //also remove the down room
-                    else if (removeVerticalRoom 
-                        && remove.Down?.Right != null 
+                    else if (removeVerticalRoom
+                        && remove.Down?.Right != null
                         && !AllRooms.Any(i => i.Down == remove)
                         && remove.Down.CountExits() == 2)
                     {
@@ -738,8 +741,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                 else
                 {
                     //also remove the right room
-                    if (!removeVerticalRoom 
-                        && remove.Right?.Up != null 
+                    if (!removeVerticalRoom
+                        && remove.Right?.Up != null
                         && remove.Right.CountExits() == 2
                         && !AllRooms.Any(i => i.Up == remove)
                         && remove.Right.Up.HasDrop == remove.HasDrop)
@@ -754,7 +757,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         //ValidateRoomConnections();
                     }
                     //also remove the down room
-                    else if(removeVerticalRoom 
+                    else if (removeVerticalRoom
                         && remove.Down?.Left != null
                         && !AllRooms.Any(i => i.Down == remove)
                         && remove.Down.CountExits() == 2)
@@ -822,7 +825,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                 else
                 {
                     //Also remove right
-                    if (!removeVerticalRoom 
+                    if (!removeVerticalRoom
                         && remove.Right!.Down != null
                         && remove.Right.CountExits() == 2
                         && remove.Right.HasDrop == remove.Up!.HasDrop
@@ -839,7 +842,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         //ValidateRoomConnections();
                     }
                     //Also remove up
-                    else if(removeVerticalRoom 
+                    else if (removeVerticalRoom
                         && remove.Up!.Left != null
                         && AllRooms.All(i => i.Up != remove)
                         && remove.Up.CountExits() == 2)
@@ -869,7 +872,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
     {
         foreach (Room room in AllRooms)
         {
-            try {
+            try
+            {
                 int sideviewIndex = 4; //Header bytes
                 while (sideviewIndex < room.SideView.Length)
                 {
@@ -947,6 +951,40 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             }
         }
     }
+
+    /*
+    public List<Room> CheckBlocks()
+    {
+        return CheckBlocksHelper([], [], Entrance!);
+    }
+
+    private List<Room> CheckBlocksHelper(List<Room> c, List<Room> blockers, Room r)
+    {
+        if (c.Contains(ItemRoom!))
+        {
+            return c;
+        }
+        c.Add(r);
+        if (r.Up != null && !c.Contains(r.Up))
+        {
+            CheckBlocksHelper(c, blockers, r.Up);
+        }
+        if (r.Down != null && !c.Contains(r.Down))
+        {
+            CheckBlocksHelper(c, blockers, r.Down);
+        }
+        if (r.Left != null && !c.Contains(r.Left))
+        {
+            CheckBlocksHelper(c, blockers, r.Left);
+        }
+        if (r.Right != null && !c.Contains(r.Right))
+        {
+            CheckBlocksHelper(c, blockers, r.Right);
+        }
+        return c;
+    }
+    */
+
     public void ResetRooms()
     {
         foreach (Room r in AllRooms)
@@ -960,13 +998,13 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
     {
         int count = 0;
         int ENEMY_SHUFFLE_LIMIT = 10;
-        foreach(Room room in AllRooms)
+        foreach (Room room in AllRooms)
         {
             room.NewEnemies = PalaceEnemyShuffler.Shuffle(room, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
             if (props.NoDuplicateRooms)
             {
                 Room? duplicateRoom = null;
-                while(duplicateRoom == null && count++ < ENEMY_SHUFFLE_LIMIT)
+                while (duplicateRoom == null && count++ < ENEMY_SHUFFLE_LIMIT)
                 {
                     duplicateRoom = AllRooms.FirstOrDefault(i =>
                         Util.byteArrayEqualityComparer.Equals(room.SideView, i.SideView)
@@ -980,7 +1018,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         room.NewEnemies = PalaceEnemyShuffler.Shuffle(room, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
                     }
                 }
-                if(count == ENEMY_SHUFFLE_LIMIT)
+                if (count == ENEMY_SHUFFLE_LIMIT)
                 {
                     logger.Warn("Room# " + room.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.Enemies) +
                         ") Exceeded the enemy shuffle limit");
@@ -989,7 +1027,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         }
     }
 
-    public bool CanClearAllRooms(IEnumerable<RequirementType> requireables, Collectable palaceItem)
+    public bool CanClearAllRooms(IReadOnlySet<RequirementType> requireables, Collectable palaceItem)
     {
         //If the palace's item can be reached with the current items, it can be used to clear the rest of the palace.
         RequirementType? palaceItemRequirement = palaceItem.AsRequirement();
@@ -999,8 +1037,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             //the shuffle will eventually put the item into the reachable place.
             if (CanReachAnItemRoom(requireables))
             {
-                requireables = new List<RequirementType>(requireables);
-                ((List<RequirementType>)requireables).Add((RequirementType)palaceItemRequirement);
+                HashSet<RequirementType> palaceRequireables = [.. requireables, palaceItemRequirement.Value];
+                requireables = palaceRequireables;
             }
             else return false;
         }
@@ -1011,7 +1049,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
     public bool HasDisallowedDrop(bool palacesContinueAfterBoss, PalaceDropStyle dropStyle, Random r)
     {
-        if(dropStyle == PalaceDropStyle.ANYTHING_GOES)
+        if (dropStyle == PalaceDropStyle.ANYTHING_GOES)
         {
             return false;
         }
@@ -1021,7 +1059,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         {
             effectiveDropStyle = r.NextDouble() < DROPS_CAN_LEAD_TO_BOSS_CHANCE ? PalaceDropStyle.ANY_EXIT : PalaceDropStyle.ENTRANCE;
         }
-        else 
+        else
         {
             effectiveDropStyle = dropStyle;
         }
@@ -1029,14 +1067,14 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         List<Room> dropZonesToCheck = [];
         foreach (Room room in AllRooms.Where(i => i.HasDrop))
         {
-            if(room.Down == null) { return true; }
-            if(!room.Down.HasDrop)
+            if (room.Down == null) { return true; }
+            if (!room.Down.HasDrop)
             {
                 dropZonesToCheck.Add(room.Down);
             }
         }
 
-        foreach(Room initialDropZone in dropZonesToCheck)
+        foreach (Room initialDropZone in dropZonesToCheck)
         {
             Stack<Room> pendingRooms = [];
             pendingRooms.Push(initialDropZone);
@@ -1087,7 +1125,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false;
     }
 
-    public bool CanReachAnItemRoom(IEnumerable<RequirementType> requireables)
+    public bool CanReachAnItemRoom(IReadOnlySet<RequirementType> requireables)
     {
         List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
         List<Room> coveredRooms = new();
@@ -1127,15 +1165,14 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false;
     }
 
-    public List<Collectable> GetGettableItems(IEnumerable<RequirementType> initialRequireables, bool shufflableItemsOnly)
+    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> initialRequireables, bool shufflableItemsOnly)
     {
-        if(shufflableItemsOnly && !PalaceItemsAreShufflable)
+        if (shufflableItemsOnly && !PalaceItemsAreShufflable)
         {
             return [];
         }
-        List<RequirementType> requireables = [];
-        requireables.AddRange(initialRequireables);
-        List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
+        HashSet<RequirementType> requireables = [.. initialRequireables];
+        List<Room> pendingRooms = [AllRooms.First(i => i.IsEntrance)];
         List<Room> coveredRooms = [];
         List<Collectable> previousGettableItems = [];
         List<Collectable> gettableItems = [];
@@ -1187,7 +1224,6 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
         return gettableItems;
     }
-
     public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false)
     {
         //Shufflable marking NYI for palaces (and probably not needed) so it's NOP for now
@@ -1243,7 +1279,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
     public void ValidateRoomConnections()
     {
-        foreach(Room room in AllRooms)
+        foreach (Room room in AllRooms)
         {
             //If this room connects to any rooms that aren't in the same palace,
             //or that it knows are invalid, it's probably a bug
@@ -1312,7 +1348,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         }
         else
         {
-            foreach(Room itemRoom in ItemRooms)
+            foreach (Room itemRoom in ItemRooms)
             {
                 if (!AllRooms.Contains(itemRoom))
                 {
@@ -1326,16 +1362,16 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             }
         }
         List<Room> normalRooms = AllRooms.Where(i => i.IsNormalRoom()).ToList();
-        foreach(Room room in normalRooms)
+        foreach (Room room in normalRooms)
         {
             //Only set the room number on the primary room of a linked room pair
-            if(room.LinkedRoom == null || room.Enabled)
+            if (room.LinkedRoom == null || room.Enabled)
             {
                 room.Map = currentMap++;
             }
         }
         //Linked room secondaries share a map number with their primary
-        foreach(Room room in AllRooms.Where(i => i.LinkedRoom != null && !i.Enabled))
+        foreach (Room room in AllRooms.Where(i => i.LinkedRoom != null && !i.Enabled))
         {
             room.Map = room.LinkedRoom!.Map;
         }
@@ -1353,7 +1389,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         newRoom.coords = roomToReplace.coords;
         // newRoom.PalaceGroup = roomToReplace.PalaceGroup;
 
-        foreach(Room room in AllRooms.Where(i => i.Left == roomToReplace))
+        foreach (Room room in AllRooms.Where(i => i.Left == roomToReplace))
         {
             room.Left = newRoom;
         }
@@ -1381,7 +1417,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
     public List<Collectable> GetVanillaCollectables(int itemCount)
     {
-        if(itemCount == 0)
+        if (itemCount == 0)
         {
             return [];
         }
@@ -1399,7 +1435,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             throw new Exception("Invalid palace number");
         }
         List<Collectable> collectables = vanillaCollectables[Number - 1];
-        for(int i = 1; i < itemCount; i++)
+        for (int i = 1; i < itemCount; i++)
         {
             collectables.Add(Collectable.LARGE_BAG);
         }
@@ -1426,11 +1462,11 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         for (int i = 1; i < coordinateRooms.Count; i++)
         {
             room = room.Merge(coordinateRooms[i]);
-            if(room.LinkedRoom != null)
+            if (room.LinkedRoom != null)
             {
                 room = room.Merge(room.LinkedRoom);
             }
-        } 
+        }
         return room;
     }
 

@@ -16,7 +16,7 @@ public abstract class PalaceGenerator
 
     protected static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
 
-    internal abstract Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber);
+    internal abstract Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt);
 
     protected static bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
     {
@@ -39,7 +39,7 @@ public abstract class PalaceGenerator
             //Short GP is ok with any 2 groups
             if (props.PalaceLengths[6] < 35) // may need to be adjusted
             {
-                if(props.AllowV4Rooms && props.AllowV5_0Rooms
+                if (props.AllowV4Rooms && props.AllowV5_0Rooms
                     || props.AllowV5_0Rooms && props.AllowVanillaRooms
                     || props.AllowV4Rooms && props.AllowVanillaRooms)
                 {
@@ -64,7 +64,7 @@ public abstract class PalaceGenerator
     [Conditional("DEBUG")]
     public static void DebugCheckDuplicates(RandomizerProperties props, Palace palace)
     {
-        switch(props.PalaceStyles[palace.Number - 1])
+        switch (props.PalaceStyles[palace.Number - 1])
         {
             case PalaceStyle.VANILLA:
             case PalaceStyle.SHUFFLED:

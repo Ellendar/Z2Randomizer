@@ -24,7 +24,7 @@ public class Utils
         {
             Room room = new Room(obj.ToString());
             newRooms.Add(room);
-            List <RequirementType> blockers = new List<RequirementType>();
+            List <RequirementType> blockers = new IReadOnlySet<RequirementType>();
             if(room.IsFairyBlocked)
             {
                 blockers.Add(RequirementType.JUMP);

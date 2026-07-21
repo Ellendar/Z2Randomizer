@@ -1594,7 +1594,7 @@ public sealed class EastHyrule : World
         }
     }
 
-    public override void UpdateVisit(List<RequirementType> requireables)
+    public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
         UpdateReachable(requireables);
 
@@ -1977,28 +1977,6 @@ public sealed class EastHyrule : World
         return requiredLocations.Where(i => i != null);
     }
 
-    /*
-    protected override void SetVanillaCollectables(bool useDash)
-    {
-        locationAtPalace5.VanillaCollectable = Collectable.FLUTE;
-        locationAtPalace6.VanillaCollectable = Collectable.CROSS;
-
-        nabooru.VanillaCollectable = useDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL;
-        fountain.VanillaCollectable = Collectable.WATER;
-        darunia.VanillaCollectable = Collectable.REFLECT_SPELL;
-        daruniaRoof.VanillaCollectable = Collectable.UPSTAB;
-        newKasutoBasement.VanillaCollectable = Collectable.MAGIC_CONTAINER;
-        newKasuto.VanillaCollectable = Collectable.SPELL_SPELL;
-        spellTower.VanillaCollectable = Collectable.MAGIC_KEY;
-        oldKasuto.VanillaCollectable = Collectable.THUNDER_SPELL;
-
-        waterTile.VanillaCollectable = Collectable.HEART_CONTAINER;
-        desertTile.VanillaCollectable = Collectable.HEART_CONTAINER;
-        pbagCave1.VanillaCollectable = Collectable.XL_BAG;
-        pbagCave2.VanillaCollectable = Collectable.XL_BAG;
-    }
-    */
-
     public override string GenerateSpoiler()
     {
         StringBuilder sb = new();
@@ -2080,7 +2058,7 @@ public sealed class EastHyrule : World
 
     public override void ResetCollectables(RandomizerProperties props)
     {
-        nabooru.Town!.GetWizard()!.Collectable = props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FAIRY_SPELL;
+        nabooru.Town!.GetWizard()!.Collectable = props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL;
         nabooru.Town!.GetWizard()!.CollectableIsShufflable = props.IncludeSpellsInShuffle;
         nabooru.Town!.GetTownMap(VanillaTownMap.NABOORU_MID)!.Collectable = Collectable.WATER;
         nabooru.Town!.GetTownMap(VanillaTownMap.NABOORU_MID)!.CollectableIsShufflable = props.IncludeQuestItemsInShuffle;

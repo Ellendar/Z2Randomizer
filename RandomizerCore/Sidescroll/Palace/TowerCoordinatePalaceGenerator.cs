@@ -70,7 +70,7 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
         //start with rings
         for (int y = 1; y < roomsPerLayer.Length; y++)
         {
-            for(int x = 0; x < roomsPerLayer[y]; x++)
+            for (int x = 0; x < roomsPerLayer[y]; x++)
             {
                 shape.Add(new Coord(x, y), RoomExitType.HORIZONTAL_PASSTHROUGH);
             }
@@ -82,11 +82,11 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
         palace.Entrance.coords = new Coord(connectionX, 0);
 
         //for each layer add an up at a random coordinate at that layer
-        for(int y = 1; y < roomsPerLayer.Length - 1; y++)
+        for (int y = 1; y < roomsPerLayer.Length - 1; y++)
         {
-            connectionX = r.Next(0, Math.Min(roomsPerLayer[y], roomsPerLayer[y+1]));
+            connectionX = r.Next(0, Math.Min(roomsPerLayer[y], roomsPerLayer[y + 1]));
             shape[new Coord(connectionX, y)] = shape[new Coord(connectionX, y)].AddUp();
-            shape[new Coord(connectionX, y+1)] = shape[new Coord(connectionX, y+1)].AddDown();
+            shape[new Coord(connectionX, y + 1)] = shape[new Coord(connectionX, y + 1)].AddDown();
         }
 
         //place the boss at the top
@@ -134,7 +134,7 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
                 List<Coord>[] segments = [[new Coord(0, y)], []];
                 int currentSegment = 0;
                 int timesSwitched = 0;
-                for(int x = 1; x < roomsPerLayer[y]; x++)
+                for (int x = 1; x < roomsPerLayer[y]; x++)
                 {
                     Coord currentCoord = new Coord(x, y);
                     if (!shape[currentCoord].ContainsLeft())
@@ -200,7 +200,7 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
                         {
                             connectionType = SegmentConnectionOptionWeights.Next(r);
                         }
-                        while((connectionType.RequiresUpRoom() && !canConnectUp)
+                        while ((connectionType.RequiresUpRoom() && !canConnectUp)
                             || (connectionType.RequiresDownRoom() && !canConnectDown));
 
                         ApplyConnection(shape, connectionCoord, connectionType);
@@ -263,13 +263,13 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
                                     break;
                                 }
                                 canConnectUp = CoordCanConnectUp(connectionCoord, numberOfLayers, shape);
-                                if(!canConnectUp)
+                                if (!canConnectUp)
                                 {
                                     connectionCandidates.Remove(connectionCoord);
                                 }
                             }
                             while (!canConnectUp);
-                            if(connectionCoord != Coord.Uninitialized)
+                            if (connectionCoord != Coord.Uninitialized)
                             {
                                 ApplyConnection(shape, connectionCoord, SegmentConnectionType.ELEVATOR_UP);
                             }
@@ -319,7 +319,7 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
             if (r.NextDouble() < DROP_CHANCE && y != 1)
             {
                 List<Coord> possibleDropXs = shape.Where(i => i.Key.Y == y && !i.Value.ContainsDown() && !i.Value.ContainsDrop()).Select(i => i.Key).ToList();
-                if(possibleDropXs.Count > 0)
+                if (possibleDropXs.Count > 0)
                 {
                     Coord dropCoord = possibleDropXs.Sample(r);
                     shape[dropCoord] = shape[dropCoord].AddDrop();
@@ -383,7 +383,7 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
     protected override void ConnectNonEuclideanPaths(Palace palace)
     {
         int maxY = palace.AllRooms.Select(i => i.coords).Max(i => i.Y);
-        for(int y = 1; y < maxY; y++)
+        for (int y = 1; y < maxY; y++)
         {
             Room leftmostRoom = palace.AllRooms.FirstOrDefault(i => i.coords.X == 0 && i.coords.Y == y)!;
             Debug.Assert(leftmostRoom != null);

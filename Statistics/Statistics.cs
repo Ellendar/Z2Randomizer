@@ -20,7 +20,7 @@ namespace Z2Randomizer.Statistics;
 /// </summary>
 class Statistics
 {
-    private static readonly string FLAGS = "hEABexKyA3zW5qAw0LJid9wd2COH+0c4YUCfstWWdAALh+h"; //Random%
+    private static readonly string FLAGS = "hEABexKyA3zW5qAw0LJid9wd2COH+0c4YUCfstWWPAAFRgy"; //Random%
     //private static readonly string FLAGS = "AAAA2dJALw3kToaJESXL#o4++o6WFU9WaAkyAAWAoh"; //Standard Swiss
     //private static readonly string FLAGS = "hEABexKyA3zWoqAw0LJidsqd2COQ+56swoE@WXss7AAWA+h"; //test
     //private static readonly string FLAGS = "g7+y2SHCACtOJ3hAAAAACsWhtocY+#caVWVprWmCQAABVAbh"; //short/short

@@ -895,7 +895,7 @@ sealed class MazeIsland : World
             map[toY, toX] = openEast ? Terrain.WALKABLEWATER : Terrain.MOUNTAIN;
         }
     }
-    public override void UpdateVisit(List<RequirementType> requireables)
+    public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
         bool changed = true;
         while (changed)

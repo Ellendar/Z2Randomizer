@@ -1409,7 +1409,7 @@ public class Hyrule
             previousReachableLocationsCount = reachableLocationsCount;
             previousGettableItemsCount = gettableItemsCount;
             gettableItemsCount = UpdateItemGets(props);
-            List<RequirementType> requireables = GetRequireables(props);
+            HashSet<RequirementType> requireables = GetRequireables(props);
             westHyrule.UpdateVisit(requireables);
             deathMountain.UpdateVisit(requireables);
             eastHyrule.UpdateVisit(requireables);
@@ -1580,7 +1580,7 @@ public class Hyrule
     /// <returns>Whether any items were marked accessable</returns>
     private int UpdateItemGets(RandomizerProperties props)
     {
-        List<RequirementType> requireables;
+        HashSet<RequirementType> requireables;
         accessibleMagicContainers = props.StartMagicContainers;
         accessibleHeartContainers = props.StartHearts;
         Location newKasuto = eastHyrule.newKasuto;
@@ -1624,9 +1624,9 @@ public class Hyrule
         return gottenItems.Count;
     }
 
-    public List<RequirementType> GetRequireables(RandomizerProperties props)
+    public HashSet<RequirementType> GetRequireables(RandomizerProperties props)
     {
-        List<RequirementType> requireables = [];
+        HashSet<RequirementType> requireables = [];
 
         foreach(Collectable item in ItemGet.Keys)
         {
@@ -3106,14 +3106,24 @@ CustomFileSelectData:
 
         sb.AppendLine("Missing Items:");
         //Where(i => !i.ItemGet && !i.Collectable.IsInternalUse()
-        bool itemWasMissing = false;
+        bool itemWasUnreachable = false, itemWasMissing = false;
         foreach (Location location in ItemLocations().Where(l => l.GetAllCollectables().Any(i => !i.IsMinorItem() && !ItemGet[i])))
         {
             string name = location.Name + (location.Palace == null ? String.Empty : $"({location?.Palace?.Number})");
             sb.AppendLine($"{name} / [{String.Join(", ", location!.GetAllCollectables()
                 .Where(i => !i.IsMinorItem() && !ItemGet[i])
                 .Select(i => Enum.GetName(i)))}]");
-            itemWasMissing = true;
+            itemWasUnreachable = true;
+        }
+
+        if (!itemWasUnreachable)
+        {
+            sb.AppendLine("One or more items were in ItemGet but in no location!");
+            foreach (Collectable missingItem in ItemGet.Keys.Where(i => ItemGet[i] == false && !i.IsMinorItem()))
+            {
+                sb.AppendLine(missingItem.ToString());
+                itemWasMissing = true;
+            }
         }
 
         if(!itemWasMissing)

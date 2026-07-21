@@ -44,7 +44,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
             }
         }
         //Tbird Room
-        else if(!props.RemoveTbird)
+        else if (!props.RemoveTbird)
         {
             if (roomPool.TbirdRooms.Count == 0)
             {
@@ -78,7 +78,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
         }
 
         //BossRoom
-        if(palace.BossRoom == null)
+        if (palace.BossRoom == null)
         {
             if (roomPool.BossRooms.Count == 0)
             {
@@ -148,7 +148,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
         }
 
         return true;
-    } 
+    }
 
     //Linked rooms were linked ahead of time for the purposes of palace generation, but need to be unlinked for
     //logical calculation
@@ -157,7 +157,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
 
         List<(Room, Room, Room)> replacements = [];
         //only the primary linked rooms
-        foreach (Room primaryRoom in palace.AllRooms.Where(i => i.LinkedRoomName != null && i.Enabled && i.LinkedRoom == null)) 
+        foreach (Room primaryRoom in palace.AllRooms.Where(i => i.LinkedRoomName != null && i.Enabled && i.LinkedRoom == null))
         {
             Room secondaryRoom = new(roomPool.LinkedRooms[primaryRoom.LinkedRoomName!]);
             Room newPrimaryRoom = new(roomPool.LinkedRooms[primaryRoom.Name]);
@@ -169,18 +169,18 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
 
             replacements.Add((primaryRoom, newPrimaryRoom, secondaryRoom));
             //Handle this one differently to account for drops
-            if(palace.AllRooms.Any(i => i.Down == primaryRoom))
+            if (palace.AllRooms.Any(i => i.Down == primaryRoom))
             {
                 Room upRoom = palace.AllRooms.First(i => i.Down == primaryRoom);
                 //This specifically handles the case where the room above is connected by elevator to another linked room
                 //AllRooms will still have a reference to the merged room, but we need to make sure the up reference is to
                 //the new room not the old room.
                 //This doesn't matter for drops because the Up reference should be null, so it will continue to be
-                if(primaryRoom.Up != null && primaryRoom.Up != upRoom)
+                if (primaryRoom.Up != null && primaryRoom.Up != upRoom)
                 {
                     upRoom = primaryRoom.Up;
                 }
-                if(newPrimaryRoom.HasUpExit)
+                if (newPrimaryRoom.HasUpExit)
                 {
                     newPrimaryRoom.Up = primaryRoom.Up;
                     upRoom.Down = newPrimaryRoom;
@@ -190,7 +190,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
                     secondaryRoom.Up = primaryRoom.Up;
                     upRoom.Down = secondaryRoom;
                 }
-                if(newPrimaryRoom.IsDropZone && upRoom.HasDrop)
+                if (newPrimaryRoom.IsDropZone && upRoom.HasDrop)
                 {
                     upRoom.Down = newPrimaryRoom;
                 }
@@ -244,7 +244,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
                     primaryRoom.Right.Left = secondaryRoom;
                 }
             }
-            if(primaryRoom.HasItem)
+            if (primaryRoom.HasItem)
             {
                 int index = palace.ItemRooms.IndexOf(primaryRoom);
                 palace.ItemRooms[index] = newPrimaryRoom;
@@ -258,8 +258,8 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
                 palace.TbirdRoom = newPrimaryRoom;
             }
         }
-        
-        foreach((Room, Room, Room) replacement in replacements)
+
+        foreach ((Room, Room, Room) replacement in replacements)
         {
             palace.AllRooms.Remove(replacement.Item1);
             palace.AllRooms.Add(replacement.Item2);

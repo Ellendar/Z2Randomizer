@@ -20,22 +20,25 @@ public class Palaces
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = [
         RequirementType.KEY, ..RequirementTypeExtensions.UpToXContainers(5)];
-    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(6) ];
-    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(6) ];
-    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, ..RequirementTypeExtensions.UpToXContainers(7) ];
-    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, ..RequirementTypeExtensions.UpToXContainers(7) ];
-    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = [
         RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8) ];
-    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = [ 
+    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = [
         RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8)];
 
-    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = [ 
+    public static readonly RequirementType[] ALL_PALACE_ALLOWED_BLOCKERS = [
+        RequirementType.JUMP, RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.KEY, RequirementType.DASH, RequirementType.GLOVE, ..RequirementTypeExtensions.UpToXContainers(8)];
+
+    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = [
         VANILLA_P1_ALLOWED_BLOCKERS,
         VANILLA_P2_ALLOWED_BLOCKERS,
         VANILLA_P3_ALLOWED_BLOCKERS,
@@ -82,7 +85,7 @@ public class Palaces
 
             bool oneWayDropToBossAllowed = !props.BossRoomsExitToPalace[currentPalace - 1];
             RoomPool roomPool;
-            if(props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool())
+            if (props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool())
             {
                 roomPool = new VanillaRoomPool(palaceRooms, currentPalace, props);
             }
@@ -91,9 +94,10 @@ public class Palaces
                 roomPool = new(palaceRooms, currentPalace, props);
             }
             Palace palace;
+            int attempts = 0;
             do
             {
-                palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace);
+                palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace, attempts++);
             } while (!palace.IsValid);
             palace.BossRoom!.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
             PalaceGenerator.DebugCheckDuplicates(props, palace);
@@ -106,12 +110,12 @@ public class Palaces
             {
                 group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize, props.RemoveTbird);
             }
-            
+
             if (palace.PalaceGroup == PalaceGrouping.Palace346)
             {
                 group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize, props.RemoveTbird);
             }
-            
+
             if (palace.PalaceGroup == PalaceGrouping.PalaceGp)
             {
                 group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize, props.RemoveTbird);
@@ -141,9 +145,9 @@ public class Palaces
             .Union(palaces[6].AllRooms.Where(i => i.HasDrop))
             .ToList();
 
-        foreach(Palace palace in palaces)
+        foreach (Palace palace in palaces)
         {
-            foreach(Room itemRoom in palace.ItemRooms)
+            foreach (Room itemRoom in palace.ItemRooms)
             {
                 RoomExitType exitType = itemRoom.CategorizeExits();
                 if (itemRoomCounts.TryGetValue(exitType, out int count))
@@ -156,7 +160,6 @@ public class Palaces
                 }
             }
         }
-
         return palaces;
     }
 
@@ -282,7 +285,7 @@ public class Palaces
             return false;
         }
 
-        foreach(Palace palace in palaces)
+        foreach (Palace palace in palaces)
         {
             //If the palace doesn't have the right number of item rooms
             //or an item room is null
@@ -301,11 +304,11 @@ public class Palaces
     private static bool AtLeastOnePalaceCanHaveGlove(RandomizerProperties props, List<Palace> palaces)
     {
         //If overworld and palace items are mixed, we don't need glove to be in a palace
-        if(props.MixOverworldPalaceItems)
+        if (props.MixOverworldPalaceItems)
         {
             return true;
         }
-        List<RequirementType> requireables =
+        HashSet<RequirementType> requireables =
         [
             RequirementType.KEY,
             RequirementType.UPSTAB,
@@ -314,7 +317,7 @@ public class Palaces
             RequirementType.FAIRY,
             ..RequirementTypeExtensions.UpToXContainers(4)
         ];
-        for(int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
             //If there is at least one palace that would be clearable with everything but the glove
             //that palace could contain the glove, so we're not deadlocked.
@@ -328,7 +331,7 @@ public class Palaces
 
     private static bool CanGetGlove(RandomizerProperties props, IEnumerable<Palace> palaces)
     {
-        List<RequirementType> requireables = [.. RequirementTypeExtensions.UpToXContainers(props.StartMagicContainers)];
+        HashSet<RequirementType> requireables = [.. RequirementTypeExtensions.UpToXContainers(props.StartMagicContainers)];
         //If shuffle overworld items is on, we assume you can get all the items / spells
         //as all progression items will eventually shuffle into spots that work
         if (props.ShuffleOverworldItems)
@@ -343,14 +346,14 @@ public class Palaces
 
         if (!props.ShufflePalaceItems)
         {
-            //If we can't clear 2 without the items available, we can never get the glove, so the palace is unbeatable
             Palace palace2 = palaces.FirstOrDefault(i => i.Number == 2)!;
+            //If we can't clear 2 without the items available, we can never get the glove, so the palace is unbeatable
             if (!palace2.CanReachAnItemRoom(requireables))
             {
                 return false;
             }
         }
-        else if(!props.MixOverworldPalaceItems)
+        else if (!props.MixOverworldPalaceItems)
         {
             //If palace items are shuffled, but not mixed, we have to be able to get to at least one item room without the glove
             return palaces.Any(palace => palace.CanReachAnItemRoom(requireables));
@@ -358,13 +361,14 @@ public class Palaces
         return true;
     }
 
+
     private static bool CanGetRaft(RandomizerProperties props, bool raftIsRequired, Palace palace2, Palace palace3)
     {
         //if the flagset has vanilla connections and vanilla palace items, you have to be able to get the raft
         //or it will send the logic into an uinrecoverable nosedive since the palaces can't re-generate
         if (!props.ShufflePalaceItems && raftIsRequired)
         {
-            List<RequirementType> requireables;
+            HashSet<RequirementType> requireables;
             //If shuffle overworld items is on, we assume you can get all the items / spells
             //as all progression items will eventually shuffle into spots that work
             if (props.ShuffleOverworldItems)

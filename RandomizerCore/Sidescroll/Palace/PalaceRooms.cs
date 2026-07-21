@@ -10,7 +10,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 public partial class PalaceRooms
 {
     private readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new();
-
+    public IReadOnlyList<Room> RoomsByGroup(RoomGroup group) => roomsByGroup.GetValueOrDefault(group, []);
     private readonly Dictionary<string, Room> roomsByName = new();
 
     public static readonly string roomsMD5 = "JCa3OsnJhIe/fZ5yrx/+mA==";
@@ -75,9 +75,9 @@ public partial class PalaceRooms
                 mapMax = 54;
                 break;
             default:
-            throw new ArgumentException("Invalid palace number: " + palaceNum);
+                throw new ArgumentException("Invalid palace number: " + palaceNum);
         }
-        
+
 
         var roomgroup = roomsByGroup[RoomGroup.VANILLA];
 
@@ -130,7 +130,7 @@ public partial class PalaceRooms
 
     public IEnumerable<Room> ItemRoomsByDirection(RoomGroup group, Direction direction)
     {
-        if(direction == Direction.NONE)
+        if (direction == Direction.NONE)
         {
             throw new ArgumentException("Invalid Direction.NONE in ItemRoomsByDirection");
         }
@@ -163,7 +163,7 @@ public partial class PalaceRooms
     public IEnumerable<Room> NormalPalaceRoomsByGroup(RoomGroup group)
     {
         var roomgroup = roomsByGroup[group];
-        return roomgroup.Where(i => (i.PalaceNumber ?? 1) != 7 
+        return roomgroup.Where(i => (i.PalaceNumber ?? 1) != 7
             && i is { IsThunderBirdRoom: false, HasItem: false, IsBossRoom: false, IsEntrance: false });
     }
 
@@ -195,7 +195,7 @@ public partial class PalaceRooms
         Dictionary<string, Room> linkedRooms = [];
         foreach (Room room in roomsByGroup[group])
         {
-            if(room.Enabled && room.LinkedRoomName != null)
+            if (room.Enabled && room.LinkedRoomName != null)
             {
                 linkedRooms.Add(room.LinkedRoomName, GetRoomByName(room.LinkedRoomName));
                 linkedRooms.Add(room.Name, GetRoomByName(room.Name));

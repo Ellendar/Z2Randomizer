@@ -17,7 +17,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
 
     private const int STALL_LIMIT = 5000;
     public static int debug = 0;
-    
+
     private HashSet<Coord> openCoords = new();
     private Dictionary<Coord, Room> roomsByCoordinate = new();
     private int stallCount;
@@ -25,8 +25,8 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
     private int roomCount;
     private int palaceNumber;
     private RoomPool? roomPool;
-    
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNum)
+
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNum, int attempt)
     {
         this.roomCount = roomCount;
         this.palaceNumber = palaceNum;
@@ -34,7 +34,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         debug++;
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         Palace palace = new(palaceNumber, props.ShufflePalaceItems);
-        openCoords = new();
+        openCoords = [];
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
         roomPool = new(rooms);
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
@@ -44,8 +44,8 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             // PalaceGroup = palaceGroup
         };
         openCoords.UnionWith(entrance.GetOpenExitCoords());
-        
-        roomsByCoordinate= new() { { Coord.Uninitialized, entrance } };
+
+        roomsByCoordinate = new() { { Coord.Uninitialized, entrance } };
         palace.Entrance = entrance;
         palace.AllRooms.Add(entrance);
 
@@ -54,11 +54,11 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         while (roomsByCoordinate.Count + openCoords.Count < this.roomCount || openJunctionsCount > 0)
         {
             //Stalled out, try again from the start
-            if(openCoords.Count == 0 || stallCount++ >= STALL_LIMIT)
+            if (openCoords.Count == 0 || stallCount++ >= STALL_LIMIT)
             {
                 await Task.Yield();
                 palace.IsValid = false;
-                if(stallCount++ >= STALL_LIMIT)
+                if (stallCount++ >= STALL_LIMIT)
                 {
                     //Debug.WriteLineIf(palaceNum == 7, palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
                     stallFailureCounts[palaceNumber - 1]++;
@@ -71,7 +71,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
                 palace.IsValid = false;
                 return palace;
             }
-            
+
             Room baseRoom = new(originalRoom);
             Room mergedRoom = baseRoom;
             //Update: Now we're just handling linked rooms like random walk does. Merge the rooms and treat them as a single room
@@ -87,7 +87,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             r.Shuffle(openCoordsIterator);
             Coord bestFitCoordinate = Coord.Uninitialized;
             int bestFitExitCount = 0;
-            foreach(Coord openCoord in openCoordsIterator) 
+            foreach (Coord openCoord in openCoordsIterator)
             {
                 var (x, y) = openCoord;
                 int fitExitCount = mergedRoom.FitsWithLeft(roomsByCoordinate.GetValueOrDefault(new Coord(x - 1, y)))
@@ -95,7 +95,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
                     + mergedRoom.FitsWithUp(roomsByCoordinate.GetValueOrDefault(new Coord(x, y + 1)))
                     + mergedRoom.FitsWithRight(roomsByCoordinate.GetValueOrDefault(new Coord(x + 1, y)));
 
-                if(fitExitCount > bestFitExitCount)
+                if (fitExitCount > bestFitExitCount)
                 {
                     bestFitExitCount = fitExitCount;
                     bestFitCoordinate = openCoord;
@@ -107,7 +107,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
                 continue;
             }
             mergedRoom.coords = bestFitCoordinate;
-            if(UpdateRoom(mergedRoom))
+            if (UpdateRoom(mergedRoom))
             {
                 palace.AllRooms.Add(mergedRoom);
                 //Debug.WriteLineIf(debug == 78, palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
@@ -235,7 +235,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         {
             throw new ImpossibleException("Palace Room count exceeds maximum room count.");
         }
-        if(openCoords.Count != 0)
+        if (openCoords.Count != 0)
         {
             throw new ImpossibleException("Stray open coordinate after palace is generated");
         }
@@ -269,7 +269,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
     private bool UpdateRoom(Room mergedRoom)
     {
         Coord bestFit = mergedRoom.coords;
-        
+
         HashSet<Coord> newOpenCoords = mergedRoom.GetOpenExitCoords();
         foreach (Coord coord in newOpenCoords)
         {
@@ -316,7 +316,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             mergedRoom.Right = right;
             right.Left = mergedRoom;
         }
-       
+
         openCoords.UnionWith(newOpenCoords);
         openCoords.Remove(bestFit);
 
@@ -329,7 +329,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         //I considered just categorizing all the rooms by type and doing logic to determine the appropriate cap,
         //but that logic tree to find what shape the hole is to fill with the appropriate peg got messy.
         openJunctionsCount = 0;
-        foreach(var coord in openCoords)
+        foreach (var coord in openCoords)
         {
             //debug++;
             (x, y) = coord;
@@ -338,7 +338,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             Room? coordUp = roomsByCoordinate.GetValueOrDefault(new Coord(x, y + 1));
             Room? coordDown = roomsByCoordinate.GetValueOrDefault(new Coord(x, y - 1));
 
-            if((coordLeft is { HasRightExit: true } ? 1 : 0)
+            if ((coordLeft is { HasRightExit: true } ? 1 : 0)
                + (coordRight is { HasLeftExit: true } ? 1 : 0)
                + (coordUp != null && (coordUp.HasDownExit || coordUp.HasDrop) ? 1 : 0)
                + (coordDown is { HasUpExit: true } ? 1 : 0) >= 2)

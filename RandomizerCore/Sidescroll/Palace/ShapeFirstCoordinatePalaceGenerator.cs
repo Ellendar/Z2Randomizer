@@ -13,7 +13,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
 
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt)
     {
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         Palace palace = new(palaceNumber, props.ShufflePalaceItems);

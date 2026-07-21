@@ -8,12 +8,12 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public class ReconstructedLoopyPalaceGenerator(CancellationToken ct) : ReconstructedPalaceGenerator(ct)
 {
-    internal override Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt)
     {
         rooms.RemoveRooms(room => room.HasDrop);
         rooms.RemoveRooms(room => !room.IsEntrance && !room.IsBossRoom && !room.HasItem
                                   && RoomExitTypeExtensions.DEADENDS.Contains(room.CategorizeExits()));
-        return base.GeneratePalace(props, rooms, r, roomCount, palaceNumber);
+        return base.GeneratePalace(props, rooms, r, roomCount, palaceNumber, attempt);
     }
 
     public override void Consolidate(List<Room> openRooms, RandomizerProperties props, int palaceNumber)

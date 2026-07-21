@@ -12,7 +12,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public record struct Coord(int X, int Y) : IComparable<Coord>
 {
-    public Coord((int, int) coords) : this(coords.Item1, coords.Item2) {}
+    public Coord((int, int) coords) : this(coords.Item1, coords.Item2) { }
     public static Coord Uninitialized = new(0, 0);
     //I want a separate constant for this in case implementation changes the value of Unitialized, but origin should always be 0,0
     public static Coord Origin = new(0, 0);
@@ -65,7 +65,7 @@ public class Room : IJsonOnDeserialized
     public PalaceGrouping? PalaceGroup => Util.AsPalaceGrouping(PalaceNumber);
     [JsonIgnore]
     public bool IsRoot { get; set; }
-    
+
     [JsonIgnore]
     public Room? LinkedRoom { get; set; }
     [JsonIgnore]
@@ -86,8 +86,8 @@ public class Room : IJsonOnDeserialized
     [JsonIgnore]
     public bool IsDeadEnd => (HasLeftExit ? 1 : 0) + (HasRightExit ? 1 : 0) + (HasUpExit ? 1 : 0) + (HasDownExit ? 1 : 0) == 1;
     //public bool IsPlaced { get; set; }
-	
-	//This still exists just to facilitate serialization because I didn't want to mess with it.
+
+    //This still exists just to facilitate serialization because I didn't want to mess with it.
     //It's also used for the vanilla rooms to build the vanilla room tree, which should probably just be
     //handled elsewhere.
     //Please do not reference it outside of that
@@ -145,8 +145,8 @@ public class Room : IJsonOnDeserialized
     //The json loads the fields the analyzer says aren't loaded. Source: trust me bro
     //But seriously eventually put some validation here.
 #pragma warning disable CS8618
-    public Room() {}
-    
+    public Room() { }
+
     public Room(Room room)
     {
         CopyFrom(room);
@@ -158,9 +158,9 @@ public class Room : IJsonOnDeserialized
     {
         var room = JsonSerializer.Deserialize(json, RoomSerializationContext.Default.Room);
         CopyFrom(room!);
-        
+
         var length = SideView?[0] ?? 0;
-        if(SideView?.Length != length)
+        if (SideView?.Length != length)
         {
             throw new Exception($"Room length header {length} does not match actual length for sideview: {SideView!.Length}");
         }
@@ -278,7 +278,7 @@ public class Room : IJsonOnDeserialized
                 tableAddr = Enemy.Enemies.GPEnemyPtr + Map * 2;
                 break;
         }
-        
+
         a.RomOrg(tableAddr);
         a.Word((ushort)enemyDataAddr);
 
@@ -292,7 +292,7 @@ public class Room : IJsonOnDeserialized
         PalaceGrouping palaceGroup = PalaceGroup ?? throw new Exception("Unable to assign ItemGetBits on a room with no palace group");
 
         var old = palaceItemBits[palaceGroup][Map / 2];
-        if(Map % 2 == 0)
+        if (Map % 2 == 0)
         {
             old = (byte)(old & 0x0F);
             old = (byte)((ItemGetBits[0] << 4) | old);
@@ -324,7 +324,7 @@ public class Room : IJsonOnDeserialized
     public int CountOpenExits()
     {
         var exits = 0;
-        if(HasRightExit && Right == null)
+        if (HasRightExit && Right == null)
         {
             exits++;
         }
@@ -423,6 +423,24 @@ public class Room : IJsonOnDeserialized
         SideView = edit.Finalize();
     }
 
+    public bool HasTag(string tag) => Tags != null && Tags.Contains(tag);
+
+    /// Aggregating PalaceNumber matching logic to determine if this room is appropriate for palaceNumber.
+    public bool InPoolForPalace(int palaceNumber)
+    {
+        if (PalaceNumber == null)
+        {
+            if (IsBossRoom)
+            {
+                return palaceNumber < 6; // Barba room is not generic
+            }
+            Debug.Assert(!IsThunderBirdRoom, "Thunderbird rooms must have palaceNumber=7");
+            return palaceNumber < 7; // Any non-GP palace is the default meaning of null
+        }
+
+        return PalaceNumber == palaceNumber;
+    }
+
     public string DebugString()
     {
         StringBuilder sb = new();
@@ -454,7 +472,7 @@ public class Room : IJsonOnDeserialized
         }
         return sb.ToString();
     }
-    public bool IsTraversable(IEnumerable<RequirementType> requireables)
+    public bool IsTraversable(IReadOnlySet<RequirementType> requireables)
     {
         return Requirements.AreSatisfiedBy(requireables);
     }
@@ -534,14 +552,14 @@ public class Room : IJsonOnDeserialized
         }
         else
         {
-            if(up.HasDownExit)
+            if (up.HasDownExit)
             {
                 return up.HasDrop && IsDropZone ? 1 : CONFLICT;
             }
         }
         //There is a room Above, but they don't interact at all
         //Theoretically we could just default true but this is a good safety
-        if(!HasUpExit && !up.HasDownExit && !up.HasDrop)
+        if (!HasUpExit && !up.HasDownExit && !up.HasDrop)
         {
             return 0;
         }
@@ -626,7 +644,7 @@ public class Room : IJsonOnDeserialized
 
     public bool ValidateExits()
     {
-        if (!HasRightExit && Right != null) 
+        if (!HasRightExit && Right != null)
         {
             return false;
         }
@@ -642,7 +660,7 @@ public class Room : IJsonOnDeserialized
         {
             return false;
         }
-        if(HasRightExit && Right != null && Right.Left != this)
+        if (HasRightExit && Right != null && Right.Left != this)
         {
             return false;
         }
@@ -668,10 +686,10 @@ public class Room : IJsonOnDeserialized
 
         foreach (Direction direction in directons)
         {
-            switch(direction)
+            switch (direction)
             {
                 case Direction.NORTH:
-                    if(FitsWithUp(otherRoom) == 1 && ElevatorScreen > -1 && otherRoom.ElevatorScreen > -1)
+                    if (FitsWithUp(otherRoom) == 1 && ElevatorScreen > -1 && otherRoom.ElevatorScreen > -1)
                     {
                         Up = otherRoom;
                         return true;
@@ -742,6 +760,15 @@ public class Room : IJsonOnDeserialized
             || HasUpExit && Up == null
             || HasDownExit && Down == null;
     }
+
+    public bool HasExitInDirection(Direction direction) => direction switch
+    {
+        Direction.NORTH => HasUpExit,
+        Direction.SOUTH => HasDownExit,
+        Direction.WEST => HasLeftExit,
+        Direction.EAST => HasRightExit,
+        _ => false
+    };
 
     public void UpdateSideviewItem(Collectable collectable)
     {

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+
 internal class ChaosPalaceGenerator : PalaceGenerator
 {
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -13,7 +14,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
     private const int CONNECTION_ATTEMPT_LIMIT = 200;
     private static int debug = 0;
 
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt)
     {
         debug++;
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
@@ -66,7 +67,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             }
         }
 
-        if(palaceNumber == 7)
+        if (palaceNumber == 7)
         {
             if (!props.RemoveTbird)
             {
@@ -146,18 +147,19 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         List<Room> reachableRooms = palace.GetReachableRooms().ToList();
         List<Room> unreachableRooms = palace.AllRooms.Except(reachableRooms).ToList();
         int connectionCount = 0;
-        while(unreachableRooms.Count > 0 && connectionCount++ < CONNECTION_ATTEMPT_LIMIT)
+        while (unreachableRooms.Count > 0 && connectionCount++ < CONNECTION_ATTEMPT_LIMIT)
         {
             await Task.Yield();
             unreachableRooms.FisherYatesShuffle(r);
-            foreach(Room unreachableRoom in unreachableRooms)
+            foreach (Room unreachableRoom in unreachableRooms)
             {
                 Room reachableRoom = reachableRooms.Sample(r) ?? throw new Exception("No reachable rooms remain)");
                 reachableRoom.ConnectRandomly(unreachableRoom, r);
             }
             reachableRooms = palace.GetReachableRooms().ToList();
             unreachableRooms = palace.AllRooms.Except(reachableRooms).ToList();
-        };
+        }
+        ;
 
         //Chaos palaces do not check for inescapable drops. They are inherently insane and not remotely beginner-friendly.
 

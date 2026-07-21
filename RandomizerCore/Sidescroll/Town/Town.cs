@@ -49,7 +49,7 @@ public class Town
     }
 
     //Determine what items you can get from this town with these reqireables from this entrance direction
-    public List<Collectable> GetGettableItems(Direction entranceDirection, List<RequirementType> requireables, bool shufflableItemsOnly = false)
+    public List<Collectable> GetGettableItems(Direction entranceDirection, IReadOnlySet<RequirementType> requireables, bool shufflableItemsOnly = false)
     {
         TownMap startMap = entranceDirection switch
         {
@@ -117,7 +117,7 @@ public class Town
         return collectables;
     }
 
-    public bool CanBeTraversed(List<RequirementType> requireables)
+    public bool CanBeTraversed(IReadOnlySet<RequirementType> requireables)
     {
         TownMap leftMap = TownMaps.First(i => i.Left == null && !i.IsInternalLocation);
 

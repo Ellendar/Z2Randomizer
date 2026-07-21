@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -36,7 +37,7 @@ public enum RequirementType
 
 public static class RequirementTypeExtensions
 {
-    public static readonly List<RequirementType> ALL = [..Enum.GetValues<RequirementType>()];
+    public static readonly ReadOnlySet<RequirementType> ALL = [..Enum.GetValues<RequirementType>()];
     /// Mirror of Collectable.AsRequirement()
     public static Collectable? AsCollectable(this RequirementType requirementType)
     {

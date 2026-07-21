@@ -1103,7 +1103,7 @@ sealed class DeathMountain : World
     /// <summary>
     /// Updates the visitation matrix and location reachability 
     /// </summary>
-    public override void UpdateVisit(List<RequirementType> requireables)
+    public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
         UpdateReachable(requireables);
 

@@ -40,7 +40,7 @@ internal class ByEntranceDirectionItemRoomSelectionStrategy : ItemRoomSelectionS
             }
 
         }
-        
+
 
         return itemRooms.ToArray();
     }

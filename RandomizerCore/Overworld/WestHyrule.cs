@@ -1350,7 +1350,7 @@ public sealed class WestHyrule : World
     }
 
 
-    public override void UpdateVisit(List<RequirementType> requireables)
+    public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
         visitation[northPalace.Y, northPalace.Xpos] = true;
         UpdateReachable(requireables);
