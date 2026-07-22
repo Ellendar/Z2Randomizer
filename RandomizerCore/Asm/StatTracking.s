@@ -412,6 +412,15 @@ CheckIfNewSaveFile:
             bne @loop
         sta StatTrackingSaveFileClear
 @skip:
+.ifdef ENABLE_Z2_MARIO
+    ; also play a coin sfx when entering the file
+    pha
+        lda #0
+        sta Square1SoundQueue
+        lda #Sfx_CoinGrab
+        sta Square2SoundQueue
+    pla
+.endif
     jmp LoadSaveFile
 
 ; Patch the "Register" button to set a flag for a new save file

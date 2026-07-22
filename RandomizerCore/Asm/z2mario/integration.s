@@ -1356,6 +1356,7 @@ CheckHammerHitboxes:
 .reloc
 PatchFireballHitcheck:
   ldy $11 ; fireball or hammer slot (0 or 1)
+PatchFireballHitcheckInternal:
   lda Fireball_State,y
   and #%01000000
   bne @IsHammer
@@ -1396,35 +1397,56 @@ PatchFireballHitcheck:
   ; the patch check above
 FREE_UNTIL $e6f3
 
-; .org $E558
-;   rts ; disable link shield maybe?
-; .org $E563
-;   rts ; disable link shield maybe?
-; .org $E579
-;   rts ; disable link shield maybe?
-
-; Replace vanilla beam/fire code with our new 
+; Skip over something? this was related to projectiles...
 .org $d50d
-  ; jsr CustomProjectileCode
   jmp *+3
 
-; .reloc
-; CustomProjectileCode:
-;   jsr ProcFireball_Bubble    ;process fireballs and air bubbles
-;   rts
-; .org $9370
-;   ; TODO this is where link takes damage
-;   jmp GameRoutines
+; Make it so hammers can hit statues/jars and reveal them
+; this is a macro since we need this in PRG4 and PRG5. we could put it in PRG7
+; but I don't want to waste room there
+; Check hammers only every other frame too.
+.macro CheckHammerHitboxMacro
+  jsr $E677 ; Check collision
+  bcs @exit
+@check1:
+    ; Didn't hit with the vanilla sword check, so check hammers too
+    lda LinkProjectile0State
+    beq @check2
+    lda FrameCounter
+    and #1 ; cant use lsr to keep the carry
+    bne @check2
+    ldy #0
+    jsr LoadProjectileCollisionBox
+    jsr PatchFireballHitcheckInternal
+    bcs @exit
+@check2:
+      lda LinkProjectile1State
+      beq @exit
+      lda FrameCounter
+      and #1 ; cant use lsr to keep the carry
+      beq @exit
+      ldy #1
+      jsr LoadProjectileCollisionBox
+      jmp PatchFireballHitcheckInternal
+@exit:
+  rts
+.endmacro
 
-; .org $937e
-;   nop ; don't do this sword attack check
-;   nop ; todo see what should be here instead
-;   nop
-; ; there's a branch here from above to call the main game routine
-;   jmp GameRoutines 
+.segment "PRG4"
+.org $AF65
+  jsr CheckStatueHammerPRG4
+.org $B842
+  jsr CheckStatueHammerPRG4
+.reloc
+CheckStatueHammerPRG4:
+  CheckHammerHitboxMacro
 
-; .org $93ba
-;   rts ; patch the link main routine to skip some unneeded stuff
+.segment "PRG5"
+.org $A525
+  jsr CheckStatueHammerPRG5
+.reloc
+CheckStatueHammerPRG5:
+  CheckHammerHitboxMacro
 
 
 ; Update the falling block "set block on ground" so that it updates marios

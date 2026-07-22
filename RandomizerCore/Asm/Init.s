@@ -59,7 +59,9 @@ FREE "PRG4" [$870E, $871B)
 FREE "PRG4" [$8817, $88A0)
 FREE "PRG4" [$8EC3, $9400)
 FREE "PRG4" [$9EE0, $a000)
-FREE "PRG4" [$A1E3, $A1F8)
+; not strictly unused. its copied to ram for palace data,
+; it may really be unused but don't risk it.
+; FREE "PRG4" [$A1E3, $A1F8)
 FREE "PRG4" [$A3FB, $A440)
 FREE "PRG4" [$A539, $A640)
 FREE "PRG4" [$A765, $A900)
