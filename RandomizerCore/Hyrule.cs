@@ -3706,6 +3706,70 @@ EndTileComparisons = $8601
         }
     }
 
+    private static void UpdateMovingNpcDialog(Assembler asm, List<Text> texts)
+    {
+        if (texts.Count == 0)
+        {
+            return;
+        }
+        var a = asm.Module();
+        a.Assign("MOVING_DIALOG_COUNT", texts.Count);
+        a.Segment("PRG3");
+        a.Reloc();
+        a.Label("MovingDialogTable");
+        for (var i = 0; i < texts.Count; i++)
+        {
+            a.Word(a.Symbol($"MovingDialogText{i}"));
+        }
+        for (var i = 0; i < texts.Count; i++)
+        {
+            a.Reloc();
+            a.Label($"MovingDialogText{i}");
+            a.Byt(texts[i].EncodedText);
+        }
+
+        a.Code("""
+.include "z2r.inc"
+LoadTextFromPointer = $b609
+
+; patch the random walking NPC dialog to choose a dialog on spawn
+.org $973b
+    jsr ChooseDialogOnSpawn
+.reloc
+ChooseDialogOnSpawn:
+    lda RNG,x
+    ; RNG modulo COUNT of texts
+    cmp #MOVING_DIALOG_COUNT
+    bcc +
+    ; subtract until we underflow
+-   sbc #MOVING_DIALOG_COUNT
+    bcs -
+    ; then add it back once to complete the modulo
+    adc #MOVING_DIALOG_COUNT
++
+    sta EnemyHP,x
+    jmp $976B ; patched code
+
+; Repoint the walking generic NPC dialogs to our new routine
+.org $b46c
+    .word CustomMovingNpcDialog
+    .word CustomMovingNpcDialog
+    .word CustomMovingNpcDialog
+    .word CustomMovingNpcDialog
+
+.reloc
+CustomMovingNpcDialog:
+    lda EnemyHP,x ; repurposed as villager dialog option
+    asl
+    tay
+    lda #<MovingDialogTable
+    sta $00
+    lda #>MovingDialogTable
+    sta $01
+    jmp LoadTextFromPointer
+""");
+    }
+
     private void AssignRealPalaceLocations(AsmModule a)
     {
         a.Assign("RealPalaceAtLocation1", (westHyrule?.locationAtPalace1.PalaceNumber ?? 1) - 1);
@@ -4019,6 +4083,7 @@ bank5_Pointer_table_for_End_Credits:
             }
         }
 
+        UpdateMovingNpcDialog(engine, CustomTexts.BuildMovingNpcDialogPool(props));
         UpdateTexts(engine, texts);
     }
 
