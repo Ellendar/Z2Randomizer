@@ -65,10 +65,10 @@ FREE "PRG5" [$A7C1, $A932)
 
 .segment "PRG5"
 .org $A72E
-    jsr InitTitleStars
+    jsr BankedInitTitleScreen
 
 .org $AE41
-    jsr InitTitleStars
+    jsr BankedInitTitleScreen
 
 .org $A6F7
     jmp *+6
@@ -282,8 +282,18 @@ TitleTimerTargetTimerHi:
 ; Well thats a problem when i want to use mario on the screen, and stars shouldn't twinkle brown.
 ; So instead, we lose one color from the star twinkle, (the deep $02 blue from before), and instead
 ; put all stars on the same palette index 0. We then use two different "star sprites" that use color
-; 1 and 2 as well as the vanilla color 3. That way the stars can twinkle independently of each other. 
-.segment "PRG5"
+; 1 and 2 as well as the vanilla color 3. That way the stars can twinkle independently of each other.
+.segment "PRG7"
+.reloc
+BankedInitTitleScreen:
+    lda #$e ; use the same bank the extended rooms use
+    sta CurrentPrgBank
+    jsr SwapPRG
+    jsr InitTitleStars
+    lda #5
+    sta CurrentPrgBank
+    jmp SwapPRG
+.segment "PRG1C", "PRG1D"
 .reloc
 InitTitleStars:
     lda Respawning
@@ -416,7 +426,6 @@ BarebonesTitleScreenRNG:
 ;; ---
 ; Drawing routines
 
-.segment "PRG7"
 .reloc
 InitMarioData:
     ldx #0
@@ -441,6 +450,7 @@ InitMarioData:
     sta Player_Y_Position
     rts
 
+.segment "PRG7"
 .reloc
 DrawTitleMario:
     jsr SwapToPRG0
