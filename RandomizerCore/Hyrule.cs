@@ -3827,7 +3827,7 @@ CustomMovingNpcDialog:
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
 
-    public void AddCredits(Assembler asm)
+    public void AddCredits(Assembler asm, RandomizerProperties props)
     {
         byte[] CmdText(int x, int y, string text)
         {
@@ -3855,18 +3855,66 @@ CustomMovingNpcDialog:
         a.Label("NewCreditsBody");
         a.Byt(body);
 
-        a.Code("""
+        if (props.MarioMode)
+        {
+            // New Zelda II Mario credit screens which comes after the z2 credits but before the
+            // rando credits
+            byte[] marioRole1 = [.. CmdText(7,  2, "Z2M PROGRAMER"), 0xff];
+            byte[] marioName1 = [.. CmdText(11, 4, "JROWEBOY"), 0xff];
+            byte[] marioRole2 = [.. CmdText(7,  2, "Z2M SOUND COMPOSER"), 0xff];
+            byte[] marioName2 = [.. CmdText(11, 4, "HEYDON  "), 0xff];
+            byte[] marioRole3 = [.. CmdText(7,  2, "SPECIAL THANKS    "), 0xff];
+            byte[] marioName3 = [.. CmdText(11, 4, "STUDSX"), .. CmdText(11, 6, "QUANTAM"), 0xff];
+            byte[] marioRole4 = [.. CmdText(7,  2, "SPECIAL THANKS"), 0xff];
+            byte[] marioName4 = [.. CmdText(11, 4, "YOU   "), .. CmdText(11, 6, "       "), 0xff];
+            a.Assign("ENABLE_Z2_MARIO", 1);
+
+            a.Reloc(); a.Label("MarioRole1"); a.Byt(marioRole1);
+            a.Reloc(); a.Label("MarioName1"); a.Byt(marioName1);
+            a.Reloc(); a.Label("MarioRole2"); a.Byt(marioRole2);
+            a.Reloc(); a.Label("MarioName2"); a.Byt(marioName2);
+            a.Reloc(); a.Label("MarioRole3"); a.Byt(marioRole3);
+            a.Reloc(); a.Label("MarioName3"); a.Byt(marioName3);
+            a.Reloc(); a.Label("MarioRole4"); a.Byt(marioRole4);
+            a.Reloc(); a.Label("MarioName4"); a.Byt(marioName4);
+        }
+
+        ushort[] vanillaEntries = [
+            0x927D, 0x9293, 0x92A1, 0x92B7, 0x92C5, 0x92D1, 0x92E6, 0x92F2,
+            0x9307, 0x9319, 0x9325, 0x9337, 0x9325, 0x937E, 0x9325, 0x9396];
+        a.Reloc();
+        a.Label("NewCreditTable");
+        a.Word(vanillaEntries);
+        if (props.MarioMode)
+        {
+            a.Word(a.Symbol("MarioRole1")); a.Word(a.Symbol("MarioName1"));
+            a.Word(a.Symbol("MarioRole2")); a.Word(a.Symbol("MarioName2"));
+            a.Word(a.Symbol("MarioRole3")); a.Word(a.Symbol("MarioName3"));
+            a.Word(a.Symbol("MarioRole4")); a.Word(a.Symbol("MarioName4"));
+        }
+        a.Word(a.Symbol("NewCreditsHeader"));
+        a.Word(a.Symbol("NewCreditsBody"));
+
+        a.Code($$"""
 .include "z2r.inc"
 
 .segment "PRG5"
 
-bank5_Pointer_table_for_End_Credits:
-.org $9259 ; first entry
-.org $9279
-    .word NewCreditsHeader
-.org $927b
-    .word NewCreditsBody
+.org $9095
+    lda NewCreditTable,y
+.org $909a
+    lda NewCreditTable+1,y
 
+.ifdef ENABLE_Z2_MARIO
+.org $9175
+    cmp #$12 + 8 ; we added 8 new entries to the credits
+.org $9196
+    cmp #$10 + 8
+.endif
+
+; Free the now unused table and stuff
+.org $9259
+    FREE_UNTIL $927D
 .org $934F
     FREE_UNTIL $9364
 .org $9364
@@ -3917,7 +3965,7 @@ bank5_Pointer_table_for_End_Credits:
         rom.ThunderbirdEnterLeftFix(engine);
         rom.FixBigBubbleSplit(engine, randomizedStats);
         StatTracking(props, engine);
-        AddCredits(engine);
+        AddCredits(engine, props);
         rom.SetBossHpBarDivisors(engine, randomizedStats);
 
         if (props.MarioMode)
