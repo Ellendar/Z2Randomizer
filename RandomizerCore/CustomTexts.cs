@@ -339,7 +339,7 @@ public class CustomTexts
         "Did you$get a$concussion$by hitting$your head$so often?",
         "What are$you?$a cop?",
         "The river$devil does$not like$plumbers.",
-        "Get the$power.$Nintendo$power.",
+        "Get the$power.$Nintendo$power!",
         "I dont$talk with$plumbers.",
         "Where in$the world$is link?$He smashed$my pots$and left!",
         "Ganon is$so scary$please$save us!",
