@@ -120,15 +120,15 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
                     }
                 }
             }
+        }
 
-            if (palace.BossRoom == null
-                || palace.Entrance == null
-                || (palace.Number == 7 && palace.TbirdRoom == null)
-                || palace.ItemRooms.Count != itemRoomTotal)
-            {
-                logger.Debug("Failed to place critical room in palace");
-                return false;
-            }
+        if (palace.BossRoom == null
+            || palace.Entrance == null
+            || (palace.Number == 7 && palace.TbirdRoom == null)
+            || palace.ItemRooms.Count != itemRoomTotal)
+        {
+            logger.Debug("Failed to place critical room in palace");
+            return false;
         }
 
         UnmergeMergedRooms(palace, roomPool);
