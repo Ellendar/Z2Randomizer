@@ -679,7 +679,7 @@ public class CustomTexts
             if (props.HelpfulHints != HelpfulHintOption.NONE || props.MarioMode)
             {
                 List<int> placedIndexes = GenerateHelpfulHints(texts, locations, hashRNG, props);
-                GenerateKnowNothings(texts, placedIndexes, nonhashRNG, props.BagusWoods, props.UseCommunityText, props.MarioMode);
+                GenerateKnowNothings(texts, placedIndexes, nonhashRNG, props.HelpfulHints, props.BagusWoods, props.UseCommunityText, props.MarioMode);
             }
 
             if (props.UseCommunityText)
@@ -867,7 +867,7 @@ public class CustomTexts
         return new Text(RIVER_MAN_TEXTS[r.Next(RIVER_MAN_TEXTS.Length)]);
     }
 
-    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndexes, Random r, bool useCommunityText, bool marioMode)
+    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndexes, Random r, bool helpfulHints, bool useCommunityText, bool marioMode)
     {
         string[][] allTexts = [
             KNOW_NOTHING_KID_TEXTS,
@@ -876,7 +876,7 @@ public class CustomTexts
             KNOW_NOTHING_TEXTS,
             MOVING_NPC_TEXTS
         ];
-        var maybeMarioAdded = (marioMode) ?
+        var maybeMarioAdded = marioMode ?
             allTexts.Select(list => (string[])[..MARIO_KNOW_NOTHING_TEXTS, ..list]).ToArray()
             : allTexts;
         ShuffleBag<string> marioOnlyTexts = new(MARIO_KNOW_NOTHING_TEXTS, r);
@@ -916,47 +916,49 @@ public class CustomTexts
         ];
 
         Text defaultKnowNothing = new();
-        for (int i = 0; i < stationary.Count; i++)
+        
+        // if we are doing mario mode, we could have helpful hints off but still want mario flavor text
+        // for the moving NPCs, so skip stationary onces
+        if (helpfulHints)
         {
-            int textIndex = stationary[i];
-            if (!placedIndexes.Contains(textIndex))
+            for (int i = 0; i < stationary.Count; i++)
             {
-                Text hint;
-                if (useCommunityText)
+                int textIndex = stationary[i];
+                if (!placedIndexes.Contains(textIndex))
                 {
-                    if (kidHintNpcs.Contains(textIndex))
+                    Text hint;
+                    if (useCommunityText)
                     {
-                        hint = new Text(kidKnowNothingTexts.Draw());
-                    }
-                    else if (textIndex == SariaGreeterNpc)
-                    {
-                        hint = new Text(sariaGreeterTexts.Draw());
-                    }
-                    else if (outsideHintNpcs.Contains(textIndex))
-                    {
-                        hint = new Text(outsideKnowNothingTexts.Draw());
+                        if (kidHintNpcs.Contains(textIndex))
+                        {
+                            hint = new Text(kidKnowNothingTexts.Draw());
+                        }
+                        else if (textIndex == SariaGreeterNpc)
+                        {
+                            hint = new Text(sariaGreeterTexts.Draw());
+                        }
+                        else if (outsideHintNpcs.Contains(textIndex))
+                        {
+                            hint = new Text(outsideKnowNothingTexts.Draw());
+                        }
+                        else
+                        {
+                            hint = new Text(knowNothingTexts.Draw());
+                        }
                     }
                     else
                     {
-                        hint = new Text(knowNothingTexts.Draw());
+                        hint = defaultKnowNothing;
                     }
-                }
-                else if (marioMode)
-                {
-                    hint = new Text(marioOnlyTexts.Draw());
-                }
-                else
-                {
-                    hint = defaultKnowNothing;
-                }
-                hints[textIndex] = hint;
-                if (textIndex == talkingAcheIndexTalking)
-                {
-                    hints[talkingAcheIndexSleeping] = hint;
-                }
-                else if (textIndex == talkingBotIndexTalking)
-                {
-                    hints[talkingBotIndexSleeping] = hint;
+                        hints[textIndex] = hint;
+                    if (textIndex == talkingAcheIndexTalking)
+                    {
+                        hints[talkingAcheIndexSleeping] = hint;
+                    }
+                    else if (textIndex == talkingBotIndexTalking)
+                    {
+                        hints[talkingBotIndexSleeping] = hint;
+                    }
                 }
             }
         }

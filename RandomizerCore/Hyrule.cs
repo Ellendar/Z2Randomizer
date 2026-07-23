@@ -3732,9 +3732,16 @@ EndTileComparisons = $8601
 .include "z2r.inc"
 LoadTextFromPointer = $b609
 
+.segment "PRG3"
+
 ; patch the random walking NPC dialog to choose a dialog on spawn
 .org $973b
     jsr ChooseDialogOnSpawn
+; Conveniently the other type of walking NPC spawn
+; will also jump to $976B at then end
+.org $9753
+    jmp ChooseDialogOnSpawn
+
 .reloc
 ChooseDialogOnSpawn:
     lda RNG,x
@@ -3752,6 +3759,10 @@ ChooseDialogOnSpawn:
 
 ; Repoint the walking generic NPC dialogs to our new routine
 .org $b46c
+    .word CustomMovingNpcDialog
+    .word CustomMovingNpcDialog
+    .word CustomMovingNpcDialog
+    .word CustomMovingNpcDialog
     .word CustomMovingNpcDialog
     .word CustomMovingNpcDialog
     .word CustomMovingNpcDialog
