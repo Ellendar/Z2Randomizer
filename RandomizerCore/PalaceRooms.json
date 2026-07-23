@@ -10567,7 +10567,7 @@
     "name": "triforceOfCourageGP M8",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": ["FAIRY", "DASH"],
+    "requirements": ["FAIRY",["JUMP","DASH"]],
     "sideviewData": "1A6081086B29F51F6B29FA1465255B02D10E8106F0508106D10F"
   },
   {

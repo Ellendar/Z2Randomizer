@@ -649,7 +649,7 @@ public class Hyrule
     private void ShuffleItems()
     {
         List<Location> possibleItemLocations = ItemLocations().ToList();
-        IEnumerable<Location> palaceLocations = AllLocations().Where(i => i.Palace != null);
+        List<Location> palaceLocations = AllLocations().Where(i => i.Palace != null).ToList();
 
         spellListOrder = [Collectable.SHIELD_SPELL, Collectable.JUMP_SPELL, Collectable.LIFE_SPELL, Collectable.FAIRY_SPELL,
             props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL, Collectable.SPELL_SPELL, Collectable.REFLECT_SPELL,
@@ -725,8 +725,8 @@ public class Hyrule
         {
             TownMap? townMap = westHyrule.mido.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER);
             shufflableItems.Add(props.StartWithDownstab ? minorItems.Sample(r) : Collectable.DOWNSTAB);
-            globalShuffleLocations.Add(westHyrule.sariaNorth);
-            townMap = eastHyrule.darunia.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER);
+            globalShuffleLocations.Add(westHyrule.mido);
+            townMap = eastHyrule.darunia.Town!.GetTownMap(VanillaTownMap.DARUNIA_TRAINER);
             shufflableItems.Add(props.StartWithUpstab ? minorItems.Sample(r) : Collectable.UPSTAB);
             globalShuffleLocations.Add(eastHyrule.darunia);
         }
