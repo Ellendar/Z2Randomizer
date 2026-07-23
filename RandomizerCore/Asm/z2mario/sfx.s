@@ -603,7 +603,9 @@ ExSfx2: rts
 Square2SfxHandler:
         lda Square2SoundBuffer ;special handling for the 1-up sound to keep it
         and #Sfx_ExtraLife     ;from being interrupted by other sounds on square 2
-        bne ContinueExtraLife
+        beq +
+          jmp ContinueExtraLife
+        +
         ldy Square2SoundQueue  ;check for sfx in queue
         beq CheckSfx2Buffer
         sty Square2SoundBuffer ;if found, put in buffer and check for the following
@@ -611,13 +613,20 @@ Square2SfxHandler:
            jmp PlayStatuePoof     ;tanooki statue change (was bowser fall)
         +
         lsr Square2SoundQueue
-        bcs PlayCoinGrab       ;coin grab
+        bcc + 
+           jmp PlayCoinGrab       ;coin grab
+        + 
         lsr Square2SoundQueue
-        bcs PlayGrowPowerUp    ;power-up reveal
+        bcc +
+           jmp PlayGrowPowerUp    ;power-up reveal
+        +
         lsr Square2SoundQueue
-        bcs PlayGrowVine       ;vine grow
-        lsr Square2SoundQueue
-        bcs PlayBlast          ;fireworks/gunfire
+        bcc +
+          jmp PlayGrowVine       ;vine grow
+        + lsr Square2SoundQueue
+        bcc +
+           jmp PlayBlast          ;fireworks/gunfire
+        +
         lsr Square2SoundQueue
         bcc +
           jmp PlayTimerTick    ;timer tick
@@ -625,15 +634,18 @@ Square2SfxHandler:
         lsr Square2SoundQueue
         bcs PlayPowerUpGrab    ;power-up grab
         lsr Square2SoundQueue
-        bcs PlayExtraLife      ;1-up
-
+        bcc +
+            jmp PlayExtraLife      ;1-up
+        +
 CheckSfx2Buffer:
         lda Square2SoundBuffer   ;check for sfx in buffer
         beq ExS2H                ;if not found, exit sub
         bpl +
           jmp ContinueStatuePoof   ;tanooki statue change (was bowser fall)
       + lsr
-        bcs Cont_CGrab_TTick     ;coin grab
+        bcc +
+          jmp Cont_CGrab_TTick     ;coin grab
+        +
         lsr
         bcs ContinueGrowItems    ;power-up reveal
         lsr
