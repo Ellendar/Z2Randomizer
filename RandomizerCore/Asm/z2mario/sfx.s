@@ -613,9 +613,9 @@ Square2SfxHandler:
            jmp PlayStatuePoof     ;tanooki statue change (was bowser fall)
         +
         lsr Square2SoundQueue
-        bcc + 
+        bcc +
            jmp PlayCoinGrab       ;coin grab
-        + 
+        +
         lsr Square2SoundQueue
         bcc +
            jmp PlayGrowPowerUp    ;power-up reveal
@@ -623,7 +623,8 @@ Square2SfxHandler:
         lsr Square2SoundQueue
         bcc +
           jmp PlayGrowVine       ;vine grow
-        + lsr Square2SoundQueue
+        +
+        lsr Square2SoundQueue
         bcc +
            jmp PlayBlast          ;fireworks/gunfire
         +
@@ -632,7 +633,9 @@ Square2SfxHandler:
           jmp PlayTimerTick    ;timer tick
         +
         lsr Square2SoundQueue
-        bcs PlayPowerUpGrab    ;power-up grab
+        bcc +
+          jmp PlayPowerUpGrab    ;power-up grab
+        +
         lsr Square2SoundQueue
         bcc +
             jmp PlayExtraLife      ;1-up
@@ -647,19 +650,23 @@ CheckSfx2Buffer:
           jmp Cont_CGrab_TTick     ;coin grab
         +
         lsr
-        bcs ContinueGrowItems    ;power-up reveal
+        ; bcs ContinueGrowItems    ;power-up reveal
         lsr
-        bcs ContinueGrowItems    ;vine grow
+        ; bcs ContinueGrowItems    ;vine grow
         lsr
         bcc +
           jmp ContinueBlast      ;fireworks/gunfire
         +
         lsr
-        bcs Cont_CGrab_TTick     ;timer tick
+        ; bcs Cont_CGrab_TTick     ;timer tick
         lsr
-        bcs ContinuePowerUpGrab  ;power-up grab
+        bcc +
+           jmp  ContinuePowerUpGrab  ;power-up grab
+        +
         lsr
-        bcs ContinueExtraLife    ;1-up
+        bcc +
+            jmp ContinueExtraLife    ;1-up
+        +
 ExS2H:  rts
 
 Cont_CGrab_TTick:
