@@ -30,12 +30,16 @@ ReleaseSquare2Sfx:
 
 ResetSquare1Sfx:
       jsr ReleaseSquare1Sfx
+      lda #$10
+      sta SND_SQUARE1_REG
       lda #SWEEP_OFF
       sta SND_SQUARE1_REG+1
       rts
 
 ResetSquare2Sfx:
       jsr ReleaseSquare2Sfx
+      lda #$10
+      sta SND_SQUARE2_REG
       lda #SWEEP_OFF
       sta SND_SQUARE2_REG+1
       rts
@@ -483,9 +487,9 @@ DecrementSfx1Length:
 StopSquare1Sfx:
         ldx #$00                ;if end of sfx reached, clear buffer
         stx Square1SoundBuffer  ;and stop making the sfx
-        ; vanilla stopped sfx through $4015 but we can't be sure we can do that, so
-        ; jroweboy: added this bit to fully clear the sfx when it ends
         stx Squ1_SfxLenCounter
+        ldx #$10
+        stx SND_SQUARE2_REG
         ldx #SWEEP_OFF
         stx SND_SQUARE1_REG+1
 ExSfx1: rts
@@ -590,9 +594,8 @@ EmptySfx2Buffer:
         stx Squ2_SfxLenCounter
 
 StopSquare2Sfx:
-        ; vanilla stopped sfx through $4015 but we can't be sure we can do that, so
-        ; just clear the sweep
-        ; jroweboy: fully clear the sfx state when a sfx ends
+        ldx #$10
+        stx SND_SQUARE2_REG
         ldx #SWEEP_OFF
         stx SND_SQUARE2_REG+1
 ExSfx2: rts
