@@ -1,7 +1,7 @@
 ﻿import { dotnet } from './_framework/dotnet.js'
 import { compile } from './js65/libassembler.js'
 
-const BUNDLE_DOWNLOAD_SIZE = 80 * 1024 * 1024; // used for progress bar - doesn't have to be exact
+const BUNDLE_DOWNLOAD_SIZE = 71 * 1024 * 1024; // used for progress bar - doesn't have to be exact
 
 const is_browser = typeof window != "undefined";
 if (!is_browser) throw new Error(`Expected to be running in a browser`);
@@ -17,8 +17,22 @@ function showError(msg) {
 (() => {
     const origFetch = globalThis.fetch.bind(globalThis);
 
+    // This is a custom cache workaround for GitHub Pages arbitrarily
+    // sending different ETags for the same files. (It might depend on
+    // which CDN handles the request.)
+    //     Instead rely on GitHub Pages setting Last - Modified to be the
+    // same for all files when the page is updated, including this script.
+    const deployTimestampPromise = (async () => {
+        try {
+            const r = await origFetch(import.meta.url, { cache: "default" });
+            return Date.parse(r.headers.get("Last-Modified") || "") || 0;
+        } catch {
+            return 0;
+        }
+    })();
+
     // track cumulative progress across all boot resources
-    let loadedKnownBytes = 0;
+    let completedBytes = 0;
     const inFlight = new Map(); // id -> {loaded,total}
     let started = false;
     let finishTimer;
@@ -40,24 +54,57 @@ function showError(msg) {
     };
 
     const updateOverall = () => {
-        updateProgress(loadedKnownBytes / BUNDLE_DOWNLOAD_SIZE);
+        let loaded = completedBytes;
+        for (const r of inFlight.values()) {
+            loaded += r.loaded;
+        }
+        updateProgress(loaded / BUNDLE_DOWNLOAD_SIZE);
+    };
+
+    const fetchError = (e) => {
+        showError("Network error while loading app. Please reload.");
+        throw e;
     };
 
     globalThis.fetch = async (input, init) => {
-        const res = await origFetch(input, init).catch((e) => {
-            showError("Network error while loading app. Please reload.");
-            throw e;
-        });
-
+        const deployTs = await deployTimestampPromise;
         const url = typeof input === "string" ? input : (input && input.url) || "";
-        if (!isBootResource(url, res) || !res.body || res.bodyUsed) {
-            return res; // leave non-boot fetches alone
+        const absoluteUrl = new URL(url, window.location.href).href;
+
+        var fetchResult;
+
+        if (deployTs !== 0) {
+            // check if transferSize is non-zero (there was no local cache)
+            const cachedFetchResult = await origFetch(input, { ...init, cache: "force-cache" }).catch(fetchError);
+            const perfEntries = performance?.getEntriesByName(absoluteUrl, "resource");
+            const lastEntry = perfEntries?.[perfEntries.length - 1];
+            const wasNetworkRequest = lastEntry?.transferSize > 0;
+
+            var staleCache = false;
+            if (!wasNetworkRequest) {
+                // if we have a reference timestamp, ensure the cached copy isn't
+                // much older than the deploy timestamp.
+                const lm = Date.parse(cachedFetchResult.headers.get("Last-Modified"));
+                staleCache = !lm || lm < deployTs - 180_000;
+            }
+
+            if (!staleCache) {
+                fetchResult = cachedFetchResult;
+            }
+        }
+
+        if (!fetchResult) {
+            fetchResult = await origFetch(input, { ...init, cache: "default" }).catch(fetchError);
+        }
+
+        if (!isBootResource(url, fetchResult) || !fetchResult.body || fetchResult.bodyUsed) {
+            return fetchResult; // leave non-boot fetches alone
         }
 
         started = true;
-        const contentLength = parseInt(res.headers.get("Content-Length") || "0", 10);
+        const contentLength = parseInt(fetchResult.headers.get("Content-Length") || "0", 10);
         const id = Math.random().toString(36).slice(2);
-        const reader = res.body.getReader();
+        const reader = fetchResult.body.getReader();
 
         inFlight.set(id, { loaded: 0, total: contentLength });
 
@@ -67,21 +114,26 @@ function showError(msg) {
                     showError("Error reading a resource stream. Please reload.");
                     throw e;
                 });
+
                 if (done) {
-                    controller.close();
-                    // account for any rounding misses
                     const r = inFlight.get(id);
-                    if (r && r.total > 0) loadedKnownBytes += (r.total - r.loaded);
-                    inFlight.delete(id);
+
+                    if (r) {
+                        completedBytes += r.loaded;
+                        inFlight.delete(id);
+                    }
+
                     updateOverall();
+                    controller.close();
                     return;
                 }
+
                 controller.enqueue(value);
-                const r = inFlight.get(id);
-                if (r) {
-                    r.loaded += value.length;
-                    if (r.total > 0) loadedKnownBytes += value.length;
-                    inFlight.set(id, r);
+
+                const current = inFlight.get(id);
+                if (current) {
+                    current.loaded += value.length;
+                    inFlight.set(id, current);
                 }
                 updateOverall();
             },
@@ -89,9 +141,9 @@ function showError(msg) {
         });
 
         return new Response(stream, {
-            headers: res.headers,
-            status: res.status,
-            statusText: res.statusText
+            headers: fetchResult.headers,
+            status: fetchResult.status,
+            statusText: fetchResult.statusText
         });
     };
 
