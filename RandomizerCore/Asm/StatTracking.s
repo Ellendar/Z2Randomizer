@@ -560,6 +560,8 @@ RenderPlayerInfo:
     beq @skip
         jmp RenderPlayerInfoBg
 @skip:
+    ; We need to clear CHR bank at some point so might as well do it now.
+    sta CurrentCHRBank
     ; Render the sprites
     jsr DrawPauseMenuRowSwitchBank
 
