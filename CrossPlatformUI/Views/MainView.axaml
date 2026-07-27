@@ -30,7 +30,7 @@
         <Grid>
             <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
                 <rxui:RoutedViewHost.DefaultContent>
-                    <views:RandomizerView />
+                    <views:RandomizerView DataContext="{Binding RandomizerViewModel}" />
                 </rxui:RoutedViewHost.DefaultContent>
                 <rxui:RoutedViewHost.ViewLocator>
                     <app:AppViewLocator />

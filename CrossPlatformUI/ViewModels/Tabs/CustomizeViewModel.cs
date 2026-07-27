@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive.Linq;
 using System.Text.Json.Serialization;
 using ReactiveUI;
+using ReactiveUI.Primitives;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels.Tabs;

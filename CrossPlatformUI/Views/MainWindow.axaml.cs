@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using ReactiveUI.Primitives.Disposables;
 using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
@@ -14,7 +15,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
     {
         InitializeComponent();
         // Prevent the previewer's DataContext from being set when the application is run.
-        this.WhenActivated(disposables => {
+        this.WhenActivated((MultipleDisposable disposables) => {
             var context = DataContext as MainViewModel;
             ClientSize = new Size(context!.WindowSize.Width,context.WindowSize.Height);
             PositionChanged += (_, args) =>

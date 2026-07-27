@@ -1,18 +1,16 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Disposables.Fluent;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Controls;
+using Avalonia.Media;
 using ReactiveUI;
-using ReactiveUI.Validation.Extensions;
-using ReactiveUI.Validation.Helpers;
+using ReactiveUI.Primitives;
+using ReactiveUI.Primitives.Disposables;
+using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
 using CrossPlatformUI.Presets;
 using CrossPlatformUI.Services;
@@ -21,10 +19,13 @@ using CrossPlatformUI.ViewModels.Tabs;
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
-public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
+public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
     [JsonIgnore]
     public IObservable<bool> CanGenerateObservable { get; private set; }
+
+    [JsonIgnore]
+    public IObservable<IBrush> FlagInputUnderlineObservable { get; }
 
     [JsonIgnore]
     public BehaviorSubject<bool> FlagsValidSubject = new(true);
@@ -129,9 +130,12 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
         var seedValidObservable = this.WhenAnyValue(x => x.Main.Config.Seed, seed => !string.IsNullOrWhiteSpace(seed));
 
-        CanGenerateObservable = Observable.CombineLatest(
-            FlagsValidSubject, seedValidObservable, Main.RomFileViewModel.HasRomDataObservable, Main.GenerateRomViewModel.IsRunning,
+        CanGenerateObservable = FlagsValidSubject.CombineLatest(
+            seedValidObservable, Main.RomFileViewModel.HasRomDataObservable, Main.GenerateRomViewModel.IsRunning,
             (flagsValid, seedValid, hasRom, isRunning) => flagsValid && seedValid && hasRom && !isRunning);
+
+        FlagInputUnderlineObservable = ThemeVariantSubject
+            .CombineLatest(FlagsValidSubject, (theme, valid) => ThemeHelper.GetFlagUnderlineBrush(theme, valid));
 
         Generate = ReactiveCommand.Create(() =>
         {
@@ -198,7 +202,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         return localPath;
     }
 
-    private void OnActivate(CompositeDisposable disposables)
+    private void OnActivate(MultipleDisposable disposables)
     {
         var loadedFlags = Main.Config.SerializeFlags(); // this serializes the configuration
         var defaultFlags = new RandomizerConfiguration().SerializeFlags();
@@ -209,17 +213,17 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         }
 
         // flag updates from RandomizerConfiguration always overwrites our flag input
-        Main.FlagsObservable
-            .Subscribe(flags =>
-            {
-                FlagsValidSubject.OnNext(true);
-                FlagInput = flags;
-            })
+        SubscribeExtensions.Subscribe(Main.FlagsObservable, flags =>
+        {
+            FlagsValidSubject.OnNext(true);
+            FlagInput = flags;
+        })
             .DisposeWith(disposables);
 
-        this.WhenAnyValue(viewModel => viewModel.FlagInput)
-            .WithLatestFrom(Main.FlagsObservable, (Input, Current) => (Input, Current))
-            .Subscribe(tuple =>
+        SubscribeExtensions.Subscribe(
+            this.WhenAnyValue(viewModel => viewModel.FlagInput)
+                .WithLatestFrom(Main.FlagsObservable, (Input, Current) => (Input, Current)),
+            tuple =>
             {
                 var isNew = tuple.Input != tuple.Current;
                 if (isNew)
@@ -230,6 +234,12 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
                     {
                         Main.Config.DeserializeFlags(tuple.Input);
                     }
+                }
+                else if (!FlagsValidSubject.Value)
+                {
+                    // The input matches the currently loaded flags (always valid), but the subject is
+                    // stale after a prior invalid paste left it false.
+                    FlagsValidSubject.OnNext(true);
                 }
             })
             .DisposeWith(disposables);
@@ -244,18 +254,21 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             }
         };
 
-        this.ValidationRule(viewModel => viewModel.FlagInput, FlagsValidSubject, "Invalid Flags");
+        // ReactiveUI.Validation (latest 7.1.0) is not updated to ReactiveUI 24 and can't be used
+        // this.ValidationRule(viewModel => viewModel.FlagsValid, this.WhenAnyValue(x => x.FlagsValid), "Invalid Flags");
 
         AddValidationRules();
     }
 
     private void AddValidationRules()
     {
-        Main.Config.WhenAnyValue(
-            x => x.ShuffleOverworldEnemies,
-            x => x.ShufflePalaceEnemies,
-            (a,b) => (a ?? true) || (b ?? true)
-        ).Subscribe(_ =>
+        SubscribeExtensions.Subscribe(
+            Main.Config.WhenAnyValue(
+                x => x.ShuffleOverworldEnemies,
+                x => x.ShufflePalaceEnemies,
+                (a,b) => (a ?? true) || (b ?? true)
+            ),
+            _ =>
         {
             var overworldEnemyShuffle = Main.Config.ShuffleOverworldEnemies ?? true;
             var palaceEnemyShuffle = Main.Config.ShufflePalaceEnemies ?? true;
@@ -271,12 +284,14 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         });
 
         // When PalaceItems and OverworldItems are off, then don't allow MixingOverworldAndPalaceItems
-        Main.Config.WhenAnyValue(
-            x => x.ShufflePalaceItems,
-            x => x.ShuffleOverworldItems,
-            (palaceItems, overworldItems) =>
-                !(palaceItems ?? true) || !(overworldItems ?? true)
-        ).Subscribe(_ =>
+        SubscribeExtensions.Subscribe(
+            Main.Config.WhenAnyValue(
+                x => x.ShufflePalaceItems,
+                x => x.ShuffleOverworldItems,
+                (palaceItems, overworldItems) =>
+                    !(palaceItems ?? true) || !(overworldItems ?? true)
+            ),
+            _ =>
         {
             if(!(Main.Config.ShufflePalaceItems ?? true) || !(Main.Config.ShufflePalaceItems ?? true))
             {
@@ -285,16 +300,14 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         });
 
         // If shuffle overworld items is off, turn off pbag cave item shuffle too
-        Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems)
-        .Subscribe(x =>
+        SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems), x =>
         {
             if (x.Value ?? true) return;
             Main.Config.IncludePBagCavesInItemShuffle = false;
         });
         
         // If Palaces can't swap continents 
-        Main.Config.ObservableForProperty(x => x.ShuffleEncounters)
-        .Subscribe(x =>
+        SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleEncounters), x =>
         {
             if (x.Value ?? true) return;
             Main.Config.IncludeLavaInEncounterShuffle = false;
@@ -302,14 +315,13 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         });
 
         // If shuffle palaces is off, then don't allow shuffling GP
-        Main.Config.ObservableForProperty(x => x.PalacesCanSwapContinents)
-            .Subscribe(x =>
+        SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.PalacesCanSwapContinents), x =>
             {
                 if (x.Value ?? true) return;
                 Main.Config.ShuffleGP = false;
             });
 
-        Main.ObservableForProperty(x => x.ShuffleAllExpState).Subscribe(x =>
+        SubscribeExtensions.Subscribe(Main.ObservableForProperty(x => x.ShuffleAllExpState), x =>
         {
             if (!x.Value) return;
             Main.Config.ShuffleAttackExperience = true;
@@ -332,29 +344,29 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public CustomizeViewModel CustomizeViewModel { get; }
     
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> RerollSeed { get; }
+    public ReactiveCommand<RxVoid, RxVoid> RerollSeed { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> Generate { get; }
+    public ReactiveCommand<RxVoid, RxVoid> Generate { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> SaveFolder { get; }
+    public ReactiveCommand<RxVoid, RxVoid> SaveFolder { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> CheckForUpdates { get; }
+    public ReactiveCommand<RxVoid, RxVoid> CheckForUpdates { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> ToggleTheme { get; }
+    public ReactiveCommand<RxVoid, RxVoid> ToggleTheme { get; }
     [JsonIgnore]
-    public ReactiveCommand<Control, Unit> VisitDiscord { get; }
+    public ReactiveCommand<Control, RxVoid> VisitDiscord { get; }
     [JsonIgnore]
-    public ReactiveCommand<Control, Unit> VisitWiki { get; }
+    public ReactiveCommand<Control, RxVoid> VisitWiki { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> SaveNewPreset { get; }
+    public ReactiveCommand<RxVoid, RxVoid> SaveNewPreset { get; }
     [JsonIgnore]
-    public ReactiveCommand<string, Unit> SaveAsPreset { get; }
+    public ReactiveCommand<string, RxVoid> SaveAsPreset { get; }
     [JsonIgnore]
-    public ReactiveCommand<string, Unit> ClearSavedPreset { get; }
+    public ReactiveCommand<string, RxVoid> ClearSavedPreset { get; }
     [JsonIgnore]
-    public ReactiveCommand<RandomizerConfiguration, Unit> LoadPreset { get; }
+    public ReactiveCommand<RandomizerConfiguration, RxVoid> LoadPreset { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, IRoutableViewModel> LoadRom { get; }
+    public ReactiveCommand<RxVoid, IRoutableViewModel> LoadRom { get; }
 
     // Unique identifier for the routable view model.
     [JsonIgnore]

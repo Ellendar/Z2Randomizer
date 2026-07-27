@@ -1,17 +1,15 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive.Disposables;
-using System.Reactive.Disposables.Fluent;
-using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
-using Z2Randomizer.RandomizerCore;
+using ReactiveUI.Primitives;
+using ReactiveUI.Primitives.Disposables;
 using CrossPlatformUI.ViewModels;
+using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.Views;
 
@@ -21,7 +19,7 @@ public partial class RandomizerView : ReactiveUserControl<RandomizerViewModel>
     public RandomizerView()
     {
         AvaloniaXamlLoader.Load(this);
-        this.WhenActivated(disposables =>
+        this.WhenActivated((MultipleDisposable disposables) =>
         {
             if (DataContext is RandomizerViewModel vm)
             {
@@ -47,17 +45,20 @@ public partial class RandomizerView : ReactiveUserControl<RandomizerViewModel>
                         e.Handled = true;
                     };
                     flagInputTextBox.PastingFromClipboard += PasteHandler;
-                    Disposable.Create(() => flagInputTextBox.PastingFromClipboard -= PasteHandler)
+
+                    new ActionDisposable(() => flagInputTextBox.PastingFromClipboard -= PasteHandler)
                         .DisposeWith(disposables);
                 }
 
-                vm.SaveAsPreset.Subscribe(_ =>
-                {
-                    Button presetsButton = this.FindControl<Button>("PresetsButton") ?? throw new System.Exception("Missing Required Validation Element");
-                    // close menu after saving preset
-                    presetsButton?.Flyout?.Hide();
-                })
-                .DisposeWith(disposables);
+                SubscribeExtensions.Subscribe(
+                    vm.SaveAsPreset,
+                    _ =>
+                    {
+                        Button presetsButton = this.FindControl<Button>("PresetsButton") ?? throw new System.Exception("Missing Required Validation Element");
+                        // close menu after saving preset
+                        presetsButton?.Flyout?.Hide();
+                    })
+                    .DisposeWith(disposables);
             }
         });
     }

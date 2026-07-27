@@ -1,24 +1,24 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Text.Json.Serialization;
 using ReactiveUI;
-using ReactiveUI.Validation.Helpers;
+using ReactiveUI.Primitives;
+using ReactiveUI.Primitives.Disposables;
+using ReactiveUI.Primitives.Signals;
+using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("")]
-public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableViewModel
+public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
 {
     public string? OutputFilePath { get; set; }
     private RandomizerConfiguration config = new();
     /// Useful inexpensive shared observable for views to attach onto
     /// for chaining change detection logic
-    public IObservable<Unit> FlagsChanged { get; }
+    public IObservable<RxVoid> FlagsChanged { get; }
 
     public IObservable<String> FlagsObservable { get; }
 
@@ -40,12 +40,12 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
 
     public MainViewModel()
     {
-        FlagsChanged = Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
+        FlagsChanged = Signal.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
             h => Config.PropertyChanged += h,
             h => Config.PropertyChanged -= h)
             .Where(e => e.EventArgs.PropertyName == "Flags")
-            .Select(_ => Unit.Default)
-            .StartWith(Unit.Default)
+            .Select(_ => default(RxVoid))
+            .StartWith(default(RxVoid))
             .Replay(1)
             .RefCount();
 
@@ -59,17 +59,17 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
         GenerateRomViewModel = new(this);
         SaveNewPresetViewModel = new(this);
         RandomizerViewModel = new(this);
-        Router.Navigate.Execute(RandomizerViewModel);
+        SubscribeExtensions.Subscribe(Router.Navigate.Execute(RandomizerViewModel));
 
         GenerateRom = ReactiveCommand.CreateFromObservable(
             () => Router.Navigate.Execute()
         );
 
-        this.WhenActivated((CompositeDisposable disposables) =>
+        this.WhenActivated((MultipleDisposable disposables) =>
         {
             if (!RomFileViewModel.HasRomData)
             {
-                Router.Navigate.Execute(RomFileViewModel);
+                SubscribeExtensions.Subscribe(Router.Navigate.Execute(RomFileViewModel));
             }
         });
     }
@@ -109,7 +109,7 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
 
     // The command that navigates a user to first view model.
     [JsonIgnore]
-    public ReactiveCommand<Unit, IRoutableViewModel> GenerateRom { get; }
+    public ReactiveCommand<RxVoid, IRoutableViewModel> GenerateRom { get; }
     
     [JsonIgnore]
     public GenerateRomViewModel GenerateRomViewModel { get; }

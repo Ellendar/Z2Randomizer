@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia.Markup.Xaml;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using ReactiveUI.Primitives.Disposables;
 using CrossPlatformUI.ViewModels.Tabs;
 
 namespace CrossPlatformUI.Views.Tabs;
@@ -11,7 +12,7 @@ public partial class SpritePreviewView : ReactiveUserControl<SpritePreviewViewMo
 {
     public SpritePreviewView()
     {
-        this.WhenActivated(disposables => { });
+        this.WhenActivated((MultipleDisposable disposables) => { });
         AvaloniaXamlLoader.Load(this);
     }
 }

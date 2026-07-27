@@ -1,6 +1,7 @@
 using Avalonia.Markup.Xaml;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using ReactiveUI.Primitives.Disposables;
 using System.Diagnostics.CodeAnalysis;
 using CrossPlatformUI.ViewModels;
 
@@ -12,7 +13,7 @@ public partial class RomFileView : ReactiveUserControl<RomFileViewModel>
     public RomFileView()
     {
         InitializeComponent();
-        this.WhenActivated(disposables => { });
+        this.WhenActivated((MultipleDisposable disposables) => { });
         AvaloniaXamlLoader.Load(this);
     }
 }

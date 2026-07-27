@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using Avalonia.Media;
 using ReactiveUI;
+using ReactiveUI.Primitives;
+using ReactiveUI.Primitives.Disposables;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 
@@ -23,13 +23,13 @@ public class HintsViewModel : ReactiveObject, IActivatableViewModel
             .Select(_ => Main.Config.GenerateSpoiler)
             .DistinctUntilChanged();
 
-        HeaderBackgroundObservable = randomizerViewModel.ThemeVariantSubject.CombineLatest(alertFlags)
-            .Select(pair => ThemeHelper.GetFlagAlertBackgroundBrush(pair.First, pair.Second));
+        HeaderBackgroundObservable = randomizerViewModel.ThemeVariantSubject
+            .CombineLatest(alertFlags, (theme, alert) => ThemeHelper.GetFlagAlertBackgroundBrush(theme, alert));
 
         this.WhenActivated(OnActivate);
     }
 
-    internal void OnActivate(CompositeDisposable disposables)
+    internal void OnActivate(MultipleDisposable disposables)
     {
     }
 }

@@ -1,11 +1,11 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
+using RxVoid = ReactiveUI.Primitives.RxVoid;
 using SD.Tools.BCLExtensions.CollectionsRelated;
 using Z2Randomizer.RandomizerCore;
 using CrossPlatformUI.Services;
@@ -93,7 +93,7 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
                     Main.OutputFilePath = new Uri(file.Path, ".").LocalPath;
                 }
             }
-            HostScreen.Router.NavigateBack.Execute();
+            HostScreen.Router.NavigateBack.Execute().Subscribe();
         }
         else
         {
@@ -102,7 +102,7 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
     }
     
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> OpenFileCommand { get; }
+    public ReactiveCommand<RxVoid, RxVoid> OpenFileCommand { get; }
     [JsonIgnore]
     public MainViewModel Main { get; }
     [JsonIgnore]
