@@ -489,7 +489,7 @@ StopSquare1Sfx:
         stx Square1SoundBuffer  ;and stop making the sfx
         stx Squ1_SfxLenCounter
         ldx #$10
-        stx SND_SQUARE2_REG
+        stx SND_SQUARE1_REG
         ldx #SWEEP_OFF
         stx SND_SQUARE1_REG+1
 ExSfx1: rts
