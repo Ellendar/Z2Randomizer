@@ -29,6 +29,7 @@ HiddenRevealAddr = HiddenPalaceRevealedAreaUpdate
 ; Weirdly the game doesn't have a power of two table except in bank 0 and 3
 .segment "PRG7"
 .reloc
+.export PowersOfTwo
 PowersOfTwo:
   .byte $01, $02, $04, $08, $10, $20, $40, $80
 
