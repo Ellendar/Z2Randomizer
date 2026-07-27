@@ -598,6 +598,7 @@ ObjectOffset = $10
 ; RESV PlayerEntranceCtrl
 ; RESV JoypadOverride
 ; RESV Vine_Height
+RESV PlayerChrBank
 RESV Player_State
 ; RESV DisableCollisionDet
 RESV GameEngineSubroutine
@@ -661,7 +662,6 @@ ALL_TIMER_COUNT = StarInvincibleTimer - Timers
 
 RESV SpriteShuffleOffset
 ;RESV CurrentCHRBank
-RESV PlayerChrBank
 RESV ReloadCHRBank
 RESV ObjectVerticalFlip
 RESV Local_eb

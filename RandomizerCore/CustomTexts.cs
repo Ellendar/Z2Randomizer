@@ -950,7 +950,7 @@ public class CustomTexts
                     {
                         hint = defaultKnowNothing;
                     }
-                        hints[textIndex] = hint;
+                    hints[textIndex] = hint;
                     if (textIndex == talkingAcheIndexTalking)
                     {
                         hints[talkingAcheIndexSleeping] = hint;
