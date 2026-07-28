@@ -3661,11 +3661,7 @@ bank5_Pointer_table_for_End_Credits:
         rom.FixBigBubbleSplit(engine, randomizedStats);
         StatTracking(props, engine);
         AddCredits(engine);
-
-        if (props.ShuffleBossHP != EnemyLifeOption.VANILLA)
-        {
-            rom.SetBossHpBarDivisors(engine, randomizedStats);
-        }
+        rom.SetBossHpBarDivisors(engine, randomizedStats);
 
         if (props.DripperEnemyOption != DripperEnemyOption.ONLY_BOTS)
         {
