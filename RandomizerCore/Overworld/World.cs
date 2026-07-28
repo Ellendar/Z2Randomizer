@@ -2178,7 +2178,7 @@ public abstract class World
             int maxAdj = (sideDir.X != 0 && pos.X == MapColumns - 2) || (sideDir.Y != 0 && pos.Y == MapRows - 2) ? 0 : 1;
             int adjust = RNG.Next(minAdj, maxAdj + 1);
             IntVector2 adjusted = pos + adjust * sideDir;
-            if (WithinMapBounds(adjusted) && !IsReserved(adjusted))
+            if (WithinMapBounds(adjusted) && !IsReserved(adjusted, map[adjusted]))
             {
                 map[adjusted] = water;
             }
@@ -2524,7 +2524,7 @@ public abstract class World
     }
 
     // subset of walkable terrains that we would expect to be next to a trap tile
-    protected static readonly FrozenSet<Terrain> TRAP_PATH_VALID_TERRAIN = [Terrain.DESERT, Terrain.GRASS, Terrain.ROAD, Terrain.LAVA, Terrain.NONE];
+    protected static readonly FrozenSet<Terrain> TRAP_PATH_VALID_TERRAIN = [Terrain.DESERT, Terrain.GRASS, Terrain.ROAD, Terrain.LAVA];
     protected static readonly FrozenSet<Terrain> TRAP_PATH_BLOCKING_TERRAIN = [Terrain.MOUNTAIN, Terrain.WATER];
 
     /// <summary>
@@ -2598,8 +2598,22 @@ public abstract class World
         cave.Pos = newCavePos;
     }
 
-    protected virtual bool IsReserved(IntVector2 pos)
+    /// If this tile is reserved, in the context of a river expanding to
+    /// this tile. Most of these are probably logically impossible.
+    /// The point is to stop a river opening up VoD.
+    /// (This method is overridden in EastHyrule)
+    protected virtual bool IsReserved(IntVector2 pos, Terrain terrain)
     {
+        switch (terrain)
+        {
+            case Terrain.TOWN:
+            case Terrain.CAVE:
+            case Terrain.PALACE:
+            case Terrain.BRIDGE:
+            case Terrain.ROCK:
+                return true;
+        }
+
         return false;
     }
 
@@ -2616,8 +2630,8 @@ public abstract class World
     /// </returns>
     public IntVector2? ValidTrapTilePosition(IntVector2 pos)
     {
-        bool isPassable(IntVector2 pos) => TRAP_PATH_VALID_TERRAIN.Contains(map[pos.Y, pos.X]);
-        bool isBlocking(IntVector2 pos) => TRAP_PATH_BLOCKING_TERRAIN.Contains(map[pos.Y, pos.X]);
+        bool isPassable(IntVector2 pos) => TRAP_PATH_VALID_TERRAIN.Contains(map[pos]);
+        bool isBlocking(IntVector2 pos) => TRAP_PATH_BLOCKING_TERRAIN.Contains(map[pos]);
 
         if (!WithinMapBounds(pos, 1)) { return null; }
         if (!isPassable(pos)) { return null; }
