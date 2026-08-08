@@ -4,6 +4,7 @@
 
 .include "z2r.inc"
 .import SwapCHR
+.import IncKeysForCurrentPalace
 
 ; ElevatorBossFix
 ; ===============
@@ -57,7 +58,7 @@ ElevatorBossFix:
     cpy #8
     bne +
         ; increment number of keys and carry on
-        inc Keys
+        jsr IncKeysForCurrentPalace
         jmp $e797  ; always overwritten by full_item_shuffle anyway
     +
     ; Otherwise continue to $E7BB which is the start of the get item code

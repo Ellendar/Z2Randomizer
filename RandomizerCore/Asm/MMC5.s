@@ -384,9 +384,9 @@ IncStatTimer:
 ; Re-organizing the code because we need RegionNumber earlier and we can save some bytes
 .org $cb78
     ldx LocationNumber
-    lda $6abd,Y
+    lda LocationByte3TableRamCopy,Y
     pha
-    and #$03
+    and #$03                            ; Region mask
     sta RegionNumber
     beq @West
         txa
@@ -411,7 +411,7 @@ IncStatTimer:
     sta PalaceNumber
 
     .assert * = $cba5
-    pla                                 ; pull $6abd,Y
+    pla
 
 ; These values are exported from the randomizer and map from internal palace number
 ; to the "real palace" at this offset.

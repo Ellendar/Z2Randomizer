@@ -3598,6 +3598,89 @@ CustomMovingNpcDialog:
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
 
+    public void KeysPerPalace(Assembler asm, bool enabled)
+    {
+        var a = asm.Module();
+
+        if (!enabled)
+        {
+            a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import FlagHudUpdate
+
+.segment "PRG7"
+.org $d9e4
+    jsr DecreaseKeysUpdateHud
+
+.reloc
+DecreaseKeysUpdateHud:
+    dec Keys
+    jmp FlagHudUpdate
+
+IncKeysForCurrentPalace:
+    inc Keys
+    rts
+.export IncKeysForCurrentPalace
+
+""");
+            return;
+        }
+
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import FlagHudUpdate
+
+.segment "PRG0"
+.org $a150
+    jsr GetKeysForCurrentPalace
+
+.segment "PRG7"
+
+.org $d9df
+    jsr GetKeysForCurrentPalace
+
+.org $d9e4
+    jsr DecKeysForCurrentPalace
+
+.org $e7b5
+jsr IncKeysForCurrentPalace
+
+.reloc
+; Sets A and Z from number of keys. Clobbers X.
+GetKeysForCurrentPalace:
+    ldx PalaceNumber
+    lda Palace1Keys-1,x
+    ;php
+    ;ldx EnemyIndex
+    ;plp
+    rts
+.export GetKeysForCurrentPalace
+
+.reloc
+; Input X must be PalaceNumber
+; Reloads X = EnemyIndex after
+DecKeysForCurrentPalace:
+    ;ldx PalaceNumber
+    dec Palace1Keys-1,x
+    ldx EnemyIndex
+    jmp FlagHudUpdate
+
+.reloc
+; IncKeysForCurrentPalace increments the current palace's key count.
+;   Returns: X = EnemyIndex, for the fall-through into bank7_remove_enemy_or_item
+;            (`sta zp_B6,x`).
+;            Flags are unspecified; that routine opens with `lda #$00`.
+IncKeysForCurrentPalace:
+    ldx PalaceNumber
+    inc Palace1Keys-1,x
+    ldx EnemyIndex
+    rts
+.export IncKeysForCurrentPalace
+
+""");
+    }
+
+
     public void CustomHud(Assembler asm, bool enabled)
     {
         var a = asm.Module();
@@ -3692,6 +3775,7 @@ FlagHudUpdate:
         a.Code(/* lang=s */"""
 .include "z2r.inc"
 .import GetItemReturn
+.import GetKeysForCurrentPalace
 
 .segment "PRG0"
 
@@ -3723,17 +3807,17 @@ UpdateNewHud:
         bne @CopyLoop
 
     lda Lives
-    adc #$d0 - 2              ; add offset for digit tile index. -1 since carry is guaranteed to be set from CPX and another -1 since we show remaining lives
+    adc #$d0 - 2                                 ; add offset for digit tile index. -1 since carry is guaranteed to be set from CPX and -1 since we show remaining lives
     sta $0302 - (NewHudLength - LivesIndex),y
 
 .if HUD_INCLUDES_KEYS
-    lda Keys
-    adc #$d0                  ; add offset for digit tile index
+    jsr GetKeysForCurrentPalace                  ; clobbers X
+    adc #$d0                                     ; add offset for digit tile index
     sta $0302 - (NewHudLength - KeyIndex),y
 .endif
 
     lda Crystals
-    adc #$d0                  ; add offset for digit tile index
+    adc #$d0                                     ; add offset for digit tile index
     sta $0302 - (NewHudLength - CrystalIndex),y
 
 @Done:
@@ -3760,14 +3844,6 @@ FlagHudUpdate:
     UpdateHudGetItemReturn:
         jsr FlagHudUpdate
         jmp GetItemReturn
-
-    .org $d9e4  ; update hud when a key is used
-        jsr DecreaseKeysUpdateHud
-
-    .reloc
-    DecreaseKeysUpdateHud:
-        dec Keys
-        jmp FlagHudUpdate
 .endif
 """);
     }
@@ -3902,6 +3978,7 @@ FlagHudUpdate:
         rom.AllowForChangingDoorYPosition(engine);
         rom.AllowForChangingElevatorYPosition(engine);
         rom.InstantText(engine);
+        KeysPerPalace(engine, true);
         CustomHud(engine, props.UpdatedHud);
         rom.ChangeLavaKillPosition(engine);
         rom.FixItemPickup(engine);
