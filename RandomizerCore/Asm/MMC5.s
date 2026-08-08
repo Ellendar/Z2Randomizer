@@ -331,12 +331,8 @@ IncStatTimer:
         cmp #3
         bcc @Exit
         ; Palaces
-        lda RegionNumber
-        asl
-        asl
-        adc PalaceRegionIndex
-        tay
-        ldx PalaceMappingTable,y
+        ldy PalaceNumber
+        ldx PalaceTimestampTable-1,y
 @IncrementTimer:
         inc StatTimeAtLocation+0,x
         bne @Exit
@@ -347,31 +343,112 @@ IncStatTimer:
 @Exit:
     rts
 
+
+; Create an updated PalaceNumber ($056c) that holds the post-shuffle palace number (1-7).
+; Re-organizing the code because we need RegionNumber earlier and we can save some bytes
+.org $cb78
+    ldx LocationNumber
+    lda $6abd,Y
+    pha
+    and #$03
+    sta RegionNumber
+    beq @West
+        txa
+        sec
+        sbc #$24                        ; Add 8 for towns in the East (because of later LSR)
+        bne @StoreTownNumber
+    @West:
+        txa
+        sec
+        sbc #$2c                        ; Town location IDs start at 45 ($2d)
+    @StoreTownNumber:
+    lsr
+    sta TownNumber                      ; ($0748 - #$2c) / 2 + 4 if East
+
+    lda RegionNumber
+    asl
+    asl
+    adc LocationNumber
+    sbc #$33
+    tax
+    lda PalaceOrderTable,x
+    sta PalaceNumber
+
+    .assert * = $cba5
+    pla                                 ; pull $6abd,Y
+
 ; These values are exported from the randomizer and map from internal palace number
-; to the "real palace" at this offset. This way if Palace 5 is in the location of Palace 1,
-; then we increment the correct timer for Palace 5
+; to the "real palace" at this offset.
 .reloc
+PalaceOrderTable:
+    ; region 0 - West
+    .byte RealPalaceAtLocation1
+    .byte RealPalaceAtLocation2
+    .byte RealPalaceAtLocation3
+    .byte $ff
+    ; region 1 - DM 
+    .byte $ff
+    .byte $ff
+    .byte $ff
+    .byte $ff
+    ; region 2 - East
+    .byte RealPalaceAtLocation5
+    .byte RealPalaceAtLocation6
+    .byte RealPalaceAtLocationGP
+    .byte $ff
+    ; region 3 - Maze
+    .byte RealPalaceAtLocation4
+    .byte $ff, $ff, $ff
+
+; Tightening tables to use new PalaceNumber
+.org $cd2a
+    FREE_UNTIL $cd40
+
+.reloc
+PalaceChrBankTable:
+    .byt $04    ; Palace 1
+    .byt $05    ; Palace 2
+    .byt $09    ; Palace 3
+    .byt $0a    ; Palace 4
+    .byt $0b    ; Palace 5
+    .byt $0c    ; Palace 6
+    .byt $06    ; Palace 7
+
+.org $cd67
+    bcc @StoreCurrentChrBank  ; branch for non-palace
+        ldy PalaceNumber
+        lda PalaceChrBankTable-1,y
+    @StoreCurrentChrBank:
+    asl
+    sta CurrentChrBank
+    bcc $cd7c
+    FREE_UNTIL $cd7c
+
+.reloc
+PalaceEntrancePaletteOffsets:
+    .byt $00,$10,$20,$30,$40,$50,$60
+
+.org $ce29
+    ldy PalaceNumber
+    lda PalaceEntrancePaletteOffsets-1,y
+    cpy #$07
+    beq $cd63  ; branch if Great Palace
+    tay
+    bpl $ce3a
+    FREE_UNTIL $ce3a
+
+; Store indexes into the table with 3-byte wide values here for fast lookup
 Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
-.export PalaceMappingTable
-PalaceMappingTable:
-    ; region 0 - east hyrule
-    .byte RealPalaceAtLocation1 * 3 + Palace1Offset
-    .byte RealPalaceAtLocation2 * 3 + Palace1Offset
-    .byte RealPalaceAtLocation3 * 3 + Palace1Offset
-    .byte $ff ; unused 4th palace in region 0
-    ; region 1 - death mountain 
-    .byte $ff ; unused 1st palace in region 1
-    .byte $ff ; unused 2nd palace in region 1
-    .byte $ff ; unused 3th palace in region 1
-    .byte $ff ; unused 4th palace in region 1
-    ; region 2 - west hyrule
-    .byte RealPalaceAtLocation5 * 3 + Palace1Offset
-    .byte RealPalaceAtLocation6 * 3 + Palace1Offset
-    .byte RealPalaceAtLocationGP * 3 + Palace1Offset
-    .byte $ff ; unused 4th palace in region 2
-    ; region 3 - maze island
-    .byte RealPalaceAtLocation4 * 3 + Palace1Offset
-    .byte $ff, $ff, $ff ; 3 unused palace locations
+.reloc
+PalaceTimestampTable:
+    .byte Palace1Offset
+    .byte Palace1Offset + 3
+    .byte Palace1Offset + 6
+    .byte Palace1Offset + 9
+    .byte Palace1Offset + 12
+    .byte Palace1Offset + 15
+    .byte Palace1Offset + 18
+.export PalaceTimestampTable
 
 ; Screen split IRQ implementation. This is not technically a part of z2ft, but due to the policy of not making the game faster than vanilla, this optimization is only enabled when z2ft is enabled to partially offset the cost of FT playback.
 
