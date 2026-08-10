@@ -179,7 +179,7 @@ public class RoomPool
         {
             allowedBlockers.Remove(RequirementType.DASH);
         }
-        RemoveRooms(room => !room.IsTraversable(allowedBlockers));
+        RemoveRooms(room => !room.GetEffectiveRequirements(props.MarioMode).AreSatisfiedBy(allowedBlockers));
     }
 
     void FinalizePool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)

@@ -7683,7 +7683,16 @@
     "name": "link7777RoomJam M10",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": ["GLOVE", "FAIRY"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE", "FAIRY"],
+        "routes": [
+          {"from": ["EAST"]},
+          {"to": ["EAST"]}
+        ]
+      }
+    ],
     "sideviewData": "46600E08D60870015502D10C909FD20850013502D10A7091D20830015502D10C9091D20850017502D10EA125F25080068106D40870015502D10C60C39093D40850017502D10E"
   },
   {
@@ -8441,7 +8450,16 @@
     "name": "gtmNewgpRooms M10",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": ["GLOVE"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"from": ["WEST"]},
+          {"to": ["WEST"]}
+        ]
+      }
+    ],
     "sideviewData": "40600E08D208DA0E80D281D2D10850015502D10ED20850015502D10E80D281D2D10850015502D10EA1250206F0500106D40850015502D10E80D281D2D108DA0F"
   },
   {
@@ -9663,7 +9681,22 @@
     "name": "winterSolsticeGP M1",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE", "UPSTAB"],
+        "routes": [
+          {"from": ["SOUTH"]}
+        ]
+      },
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE", "DOWNSTAB"],
+        "routes": [
+          {"to": ["SOUTH"]}
+        ]
+      }
+    ],
     "duplicateGroup": "winterSolsticeGP M1",
     "sideviewData": "28600308823E90CE2800893D90CD270089C961C790C742C36093F150800651408006873E90CE2600"
   },
@@ -9741,7 +9774,22 @@
     "name": "winterSolsticeGP M5",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE", "UPSTAB"],
+        "routes": [
+          {"from": ["SOUTH"]}
+        ]
+      },
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE", "DOWNSTAB"],
+        "routes": [
+          {"to": ["SOUTH"]}
+        ]
+      }
+    ],
     "duplicateGroup": "winterSolsticeGP M1",
     "sideviewData": "28600308823E90CE2800893D90CD270089C961C790C742C36093F150800651408006873E90CE2600"
   },
@@ -12647,7 +12695,16 @@
     "name": "flippedGp M10",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": ["GLOVE"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE", "FAIRY"],
+        "routes": [
+          {"from": ["WEST"]},
+          {"to": ["WEST"]}
+        ]
+      }
+    ],
     "sideviewData": "40600E08D40850015502D10E80D281D2D10850015502D10EA325F25080068106D40850015502D10ED20850015502D10ED20850015502D10ED20850015502D10E"
   },
   {
@@ -13828,6 +13885,14 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"from": ["WEST"]},
+          {"to": ["WEST"]}
+        ]
+      }
     ],
     "sideviewData": "3E6008083500D60931F7D30BD30C7102D10E82339033A023F15000060106D1082020302060237022310172238324930AD102310014F7D601320015F83400"
   },
@@ -15955,7 +16020,16 @@
     "enemies": "0908D007106B916191",
     "sideviewData": "2C600708240A2C0AD500407F88F2A13435F480F211F9B1065170B006B10611F931F480F2417DA03485F2D907",
     "bitmask": "0F",
-    "requirements": ["FAIRY"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["FAIRY"],
+        "routes": [
+          {"from": ["WEST"], "to": ["EAST"]},
+          {"from": ["EAST"], "to": ["WEST"]}
+        ]
+      }
+    ],
     "tags": ["Expert"],
     "hasItem": false,
     "hasBoss": false,
@@ -18933,7 +19007,15 @@
     "connections": "2B000300",
     "hasDrop": true,
     "elevatorScreen": 2,
-    "requirements": ["GLOVE"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"to": ["SOUTH"]}
+        ]
+      }
+    ],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "052F983751",
@@ -19343,7 +19425,15 @@
     "connections": "2BFF92E4",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": ["GLOVE"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"to": ["SOUTH"]}
+        ]
+      }
+    ],
     "duplicateGroup": "aaron GP set 2 M11",
     "isDropZone": true,
     "hasItem": false,
@@ -19394,7 +19484,15 @@
     "connections": "2BFF92E4",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": ["GLOVE"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"to": ["SOUTH"]}
+        ]
+      }
+    ],
     "duplicateGroup": "aaron GP set 2 M11",
     "isDropZone": true,
     "hasItem": false,
@@ -20799,7 +20897,16 @@
     "name": "gtmNewgpRooms M10 modified mirror",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": ["GLOVE"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"from": ["EAST"]},
+          {"to": ["EAST"]}
+        ]
+      }
+    ],
     "sideviewData": "34600F08E100F75000060106D10EA021D30850015502D10E80D281D2D10850015502D10ED20850015502D10E80D281D2D108DA0E"
   },
   {
@@ -20849,7 +20956,16 @@
     "name": "4-way Waffle Room",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": ["GLOVE"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"from": ["WEST", "EAST"]},
+          {"to": ["WEST", "EAST"]}
+        ]
+      }
+    ],
     "sideviewData": "54600D08D208440024D831306030903021D821305030803021D841307030A03021D84300D30EF15000060106D2084200450024D841307030A03021D821305030803021D831306030903021D8440045004500D50D"
   },
   {
@@ -20874,7 +20990,16 @@
     "name": "Right T Half-eaten Waffle Room",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": ["GLOVE"],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"from": ["EAST"]},
+          {"to": ["EAST"]}
+        ]
+      }
+    ],
     "sideviewData": "2E600F08E200D70EF05000060106D30012D9113040307030A03021D831305030803041D651D1903061D444004500"
   },
   {

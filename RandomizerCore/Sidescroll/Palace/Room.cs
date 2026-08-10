@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using js65;
 using NLog;
+using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
@@ -44,6 +45,8 @@ public record struct Coord(int X, int Y) : IComparable<Coord>
 [JsonSerializable(typeof(List<Room>))]
 [JsonSerializable(typeof(Room))]
 [JsonSerializable(typeof(Requirements))]
+[JsonSerializable(typeof(ComplexRequirement))]
+[JsonSerializable(typeof(RequirementRoute))]
 [JsonSerializable(typeof(Coord))]
 public partial class RoomSerializationContext : JsonSerializerContext { }
 
@@ -455,6 +458,29 @@ public class Room : IJsonOnDeserialized
 
     public bool HasTag(string tag) => Tags != null && Tags.Contains(tag);
 
+    public int Keys(bool bossesDropKeys)
+    {
+        // TODO: probably add this to rooms file for optimization
+        SideviewEditable<PalaceObject> sv = new(SideView);
+        int keys = sv.Commands.Count(cmd => cmd.IsItem(RandomizerCore.Collectable.KEY));
+
+        if (bossesDropKeys && HasBoss)
+        {
+            keys++;
+        }
+
+        return keys;
+    }
+
+    public int LockedDoors()
+    {
+        // TODO: probably add this to rooms file for optimization
+        SideviewEditable<PalaceObject> sv = new(SideView);
+        int doors = sv.Commands.Count(cmd => cmd.IsLockedDoor());
+
+        return doors;
+    }
+
     /// Aggregating PalaceNumber matching logic to determine if this room is appropriate for palaceNumber.
     public bool InPoolForPalace(int palaceNumber)
     {
@@ -501,10 +527,6 @@ public class Room : IJsonOnDeserialized
             sb.Append("(Down) ");
         }
         return sb.ToString();
-    }
-    public bool IsTraversable(IReadOnlySet<RequirementType> requireables)
-    {
-        return LinkRequirements.AreSatisfiedBy(requireables);
     }
 
     public string GetDebuggerDisplay()
@@ -773,7 +795,7 @@ public class Room : IJsonOnDeserialized
         mergedRoom.LinkedRoom = null;
         mergedRoom.LinkedRoomName = otherRoom.Name;
 
-        mergedRoom.coords = this.coords;
+        mergedRoom.coords = coords;
 
         return mergedRoom;
     }
@@ -879,6 +901,43 @@ public class Room : IJsonOnDeserialized
             MarioRequirements = requirements;
         }
         else LinkRequirements = requirements;
+    }
+
+    /// The room's exits as (exit direction, direction the neighbor is entered from, neighbor).
+    public IEnumerable<(Direction ExitTo, Direction EnterFrom, Room Neighbor)> Exits()
+    {
+        if (Left != null) { yield return (Direction.WEST, Direction.EAST, Left); }
+        if (Right != null) { yield return (Direction.EAST, Direction.WEST, Right); }
+        if (Up != null) { yield return (Direction.NORTH, Direction.SOUTH, Up); }
+        if (Down != null) { yield return (Direction.SOUTH, Direction.NORTH, Down); }
+    }
+
+    public IEnumerable<(Direction EnterFrom, Room Left)> PossibleDirections(HashSet<RequirementType> requireables, Direction enterFrom)
+    {
+        foreach (var (exitTo, neighborEnterFrom, neighbor) in Exits())
+        {
+            if (LinkRequirements.AreSatisfiedBy(requireables, RequirementTarget.EXIT, enterFrom: enterFrom, exitTo: exitTo))
+            {
+                yield return (neighborEnterFrom, neighbor);
+            }
+        }
+    }
+
+    /// Exits of a locked-door room that can be used without spending a small key. Only rooms whose
+    /// complex requirements contain a KEY requirement in some capacity have any such exits.
+    public IEnumerable<(Direction EnterFrom, Room Left)> FreeExitsInLockedDoorRoom(Direction enterFrom)
+    {
+        if (!LinkRequirements.ComplexRequirementsContains(RequirementType.KEY))
+        {
+            yield break;
+        }
+        foreach (var (exitTo, neighborEnterFrom, neighbor) in Exits())
+        {
+            if (!LinkRequirements.ExitRequiresKey(enterFrom, exitTo))
+            {
+                yield return (neighborEnterFrom, neighbor);
+            }
+        }
     }
 
     public void UpdateSideviewItem(Collectable collectable)

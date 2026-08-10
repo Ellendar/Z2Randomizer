@@ -383,8 +383,9 @@ public class Palaces
         //as all progression items will eventually shuffle into spots that work
         if (props.ShuffleOverworldItems)
         {
-            requireables = [RequirementType.KEY, .. RequirementTypeExtensions.UpToXContainers(8)];
+            requireables = [.. RequirementTypeExtensions.UpToXContainers(8)];
         }
+        requireables.Add(RequirementType.KEY); // some vanilla rooms have key door requirements now
         //Otherwise if it's vanilla items we can't get the magic key, because we could need glove for boots for flute to get to new kasuto
         requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
         requireables.Add(RequirementType.JUMP);
@@ -432,7 +433,9 @@ public class Palaces
             //Otherwise we can only get the things you can get on the west normally
             else
             {
+                //KEY is a palace's own small key, not an overworld item: see CanGetGlove
                 requireables = [
+                    RequirementType.KEY,
                     props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB,
                     RequirementType.JUMP,
                     RequirementType.FAIRY,

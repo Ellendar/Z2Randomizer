@@ -1,6 +1,8 @@
 using NLog;
 using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -171,7 +173,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
     public bool IsBossRoomAtLeastMinDistance(int minSteps)
     {
         if (Entrance == null) { throw new Exception("Palace Entrance is missing"); }
-        HashSet<Room> reachedRooms = [];
+        HashSet<Room> reachedRooms = new(ReferenceEqualityComparer.Instance);
         Queue<(Room, int)> roomsToCheck = [];
         roomsToCheck.Enqueue((Entrance, 0));
         while (roomsToCheck.Count > 0)
@@ -198,9 +200,173 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false; // Boss room not found??
     }
 
+    /// Represents a region of the palace that is unlocked so far: the rooms that can be
+    /// reached without spending any more keys, and the locked doors bordering that region.
+    struct AreaBetweenDoors
+    {
+        /// Rooms reachable from the entrance without opening any new locked doors.
+        public HashSet<Room> AccessibleRooms;
+        /// Rooms containing locked doors that border the accessible area, with the direction
+        /// they would be entered from.
+        public List<(Direction EnterFrom, Room Room)> UnopenedDoors;
+        /// Keys the player would currently have on hand (starting keys plus keys found in the
+        /// accessible area so far).
+        public int KeysOnHand;
+    }
+
+    /// <summary>
+    /// Determines whether the palace is solvable under worst-case small-key usage.
+    /// This expands the unlocked area from the entrance (recursively over every openable
+    /// locked door) and makes sure that no matter which locked doors the player opens, they
+    /// can never burn through their keys and get stuck while there are still locked doors
+    /// (and the keys behind them) left to find.
+
+    /// All traversable rooms are considered reachable (?)
+    /// because it is assumed the player has every requirement expected of them going in.
+    /// </summary>
+    public bool HasSolvableKeyLogic(IReadOnlyCollection<RequirementType> initialRequireables, bool bossesDropKeys, int startingKeys = 0)
+    {
+        var entrance = AllRooms.First(room => room.IsEntrance);
+        var doorRooms = AllRooms.Where(room => room.LockedDoors() > 0).ToImmutableSortedSet(new RoomReferenceComparer());
+        int doorsTotal = doorRooms.Sum(room => room.LockedDoors());
+        if (doorsTotal == 0)
+        {
+            return true;
+        }
+
+        // Fail quickly if there are not enough keys to open every locked door.
+        int keysTotal = AllRooms.Sum(room => room.Keys(bossesDropKeys));
+        if (keysTotal + startingKeys < doorsTotal)
+        {
+            return false;
+        }
+
+        HashSet<RequirementType> requireables = [.. initialRequireables.Where(req => req != RequirementType.KEY)];
+        HashSet<RequirementType> requireablesIncludingKey = new(requireables) { RequirementType.KEY };
+
+        // Compute the currently unlocked area
+        // Traversal uses Room.PossibleDirections so Requirements are respected.
+        AreaBetweenDoors ComputeArea(HashSet<Room> openedDoors)
+        {
+            AreaBetweenDoors area = new()
+            {
+                AccessibleRooms = new HashSet<Room>(ReferenceEqualityComparer.Instance),
+                UnopenedDoors = [],
+            };
+            Queue<(Direction, Room)> pendingRooms = new();
+
+            void AddRoom(Direction enterFrom, Room room)
+            {
+                if (doorRooms.Contains(room))
+                {
+                    if (openedDoors.Contains(room))
+                    {
+                        // The locked door has been paid for, so this room is traversable.
+                        if (area.AccessibleRooms.Add(room))
+                        {
+                            pendingRooms.Enqueue((enterFrom, room));
+                        }
+                        return;
+                    }
+
+                    // A locked-door room may not block all of its exits: when its complex
+                    // requirements contain a KEY requirement in some capacity, exits that do not
+                    // require a key can be used without spending one.
+                    foreach (var (nextEnterFrom, nextRoom) in room.FreeExitsInLockedDoorRoom(enterFrom))
+                    {
+                        AddRoom(nextEnterFrom, nextRoom);
+                    }
+
+                    if (area.UnopenedDoors.All(door => door.Room != room))
+                    {
+                        area.UnopenedDoors.Add((enterFrom, room));
+                    }
+                    return;
+                }
+                if (area.AccessibleRooms.Add(room))
+                {
+                    pendingRooms.Enqueue((enterFrom, room));
+                }
+            }
+
+            AddRoom(Direction.WEST, entrance);
+            while (pendingRooms.Count > 0)
+            {
+                var (enterFrom, room) = pendingRooms.Dequeue();
+                bool doorOpened = doorRooms.Contains(room) && openedDoors.Contains(room);
+                foreach (var (nextEnterFrom, nextRoom) in room.PossibleDirections(doorOpened ? requireablesIncludingKey : requireables, enterFrom))
+                {
+                    AddRoom(nextEnterFrom, nextRoom);
+                }
+            }
+
+            area.KeysOnHand = startingKeys
+                + area.AccessibleRooms.Sum(room => room.Keys(bossesDropKeys))
+                - openedDoors.Sum(room => room.LockedDoors());
+
+            return area;
+        }
+
+        // array that is 1 at each opened door room's index
+        byte[] MemoKey(HashSet<Room> openedDoors) => doorRooms
+                .Select(room => (byte)(openedDoors.Contains(room) ? 1 : 0))
+                .ToArray();
+        Dictionary<byte[], bool> memo = new(new StandardByteArrayEqualityComparer());
+
+        bool RecursiveSolvableKeyLogic(HashSet<Room> openedDoors)
+        {
+            byte[] key = MemoKey(openedDoors);
+            if (memo.TryGetValue(key, out bool cached))
+            {
+                return cached;
+            }
+
+            AreaBetweenDoors area = ComputeArea(openedDoors);
+            bool result;
+            if (area.UnopenedDoors.Count == 0)
+            {
+                // every reachable door has been opened.
+                // result now depends on whether every door was
+                // reachable with the requirements
+                result = openedDoors.Count == doorRooms.Count; // Should this not just be result = true?
+            }
+            else
+            {
+                // The player may open any available locked door next. If any of the choices
+                // lead to a state from which a deadlock is possible, result should be false.
+                int keys = area.KeysOnHand;
+                bool openedAny = false;
+                result = true;
+                foreach (var (_, door) in area.UnopenedDoors)
+                {
+                    if (door.LockedDoors() > keys)
+                    {
+                        continue;
+                    }
+                    openedAny = true;
+                    if (!RecursiveSolvableKeyLogic(new HashSet<Room>(openedDoors) { door }))
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+                // If no locked door was affordable, the player cannot open anything and is deadlocked.
+                if (!openedAny)
+                {
+                    result = false;
+                }
+            }
+
+            memo[key] = result;
+            return result;
+        }
+
+        return RecursiveSolvableKeyLogic([]);
+    }
+
     public static int RoomDistance(Room room1, Room room2)
     {
-        HashSet<Room> reachedRooms = [];
+        HashSet<Room> reachedRooms = new(ReferenceEqualityComparer.Instance);
         Queue<(Room, int)> roomsToCheck = [];
         roomsToCheck.Enqueue((room1, 0));
         while (roomsToCheck.Count > 0)
@@ -1125,7 +1291,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             else return false;
         }
 
-        IEnumerable<Room> unclearableRooms = AllRooms.Where(i => !i.GetEffectiveRequirements(isMario).AreSatisfiedBy(requireables));
+        IEnumerable<Room> unclearableRooms = AllRooms.Where(i => !i.GetEffectiveRequirements(isMario).AreSatisfiedBy(requireables, RequirementTarget.EXIT));
         return !unclearableRooms.Any();
     }
 
@@ -1209,102 +1375,91 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
     public bool CanReachAnItemRoom(IReadOnlySet<RequirementType> requireables)
     {
-        List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
-        List<Room> coveredRooms = new();
+        var entrance = AllRooms.First(i => i.IsEntrance);
+        Queue<(Direction, Room)> pendingRooms = new([(Direction.WEST, entrance)]);
+        HashSet<(Direction, Room)> coveredRooms = new(new RoomTupleComparer<Direction>());
 
         while (pendingRooms.Count > 0)
         {
-            Room room = pendingRooms.First();
-            if (ItemRooms.Contains(room))
+            var t = pendingRooms.Dequeue();
+            (Direction enterFrom, Room room) = t;
+            if (coveredRooms.Contains(t))
+            {
+                continue;
+            }
+            if (ItemRooms.Contains(room) && room.LinkRequirements.AreSatisfiedBy(requireables, RequirementTarget.ITEM, enterFrom: enterFrom))
             {
                 return true;
             }
-            if (coveredRooms.Contains(room))
+            coveredRooms.Add(t);
+            foreach (var (exitTo, neighborEnterFrom, neighbor) in room.Exits())
             {
-                pendingRooms.Remove(room);
-                continue;
-            }
-            coveredRooms.Add(room);
-            pendingRooms.Remove(room);
-            if (room.Left != null && room.Left.IsTraversable(requireables))
-            {
-                pendingRooms.Add(room.Left);
-            }
-            if (room.Right != null && room.Right.IsTraversable(requireables))
-            {
-                pendingRooms.Add(room.Right);
-            }
-            if (room.Up != null && room.Up.IsTraversable(requireables))
-            {
-                pendingRooms.Add(room.Up);
-            }
-            if (room.Down != null && room.Down.IsTraversable(requireables))
-            {
-                pendingRooms.Add(room.Down);
+                if (room.LinkRequirements.AreSatisfiedBy(requireables, RequirementTarget.EXIT, enterFrom: enterFrom, exitTo: exitTo))
+                {
+                    pendingRooms.Enqueue((neighborEnterFrom, neighbor));
+                }
             }
         }
 
         return false;
     }
 
-    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> initialRequireables, bool shufflableItemsOnly)
+    public List<Collectable> GetGettableItems(IReadOnlyCollection<RequirementType> initialRequireables, bool shufflableItemsOnly, RandomizerProperties? props = null)
     {
         if (shufflableItemsOnly && !PalaceItemsAreShufflable)
         {
             return [];
         }
         HashSet<RequirementType> requireables = [.. initialRequireables];
-        List<Room> pendingRooms = [AllRooms.First(i => i.IsEntrance)];
-        List<Room> coveredRooms = [];
-        List<Collectable> previousGettableItems = [];
-        List<Collectable> gettableItems = [];
+        var entrance = AllRooms.First(i => i.IsEntrance);
+        Queue<(Direction, Room)> pendingRooms = new([(Direction.WEST, entrance)]);
+        HashSet<(Direction, Room)> coveredRooms = new(new RoomTupleComparer<Direction>());
+        HashSet<Collectable> previousGettableItems = [];
+        HashSet<Collectable> gettableItems = [];
+
+        HashSet<Room> reachedItemRooms = [];
+        List<Collectable> gettableItemList = [];
 
         do
         {
             previousGettableItems = gettableItems;
             while (pendingRooms.Count > 0)
             {
-                Room room = pendingRooms.First();
-                if (coveredRooms.Contains(room))
+                var t = pendingRooms.Dequeue();
+                (Direction enterFrom, Room room) = t;
+                if (coveredRooms.Contains(t))
                 {
-                    pendingRooms.Remove(room);
                     continue;
                 }
-                if (ItemRooms.Contains(room))
+                if (ItemRooms.Contains(room) && room.LinkRequirements.AreSatisfiedBy(requireables, RequirementTarget.ITEM, enterFrom: enterFrom))
                 {
                     if (room.Collectable == null)
                     {
                         throw new Exception("Unable to assess gettability of item room with no item");
                     }
                     Collectable roomCollectable = room.Collectable ?? Collectable.DO_NOT_USE;
-                    gettableItems.Add(roomCollectable);
-                    if (roomCollectable.AsRequirement() != null)
+                    if (reachedItemRooms.Add(room))
                     {
-                        requireables.Add(roomCollectable.AsRequirement() ?? RequirementType.JUMP);
+                        gettableItemList.Add(roomCollectable);
+                    }
+                    if (!gettableItems.Contains(roomCollectable))
+                    {
+                        gettableItems.Add(roomCollectable);
+                        if (roomCollectable.AsRequirement() is { } collectableReq)
+                        {
+                            requireables.Add(collectableReq);
+                        }
                     }
                 }
-                coveredRooms.Add(room);
-                pendingRooms.Remove(room);
-                if (room.Left != null && room.Left.IsTraversable(requireables))
+                coveredRooms.Add(t);
+                foreach (var pair in room.PossibleDirections(requireables, enterFrom))
                 {
-                    pendingRooms.Add(room.Left);
-                }
-                if (room.Right != null && room.Right.IsTraversable(requireables))
-                {
-                    pendingRooms.Add(room.Right);
-                }
-                if (room.Up != null && room.Up.IsTraversable(requireables))
-                {
-                    pendingRooms.Add(room.Up);
-                }
-                if (room.Down != null && room.Down.IsTraversable(requireables))
-                {
-                    pendingRooms.Add(room.Down);
+                    pendingRooms.Enqueue(pair);
                 }
             }
         } while (gettableItems.Count != previousGettableItems.Count);
 
-        return gettableItems;
+        return gettableItemList;
     }
     // The collectables present in this palace's item rooms, independent of reachability
     public List<Collectable> GetAllCollectables()

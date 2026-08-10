@@ -187,6 +187,16 @@ public class SideviewMapCommand<T> where T : struct, Enum
         return Bytes[1] == 0x0F && Y < 13 && HasExtra();
     }
 
+    public bool IsItem(Collectable item)
+    {
+        return Bytes[1] == 0x0F && Y < 13 && HasExtra() && Extra == item;
+    }
+
+    public bool IsLockedDoor()
+    {
+        return Y < 13 && Bytes[1] == PalaceObjectShared.LOCKED_DOOR;
+    }
+
     public bool IsNewFloor()
     {
         return Y == 13;
