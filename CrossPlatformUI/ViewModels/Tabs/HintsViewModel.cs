@@ -23,8 +23,9 @@ public class HintsViewModel : ReactiveObject, IActivatableViewModel
             .Select(_ => Main.Config.GenerateSpoiler)
             .DistinctUntilChanged();
 
-        HeaderBackgroundObservable = randomizerViewModel.ThemeVariantSubject
-            .CombineLatest(alertFlags, (theme, alert) => ThemeHelper.GetFlagAlertBackgroundBrush(theme, alert));
+        HeaderBackgroundObservable = randomizerViewModel.WhenAnyValue(x => x.ThemeVariantName)
+            .CombineLatest(alertFlags, (theme, alert) =>
+                ThemeHelper.GetFlagAlertBackgroundBrush(theme, alert));
 
         this.WhenActivated(OnActivate);
     }

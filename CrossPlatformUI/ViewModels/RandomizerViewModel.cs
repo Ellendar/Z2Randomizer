@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reactive.Subjects;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,8 +26,8 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     [JsonIgnore]
     public IObservable<IBrush> FlagInputUnderlineObservable { get; }
 
-    [JsonIgnore]
-    public BehaviorSubject<bool> FlagsValidSubject = new(true);
+    private bool flagsValid = true;
+    private bool FlagsValid { get => flagsValid; set => this.RaiseAndSetIfChanged(ref flagsValid, value); }
 
     private static bool IsFlagStringValid(string flags) => FlagPasteParser.IsValidFlagString(flags);
 
@@ -46,18 +45,17 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
         }
     }
 
-    [JsonIgnore]
-    public BehaviorSubject<string> ThemeVariantSubject = new("");
+    private string themeVariantName = "";
     public string ThemeVariantName 
     {
         get
         {
-            return ThemeVariantSubject.Value;
+            return themeVariantName;
         }
         set
         {
             ThemeHelper.SetTheme(value);
-            ThemeVariantSubject.OnNext(value);
+            this.RaiseAndSetIfChanged(ref themeVariantName, value);
         }
     }
     private int currentTabIndex;
@@ -130,12 +128,16 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
 
         var seedValidObservable = this.WhenAnyValue(x => x.Main.Config.Seed, seed => !string.IsNullOrWhiteSpace(seed));
 
-        CanGenerateObservable = FlagsValidSubject.CombineLatest(
-            seedValidObservable, Main.RomFileViewModel.HasRomDataObservable, Main.GenerateRomViewModel.IsRunning,
-            (flagsValid, seedValid, hasRom, isRunning) => flagsValid && seedValid && hasRom && !isRunning);
+        CanGenerateObservable = this.WhenAnyValue(x => x.FlagsValid).CombineLatest(
+            seedValidObservable,
+            Main.RomFileViewModel.HasRomDataObservable,
+            Main.GenerateRomViewModel.WhenAnyValue(x => x.IsRunning),
+            (flagsValid, seedValid, hasRom, isRunning) =>
+                flagsValid && seedValid && hasRom && !isRunning);
 
-        FlagInputUnderlineObservable = ThemeVariantSubject
-            .CombineLatest(FlagsValidSubject, (theme, valid) => ThemeHelper.GetFlagUnderlineBrush(theme, valid));
+        FlagInputUnderlineObservable = this.WhenAnyValue(x => x.ThemeVariantName)
+            .CombineLatest(this.WhenAnyValue(x => x.FlagsValid), (theme, valid) =>
+                ThemeHelper.GetFlagUnderlineBrush(theme, valid));
 
         Generate = ReactiveCommand.Create(() =>
         {
@@ -215,7 +217,7 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
         // flag updates from RandomizerConfiguration always overwrites our flag input
         SubscribeExtensions.Subscribe(Main.FlagsObservable, flags =>
         {
-            FlagsValidSubject.OnNext(true);
+            FlagsValid = true;
             FlagInput = flags;
         })
             .DisposeWith(disposables);
@@ -229,17 +231,17 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
                 if (isNew)
                 {
                     bool isValid = IsFlagStringValid(tuple.Input);
-                    FlagsValidSubject.OnNext(isValid);
+                    FlagsValid = isValid;
                     if (isValid)
                     {
                         Main.Config.DeserializeFlags(tuple.Input);
                     }
                 }
-                else if (!FlagsValidSubject.Value)
+                else if (!FlagsValid)
                 {
-                    // The input matches the currently loaded flags (always valid), but the subject is
+                    // The input matches the currently loaded flags (always valid), but the flag is
                     // stale after a prior invalid paste left it false.
-                    FlagsValidSubject.OnNext(true);
+                    FlagsValid = true;
                 }
             })
             .DisposeWith(disposables);
