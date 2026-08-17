@@ -2311,10 +2311,13 @@ ResetRedPalettePayload:
         List<TownMap> townMaps = [];
         Dictionary<int, byte[]> connections = [];
         Dictionary<int, byte[]> doorConnections = [];
+        //Load the external maps first so the backreferences from the internal maps reference the exterior
         for (int currentMapNum = startMapNum; currentMapNum - startMapNum < numMaps; currentMapNum++)
         {
             townMaps.Add(LoadTownMap(currentMapNum, false));
-
+        }
+        for (int currentMapNum = startMapNum; currentMapNum - startMapNum < numMaps; currentMapNum++)
+        {
             var roomDoorConnectionsRomAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x8817 + currentMapNum * 4);
             var roomDoorConnections = GetBytes(roomDoorConnectionsRomAddr, 4);
 
@@ -2330,7 +2333,6 @@ ResetRedPalettePayload:
 
         foreach(TownMap townMap in townMaps)
         {
-
             var romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x871B + townMap.Map * 4);
             var connectionsRaw = GetBytes(romAddr, 4);
             connections.Add(townMap.Map, connectionsRaw);
@@ -2338,7 +2340,6 @@ ResetRedPalettePayload:
             var doorConnectionsRaw = GetBytes(romAddr, 4);
             doorConnections.Add(townMap.Map, doorConnectionsRaw);
         }
-
 
         return new Town(townMaps, connections, doorConnections);
     }

@@ -1004,7 +1004,7 @@ public class Hyrule
                     {
                         collectables[i] = props.StartsWithCollectable(collectables[i]) ? minorItems.Sample(r) : collectables[i];
                     }
-                    palaceLocation.SetCollectables(collectables);
+                    palaceLocation.SetCollectables(collectables, false);
                 }
             }
 
@@ -1034,7 +1034,7 @@ public class Hyrule
                     {
                         collectables[i] = props.StartsWithCollectable(collectables[i]) ? minorItems.Sample(r) : collectables[i];
                     }
-                    nonPalaceLocation.SetCollectables(collectables);
+                    nonPalaceLocation.SetCollectables(collectables, false);
                 }
             }
         }
@@ -1518,36 +1518,41 @@ public class Hyrule
 
     private void ShortenWizards()
     {
+        //These are all changing the vanilla addresses so they can be used properly when towns aren't modified
+        //and to make it easier to parse the vanilla town data even when it will be later modified.
+
         //Change the exit leading to the intermedaite wizard room to go directly to the basement
-        ROMData.Put(0xC827 + 1 * 4 + 2, 36 << 2);
-        ROMData.Put(0xC827 + 4 * 4 + 3, 37 << 2);
-        ROMData.Put(0xC827 + 8 * 4 + 1, 38 << 2);
-        ROMData.Put(0xC827 + 9 * 4 + 3, 39 << 2);
-        ROMData.Put(0xC827 + 13 * 4 + 3, 40 << 2);
-        ROMData.Put(0xC827 + 15 * 4 + 3, 41 << 2);
-        ROMData.Put(0xC827 + 19 * 4 + 1, 42 << 2);
-        ROMData.Put(0xC827 + 23 * 4 + 2, 43 << 2);
+        //uses the map door table
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 1 * 4 + 2, 36 << 2);
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 4 * 4 + 3, 37 << 2);
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 8 * 4 + 1, 38 << 2);
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 9 * 4 + 3, 39 << 2);
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 13 * 4 + 3, 40 << 2);
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 15 * 4 + 3, 41 << 2);
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 19 * 4 + 1, 42 << 2);
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 23 * 4 + 2, 43 << 2);
 
         //Change the exit from the wizard room to point back out to the town
-        ROMData.Put(0xC827 + 36 * 4, (1 << 2) + 2);
-        ROMData.Put(0xC827 + 37 * 4, (4 << 2) + 3);
-        ROMData.Put(0xC827 + 38 * 4, (8 << 2) + 1);
-        ROMData.Put(0xC827 + 39 * 4, (9 << 2) + 3);
-        ROMData.Put(0xC827 + 40 * 4, (13 << 2) + 3);
-        ROMData.Put(0xC827 + 41 * 4, (15 << 2) + 3);
-        ROMData.Put(0xC827 + 42 * 4, (19 << 2) + 1);
-        ROMData.Put(0xC827 + 43 * 4, (23 << 2) + 2);
+        //these are general connections table
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 36 * 4, (1 << 2) + 2);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 37 * 4, (4 << 2) + 3);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 38 * 4, (8 << 2) + 1);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 39 * 4, (9 << 2) + 3);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 40 * 4, (13 << 2) + 3);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 41 * 4, (15 << 2) + 3);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 42 * 4, (19 << 2) + 1);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 43 * 4, (23 << 2) + 2);
 
         //downstab guy
-        ROMData.Put(0xC827 + 10 * 4 + 1, 44 << 2);
-        ROMData.Put(0xC827 + 44 * 4, (10 << 2) + 1);
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 10 * 4 + 1, 44 << 2);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 44 * 4, (10 << 2) + 1);
 
         //granny's basement
-        ROMData.Put(0xC827 + 18 * 4 + 1, 46 << 2);
-        ROMData.Put(0xC827 + 46 * 4, (18 << 2) + 1);
+        ROMData.Put(RomMap.TOWN_DOOR_CONNECTIONS_TABLE + 18 * 4 + 1, 46 << 2);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 46 * 4, (18 << 2) + 1);
 
         //upstab guy entrance is unchanged because you drop into it, but still change the exit to lead directly out
-        ROMData.Put(0xC827 + 45 * 4, (16 << 2) + 3);
+        ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 45 * 4, (16 << 2) + 3);
     }
 
     /// <summary>
@@ -2006,10 +2011,11 @@ public class Hyrule
 
                     ShufflePalaces();
                     ShuffleItems();
-
+                    //Debug.WriteLine(GenerateSpoiler());
 
                     westHyrule.UpdateAllReached();
                     eastHyrule.UpdateAllReached();
+
                     mazeIsland.UpdateAllReached();
                     deathMountain.UpdateAllReached();
 

@@ -156,8 +156,7 @@ public class Towns
                 map.Name = "Granny's Basement";
                 map.AccessRequirements = new Requirements([RequirementType.SEVEN_CONTAINERS]);
                 map = town.GetTownMap(VanillaTownMap.SPELL_TOWER_INTERIOR)!;
-                map.Name = "Spell Tower" +
-                    "";
+                map.Name = "Spell Tower";
                 map.AccessRequirements = new Requirements([RequirementType.SPELL]);
                 break;
             case TownType.OLD_KASUTO:
