@@ -3,10 +3,10 @@
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              x:Class="CrossPlatformUI.Views.NesColorDropdown"
              Width="340" Height="40">
-    <Grid ColumnDefinitions="108,222">
-        <TextBlock Grid.Column="0" Margin="32, 0, 8, 0" Width="98" x:Name="ControlLabel" VerticalAlignment="Center" />
+    <Grid ColumnDefinitions="108,222" Margin="16 0 0 0">
+        <TextBlock Grid.Column="0" Margin="32, 0, 8, 0" Width="97" x:Name="ControlLabel" VerticalAlignment="Center" />
 
-        <Button Grid.Column="1" x:Name="SelectedButton" BorderBrush="Gray" BorderThickness="1" Width="170" Height="32" HorizontalAlignment="Left">
+        <Button Grid.Column="1" x:Name="SelectedButton" BorderBrush="Gray" BorderThickness="1" Width="184" Height="32" HorizontalAlignment="Left">
             <TextBlock x:Name="SelectedLabel" Width="170" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Default"/>
         </Button>
 

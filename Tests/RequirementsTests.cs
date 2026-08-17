@@ -14,6 +14,7 @@ public class RequirementsTests
         Assert.AreEqual(json, serialized);
     }
 
+    [TestMethod]
     public void TestEmptyJsonConstructor()
     {
         string? json = @"[]";

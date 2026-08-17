@@ -15,14 +15,11 @@ public static class RandomPercentPreset
         StartingHeartContainersMax = 8,
         StartingTechniques = StartingTechs.RANDOM,
         StartingLives = StartingLives.LivesRandom,
-        IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
         PalacesCanSwapContinents = null,
         ShuffleGP = null,
         ShuffleEncounters = null,
-        AllowUnsafePathEncounters = false,
-        IncludeLavaInEncounterShuffle = false,
         EncounterRate = EncounterRate.HALF,
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = null,
@@ -53,30 +50,21 @@ public static class RandomPercentPreset
         Includev4_0Rooms = null,
         Includev5_0Rooms = null,
         TBirdRequired = null,
-        RemoveTBird = false,
         PalacesToCompleteMin = 0,
-        PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = null,
-        ReduceDripperVariance = false,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
         PalaceDropStyle = PalaceDropStyle.ANYTHING_GOES,
         BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
-        HardBosses = false,
-        PalaceItemRoomCount = PalaceItemRoomCount.ONE,
-        DarkLinkMinDistance = BossRoomMinDistance.NONE,
 
         //Levels
         ShuffleAttackExperience = true,
         ShuffleMagicExperience = true,
         ShuffleLifeExperience = true,
 
-        AttackLevelCap = 8,
-        MagicLevelCap = 8,
-        LifeLevelCap = 8,
         AttackEffectiveness = AttackEffectiveness.AVERAGE,
         MagicEffectiveness = MagicEffectiveness.AVERAGE,
         LifeEffectiveness = LifeEffectiveness.AVERAGE,
@@ -100,7 +88,7 @@ public static class RandomPercentPreset
         ShuffleBossHP = EnemyLifeOption.MEDIUM,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,
-        ShuffleSwordImmunity = true,
+        SwordImmunityOption = SwordImmunityOption.SHUFFLE,
         EnemyXPDrops = XPEffectiveness.RANDOM,
 
         //Items
@@ -117,7 +105,6 @@ public static class RandomPercentPreset
         ShufflePBagAmounts = null,
         PalacesContainExtraKeys = null,
         RandomizeNewKasutoJarRequirements = true,
-        AllowImportantItemDuplicates = false,
         PreventSpellItemChains = false,
 
         //Drops
@@ -130,6 +117,5 @@ public static class RandomPercentPreset
         EnableSpellItemHints = null,
         EnableTownNameHints = null,
 
-        RevealWalkthroughWalls = false,
     };
 }

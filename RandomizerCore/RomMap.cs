@@ -127,6 +127,12 @@ class RomMap
         // (0x15454, 0x158aa), // Dark Link
     ];
 
+    public const int BOSS_DROP_COLLECTABLE = 0x1de29;
+    public const int PBAG_XP_TABLE = 0x1e800;
+    public const int SMALL_DROP_TABLE = 0x1e880;
+    public const int LARGE_DROP_TABLE = 0x1e888;
+    public const int ENEMY_DROP_FREQUENCY = 0x1e8b0;
+
     public const int WEST_PALETTE_TABLE = 0x401e;
     public const int EAST_PALETTE_TABLE = 0x801e;
     public const int TOWN_PALETTE_TABLE = 0xc01e;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore;
@@ -365,58 +366,55 @@ public class StatRandomizer
         }
 
         byte[] newTable = new byte[8];
-        for (int i = 0; i < 8; i++)
+
+        FixedBytesAttribute? fixedBytes = attackEffectiveness.GetFixedBytes();
+        if (fixedBytes != null)
         {
-            int nextVal;
-            byte vanilla = AttackEffectivenessTable[i];
-            switch (attackEffectiveness)
+            Debug.Assert(fixedBytes.Values.Length == 8);
+            newTable = fixedBytes.Values;
+        }
+        else
+        {
+            RandomRangeDoubleAttribute? range = attackEffectiveness.GetRandomRangeDouble();
+            Debug.Assert(range != null);
+
+            for (int i = 0; i < 8; i++)
             {
-                case AttackEffectiveness.LOW:
-                    //the naieve approach here gives a curve of 1,2,2,4,5,6 which is weird, or a different
-                    //irregular curve in digshake's old approach. Just use a linear increase for the first 6 levels on low
-                    if (i < 6)
-                    {
-                        nextVal = i + 1;
-                    }
-                    else
-                    {
-                        nextVal = (int)Math.Round(vanilla * .5, MidpointRounding.ToPositiveInfinity);
-                    }
-                    break;
-                case AttackEffectiveness.AVERAGE_LOW:
-                    nextVal = RandomInRange(r, vanilla * .5, vanilla);
+                int nextVal;
+                byte vanilla = AttackEffectivenessTable[i];
+
+                int min = (int)(vanilla * range.Low);
+                int max = (int)(vanilla * range.High);
+                nextVal = r.Next(min, max);
+
+                if (attackEffectiveness == AttackEffectiveness.AVERAGE_LOW)
+                {
                     if (i == 1)
                     {
                         nextVal = Math.Max(nextVal, 2); // set minimum 2 damage at level 2
                     }
-                    break;
-                case AttackEffectiveness.AVERAGE:
-                    nextVal = RandomInRange(r, vanilla * .667, vanilla * 1.5);
+                }
+                else if (attackEffectiveness == AttackEffectiveness.AVERAGE)
+                {
                     if (i == 0)
                     {
                         nextVal = Math.Max(nextVal, 2); // set minimum 2 damage at start
                     }
-                    break;
-                case AttackEffectiveness.AVERAGE_HIGH:
-                    nextVal = RandomInRange(r, vanilla, vanilla * 1.5);
-                    break;
-                case AttackEffectiveness.HIGH:
-                    nextVal = (int)Math.Round(vanilla * 1.5);
-                    break;
-                default:
-                    throw new NotImplementedException("Invalid Attack Effectiveness");
-            }
-            if (i > 0)
-            {
-                byte lastValue = newTable[i - 1];
-                if (nextVal < lastValue)
-                {
-                    nextVal = lastValue; // levelling up should never be worse
                 }
-            }
 
-            newTable[i] = (byte)nextVal;
+                if (i > 0)
+                {
+                    byte lastValue = newTable[i - 1];
+                    if (nextVal < lastValue)
+                    {
+                        nextVal = lastValue; // levelling up should never be worse
+                    }
+                }
+
+                newTable[i] = (byte)nextVal;
+            }
         }
+
         AttackEffectivenessTable = newTable;
     }
 
@@ -437,6 +435,9 @@ public class StatRandomizer
             return;
         }
 
+        RandomRangeDoubleAttribute? range = statEffectiveness.GetRandomRangeDouble();
+        Debug.Assert(range != null);
+
         byte[] newTable = new byte[LIFE_EFFECTIVENESS_ROWS * 8];
 
         // The values we are randomizing are actually *enemy damage* values
@@ -447,25 +448,11 @@ public class StatRandomizer
                 int index = damageCode * 8 + level;
                 byte nextVal;
                 byte vanilla = (byte)(LifeEffectivenessTable[index] >> 1);
-                int min = (int)(vanilla * .75);
-                int max = Math.Min((int)(vanilla * 1.5), 120);
-                switch (statEffectiveness)
-                {
-                    case LifeEffectiveness.AVERAGE_LOW:
-                        nextVal = (byte)r.Next(vanilla, max);
-                        break;
-                    case LifeEffectiveness.AVERAGE:
-                        nextVal = (byte)r.Next(min, max);
-                        break;
-                    case LifeEffectiveness.AVERAGE_HIGH:
-                        nextVal = (byte)r.Next(min, vanilla);
-                        break;
-                    case LifeEffectiveness.HIGH:
-                        nextVal = (byte)(vanilla * .5);
-                        break;
-                    default:
-                        throw new NotImplementedException("Invalid Life Effectiveness");
-                }
+                int min = (int)(vanilla * range.Low);
+                int max = (int)(vanilla * range.High);
+                nextVal = (byte)r.Next(min, max);
+                nextVal = Math.Min(nextVal, (byte)120);
+
                 if (level > 0)
                 {
                     byte lastVal = (byte)(newTable[index - 1] >> 1);
@@ -493,6 +480,9 @@ public class StatRandomizer
             return;
         }
 
+        RandomRangeDoubleAttribute? range = statEffectiveness.GetRandomRangeDouble();
+        Debug.Assert(range != null);
+
         byte[] newTable = new byte[MAGIC_EFFECTIVENESS_ROWS * 8];
 
         for (int level = 0; level < 8; level++)
@@ -501,29 +491,12 @@ public class StatRandomizer
             {
                 int index = spellIndex * 8 + level;
                 byte nextVal;
-                byte vanilla = (byte)(MagicEffectivenessTable[index] >> 1);
-                int min = (int)(vanilla * .5);
-                int max = Math.Min((int)(vanilla * 1.5), 120);
-                switch (statEffectiveness)
-                {
-                    case MagicEffectiveness.HIGH_COST:
-                        nextVal = (byte)max;
-                        break;
-                    case MagicEffectiveness.AVERAGE_HIGH_COST:
-                        nextVal = (byte)r.Next(vanilla, max);
-                        break;
-                    case MagicEffectiveness.AVERAGE:
+                byte baseVal = (byte)(MagicEffectivenessTable[index] >> 1);
+                int min = (int)(baseVal * range.Low);
+                int max = (int)(baseVal * range.High);
                         nextVal = (byte)r.Next(min, max);
-                        break;
-                    case MagicEffectiveness.AVERAGE_LOW_COST:
-                        nextVal = (byte)r.Next(min, vanilla);
-                        break;
-                    case MagicEffectiveness.LOW_COST:
-                        nextVal = (byte)min;
-                        break;
-                    default:
-                        throw new Exception("Invalid Magic Effectiveness");
-                }
+                nextVal = Math.Min(nextVal, (byte)120);
+
                 if (level > 0)
                 {
                     byte lastVal = (byte)(newTable[index - 1] >> 1);
@@ -619,10 +592,28 @@ public class StatRandomizer
         const int SWORD_IMMUNE_BIT = 0b00100000;
         const int XP_STEAL_BIT = 0b00010000;
 
-        if (props.ShuffleSwordImmunity)
+        switch (props.SwordImmunityOption)
         {
-            RandomizeBits(r, enemyBytes1, SWORD_IMMUNE_BIT);
+            case SwordImmunityOption.VANILLA:
+                break;
+            case SwordImmunityOption.SHUFFLE:
+                RandomizeBits(r, enemyBytes1, SWORD_IMMUNE_BIT);
+                break;
+            case SwordImmunityOption.SHUFFLE_CONDITIONAL:
+                if (props.ReplaceFireWithDash || props.LinkedFireSpell is Collectable.FAIRY_SPELL)
+                {
+                    SetBits(enemyBytes1, SWORD_IMMUNE_BIT, false);
+                }
+                else
+                {
+                    RandomizeBits(r, enemyBytes1, SWORD_IMMUNE_BIT);
+                }
+                break;
+            case SwordImmunityOption.NONE:
+                SetBits(enemyBytes1, SWORD_IMMUNE_BIT, false);
+                break;
         }
+
         if (props.ShuffleEnemyStealExp)
         {
             RandomizeBits(r, enemyBytes1, XP_STEAL_BIT);
@@ -738,6 +729,28 @@ public class StatRandomizer
         }
     }
 
+    /// <summary>
+    /// For a given set of bytes, set a masked portion of the value of each byte to bitValue (all 1's or all 0's).
+    /// </summary>
+    /// <param name="bytes">Bytes to modify.</param>
+    /// <param name="mask">What part of the byte value at each address contains the configuration bit(s) we care about.</param>
+    public static void SetBits(byte[] bytes, int mask, bool bitValue)
+    {
+        if (bytes.Length == 0) { return; }
+
+        int notMask = mask ^ 0xFF;
+
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            int v = bytes[i] & notMask;
+            if (bitValue)
+            {
+                v |= mask;
+            }
+            bytes[i] = (byte)v;
+        }
+    }
+
     /// When Rebonack's HP is set to exactly 2 * your damage, it will
     /// trigger a bug where you kill Rebo's horse while de-horsing him.
     /// This causes an additional key to drop, as well as softlocking
@@ -764,5 +777,88 @@ public class StatRandomizer
         var spellIndex = spell.VanillaSpellOrder();
         int index = spellIndex * 8 + level - 1;
         return MagicEffectivenessTable[index];
+    }
+
+    public string GenerateSpoiler()
+    {
+        StringBuilder sb = new();
+
+        string fireSpellText = "FIRE";
+        if (props.ReplaceFireWithDash)
+        {
+            fireSpellText = "DASH";
+        }
+        else if (props.LinkedFireSpell != null)
+        {
+            fireSpellText = "FIRE/" + props.LinkedFireSpell.Value.SingleLineText();
+        }
+
+        string[] spellNames = { "SHIELD", "JUMP", "LIFE", "FAIRY", fireSpellText, "REFLECT", "SPELL", "THUNDER" };
+        int spellNameLength = spellNames.Max(s => s.Length);
+        sb.AppendLine("SPELL COST");
+        sb.AppendLine(new string('=', spellNameLength * 2 + 42));
+        for (int spell = 0; spell < 8; spell++)
+        {
+            sb.Append($"{spellNames[spell].PadRight(spellNameLength)}  ");
+            for (int level = 0; level < 8; level++)
+            {
+                int value = MagicEffectivenessTable[spell * 8 + level] >> 1;
+                sb.Append($"{value,3}  ");
+            }
+            sb.AppendLine(spellNames[spell]);
+        }
+        sb.AppendLine(new string('-', spellNameLength * 2 + 42));
+        sb.AppendLine($"{"LEVEL".PadRight(spellNameLength)}    1    2    3    4    5    6    7    8");
+        sb.AppendLine();
+        sb.AppendLine();
+
+        string[] statNames = { "ATTACK", "MAGIC", "LIFE" };
+        sb.AppendLine("EXPERIENCE");
+        sb.AppendLine("======================================================");
+        for (int stat = 0; stat < 3; stat++)
+        {
+            sb.Append($"{statNames[stat],-6}");
+            for (int level = 0; level < 8; level++)
+            {
+                sb.Append($"  {ExperienceToLevelTable[stat * 8 + level],4}");
+            }
+            sb.AppendLine();
+        }
+        sb.AppendLine("------------------------------------------------------");
+        sb.AppendLine("LEVEL      2     3     4     5     6     7     8     9");
+        sb.AppendLine();
+        sb.AppendLine();
+
+        sb.AppendLine("ATTACK EFFECTIVENESS");
+        sb.AppendLine("======================================");
+        sb.Append("DAMAGE");
+        for (int level = 0; level < 8; level++)
+        {
+            sb.Append($"  {AttackEffectivenessTable[level],2}");
+        }
+        sb.AppendLine();
+        sb.AppendLine("--------------------------------------");
+        sb.AppendLine("LEVEL    1   2   3   4   5   6   7   8");
+        sb.AppendLine();
+        sb.AppendLine();
+
+        string[] damageTypeEnemyText = { "Ache", "Myu", "Orange Ironknuckle", "Red/Blue Ironknuckle", "Red/Blue Geru", "Gooma, Barba", "Thunderbird" };
+        sb.AppendLine("LIFE EFFECTIVENESS");
+        sb.AppendLine("================================================");
+        for (int damageCode = 0; damageCode < LIFE_EFFECTIVENESS_ROWS; damageCode++)
+        {
+            sb.Append($"DAMAGE-{Convert.ToChar('A' + damageCode)}");
+            for (int level = 0; level < 8; level++)
+            {
+                int value = LifeEffectivenessTable[damageCode * 8 + level] >> 1;
+                sb.Append($"  {value,3}");
+            }
+            sb.Append($"    ({damageTypeEnemyText[damageCode]})");
+            sb.AppendLine();
+        }
+        sb.AppendLine("------------------------------------------------");
+        sb.AppendLine("LEVEL       1    2    3    4    5    6    7    8");
+
+        return sb.ToString();
     }
 }
