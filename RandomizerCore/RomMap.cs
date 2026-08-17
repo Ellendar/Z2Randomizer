@@ -141,6 +141,6 @@ class RomMap
     public const int PALACE_PALETTE_TABLE_PER_PALACE = 0x13f10;
     public const int GP_PALETTE_TABLE_MAJOR = 0x1401e;
 
-    public const int TOWN_NORMAL_CONNECTIONS_TABLE = 0xC7AB;
+    public const int TOWN_NORMAL_CONNECTIONS_TABLE = 0xC72B;
     public const int TOWN_DOOR_CONNECTIONS_TABLE = 0xC827;
 }
