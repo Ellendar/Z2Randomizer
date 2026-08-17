@@ -3070,6 +3070,25 @@ CustomFileSelectData:
         return locations ?? [];
     }
 
+    public IEnumerable<(string, int)> GetFullShuffleLocationCollectables()
+    {
+        return [
+            ("SHIELD_SPELL_ITEMLOC", (int)westHyrule.rauru.Town!.GetWizard()!.Collectable!),
+            ("JUMP_SPELL_ITEMLOC", (int)westHyrule.ruto.Town!.GetWizard()!.Collectable!),
+            ("LIFE_SPELL_ITEMLOC", (int)westHyrule.sariaNorth.Town!.GetWizard()!.Collectable!),
+            ("FAIRY_SPELL_ITEMLOC", (int)westHyrule.mido.Town!.GetWizard()!.Collectable!),
+            ("FIRE_SPELL_ITEMLOC", (int)eastHyrule.nabooru.Town!.GetWizard()!.Collectable!),
+            ("REFLECT_SPELL_ITEMLOC", (int)eastHyrule.darunia.Town!.GetWizard()!.Collectable!),
+            ("SPELL_SPELL_ITEMLOC", (int)eastHyrule.newKasuto.Town!.GetWizard()!.Collectable!),
+            ("THUNDER_SPELL_ITEMLOC", (int)eastHyrule.oldKasuto.Town!.GetWizard()!.Collectable!),
+            ("MIRROR_ITEMLOC", (int)westHyrule.sariaNorth.Town!.GetTownMap(VanillaTownMap.SARIA_TABLE)!.Collectable!),
+            ("BAGUS_NOTE_ITEMLOC", (int)westHyrule.bagu.Town!.GetTownMap(VanillaTownMap.BAGU_INDOORS)!.Collectable!),
+            ("WATER_ITEMLOC", (int)eastHyrule.nabooru.Town!.GetTownMap(VanillaTownMap.NABOORU_MID)!.Collectable!),
+            ("DOWNSTAB_ITEMLOC", (int)westHyrule.mido.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER)!.Collectable!),
+            ("UPSTAB_ITEMLOC", (int)eastHyrule.darunia.Town.GetTownMap(VanillaTownMap.DARUNIA_TRAINER)!.Collectable!),
+        ];
+    }
+
     public IEnumerable<Location> ItemLocations()
     {
         List<Location> possibleItemLocations = AllLocations().Where(i => i.GetCollectableCount() > 0).ToList();
@@ -3147,19 +3166,17 @@ logger.Error(sb.ToString());
         return false;
     }
 
-    private void FullItemShuffle(Assembler asm)
+    private void FullItemShuffle(Assembler asm, IEnumerable<(string, int)> fullShuffleLocations)
     {
         var a = asm.Module();
         foreach (var collect in Enum.GetValues<Collectable>())
         {
             a.Set($"{collect.ToString().ToUpper()}_ITEMLOC", (int)collect);
         }
-        /*
-        foreach (var loc in nonSideviewLocations)
+        foreach (var loc in fullShuffleLocations)
         {
-            //a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectables[0]);
+            a.Set(loc.Item1, loc.Item2);
         }
-        */
         foreach (var val in Enum.GetValues<DialogWest>())
         {
             a.Set($"{val.ToString()}_DIALOG_WEST_INDEX", (int)val);
@@ -3653,7 +3670,7 @@ bank5_Pointer_table_for_End_Credits:
         AddCropGuideBoxesToFileSelect(engine);
         rom.SetEncounterRate(engine, props, r);
         FixHelmetheadBossRoom(engine);
-        FullItemShuffle(engine);
+        FullItemShuffle(engine, GetFullShuffleLocationCollectables());
         rom.DontCountExpDuringTalking(engine);
         rom.ElevatorBossFix(engine, props.BossItem);
         rom.FixElevatorPositionInFallRooms(engine);
