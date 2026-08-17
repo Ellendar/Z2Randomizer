@@ -1,7 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using static System.ObservableExtensions;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using ReactiveUI.Primitives;
+using ReactiveUI.Primitives.Disposables;
 using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
@@ -12,22 +13,29 @@ public partial class GenerateRomView : ReactiveUserControl<GenerateRomViewModel>
     public GenerateRomView()
     {
         InitializeComponent();
-        this.WhenActivated(disposables =>
+        this.WhenActivated((MultipleDisposable disposables) =>
         {
-            CancelGen.WhenAnyValue(x => x.IsVisible).Subscribe(_ =>
-            {
-                if (CancelGen?.IsVisible ?? false)
+            SubscribeExtensions.Subscribe(
+                CancelGen.WhenAnyValue(x => x.IsVisible),
+                _ =>
                 {
-                    CancelGen.Focus();
-                }
-            });
-            CloseGen.WhenAnyValue(x => x.IsVisible).Subscribe(_ =>
-            {
-                if (CloseGen?.IsVisible ?? false)
+                    if (CancelGen?.IsVisible ?? false)
+                    {
+                        CancelGen.Focus();
+                    }
+                })
+                .DisposeWith(disposables);
+
+            SubscribeExtensions.Subscribe(
+                CloseGen.WhenAnyValue(x => x.IsVisible),
+                _ =>
                 {
-                    CloseGen.Focus();
-                }
-            });
+                    if (CloseGen?.IsVisible ?? false)
+                    {
+                        CloseGen.Focus();
+                    }
+                })
+                .DisposeWith(disposables);
         });
     }
 }

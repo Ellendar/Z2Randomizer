@@ -21,7 +21,15 @@ public class AppViewLocator : IViewLocator
     public IViewFor? ResolveView(object? viewModel, string? contract = null)
         => viewModel is null ? null : CreateView(viewModel);
 
+    public IViewFor? ResolveView(object? viewModel)
+        => viewModel is null ? null : CreateView(viewModel);
+
     public IViewFor<TViewModel>? ResolveView<TViewModel>(string? contract = null) where TViewModel : class
+    {
+        throw new NotImplementedException();
+    }
+
+    public IViewFor<TViewModel>? ResolveView<TViewModel>() where TViewModel : class
     {
         throw new NotImplementedException();
     }

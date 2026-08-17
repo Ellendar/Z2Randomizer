@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -13,6 +12,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Material.Styles.Assists;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI.Primitives;
 using Z2Randomizer.RandomizerCore;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels;
@@ -96,10 +96,11 @@ public sealed partial class App : Application // , IDisposable
             var spriteLoaderService = App.Current?.Services?.GetService<SpriteLoaderService>();
             Debug.Assert(spriteLoaderService != null);
 
-            spriteLoaderService.Sprites
-                .Where(sprites => sprites.Count > 0)
-                .Take(1)
-                .Subscribe(sprites =>
+            SubscribeExtensions.Subscribe(
+                spriteLoaderService.Sprites
+                    .Where(sprites => sprites.Count > 0)
+                    .Take(1),
+                sprites =>
                 {
                     var sprite = sprites.FirstOrDefault(loaded => loaded.DisplayName == main.Config.SpriteName);
                     if (sprite != null)

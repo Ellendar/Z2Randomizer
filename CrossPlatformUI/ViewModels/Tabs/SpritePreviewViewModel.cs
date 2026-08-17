@@ -1,24 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Text.Json.Serialization;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive.Disposables.Fluent;
+using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
-using CrossPlatformUI.Services;
+using ReactiveUI;
+using ReactiveUI.Primitives;
+using ReactiveUI.Primitives.Disposables;
+using ReactiveUI.Primitives.Signals;
 using DynamicData;
 using DynamicData.Binding;
-using Microsoft.Extensions.DependencyInjection;
-using ReactiveUI;
+using CrossPlatformUI.Services;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
@@ -119,7 +118,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
     [JsonIgnore]
     public ObservableCollectionExtended<LoadedCharacterSprite> Options { get; } = new();
 
-    private CompositeDisposable _disposables = new();
+    private MultipleDisposable _disposables = new();
 
     [JsonIgnore]
     public ViewModelActivator Activator { get; }
@@ -135,19 +134,17 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         Activator = new();
         this.WhenActivated(OnActivate);
 
-        options
-            .Connect()
-            .Bind(Options)
-            .Subscribe()
+        SubscribeExtensions.Subscribe(options.Connect().Bind(Options))
             .DisposeWith(_disposables);
 
         var spriteLoaderService = App.Current?.Services?.GetService<SpriteLoaderService>();
         Debug.Assert(spriteLoaderService != null);
 
-        spriteLoaderService.Sprites
-            .Where(sprites => sprites.Count > 0)
-            .Take(1)
-            .Subscribe(sprites =>
+        SubscribeExtensions.Subscribe(
+            spriteLoaderService.Sprites
+                .Where(sprites => sprites.Count > 0)
+                .Take(1),
+            sprites =>
             {
                 Dispatcher.UIThread.Post(() => LoadCharacterSprites(sprites), DispatcherPriority.Background);
             })
@@ -159,7 +156,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         _disposables.Dispose();
     }
 
-    internal void OnActivate(CompositeDisposable disposables)
+    internal void OnActivate(MultipleDisposable disposables)
     {
         IObservable<(string? DisplayName, NesColor, NesColor, NesColor)> settingsObservable = this.WhenAnyValue(
                 x => x.Main.Config.Sprite,
@@ -181,21 +178,21 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         var hasRomObservable = Main.RomFileViewModel.ObservableForProperty(x => x.HasRomData, false, false);
         var optionsObservable = options.Connect().ToCollection();
 
-        Observable.CombineLatest(
-            settingsObservable,
-            hasRomObservable,
-            optionsObservable,
-            (settings, hasRom, options) => (settings, hasRom, options)
-        )
-            .Where(t => t.hasRom.Value && t.options.Count > 0)
-            .Subscribe(t => {
-                backgroundUpdateTask.CancelAsync().ToObservable().Subscribe(_ =>
+        SubscribeExtensions.Subscribe(
+            settingsObservable
+                .CombineLatest(hasRomObservable, optionsObservable, (settings, hasRom, options) => (settings, hasRom, options))
+                .Where(t => t.hasRom.Value && t.options.Count > 0),
+            t =>
+            {
+                SubscribeExtensions.Subscribe(
+                    Signal.FromAsync(async () => { await backgroundUpdateTask.CancelAsync(); return default(RxVoid); }),
+                    _ =>
                 {
                     backgroundUpdateTask = new CancellationTokenSource();
                     Dispatcher.UIThread.Post(() => UpdateCharacterSprites(Main.RomFileViewModel.RomData, backgroundUpdateTask.Token), DispatcherPriority.Background);
                 });
             })
-            .DisposeWith(disposables);
+            .DisposeWith(_disposables);
     }
 
     void LoadCharacterSprites(IReadOnlyList<CharacterSprite> sprites)

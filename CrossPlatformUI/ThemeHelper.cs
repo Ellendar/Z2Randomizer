@@ -1,4 +1,5 @@
-﻿using Avalonia.Media;
+﻿using Avalonia.Controls;
+using Avalonia.Media;
 using Avalonia.Styling;
 using Material.Styles.Themes;
 
@@ -13,6 +14,9 @@ public class ThemeHelper
 
     private static IBrush DarkNonStandardFlagEnabledBackground = SolidColorBrush.Parse("#80b10600");
     private static IBrush LightNonStandardFlagEnabledBackground = SolidColorBrush.Parse("#d2b30000");
+
+    private static IBrush DarkInvalidFlagUnderline = SolidColorBrush.Parse("#b10600");
+    private static IBrush LightInvalidFlagUnderline = SolidColorBrush.Parse("#b30000");
 
     static ThemeHelper() {
         DarkMaterialTheme = Theme.Create(Theme.Dark, Color.Parse("#ffbc33"), Color.Parse("#969696"));
@@ -62,5 +66,16 @@ public class ThemeHelper
         {
             return Brushes.Transparent;
         }
+    }
+
+    public static IBrush GetFlagUnderlineBrush(string? theme, bool valid)
+    {
+        // Matches the brushes the Material TextBox template uses by default (underline) and on error.
+        var app = App.Current;
+        if (app != null && app.TryFindResource(valid ? "MaterialTextBoxBorderBrush" : "MaterialValidationErrorBrush", out var brush) && brush is IBrush b)
+        {
+            return b;
+        }
+        return valid ? Brushes.Gray : (IsDark(theme) ? DarkInvalidFlagUnderline : LightInvalidFlagUnderline);
     }
 }

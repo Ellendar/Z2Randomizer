@@ -35,7 +35,7 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Avalonia" />
-        <PackageReference Include="ReactiveUI.Validation" />
+        <PackageReference Include="ReactiveUI.Primitives" />
         <PackageReference Include="Aigamo.ResXGenerator" >
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>

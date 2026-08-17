@@ -1,9 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Subjects;
 using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -13,7 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using ReactiveUI;
-using ReactiveUI.Validation.Helpers;
+using ReactiveUI.Primitives.Disposables;
+using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 using CrossPlatformUI.Services;
@@ -22,7 +20,7 @@ using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("")]
-public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
+public class GenerateRomViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
 
 #pragma warning disable CS8618
@@ -63,12 +61,12 @@ Seed: {config.Seed}
         this.WhenActivated(Randomize);
         return;
 
-        async void Randomize(CompositeDisposable disposables)
+        async void Randomize(MultipleDisposable disposables)
         {
             if (!Main.GenerateRomDialogOpen) return;
 
             runningMutex.Wait();
-            isRunning.OnNext(true);
+            IsRunning = true;
 
             lastError = null;
             HasError = false;
@@ -177,7 +175,7 @@ Seed: {config.Seed}
                 {
                     tokenSource.Dispose();
                     tokenSource = null;
-                    isRunning.OnNext(false);
+                    IsRunning = false;
                     runningMutex.Release();
                 }
             }
@@ -210,13 +208,13 @@ Seed: {config.Seed}
     }
 
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> CancelGeneration { get; }
+    public ReactiveCommand<RxVoid, RxVoid> CancelGeneration { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> CopyError { get; }
+    public ReactiveCommand<RxVoid, RxVoid> CopyError { get; }
 
     private readonly SemaphoreSlim runningMutex = new SemaphoreSlim(1, 1);
-    private readonly BehaviorSubject<bool> isRunning = new BehaviorSubject<bool>(false);
-    public IObservable<bool> IsRunning => isRunning;
+    private bool isRunning;
+    public bool IsRunning { get => isRunning; set => this.RaiseAndSetIfChanged(ref isRunning, value); }
 
     private CancellationTokenSource? tokenSource;
 

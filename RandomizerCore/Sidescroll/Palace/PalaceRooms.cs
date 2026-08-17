@@ -11,33 +11,56 @@ public partial class PalaceRooms
 {
     private readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new();
     public IReadOnlyList<Room> RoomsByGroup(RoomGroup group) => roomsByGroup.GetValueOrDefault(group, []);
+    private readonly Dictionary<string, List<Room>> roomsByTag = new();
+    public IReadOnlyList<Room> RoomsByTag(string tag) => roomsByTag.GetValueOrDefault(tag, []);
     private readonly Dictionary<string, Room> roomsByName = new();
 
     public static readonly string roomsMD5 = "JCa3OsnJhIe/fZ5yrx/+mA==";
 
     public PalaceRooms(string palaceJson, bool doValidation)
+        : this(JsonSerializer.Deserialize(palaceJson, RoomSerializationContext.Default.ListRoom)!)
     {
         var hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(RemoveNewLines().Replace(palaceJson, "")));
         if (doValidation && roomsMD5 != Convert.ToBase64String(hash))
         {
             throw new Exception("Invalid PalaceRooms.json");
         }
+    }
 
-        var rooms = JsonSerializer.Deserialize(palaceJson, RoomSerializationContext.Default.ListRoom)!;
+    public PalaceRooms(IEnumerable<Room> rooms)
+    {
         foreach (var room in rooms)
         {
             if (room.Enabled)
             {
-                if (!roomsByGroup.TryGetValue(room.Group, out var value))
+                if (!roomsByGroup.TryGetValue(room.Group, out var groupList))
                 {
-                    value = [];
-                    roomsByGroup.Add(room.Group, value);
+                    groupList = [];
+                    roomsByGroup.Add(room.Group, groupList);
                 }
+                groupList.Add(room);
 
-                value.Add(room);
+                if (room.Tags != null)
+                {
+                    foreach (var tag in room.Tags)
+                    {
+                        AddRoomToTagList(room, tag);
+                    }
+                }
             }
+
             roomsByName[room.Name] = room;
         }
+    }
+
+    private void AddRoomToTagList(Room room, string tag)
+    {
+        if (!roomsByTag.TryGetValue(tag, out var tagList))
+        {
+            tagList = [];
+            roomsByTag.Add(tag, tagList);
+        }
+        tagList.Add(room);
     }
 
     public IEnumerable<Room> VanillaPalaceRoomsByPalaceNumber(int palaceNum)
@@ -90,14 +113,9 @@ public partial class PalaceRooms
         );
     }
 
-    public IEnumerable<Room> ThunderBirdRooms(RoomGroup group)
-    {
-        var roomgroup = roomsByGroup[group];
-        return roomgroup.Where(i => i.IsThunderBirdRoom);
-    }
-
     public Room VanillaBossRoom(int palaceNum)
     {
+        /*
         var map = palaceNum switch
         {
             1 => 13,
@@ -109,7 +127,9 @@ public partial class PalaceRooms
             7 => 54,
             _ => throw new ArgumentException("Invalid palace number: " + palaceNum)
         };
-        return roomsByGroup[RoomGroup.VANILLA].First(i => i.IsBossRoom && map == i.Map);
+        */
+        // might be null for test pool
+        return roomsByGroup[RoomGroup.VANILLA].FirstOrDefault(i => i.IsBossRoom && i.PalaceNumber == palaceNum)!;
     }
 
     public Room VanillaItemRoom(int palaceNum)
@@ -130,61 +150,98 @@ public partial class PalaceRooms
 
     public IEnumerable<Room> ItemRoomsByDirection(RoomGroup group, Direction direction)
     {
+        return ItemRoomsByDirection(roomsByGroup.GetValueOrDefault(group, []), direction);
+    }
+
+    public IEnumerable<Room> ItemRoomsByDirection(IReadOnlyList<Room> rooms, Direction direction)
+    {
         if (direction == Direction.NONE)
         {
             throw new ArgumentException("Invalid Direction.NONE in ItemRoomsByDirection");
         }
 
-        var rooms = roomsByGroup;
         return direction switch
         {
-            //case Direction.HORIZONTAL_PASSTHROUGH:
-            //    return rooms[group].Where(i => i.HasItem && i.HasLeftExit() && i.HasRightExit());
-            //case Direction.VERTICAL_PASSTHROUGH:
-            //    return rooms[group].Where(i => i.HasItem && i.HasUpExit() && i.HasDownExit());
-            Direction.NORTH => rooms[group].Where(i => i.HasItem && i.HasUpExit),
-            Direction.SOUTH => rooms[group].Where(i => i.HasItem && i.HasDownExit),
-            Direction.WEST => rooms[group].Where(i => i.HasItem && i.HasLeftExit),
-            Direction.EAST => rooms[group].Where(i => i.HasItem && i.HasRightExit),
+            Direction.NORTH => rooms.Where(i => i.HasItem && i.HasUpExit),
+            Direction.SOUTH => rooms.Where(i => i.HasItem && i.HasDownExit),
+            Direction.WEST => rooms.Where(i => i.HasItem && i.HasLeftExit),
+            Direction.EAST => rooms.Where(i => i.HasItem && i.HasRightExit),
             _ => throw new ImpossibleException("Invalid direction in ItemRoomsByDirection")
         };
     }
 
     public IEnumerable<Room> ItemRoomsByShape(RoomGroup group, RoomExitType shape)
     {
-        return roomsByGroup[group].Where(i => i.HasItem && i.CategorizeExits() == shape);
+        return ItemRoomsByShape(roomsByGroup.GetValueOrDefault(group, []), shape);
+    }
+
+    public IEnumerable<Room> ItemRoomsByShape(IReadOnlyList<Room> rooms, RoomExitType shape)
+    {
+        return rooms.Where(i => i.HasItem && i.CategorizeExits() == shape);
     }
 
     public IEnumerable<Room> ItemRooms(RoomGroup group)
     {
-        return roomsByGroup[group].Where(i => i.HasItem);
+        return ItemRooms(roomsByGroup.GetValueOrDefault(group, []));
+    }
+
+    public IEnumerable<Room> ItemRooms(IReadOnlyList<Room> rooms)
+    {
+        return rooms.Where(i => i.HasItem);
     }
 
     public IEnumerable<Room> NormalPalaceRoomsByGroup(RoomGroup group)
     {
-        var roomgroup = roomsByGroup[group];
-        return roomgroup.Where(i => (i.PalaceNumber ?? 1) != 7
+        return NormalPalaceRoomsInList(roomsByGroup.GetValueOrDefault(group, []));
+    }
+
+    public IEnumerable<Room> NormalPalaceRoomsInList(IReadOnlyList<Room> rooms)
+    {
+        return rooms.Where(i => (i.PalaceNumber ?? 1) != 7
             && i is { IsThunderBirdRoom: false, HasItem: false, IsBossRoom: false, IsEntrance: false });
     }
 
     public IEnumerable<Room> GpRoomsByGroup(RoomGroup group)
     {
-        var roomgroup = roomsByGroup[group];
-        return roomgroup.Where(i => (i.PalaceNumber ?? 1) == 7
+        return GpRoomsInList(roomsByGroup.GetValueOrDefault(group, []));
+    }
+
+    public IEnumerable<Room> GpRoomsInList(IReadOnlyList<Room> rooms)
+    {
+        return rooms.Where(i => (i.PalaceNumber ?? 1) == 7
             && i is { IsThunderBirdRoom: false, HasItem: false, IsBossRoom: false, IsEntrance: false });
     }
 
     public IEnumerable<Room> Entrances(RoomGroup group)
     {
-        var roomgroup = roomsByGroup[group];
-        return roomgroup.Where(i => i.IsEntrance);
+        return Entrances(roomsByGroup.GetValueOrDefault(group, []));
+    }
+
+    public IEnumerable<Room> Entrances(IReadOnlyList<Room> rooms)
+    {
+        return rooms.Where(i => i.IsEntrance);
+    }
+
+    public IEnumerable<Room> ThunderBirdRooms(RoomGroup group)
+    {
+        return ThunderBirdRooms(roomsByGroup.GetValueOrDefault(group, []));
+    }
+
+    public IEnumerable<Room> ThunderBirdRooms(IReadOnlyList<Room> rooms)
+    {
+        return rooms.Where(i => i.IsThunderBirdRoom);
     }
 
     public IEnumerable<Room> BossRooms(RoomGroup group, int? palaceNum = null)
     {
-        var roomgroup = roomsByGroup[group];
-        return roomgroup.Where(i => i.IsBossRoom && (palaceNum == null || palaceNum == i.PalaceNumber));
+        return BossRooms(roomsByGroup.GetValueOrDefault(group, []), palaceNum);
     }
+
+    public IEnumerable<Room> BossRooms(IReadOnlyList<Room> rooms, int? palaceNum = null)
+    {
+        return rooms.Where(i => i.IsBossRoom && (palaceNum == null || palaceNum == i.PalaceNumber));
+    }
+
     public Room GetRoomByName(string name)
     {
         return roomsByName[name];
@@ -192,8 +249,13 @@ public partial class PalaceRooms
 
     public Dictionary<string, Room> LinkedRooms(RoomGroup group, int? palaceNum = null)
     {
+        return LinkedRooms(roomsByGroup.GetValueOrDefault(group, []));
+    }
+
+    public Dictionary<string, Room> LinkedRooms(IReadOnlyList<Room> rooms, int? palaceNum = null)
+    {
         Dictionary<string, Room> linkedRooms = [];
-        foreach (Room room in roomsByGroup[group])
+        foreach (Room room in rooms)
         {
             if (room.Enabled && room.LinkedRoomName != null)
             {

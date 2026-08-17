@@ -1968,6 +1968,80 @@ ResetRedPalettePayload:
 """);
     }
 
+    public void ThunderbirdEnterLeftFix(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import ElevatorBossFix
+
+.segment "PRG5"
+
+DrawThunderbird = $9ebf
+ThunderbirdMainRoutineStart = $a359
+ThunderbirdMainRoutine = $a36b
+ThunderbirdNoRoutine = $a3bd
+
+; Do a much finer scroll position check so we can get into position
+; when entering from the right as well.
+.org $94d1
+    .word ThunderbirdFixedScrollCheck
+
+; When entering from the right, Thunderbird would be visible before the combat starts.
+; While it's not a problem, it feels a bit jank, so lets not draw Thunderbird pre-battle.
+.org $95a9
+    .word ConditionalDrawThunderbird
+
+
+.org ThunderbirdMainRoutineStart
+FREE_UNTIL ThunderbirdMainRoutine
+
+.reloc
+ThunderbirdFixedScrollCheck:
+    lda ScrollLeftPage
+    cmp #$01
+    bne @DontSpawn
+
+    lda ScrollLeftX
+    cmp #$04                     ; need at least 3 pixel margin so dash speed can't skip the trigger point
+    bcs @DontSpawn
+
+    lda ScrollFrozen
+    bne @TimerRunning
+        jsr ElevatorBossFix      ; will freeze the scrolling (and more)
+        lda #$90
+        sta $0504,x              ; set timer for Thunderbird to begin
+    
+    @TimerRunning:
+    lda ScrollLeftX
+    beq @NoScroll
+
+    lda FrameCounter
+    and #$01 
+    bne @NoScroll                ; slow down screen scroll to every other frame
+
+    lda ScrollLeftX
+    sbc #$00                     ; subtracts 1 because carry is cleared by cmp
+    bcs @SetScrollX
+        lda #$00                 ; clamp to 0
+    @SetScrollX:
+    sta ScrollLeftX
+    sta ScrollPosShadow
+    @NoScroll:
+        jmp ThunderbirdMainRoutine
+    @DontSpawn:
+        jmp ThunderbirdNoRoutine
+
+.reloc
+ConditionalDrawThunderbird:
+    lda ScrollFrozen
+    beq @NotInBattle
+        jmp DrawThunderbird
+    @NotInBattle:
+        rts
+""");
+    }
+
     public void BuffCarrock(Assembler a)
     {
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
@@ -2115,9 +2189,10 @@ DontSwitchMusicIfInPalace2:
     jsr ElevatorBossFix
 
 ; Screen lock tbird set at bank 5 A363 (0x16373)
-.segment "PRG5"
-.org $a363
-    jsr ElevatorBossFix
+; ThunderbirdEnterLeftFix does this call now
+;.segment "PRG5"
+;.org $a363
+;    jsr ElevatorBossFix
 
 .segment "PRG7"
 

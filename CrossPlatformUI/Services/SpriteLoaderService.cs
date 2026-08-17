@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
+using ReactiveUI.Primitives;
+using ReactiveUI.Primitives.Signals;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.Services;
@@ -16,7 +17,7 @@ public class SpriteLoaderService
     public SpriteLoaderService(IFileSystemService fileSystemService)
     {
         _fileService = fileSystemService;
-        Sprites = Observable.Defer(() => Observable.FromAsync(LoadSpritesAsync)).Replay(1).AutoConnect();
+        Sprites = Signal.Defer(() => Signal.FromAsync(LoadSpritesAsync)).Replay(1).AutoConnect();
     }
 
     private async Task<IReadOnlyList<CharacterSprite>> LoadSpritesAsync()

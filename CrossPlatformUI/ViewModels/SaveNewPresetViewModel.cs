@@ -1,14 +1,13 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using DynamicData.Binding;
 using ReactiveUI;
-using ReactiveUI.Validation.Helpers;
+using ReactiveUI.Primitives;
+using ReactiveUI.Primitives.Disposables;
+using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
@@ -67,7 +66,7 @@ public class CustomPreset : ReactiveObject
 }
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
-public class SaveNewPresetViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
+public class SaveNewPresetViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
 
 #pragma warning disable CS8618
@@ -91,7 +90,7 @@ public class SaveNewPresetViewModel : ReactiveValidationObject, IRoutableViewMod
         {
             Main.SaveNewPresetDialogOpen = false;
         });
-        this.WhenActivated((CompositeDisposable disposables) =>
+        this.WhenActivated((MultipleDisposable disposables) =>
         {
             PresetName = string.Empty;
         });
@@ -117,9 +116,9 @@ public class SaveNewPresetViewModel : ReactiveValidationObject, IRoutableViewMod
     [JsonIgnore]
     private MainViewModel Main { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> SavePreset { get; }
+    public ReactiveCommand<RxVoid, RxVoid> SavePreset { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> CancelPreset { get; }
+    public ReactiveCommand<RxVoid, RxVoid> CancelPreset { get; }
 
 
     [JsonIgnore]

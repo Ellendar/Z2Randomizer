@@ -1587,12 +1587,29 @@ public sealed class EastHyrule : World
         }
     }
 
-    protected override bool IsReserved(IntVector2 pos)
+    /// If this tile is reserved, in the context of a river expanding to
+    /// this tile. Most of these are probably logically impossible.
+    /// The point is to stop a river opening up VoD.
+    protected override bool IsReserved(IntVector2 pos, Terrain terrain)
     {
+        switch (terrain)
+        {
+            case Terrain.TOWN:
+            case Terrain.CAVE:
+            case Terrain.PALACE:
+            case Terrain.BRIDGE:
+            case Terrain.LAVA:
+            case Terrain.MOUNTAIN:
+            case Terrain.ROCK:
+            case Terrain.RIVER_DEVIL:
+                return true;
+        }
+
         if ((locationAtGP.Pos - pos).Abs().MinComponent() < 4)
         {
             return true;
         }
+
         return false;
     }
 

@@ -28,7 +28,7 @@ public class RoomPool
     public RoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
         var allRooms = GatherRoomsFromProps(palaceRooms, palaceNumber, props);
-        ApplyPropertyExclusions(props);
+        ApplyPropertyExclusions(allRooms, props);
         GatherLinkedRooms(allRooms, palaceRooms);
         SplitRooms(allRooms, palaceNumber);
         FinalizePool(palaceRooms, palaceNumber, props);
@@ -61,23 +61,36 @@ public class RoomPool
         return roomSet.ToList();
     }
 
-    private static void AddGroup(List<Room> roomSet, PalaceRooms palaceRooms, RoomGroup group)
+    private static void AddGroup(List<Room> roomList, PalaceRooms palaceRooms, RoomGroup group)
     {
+        // a room can only belong to one group and groups are added first, so we don't need to check contains
         foreach (var room in palaceRooms.RoomsByGroup(group))
         {
-            roomSet.Add(room);
+            roomList.Add(room);
         }
     }
 
-    private void ApplyPropertyExclusions(RandomizerProperties props)
+    private static void AddTag(List<Room> roomList, PalaceRooms palaceRooms, string tag)
+    {
+        foreach (var room in palaceRooms.RoomsByTag(tag))
+        {
+            if (!roomList.Contains(room, ReferenceEqualityComparer.Instance)) // rooms added by tag might overlap with groups
+            {
+                roomList.Add(room);
+            }
+        }
+    }
+
+    private void ApplyPropertyExclusions(List<Room> allRooms, RandomizerProperties props)
     {
         if (props.RemoveLongDeadEnds)
         {
-            RemoveRooms(r => r.HasTag("LongDeadEnd"));
+            allRooms.RemoveAll(r => r.HasTag("LongDeadEnd"));
         }
+
         if (!props.IncludeExpertRooms)
         {
-            RemoveRooms(r => r.HasTag("Expert"));
+            allRooms.RemoveAll(r => r.HasTag("Expert"));
         }
     }
 
@@ -188,6 +201,10 @@ public class RoomPool
         }
 
         var exitTypes = ItemRooms.Select(r => r.CategorizeExits()).Distinct();
+        if (palaceNumber != 7 && exitTypes.Count() < 1)
+        {
+            throw new UserFacingException("Incomplete Room Pool", "Room pool has no item rooms.");
+        }
         foreach (var shape in exitTypes)
         {
             var shapeRooms = ItemRooms.Where(r => r.CategorizeExits() == shape).ToList();
@@ -220,6 +237,7 @@ public class RoomPool
         VanillaBossRoom = palaceRooms.VanillaBossRoom(palaceNumber);
         if (BossRooms.Count == 0)
         {
+            if (VanillaBossRoom == null) { throw new Exception("No boss room in pool!"); }
             BossRooms.Add(VanillaBossRoom);
         }
 
@@ -249,7 +267,7 @@ public class RoomPool
 
     public List<Room> GetItemRoomsForShape(RoomExitType itemRoomExitType)
     {
-        return ItemRoomsByShape[itemRoomExitType];
+        return ItemRoomsByShape.GetValueOrDefault(itemRoomExitType, []);
     }
 
     public void RemoveDuplicates(RandomizerProperties props, Room roomThatWasUsed)
@@ -290,22 +308,36 @@ public class RoomPool
         Entrances.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
         BossRooms.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
         TbirdRooms.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
-        ItemRooms.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
         RemoveFromItemRooms(removalCondition);
     }
 
     void RemoveFromItemRooms(Room room)
     {
         ItemRooms.Remove(room);
+
+        var directionsToRemove = new List<Direction>();
         foreach (Direction direction in ItemRoomsByDirection.Keys)
         {
             var originalTable = ItemRoomsByDirection[direction];
-            var newTable = (TableWeightedRandom<Room>)originalTable.Subtract(room);
+            var newTable = (TableWeightedRandom<Room>?)originalTable.Subtract(room);
             if (newTable != originalTable)
             {
-                ItemRoomsByDirection[direction] = newTable;
+                if (newTable == null)
+                {
+                    directionsToRemove.Add(direction);
+                }
+                else
+                {
+                    ItemRoomsByDirection[direction] = newTable;
+                }
             }
         }
+
+        foreach (var dir in directionsToRemove)
+        {
+            ItemRoomsByDirection.Remove(dir);
+        }
+
         foreach (var key in ItemRoomsByShape.Keys)
         {
             ItemRoomsByShape[key].Remove(room);
@@ -314,6 +346,9 @@ public class RoomPool
 
     void RemoveFromItemRooms(Predicate<Room> removalCondition)
     {
+        ItemRooms.RemoveAll(room => RoomMatchesIncludingLinked(room, removalCondition));
+
+        var directionsToRemove = new List<Direction>();
         foreach (Direction direction in ItemRoomsByDirection.Keys)
         {
             var originalTable = ItemRoomsByDirection[direction];
@@ -322,13 +357,25 @@ public class RoomPool
             {
                 if (RoomMatchesIncludingLinked(room, removalCondition))
                 {
-                    newTable = (TableWeightedRandom<Room>)newTable.Subtract(room);
+                    newTable = (TableWeightedRandom<Room>?)newTable?.Subtract(room);
                 }
             }
             if (newTable != originalTable)
             {
-                ItemRoomsByDirection[direction] = newTable;
+                if (newTable == null)
+                {
+                    directionsToRemove.Add(direction);
+                }
+                else
+                {
+                    ItemRoomsByDirection[direction] = newTable;
+                }
             }
+        }
+
+        foreach (var dir in directionsToRemove)
+        {
+            ItemRoomsByDirection.Remove(dir);
         }
 
         foreach (var key in ItemRoomsByShape.Keys)
@@ -372,7 +419,7 @@ public class RoomPool
         return categorizedRooms;
     }
 
-    RoomExitType GetMergedExitType(Room room)
+    public RoomExitType GetMergedExitType(Room room)
     {
         var type = room.CategorizeExits();
         if (room.LinkedRoomName != null && LinkedRooms.TryGetValue(room.LinkedRoomName, out var linked))

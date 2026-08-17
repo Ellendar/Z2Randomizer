@@ -84,17 +84,20 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         }
     }
 
-    public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false)
+    public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false, bool allowBossEnterLeft = false)
     {
         if (Entrance == null)
         {
             throw new Exception("Palace Entrance is missing");
         }
-        foreach (Room r in AllRooms)
+        if (!allowBossEnterLeft)
         {
-            if (r.HasBoss && CanEnterBossFromLeft(r))
+            foreach (Room r in AllRooms)
             {
-                return [Entrance];
+                if (r.HasBoss && CanEnterBossFromLeft(r))
+                {
+                    return [Entrance];
+                }
             }
         }
         HashSet<Room> reachedRooms = [];
@@ -103,13 +106,16 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         while (roomsToCheck.Count > 0)
         {
             var (room, originDirection) = roomsToCheck.Pop();
+
             //For required thunderbird, you can't path backwards into tbird room
-            if ((Number == 7 && room.IsThunderBirdRoom)
-                || (Number < 7 && room.IsBossRoom))
+            if (!allowBossEnterLeft)
             {
-                if (originDirection == Direction.EAST)
+                if ((Number == 7 && room.IsThunderBirdRoom) || (Number < 7 && room.IsBossRoom))
                 {
-                    return [Entrance];
+                    if (originDirection == Direction.EAST)
+                    {
+                        return [Entrance];
+                    }
                 }
             }
 
@@ -232,9 +238,9 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false; // Boss room not found?
     }
 
-    public bool AllReachable(bool allowBacktracking = false)
+    public bool AllReachable(bool allowBacktracking = false, bool allowBossEnterLeft = false)
     {
-        var reachableRooms = GetReachableRooms(allowBacktracking);
+        var reachableRooms = GetReachableRooms(allowBacktracking: allowBacktracking, allowBossEnterLeft: allowBossEnterLeft);
         return AllRooms.All(i => reachableRooms.Contains(i));
     }
 

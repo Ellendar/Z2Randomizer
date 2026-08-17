@@ -5,12 +5,12 @@
     <RoslynVersion>5.6.0</RoslynVersion>
     <ClearScriptVersion>7.5.1</ClearScriptVersion>
     <Js65Version>1.0.9</Js65Version>
-    <AvaloniaVersion>12.1.0</AvaloniaVersion>
+    <AvaloniaVersion>12.1.1</AvaloniaVersion>
     <SkiaSharpVersion>3.119.4</SkiaSharpVersion>
   </PropertyGroup>
   <ItemGroup>
     <!-- Core -->
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
     <PackageVersion Include="PolySharp" Version="1.16.0" />
@@ -31,21 +31,21 @@
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" />
-    <PackageVersion Include="DialogHost.Avalonia" Version="0.12.2" />
+    <PackageVersion Include="DialogHost.Avalonia" Version="0.12.3" />
     <!-- Material Avalonia -->
-    <PackageVersion Include="Material.Avalonia" Version="3.17.0" />
-    <PackageVersion Include="Material.Avalonia.DataGrid" Version="3.17.0" />
+    <PackageVersion Include="Material.Avalonia" Version="3.18.0" />
+    <PackageVersion Include="Material.Avalonia.DataGrid" Version="3.18.0" />
     <PackageVersion Include="Material.Icons.Avalonia" Version="3.0.2" />
     <!-- Skia -->
     <PackageVersion Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
     <!-- ReactiveUI -->
     <PackageVersion Include="DynamicData" Version="9.4.33" />
-    <PackageVersion Include="ReactiveUI" Version="23.2.28" />
-    <PackageVersion Include="ReactiveUI.Avalonia" Version="12.0.3" />
-    <PackageVersion Include="ReactiveUI.Validation" Version="7.1.0" />
+    <PackageVersion Include="ReactiveUI" Version="24.1.0" />
+    <PackageVersion Include="ReactiveUI.Avalonia" Version="12.1.1" />
+    <PackageVersion Include="ReactiveUI.Primitives" Version="7.2.0" />
     <!-- Misc -->
     <PackageVersion Include="Aigamo.ResXGenerator" Version="4.4.0" />
-    <PackageVersion Include="NLog" Version="6.1.4" />
+    <PackageVersion Include="NLog" Version="6.2.0" />
     <PackageVersion Include="SD.Tools.Algorithmia" Version="1.4.0" />
     <PackageVersion Include="Xaml.Behaviors.Interactions" Version="12.0.5" />
     <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="5.1.0" />
@@ -59,9 +59,9 @@
     <PackageVersion Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageVersion Include="System.Data.SQLite" Version="2.0.3" />
     <!-- Test -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="4.3.0" />
-    <PackageVersion Include="MSTest.TestFramework" Version="4.3.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="4.3.3" />
+    <PackageVersion Include="MSTest.TestFramework" Version="4.3.3" />
     <PackageVersion Include="FluentAssertions" Version="8.10.0" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
   </ItemGroup>
