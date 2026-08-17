@@ -15447,8 +15447,8 @@
     "name": "island adventure trapped spicy chicken room",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Expert"],
     "sideviewData": "26600E08DE0CD101810A9C28612670218021410A322040205020420A702180218E0AD20CD10E"
   },
   {
@@ -15848,8 +15848,8 @@
     "name": "z2oot water temple crumbling block with Aneru",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Expert"],
     "sideviewData": "1E600820F01F80787C23F41F83239624F71F81557954F61B6257DA061023"
   },
   {
@@ -19211,6 +19211,7 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["Expert"],
     "duplicateGroup": "aaron GP set 2 M3",
     "isDropZone": false,
     "hasItem": false,
@@ -19859,6 +19860,7 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["Expert"],
     "duplicateGroup": "aaron GP set 2 M3",
     "isDropZone": false,
     "hasItem": false,
