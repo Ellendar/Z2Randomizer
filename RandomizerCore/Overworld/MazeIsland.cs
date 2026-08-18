@@ -44,7 +44,7 @@ sealed class MazeIsland : World
             .. rom.LoadLocations(LocationID.MI_TRAP3, 5, terrains),
         ];
 
-        List < Location> locations =
+        List<Location> locations =
         [
             .. rom.LoadLocations(LocationID.MI_MAGIC_CONTAINER_DROP, 1, terrains),
             .. rom.LoadLocations(LocationID.MI_PALACE4, 1, terrains),
@@ -92,7 +92,7 @@ sealed class MazeIsland : World
             MapColumns = meta.Height;
             MapRows = meta.Width;
 
-            // TODO: use metadata for num caves to remove
+            // TODO: use metadata for num traps to remove
             var trapTilesToRemove = props.MazeSize switch
             {
                 MazeSizeOption.LARGE => 0,
@@ -169,7 +169,7 @@ sealed class MazeIsland : World
 
                 // fill non-walkable water to the right of the island water border
                 for (int y = 0; y < MapRows; y++)
-                    {
+                {
                     for (int x = MapColumns; x < 64; x++)
                     {
                         map[y, x] = Terrain.WATER;
@@ -191,8 +191,8 @@ sealed class MazeIsland : World
                     for (int y = 1; y < MapRows - 1; y++)
                     {
                         map[y, x] = Terrain.MOUNTAIN;
-                        }
                     }
+                }
 
                 for (int y = 1; y < MapRows; y++)
                 {
@@ -234,7 +234,7 @@ sealed class MazeIsland : World
                         map[current + delta] = Terrain.ROAD;
                         current = next;
                         visited[current.Y, current.X] = true;
-                        }
+                    }
                     else if (stack.Count > 0)
                     {
                         if (cave1 != null && cave1.CanShuffle && GetLocationAt(current) == null)
@@ -275,9 +275,9 @@ sealed class MazeIsland : World
                 locationAtPalace4.Pos = palace4Pos;
                 map[palace4Pos] = Terrain.PALACE;
                 foreach (var dir in IntVector2.DIRECTIONS)
-                    {
+                {
                     map[palace4Pos + dir] = Terrain.ROAD;
-                            }
+                }
                 placedLocations.Add(locationAtPalace4);
 
                 //draw a river
@@ -296,12 +296,12 @@ sealed class MazeIsland : World
                 } while (riverStartY == starty || Math.Abs(palace4Pos.Y - riverStartY) < 2);
 
                 do
-                    {
+                {
                     riverEndY = RNG.Next((MapRows - 5) / 2) * 2 + 3;
                 } while (Math.Abs(riverStartY - riverEndY) < 2 || Math.Abs(palace4Pos.Y - riverEndY) < 2);
 
                 do
-                        {
+                {
                     riverPivotX = RNG.Next(1, riverEndX / 2) * 2 + 1; //3,5,7,9,11,13,15,17,19
                 } while (Math.Abs(palace4Pos.X - riverPivotX) < 2);
 
@@ -313,19 +313,19 @@ sealed class MazeIsland : World
                 Direction raftDirEnum = (Direction)RNG.Next(4);
                 Direction bridgeDirEnum;
                 do
-                    {
+                {
                     bridgeDirEnum = (Direction)RNG.Next(4);
                 } while (bridgeDirEnum == raftDirEnum);
 
                 //Place raft
                 if (raft != null)
-                        {
+                {
                     IntVector2 raftDirVec = raftDirEnum.ToIntVector2();
                     IntVector2 raftPos, nextToRaft;
                     do
-                            {
-                        raftPos = raftDirEnum switch
                     {
+                        raftPos = raftDirEnum switch
+                        {
                             Direction.NORTH => new IntVector2(RNG.Next(2, MapColumns - 2), 1),
                             Direction.SOUTH => new IntVector2(RNG.Next(2, MapColumns - 2), MapRows - 2),
                             Direction.WEST => new IntVector2(1, RNG.Next(2, MapRows - 2)),
@@ -337,7 +337,7 @@ sealed class MazeIsland : World
 
                     map[raftPos] = Terrain.BRIDGE;
                     raft.Pos = raftPos;
-                            }
+                }
 
                 //Place bridge
                 if (bridge != null)
@@ -368,13 +368,28 @@ sealed class MazeIsland : World
                 {
                     if (location.TerrainType == Terrain.ROAD)
                     {
-                        while (true)
+                        if ((location != magicContainerDrop && location != childDrop))
                         {
-                            var pos = IntVector2.Random(RNG, 2, MapColumns - 2, 2, MapRows - 2);
-                            if (ValidMazeDropPosition(pos))
+                            while (true)
                             {
-                                location.Pos = pos;
-                                break;
+                                var pos = IntVector2.Random(RNG, 2, MapColumns - 2, 2, MapRows - 2);
+                                if (ValidTrapTilePosition(pos) != null)
+                                {
+                                    location.Pos = pos;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            while (true)
+                            {
+                                var pos = IntVector2.Random(RNG, 2, MapColumns - 2, 2, MapRows - 2);
+                                if (ValidMazeDropPosition(pos))
+                                {
+                                    location.Pos = pos;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -387,7 +402,6 @@ sealed class MazeIsland : World
 
                 //check bytes and adjust
                 bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
-                
             }
         }
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
@@ -418,9 +432,9 @@ sealed class MazeIsland : World
         foreach (IntVector2 dir in cardinalOrder)
         {
             IntVector2 neighbor = pos + dir;
-        
+
             if (map[neighbor] != Terrain.ROAD)
-        {
+            {
                 continue;
             }
             if (foundRoad)
@@ -432,7 +446,7 @@ sealed class MazeIsland : World
                 foundRoad = true;
             }
         }
-            }
+    }
 
     private bool MoreToVisit(bool[,] v)
     {
@@ -457,17 +471,17 @@ sealed class MazeIsland : World
         {
             IntVector2 candidate = current + 2 * dir;
             if (!WithinMapBounds(candidate, 2))
-        {
+            {
                 continue;
-        }
+            }
             if (!visited[candidate.Y, candidate.X])
-        {
+            {
                 neighbors.Add(candidate);
-        }
+            }
         }
 
         return neighbors;
-        }
+    }
 
     private void DrawRiver(int fromY, int fromX, int toY, int toX, int xPivot, bool openWest, bool openEast)
     {
@@ -480,52 +494,53 @@ sealed class MazeIsland : World
         IntVector2 verticalStep = endPos.Y > pos.Y ? IntVector2.SOUTH : IntVector2.NORTH;
 
         while (pos.X != endPos.X)
-                {
+        {
             if (pos.X == xPivot && pos.Y != endPos.Y)
-                    {
+            {
                 PaintRiverTile(pos, terrain, horizontalStep);
                 pos += verticalStep;
-                            }
+            }
             else
-                            {
+            {
                 PaintRiverTile(pos, terrain, verticalStep);
                 pos += horizontalStep;
-                            }
+            }
 
             map[startPos] = openWest ? Terrain.WALKABLEWATER : Terrain.MOUNTAIN;
             map[endPos] = openEast ? Terrain.WALKABLEWATER : Terrain.MOUNTAIN;
-                        }
-                        }
+        }
+    }
 
     private void PaintRiverTile(IntVector2 pos, Terrain terrain, IntVector2 perpendicular)
-            {
+    {
         if (GetLocationAt(pos) != null)
-                {
+        {
             return;
-                            }
+        }
         Terrain current = map[pos];
         if (current == Terrain.MOUNTAIN)
-                            {
+        {
             map[pos] = terrain;
-                            }
+        }
         else if (current == Terrain.ROAD)
-                            {
+        {
             IntVector2 leftOf = pos - perpendicular;
             IntVector2 rightOf = pos + perpendicular;
             if (map[leftOf] != Terrain.MOUNTAIN && map[rightOf] != Terrain.MOUNTAIN)
-                        {
-                map[pos] = Terrain.BRIDGE;
-                        }
-            else
-                        {
-                map[pos] = terrain;
-                        }
-                    }
-        else if (current != Terrain.PALACE && current != Terrain.BRIDGE && current != Terrain.CAVE)
             {
-            map[pos] = terrain;
+                map[pos] = Terrain.BRIDGE;
+            }
+            else
+            {
+                map[pos] = terrain;
             }
         }
+        else if (current != Terrain.PALACE && current != Terrain.BRIDGE && current != Terrain.CAVE)
+        {
+            map[pos] = terrain;
+        }
+    }
+
     public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
         bool changed = true;
@@ -536,12 +551,13 @@ sealed class MazeIsland : World
             {
                 for (int j = 0; j < MapColumns; j++)
                 {
+                    Terrain terrain = map[i, j];
                     if (!visitation[i, j]
                     && (
-                        (map[i, j] == Terrain.WALKABLEWATER && requireables.Contains(RequirementType.BOOTS))
-                        || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE
-                        || map[i, j] == Terrain.BRIDGE
-                        || map[i, j] == Terrain.CAVE
+                        (terrain == Terrain.WALKABLEWATER && requireables.Contains(RequirementType.BOOTS))
+                        || terrain == Terrain.ROAD || map[i, j] == Terrain.PALACE
+                        || terrain == Terrain.BRIDGE
+                        || terrain == Terrain.CAVE
                         )
                     )
                     {
