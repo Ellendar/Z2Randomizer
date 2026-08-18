@@ -60,11 +60,12 @@ public class EnemiesEditable<T> where T : Enum
         return bytes;
     }
 
-    public void Mirror()
+    public void Mirror(int pages)
     {
+        int width = pages * 16;
         foreach (var enemy in Enemies)
         {
-            enemy.X = 63 - enemy.X;
+            enemy.X = width - enemy.X - 1;
         }
     }
 

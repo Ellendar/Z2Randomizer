@@ -2370,7 +2370,8 @@
     "palaceNumber": null,
     "requirements": [],
     "duplicateGroup": "P6 Drop-through With P-bag",
-    "sideviewData": "17600F10D200A10F0CD98072C3B6F992537BC3D500D80F"
+    "sideviewData": "17600F10D200A10F0CD98072C3B6F992537BC3D500D80F",
+    "mirrorSideviewData": "17600F10DF00DB8074C3B4F994537BC3D300A80F0CD20F"
   },
   {
     "author": "palace6vanilla",
@@ -2475,7 +2476,8 @@
     "palaceNumber": null,
     "requirements": [],
     "duplicateGroup": "P6 Drop-through With P-bag",
-    "sideviewData": "17600F10D200A10F0CD98072C3B6F992537BC3D500D80F"
+    "sideviewData": "17600F10D200A10F0CD98072C3B6F992537BC3D500D80F",
+    "mirrorSideviewData": "17600F10DF00DB8074C3B4F994537BC3D300A80F0CD20F"
   },
   {
     "author": "palace6vanilla",
@@ -6222,7 +6224,7 @@
     "requirements": [],
     "tags": ["Easy"],
     "duplicateGroup": "winterSolstice 1 M5",
-    "sideviewData": "24600E08D3806001A521927842C4976DF01D7E099071F11B906B9C7745C4A3216602D10E"
+    "sideviewData": "24600E08D3806001A521927842C4F71D906D7E099070F11B906B9C7745C4A3216602D10E"
   },
   {
     "author": "winterSolstice",
@@ -6249,7 +6251,7 @@
     "requirements": [],
     "duplicateGroup": "winterSolstice M10",
     "suppressWarning": ["DropTilesInNonDropRoom"],
-    "sideviewData": "2960030804FE802F96C3240705FD802D95C3730F0C06FE802E130794C3A40704FB802B330792C3D703"
+    "sideviewData": "2960030804FF802F96C3240706FF802F94C3730F0C09FE1007802E94C3A40707F83007802892C3D703"
   },
   {
     "author": "winterSolstice",
@@ -6327,7 +6329,7 @@
     "palaceNumber": null,
     "requirements": [],
     "duplicateGroup": "winterSolstice 1 M5",
-    "sideviewData": "24600E08D3806001A521927842C4976DF01D7E099071F11B906B9C7745C4A3216602D10E"
+    "sideviewData": "24600E08D3806001A521927842C4F71D906D7E099070F11B906B9C7745C4A3216602D10E"
   },
   {
     "author": "winterSolstice",
@@ -6537,7 +6539,7 @@
     "palaceNumber": null,
     "requirements": [],
     "duplicateGroup": "winterSolstice 1 M5",
-    "sideviewData": "24600E08D3806001A521927842C4976DF01D7E099071F11B906B9C7745C4A3216602D10E"
+    "sideviewData": "24600E08D3806001A521927842C4F71D906D7E099070F11B906B9C7745C4A3216602D10E"
   },
   {
     "author": "winterSolstice",
@@ -6774,7 +6776,7 @@
     "requirements": [],
     "duplicateGroup": "winterSolstice M10",
     "suppressWarning": ["DropTilesInNonDropRoom"],
-    "sideviewData": "2960030804FE802F96C3240705FD802D95C3730F0C06FE802E130794C3A40704FB802B330792C3D703"
+    "sideviewData": "2960030804FF802F96C3240706FF802F94C3730F0C09FE1007802E94C3A40707F83007802892C3D703"
   },
   {
     "author": "winterSolstice",
@@ -6801,7 +6803,7 @@
     "requirements": [],
     "duplicateGroup": "winterSolstice M10",
     "suppressWarning": ["DropTilesInNonDropRoom"],
-    "sideviewData": "2960030804FE802F96C3240705FD802D95C3730F0C06FE802E130794C3A40704FB802B330792C3D703"
+    "sideviewData": "2960030804FF802F96C3240706FF802F94C3730F0C09FE1007802E94C3A40707F83007802892C3D703"
   },
   {
     "author": "winterSolstice",
@@ -6828,7 +6830,7 @@
     "requirements": [],
     "duplicateGroup": "winterSolstice M10",
     "suppressWarning": ["DropTilesInNonDropRoom"],
-    "sideviewData": "2960030804FE802F96C3240705FD802D95C3730F0C06FE802E130794C3A40704FB802B330792C3D703"
+    "sideviewData": "2960030804FF802F96C3240706FF802F94C3730F0C09FE1007802E94C3A40707F83007802892C3D703"
   },
   {
     "author": "winterSolstice",
@@ -11664,7 +11666,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "26600E1080F1B075D20983759075D90DD60983759075D90DA22BF55070F1D90984759075DA0E"
+    "sideviewData": "26600E1080F1B071D20983259075D90DD60983259075D90DA22BF55070F1D90984259075DA0E"
   },
   {
     "author": "benthicKing",
@@ -12006,6 +12008,7 @@
     "requirements": [
       "GLOVE"
     ],
+    "tags": ["NoMirror"],
     "sideviewData": "39600308107CDD054271D201402E722D84F1827868B161918091112C20714029732D310F0B26923092509281B1D20DA02FF75000D901D9D10F"
   },
   {
@@ -13952,9 +13955,8 @@
     "name": "Royal Drop Room v3",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
-    "sideviewData": "3A600110D00FD101920F1162C3D270F019A0598230D3805455B040A1B2B1FD5434A1325455A4B2F119A059B040D5008230D30161C3920F11D30F"
+    "requirements": [],
+    "sideviewData": "38600F10D101920F1162C3D270F019A0598230D3805455B040A1B2B1FC5434A1325455A4B2F119A059B040D5008230D30161C3920F11D30F"
   },
   {
     "author": "valence",
@@ -14611,7 +14613,7 @@
     "name": "aaron jam 4_4 P1_M6",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": ["GLOVE"],
+    "requirements": [],
     "sideviewData": "2D600E08D208208DDE0E8205D208208F70B07FB02189607780C2A125F250500F0C80F184C27130228FE300DE0E"
   },
   {
@@ -15743,9 +15745,7 @@
     "name": "z2oot Ganon's castle fokka room",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [[
-      "GLOVE"
-    ]],
+    "requirements": [["GLOVE", "KEY"]],
     "sideviewData": "32600D08D4089491F217808728D6909121D6A822810A29D6909121D6F11780879891D50E8105F2500006B0900106B090D10F"
   },
   {
@@ -17306,6 +17306,7 @@
     "hasItem": false,
     "enemies": "0B015A009A48473D063486",
     "sideviewData": "1A600F10DB00D480325F40C6525BB1F97157925349C6D300DB0F",
+    "mirrorSideviewData": "1A600F10DF00DE80325F40C6525BB1F97157925349C6D300D40F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Drop-through V-shaped crumble bridge (aaron jam 4_4 P6_M45)",
@@ -17327,6 +17328,7 @@
     "hasDrop": true,
     "elevatorScreen": 3,
     "requirements": [],
+    "tags": ["NoMirror"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "070D473A9E3C1E",
@@ -17708,7 +17710,7 @@
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0B04C709076E4E19561497",
-    "sideviewData": "24600E907401D180997F117F717D38203101B5F1117F717D907F34023120E300DB0E7002",
+    "sideviewData": "24600E907401D180987F117F717D38203101B5F1117F717D907F34023120E300DB0E7002",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron jam 4_4 P6_M61",
@@ -18630,6 +18632,7 @@
     "hasDrop": true,
     "elevatorScreen": 1,
     "requirements": [],
+    "tags": ["NoMirror"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "01",
@@ -18680,6 +18683,7 @@
     "hasDrop": true,
     "elevatorScreen": 0,
     "requirements": ["FAIRY", "GLOVE"],
+    "tags": ["NoMirror"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "054FA32287",
@@ -18705,6 +18709,7 @@
     "hasDrop": true,
     "elevatorScreen": 2,
     "requirements": [],
+    "tags": ["NoMirror"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "097C4505CE3C044284",
@@ -19730,7 +19735,6 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
-    "duplicateGroup": "aaron GP set 2 M32",
     "isDropZone": false,
     "hasItem": false,
     "enemies": "050B0E044E",

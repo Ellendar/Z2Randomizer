@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using js65;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
@@ -25,6 +26,11 @@ public record struct Coord(int X, int Y) : IComparable<Coord>
             return yComparison;
         }
         return X.CompareTo(other.X);
+    }
+
+    public IntVector2 ToIntVector2()
+    {
+        return new IntVector2(X, Y);
     }
 }
 
@@ -110,6 +116,10 @@ public class Room : IJsonOnDeserialized
     [JsonPropertyName("sideviewData")]
     [JsonConverter(typeof(HexStringConverter))]
     public byte[] SideView { get; set; }
+    [JsonPropertyName("mirrorSideviewData")]
+    [JsonConverter(typeof(HexStringConverter))]
+    public byte[]? MirrorSideView { get; set; }
+
     //public int? NewMap { get; set; }
     //Whether the room contains a boss, which is true of boss rooms, but also boss-containing passthrough/item rooms.
     public bool HasBoss { get; set; }
@@ -169,7 +179,6 @@ public class Room : IJsonOnDeserialized
     private void CopyFrom(Room room)
     {
         Map = room.Map;
-        HasLeftExit = room.HasLeftExit;
         Enemies = room.Enemies.ToArray();
         NewEnemies = new byte[Enemies.Length];
         SideView = room.SideView.ToArray();
@@ -195,12 +204,19 @@ public class Room : IJsonOnDeserialized
         PalaceNumber = room.PalaceNumber;
         DuplicateGroup = room.DuplicateGroup;
         coords = room.coords;
+        Tags = room.Tags;
+        SuppressWarning = room.SuppressWarning;
 
-        Connections = room.Connections;
-        HasLeftExit = room.Connections[0] < 0xFC;
-        HasDownExit = IsUpDownReversed ? room.Connections[2] < 0xFC : room.Connections[1] < 0xFC;
-        HasUpExit = IsUpDownReversed ? room.Connections[1] < 0xFC : room.Connections[2] < 0xFC;
-        HasRightExit = room.Connections[3] < 0xFC;
+        SetConnections(room.Connections);
+    }
+
+    private void SetConnections(byte[] connections)
+    {
+        Connections = connections;
+        HasLeftExit = connections[0] < 0xFC;
+        HasDownExit = IsUpDownReversed ? connections[2] < 0xFC : connections[1] < 0xFC;
+        HasUpExit = IsUpDownReversed ? connections[1] < 0xFC : connections[2] < 0xFC;
+        HasRightExit = connections[3] < 0xFC;
     }
 
     public void OnDeserialized()
@@ -769,6 +785,67 @@ public class Room : IJsonOnDeserialized
         Direction.EAST => HasRightExit,
         _ => false
     };
+
+    public bool CanBeMirrored()
+    {
+        if (HasTag("NoMirror")) { return false; }
+        if (!IsNormalRoom()) { return false; }
+        if (HasBoss) { return false; }
+        if (HasDrop && HasUpExit) { return false; }
+        return true;
+    }
+
+    public Room Mirror<S,E>() where S : struct, Enum where E : Enum
+    {
+        Room mirror = new(this);
+
+        SideviewEditable<S> sv = new(SideView);
+        int pages = sv.PageCount;
+
+        if (MirrorSideView != null)
+        {
+            mirror.SideView = MirrorSideView;
+        }
+        else
+        {
+            sv.Mirror();
+            mirror.SideView = sv.Finalize();
+        }
+
+        var ee = new EnemiesEditable<E>(Enemies);
+        ee.Mirror(pages);
+        mirror.Enemies = ee.Finalize();
+
+        if (ElevatorScreen != -1)
+        {
+            mirror.ElevatorScreen = 3 - ElevatorScreen;
+        }
+
+        if (HasDrop && HasUpExit) { throw new Exception($"Cannot mirror room \"{Name}\" with both drop and an up elevator."); }
+        if (HasDrop)
+        {
+            mirror.IsUpDownReversed = !IsUpDownReversed;
+        }
+
+        // 2 page room connection bytes are swapped around in WriteConnections,
+        // so all current 2 page rooms seem to work the same up until that point
+        byte[] mirroredConnections = [
+            HasRightExit ? (byte)0 : (byte)0xFC,
+            (!HasDrop && HasDownExit) || (HasDrop && Connections[2] < 0xFC) ? (byte)0 : (byte)0xFC,
+            HasUpExit || (HasDrop && Connections[1] < 0xFC) ? (byte)0 : (byte)0xFC,
+            HasLeftExit ? (byte)0 : (byte)0xFC,
+        ];
+        mirror.SetConnections(mirroredConnections);
+
+        mirror.ItemGetBits = [(byte)(
+             ((ItemGetBits[0] & 0b0001) != 0 ? 0b1000 : 0) |
+             ((ItemGetBits[0] & 0b0010) != 0 ? 0b0100 : 0) |
+             ((ItemGetBits[0] & 0b0100) != 0 ? 0b0010 : 0) |
+             ((ItemGetBits[0] & 0b1000) != 0 ? 0b0001 : 0)
+        )];
+
+        return mirror;
+    }
 
     public void UpdateSideviewItem(Collectable collectable)
     {

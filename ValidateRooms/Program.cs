@@ -60,7 +60,8 @@ void ValidateRoomsForFile(string filename)
     // REGULAR PALACE ROOMS
     var enabledRegularPalaceRooms = enabledRooms.Where(r => r.PalaceNumber != 7);
     var regularPalaceGroupedSideviews = palaceRooms!.Where(r => r.PalaceNumber != 7).GroupBy(x => x.SideView, sideviewComparer);
-    foreach (var room in enabledRegularPalaceRooms)
+
+    void RegularPalaceRoomChecks(Room room)
     {
         var sv = new SideviewEditable<PalaceObject>(room.SideView);
         var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
@@ -101,8 +102,20 @@ void ValidateRoomsForFile(string filename)
         var elevators = sv.FindAll(o => o.IsElevator());
         CheckElevatorsAndDrops(room, sv, solidGrid, elevators, dropTiles);
         CheckDropZones(room, solidGrid, openCeilingTiles);
+    }
 
+    foreach (var room in enabledRegularPalaceRooms)
+    {
+        RegularPalaceRoomChecks(room);
         CheckDupes(room, enabledRegularPalaceRooms, regularPalaceGroupedSideviews);
+    }
+
+    foreach (var room in enabledRegularPalaceRooms)
+    {
+        if (room.HasTag("NoMirror")) { continue; }
+        if (room.HasBoss || room.IsBossRoom || room.HasItem) { continue; }
+        var mirrored = room.Mirror<PalaceObject, EnemiesPalace125>();
+        RegularPalaceRoomChecks(mirrored);
     }
 
     // GREAT PALACE ROOMS
@@ -116,6 +129,7 @@ void ValidateRoomsForFile(string filename)
         CheckPageOverflow(room, sv, ee);
         CheckHeaders(room, sv);
         CheckDoorsAndItems(room, sv, ee);
+        CheckDoorsKeyRequirement(room, sv);
         CheckEnemyPlacements(room, sv, ee);
         CheckForFalseWalls(room, sv);
 
@@ -182,7 +196,7 @@ void CheckDupes(Room room, IEnumerable<Room> enabledRegularPalaceRooms, IEnumera
     }
 }
 
-void CheckHeaders<T>(Room room, SideviewEditable<T> sv) where T : Enum
+void CheckHeaders<T>(Room room, SideviewEditable<T> sv) where T : struct, Enum
 {
     // if (sv.SpritePalette != 0) { Warning(room, "SpritePalette", $"Using non-zero sprite palette={sv.SpritePalette}"); }
     if (sv.TilesHeader == 0 /* palace room/cave */)
@@ -210,7 +224,7 @@ void CheckHeaders<T>(Room room, SideviewEditable<T> sv) where T : Enum
     if (sv.BackgroundMap != 0) { Warning(room, "BackgroundMapInCustomRoom", "Using a background map in custom rooms"); }
 }
 
-void CheckPageOverflow<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : Enum where U : Enum
+void CheckPageOverflow<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : struct, Enum where U : Enum
 {
     foreach (var cmd in sv.Commands)
     {
@@ -240,7 +254,7 @@ void CheckPageOverflow<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U
     }
 }
 
-void CheckDoorsAndItems<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : Enum where U : Enum
+void CheckDoorsAndItems<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : struct, Enum where U : Enum
 {
     var lockedDoorCmds = sv.FindAll(o =>  o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LOCKED_DOOR);
     var itemCmds = sv.Commands.Where(o => o.HasExtra());
@@ -279,18 +293,25 @@ void CheckDoorsAndItems<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<
     }
 }
 
-void CheckEnemyPlacements<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : Enum where U : Enum
+void CheckDoorsKeyRequirement<T>(Room room, SideviewEditable<T> sv) where T : struct, Enum
+{
+    var lockedDoorCmds = sv.FindAll(o => o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LOCKED_DOOR);
+
+    if (lockedDoorCmds.Count > 0 && !room.Requirements.Contains(RequirementType.KEY)) { Warning(room, "LockedDoorNotInRequirements", $"Locked doors in GP are supposed to be in requirements."); }
+}
+
+void CheckEnemyPlacements<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : struct, Enum where U : Enum
 {
     var xEnd = sv.PageCount * 16 - 6;
     foreach (var enemy in ee.Enemies)
     {
         if (!(enemy.IsShufflableSmallOrLarge())) { continue; }
-        if (room.HasLeftExit && enemy.X < 6) { Warning(room, "EnemyTooCloseToEntrance", $"Room has an enemy too close to the left entrance: {enemy.DebugString()}"); }
+        if (room.HasLeftExit && enemy.X < 5) { Warning(room, "EnemyTooCloseToEntrance", $"Room has an enemy too close to the left entrance: {enemy.DebugString()}"); }
         if (room.HasRightExit && enemy.X > xEnd) { Warning(room, "EnemyTooCloseToEntrance", $"Room has an enemy too close to the right entrance: {enemy.DebugString()}"); }
     }
 }
 
-void CheckForFalseWalls<T>(Room room, SideviewEditable<T> sv) where T : Enum
+void CheckForFalseWalls<T>(Room room, SideviewEditable<T> sv) where T : struct, Enum
 {
     foreach (var cmd in sv.Commands)
     {
@@ -305,7 +326,7 @@ void CheckForFalseWalls<T>(Room room, SideviewEditable<T> sv) where T : Enum
     }
 }
 
-void AddOpenCeilingTiles<T>(SideviewEditable<T> sv, bool[,] solidGrid, SortedSet<int> openCeilingTiles) where T : Enum
+void AddOpenCeilingTiles<T>(SideviewEditable<T> sv, bool[,] solidGrid, SortedSet<int> openCeilingTiles) where T : struct, Enum
 {
     int w = sv.PageCount * 16;
     for (var x = 0; x < w; x++)
@@ -317,7 +338,7 @@ void AddOpenCeilingTiles<T>(SideviewEditable<T> sv, bool[,] solidGrid, SortedSet
     }
 }
 
-void AddDropTiles<T>(SideviewEditable<T> sv, bool[,] solidGrid, SortedSet<int> dropTiles) where T : Enum
+void AddDropTiles<T>(SideviewEditable<T> sv, bool[,] solidGrid, SortedSet<int> dropTiles) where T : struct, Enum
 {
     int w = sv.PageCount * 16;
     for (var x = 0; x < w; x++)
@@ -329,7 +350,7 @@ void AddDropTiles<T>(SideviewEditable<T> sv, bool[,] solidGrid, SortedSet<int> d
     }
 }
 
-void RemoveTilesThatAreLavaPits<T>(List<SideviewMapCommand<T>> pits, SortedSet<int> dropTiles) where T : Enum
+void RemoveTilesThatAreLavaPits<T>(List<SideviewMapCommand<T>> pits, SortedSet<int> dropTiles) where T : struct, Enum
 {
     foreach (var pit in pits)
     {
@@ -340,7 +361,7 @@ void RemoveTilesThatAreLavaPits<T>(List<SideviewMapCommand<T>> pits, SortedSet<i
     }
 }
 
-void CheckDropsOverLava<T>(Room room, SideviewEditable<T> sv, List<SideviewMapCommand<T>> lavaPits, SortedSet<int> openCeilingTiles) where T : Enum
+void CheckDropsOverLava<T>(Room room, SideviewEditable<T> sv, List<SideviewMapCommand<T>> lavaPits, SortedSet<int> openCeilingTiles) where T : struct, Enum
 {
     if (!room.IsDropZone) { return; }
 
@@ -367,7 +388,7 @@ void CheckDropsOverLava<T>(Room room, SideviewEditable<T> sv, List<SideviewMapCo
     }
 }
 
-void CheckFallingBlockRooms<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee, List<SideviewMapCommand<T>> lavaPits, SortedSet<int> dropTiles) where T : Enum where U : Enum
+void CheckFallingBlockRooms<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee, List<SideviewMapCommand<T>> lavaPits, SortedSet<int> dropTiles) where T : struct, Enum where U : Enum
 {
     var singles = ee.Enemies.Where(e => e.Id is EnemiesPalace125.SINGLE_FALLING_BLOCK || e.Id is EnemiesPalace346.SINGLE_FALLING_BLOCK).ToList();
     // Generators create blocks from positions X-5 to X+4 (inclusive)
@@ -443,7 +464,7 @@ bool FindTileOpeningAtX(bool[,] solidGrid, int x, int n = 3)
     return false;
 }
 
-void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, List<SideviewMapCommand<T>> allElevators, SortedSet<int> dropTiles) where T : Enum
+void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, List<SideviewMapCommand<T>> allElevators, SortedSet<int> dropTiles) where T : struct, Enum
 {
     bool IsDownElevator(SideviewMapCommand<T> o)
     {
@@ -585,7 +606,7 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
     }
 }
 
-void CheckDropConnector<T>(Room room, SideviewEditable<T> sv, int dropScreen) where T : Enum
+void CheckDropConnector<T>(Room room, SideviewEditable<T> sv, int dropScreen) where T : struct, Enum
 {
     switch (dropScreen)
     {
@@ -657,7 +678,7 @@ static string ConvertToRangeString(IEnumerable<int> numbers)
         .Select(g => g.Count() > 1 ? $"{g.First().num}-{g.Last().num}" : $"{g.First().num}"));
 }
 
-string FixedOverflowCommandString<T>(SideviewEditable<T> sv, SideviewMapCommand<T> cmd) where T : Enum
+string FixedOverflowCommandString<T>(SideviewEditable<T> sv, SideviewMapCommand<T> cmd) where T : struct, Enum
 {
     cmd.AbsX = Math.Min(63, cmd.AbsX);
     if (cmd.HasParam())
@@ -667,7 +688,7 @@ string FixedOverflowCommandString<T>(SideviewEditable<T> sv, SideviewMapCommand<
     var newBytes = sv.Finalize();
     return $"Fixed bytes:\n{Convert.ToHexString(newBytes)}\n\n";
 }
-string FixedElevatorHexString<T>(SideviewEditable<T> sv, SideviewMapCommand<T> elevator, int param) where T : Enum
+string FixedElevatorHexString<T>(SideviewEditable<T> sv, SideviewMapCommand<T> elevator, int param) where T : struct, Enum
 {
     elevator.Param = param;
     var newBytes = sv.Finalize();
@@ -678,16 +699,58 @@ void Warning(Room room, string id, string msg)
 {
     if (room.SuppressWarning.Contains(id)) { return; }
     sb.AppendLine($"{$"[{id}]", -26} \"{room.Name}\": " + msg);
+    //sb.AppendLine($"\n{Convert.ToHexString(room.SideView)} {Convert.ToHexString(room.Connections)}\n");
 }
 
 #pragma warning disable CS8321 // Local function is declared but never used
-void DebugPalaceRoomHex<T>(String hex) where T : Enum
+void DebugPalaceRoomHex<T>(String hex) where T : struct, Enum
 {
     byte[] bytes = Convert.FromHexString(hex);
     var sv = new SideviewEditable<T>(bytes);
     sb.AppendLine(sv.DebugString());
 }
-#pragma warning restore CS8321 // Local function is declared but never used
+
+void MirrorRoom<T>(String hex) where T : struct, Enum
+{
+    byte[] bytes = Convert.FromHexString(hex);
+    var sv = new SideviewEditable<T>(bytes);
+    sb.AppendLine(sv.DebugString());
+    sv.Mirror();
+    byte[] mirrored = sv.Finalize();
+    sb.AppendLine("Mirrored:");
+    sb.AppendLine(sv.DebugString());
+    sb.AppendLine(Convert.ToHexString(mirrored));
+}
+
+void MirrorEnemies<T>(String hex) where T : Enum
+{
+    byte[] bytes = Convert.FromHexString(hex);
+    var ee = new EnemiesEditable<T>(bytes);
+    sb.AppendLine(ee.DebugString());
+    ee.Mirror(4);
+    byte[] mirrored = ee.Finalize();
+    sb.AppendLine(ee.DebugString());
+    sb.AppendLine(Convert.ToHexString(mirrored));
+}
+
+void MirrorConnections(String hex)
+{
+    byte[] bytes = Convert.FromHexString(hex);
+    byte[] mirrored = [(byte)(bytes[3] | 0b00000011), .. bytes[1..3], (byte)(bytes[0] & 0b11111100)];
+    sb.AppendLine(Convert.ToHexString(mirrored));
+}
+
+
+void ConvertRoom<I,O>(String hex) where I : struct, Enum where O : struct, Enum
+{
+    byte[] bytes = Convert.FromHexString(hex);
+    var sv = new SideviewEditable<I>(bytes);
+    SideviewEditable<O> sv2 = sv.ConvertTo<O>();
+    byte[] converted = sv2.Finalize();
+    sb.AppendLine("Converted:");
+    sb.AppendLine(sv.DebugString());
+    sb.AppendLine(Convert.ToHexString(converted));
+}
 
 ValidateRoomsForFile("PalaceRooms.json");
 sb.AppendLine();
@@ -695,6 +758,13 @@ sb.AppendLine();
 sb.AppendLine();
 
 //DebugPalaceRoomHex<GreatPalaceObject>("32600808102F23F8D50123F7D502102F23F694069106D10323F5D404102F23F4D50522F3F3500006B0910106B091D10F112F");
+//ConvertRoom<PalaceObject, GreatPalaceObject>("");
+
+// Palace 1 item room re-created without the background map:
+//MirrorRoom<PalaceObject>("4C600E08DC08440024D831306030903021D821305030803021D841307030A03021D845004500F35000060106430024D841307030A03021D821305030803021D831306030903021D84400D50E");
+//MirrorEnemies<EnemiesPalace125>("096551795164D176D8");
+//MirrorConnections("FCFFFF24");
+
 
 var result = sb.ToString();
 File.WriteAllText("ValidationOutput.txt", result);

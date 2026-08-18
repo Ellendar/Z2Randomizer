@@ -250,6 +250,8 @@ public enum PalaceStyle
     VANILLA_WEIGHTED,
     [Description("Tower"), DefaultWeight(10)]
     TOWER,
+    [Description("Mirror"), DefaultWeight(10)]
+    MIRROR,
     [Description("Reconstructed"), DefaultWeight(10)]
     RECONSTRUCTED,
     [Description("Loopy"), DefaultWeight(0)]
@@ -283,6 +285,7 @@ public static class PalaceStyleExtensions
             PalaceStyle.RANDOM_WALK => true,
             PalaceStyle.VANILLA_WEIGHTED => true,
             PalaceStyle.TOWER => true,
+            PalaceStyle.MIRROR => true,
             _ => false
         };
     }
@@ -299,6 +302,7 @@ public static class PalaceStyleExtensions
         return style switch
         {
             PalaceStyle.VANILLA_WEIGHTED => false,
+            PalaceStyle.MIRROR => false,
             PalaceStyle.RANDOM_ALL => false,
             PalaceStyle.RANDOM_PER_PALACE => false,
             _ => true

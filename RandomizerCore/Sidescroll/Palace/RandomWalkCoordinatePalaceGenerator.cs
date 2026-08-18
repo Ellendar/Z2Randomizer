@@ -57,12 +57,7 @@ public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGen
                 3 => currentCoord with { X = currentCoord.X + 1 }, //right
                 _ => throw new ImpossibleException()
             };
-            if (nextCoord == Coord.Uninitialized
-                || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(-1, 0)) //can't ever go left from an entrance.
-                || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(1, 0) && !entrance.HasRightExit)
-                || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(0, 1) && !entrance.HasUpExit)
-                || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(0, -1) && !entrance.HasDownExit)
-            )
+            if (!CanExpandTo(currentCoord, nextCoord, entrance))
             {
                 continue;
             }
@@ -159,6 +154,16 @@ public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGen
         //Debug.WriteLine(GetLayoutDebug(walkGraph, false));
 
         return walkGraph;
+    }
+
+    protected virtual bool CanExpandTo(Coord currentCoord, Coord nextCoord, Room entrance)
+    {
+        return !(nextCoord == Coord.Uninitialized
+            || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(-1, 0)) //can't ever go left from an entrance.
+            || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(1, 0) && !entrance.HasRightExit)
+            || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(0, 1) && !entrance.HasUpExit)
+            || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(0, -1) && !entrance.HasDownExit)
+        );
     }
 
     protected override ItemRoomSelectionStrategy GetItemRoomSelectionStrategy()

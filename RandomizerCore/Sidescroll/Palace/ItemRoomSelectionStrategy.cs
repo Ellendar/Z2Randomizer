@@ -10,5 +10,5 @@ public abstract class ItemRoomSelectionStrategy
 
 public interface IItemRoomInShapeSelectionStrategy
 {
-    Room[] SelectItemRoomsInShape(RoomPool roomPool, int itemRoomCount, bool duplicateProtection, Random r, Dictionary<Coord, RoomExitType> shape, IEnumerable<RoomExitType> itemRoomShapes, List<Coord> prepopulatedCoordinates);
+    Room[] SelectItemRoomsInShape(RoomPool roomPool, int itemRoomCount, bool duplicateProtection, Random r, Dictionary<Coord, RoomExitType> shape, IEnumerable<RoomExitType> itemRoomShapes, Coord entrance, List<Coord> prepopulatedCoordinates);
 }

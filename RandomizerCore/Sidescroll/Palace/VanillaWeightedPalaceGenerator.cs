@@ -182,35 +182,8 @@ public class VanillaWeightedPalaceGenerator : RandomWalkCoordinatePalaceGenerato
         return distancesToOptimalPath;
     }
 
-    /// iterator over all neighboring coords from `coord` according to `exitType`
-    public static IEnumerable<Coord> GetNeighborsOutgoing(RoomExitType exitType, Coord coord)
-    {
-        if (exitType.ContainsLeft())  { yield return coord with { X = coord.X - 1 }; }
-        if (exitType.ContainsRight()) { yield return coord with { X = coord.X + 1 }; }
-        if (exitType.ContainsUp())    { yield return coord with { Y = coord.Y + 1 }; }
-        if (exitType.ContainsDown())  { yield return coord with { Y = coord.Y - 1 }; }
-    }
-
-    /// iterator over all neighbors, with drop rooms being included both ways
-    public static IEnumerable<Coord> GetNeighborsAnyDirection(Dictionary<Coord, RoomExitType> shape, RoomExitType exitType, Coord coord)
-    {
-        if (exitType.ContainsLeft())  { yield return coord with { X = coord.X - 1 }; }
-        if (exitType.ContainsRight()) { yield return coord with { X = coord.X + 1 }; }
-
-        var upCoord = coord with { Y = coord.Y + 1 };
-        if (exitType.ContainsUp())
-        {
-            yield return upCoord;
-        }
-        else if (shape.TryGetValue(upCoord, out var upShape) && upShape.ContainsDown())
-        {
-            yield return upCoord;
-        }
-        if (exitType.ContainsDown()) { yield return coord with { Y = coord.Y - 1 }; }
-    }
-
     /// Vanilla Z2 only has deadend item rooms. Lets try it.
-    protected override IEnumerable<RoomExitType> GetItemRoomShapes(RoomPool roomPool)
+    protected override IEnumerable<RoomExitType> GetItemRoomShapes(RoomPool roomPool, Palace palace)
     {
         var shapesInPool = roomPool.GetItemRoomShapes();
         return RoomExitTypeExtensions.DEADENDS.Intersect(shapesInPool);
@@ -231,19 +204,22 @@ public class VanillaWeightedPalaceGenerator : RandomWalkCoordinatePalaceGenerato
             return false;
         }
 
+        return EffectivePalaceCheck(palace, palaceShape, palaceSize, 6.0);
+    }
+
+    public static bool EffectivePalaceCheck(Palace palace, Dictionary<Coord, RoomExitType> palaceShape, int palaceSize, double maxRatio)
+    {
         var distancesToOptimalPath = MeasureDeadendPaths(palace, palaceShape);
-        var coords = distancesToOptimalPath.Keys;
         double totalCost = 0.0;
         double itemCount = palace.ItemRooms.Count;
-        foreach (var k in coords)
+        foreach (var (k, v) in distancesToOptimalPath)
         {
-            var v = distancesToOptimalPath[k];
             // the number of items influences how strict we are about deadend paths
             // (otherwise a 0 item palace would be an unfairly long linear path to the boss)
             totalCost += Math.Pow(v, (itemCount * 0.5) + 1);
         }
         // get a ratio of deadend paths/palace size
         double ratio = totalCost / palaceSize;
-        return ratio <= 6.0;
+        return ratio <= maxRatio;
     }
 }

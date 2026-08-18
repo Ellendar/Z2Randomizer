@@ -1,6 +1,4 @@
-﻿using DynamicData;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -21,9 +19,9 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         var itemRoomSelector = GetItemRoomSelectionStrategy();
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
-        Dictionary<Coord, RoomExitType> shape;
-        shape = await GetPalaceShape(props, palace, roomPool, r, roomCount);
-        if(shape.Count == 0)
+        Dictionary<Coord, RoomExitType> palaceShape;
+        palaceShape = await GetPalaceShape(props, palace, roomPool, r, roomCount);
+        if(palaceShape.Count == 0)
         {
             palace.IsValid = false;
             return palace;
@@ -31,7 +29,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
 
         if (palace.BossRoom == null)
         {
-            if (!PlaceBossRoomInShape(palace, roomPool, r, props, shape))
+            if (!PlaceBossRoomInShape(palace, roomPool, r, props, palaceShape))
             {
                 palace.IsValid = false;
                 return palace;
@@ -46,8 +44,8 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         // place item rooms at the shape stage if strategy allows
         if (palace.ItemRooms.Count < itemRoomCount && itemRoomSelector is IItemRoomInShapeSelectionStrategy shapeSelector)
         {
-            var itemRoomShapes = GetItemRoomShapes(roomPool);
-            Room[] itemRooms = shapeSelector.SelectItemRoomsInShape(roomPool, itemRoomCount, duplicateProtection, r, shape, itemRoomShapes, prepopulatedCoordinates);
+            var itemRoomShapes = GetItemRoomShapes(roomPool, palace);
+            Room[] itemRooms = shapeSelector.SelectItemRoomsInShape(roomPool, itemRoomCount, duplicateProtection, r, palaceShape, itemRoomShapes, palace.Entrance!.coords, prepopulatedCoordinates);
             if (itemRooms.Length < itemRoomCount)
             {
                 palace.IsValid = false;
@@ -63,85 +61,74 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         //Too lazy for now
         //prepopulatedCoordinates.Add(palace.AllRooms.First(i => i.IsThunderBirdRoom).coords);
 
-        if (!ValidateShape(palace, shape))
+        if (!ValidateShape(palace, palaceShape))
         {
             //Debug.WriteLine("ValidateShape failed:\n" + GetLayoutDebug(shape, false, prepopulatedCoordinates));
             palace.IsValid = false;
             return palace;
         }
 
-        var roomsByExitTypeUnmodified = roomPool.CategorizeNormalRoomExits();
-        Dictionary<RoomExitType, bool> stubOnlyExitTypes = new();
-        bool IsStubOnly(RoomExitType exitType)
+        //Add rooms
+        bool success = false;
+        if (await FillShape(props, palace, rooms, roomPool, r, palaceShape, prepopulatedCoordinates))
         {
-            if (stubOnlyExitTypes.TryGetValue(exitType, out var cached)) { return cached; }
-            roomsByExitTypeUnmodified.TryGetValue(exitType, out var roomList);
-            bool stubOnly = roomList == null || roomList.Count == 0;
-            stubOnlyExitTypes[exitType] = stubOnly;
-            return stubOnly;
+            if (await FinalizePalace(props, palace, roomPool, roomCount, r, itemRoomSelector))
+            {
+                success = true;
+            }
+        }
+        if (!success)
+        {
+            palace.IsValid = false;
+            return palace;
         }
 
-        //Add rooms
-        foreach (KeyValuePair<Coord, RoomExitType> item in shape.OrderBy(i => i.Key.X).ThenByDescending(i => i.Key.Y))
+        palace.AllRooms.ForEach(i => i.PalaceNumber = palaceNumber);
+
+        palace.IsValid = true;
+        return palace;
+    }
+
+    protected virtual async Task<bool> FillShape(RandomizerProperties props, Palace palace, RoomPool rooms, RoomPool roomPool, Random r, Dictionary<Coord, RoomExitType> palaceShape, List<Coord> prepopulatedCoordinates)
+    {
+        var roomsByExitTypeUnmodified = roomPool.CategorizeNormalRoomExits();
+
+        foreach (KeyValuePair<Coord, RoomExitType> pair in palaceShape.OrderBy(i => i.Key.X).ThenByDescending(i => i.Key.Y))
         {
-            if (prepopulatedCoordinates.Contains(item.Key))
+            Coord roomCoords = pair.Key;
+            if (prepopulatedCoordinates.Contains(roomCoords))
             {
                 continue;
             }
-            var (x, y) = item.Key;
-            RoomExitType roomExitType = item.Value;
+            RoomExitType roomExitType = pair.Value;
 
-            bool stubOnly = IsStubOnly(roomExitType);
-            List<Room>? roomCandidates = stubOnly ? null : roomPool.GetNormalRoomsForExitType(roomExitType);
-            Room? newRoom = null;
+            Coord coordAbove = new(roomCoords.X, roomCoords.Y + 1);
+            Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == coordAbove);
+            bool dropZone = upRoom != null && upRoom.HasDrop;
 
-            if (!stubOnly)
-            {
-                Debug.Assert(roomCandidates != null);
-                if (duplicateProtection && roomCandidates!.Count == 0)
-                {
-                    logger.Debug($"Shape-first palace ran out of rooms of exit type: {roomExitType} in palace {palaceNumber}. Starting to use duplicate rooms.");
-                    roomPool.RefillNormalRoomsForExitType(rooms, roomExitType);
-                    roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
-                    Debug.Assert(roomCandidates.Count() > 0);
-                }
-                roomCandidates!.FisherYatesShuffle(r);
-                Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
-                foreach (Room roomCandidate in roomCandidates!)
-                {
-                    if (upRoom == null || !upRoom.HasDrop || roomCandidate.IsDropZone)
-                    {
-                        Debug.Assert(roomCandidate.IsNormalRoom());
-                        newRoom = roomCandidate;
-                        break;
-                    }
-                }
-                if (newRoom != null && duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
-            }
+            Room? newRoom = PickNonStubRoom(props, palace, rooms, roomPool, r, palaceShape, roomCoords, roomExitType, dropZone);
 
             if (newRoom == null)
             {
-                Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
                 roomPool.DefaultStubsByDirection.TryGetValue(roomExitType, out newRoom);
-                if (newRoom != null && upRoom != null && upRoom.HasDrop && !newRoom.IsDropZone)
+                if (newRoom != null && dropZone && !newRoom.IsDropZone)
                 {
                     //We need to use a drop zone stub but one does not (and cannot) exist so this graph is doomed.
                     //Debug.WriteLine(GetLayoutDebug(walkGraph, false));
-                    palace.IsValid = false;
-                    return palace;
+                    return false;
                 }
             }
+
             if (newRoom == null)
             {
-                palace.IsValid = false;
-                return palace;
+                return false;
             }
             else
             {
                 newRoom = new(newRoom);
             }
 
-            newRoom.coords = item.Key;
+            newRoom.coords = roomCoords;
             if (newRoom.LinkedRoomName == null)
             {
                 palace.AllRooms.Add(newRoom);
@@ -151,12 +138,117 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
                 Room linkedRoom = new(roomPool.LinkedRooms[newRoom.LinkedRoomName]);
                 newRoom.LinkedRoom = linkedRoom;
                 linkedRoom.LinkedRoom = newRoom;
-                linkedRoom.coords = item.Key;
+                linkedRoom.coords = roomCoords;
                 Room mergedRoom = newRoom.Merge(linkedRoom);
                 palace.AllRooms.Add(mergedRoom);
             }
         }
 
+        return true;
+    }
+
+    protected virtual Room? PickNonStubRoom(RandomizerProperties props, Palace palace, RoomPool rooms, RoomPool roomPool, Random r, Dictionary<Coord, RoomExitType> palaceShape, Coord roomCoords, RoomExitType roomExitType, bool dropZone)
+    {
+        bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palace.Number);
+        List<Room> roomCandidates = GetNormalRoomsForExitType(roomPool, roomCoords, roomExitType);
+
+        Room? newRoom = null;
+
+        if (roomCandidates.Count > 0)
+        {
+            bool refillAllowed = duplicateProtection;
+            while (true)
+            {
+                if (roomCandidates.Count == 0)
+                {
+                    if (!refillAllowed)
+                    {
+                        break;
+                    }
+
+                    logger.Debug($"Shape-first palace ran out of rooms of exit type: {roomExitType} in palace {palace.Number}. Starting to use duplicate rooms.");
+                    roomPool.RefillNormalRoomsForExitType(rooms, roomExitType);
+                    roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
+                    Debug.Assert(roomCandidates.Count() > 0);
+                    refillAllowed = false;
+                }
+
+                roomCandidates.FisherYatesShuffle(r);
+
+                newRoom = SelectRoomForCoord(palace, rooms, roomPool, palaceShape, roomCoords, dropZone, roomCandidates);
+                if (newRoom != null)
+                {
+                    break;
+                }
+
+                roomCandidates.Clear(); // clear after failure to force a refill and try again (once)
+            }
+            if (newRoom != null && duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
+        }
+
+        return newRoom;
+    }
+
+    protected virtual List<Room> GetNormalRoomsForExitType(RoomPool roomPool, Coord roomCoords, RoomExitType roomExitType)
+    {
+        return roomPool.GetNormalRoomsForExitType(roomExitType);
+    }
+
+    protected virtual Room? SelectRoomForCoord(Palace palace, RoomPool rooms, RoomPool roomPool, Dictionary<Coord, RoomExitType> palaceShape, Coord roomCoords, bool dropZone, List<Room> shuffledRoomCandidates)
+    {
+        foreach (Room roomCandidate in shuffledRoomCandidates)
+        {
+            Debug.Assert(roomCandidate.IsNormalRoom());
+            if (dropZone && !roomCandidate.IsDropZone)
+            {
+                continue;
+            }
+            if (!string.IsNullOrWhiteSpace(roomCandidate.LinkedRoomName))
+            {
+                if (!LinkedRoomFitInShape(roomPool, palaceShape, palace.Entrance!.coords, roomCoords, roomCandidate))
+                {
+                    continue;
+                }
+            }
+            return roomCandidate;
+        }
+
+        return null;
+    }
+
+    protected virtual async Task<bool> FinalizePalace(RandomizerProperties props, Palace palace, RoomPool roomPool, int roomCount, Random r, ItemRoomSelectionStrategy itemRoomSelector)
+    {
+        if (palace.AllRooms.Count(i => i.Enabled) > roomCount)
+        {
+            throw new Exception("Generated palace has the incorrect number of rooms");
+        }
+
+        await ConnectRooms(palace);
+
+        ConnectNonEuclideanPaths(palace);
+
+        //Some percentage of the time, dropifying some rooms causes part of the palace to become
+        //unreachable because up was the only way to get there.
+        if (!palace.AllReachable())
+        {
+            return false;
+        }
+
+        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props, itemRoomSelector))
+        {
+            return false;
+        }
+
+        if (palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], props.PalaceDropStyle, r))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static async Task ConnectRooms(Palace palace)
+    {
         //Connect adjacent rooms if they exist
         foreach (Room room in palace.AllRooms)
         {
@@ -174,7 +266,6 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
                     left.Right = room;
                 }
             }
-
             foreach(Room down in downRooms)
             {
                 if (down != null && room.FitsWithDown(down) > 0)
@@ -206,39 +297,69 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
                 }
             }
         }
+    }
 
-        ConnectNonEuclideanPaths(palace);
+    public static bool LinkedRoomFitInShape(RoomPool roomPool, Dictionary<Coord, RoomExitType> palaceShape, Coord entrance, Coord coord, Room room)
+    {
+        Debug.Assert(room.LinkedRoomName != null);
+        Room linkedRoom = new(roomPool.LinkedRooms[room.LinkedRoomName]);
+        Debug.Assert(linkedRoom != null);
 
-        //Some percentage of the time, dropifying some rooms causes part of the palace to become
-        //unreachable because up was the only way to get there.
-        if (!palace.AllReachable())
+        // get unmerged shapes
+        var shape1 = room.CategorizeExits();
+        var shape2 = linkedRoom.CategorizeExits();
+
+        // exits exclusive to each shape to verify reachability
+        RoomExitType shape1Only = (RoomExitType)((int)shape1 & ~(int)shape2);
+        RoomExitType shape2Only = (RoomExitType)((int)shape2 & ~(int)shape1);
+
+        bool foundShape1 = false, foundShape2 = false;
+        HashSet<Coord> visited = [];
+        Queue<(IntVector2 dir, Coord target)> queue = [];
+
+        queue.Enqueue((IntVector2.EAST, entrance));
+
+        while (queue.Count > 0)
         {
-            palace.IsValid = false;
-            return palace;
+            var (travelDirection, currentCoord) = queue.Dequeue();
+            if (currentCoord == coord)
+            {
+                if (shape1Only.Contains(-travelDirection))
+                {
+                    foundShape1 = true;
+                }
+                if (shape2Only.Contains(-travelDirection))
+                {
+                    foundShape2 = true;
+                }
+                if (foundShape1 && foundShape2)
+                {
+                    return true;
+                }
+                // coord *not* added to visited
+            }
+            else if (!visited.Contains(currentCoord))
+            {
+
+                foreach (Coord neighbor in GetNeighborsOutgoing(palaceShape[currentCoord], currentCoord))
+                {
+                    if (!palaceShape.ContainsKey(neighbor))
+                    {
+                        return true; // shape is not closed, so just allow the linked room
+                    }
+                    if (!visited.Contains(neighbor))
+                    {
+                        var dir = neighbor.ToIntVector2() - currentCoord.ToIntVector2();
+                        queue.Enqueue((dir, neighbor));
+                    }
+                }
+                visited.Add(currentCoord);
+            }
         }
 
+        //Debug.WriteLine("Linked room failed:\n" + GetLayoutDebug(palaceShape, false, []));
 
-        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props, itemRoomSelector))
-        {
-            palace.IsValid = false;
-            return palace;
-        }
-
-        if (palace.AllRooms.Count(i => i.Enabled) != roomCount)
-        {
-            throw new Exception("Generated palace has the incorrect number of rooms");
-        }
-
-        if (palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], props.PalaceDropStyle, r))
-        {
-            palace.IsValid = false;
-            return palace;
-        }
-
-        palace.AllRooms.ForEach(i => i.PalaceNumber = palaceNumber);
-
-        palace.IsValid = true;
-        return palace;
+        return false;
     }
 
     /// used to place a boss room when we are still working with shapes
@@ -268,6 +389,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
             foreach (var pair in bossCoordCandidates)
             {
                 var coord = pair.Key;
+                if (coord == Coord.Origin) { continue; }
                 var upCoord = coord with { Y = coord.Y + 1 };
                 if (shape.TryGetValue(upCoord, out var exit) && exit.ContainsDrop()) { continue; }
 
@@ -294,7 +416,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         return palaceNumber == 7 ? props.DarkLinkMinDistance : 0;
     }
 
-    protected virtual IEnumerable<RoomExitType> GetItemRoomShapes(RoomPool roomPool)
+    protected virtual IEnumerable<RoomExitType> GetItemRoomShapes(RoomPool roomPool, Palace palace)
     {
         return roomPool.GetItemRoomShapes();
     }
@@ -407,6 +529,33 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
     protected virtual void ConnectNonEuclideanPaths(Palace palace)
     {
 
+    }
+
+    /// iterator over all neighboring coords from `coord` according to `exitType`
+    public static IEnumerable<Coord> GetNeighborsOutgoing(RoomExitType exitType, Coord coord)
+    {
+        if (exitType.ContainsLeft()) { yield return coord with { X = coord.X - 1 }; }
+        if (exitType.ContainsRight()) { yield return coord with { X = coord.X + 1 }; }
+        if (exitType.ContainsUp()) { yield return coord with { Y = coord.Y + 1 }; }
+        if (exitType.ContainsDown()) { yield return coord with { Y = coord.Y - 1 }; }
+    }
+
+    /// iterator over all neighbors, with drop rooms being included both ways
+    public static IEnumerable<Coord> GetNeighborsAnyDirection(Dictionary<Coord, RoomExitType> shape, RoomExitType exitType, Coord coord)
+    {
+        if (exitType.ContainsLeft()) { yield return coord with { X = coord.X - 1 }; }
+        if (exitType.ContainsRight()) { yield return coord with { X = coord.X + 1 }; }
+
+        var upCoord = coord with { Y = coord.Y + 1 };
+        if (exitType.ContainsUp())
+        {
+            yield return upCoord;
+        }
+        else if (shape.TryGetValue(upCoord, out var upShape) && upShape.ContainsDown())
+        {
+            yield return upCoord;
+        }
+        if (exitType.ContainsDown()) { yield return coord with { Y = coord.Y - 1 }; }
     }
 
     private static readonly Regex BlankLine = new(@"^[ \t\f\r\n]+$");
