@@ -2515,6 +2515,7 @@ public class Hyrule
             palace.WriteConnections(ROMData);
         }
 
+        /*
         ROMData.Put(0x1CD3A, (byte)palGraphics[(int)westHyrule.locationAtPalace1.Palace!.Number!]);
         ROMData.Put(0x1CD3B, (byte)palGraphics[(int)westHyrule.locationAtPalace2.Palace!.Number!]);
         ROMData.Put(0x1CD3C, (byte)palGraphics[(int)westHyrule.locationAtPalace3.Palace!.Number!]);
@@ -2522,7 +2523,7 @@ public class Hyrule
         ROMData.Put(0x1CD42, (byte)palGraphics[(int)eastHyrule.locationAtPalace5.Palace!.Number!]);
         ROMData.Put(0x1CD43, (byte)palGraphics[(int)eastHyrule.locationAtPalace6.Palace!.Number!]);
         ROMData.Put(0x1CD44, (byte)palGraphics[(int)eastHyrule.locationAtGP.Palace!.Number!]);
-
+        */
         if (props.ShuffleEnemyPalettes)
         {
             Random customizationRng = new Random(SeedHash);
@@ -3358,6 +3359,7 @@ CheckIfEndOfData:
 """, "prevent_sideview_oob.s");
     }
 
+    /*
     public void SetPalacePalettes(Assembler asm)
     {
         var a = asm.Module();
@@ -3381,7 +3383,7 @@ PalacePaletteOffset:
     .byte P1Palette, P2Palette, P3Palette, $20, $30, $30, $30, $30, P5Palette, P6Palette, PGreatPalette, $60, P4Palette
 """, "set_palace_palettes.s");
     }
-
+    */
 
     public static void FixContinentTransitions(Assembler asm)
     {
@@ -3392,11 +3394,6 @@ PalacePaletteOffset:
 .import SwapPRG
 
 .segment "PRG7"
-
-; No need to set PreviousRegionNumber ($070a) anymore
-.org $cb8b
-    jmp $cb91
-FREE_UNTIL $cb91
 
 ; Patch switching the bank when loading the overworld
 .org $cd48
@@ -3555,13 +3552,13 @@ EndTileComparisons = $8601
 
     private void AssignRealPalaceLocations(AsmModule a)
     {
-        a.Assign("RealPalaceAtLocation1", (westHyrule?.locationAtPalace1.Palace!.Number ?? 1) - 1);
-        a.Assign("RealPalaceAtLocation2", (westHyrule?.locationAtPalace2.Palace!.Number ?? 2) - 1);
-        a.Assign("RealPalaceAtLocation3", (westHyrule?.locationAtPalace3.Palace!.Number ?? 3) - 1);
-        a.Assign("RealPalaceAtLocation4", (mazeIsland?.locationAtPalace4.Palace!.Number ?? 4) - 1);
-        a.Assign("RealPalaceAtLocation5", (eastHyrule?.locationAtPalace5.Palace!.Number ?? 5) - 1);
-        a.Assign("RealPalaceAtLocation6", (eastHyrule?.locationAtPalace6.Palace!.Number ?? 6) - 1);
-        a.Assign("RealPalaceAtLocationGP", (eastHyrule?.locationAtGP.Palace!.Number ?? 7) - 1);
+        a.Assign("RealPalaceAtLocation1", (westHyrule?.locationAtPalace1.Palace!.Number ?? 1));
+        a.Assign("RealPalaceAtLocation2", (westHyrule?.locationAtPalace2.Palace!.Number ?? 2));
+        a.Assign("RealPalaceAtLocation3", (westHyrule?.locationAtPalace3.Palace!.Number ?? 3));
+        a.Assign("RealPalaceAtLocation4", (mazeIsland?.locationAtPalace4.Palace!.Number ?? 4));
+        a.Assign("RealPalaceAtLocation5", (eastHyrule?.locationAtPalace5.Palace!.Number ?? 5));
+        a.Assign("RealPalaceAtLocation6", (eastHyrule?.locationAtPalace6.Palace!.Number ?? 6));
+        a.Assign("RealPalaceAtLocationGP", (eastHyrule?.locationAtGP.Palace!.Number ?? 7));
     }
 
     public void StatTracking(RandomizerProperties props, Assembler asm)
@@ -3775,7 +3772,7 @@ bank5_Pointer_table_for_End_Credits:
         rom.UseExtendedBanksForPalaceRooms(engine);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
-        SetPalacePalettes(engine);
+        //SetPalacePalettes(engine);
         FixContinentTransitions(engine);
         PreventSideviewOutOfBounds(engine);
 
