@@ -991,7 +991,7 @@ public class Hyrule
             //This should probably always be true but safety
             if(props.ShufflePalaceItems)
             {
-                HashSet<Collectable> palaceCollectables = [.. palaceLocations.SelectMany(i => i.GetAllCollectables())];
+                List<Collectable> palaceCollectables = [.. palaceLocations.SelectMany(i => i.GetAllCollectables())];
                 shufflableItems.Add(palaceCollectables.Select(c => props.StartsWithCollectable(c) ? minorItems.Sample(r) : c));
                 globalShuffleLocations.Add(palaceLocations);
             }
