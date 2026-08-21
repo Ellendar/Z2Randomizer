@@ -75,8 +75,6 @@ sealed class MazeIsland : World
         childDrop = GetLocation(LocationID.MI_CHILD_DROP);
         magicContainerDrop = GetLocation(LocationID.MI_MAGIC_CONTAINER_DROP);
         locationAtPalace4 = GetLocation(LocationID.MI_PALACE4);
-        locationAtPalace4.PalaceNumber = 4;
-        locationAtPalace4.CollectableRequirements = DEFAULT_PALACE_REQUIREMENTS;
 
         continentId = Continent.MAZE;
         baseAddr = RomMap.ContinentLocationBases[continentId];
@@ -111,7 +109,7 @@ sealed class MazeIsland : World
                 trapLocations.Remove(removeLoc);
             }
         }
-        SetVanillaCollectables(props.ReplaceFireWithDash);
+        //SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
@@ -647,22 +645,25 @@ sealed class MazeIsland : World
         return requiredLocations.Where(i => i != null);
     }
 
+    /*
     protected override void SetVanillaCollectables(bool useDash)
     {
         locationAtPalace4.VanillaCollectable = Collectable.BOOTS;
         childDrop.VanillaCollectable = Collectable.CHILD;
         magicContainerDrop.VanillaCollectable = Collectable.MAGIC_CONTAINER;
     }
+    */
 
     public override string GenerateSpoiler()
     {
         StringBuilder sb = new();
         sb.AppendLine("MAZE ISLAND: ");
-        sb.AppendLine("\tMagic Container Drop: " + magicContainerDrop.Collectables[0].EnglishText());
-        sb.AppendLine("\tChild Drop: " + childDrop.Collectables[0].EnglishText());
+        sb.AppendLine("\tMagic Container Drop: " + magicContainerDrop.GetAllCollectables()[0].EnglishText());
+        sb.AppendLine("\tChild Drop: " + childDrop.GetAllCollectables()[0].EnglishText());
 
-        sb.Append("\tPalace 4 (" + locationAtPalace4.PalaceNumber + "): ");
-        sb.AppendLine(locationAtPalace4.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace4.Collectables.Select(c => c.EnglishText())));
+        sb.Append("\tPalace 4 (" + locationAtPalace4.Palace!.Number + "): ");
+        List<Collectable> palaceCollectables = locationAtPalace4.GetAllCollectables();
+        sb.AppendLine(palaceCollectables.Count == 0 ? "No Items" : string.Join(", ", palaceCollectables.Select(c => c.EnglishText())));
 
         sb.AppendLine();
         return sb.ToString();

@@ -1,12 +1,9 @@
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-<<<<<<< HEAD
-=======
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
->>>>>>> 0502baa (Restoring changes inadvertently removed.)
 using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -21,6 +18,7 @@ using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 using CrossPlatformUI.Services;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace CrossPlatformUI.ViewModels;
 

@@ -51,6 +51,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <WasmExtraFilesToDeploy Include="wwwroot\**" />
+    </ItemGroup>
+    <Target Name="CopyAssetsToLocalWwwRoot" BeforeTargets="BeforeBuild;AssignTargetPaths">
+    <ItemGroup>
       <!-- Define the external source items -->
       <ExternalSprites Include="..\RandomizerCore\Sprites\**" />
       <ExternalJson Include="..\RandomizerCore\PalaceRooms.json" />

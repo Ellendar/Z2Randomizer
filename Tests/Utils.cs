@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace Z2Randomizer.Tests;
 

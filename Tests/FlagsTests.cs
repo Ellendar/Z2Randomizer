@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using CrossPlatformUI.Presets;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Flags;
@@ -9,6 +9,10 @@ namespace Z2Randomizer.Tests;
 [TestClass]
 public class FlagsTests
 {
+    // Built from the current configuration rather than hardcoded, so the fixture
+    // can't go stale when new flags are added to RandomizerConfiguration.
+    private static string SampleFlagString() => new RandomizerConfiguration().SerializeFlags();
+
     [TestMethod]
     public void TestBoolEncodeCycle()
     {
@@ -208,7 +212,7 @@ public class FlagsTests
             EnemyXPDrops = XPEffectiveness.NONE
         };
 
-        RandomizerProperties properties = config.Export(new Random(1234), includeDifficulty: false);
+        RandomizerProperties properties = config.Export(new RandomizerCore.Random(1234), includeDifficulty: false);
 
         Assert.IsFalse(properties.StartCandle);
         Assert.IsFalse(properties.StartCross);
@@ -258,7 +262,7 @@ public class FlagsTests
     [TestMethod]
     public void FlagPasteParserExtractsFlagsFromSeedAndFlagsMessage()
     {
-        const string flags = "hEAAdgKyAs6WvqAssLJidnf7xJOY+0csos1gnXRs!AAFR+h";
+        var flags = SampleFlagString();
         var input = $"Seed: 228401255 - Flags: {flags}";
 
         Assert.AreEqual(flags, FlagPasteParser.ExtractFlags(input));
@@ -268,7 +272,7 @@ public class FlagsTests
     [TestMethod]
     public void FlagPasteParserExtractsFlagsFromEmbeddedLabels()
     {
-        const string flags = "hEAAdgKyAs6WvqAssLJidnf7xJOY+0csos1gnXRs!AAFR+h";
+        var flags = SampleFlagString();
         var input = $"Seed:228401255-Flags:{flags}";
 
         Assert.AreEqual(flags, FlagPasteParser.ExtractFlags(input));
@@ -278,7 +282,7 @@ public class FlagsTests
     [TestMethod]
     public void FlagPasteParserDoesNotExtractSeedFromPlainFlagString()
     {
-        const string flags = "hEAAdgKyAs6WvqAssLJidnf7xJOY+0csos1gnXRs!AAFR+h";
+        var flags = SampleFlagString();
 
         Assert.AreEqual(flags, FlagPasteParser.ExtractFlags(flags));
         Assert.IsNull(FlagPasteParser.ExtractSeed(flags));
@@ -287,7 +291,7 @@ public class FlagsTests
     [TestMethod]
     public void FlagPasteParserRequiresDelimitedSixDigitSeedToken()
     {
-        const string flags = "hEAAdgKyAs6WvqAssLJidnf7xJOY+0csos1gnXRs!AAFR+h";
+        var flags = SampleFlagString();
 
         Assert.IsNull(FlagPasteParser.ExtractSeed($"Seed: 12345 - Flags: {flags}"));
         Assert.AreEqual("228401255", FlagPasteParser.ExtractSeed($"Seed: 228401255 - Flags: {flags}"));

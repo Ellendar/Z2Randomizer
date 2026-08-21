@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -33,24 +33,6 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
 
     [JsonIgnore]
     public string FlagInput { get; set { field = value.Trim(); this.RaisePropertyChanged(); } } = "";
-
-    [JsonIgnore]
-    public string FlagInput
-    {
-        get => flagInput;
-        set
-        {
-            var trimmedValue = value?.Trim() ?? "";
-            var (extractedFlags, extractedSeed) = FlagPasteParser.Parse(trimmedValue);
-
-            if (Main is not null && !string.IsNullOrEmpty(extractedSeed))
-            {
-                Main.Config.Seed = extractedSeed;
-            }
-
-            this.RaiseAndSetIfChanged(ref flagInput, extractedFlags ?? trimmedValue);
-        }
-    }
 
     [JsonIgnore]
     public string Seed

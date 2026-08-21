@@ -1,6 +1,6 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <ManagePackageVersionsCentrally Condition="'$(MSBuildProjectName)' != 'FtRandoLib'">true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <RoslynVersion>5.6.0</RoslynVersion>
     <ClearScriptVersion>7.5.1</ClearScriptVersion>
@@ -15,8 +15,6 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
     <PackageVersion Include="PolySharp" Version="1.16.0" />
-    <PackageVersion Include="Microsoft.JSInterop" Version="10.0.8" />
-
     <!-- ClearScript -->
     <PackageVersion Include="Microsoft.ClearScript" Version="$(ClearScriptVersion)" />
     <PackageVersion Include="Microsoft.ClearScript.Core" Version="$(ClearScriptVersion)" />

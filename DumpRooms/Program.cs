@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 ROM ROMData = new ROM(args[0], true);
 

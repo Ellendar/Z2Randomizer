@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 internal class ByShapeItemRoomSelectionStrategy : ItemRoomSelectionStrategy, IItemRoomInShapeSelectionStrategy
 {

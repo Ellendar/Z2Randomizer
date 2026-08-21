@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Z2Randomizer.RandomizerCore;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 internal class ByEntranceDirectionItemRoomSelectionStrategy : ItemRoomSelectionStrategy
 {

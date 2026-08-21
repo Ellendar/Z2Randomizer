@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -276,7 +277,7 @@ public static class LocationIDUtils
 
 public static class LocationIDExtensions
 {
-    static readonly Dictionary<LocationID, Town> townMap = new()
+    static readonly Dictionary<LocationID, TownType> townMap = new()
     {
         [LocationID.WEST_TOWN_RAURU] = TownType.RAURU,
         [LocationID.WEST_TOWN_RUTO] = TownType.RUTO,
@@ -338,9 +339,9 @@ public static class LocationIDExtensions
     /// </summary>
     /// <param name="lid"></param>
     /// <returns></returns>
-    public static Town? GetTown(this LocationID lid)
+    public static TownType? GetTown(this LocationID lid)
     {
-        if (townMap.TryGetValue(lid, out Town town))
+        if (townMap.TryGetValue(lid, out TownType town))
             return town;
 
         return null;

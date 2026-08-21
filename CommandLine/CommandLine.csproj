@@ -23,6 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Desktop.Common\Desktop.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="DefaultPlayerOptions.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

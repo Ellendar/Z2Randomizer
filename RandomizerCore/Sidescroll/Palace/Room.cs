@@ -9,7 +9,7 @@ using js65;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public record struct Coord(int X, int Y) : IComparable<Coord>
 {

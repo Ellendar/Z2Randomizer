@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using YamlDotNet.Core.Tokens;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public class RandomItemRoomSelectionStrategy : ItemRoomSelectionStrategy
 {
