@@ -1161,7 +1161,7 @@ public class CustomTexts
             do
             {
                 wizardHint = GenerateWizardText(vanillaText, r, location, useCommunityText, z2MarioMode);
-            } while (useCommunityText && usedWizardTexts.Contains(wizardHint) && tries++ < 100);
+            } while ((useCommunityText || z2MarioMode) && usedWizardTexts.Contains(wizardHint) && tries++ < 100);
             usedWizardTexts.Add(wizardHint);
             texts[townWizardTextIndexes[(TownType)location.Town.Type!]] = wizardHint;
         }
