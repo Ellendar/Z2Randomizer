@@ -673,8 +673,8 @@ public class Hyrule
         List<Location> palaceLocations = AllLocations().Where(i => i.Palace != null).ToList();
 
         spellListOrder = [Collectable.SHIELD_SPELL, Collectable.JUMP_SPELL, Collectable.LIFE_SPELL, Collectable.FAIRY_SPELL,
-            props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL, Collectable.SPELL_SPELL, Collectable.REFLECT_SPELL,
-            Collectable.THUNDER_SPELL];
+            props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL, Collectable.REFLECT_SPELL,
+            Collectable.SPELL_SPELL, Collectable.THUNDER_SPELL];
 
         //Non-pbag, non-wizard, non-palace items are inherently in the global shuffle pool
         List<Collectable> shufflableItems = [Collectable.TROPHY, Collectable.MEDICINE, Collectable.HEART_CONTAINER, Collectable.MAGIC_CONTAINER,
