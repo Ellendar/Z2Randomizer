@@ -2134,16 +2134,16 @@ PlayerHeadCollision:
   clc
   adc #$04
   adc ScrollX
-  sta LinkProjectileXPositionLoRelated
+  sta LinkSwordXBreakableBlockAdjusted
   lda ScrollPage
   adc #$00
-  sta LinkProjectileXPositionHiRelated
+  sta LinkSwordBreakableBlockAdjusted
 
   lda CrouchingFlag ; 4 if crouching
   asl
   asl
   adc Player_Y_Position
-  sta LinkProjectileYPositionRelated
+  sta LinkSwordYBreakableBlockAdjusted
   ldx #$10 ; use the hitboxes we just set
   ldy #$1c ; tell it we are stabbing?
   jsr bank7_Generic_Collision_Test_with_Level_Objects

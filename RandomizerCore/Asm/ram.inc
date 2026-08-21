@@ -100,6 +100,7 @@ EndingDisplayTileY0 = $38
 LinkSwordYBreakableBlockAdjusted = $39   ; [SS] Link's sword hitbox Y as used for breakable blocks - [Ending] Y of tile 1 in ending sequence
 EndingDisplayTileY2 = $3a
 LinkXPositionHi = $3b                    ; [SS] Which page of the room Link is in                  - [Ending] X of tile 0 in ending sequence
+EnemyXPositionHi = $3c
 Enemy0XPositionHi = $3c                  ; [SS] Which page of the room Enemy0 is in                - [Ending] X of tile 1 in ending sequence
 Enemy1XPositionHi = $3d                  ; [SS] Which page of the room Enemy1 is in                - [Ending] X of tile 2 in ending sequence
 Enemy2XPositionHi = $3e
