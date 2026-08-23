@@ -2255,6 +2255,88 @@ ElevatorBossFix:
         //Put(0x15428, 0x00); // already at 0
     }
 
+    public void RevealHiddenJars(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+CheckHiddenJarOrIkStrike = $af61
+CheckHiddenJarStrike = $b83e
+CheckHiddenJarOrFokkaStrike = $a521
+EnemyDrawRoutine = $de3d
+DrawFromCommonEnemyTileTable = $f0c6
+
+.segment "PRG4"
+.org $94da
+    .byte $40  ; make it orange
+.org $a9da
+    .byte $40
+
+.org $9497  ; P1/2/5 enemy main routine
+    .word UpdatedHiddenJar
+.org $a997  ; P3/4/6 enemy main routine
+    .word UpdatedHiddenJarOrIk
+.org $956f  ; P1/2/5 enemy draw routine
+    .word DrawHiddenJarBank4
+.org $aa6f  ; P3/4/6 enemy draw routine
+    .word DrawHiddenJarBank4
+
+.reloc
+UpdatedHiddenJar:
+    jsr EnemyDrawRoutine
+    jmp CheckHiddenJarStrike
+
+.reloc
+UpdatedHiddenJarOrIk:
+    jsr EnemyDrawRoutine
+    jmp CheckHiddenJarOrIkStrike
+
+.reloc
+DrawHiddenJarBank4:
+    lda zp_01
+    clc
+    adc #$04                          ; center-adjust the sprite
+    bcs @OffScreen
+    sta zp_01
+    lda #$00
+    sta zp_02                         ; no sprite mirroring
+    ldx #$50                          ; jar tile index
+    jmp DrawFromCommonEnemyTileTable
+@OffScreen:
+    rts
+
+.segment "PRG5"
+.org $94da
+    .byte $40  ; make it orange
+
+.org $9497
+    .word UpdatedHiddenJarOrFokkaStrike
+.org $956f
+    .word DrawHiddenJarBank5
+
+.reloc
+UpdatedHiddenJarOrFokkaStrike:
+    jsr EnemyDrawRoutine
+    jmp CheckHiddenJarOrFokkaStrike
+
+.reloc
+DrawHiddenJarBank5:
+    lda zp_01
+    clc
+    adc #$04                          ; center-adjust the sprite
+    bcs @OffScreen
+    sta zp_01
+    lda #$00
+    sta zp_02                         ; no sprite mirroring
+    ldx #$50                          ; jar tile index
+    jmp DrawFromCommonEnemyTileTable
+@OffScreen:
+    rts
+
+""");
+    }
+
     /// Rewrite the graphic tiles for walkthrough walls to be something else
     public void RevealWalkthroughWalls()
     {
