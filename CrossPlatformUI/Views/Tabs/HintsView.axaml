@@ -68,6 +68,12 @@
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RevealWalkthroughWallsToolTip}"/></ToolTip.Tip>
             </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Main.Config.RevealHiddenJars}"
+                Content="Reveal Hidden Jars"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RevealHiddenJarsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
     </Grid>
 </UserControl>

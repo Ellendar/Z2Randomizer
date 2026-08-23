@@ -138,6 +138,7 @@ public class RandomizerProperties
     public int[] PalaceItemRoomCounts { get; set; } = new int[7];
     public bool UsePalaceItemRoomCountIndicator { get; set; }
     public bool RevealWalkthroughWalls { get; set; }
+    public bool RevealHiddenJars { get; set; }
 
     //Enemies
     public EnemyLifeOption ShuffleEnemyHP { get; set; }
