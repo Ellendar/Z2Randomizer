@@ -53,9 +53,9 @@
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="YamlDotNet" Version="16.3.0" />
     <!-- Statistics -->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
-    <PackageVersion Include="SQLite" Version="3.13.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
+    <PackageVersion Include="SQLite" Version="3.53.4" />
     <PackageVersion Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageVersion Include="System.Data.SQLite" Version="2.0.3" />
     <!-- Test -->

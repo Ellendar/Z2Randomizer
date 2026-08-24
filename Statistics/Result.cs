@@ -166,6 +166,7 @@ class Result
         width = hyrule.palaces[6].AllRooms.Max(i => i.coords.X) - hyrule.palaces[6].AllRooms.Min(i => i.coords.X);
         height = hyrule.palaces[6].AllRooms.Max(i => i.coords.Y) - hyrule.palaces[6].AllRooms.Min(i => i.coords.Y);
         GPWidthRatio = width / height;
+        GPWidthRatio = float.IsNaN(GPWidthRatio) || float.IsInfinity(GPWidthRatio) ? float.MaxValue : GPWidthRatio;
         GPMinDistanceToBoss = StepCountToBossRoom(hyrule.palaces[6]);
 
     }
