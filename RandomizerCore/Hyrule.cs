@@ -3732,6 +3732,180 @@ CustomMovingNpcDialog:
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
 
+    public void CustomHud(Assembler asm, bool enabled)
+    {
+        var a = asm.Module();
+
+        if (!enabled)
+        {
+            // Just put an RTS placeholder. js65 will surely find an existing byte to use.
+            a.Code(/* lang=s */"""
+.segment "PRG7"
+.reloc
+FlagHudUpdate:
+    rts
+.export FlagHudUpdate
+""");
+            return;
+        }
+
+        byte[] HudCmdText(int x, int y, string text)
+        {
+            byte pos = (byte)((y << 5) + (x & 0b00011111));
+            var stringByte = ROM.StringToZ2Bytes(text);
+            byte stringLen = (byte)stringByte.Length;
+            return [0x20, pos, stringLen, .. stringByte];
+        }
+        byte[] HudCmdSymbol(int x, int y, byte[] symbols)
+        {
+            byte pos = (byte)((y << 5) + (x & 0b00011111));
+            var stringByte = symbols;
+            byte stringLen = (byte)stringByte.Length;
+            return [0x20, pos, stringLen, .. stringByte];
+        }
+
+        // VanillaHudCmd1 = $962e
+        /* 20 4A 01 D1              ; magic level (D1 is replaced in code with current level)
+           20 62 0B D1              ; attack level
+           F4 F9                    ; empty tiles (f4) and magic bar M tile (f9)
+           F4 F4 F4 F4 F4 F4 F4 F4  ; replaced in code with full/empty containers
+           FF
+         */
+        // VanillaHudCmd2 = $9641
+        /* 20 52 01 D1              ; life level
+           20 6E 10 
+           F4 F4 F4 F4 F4 F4 F4 F4  ; empty tiles - replaced by life containers in code
+           D0 D0 D0 D0 CE D0 D0 D0  ; XP/NEXT (minus static last 0)
+           FF
+         */
+
+        // static HUD (set on sideview load)
+        ushort staticHudCmdAddr = 0xd0d1;
+        byte[] staticHud = [
+            .. HudCmdText(4, 2, "MAGIC-"),
+            .. HudCmdText(13, 2, "LIFE-"),
+            // .. HudCmdText(26, 2, "NEXT"),
+            .. HudCmdSymbol(1, 3, [0xc9]),  // attack level sword tile (c9)
+            .. HudCmdSymbol(13, 3, [0xf7]), // life bar L tile (f7)
+            .. HudCmdText(30, 3, "0"),      // last level up XP zero (3 bytes trimmed)
+            0x4c, 0x02, 0x03                // link back to PPU macro buffer
+        ];
+        a.Segment("PRG7");
+        a.Org(staticHudCmdAddr);
+        a.Byt(staticHud);
+        a.Free("PRG7", (ushort)(staticHudCmdAddr + staticHud.Length), 0xd0fc);
+
+        // dynamic HUD (new)
+        List<byte> newHudCmd = [];
+
+        byte rightCmdStart = (byte)newHudCmd.Count;
+        newHudCmd.AddRange([.. HudCmdSymbol(23, 2, [])]);
+
+        newHudCmd.AddRange([0x96, 0xf4]);                                 // lives tile (96)
+        byte livesIndex = (byte)(newHudCmd.Count - 1);
+        newHudCmd.Add(0xf4);
+        newHudCmd.AddRange([0xb9, 0xf4]);                                 // key tile (b9)
+        byte keyIndex = (byte)(newHudCmd.Count - 1);
+        newHudCmd.Add(0xf4);
+        newHudCmd.AddRange([0xcd, 0xf4]);                                 // crystal tile (cd)
+        byte crystalIndex = (byte)(newHudCmd.Count - 1);
+
+        byte rightLength = (byte)(newHudCmd.Count - rightCmdStart - 3);
+        newHudCmd[rightCmdStart + 2] = rightLength;
+        newHudCmd.Add(0xff);
+
+        a.Assign("HUD_INCLUDES_KEYS", 1);
+        a.Segment("PRG0");
+        a.Reloc();
+        a.Label("NewHudCmd");
+        a.Byt(newHudCmd.ToArray());
+        a.Assign("NewHudLength", newHudCmd.Count());
+        a.Assign("KeyIndex", keyIndex);
+        a.Assign("LivesIndex", livesIndex);
+        a.Assign("CrystalIndex", crystalIndex);
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import GetItemReturn
+
+.segment "PRG0"
+
+.org $96ff  ; optimized code to make room for our UpdateNewHud hook
+    tax
+    @Loop:
+        dex
+        bmi @Done
+        lda #$c6
+        sta $030c,y
+        iny
+        bne @Loop
+    @Done:
+        jmp UpdateNewHud
+FREE_UNTIL $970e
+
+.reloc
+UpdateNewHud:
+    pla
+    tay
+    dey
+    ldx #$00
+    @CopyLoop:
+        lda NewHudCmd,x
+        sta $0302,y
+        inx
+        iny
+        cpx #NewHudLength
+        bne @CopyLoop
+
+    lda Lives
+    adc #$d0 - 2              ; add offset for digit tile index. -1 since carry is guaranteed to be set from CPX and another -1 since we show remaining lives
+    sta $0302 - (NewHudLength - LivesIndex),y
+
+.if HUD_INCLUDES_KEYS
+    lda Keys
+    adc #$d0                  ; add offset for digit tile index
+    sta $0302 - (NewHudLength - KeyIndex),y
+.endif
+
+    lda Crystals
+    adc #$d0                  ; add offset for digit tile index
+    sta $0302 - (NewHudLength - CrystalIndex),y
+
+@Done:
+    tya
+    pha
+    jmp $970e
+
+; Insert HUD updates
+.segment "PRG7"
+
+.reloc
+FlagHudUpdate:
+    lda HudSectionFlag
+    ora #$80
+    sta HudSectionFlag
+    rts
+.export FlagHudUpdate
+
+.if HUD_INCLUDES_KEYS
+    .org $e7b8  ; update hud when a key is stabbed
+        jmp UpdateHudGetItemReturn
+
+    .reloc
+    UpdateHudGetItemReturn:
+        jsr FlagHudUpdate
+        jmp GetItemReturn
+
+    .org $d9e4  ; update hud when a key is used
+        jsr DecreaseKeysUpdateHud
+
+    .reloc
+    DecreaseKeysUpdateHud:
+        dec Keys
+        jmp FlagHudUpdate
+.endif
+""");
+    }
+
     public void AddCredits(Assembler asm, RandomizerProperties props)
     {
         byte[] CmdText(int x, int y, string text)
@@ -3863,6 +4037,7 @@ CustomMovingNpcDialog:
         rom.AllowForChangingDoorYPosition(engine);
         rom.AllowForChangingElevatorYPosition(engine);
         rom.InstantText(engine);
+        CustomHud(engine, props.UpdatedHud);
         rom.ChangeLavaKillPosition(engine);
         rom.FixItemPickup(engine);
         rom.FixMinibossGlitchyAppearance(engine);

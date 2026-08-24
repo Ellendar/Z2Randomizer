@@ -19,6 +19,8 @@ namespace Z2Randomizer.CommandLine.Models
 
         public bool RemoveFlashingUponDeath { get; set; }
 
+        public bool UpdatedHud { get; set; }
+
         public bool DisableHUDLag { get; set; }
 
         public string? Sprite { get; set; }

@@ -2,6 +2,7 @@
 .include "z2r.inc"
 
 .import SwapPRG, SwapToSavedPRG
+.import FlagHudUpdate
 
 DOT = $cf
 SPACE = $f4
@@ -119,6 +120,7 @@ StatTrackDownStab:
 .reloc
 SaveTimestampForPalace:
     dec $0794
+    jsr FlagHudUpdate
     ldy PalaceNumber
 .ifdef FLUTE_WARP_CLEARED_PALACES
 .import PowersOfTwo
