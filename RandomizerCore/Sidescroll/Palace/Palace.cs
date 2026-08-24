@@ -957,40 +957,6 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             }
         }
     }
-
-    /*
-    public List<Room> CheckBlocks()
-    {
-        return CheckBlocksHelper([], [], Entrance!);
-    }
-
-    private List<Room> CheckBlocksHelper(List<Room> c, List<Room> blockers, Room r)
-    {
-        if (c.Contains(ItemRoom!))
-        {
-            return c;
-        }
-        c.Add(r);
-        if (r.Up != null && !c.Contains(r.Up))
-        {
-            CheckBlocksHelper(c, blockers, r.Up);
-        }
-        if (r.Down != null && !c.Contains(r.Down))
-        {
-            CheckBlocksHelper(c, blockers, r.Down);
-        }
-        if (r.Left != null && !c.Contains(r.Left))
-        {
-            CheckBlocksHelper(c, blockers, r.Left);
-        }
-        if (r.Right != null && !c.Contains(r.Right))
-        {
-            CheckBlocksHelper(c, blockers, r.Right);
-        }
-        return c;
-    }
-    */
-
     public void ResetRooms()
     {
         foreach (Room r in AllRooms)
@@ -1255,6 +1221,27 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             replacementIndexCandidates.FisherYatesShuffle(r);
         }
         ItemRooms[replacementIndexCandidates[0]].Collectable = replacement;
+        return true;
+    }
+
+    public void SetCollectables(IEnumerable<Collectable> collectables)
+    {
+        Debug.Assert(collectables.Count() == ItemRooms.Count);
+        int i = 0;
+        foreach (Collectable collectable in collectables)
+        {
+            ItemRooms[i++].Collectable = collectable;
+        }
+    }
+
+    public bool ReplaceCollectable(Collectable toReplace, Collectable replacement)
+    {
+        Room? room = ItemRooms.FirstOrDefault(i => i.Collectable == toReplace);
+        if (room == null)
+        {
+            return false;
+        }
+        room.Collectable = replacement;
         return true;
     }
 

@@ -1500,7 +1500,6 @@ public sealed class WestHyrule : World
         sb.AppendLine("Saria: \n" + sariaNorth.Town!.GenerateSpoiler());
         sb.AppendLine("Mido: \n" + mido.Town!.GenerateSpoiler());
         sb.AppendLine("Bagu: \n" + bagu.Town!.GenerateSpoiler());
-
         sb.AppendLine("\tMagic Container Cave: " + magicContainerCave.GetAllCollectables()[0].EnglishText());
         sb.AppendLine("\tTrophy Cave: " + trophyCave.GetAllCollectables()[0].EnglishText());
         sb.AppendLine("\tGrass Tile: " + grassTile.GetAllCollectables()[0].EnglishText());

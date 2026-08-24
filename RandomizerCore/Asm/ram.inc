@@ -1,3 +1,40 @@
+.ifndef _Z2R_RAMMAP_INC
+_Z2R_RAMMAP_INC = 1
+
+
+; janky macro res till it starts working
+.macro SET_RES_BASE addr
+    RES_BASE .set addr
+    RES_OFFSET .set 0
+.endmacro
+
+.macro RESV name, size
+    .ident(.string(name)) = RES_BASE + RES_OFFSET
+    .ifnblank size
+        RES_OFFSET .set RES_OFFSET + size
+    .else
+        RES_OFFSET .set RES_OFFSET + 1
+    .endif
+.endmacro
+
+; compile time array definition
+.macro DEFINE_ARRAY name
+    .macro .ident(.concat(.string(name), "_APPEND")) value
+        .local temp
+        .define temp name
+        .undefine name
+        .ifblank temp
+            .define name value
+        .else
+            .define name temp, value
+        .endif
+        .undefine temp
+    END_MAC
+
+    .define name
+.endmacro
+.define END_MAC .endmacro
+
 ; Define low zero page addresses even if they're not well-defined
 ; so they will have debug info precedence over other constants
 zp_00 = $00                              ; LSB of general-purpose pointer
@@ -25,12 +62,12 @@ LinkScreenX = $15                        ; Link's X position on the screen (not 
 LinksShadowScreenX = $16
 LinkStanding = $17                       ; 0 = Link in ducked shield position, 1 = Link standing
 DarkLinkStanding = $18                   ; 0 = Dark Link ducking, 1 = Dark Link standing
-LinkYPositionHi = $19                    ; [SS] 0 = Invisible, 1 = Normal, 2-FF = Fall in hole   - [FILE] Cursor position
-Enemy0YPositionHi = $1a                  ; [SS] 0 = Enemy0 off the top of the screen, 1 = Normal - [FILE] Save file presence bits
+LinkYPositionHi = $19                    ; 0 = Invisible, 1 = Normal, 2-FF = Fall in hole   - [FILE] Cursor position
+Enemy0YPositionHi = $1a                  ; 0 = Enemy0 off the top of the screen, 1 = Normal - [FILE] Save file presence bits
 Enemy1YPositionHi = $1b
 Enemy2YPositionHi = $1c
 Enemy3YPositionHi = $1d
-Enemy4YPositionHi = $1e                  ; [SS] 0 = Enemy4 off the top of the screen, 1 = Normal - [FILE] File selection cursor
+Enemy4YPositionHi = $1e                  ; 0 = Enemy4 off the top of the screen, 1 = Normal - [FILE] File selection cursor
 Enemy5YPositionHi = $1f
 Enemy0Condition = $20
 Enemy1Condition = $21
@@ -42,12 +79,15 @@ OverworldStepCounter = $26
 VramAddrHi = $27
 VramAddrLo = $28
 LinkYPos = $29
+EnemyYPositionLo = $2a
 Enemy0YPositionLo = $2a
+OverworldEnemyYPosition = $2a            ; base of overworld demon Y world position array, indexed by slot X
 Enemy1YPositionLo = $2b
 Enemy2YPositionLo = $2c
 Enemy3YPositionLo = $2d
 Enemy4YPositionLo = $2e
 Enemy5YPositionLo = $2f
+ProjectileYPosition = $30
 Projectile0YPosition = $30
 Projectile1YPosition = $31
 Projectile2YPosition = $32
@@ -60,6 +100,7 @@ EndingDisplayTileY0 = $38
 LinkSwordYBreakableBlockAdjusted = $39   ; [SS] Link's sword hitbox Y as used for breakable blocks - [Ending] Y of tile 1 in ending sequence
 EndingDisplayTileY2 = $3a
 LinkXPositionHi = $3b                    ; [SS] Which page of the room Link is in                  - [Ending] X of tile 0 in ending sequence
+EnemyXPositionHi = $3c
 Enemy0XPositionHi = $3c                  ; [SS] Which page of the room Enemy0 is in                - [Ending] X of tile 1 in ending sequence
 Enemy1XPositionHi = $3d                  ; [SS] Which page of the room Enemy1 is in                - [Ending] X of tile 2 in ending sequence
 Enemy2XPositionHi = $3e
@@ -77,8 +118,11 @@ LinkProjectile1XPositionHi = $49
 zp_4a = $4a                              ; Unused? (Likely leftover of Link having 3 projectiles)
 LinkSwordBreakableBlockAdjusted = $4b
 zp_4c = $4c                              ; Unused?
+LinkXPosition   = $4d
 LinkXPositionLo = $4d
+EnemyXPositionLo  = $4e
 Enemy0XPositionLo = $4e
+OverworldEnemyXPosition = $4e            ; base of overworld demon X world position array, indexed by slot X
 Enemy1XPositionLo = $4f
 Enemy2XPositionLo = $50
 Enemy3XPositionLo = $51
@@ -115,10 +159,10 @@ zp_6f = $6f                              ; Unused?
 LinkXVelocity = $70
 Enemy0XVelocity = $71
 Enemy1XVelocity = $72
-OverworldYPosition = $73                 ; [SS] Enemy2XVelocity - [OW] OverworldYPosition
-OverworldXPosition = $74                 ; [SS] Enemy3XVelocity - [OW] OverworldXPosition
-OverworldLinkYPosition = $75             ; [SS] Enemy4XVelocity - [OW] OverworldLinkYPosition
-OverworldLinkXPosition = $76             ; [SS] Enemy5XVelocity - [OW] OverworldLinkXPosition
+OverworldYPosition = $73                 ; Enemy2XVelocity / OverworldYPosition
+OverworldXPosition = $74                 ; Enemy3XVelocity / OverworldXPosition
+OverworldLinkYPosition = $75             ; Enemy4XVelocity / OverworldLinkYPosition
+OverworldLinkXPosition = $76             ; Enemy5XVelocity / OverworldLinkXPosition
 Projectile0XVelocity = $77
 Projectile1XVelocity = $78
 Projectile2XVelocity = $79
@@ -127,17 +171,21 @@ Projectile4XVelocity = $7b
 Projectile5XVelocity = $7c
 LinkProjectile0XVelocity = $7d
 LinkProjectile1XVelocity = $7e
-OverworldYScroll = $7f
+zp_7f = $7f
+OverworldScrollY = $7f                   ; camera Y scroll offset; screen Y = world_Y - OverworldScrollY
 LinkAnimationFrame = $80
+OverworldCurrentSlot = $80              ; current overworld demon slot index during per-frame processing (0-7)
 Enemy0AnimationFrame = $81
-OverworldEnemy0Type = $82                ; [SS] Enemy1AnimationFrame - [OW] OverworldEnemy0Type, 1 = Weak, 2 = Strong, 3 = Fairy
-OverworldEnemy1Type = $83                ; [SS] Enemy2AnimationFrame - [OW] OverworldEnemy1Type
-OverworldEnemy2Type = $84                ; [SS] Enemy3AnimationFrame - [OW] OverworldEnemy2Type
-OverworldEnemy3Type = $85                ; [SS] Enemy4AnimationFrame - [OW] OverworldEnemy3Type
-OverworldEnemy4Type = $86                ; [SS] Enemy5AnimationFrame - [OW] OverworldEnemy4Type
-Projectile0Type = $87                    ; [SS] Projectile0Type - [OW] OverworldEnemy5Type
-Projectile1Type = $88                    ; [SS] Projectile1Type - [OW] OverworldEnemy6Type
-Projectile2Type = $89                    ; [SS] Projectile2Type - [OW] OverworldEnemy7Type
+OverworldEnemy0Type = $82                ; Enemy1AnimationFrame / OverworldEnemy0Type, 1 = Weak, 2 = Strong, 3 = Fairy
+OverworldEnemy1Type = $83                ; Enemy2AnimationFrame / OverworldEnemy1Type
+OverworldEnemy2Type = $84                ; Enemy3AnimationFrame / OverworldEnemy2Type
+OverworldEnemy3Type = $85                ; Enemy4AnimationFrame / OverworldEnemy3Type
+OverworldEnemy4Type = $86                ; Enemy5AnimationFrame / OverworldEnemy4Type
+ProjectileType = $87
+Enemy_Flag = ProjectileType
+Projectile0Type = $87                    ; Projectile0Type / OverworldEnemy5Type
+Projectile1Type = $88                    ; Projectile1Type / OverworldEnemy6Type
+Projectile2Type = $89                    ; Projectile2Type / OverworldEnemy7Type
 Projectile3Type = $8a
 Projectile4Type = $8b
 Projectile5Type = $8c
@@ -161,6 +209,7 @@ SpriteShuffleOffsetLinkProjectile0 = $9d
 SpriteShuffleOffsetLinkProjectile1 = $9e
 DpadHorizontalState = $9f                ; 1 = Right, 2 = Left
 LinksShadowFacingDirection = $a0         ; Link's Shadow's facing direction when his shadow is displayed during a boss explosion and during the final battle
+EnemyType  = $a1
 Enemy0Type = $a1                         ; Enemy (Elevator) slot
 Enemy1Type = $a2                         ; Enemy (Locked door) slot
 Enemy2Type = $a3
@@ -168,6 +217,7 @@ Enemy3Type = $a4
 Enemy4Type = $a5
 Enemy5Type = $a6                         ; Enemy (Boss) slot
 LinkCollisionBits = $a7                  ; 0000ABLR (above, below, left, right)
+EnemyState = $a8
 Enemy0State = $a8
 Enemy1State = $a9
 Enemy2State = $aa
@@ -194,6 +244,7 @@ Enemy2Persistence = $be
 Enemy3Persistence = $bf
 Enemy4Persistence = $c0
 Enemy5Persistence = $c1
+EnemyHP = $c2
 Enemy0HP = $c2
 Enemy1HP = $c3
 Enemy2HP = $c4
@@ -260,6 +311,19 @@ PpuTextLength = $0304
 PpuTextData = $0305
 PpuBuffer2Length = $0362
 
+Sprite_Y_Position = $200
+Sprite_Tilenumber = $201
+Sprite_Attributes = $202
+Sprite_X_Position = $203
+Sprite_Data = Sprite_Y_Position
+
+
+BUFFER_OFF = $0301
+PPUADDR_HI = $0302
+PPUADDR_LO = $0303
+BUFFER_LEN = $0304
+BUFFER_DAT = $0305
+
 LinkXSubpixel = $03d6
 Enemy0XSubpixel = $03d7
 Enemy1XSubpixel = $03d8
@@ -268,6 +332,18 @@ Enemy3XSubpixel = $03da
 Enemy4XSubpixel = $03db
 Enemy5XSubpixel = $03dc
 LinkYVelocityLo = $03e6
+
+; This is where the buffers for breaking blocks are stored in vanilla. We increase the number of blocks that can be broken
+; at the same time by expanding the number of blocks here, and then moving the extra fields to a different location in
+; stack ram
+; Expanded the block break list to hold up to 10 bricks at a time instead of just 5
+BREAKABLE_BLOCK_COUNT = 10
+RelocatedRAMBase = $041A
+SET_RES_BASE RelocatedRAMBase
+RESV BlockBreakState, BREAKABLE_BLOCK_COUNT ; Vanilla addr $041a - bits 0-6 = timer; bit 7 set = step block. $00 means no brick breaking
+RESV BlockBreakMapPage, BREAKABLE_BLOCK_COUNT ; Vanilla addr $041F - Nametable select for the PPUADDR
+RESV BlockBreakXCoord, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0424 - X Low Byte for collision table
+.assert RES_BASE + RES_OFFSET < $043E
 
 LinkSwordAttackFrame = $0400
 Enemy0HitState = $040e
@@ -287,12 +363,18 @@ timer_501 = $0501                        ; $501 through $50d are timers that are
 LinkEntrySlideTime = $0503
 SwordAttackTimer = $050a
 InjuryTimer = $050c
+OverworldDemonTimer = $050e              ; overworld demon active flag/timer, indexed by slot X; non-zero = active
 EncounterSpawnTimer = $0516
 RNG = $051b
 MapNumber = $0561
+OverworldFacingDirection = $0562         ; Link's facing direction: $01=right, $02=left, $04=down, $08=up
+OverworldFacingTerrain = $0563           ; terrain type Link is currently facing
 TownNumber = $056b
 PalaceNumber = $056c                     ; [Z2R] Current post-shuffle palace number (1-7); [Z2] Palace index in continent (0-2)
+OverworldDemonYVelocity = $056d          ; overworld demon Y velocity, indexed by slot X (signed: $01=down, $FF=up)
+OverworldDemonXVelocity = $0575          ; overworld demon X velocity, indexed by slot X (signed: $01=right, $FF=left)
 LinkYVelocityHi = $057d
+EnemyYVelocity = $057e
 Enemy0YVelocity = $057e
 TownfolkTimer0 = $05bd
 TownfolkTimer1 = $05be
@@ -312,10 +394,13 @@ LargeDropCount = $05e0
 OverworldStepCounterHi = $06e0           ; [Z2R] Used for halved encounter rate to only trigger encounters every other time the steps are reached
 
 Lives = $0700
+NumberofLives = $0700
 EntryFacing = $0701                      ; Sideview entry facing direction. 0=Facing right (enter from the left), 1=Facing left (enter from the right)
 EnterFromElevatorAbove = $0704           ; >0 Link enters the room from the top
 EnterCentered = $0705                    ; >0 Link enters centered; like at North Palace, taking an elevator exit or entering a random encounter
 RegionNumber = $0706                     ; 0=West, 1=Death Mountain, 2=East, 3=Maze Island
+GoingOutsideFlag = $0709                 ; non-zero routes game mode 0 (load area data) out to the overworld via go_outside
+PreviousRegion = $070a                   ; RegionNumber Link came from
 WorldNumber = $0707                      ; 0=Caves & enemy encounters, 1=West towns, 2=East towns, 3=Palace 1/2/5, 4=Palace 3/4/6, 5=Great Palace
 PreviousRegionNumber = $070a             ; [Z2R] Unused; made obsolete by FixContinentTransitions; [Z2] PreviousRegionNumber
 PalaceChrBank2 = $070b                   ; [Z2R] Unused; [Z2] Written as CHR bank * 2 but never read
@@ -329,6 +414,15 @@ ScrollLeftPage = $072a                   ; Which page the left-most pixel of the
 ScrollRightPage = $72b
 ScrollLeftX = $072c
 ScrollRightX = $072d
+ScrollLock = $0728
+ScreenLeft_PageLoc = $72a
+ScrollPage = $072a                       ; Which page the left-most pixel of the screen is on (0-3)
+ScreenRight_PageLoc = $72b
+ScreenEdge_PageLoc = ScreenLeft_PageLoc
+ScreenLeft_X_Pos = $72c
+ScreenRight_X_Pos = $72d
+ScreenEdge_X_Pos = ScreenLeft_X_Pos
+ScrollX = $072c
 SideviewCommandY = $0730
 SideviewCommandOp = $0731
 UpdateScrollColumnLeftPage = $0732
@@ -356,7 +450,7 @@ EnterAreaFlag = $075f                    ; Set to 1 when entering a screen cente
 CurrentPrgBank = $0769
 GameEvent = $076c                        ; 0=Restart with full lives, 1=Main game loop, 2=Link dying, 3=Wake up Zelda, 4=Roll credits, 06=Show lives left then restart the scene
 GameEventCurrent = $076d                 ; GameEvent is compared to this and only triggered if it has changed
-CurrentChrBank = $076e
+CurrentCHRBank = $076e
 FireSpellActive = $076f                  ; 0x10 = Fire spell active
 ExpForNextLevelHi = $0770
 ExpForNextLevelLo = $0771
@@ -386,7 +480,7 @@ HaveFlute = $0789
 HaveCross = $078a
 HaveHammer = $078b
 HaveMagicKey = $078c
-Crystal1Placed = $078d
+Crystal1Placed = $078d                   ; crystal-placed flags, unused in randomizer
 Crystal2Placed = $078e
 Crystal3Placed = $078f
 Crystal4Placed = $0790
@@ -401,6 +495,8 @@ HaveBagusNoteAndMedicine = $079a         ; 0x08 = Bagu's Note | 0x40 = Medicine
 HaveWater = $079b                        ; 1 = Have Water
 HaveChild = $079c                        ; 0x20 = Have Child
 HaveBasementAccess = $079d               ; 0x08 = Have New Kasuto Basement access
+; Bitlist of palaces cleared/towns visited/etc for flute warp mode
+FluteWarpFlags = $079e
 ContinuesUsed = $079f
 
 ; New variables that use free memory
@@ -410,8 +506,297 @@ BackgroundTilesPage1 = $6000
 BackgroundTilesPage2 = $60d0
 BackgroundTilesPage3 = $61a0
 BackgroundTilesPage4 = $6270
+; These are new variables that use free memory
+Z2Noise_SfxLenCounter = $07f5
+Z2Squ2_SfxLenCounter = $07f7
+Z2Squ1_SfxLenCounter = $07f9
+Z2NoiseSoundBuffer = $07fd
+Z2Square2SoundBuffer = $07fe
+Z2Square1SoundBuffer = $07ff
 
 SavedDoorExit1ScrollPage = $69aa         ; accessed as $69a5,X with X = 5
 SavedDoorExit1ScrollX = $69b1            ; accessed as $69ac,X with X = 5
 SavedDoorExit2ScrollPage = $69ab         ; used for New Kasuto fireplace
 SavedDoorExit2ScrollX = $69b2
+
+; LocationNumber will later be changed to the side-scrolling location
+; index. z2ft needs this, at this specific address.
+AreaEntranceIndex = $69ff
+
+; We need a horizontal IRQ for gameplay and a vertical IRQ for the title screen
+; so we manage to keep both by making a small `jmp Irq` in sram
+IRQTrampoline = $7ffd
+IRQTrampolineAddrLo = $7ffe
+IRQTrampolineAddrHi = $7fff
+
+; All Timestamp types listed below for reference
+TS_COUNT .set 0
+.macro TimestampId name
+.ident(.string(name)) = TS_COUNT
+TS_COUNT .set TS_COUNT + 1
+.endmacro
+
+TimestampId TsGlove
+TimestampId TsRaft
+TimestampId TsBoots
+TimestampId TsHammer
+TimestampId TsJumpSpell
+TimestampId TsFairySpell
+TimestampId TsReflectSpell
+TimestampId TsThunderSpell
+TimestampId TsPalace1
+TimestampId TsPalace2
+TimestampId TsPalace3
+TimestampId TsPalace4
+TimestampId TsPalace5
+TimestampId TsPalace6
+TimestampId TsPalaceGP
+TimestampId TsTowns
+
+
+;; NEW VARIABLE ALLOCATIONS
+; Stack RAM
+StackRAMBase = $0120
+SET_RES_BASE StackRAMBase
+RESV temp_room_code ; , $0120
+RESV temp_room_flag ; , $0121
+RESV DontKillEnemyFlag ; , $0122
+RESV Global5050JarDrop ; = $123 ; $0123
+RESV PreventDoubleLag
+RESV PreviousFrameMetasprite
+RESV StatDisplayState
+RESV InternalState
+RESV GameComplete ; set when you beat the game to stop the timers
+RESV ElevatorYStart
+RESV DripperRedCounter
+RESV PpuCtrlForIrq
+RESV ScrollPosForIrq
+RESV IrqSetupAlready
+RESV ProjectileProcessing
+RESV PendingAudioCall ; 1=audio running on main thread, 0=NMI decremented it (needs re-run)
+RESV BlockBreakYCoord, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0429 - Y Low byte for collision table
+RESV BlockBreakColumnOffset, BREAKABLE_BLOCK_COUNT ; Vanilla addr $042E - Offset in the collision table
+RESV BlockBreakAddrLo, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table lo addr
+RESV BlockBreakAddrHi, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0433 - Collision table hi addr
+
+; global palace slot of last dungeon Link entered or warped to
+RESV TwisterCurrentPalaceSlot
+; Nonzero if we are changing continents with the warp and need to reload it
+RESV TwisterPendingPalaceLocation
+
+.ifdef ENABLE_Z2_MARIO
+
+; New RAM values that aren't from vanilla SMB1 code
+RESV mapMarioIndex
+RESV mapMarioTimer
+RESV mapMarioPrevDirection
+
+;;;
+; MARIO related values that are not directly mapped to vanilla z2 object values
+
+ObjectOffset = $10
+; RESV FBall_OffscreenBits
+; RESV AltEntranceControl
+; RESV PlayerEntranceCtrl
+; RESV JoypadOverride
+; RESV Vine_Height
+RESV PlayerChrBank
+RESV Player_State
+; RESV DisableCollisionDet
+RESV GameEngineSubroutine
+; RESV AreaType
+; RESV A_B_Buttons
+A_B_Buttons = $741
+RESV PreviousA_B_Buttons
+; RESV Left_Right_Buttons
+Left_Right_Buttons = $742
+; RESV Up_Down_Buttons
+Up_Down_Buttons = $743
+RESV PlayerSize
+; RESV DeathMusicLoaded
+RESV EventMusicQueue
+RESV EventMusicBuffer ; TODO use the vanilla music queues
+; RESV WarpZoneControl
+RESV Player_CollisionBits ; Split Z2 and SMB1 collision bits
+; RESV HalfwayPage
+;RESV SwimmingFlag
+SwimmingFlag = $13
+RESV CurrentOAMOffset
+; RESV ObjectMetasprite
+RESV PlayerAnimCtrl
+RESV PlayerChangeSizeFlag
+RESV VerticalForceDown
+RESV VerticalForce
+RESV JumpOrigin_Y_Position
+RESV JumpOrigin_Y_HighPos
+RESV DiffToHaltJump
+RESV PlayerAnimTimerSet
+RESV JumpspringAnimCtrl
+RESV Player_XSpeedAbsolute
+; RESV Whirlpool_Flag
+RESV RunningSpeed
+RESV MaximumLeftSpeed
+RESV MaximumRightSpeed
+RESV FrictionAdderLow
+RESV FrictionAdderHigh
+RESV Player_Pos_ForScroll
+RESV Player_X_Scroll
+RESV Player_X_MoveForce
+RESV PlayerStandingMetatile ; added to keep this for door checks and other metatiles
+RESV PlayerIsDownstabbing ; Simplify downstab checks by just storing if we set the hitbox
+
+; Non-timer timer.
+RESV FireballThrowingTimer
+
+RESV TimerControl
+RESV IntervalTimerControl
+
+Timers = PlayerAnimTimer
+RESV PlayerAnimTimer
+RESV ClimbSideTimer
+RESV JumpSwimTimer
+RESV RunningTimer
+RESV SideCollisionTimer
+; RESV BlockBounceTimer
+RESV StarInvincibleTimer
+FRAME_TIMER_COUNT = StarInvincibleTimer - Timers
+ALL_TIMER_COUNT = StarInvincibleTimer - Timers
+
+RESV SpriteShuffleOffset
+;RESV CurrentCHRBank
+RESV ReloadCHRBank
+RESV ObjectVerticalFlip
+RESV Local_eb
+; Used by hammers to track how long they've been alive
+RESV PlayerProj_Cnt, 2
+
+; Values use for SMB1 sfx audio engine
+
+RESV Sfx_SecondaryCounter
+; RESV PauseSoundBuffer
+; RESV PauseModeFlag
+; RESV PauseSoundQueue
+RESV Square1SoundBuffer
+RESV Square2SoundBuffer
+RESV NoiseSoundBuffer
+RESV Squ1_SfxLenCounter
+RESV Squ2_SfxLenCounter
+RESV Noise_SfxLenCounter
+RESV TailWag_CtlHold
+RESV TailWag_FreqLo
+RESV TailWag_FreqHi
+; have to keep this separate from the tail wag since they can proc at the same time
+RESV Poof_CtlHold
+
+RESV JustThrownHammer
+RESV TailSwingTimer
+RESV TailWagCount
+; Not in the standard timer place so we can tick it down manually
+RESV StatueTimer
+; duration for specifically the poof effect timer
+RESV StatueChangeTimer
+; Mario-only scroll freeze for shrinking/growing and tanooki statue.
+; Originally I used the Z2 scroll freeze, but that meant that turning into a
+; statue could cause a boss to start attacking since bosses start once the
+; screen is locked lol
+RESV MarioScrollFreeze
+; We need to surpress enemy knockback when they are hit by a hammer
+; but the place we process the knockback is way later, so this stores "hits"
+; on a per-enemy basis so that we can avoid knockback.
+RESV HammerHitFlag, 6
+
+; Shadow Mario Boss RAM
+CUSTOM_BOSS_START = RES_OFFSET
+RESV boss_animation
+RESV boss_invincibility_timer
+RESV boss_screech
+RESV boss_state
+RESV boss_state_timer
+RESV boss_walking_anim
+RESV boss_bridge
+RESV boss_shootanim
+RESV boss_substate
+RESV boss_counter
+RESV boss_freeze
+RESV boss_ChrBank
+RESV boss_transition_delay      ; nonzero = boss is paused mid-state-switch (frames remaining)
+BOSS_RAM_SIZE = RES_OFFSET - CUSTOM_BOSS_START - 1
+
+; After a boss dies, the game renders a shadow during the flashing animation
+; and this is our custom value to say "hey its time to copy the mario sprites"
+; and also doubles as the direction to cast the shadow.
+RESV MarioShadowXOffset
+
+EnemyProjectileOffset = 7
+EnemyProjectileType        = ObjectMetasprite     + EnemyProjectileOffset
+EnemyProjectile_X_Position = SprObject_X_Position + EnemyProjectileOffset
+EnemyProjectile_Y_Position = SprObject_Y_Position + EnemyProjectileOffset
+EnemyProjectile_PageLoc    = SprObject_PageLoc    + EnemyProjectileOffset
+EnemyProjectile_Y_HighPos  = SprObject_Y_HighPos  + EnemyProjectileOffset
+EnemyProjectile_X_Speed    = SprObject_X_Speed    + EnemyProjectileOffset
+EnemyProjectile_Y_Speed    = SprObject_Y_Speed    + EnemyProjectileOffset
+EnemyProjectile_SprAttrib  = SprObject_SprAttrib  + EnemyProjectileOffset
+ENEMY_PROJECTILE_COUNT     = 6
+
+; MARIO SPECIFIC RAM LOCATIONS
+; These are values that are hardcoded to match where Zelda 2 places them
+Player_X_Speed = $70
+SprObject_X_Speed = Player_X_Speed
+Player_X_Position = $4D
+SprObject_X_Position = Player_X_Position
+Player_PageLoc = $3B
+SprObject_PageLoc = Player_PageLoc
+Player_Y_Position = $29
+SprObject_Y_Position = Player_Y_Position
+Player_Y_HighPos = $19
+SprObject_Y_HighPos = Player_Y_HighPos
+
+;Player_CollisionBits = $A7
+ScrollAmount = $14
+ObjectMetasprite = $80
+
+ProjectileOffset = 13
+FireballOffset = 13
+FireballMetasprite = ObjectMetasprite + FireballOffset
+Fireball_X_Position = SprObject_X_Position + FireballOffset
+Fireball_Y_Position = SprObject_Y_Position + FireballOffset
+Fireball_Y_HighPos = SprObject_Y_HighPos + FireballOffset
+Fireball_PageLoc = SprObject_PageLoc + FireballOffset
+Fireball_X_Speed = SprObject_X_Speed + FireballOffset
+Fireball_Y_Speed = SprObject_Y_Speed + FireballOffset
+RESV FireballBouncingFlag, 2
+RESV Fireball_State, 2
+
+EnemyOffset = 1   ; Enemy slot 0 = offset 1 from player
+Enemy_X_Position  = SprObject_X_Position + EnemyOffset
+Enemy_Y_Position  = SprObject_Y_Position + EnemyOffset
+Enemy_X_Speed     = SprObject_X_Speed + EnemyOffset
+Enemy_PageLoc     = SprObject_PageLoc + EnemyOffset
+Enemy_Y_HighPos   = SprObject_Y_HighPos + EnemyOffset
+Enemy_MovingDir   = Player_MovingDir + EnemyOffset
+Enemy_State       = $A8
+
+
+; For reasons I cannot explain, player_x_moveforce is not the same as sprobject_x_moveforce
+SprObject_X_MoveForce = $03d6 ; Player_X_MoveForce
+Player_Y_MoveForce = $03e6
+SprObject_Y_MoveForce = Player_Y_MoveForce
+Enemy_X_MoveForce = SprObject_X_MoveForce + EnemyOffset
+Enemy_Y_MoveForce = SprObject_Y_MoveForce + EnemyOffset
+
+Player_Y_Speed = $057D
+SprObject_Y_Speed = Player_Y_Speed
+Enemy_Y_Speed     = SprObject_Y_Speed + EnemyOffset
+
+; CrouchingFlag = $17
+RESV CrouchingFlag
+Player_MovingDir = $5F
+Fireball_MovingDir = $6D
+PlayerFacingDir = $9F
+EnemyFacingDir = $A0
+SavedJoypadBits = $F7
+
+.assert RES_BASE + RES_OFFSET < $01bd
+.endif ; ENABLE_Z2_MARIO
+
+.endif ; _Z2R_RAMMAP_INC

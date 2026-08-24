@@ -23,7 +23,7 @@ FREE "PRG7" [$FEDE, $FFDC)
 .org $fffa
     .word Nmi
 .org $fffe
-	.word IrqHdlr
+	.word IRQTrampoline
 
 bank7_code0 = $c000
 bank7_Remove_All_Sprites = $d24c
@@ -106,7 +106,6 @@ SetupScanlineIRQ:
 .proc IrqHdlr
 	pha
 	lda LineIrqStatusReg
-	
 	lda PpuCtrlForIrq
 	sta PPUCTRL
 	sta PpuCtrlShadow ; Not sure about this
@@ -119,6 +118,24 @@ SetupScanlineIRQ:
 	rti
 .endproc ; IrqHdlr
 
+; We have two different IRQ routines, one for the X only split, and one for the Y only split
+; when loading into a save file, setup the X only split for gameplay.
+.segment "PRG5"
+.org $b2b6
+    jsr LoadMainIRQRoutineHandler
+.reloc
+LoadMainIRQRoutineHandler:
+    sta $0772
+    ; write JMP IrqHdlr to RAM
+    lda #$4c
+    sta IRQTrampoline
+    lda #<IrqHdlr
+    sta IRQTrampolineAddrLo
+    lda #>IrqHdlr
+    sta IRQTrampolineAddrHi
+    rts
+
+.segment "PRG7"
 ; Summary of the bug
 ; On a lag frame NMI is skipped, which means the hud scroll value of 0 isn't set
 ; We can work around this by never disabling NMI and using a soft disable instead
@@ -133,6 +150,7 @@ LagFrameVar = $100
 .else
     UpdateSound = $9000
 .endif
+UpdateTitleScreenSound = $800a
 
 .segment "PRG6"
 
@@ -201,16 +219,19 @@ HandleLagFrame:
 ;        bne @loop
     jsr SetupScanlineIRQ
 @HandleAudio:
-    ; Skip processing audio during a real lag frame since thats what
-    ; vanilla accomplishes with a hard disabled NMI
-    lda SoftDisableNmi
-    bne @skip
-        jsr UpdateSound
-@skip:
-    rts
+    lda PendingAudioCall
+    beq @RunAudio
+        ; Audio is currently running on the main thread; signal it to re-run after
+        dec PendingAudioCall
+@TitleScreenSoSkip:
+        rts
+@RunAudio:
+    ; Run title screen music if we are in the title screen instead
+    bit LagFrameVar
+    bvc @TitleScreenSoSkip
+    jmp UpdateSound
 
 .segment "PRG7"
-
 .reloc
 RunAudioFrameOrLagFrame:
     pha
@@ -244,6 +265,8 @@ RunAudioFrameOrLagFrame:
     pla
     rti
 
+.segment "PRG7"
+
 ; Disable the final sta PPUCTRL in NMI if we handle that in the IRQ instead
 .org $C1B1
     jmp *+3
@@ -270,7 +293,6 @@ Nmi:
 .assert * = $C085
 
 ; Also run the stat timers during the title/menu in case they push the reset button
-.pushseg
 .segment "PRG5"
 .org $A612
     ; Change this from and #$7c to $fc to keep NMI running
@@ -295,9 +317,8 @@ IncStatTimerTitle:
     sta SoftDisableNmi
     ora $0747
     rts
-.popseg
 
-
+.segment "PRG7"
 ; Add a patch to increment the stat timer every NMI
 ; This is cleared when a new save file is loaded for the first time
 .reloc
@@ -547,7 +568,8 @@ bank1f_reset:
 	sta PrgBankEReg
 	jmp bank1f_reset_part2
 
-.org $fffc
+.org $fffa
+    .word (Bank1f_Nmi)
     .word (bank1f_reset)
 	.word (bank1f_reset)
 
@@ -598,7 +620,10 @@ SwapCHR:
     ; 1kb sprite banks are 20-27 and the 1kb bg banks are 28-2b
     asl
     asl
+.ifndef ENABLE_Z2_MARIO
+    ; do NOT change the first sprite bank since thats controlling the mario graphics
     sta SpChrBank0Reg
+.endif
     adc #1
     sta SpChrBank1Reg
     adc #1
@@ -705,6 +730,8 @@ ClearStackRAM:
 ;;;;; Fix sword flashing on title screen bug
 ; Switch the OAM position of an unused sprite and the glitchy sword tile
 ; and move that just off to the left. This sprite just doesn't seem to glitch?
+; We have an entire custom title screen in z2mario so just ignore this whole thing
+.ifndef ENABLE_Z2_MARIO
 
 .org $A7C1 + 22 * 4
     .byte $80,$E8,$20,$70
@@ -720,6 +747,8 @@ ClearStackRAM:
     lda $0267 + 4,x
     and #$23
     sta $0267 + 4,x
+
+.endif ; ENABLE_Z2_MARIO
 
 .segment "PRG7"
 ; Update the pointers to the bank switches
@@ -737,6 +766,74 @@ UPDATE_REFS SwapToPRG0 @ $DFD9 $DFE2 $DFF6 $DFFF $E017 $E022 $E02B $E077 $E1E4 $
 UPDATE_REFS SwapToSavedPRG @ $E002
 
 .endif
+
+
+; Clear a ton of free space out of the fixed bank by banking ganon's laugh sfx
+; its only used during a scene thats otherwise doing nothing special, so we can
+; cheese it out using mmc5's ability to bank $e000.
+.segment "PRG7"
+
+.org $CA72
+    lda #$80
+    sta SoftDisableNmi
+	lda #$ff ; place the final bank in
+	sta PrgBankEReg
+    jmp GanonLaughingTeeHee
+SwapBackFromBank1f:
+	sta PrgBankEReg
+    jmp $CF05
+.assert * <= $CA85
+
+.segment "PRG1F"
+.reloc
+Bank1f_Nmi:
+    inc StatTimer
+    bne @skip
+        inc StatTimer+1
+        bne @skip
+            inc StatTimer+2
+@skip:
+    pha
+    lda $FE
+    sta PPUMASK
+    pla
+    rti
+.reloc
+GanonLaughingTeeHee:
+    lda #0
+    sta $0488 ; clear the default menu selection option
+    sta $0726
+	lda #(6*2) | PRG_BANK_ROM
+	sta PrgBank8Reg
+    lda #(6*2+1) | PRG_BANK_ROM
+	sta PrgBankAReg
+    ; re-enable bg rendering only
+    lda $FE
+    ora #$08
+    ora $0768
+    sta $FE
+@loop:
+    ; Wait for NMI each frame
+    lda StatTimer
+@WaitForNMI:
+    cmp StatTimer
+    beq @WaitForNMI
+	jsr UpdateSound
+    jsr $D346 ; bank7_Controllers_Input ; this is in $d000 so its safe
+    lda $F7
+    and #$10
+    bne @donewaiting
+    lda $0501
+    beq @donewaiting
+        dec $0501
+        jmp @loop
+@donewaiting:
+    ldx #1
+    stx $07EE ; set to skip to the last sfx
+    dex
+    stx SoftDisableNmi
+	lda #((7*2 + 1) | PRG_BANK_ROM); place the final bank in
+    jmp SwapBackFromBank1f
 
 .segment "PRG0"
 
@@ -849,7 +946,6 @@ LoadAreaBGMetatile:
     ; switch back to 0 just in case
     jmp SwapToPRG0
 
-
 ; Move sprites out of the last fixed bank
 ; Instead of using the blank tile sprites to cover the right 8px on the overworld, just use
 ; any other full color sprite (since the palette is all black this is fine)
@@ -873,3 +969,18 @@ LoadAreaBGMetatile:
 SetupScrollSplitEarly:
     jsr SetupScanlineIRQ
     jmp SwapToPRG0
+
+; Update the number of slots available for breaking bricks from 5 to BREAKABLE_BLOCK_COUNT
+; Not really related to MMC5, but whatever.
+.segment "PRG0", "PRG7"
+.org $a6d2
+    ldx #BREAKABLE_BLOCK_COUNT-1 ; was ldx #4 to search through the brick slots
+.org $E292
+    ldx #BREAKABLE_BLOCK_COUNT-1 ; was ldx #4 to search through the brick slots
+UPDATE_REFS BlockBreakState @ $A6DE $A6E3 $A6EF $E108 $E246 $E295
+UPDATE_REFS BlockBreakMapPage @ $A745 $E127 $E25D
+UPDATE_REFS BlockBreakXCoord @ $A752 $E120 $E258
+UPDATE_REFS BlockBreakYCoord @ $A74D $E116 $E251
+UPDATE_REFS BlockBreakColumnOffset @ $A6FC $E2A2
+UPDATE_REFS BlockBreakAddrLo @ $A6F2 $E2A7
+UPDATE_REFS BlockBreakAddrHi @ $A6F7 $E2AC

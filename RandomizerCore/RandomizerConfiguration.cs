@@ -700,6 +700,12 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     private bool permanentBeamSword = false;
 
+    [Reactive]
+    private bool marioMode = false;
+
+    [Reactive]
+    private FluteWarpMode fluteWarpMode;
+
     //Custom
     [Reactive]
     [IgnoreInFlags]
@@ -1060,6 +1066,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         properties.StartLives = ResolveStartingLives(r, includeDifficulty);
         properties.PermanentBeam = permanentBeamSword;
+        properties.MarioMode = marioMode;
         properties.UseCommunityText = useCommunityText;
 
         // If shared difficulty is enabled and we're setting up the shared
@@ -1450,6 +1457,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         };
         properties.JumpAlwaysOn = jumpAlwaysOn;
         properties.DashAlwaysOn = dashAlwaysOn;
+        properties.FluteWarpMode = fluteWarpMode;
         properties.FastCast = fastSpellCasting;
         properties.BeamSprite = beamSprite;
         properties.DisableMusic = disableMusic;
