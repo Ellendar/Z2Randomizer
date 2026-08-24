@@ -111,47 +111,6 @@ StatTrackDownStab:
     rts
 .endif
 
-.segment "PRG7"
-
-; These values are exported from the randomizer and map from internal palace number
-; to the "real palace" at this offset. This way if Palace 5 is in the location of Palace 1,
-; then we increment the correct timer for Palace 5
-.reloc
-.export PalaceMappingTable
-PalaceMappingTable:
-    ; region 0 - east hyrule
-    .byte RealPalaceAtLocation1 * 3 + Palace1Offset
-    .byte RealPalaceAtLocation2 * 3 + Palace1Offset
-    .byte RealPalaceAtLocation3 * 3 + Palace1Offset
-    .byte $ff ; unused 4th palace in region 0
-    ; region 1 - death mountain
-    .byte $ff ; unused 1st palace in region 1
-    .byte $ff ; unused 2nd palace in region 1
-    .byte $ff ; unused 3th palace in region 1
-    .byte $ff ; unused 4th palace in region 1
-    ; region 2 - west hyrule
-    .byte RealPalaceAtLocation5 * 3 + Palace1Offset
-    .byte RealPalaceAtLocation6 * 3 + Palace1Offset
-    .byte RealPalaceAtLocationGP * 3 + Palace1Offset
-    .byte $ff ; unused 4th palace in region 2
-    ; region 3 - maze island
-    .byte RealPalaceAtLocation4 * 3 + Palace1Offset
-    .byte $ff, $ff, $ff ; 3 unused palace locations
-
-.reloc
-; Same as the above table but not optimized for stat tracking
-.export RealPalaceNumberTable
-RealPalaceNumberTable:
-    ; region 0 - east hyrule
-    .byte RealPalaceAtLocation1, RealPalaceAtLocation2, RealPalaceAtLocation3, $ff
-    ; region 1 - death mountain (no palaces)
-    .byte $ff, $ff, $ff, $ff
-    ; region 2 - west hyrule
-    .byte RealPalaceAtLocation5, RealPalaceAtLocation6, RealPalaceAtLocationGP, $ff
-    ; region 3 - maze island
-    .byte RealPalaceAtLocation4, $ff, $ff, $ff
-
-
 .segment "PRG4"
 
 .org $9B0F ; dec $0794

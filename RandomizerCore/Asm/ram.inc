@@ -450,6 +450,7 @@ EnterAreaFlag = $075f                    ; Set to 1 when entering a screen cente
 CurrentPrgBank = $0769
 GameEvent = $076c                        ; 0=Restart with full lives, 1=Main game loop, 2=Link dying, 3=Wake up Zelda, 4=Roll credits, 06=Show lives left then restart the scene
 GameEventCurrent = $076d                 ; GameEvent is compared to this and only triggered if it has changed
+CurrentChrBank = $076e
 CurrentCHRBank = $076e
 FireSpellActive = $076f                  ; 0x10 = Fire spell active
 ExpForNextLevelHi = $0770

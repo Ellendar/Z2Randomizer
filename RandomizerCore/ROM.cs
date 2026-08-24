@@ -406,9 +406,10 @@ public class ROM
         }
     }
 
-    public void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft, bool enableZ2Mario)
+    public void ChangeMapperToMMC5(Assembler asm, int[] palaceOrder, bool preventFlash, bool enableZ2Ft, bool enableZ2Mario)
     {
         var a = asm.Module();
+        AssignRealPalaceLocations(a, palaceOrder);
         a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
         a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
         if (enableZ2Mario)
@@ -437,6 +438,18 @@ public class ROM
         a.Org(0x9189);
         a.Byt((byte)((0xfd40 - 0xc000) / 64));
     }
+
+    internal static void AssignRealPalaceLocations(AsmModule a, int[] palaceOrder)
+    {
+        a.Assign("RealPalaceAtLocation1", palaceOrder[0]);
+        a.Assign("RealPalaceAtLocation2", palaceOrder[1]);
+        a.Assign("RealPalaceAtLocation3", palaceOrder[2]);
+        a.Assign("RealPalaceAtLocation4", palaceOrder[3]);
+        a.Assign("RealPalaceAtLocation5", palaceOrder[4]);
+        a.Assign("RealPalaceAtLocation6", palaceOrder[5]);
+        a.Assign("RealPalaceAtLocationGP", palaceOrder[6]);
+    }
+
     public void AddRandomizerToTitle(Assembler asm, bool marioMode, bool isRandomized)
     {
         // This is just updating the macro commands used to draw the title screen tiles
@@ -1952,37 +1965,6 @@ SetDripperHp:
         a.Byt(splitHp);
     }
 
-    public void HalfEncounterRate(Assembler asm)
-    {
-        var a = asm.Module();
-        a.Code(/* lang=s */"""
-.include "z2r.inc"
-.segment "PRG0"
-; Update terrain timers
-.org $8240
-    ; grass, desert, forset, ... etc
-    .byte $40, $30, $30, $40, $12, $06
-; Initial overworld timer
-.org $887a
-    .byte $10
-; Update some new whatever this is
-.org $828f
-    jmp PatchEncounterRate
-FREE_UNTIL $8293
-.reloc
-PatchEncounterRate:
-    lda $26
-    bne @end
-    inc HalfEncounterRateStepCounter
-    lda #1
-    eor HalfEncounterRateStepCounter
-    bne @end
-    jmp $8298
-@end:
-    jmp $8293
-""");
-    }
-
     public void FixItemPickup(Assembler asm)
     {
         // In Z2R, Link never holds items above his head. So,
@@ -2220,7 +2202,7 @@ ConditionalDrawThunderbird:
         Put(0x16413, thunderBirdHP);
     }
 
-    public static void FluteTwisterWarp(Assembler asm, FluteWarpMode mode)
+    public static void FluteTwisterWarp(Assembler asm, FluteWarpMode mode, int[] palaceOrder)
     {
         var a = asm.Module();
         // Exactly one mode define is set so Flute.s only assembles that mode's code paths.
@@ -2228,9 +2210,11 @@ ConditionalDrawThunderbird:
         {
             case FluteWarpMode.CLEARED_PALACES:
                 a.Assign("FLUTE_WARP_CLEARED_PALACES", 1);
+                AssignPalaceWarpLocations(a, palaceOrder);
                 break;
             case FluteWarpMode.VISITED_PALACES:
                 a.Assign("FLUTE_WARP_VISITED_PALACES", 1);
+                AssignPalaceWarpLocations(a, palaceOrder);
                 break;
             case FluteWarpMode.VISITED_TOWNS:
                 a.Assign("FLUTE_WARP_VISITED_TOWNS", 1);
@@ -2241,6 +2225,25 @@ ConditionalDrawThunderbird:
                 throw new ArgumentOutOfRangeException(nameof(mode), mode, "NONE must not assemble Flute.s");
         }
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.Flute.s"), "flute.s");
+    }
+
+    /// Sets up the reverse PalaceNumber tables
+    private static void AssignPalaceWarpLocations(AsmModule a, int[] palaceOrder)
+    {
+        a.Assign($"Palace{palaceOrder[0]}Region", 0);
+        a.Assign($"Palace{palaceOrder[1]}Region", 0);
+        a.Assign($"Palace{palaceOrder[2]}Region", 0);
+        a.Assign($"Palace{palaceOrder[3]}Region", 3);
+        a.Assign($"Palace{palaceOrder[4]}Region", 2);
+        a.Assign($"Palace{palaceOrder[5]}Region", 2);
+        a.Assign($"Palace{palaceOrder[6]}Region", 2);
+        a.Assign($"Palace{palaceOrder[0]}Location", 52);
+        a.Assign($"Palace{palaceOrder[1]}Location", 53);
+        a.Assign($"Palace{palaceOrder[2]}Location", 54);
+        a.Assign($"Palace{palaceOrder[3]}Location", 52);
+        a.Assign($"Palace{palaceOrder[4]}Location", 52);
+        a.Assign($"Palace{palaceOrder[5]}Location", 53);
+        a.Assign($"Palace{palaceOrder[6]}Location", 54);
     }
 
     // Similar to the real palace location table, this is a map of town ID to the real town ID

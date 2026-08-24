@@ -35,8 +35,6 @@ PowersOfTwo:
 
 .segment "PRG0", "PRG7"
 
-.import RealPalaceNumberTable
-
 ProcessNextOverworldEnemy = $842F
 UpdateOverworldSpritePosition = $8397
 AreaLoadTrigger = $85eb
@@ -167,19 +165,15 @@ TwisterWarp:
   beq @have_region
     lda #$02
 @have_region:
-.else
-  ; TwisterCurrentPalaceSlot holds a global palace slot (0-15).
-  ; LocationNumber = $34 + within-region palace code
-  lda TwisterCurrentPalaceSlot
-  and #$03
-  clc
-  adc #$34
+.else ; FLUTE_WARP_VISITED_PALACES | FLUTE_WARP_CLEARED_PALACES
+  ; TwisterCurrentPalaceSlot holds the palace number (1-7). Look up that
+  ; palace's entrance location and region from tables built by the
+  ; randomizer (AssignPalaceWarpLocations).
+  ldy TwisterCurrentPalaceSlot
+  lda PalaceWarpLocationTable-1, y
   sta LocationNumber
   sta AreaEntranceIndex
-  ; target region = global slot >> 2
-  lda TwisterCurrentPalaceSlot
-  lsr
-  lsr
+  lda PalaceWarpRegionTable-1, y
 .endif
   cmp RegionNumber
   ; already in the right continent so we don't need to switch continents
@@ -239,14 +233,13 @@ TwisterWarp:
 @scan:
   sta R7
 
-  ldy TwisterCurrentPalaceSlot
+  lda TwisterCurrentPalaceSlot
 .ifdef FLUTE_WARP_VISITED_TOWNS
   ; Visited towns: walk town codes 0-7.
   ; TwisterCurrentPalaceSlot is already the town slot
-  tya
 .else
-  ; Palace modes: walk palace numbers 0-5/6, then map back to a global slot
-  lda RealPalaceNumberTable,y
+  ; Palace modes: TwisterCurrentPalaceSlot holds the real palace number
+  ; (1-7) of the last warp target, so walk palace numbers 1-6/7
 .endif
   and #7
   sta R6
@@ -255,22 +248,25 @@ TwisterWarp:
 @next_dst:
   lda R6
   clc
-  adc R7
+  adc R7  ; add or subtract 1 depending on whistle direction
   and #7
   sta R6
   ; Make sure that we don't warp to something unavailable in the slots
   ; when using a palace warp not all bits are used in the FluteWarpFlags
-.ifndef FLUTE_WARP_VISITED_TOWNS
+.if .defined(FLUTE_WARP_CLEARED_PALACES) .or .defined(FLUTE_WARP_VISITED_PALACES)
+  beq @skip_dst ; skip 0, not a palace number
 .ifdef FLUTE_WARP_CLEARED_PALACES
-  cmp #6 ; skip gp (#6 since theres no crystal) and the unused value 7
-.else ; FLUTE_WARP_VISITED_PALACES
-  cmp #7 ; only skip the unused value 7
-.endif
+  cmp #7        ; skip GP (#7) since there is no crystal for it
   bcs @skip_dst
-.endif ; .ifndef FLUTE_WARP_VISITED_TOWNS
+.endif ; FLUTE_WARP_CLEARED_PALACES
+.endif
   tay
   lda FluteWarpFlags
+.ifdef FLUTE_WARP_VISITED_TOWNS
   and PowersOfTwo,y
+.else
+  and PowersOfTwo-1,y
+.endif
   bne @found_dst
 @skip_dst:
   dex
@@ -283,21 +279,8 @@ TwisterWarp:
   lda R6
   sta TwisterCurrentPalaceSlot
 .else
-  ; R6 = target palace number. Loop the mapping table to find its global slot.
-  ldy #$0f
-@next_mapping_entry:
-  lda RealPalaceNumberTable, y
-  cmp #$ff ; $ff means no palace at this slot
-  beq @advance
-  cmp R6
-  beq @foundSlot
-@advance:
-  dey
-  bpl @next_mapping_entry
-    ; we couldn't find the mapping? that shouldn't be possible...
-    jmp @exit
-@foundSlot:
-  sty TwisterCurrentPalaceSlot
+  lda R6
+  sta TwisterCurrentPalaceSlot
 .endif
 
 @spawn:
@@ -333,6 +316,18 @@ TwisterWarp:
   rts
 .endmacro
 
+
+.if .defined(FLUTE_WARP_CLEARED_PALACES) .or .defined(FLUTE_WARP_VISITED_PALACES)
+.segment "PRG7"
+.reloc
+; Should be indexed by PalaceNumber-1
+PalaceWarpLocationTable:
+  .byte Palace1Location, Palace2Location, Palace3Location, Palace4Location
+  .byte Palace5Location, Palace6Location, Palace7Location
+PalaceWarpRegionTable:
+  .byte Palace1Region, Palace2Region, Palace3Region, Palace4Region
+  .byte Palace5Region, Palace6Region, Palace7Region
+.endif
 
 ; If our flute mode needs to save visited locations, then include the following code
 .if .defined(FLUTE_WARP_VISITED_PALACES) .or .defined(FLUTE_WARP_VISITED_TOWNS)
@@ -371,16 +366,12 @@ FluteMarkVisited:
   lda WorldNumber
   cmp #3
   bcc @done ; < 3 means we entered a town/cave, not a palace
-    lda RegionNumber
-    asl
-    asl
-    adc PalaceRegionIndex
+    lda PalaceNumber
+    beq @done  ; Palace 0 does not exist, abort
+    cmp #$08
+    bcs @done  ; Palace >7 does not exist, abort
     tay
-    lda RealPalaceNumberTable,y
-    cmp #7 ; guard against an unexpected empty slot
-    bcs @done
-    tay
-    lda PowersOfTwo,y
+    lda PowersOfTwo-1,y
     ora FluteWarpFlags
     sta FluteWarpFlags
 @done:

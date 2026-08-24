@@ -401,6 +401,7 @@ IncStatTimer:
 ; These values are exported from the randomizer and map from internal palace number
 ; to the "real palace" at this offset.
 .reloc
+.export PalaceOrderTable
 PalaceOrderTable:
     ; region 0 - West
     .byte RealPalaceAtLocation1
@@ -459,7 +460,6 @@ PalaceEntrancePaletteOffsets:
     FREE_UNTIL $ce3a
 
 ; Store indexes into the table with 3-byte wide values here for fast lookup
-Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
 .reloc
 PalaceTimestampTable:
     .byte Palace1Offset

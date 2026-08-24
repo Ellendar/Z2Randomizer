@@ -210,7 +210,7 @@ public class Hyrule
     // In general, we will distribute the randomizer app in release mode, so this should always be true for players.
     // But for z2mario as a romhack, I build in debug mode, so this just removes the "RANDOMIZER" text in the title.
 #if DEBUG
-    const bool IS_RANDOMIZED = false;
+    const bool IS_RANDOMIZED = true;
 #else
     const bool IS_RANDOMIZED = true;
 #endif
@@ -3686,17 +3686,6 @@ CustomMovingNpcDialog:
 """);
     }
 
-    private void AssignRealPalaceLocations(AsmModule a)
-    {
-        a.Assign("RealPalaceAtLocation1", (westHyrule?.locationAtPalace1.Palace!.Number ?? 1));
-        a.Assign("RealPalaceAtLocation2", (westHyrule?.locationAtPalace2.Palace!.Number ?? 2));
-        a.Assign("RealPalaceAtLocation3", (westHyrule?.locationAtPalace3.Palace!.Number ?? 3));
-        a.Assign("RealPalaceAtLocation4", (mazeIsland?.locationAtPalace4.Palace!.Number ?? 4));
-        a.Assign("RealPalaceAtLocation5", (eastHyrule?.locationAtPalace5.Palace!.Number ?? 5));
-        a.Assign("RealPalaceAtLocation6", (eastHyrule?.locationAtPalace6.Palace!.Number ?? 6));
-        a.Assign("RealPalaceAtLocationGP", (eastHyrule?.locationAtGP.Palace!.Number ?? 7));
-    }
-
     public void StatTracking(RandomizerProperties props, Assembler asm)
     {
         var a = asm.Module();
@@ -3734,7 +3723,7 @@ CustomMovingNpcDialog:
         a.Label("PressStartString");
         a.Byt(Util.ToGameText(message).Select(x => (byte)x).ToArray());
         a.Assign("PressStartStringLen", message.Length);
-        AssignRealPalaceLocations(a);
+        ROM.AssignRealPalaceLocations(a, GetPalaceOrder());
         a.Set("_ALLOW_ITEM_DUPLICATES", props.AllowImportantItemDuplicates ? 1 : 0);
         if (props.MarioMode)
             a.Assign("ENABLE_Z2_MARIO", 1);
@@ -3860,7 +3849,7 @@ CustomMovingNpcDialog:
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
-        rom.ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic, props.MarioMode); // will make output vary with customize tab options
+        rom.ChangeMapperToMMC5(engine, GetPalaceOrder(), props.DisableHUDLag, randomizeMusic, props.MarioMode); // will make output vary with customize tab options
         // the second flag determines if we should add the "randomizer" text, but we don't have a "vanilla" option
         // right now, so this is just always off, except when i manually make an update
         rom.AddRandomizerToTitle(engine, props.MarioMode, IS_RANDOMIZED);
@@ -3920,11 +3909,6 @@ CustomMovingNpcDialog:
             }
         }
 
-        if (props.EncounterRates == EncounterRate.HALF)
-        {
-            rom.HalfEncounterRate(engine);
-        }
-
         if (props.AttackEffectiveness == AttackEffectiveness.OHKO)
         {
             rom.UseOHKOMode(engine);
@@ -3962,7 +3946,7 @@ CustomMovingNpcDialog:
 
         if (props.FluteWarpMode != FluteWarpMode.NONE)
         {
-            ROM.FluteTwisterWarp(engine, props.FluteWarpMode);
+            ROM.FluteTwisterWarp(engine, props.FluteWarpMode, GetPalaceOrder());
         }
 
         if (props.UpARestartsAtPalaces)
@@ -4054,6 +4038,19 @@ CustomMovingNpcDialog:
 
         UpdateMovingNpcDialog(engine, CustomTexts.BuildMovingNpcDialogPool(props));
         UpdateTexts(engine, texts);
+    }
+
+    private int[] GetPalaceOrder()
+    {
+        return [
+            (westHyrule?.locationAtPalace1.Palace!.Number ?? 1),
+            (westHyrule?.locationAtPalace2.Palace!.Number ?? 2),
+            (westHyrule?.locationAtPalace3.Palace!.Number ?? 3),
+            (mazeIsland?.locationAtPalace4.Palace!.Number ?? 4),
+            (eastHyrule?.locationAtPalace5.Palace!.Number ?? 5),
+            (eastHyrule?.locationAtPalace6.Palace!.Number ?? 6),
+            (eastHyrule?.locationAtGP.Palace!.Number ?? 7)
+        ];
     }
 
     private void AssignPalaceLocations()
