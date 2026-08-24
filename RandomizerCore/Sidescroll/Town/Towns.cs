@@ -26,6 +26,7 @@ public class Towns
                 map.RightExitIsOutside = true;
                 map = town.GetTownMap(VanillaTownMap.RAURU_WIZARD)!;
                 map.Name = "Rauru Wizard";
+                map.CollectableTextType = CollectableTextType.WIZARD;
                 map.Collectable = Collectable.SHIELD_SPELL;
                 map.AccessRequirements = disableContainerRequirements ? Requirements.NONE : new Requirements([RequirementType.ONE_CONTAINER]);
                 break;
@@ -41,6 +42,7 @@ public class Towns
                 map.RightExitIsOutside = true;
                 map = town.GetTownMap(VanillaTownMap.RUTO_WIZARD)!;
                 map.Name = "Ruto Wizard";
+                map.CollectableTextType = CollectableTextType.WIZARD;
                 map.Collectable = Collectable.JUMP_SPELL;
                 map.AccessRequirements = disableContainerRequirements ? new Requirements([RequirementType.TROPHY])
                     : new Requirements([], [[RequirementType.TROPHY, RequirementType.TWO_CONTAINERS]]);
@@ -60,12 +62,14 @@ public class Towns
                 map.RightExitIsOutside = true;
                 map = town.GetTownMap(VanillaTownMap.SARIA_WIZARD)!;
                 map.Name = "Saria Wizard";
+                map.CollectableTextType = CollectableTextType.WIZARD;
                 map.Collectable = Collectable.LIFE_SPELL;
                 map.AccessRequirements = disableContainerRequirements ?
                     new Requirements([RequirementType.MIRROR]) : new Requirements([], [[RequirementType.MIRROR, RequirementType.THREE_CONTAINERS]]);
                 map = town.GetTownMap(VanillaTownMap.SARIA_TABLE)!;
                 map.Name = "Saria Table";
                 map.Collectable = Collectable.MIRROR;
+                map.CollectableTextType = CollectableTextType.TABLE;
                 break;
             case TownType.MIDO:
                 town = rom.LoadTown(9, 3);
@@ -81,11 +85,13 @@ public class Towns
                 map.RightExitIsOutside = true;
                 map = town.GetTownMap(VanillaTownMap.MIDO_WIZARD)!;
                 map.Name = "Mido Wizard";
+                map.CollectableTextType = CollectableTextType.WIZARD;
                 map.Collectable = Collectable.FAIRY_SPELL;
                 map.AccessRequirements = disableContainerRequirements ? new Requirements([RequirementType.MEDICINE])
                     : new Requirements([], [[RequirementType.MEDICINE, RequirementType.FOUR_CONTAINERS]]);
                 map = town.GetTownMap(VanillaTownMap.MIDO_TRAINER)!;
                 map.Name = "Downstab Guy";
+                map.CollectableTextType = CollectableTextType.DOWNSTAB_TRAINER;
                 map.Collectable = Collectable.DOWNSTAB;
                 map.AccessRequirements = new Requirements([RequirementType.JUMP, RequirementType.FAIRY]);
                 break;
@@ -99,11 +105,13 @@ public class Towns
                 map = town.GetTownMap(VanillaTownMap.NABOORU_MID)!;
                 map.Name = "Nabooru Fountain";
                 map.Collectable = Collectable.WATER;
+                map.CollectableTextType = CollectableTextType.FOUNTAIN;
                 map = town.GetTownMap(VanillaTownMap.NABOORU_RIGHT)!;
                 map.Name = "Nabooru Right";
                 map.RightExitIsOutside = true;
                 map = town.GetTownMap(VanillaTownMap.NABOORU_WIZARD)!;
                 map.Name = "Nabooru Wizard";
+                map.CollectableTextType = CollectableTextType.WIZARD;
                 map.Collectable = Collectable.FIRE_SPELL;
                 map.AccessRequirements = disableContainerRequirements ? new Requirements([RequirementType.WATER])
                     : new Requirements([], [[RequirementType.WATER, RequirementType.FIVE_CONTAINERS]]);
@@ -122,6 +130,7 @@ public class Towns
                 map.RightExitIsOutside = true;
                 map = town.GetTownMap(VanillaTownMap.DARUNIA_WIZARD)!;
                 map.Name = "Darunia Wizard";
+                map.CollectableTextType = CollectableTextType.WIZARD;
                 map.Collectable = Collectable.REFLECT_SPELL;
                 map.AccessRequirements = disableContainerRequirements ? new Requirements([RequirementType.CHILD])
                     : new Requirements([], [[RequirementType.CHILD, RequirementType.SIX_CONTAINERS]]);
@@ -131,6 +140,7 @@ public class Towns
                 town.TownMaps.Add(map);
                 map.Left = town.GetTownMap(VanillaTownMap.DARUNIA_MID);
                 map.Name = "Upstab Guy";
+                map.CollectableTextType = CollectableTextType.UPSTAB_TRAINER;
                 map.Collectable = Collectable.UPSTAB;
                 town.GetTownMap(VanillaTownMap.DARUNIA_UPSTAB_HOUSE)!.Right = map;
                 map.AccessRequirements = new Requirements([RequirementType.JUMP, RequirementType.FAIRY]);
@@ -150,6 +160,7 @@ public class Towns
                 map.RightExitIsOutside = false;
                 map = town.GetTownMap(VanillaTownMap.NEW_KASUTO_WIZARD)!;
                 map.Name = "New Kasuto Wizard";
+                map.CollectableTextType = CollectableTextType.WIZARD;
                 map.Collectable = Collectable.SPELL_SPELL;
                 map.AccessRequirements = disableContainerRequirements ? Requirements.NONE : new Requirements([RequirementType.SEVEN_CONTAINERS]);
                 map = town.GetTownMap(VanillaTownMap.GRANNYS_BASEMENT)!;
@@ -173,6 +184,7 @@ public class Towns
                 map.RightExitIsOutside = true;
                 map = town.GetTownMap(VanillaTownMap.OLD_KASUTO_WIZARD)!;
                 map.Name = "Old Kasuto Wizard";
+                map.CollectableTextType = CollectableTextType.WIZARD;
                 map.Collectable = Collectable.THUNDER_SPELL;
                 map.AccessRequirements = disableContainerRequirements ? Requirements.NONE
                     : new Requirements([RequirementType.EIGHT_CONTAINERS]);
@@ -186,6 +198,7 @@ public class Towns
                 map.LeftExitIsOutside = true;
                 map = town.GetTownMap(VanillaTownMap.BAGU_INDOORS)!;
                 map.Name = "Bagu Interior";
+                map.CollectableTextType = CollectableTextType.WIZARD;
                 map.Collectable = Collectable.BAGUS_NOTE;
                 break;
             case TownType.INVALID:

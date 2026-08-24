@@ -10,7 +10,6 @@ public class TownMap
     public int Map { get; set; }
     public bool IsInternalLocation { get; }
     public SideviewEditable<TownObject> Sideview { get; }
-
     public Collectable? Collectable { get; set; }
     public bool CollectableIsShufflable { get; set; }
     public TownMap? Left { get; set; }
@@ -33,6 +32,7 @@ public class TownMap
     //We can just test it when we have writing working and modify if needed
     public bool LeftExitIsOutside { get; set; }
     public bool RightExitIsOutside { get; set; }
+    public CollectableTextType? CollectableTextType { get; set; }
 
     public TownMap(int mapNumber, byte[] sideviewsRaw, byte[] enemiesRaw, bool isInternalLocation)
     {

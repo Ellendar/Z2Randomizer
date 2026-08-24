@@ -182,6 +182,7 @@ public class Room : IJsonOnDeserialized
         Enemies = room.Enemies.ToArray();
         NewEnemies = new byte[Enemies.Length];
         SideView = room.SideView.ToArray();
+        MirrorSideView = room.MirrorSideView?.ToArray();
         ItemGetBits = room.ItemGetBits.ToArray();
         HasItem = room.HasItem;
         HasBoss = room.HasBoss;

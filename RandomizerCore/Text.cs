@@ -30,6 +30,11 @@ public class Text : IEquatable<Text>
         EncodedText = bytes;
     }
 
+    public Text(Text text) : this(text.RawText)
+    {
+        //This space intentionally left blank
+    }
+
     public Text(string text)
     {
         RawText = text;

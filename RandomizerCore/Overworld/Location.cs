@@ -374,4 +374,5 @@ public class Location
         }
         return (CollectablesAreShufflable || !shufflableOnly) ? NonPalaceTownCollectables.Count : 0;
     }
+
 }
