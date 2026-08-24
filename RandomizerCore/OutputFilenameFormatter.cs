@@ -8,7 +8,7 @@ namespace Z2Randomizer.RandomizerCore;
 
 public static class OutputFilenameFormatter
 {
-    public const string DefaultTemplate = "Z2-%f-%s-%h.nes";
+    public const string DefaultTemplate = "%g-%s-%h-%f.nes";
 
     // The characters Windows forbids in a filename. Linux and macOS only
     // disallow '/' (and NUL), so honoring the Windows set produces a name that
@@ -22,7 +22,11 @@ public static class OutputFilenameFormatter
         var resolvedTimestamp = (timestamp ?? DateTime.Now).ToString("yyyy-MM-dd-HHmm", CultureInfo.InvariantCulture);
         var normalizedHash = string.Concat((hash ?? "").Where(c => !char.IsWhiteSpace(c)));
 
+        // add a Z2M option here once the Mario version is merged
+        var resolvedGame = "Z2";
+
         var formatted = resolvedTemplate
+            .Replace("%g", resolvedGame, StringComparison.Ordinal)
             .Replace("%d", resolvedTimestamp, StringComparison.Ordinal)
             .Replace("%f", flags, StringComparison.Ordinal)
             .Replace("%s", seed ?? "", StringComparison.Ordinal)

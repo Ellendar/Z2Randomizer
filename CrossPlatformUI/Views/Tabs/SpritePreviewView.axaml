@@ -69,11 +69,11 @@
             <TextBox
                 Margin="0 8 0 0"
                 UseFloatingPlaceholder="True"
-                PlaceholderText="Z2-%f-%s-%h.nes"
+                PlaceholderText="%g-%s-%h-%f.nes"
                 assists:TextFieldAssist.Label="Output Filename"
                 Text="{Binding OutputFilenameTemplate}"
             >
-                <ToolTip.Tip><TextBlock Text="%f = flags, %s = seed, %h = hash, %d = date/time, %v = version"/></ToolTip.Tip>
+              <ToolTip.Tip><TextBlock Text="%f = flags, %s = seed, %h = hash, %d = date/time, %v = version, %g = game (Z2, Z2M)"/></ToolTip.Tip>
             </TextBox>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Vertical">
