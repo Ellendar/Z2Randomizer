@@ -308,6 +308,9 @@ retroactively generate a spoiler file for a non-spoiler seed.</value>
 	<data name="RevealWalkthroughWallsToolTip" xml:space="preserve">
 <value>Replaces all false wall and floor tiles with background tiles.</value>
 	</data>
+	<data name="RevealHiddenJarsToolTip" xml:space="preserve">
+<value>Show an orange jar to reveal places to hit for a hidden jar or enemy.</value>
+	</data>
 	<data name="ShufflePalaceItemsToolTip" xml:space="preserve">
 <value>Each normal palace contains exactly one item room. When selected, this shuffles which item
 is available in this palace with a different palace item, or with a general item if &quot;Mix
@@ -882,6 +885,15 @@ dash, the Dash spell will still appear, but do nothing.</value>
 	<data name="PermanentBeamSwordToolTip" xml:space="preserve">
 <value>Link will always shoot beams from his sword, regardless of life.</value>
 	</data>
+	<data name="FluteTwisterWarpToolTip" xml:space="preserve">
+<value>Flute works like the Zelda 1 flute and spawns a twister you can walk into to warp the player.
+Facing up or right takes you to the next destination in order; facing down or left takes you to the previous one.
+Available Modes:
+  • No Flute Warp - disables the feature.
+  • Cleared Palaces - warps to palaces you've already cleared (placed a gem in).
+  • Visited Palaces - warps to any palace you've entered, including the Great Palace.
+  • Visited Towns - warps to any town you've entered.</value>
+	</data>
 	<data name="ShuffleStartingItemsToolTip" xml:space="preserve">
 <value>When enabled, your starting items will be randomized.
 
@@ -980,5 +992,10 @@ Use this only when everyone intentionally wants the same base seed with differen
 	<data name="RandomFlagRateToolTip" xml:space="preserve">
 <value>For flags set to an indeterminate value (question mark), those flags will be on or off at
 random, at the freqency specified by this flag.</value>
+	</data>
+	<data name="MarioModeToolTip" xml:space="preserve">
+		<value>Play as Mario from SMB1 using 100% authentic Mario physics and controls!
+
+This is a wildly different gameplay experience, so be warned when setting this flag.</value>
 	</data>
 </root>

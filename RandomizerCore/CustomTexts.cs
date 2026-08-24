@@ -54,6 +54,8 @@ public class CustomTexts
     private static readonly int[] newkasutoHints = [83 /* greeting lady at town entrance */, 68 /* text on wall inside house on 1st screen */, /*92 unreachable Lady in Magic Container house (removed) */];
     private static readonly int[] oldkasutoHint = [74 /* readable wall inside last house on 2nd screen */];
 
+    private static readonly int[] genericWestMoving = [4, 5, 6, 7, 8];
+    private static readonly int[] genericEastMoving = [56, 57, 58, 59];
     private static readonly int[] rauruMoving = [9, 10];
     private static readonly int[] rutoMoving = [17, 19];
     private static readonly int[] sariaMoving = [27];
@@ -95,6 +97,10 @@ public class CustomTexts
     public const int WEST_TEXT_COUNT = 52;
     private const int MAX_TEXT_LENGTH = 3134;
     private const int numberOfTextEntries = 98;
+
+    // On the off chance we do something that eats up space in PRG3, we can limit
+    // the silly dialog here so that it doesn't eat up extra space for no reason.
+    private const int MOVING_NPC_DIALOG_MAX_BYTES = 3000;
     //TODO: This should just be a listing of every text index by continent, but for now it's a pile.
     private const int westAlreadyGotItemTextIndex = 16;
     private const int eastAlreadyGotItemTextIndex = 71;
@@ -314,6 +320,77 @@ public class CustomTexts
         "If I knew$something,$I would$tell you"
     ];
 
+    public static readonly string[] MARIO_KNOW_NOTHING_TEXTS =
+    [
+        "Link, you$are looking$a little$red today.$Are you$well?",
+        "Wow$you really$took the$wrong pipe",
+        "You are$gonna save$Hyrule?$You dont$even have$a sword!",
+        "With those$ears you$must be a$Gerudo.",
+        "Are you$okay...$you look a$little red",
+        "Mamma$mia",
+        "Your$princess$is in$another$castle!",
+        "I am sorry$but we do$not sell$mushrooms",
+        "Bowser$sends$his$regards.",
+        "You look$better in$green",
+        "Do you$have a$cuter$younger$brother?",
+        "Link was$looking for$you...$Did you$steal his$crystals?",
+        "Did you$come here$by pipe or$by kart?",
+        "Where is$Luigi$",
+        "Where is$your sword",
+        "Thank you$but your$princess$is in a$different$game",
+        "Of course$I know you.$Everyone$knows$red Luigi!",
+        "Jumping$without$the magic$words...$Thats not$fair.",
+        "Your coins$are no$good here.",
+        "Did you$get a$concussion$by hitting$your head$so often?",
+        "What are$you?$a cop?",
+        "The river$devil does$not like$plumbers.",
+        "Get the$power.$Nintendo$power!",
+        "I dont$talk with$plumbers.",
+        "Where in$the world$is link?$He smashed$my pots$and left!",
+        "Ganon is$so scary$please$save us!",
+        "I$I said$I said this$I said this$to waste$your time.",
+        "Welcome$stranger!$Hyrule is$a great$place to$live.",
+        "I am$surprised$that we$speak the$same$language",
+        "...",
+        "Well$excuuuuuuse$me, Mario!",
+        "Where did$you learn$to jump$like that?",
+        "$$$$$... hi",
+        "Save our$town and$i will let$you break$all our$pots!",
+        "Are you$gonna save$us or what?",
+        "So you$saved us.$$Big deal.",
+        "Stop by$my shop$sometime.$Oh, you$dont have$any rupees.",
+        "We welcome$all heroes.",
+        "Take a$minute to$enjoy the$scenery",
+        "Hope you$have a fun$stay in$our town!",
+        "Why dont$you have$an outline?",
+        "How can$your neck$support$that big$head?",
+        "Try out$the Zelda 2$randomizer!",
+        "Try out$other hacks$by jroweboy",
+        "Go save$your own$princess,$bub.",
+        "Wish I$could get$as strong$as you",
+        "Isnt it$cheating$to start$with$downstab?",
+        "Link had$to work$to earn$those$crystals$you know...",
+        "Why is it$a triforce$if there$is only one$triangle?",
+        "I am a$big fan of$jump man.",
+        "What ever$happened$to your$famous$hotel chain",
+        "Woah, not$everyday$you see$a man with$your build.",
+        "Gotta say,$Zelda is a$cooler name$than Peach.",
+        "Welcome!",
+        "Hello$there!",
+        "Please$stay as$long as you$need!",
+        "I am in$a hurry. No$time to$explain!",
+        "Time lost.$Reset your$speedrun.",
+        "I always$feel like$ganon is$watching me",
+        "The eyes$of Bowser$are$nowhere.",
+        "The eyes$of Ganon$are$everywhere.",
+        "So long,$I am off$to save$hyrule!",
+        "Oh, didnt$see you$there!",
+        "I am much$too busy$to talk$right now.",
+        "I heard$Kasuto is$not doing$so well.",
+        "Our towns$are named$after the$heroes of$old",
+        "Is there$even a king$in the$mushroom$kingdom?",
+    ];
+
     public static readonly string[] KNOW_NOTHING_OUTSIDE_TEXTS =
     [
         .. KNOW_NOTHING_TEXTS,
@@ -515,6 +592,17 @@ public class CustomTexts
         Random hashRNG)
     {
         DebugValidateTexts();
+      
+        //Change the "vanilla" spell texts to mario specific texts
+        if (props.MarioMode)
+        {
+            // In Mario Mode, change a few spell hint text to reflect its new ability
+            texts[wizardTextIndexesBySpell[Collectable.JUMP_SPELL]] = new Text("JUMP WONT$HELP YOU.$TRY THIS$INSTEAD.");
+            texts[downstabGuyGotItemTextIndex] = new Text("PIERCE$SHIELDS$WITH YOUR$STOMP.");
+            texts[upstabGuyGotItemTextIndex] = new Text("BREAK BLOCKS$WITH HEAD$TO CREATE$POW-ERFUL$SHOCKWAVE");
+            texts[wizardTextIndexesBySpell[Collectable.FIRE_SPELL]] = new Text("THIS MAGIC$WILL MAKE$YOUR HAND$THROW FIRE");
+            texts[wizardTextIndexesBySpell[Collectable.SPELL_SPELL]] = new Text("SAY THE$MAGIC WORD$AND FEEL$THE POWER");
+        }
 
         // This will use the `texts` list internally. A compromise because I shouldn't refactor this entire class at the moment,
         // and I can still use proper east indexes.
@@ -549,6 +637,8 @@ public class CustomTexts
 
             if (props.SpellItemHints && props.IncludeSwordTechsInShuffle)
             {
+                var downstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
+                var upstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
                 Text hint;
                 if (props.StartWithDownstab)
                 {
@@ -557,7 +647,6 @@ public class CustomTexts
                 }
                 else
                 {
-                    var downstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
                     hint = Text.GenerateHelpfulHint(downstabLoc, Collectable.DOWNSTAB, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                 }
                 texts[downstabClosedDoorTextIndex] = hint;
@@ -568,8 +657,7 @@ public class CustomTexts
                 }
                 else
                 {
-                    var upstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
-                    hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
+                    hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
                 }
                 texts[upstabClosedDoorTextIndex] = hint;
                 if (props.SwapUpAndDownStab)
@@ -579,10 +667,10 @@ public class CustomTexts
                 }
             }
 
-            if (props.HelpfulHints != HelpfulHintOption.NONE)
+            if (props.HelpfulHints != HelpfulHintOption.NONE || props.MarioMode)
             {
                 List<int> placedIndexes = GenerateHelpfulHints(texts, locations, hashRNG, props);
-                GenerateKnowNothings(texts, placedIndexes, nonhashRNG, props.BagusWoods, props.UseCommunityText);
+                GenerateKnowNothings(texts, placedIndexes, nonhashRNG, props.HelpfulHints, props.BagusWoods, props.UseCommunityText, props.MarioMode);
             }
 
             if (props.UseCommunityText)
@@ -682,16 +770,16 @@ public class CustomTexts
     }
 
     private static Text GenerateTownsfolkText(List<Text> texts, Random r, TownType town, TownMap townMap,
-        bool useCommunityText, bool includeQuestItemsInShuffle)
+     bool useCommunityText, bool includeQuestItemsInShuffle)
     {
         Collectable collectable = townMap.Collectable ?? throw new Exception("Cannot generate hint for location with no collectable");
-        switch(townMap.CollectableTextType)
+        switch (townMap.CollectableTextType)
         {
             //Wizards (and wizard-like trainers) use old spell texts if they have a spell, else newer collectable text
             case CollectableTextType.WIZARD:
             case CollectableTextType.DOWNSTAB_TRAINER:
             case CollectableTextType.UPSTAB_TRAINER:
-                if(collectable.IsSpell())
+                if (collectable.IsSpell())
                 {
                     if (useCommunityText)
                     {
@@ -713,7 +801,7 @@ public class CustomTexts
                 return GenerateBaguText(collectable, r, useCommunityText, includeQuestItemsInShuffle)
                     ?? new Text(texts[baguTextIndex].RawText);
             case CollectableTextType.TABLE:
-                return GenerateMirrorTableText(collectable, r, useCommunityText, includeQuestItemsInShuffle) 
+                return GenerateMirrorTableText(collectable, r, useCommunityText, includeQuestItemsInShuffle)
                     ?? new Text(texts[gotMirrorTextIndex].RawText);
             case CollectableTextType.FOUNTAIN:
                 return GenerateFountainText(collectable, r, useCommunityText, includeQuestItemsInShuffle)
@@ -721,7 +809,7 @@ public class CustomTexts
             default:
                 throw new Exception("Unrecognized CollectableTextType while generating hint");
         }
-    }
+    } 
 
     private static Text? GenerateBaguText(Collectable baguItem, Random r, bool useCommunityText, bool includeQuestItemsInShuffle)
     {
@@ -765,13 +853,24 @@ public class CustomTexts
         return new Text(RIVER_MAN_TEXTS[r.Next(RIVER_MAN_TEXTS.Length)]);
     }
 
-    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndexes, Random r, bool useBaguWoods, bool useCommunityText)
+    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndexes, Random r, HelpfulHintOption helpfulHintOption, bool useBaguWoods, bool useCommunityText, bool marioMode)
     {
-        ShuffleBag<string> kidKnowNothingTexts = new(KNOW_NOTHING_KID_TEXTS, r);
-        ShuffleBag<string> sariaGreeterTexts = new(KNOW_NOTHING_SARIA_GREETER_TEXTS, r);
-        ShuffleBag<string> outsideKnowNothingTexts = new(KNOW_NOTHING_OUTSIDE_TEXTS, r);
-        ShuffleBag<string> knowNothingTexts = new(KNOW_NOTHING_TEXTS, r);
-        ShuffleBag<string> movingNpcTexts = new(MOVING_NPC_TEXTS, r);
+        string[][] allTexts = [
+            KNOW_NOTHING_KID_TEXTS,
+            KNOW_NOTHING_SARIA_GREETER_TEXTS,
+            KNOW_NOTHING_OUTSIDE_TEXTS,
+            KNOW_NOTHING_TEXTS,
+            MOVING_NPC_TEXTS
+        ];
+        var maybeMarioAdded = marioMode ?
+            allTexts.Select(list => (string[])[..MARIO_KNOW_NOTHING_TEXTS, ..list]).ToArray()
+            : allTexts;
+        ShuffleBag<string> marioOnlyTexts = new(MARIO_KNOW_NOTHING_TEXTS, r);
+        ShuffleBag<string> kidKnowNothingTexts = new(maybeMarioAdded[0], r);
+        ShuffleBag<string> sariaGreeterTexts = new(maybeMarioAdded[1], r);
+        ShuffleBag<string> outsideKnowNothingTexts = new(maybeMarioAdded[2], r);
+        ShuffleBag<string> knowNothingTexts = new(maybeMarioAdded[3], r);
+        ShuffleBag<string> movingNpcTexts = new(maybeMarioAdded[4], r);
 
         List<int> stationary =
         [
@@ -791,6 +890,8 @@ public class CustomTexts
 
         List<int> moving =
         [
+            .. genericEastMoving,
+            .. genericWestMoving,
             .. rauruMoving,
             .. rutoMoving,
             .. sariaMoving,
@@ -801,50 +902,56 @@ public class CustomTexts
         ];
 
         Text defaultKnowNothing = new();
-        for (int i = 0; i < stationary.Count; i++)
+        
+        // if we are doing mario mode, we could have helpful hints off but still want mario flavor text
+        // for the moving NPCs, so skip stationary onces
+        if (helpfulHintOption != HelpfulHintOption.NONE)
         {
-            int textIndex = stationary[i];
-            if (!placedIndexes.Contains(textIndex))
+            for (int i = 0; i < stationary.Count; i++)
             {
-                Text hint;
-                if (useCommunityText)
+                int textIndex = stationary[i];
+                if (!placedIndexes.Contains(textIndex))
                 {
-                    if (kidHintNpcs.Contains(textIndex))
+                    Text hint;
+                    if (useCommunityText)
                     {
-                        hint = new Text(kidKnowNothingTexts.Draw());
-                    }
-                    else if (textIndex == SariaGreeterNpc)
-                    {
-                        hint = new Text(sariaGreeterTexts.Draw());
-                    }
-                    else if (outsideHintNpcs.Contains(textIndex))
-                    {
-                        hint = new Text(outsideKnowNothingTexts.Draw());
+                        if (kidHintNpcs.Contains(textIndex))
+                        {
+                            hint = new Text(kidKnowNothingTexts.Draw());
+                        }
+                        else if (textIndex == SariaGreeterNpc)
+                        {
+                            hint = new Text(sariaGreeterTexts.Draw());
+                        }
+                        else if (outsideHintNpcs.Contains(textIndex))
+                        {
+                            hint = new Text(outsideKnowNothingTexts.Draw());
+                        }
+                        else
+                        {
+                            hint = new Text(knowNothingTexts.Draw());
+                        }
                     }
                     else
                     {
-                        hint = new Text(knowNothingTexts.Draw());
+                        hint = defaultKnowNothing;
                     }
-                }
-                else
-                {
-                    hint = defaultKnowNothing;
-                }
-                hints[textIndex] = hint;
-                if (textIndex == talkingAcheIndexTalking)
-                {
-                    hints[talkingAcheIndexSleeping] = hint;
-                }
-                else if (textIndex == talkingBotIndexTalking)
-                {
-                    hints[talkingBotIndexSleeping] = hint;
+                    hints[textIndex] = hint;
+                    if (textIndex == talkingAcheIndexTalking)
+                    {
+                        hints[talkingAcheIndexSleeping] = hint;
+                    }
+                    else if (textIndex == talkingBotIndexTalking)
+                    {
+                        hints[talkingBotIndexSleeping] = hint;
+                    }
                 }
             }
         }
 
         for (int i = 0; i < moving.Count; i++)
         {
-            hints[moving[i]] = useCommunityText ? new Text(movingNpcTexts.Draw()) : defaultKnowNothing;
+            hints[moving[i]] = useCommunityText ? new Text(movingNpcTexts.Draw()) : marioMode ? new Text(marioOnlyTexts.Draw()) : defaultKnowNothing;
         }
     }
 
@@ -1087,6 +1194,38 @@ public class CustomTexts
         return sum;
     }
 
+    public static List<Text> BuildMovingNpcDialogPool(RandomizerProperties props)
+    {
+        List<string> raw = [];
+        if (props.UseCommunityText)
+        {
+            raw.AddRange(MOVING_NPC_TEXTS);
+            raw.AddRange(KNOW_NOTHING_TEXTS);
+        }
+        if (props.MarioMode)
+        {
+            raw.AddRange(MARIO_KNOW_NOTHING_TEXTS);
+        }
+
+        // Dedup by string (preserving first-seen order) so no line is stored twice in ROM.
+        List<Text> pool = [.. raw.Distinct().Select(s => new Text(s))];
+        // Trim the list of texts back until it fits in the max size given
+        while (pool.Count > 1 && MovingNpcDialogByteLength(pool) > MOVING_NPC_DIALOG_MAX_BYTES)
+        {
+            pool.RemoveAt(pool.Count - 1);
+        }
+
+        return pool;
+    }
+
+    private static int MovingNpcDialogByteLength(List<Text> pool)
+    {
+        const int rollRoutineBytes = 24;
+        int stringBytes = pool.Sum(t => t.EncodedText.Length);
+        int pointerTableBytes = pool.Count * 2;
+        return stringBytes + pointerTableBytes + rollRoutineBytes;
+    }
+
     /// Make sure all strings are max 11x6
     [Conditional("DEBUG")]
     private static void DebugValidateTexts()
@@ -1117,3 +1256,4 @@ public class CustomTexts
         }
     }
 }
+

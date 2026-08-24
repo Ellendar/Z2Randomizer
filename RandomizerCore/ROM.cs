@@ -406,11 +406,160 @@ public class ROM
         }
     }
 
-    public void AddRandomizerToTitle(Assembler asm)
+    public void ChangeMapperToMMC5(Assembler asm, int[] palaceOrder, bool preventFlash, bool enableZ2Ft, bool enableZ2Mario)
+    {
+        var a = asm.Module();
+        AssignRealPalaceLocations(a, palaceOrder);
+        a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
+        a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
+        if (enableZ2Mario)
+            a.Assign("ENABLE_Z2_MARIO", 1);
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
+        // Copy the ganon laugh from bank F to bank 1F
+        a.Segment("PRG1F");
+        a.Org(0xf800);
+        a.Byt(GetBytes(0x1f3d0, 0x1c0));
+        a.Org(0xf9c0);
+        a.Byt(GetBytes(0x1f710, 0x115));
+        a.Org(0xfb00);
+        a.Byt(GetBytes(0x1f850, 0x115));
+        a.Org(0xfc40);
+        a.Byt(GetBytes(0x1f9d0, 0x1b1)); // Theres two samples here in vanilla back to back
+        // Update the DPCM sample address to point to the new location
+        a.Segment("PRG6");
+        a.Org(0x917f);
+        a.Byt((byte)((0xf800 - 0xc000) / 64));
+        a.Org(0x9183);
+        a.Byt((byte)((0xf9c0 - 0xc000) / 64));
+        a.Org(0x9185);
+        a.Byt((byte)((0xfb00 - 0xc000) / 64));
+        a.Org(0x9187);
+        a.Byt((byte)((0xfc40 - 0xc000) / 64));
+        a.Org(0x9189);
+        a.Byt((byte)((0xfd40 - 0xc000) / 64));
+    }
+
+    internal static void AssignRealPalaceLocations(AsmModule a, int[] palaceOrder)
+    {
+        a.Assign("RealPalaceAtLocation1", palaceOrder[0]);
+        a.Assign("RealPalaceAtLocation2", palaceOrder[1]);
+        a.Assign("RealPalaceAtLocation3", palaceOrder[2]);
+        a.Assign("RealPalaceAtLocation4", palaceOrder[3]);
+        a.Assign("RealPalaceAtLocation5", palaceOrder[4]);
+        a.Assign("RealPalaceAtLocation6", palaceOrder[5]);
+        a.Assign("RealPalaceAtLocationGP", palaceOrder[6]);
+    }
+
+    public void AddRandomizerToTitle(Assembler asm, bool marioMode, bool isRandomized)
     {
         // This is just updating the macro commands used to draw the title screen tiles
         // The actual tile data will be imported into the rom data later
-        asm.Module().Code("""
+
+        // Display the randomizer text line if randomized
+        var displayRandomizerLine = isRandomized ?
+"""
+Line0:
+; ZELDA II
+.byte $22, $4c, 8 ; Write 8 bytes to $224c
+.byte $00, $01, $02, $03, $04, $05, $06, $07
+; setup the attributes for the right hand side
+.byte $23,$E0,REPEAT | 16,$00
+.byte $23,$E7,1,$cc
+; .byte $23,$E8,REPEAT | 7,$00
+.byte $23,$EF,1,$cc
+.byte $23,$f0,REPEAT | 16,$00
+.byte $23,$f7,1,$cc
+;.byte $23,$f8,REPEAT | 7,$00
+.byte $23,$ff,1,$cc
+
+Line1:
+; RANDOMIZER
+.byte $22, $6a, 12 ; Write 12 bytes to $226a
+; skipping over $0e since its the copyright symbol used at the end
+.byte $08, $09, $0a, $0b, $0c, $0d, $0f, $10, $11, $12, $13, $14
+
+Line2:
+; THE ADVENTURE OF TOP
+.byte $22, $88, 17 ; Write 17 bytes to $2288
+.byte $15, $16, $17, $18, $19, $1a, $1b, $1c, $1d, $1e, $1f, $20, $21, $22, $23, $24, $25 ; Top
+
+Line3:
+; THE ADVENTURE OF BOT
+.byte $22, $a7, 18 ; Write 18 bytes to $22a7
+.byte $26, $27, $28, $29, $2a, $2b, $2c, $2d, $2e, $2f, $30, $31, $32, $33, $34, $35, $36, $37 ; Bot
+"""
+        :
+"""
+
+Line0:
+; SKIP THIS IF NOT RANDOMIZED
+.byte $22, $4a, 1 ; Write 1 useless byte to just skip this write
+.byte $f4
+; setup the attributes for the right hand side
+.byte $23,$E0,REPEAT | 16,$00
+.byte $23,$E7,1,$cc
+; .byte $23,$E8,REPEAT | 7,$00
+.byte $23,$EF,1,$cc
+
+Line1:
+; ZELDA II
+.byte $22, $6C, 8
+.byte $10, $11, $12, $13, $14, $15, $16, $17
+; setup the attributes for the right hand side
+.byte $23,$f0,REPEAT | 16,$00
+.byte $23,$f7,1,$cc
+;.byte $23,$f8,REPEAT | 7,$00
+.byte $23,$ff,1,$cc
+
+Line2:
+; THE ADVENTURE OF TOP
+.byte $22, $88, 17
+.byte $1C,$1E,$20,$22,$24,$26,$28,$2A,$2C,$2E,$30,$32,$34,$36,$00,$02,$04
+
+Line3:
+; THE ADVENTURE OF BOT
+.byte $22, $A7, 18
+.byte $1B,$1D,$1F,$21,$23,$25,$27,$29,$2B,$2D,$2F,$31,$33,$35,$37,$01,$03,$05
+""";
+
+
+        var playerName = marioMode ? 
+"""
+Line4:
+; MARIO(TM)
+.byte $22, $ca, 14 ; Write 14 bytes to $22a7
+.byte $38, $39, $3a, $3b, $3c, $3d, $3e, $3f, $40, $41, $42, $43, $44, $45
+
+Line5:
+.byte $22, $ea, 13 ; Write 14 bytes to $22ea
+.byte $46, $47, $48, $49, $4a, $4b, $4c, $4d, $4e, $4f, $50, $51, $52
+Line6:
+.byte $23, $09, 15 ; Write 15 bytes to $2309
+.byte $53, $54, $55, $56, $57, $58, $59, $5a, $5b, $5c, $5d, $5e, $5f, $60, $61
+Line7:
+.byte $23, $29, 15 ; Write 15 bytes to $2329
+.byte $62, $63, $64, $65, $66, $67
+.byte $84, $85, $86, $87, $88, $89, $8a, $8b, $8c
+"""
+        :
+"""
+Line4:
+; LINK(TM)
+.byte $22, $ca, 14 ; Write 14 bytes to $22a7
+.byte $38, $39, $3a, $f4, $3b, $3c, $39, $3d, $39, $3e, $3f, $40, $41, $42
+
+Line5:
+.byte $22, $ea, 13 ; Write 13 bytes to $22ea
+.byte $43, $44, $45, $f4, $46, $47, $48, $49, $4a, $4b, $4c, $4d, $4e
+Line6:
+.byte $23, $09, 15 ; Write 15 bytes to $2309
+.byte $4f, $50, $51, $52, $53, $54, $55, $56, $57, $54, $58, $59, $5a, $5b, $5c
+Line7:
+.byte $23, $29, 15 ; Write 15 bytes to $2329
+.byte $5d, $5e, $5e, $5e, $5f, $5e, $60, $5e, $61, $62, $63, $64, $65, $66, $67
+""";
+        
+        asm.Module().Code($"""
 .macpack common
 .segment "PRG5"
 
@@ -461,52 +610,9 @@ TitleLineTable:
 
 .org $af69
 
-Line0:
-; ZELDA II
-.byte $22, $4c, 8 ; Write 8 bytes to $224c
-.byte $00, $01, $02, $03, $04, $05, $06, $07
-; setup the attributes for the right hand size
-.byte $23,$E0,REPEAT | 16,$00
-.byte $23,$E7,1,$cc
-; .byte $23,$E8,REPEAT | 7,$00
-.byte $23,$EF,1,$cc
-.byte $23,$f0,REPEAT | 16,$00
-.byte $23,$f7,1,$cc
-;.byte $23,$f8,REPEAT | 7,$00
-.byte $23,$ff,1,$cc
+{displayRandomizerLine}
 
-
-Line1:
-; RANDOMIZER
-.byte $22, $6a, 12 ; Write 12 bytes to $226a
-; skipping over $0e since its the copyright symbol used at the end
-.byte $08, $09, $0a, $0b, $0c, $0d, $0f, $10, $11, $12, $13, $14
-
-Line2:
-; THE ADVENTURE OF TOP
-.byte $22, $88, 17 ; Write 17 bytes to $2288
-.byte $15, $16, $17, $18, $19, $1a, $1b, $1c, $1d, $1e, $1f, $20, $21, $22, $23, $24, $25 ; Top
-
-
-Line3:
-; THE ADVENTURE OF BOT
-.byte $22, $a7, 18 ; Write 18 bytes to $22a7
-.byte $26, $27, $28, $29, $2a, $2b, $2c, $2d, $2e, $2f, $30, $31, $32, $33, $34, $35, $36, $37 ; Bot
-
-Line4:
-; LINK(TM)
-.byte $22, $ca, 14 ; Write 14 bytes to $22a7
-.byte $38, $39, $3a, $f4, $3b, $3c, $39, $3d, $39, $3e, $3f, $40, $41, $42
-
-Line5:
-.byte $22, $ea, 13 ; Write 13 bytes to $22ea
-.byte $43, $44, $45, $f4, $46, $47, $48, $49, $4a, $4b, $4c, $4d, $4e
-Line6:
-.byte $23, $09, 15 ; Write 15 bytes to $2309
-.byte $4f, $50, $51, $52, $53, $54, $55, $56, $57, $54, $58, $59, $5a, $5b, $5c
-Line7:
-.byte $23, $29, 15 ; Write 15 bytes to $2329
-.byte $5d, $5e, $5e, $5e, $5f, $5e, $60, $5e, $61, $62, $63, $64, $65, $66, $67
+{playerName}
 TitleEnd:
 
 ; Add some filler commands to take up the rest of the space
@@ -518,7 +624,38 @@ TitleEnd:
 .byte $20,$1F,VERTICAL | REPEAT | $1f,$FD
 
 .assert * = $b02e
-""", "randomizer_title_text.s");
+
+""", "randomizer_title_gamename.s");
+
+        // Also update the text on the title screen to our hot new L O R E
+        // There's 15 lines with 29 columns of tiles, with $fd as the 29th tile
+        // Realistically we can use 26 or so letters a line for it to be readable
+        // cause of the wall of sprites on the right
+        var titleText = """
+IN A LOCAL MILK BAR, MARIO
+AND LINK TRADED TALES OF
+PRINCESS PROBLEMS. MARIO
+SCOFFED WHEN LINK IMPLIED
+THAT SAVING ZELDA WAS SO
+MUCH HARDER, AFTER ALL,
+ENEMIES IN HYRULE ARE WAY
+SMARTER THAN A SILLY KOOPA.
+BLINDED BY MILK-FUELED RAGE,
+MARIO STOMPED DOWN THE PIPE
+TO HYRULE TO PROVE LINK
+WRONG. BUT CAN HE ACTUALLY
+SAVE PRINCESS ZELDA...
+""".Trim();
+        var a = asm.Module();
+        a.Segment("PRG5");
+        foreach (var (line, i) in titleText.Split('\n').Select((item, index) => (item, index)))
+        {
+            var blankLine = Enumerable.Repeat((byte)0xf4,29).ToArray();
+            StringToZ2Bytes(line.Trim()).CopyTo(blankLine, 0);
+            blankLine[28] = 0xfd;
+            a.Org((ushort) (0xA932 + i * 29));
+            a.Byt(blankLine);
+        }
     }
 
     public void ApplyIps(byte[] patch, bool expandRom = false)
@@ -935,17 +1072,18 @@ ReturnNormally:
         a.Module().Code("""
 .include "z2r.inc"
 
-.import SwapPRG, SwapToSavedPRG, PalaceMappingTable
+.import SwapPRG, SwapToSavedPRG, PalaceTimestampTable
 
 ; move the pointers for the data for the sideviews to load from RAM instead.
 .segment "PRG7"
 .org $C50C ; patch where the pointer for sideview data is loaded
-    jsr CopySideviewIntoRAMAndLoadPointer
+    jsr LoadPointerForReadingBankedSideView
+    jsr CopySideviewIntoRAM
     jmp $C53A
 FREE_UNTIL $C53A
 
 .reloc
-CopySideviewIntoRAMAndLoadPointer:
+LoadPointerForReadingBankedSideView:
     ; y is the offset for the type to load from.
     ; 0 = encounter
     ; 1 = west hyrule town
@@ -985,17 +1123,17 @@ CopySideviewIntoRAMAndLoadPointer:
     sta $d5
     lda ($02),y
     sta $d7
+    rts
+
+.reloc
+CopySideviewIntoRAM:
 
     ; if its not a palace area, skip switching banks
     lda WorldNumber
     cmp #3
     bcc @skipswap
-        lda RegionNumber
-        asl
-        asl
-        adc PalaceRegionIndex
-        tay
-        lda PalaceMappingTable,y
+        ldy PalaceNumber
+        lda PalaceTimestampTable-1,y
         cmp #$ff
         beq @skipswap
         ; Prevent bank swapping during the end game cutscene
@@ -1143,6 +1281,10 @@ CheckController1ForUpAMagic:
         Put(0x2A03, 0x12);
         Put(0x1C9FA, 0x16);
         Put(0x1C9FC, 0x16);
+        // final flashing color is black for some reason in vanilla
+        // change this to red, the game will still put a black background
+        // next frame. this prevents a black flash when game overing
+        Put(0x1ca19, 0x16);
     }
 
     public async Task<Js65CompileResult> ApplyAsm(Assembler engine)
@@ -1865,8 +2007,6 @@ FREE_UNTIL $e54f
 .include "z2r.inc"
 .import SwapCHR
 
-EnemyFacingDirection = $DC91
-
 .segment "PRG7"
 
 ; Patch the start of the sideview initialization to check if the enemy is loaded in the first screen
@@ -1907,7 +2047,7 @@ OverwriteSpriteCHRBank:
     adc #1
     sta SpChrBank5Reg
     ; due to an MMC5 issue, we need to write a bg bank as well.
-    lda CurrentChrBank
+    lda CurrentCHRBank
     asl
     asl
     ; clc ; carry is clear here
@@ -2060,6 +2200,71 @@ ConditionalDrawThunderbird:
         Put(0x16406, (byte)(thunderBirdHP / 8));
         // 0x16403 - Hard Mode if HP < this value (vanilla half HP)
         Put(0x16413, thunderBirdHP);
+    }
+
+    public static void FluteTwisterWarp(Assembler asm, FluteWarpMode mode, int[] palaceOrder)
+    {
+        var a = asm.Module();
+        // Exactly one mode define is set so Flute.s only assembles that mode's code paths.
+        switch (mode)
+        {
+            case FluteWarpMode.CLEARED_PALACES:
+                a.Assign("FLUTE_WARP_CLEARED_PALACES", 1);
+                AssignPalaceWarpLocations(a, palaceOrder);
+                break;
+            case FluteWarpMode.VISITED_PALACES:
+                a.Assign("FLUTE_WARP_VISITED_PALACES", 1);
+                AssignPalaceWarpLocations(a, palaceOrder);
+                break;
+            case FluteWarpMode.VISITED_TOWNS:
+                a.Assign("FLUTE_WARP_VISITED_TOWNS", 1);
+                AssignTownWarpLocations(a);
+                break;
+            case FluteWarpMode.NONE:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(mode), mode, "NONE must not assemble Flute.s");
+        }
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.Flute.s"), "flute.s");
+    }
+
+    /// Sets up the reverse PalaceNumber tables
+    private static void AssignPalaceWarpLocations(AsmModule a, int[] palaceOrder)
+    {
+        a.Assign($"Palace{palaceOrder[0]}Region", 0);
+        a.Assign($"Palace{palaceOrder[1]}Region", 0);
+        a.Assign($"Palace{palaceOrder[2]}Region", 0);
+        a.Assign($"Palace{palaceOrder[3]}Region", 3);
+        a.Assign($"Palace{palaceOrder[4]}Region", 2);
+        a.Assign($"Palace{palaceOrder[5]}Region", 2);
+        a.Assign($"Palace{palaceOrder[6]}Region", 2);
+        a.Assign($"Palace{palaceOrder[0]}Location", 52);
+        a.Assign($"Palace{palaceOrder[1]}Location", 53);
+        a.Assign($"Palace{palaceOrder[2]}Location", 54);
+        a.Assign($"Palace{palaceOrder[3]}Location", 52);
+        a.Assign($"Palace{palaceOrder[4]}Location", 52);
+        a.Assign($"Palace{palaceOrder[5]}Location", 53);
+        a.Assign($"Palace{palaceOrder[6]}Location", 54);
+    }
+
+    // Similar to the real palace location table, this is a map of town ID to the real town ID
+    private static void AssignTownWarpLocations(AsmModule a)
+    {
+        LocationID[] townWarpLocations =
+        [
+            LocationID.WEST_TOWN_RAURU,
+            LocationID.WEST_TOWN_RUTO,
+            LocationID.WEST_TOWN_SARIA_NORTH,
+            LocationID.WEST_TOWN_MIDO,
+            LocationID.EAST_TOWN_NABOORU,
+            LocationID.EAST_TOWN_DARUNIA,
+            LocationID.EAST_TOWN_NEW_KASUTO,
+            LocationID.EAST_TOWN_OLD_KASUTO,
+        ];
+        for (int i = 0; i < townWarpLocations.Length; i++)
+        {
+            var (_, locIdx) = townWarpLocations[i].GetIndices();
+            a.Assign($"RealTownAtLocation{i}", locIdx);
+        }
     }
 
     public void DashSpell(Assembler asm)
@@ -2255,6 +2460,88 @@ ElevatorBossFix:
         //Put(0x15428, 0x00); // already at 0
     }
 
+    public void RevealHiddenJars(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+CheckHiddenJarOrIkStrike = $af61
+CheckHiddenJarStrike = $b83e
+CheckHiddenJarOrFokkaStrike = $a521
+EnemyDrawRoutine = $de3d
+DrawFromCommonEnemyTileTable = $f0c6
+
+.segment "PRG4"
+.org $94da
+    .byte $40  ; make it orange
+.org $a9da
+    .byte $40
+
+.org $9497  ; P1/2/5 enemy main routine
+    .word UpdatedHiddenJar
+.org $a997  ; P3/4/6 enemy main routine
+    .word UpdatedHiddenJarOrIk
+.org $956f  ; P1/2/5 enemy draw routine
+    .word DrawHiddenJarBank4
+.org $aa6f  ; P3/4/6 enemy draw routine
+    .word DrawHiddenJarBank4
+
+.reloc
+UpdatedHiddenJar:
+    jsr EnemyDrawRoutine
+    jmp CheckHiddenJarStrike
+
+.reloc
+UpdatedHiddenJarOrIk:
+    jsr EnemyDrawRoutine
+    jmp CheckHiddenJarOrIkStrike
+
+.reloc
+DrawHiddenJarBank4:
+    lda zp_01
+    clc
+    adc #$04                          ; center-adjust the sprite
+    bcs @OffScreen
+    sta zp_01
+    lda #$00
+    sta zp_02                         ; no sprite mirroring
+    ldx #$50                          ; jar tile index
+    jmp DrawFromCommonEnemyTileTable
+@OffScreen:
+    rts
+
+.segment "PRG5"
+.org $94da
+    .byte $40  ; make it orange
+
+.org $9497
+    .word UpdatedHiddenJarOrFokkaStrike
+.org $956f
+    .word DrawHiddenJarBank5
+
+.reloc
+UpdatedHiddenJarOrFokkaStrike:
+    jsr EnemyDrawRoutine
+    jmp CheckHiddenJarOrFokkaStrike
+
+.reloc
+DrawHiddenJarBank5:
+    lda zp_01
+    clc
+    adc #$04                          ; center-adjust the sprite
+    bcs @OffScreen
+    sta zp_01
+    lda #$00
+    sta zp_02                         ; no sprite mirroring
+    ldx #$50                          ; jar tile index
+    jmp DrawFromCommonEnemyTileTable
+@OffScreen:
+    rts
+
+""");
+    }
+
     /// Rewrite the graphic tiles for walkthrough walls to be something else
     public void RevealWalkthroughWalls()
     {
@@ -2356,6 +2643,9 @@ ElevatorBossFix:
         { ' ', 0xf4 },
         { '-', 0xf6 },
         { '\n', 0xfd },
+        // Extended characters on the title screen
+        { ',', 0x9c },
+        { '©', 0x0e },
     };
 
     private static readonly IDictionary<byte, char> ReverseCharMap = CharMap.ToDictionary(x => x.Value, x => x.Key);

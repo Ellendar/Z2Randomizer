@@ -33,6 +33,8 @@
 
 FREE "PRG0" [$a89e, $a980)
 ; FREE "PRG0" [$AA40, $c000)
+;FREE "PRG0" [$A89E, $A980)
+; FREE "PRG0" [$A89E, $A970) ; Reserve some space for z2ft
 FREE "PRG0" [$AB00, $c000) ; give room for z2edit to patch $aa40
 
 FREE "PRG1" [$87c6, $88a0)
@@ -45,9 +47,9 @@ FREE "PRG2" [$93c9, $9400)
 FREE "PRG2" [$9f85, $a000)
 FREE "PRG2" [$a933, $b480)
 
-FREE "PRG3" [$8cc0, $90f0)
-FREE "PRG3" [$9135, $9400)
-FREE "PRG3" [$9d0b, $a000)
+FREE "PRG3" [$8bb1, $90f0)
+FREE "PRG3" [$9134, $9400)
+FREE "PRG3" [$9d0a, $a000)
 FREE "PRG3" [$B803, $c000)
 
 FREE "PRG4" [$83DC, $8470)
@@ -57,7 +59,9 @@ FREE "PRG4" [$870E, $871B)
 FREE "PRG4" [$8817, $88A0)
 FREE "PRG4" [$8EC3, $9400)
 FREE "PRG4" [$9EE0, $a000)
-FREE "PRG4" [$A1E3, $A1F8)
+; not strictly unused. its copied to ram for palace data,
+; it may really be unused but don't risk it.
+; FREE "PRG4" [$A1E3, $A1F8)
 FREE "PRG4" [$A3FB, $A440)
 FREE "PRG4" [$A539, $A640)
 FREE "PRG4" [$A765, $A900)
@@ -77,11 +81,19 @@ FREE "PRG5" [$bda1, $c000)
 ;FREE "PRG6" [$ac09, $c000) TEMP
 FREE "PRG6" [$ac21, $c000)
 
-FREE "PRG7" [$d39a, $d3ca)
+; FREE "PRG7" [$d39a, $d3c2)
 ; DPCM data, will affect dpcm sfx but not gameplay so its fine to use this as a last ditch
 ; free space for patches. Keep it disabled as much as possible
 ; FREE "PRG7" [$f369, $fcfb)
-FREE "PRG7" [$f3d0, $fcfb) ; allow code in the ganon laugh sfx but not the hurt sfx
+; allow code in the ganon laugh sfx but not the hurt sfx
+; This is fine because we now put the ganon laugh in PRG1F instead
+FREE "PRG7" [$f3d0, $fcfb)
+; carve around the ganon sfx and hope it still fits
+; FREE "PRG7" [$f581, $f700)
+; FREE "PRG7" [$f814, $f840)
+; FREE "PRG7" [$f955, $f9c0)
+; FREE "PRG7" [$fb71, $fcfb)
+; FREE "PRG7" [$FEAA, $FED0)
 
 ; Currently these are only used as space for music tracks
 ;FREE "PRG10" [$a000, $c000)
@@ -101,4 +113,7 @@ FREE "PRG1D" [$a000, $c000)
 FREE "PRG1E" [$a000, $c000)
 
 ; Most of bank 1f is reserved for z2ft
-FREE "PRG1F" [$ff80, $ffe8)
+; But we have some small gaps we can slide in between the DPCM samples
+FREE "PRG1F" [$fad6, $fb00)
+FREE "PRG1F" [$fc14, $fc40)
+FREE "PRG1F" [$fe31, $ffe8)

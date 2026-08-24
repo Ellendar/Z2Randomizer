@@ -75,6 +75,20 @@
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.PermanentBeamSwordToolTip}"/></ToolTip.Tip>
             </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Main.Config.MarioMode}"
+                Content="Mario Mode"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MarioModeToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <ComboBox
+                Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Flute Warp"
+                ItemsSource="{Binding Source={x:Static rc:Enums.FluteWarpModeList}}"
+                SelectedItem="{Binding Main.Config.FluteWarpMode, Converter={x:Static ui:Util.EnumConvert}}"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.FluteTwisterWarpToolTip}"/></ToolTip.Tip>
+            </ComboBox>
         </StackPanel>
     </Grid>
 </UserControl>

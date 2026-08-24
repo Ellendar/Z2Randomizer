@@ -138,6 +138,7 @@ public class RandomizerProperties
     public int[] PalaceItemRoomCounts { get; set; } = new int[7];
     public bool UsePalaceItemRoomCountIndicator { get; set; }
     public bool RevealWalkthroughWalls { get; set; }
+    public bool RevealHiddenJars { get; set; }
 
     //Enemies
     public EnemyLifeOption ShuffleEnemyHP { get; set; }
@@ -216,10 +217,12 @@ public class RandomizerProperties
     public bool TownNameHints { get; set; }
 
     //Misc.
+    public bool MarioMode { get; set; }
     public byte BeepFrequency { get; set; }
     public byte BeepThreshold { get; set; }
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
+    public FluteWarpMode FluteWarpMode { get; set; }
     public bool FastCast { get; set; }
 
     public BeamSprites BeamSprite { get; set; }

@@ -235,6 +235,19 @@ public enum SwordImmunityOption
     NONE,
 }
 
+[DefaultValue(NONE)]
+public enum FluteWarpMode
+{
+    [Description("No Flute Warp")]
+    NONE,
+    [Description("Cleared Palaces")]
+    CLEARED_PALACES,
+    [Description("Visited Palaces")]
+    VISITED_PALACES,
+    [Description("Visited Towns")]
+    VISITED_TOWNS,
+}
+
 [DefaultValue(VANILLA)]
 public enum PalaceStyle
 {
@@ -1007,6 +1020,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> BossLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>(i => i != EnemyLifeOption.WIDE);
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
     public static IEnumerable<EnumDescription> SwordImmunityOptionList { get; } = ToDescriptions<SwordImmunityOption>();
+    public static IEnumerable<EnumDescription> FluteWarpModeList { get; } = ToDescriptions<FluteWarpMode>();
     public static IEnumerable<EnumDescription> BossRoomMinDistanceOptions { get; } = ToDescriptions<BossRoomMinDistance>();
     public static IEnumerable<EnumDescription> PalaceLengthOptionList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();

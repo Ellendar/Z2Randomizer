@@ -19,8 +19,8 @@
     <None Remove="nlog.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Desktop.Common\Desktop.Common.csproj" />
     <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
+    <ProjectReference Include="..\Desktop.Common\Desktop.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
