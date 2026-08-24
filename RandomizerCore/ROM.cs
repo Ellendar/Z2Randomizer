@@ -935,7 +935,7 @@ ReturnNormally:
         a.Module().Code("""
 .include "z2r.inc"
 
-.import SwapPRG, SwapToSavedPRG, PalaceMappingTable
+.import SwapPRG, SwapToSavedPRG, PalaceTimestampTable
 
 ; move the pointers for the data for the sideviews to load from RAM instead.
 .segment "PRG7"
@@ -990,12 +990,8 @@ CopySideviewIntoRAMAndLoadPointer:
     lda WorldNumber
     cmp #3
     bcc @skipswap
-        lda RegionNumber
-        asl
-        asl
-        adc PalaceRegionIndex
-        tay
-        lda PalaceMappingTable,y
+        ldy PalaceNumber
+        lda PalaceTimestampTable-1,y
         cmp #$ff
         beq @skipswap
         ; Prevent bank swapping during the end game cutscene
