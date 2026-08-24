@@ -817,6 +817,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool revealWalkthroughWalls = false;
 
     [Reactive]
+    private bool revealHiddenJars = false;
+
+    [Reactive]
     private bool shareSeedAcrossDifficulty = false;
 
     //Meta
@@ -1314,6 +1317,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.HardBosses = hardBosses;
         properties.AggressiveTbird = aggressiveTbird;
         properties.RevealWalkthroughWalls = revealWalkthroughWalls;
+        properties.RevealHiddenJars = revealHiddenJars;
 
         //Enemies
         properties.ShuffleEnemyHP = includeDifficulty ? shuffleEnemyHP : EnemyLifeOption.VANILLA;

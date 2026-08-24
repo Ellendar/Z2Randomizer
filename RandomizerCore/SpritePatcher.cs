@@ -167,6 +167,8 @@ internal class SpritePatcher
         // Level up pane
         if (0x1bba <= addr && addr < 0x1c2a) { return true; }
 
+        // Some_Palettes_Data_related_to_Falling_Animation
+        if (0x2849 <= addr && addr < 0x2869) { return true; }
         // Table_for_Links_Palettes_Probably
         if (0x2a00 <= addr && addr < 0x2a18) { return true; }
 
@@ -219,7 +221,7 @@ internal class SpritePatcher
         if (0xCb9e <= addr && addr < 0xCba5) { return false; }
         // bank3_Object_Construction_Routine
         if (0xCba5 <= addr && addr < 0xCbc1) { return false; }
-        // Blank data
+        // Blank data in bank 3
         if (0xCbc1 <= addr && addr < 0xD100) { return true; }
 
         // bank3_Pointer_table_for_Objects_Construction_Routines
@@ -237,6 +239,11 @@ internal class SpritePatcher
 
         // bank4_Default_Palettes_for_Palaces_Type_A_B_
         if (0x1001e <= addr && addr < 0x100fe) { return true; }
+        // bank4_Area_Data_for_Palaces_Type_A_Entrance
+        if (0x102f5 <= addr && addr < 0x103ec) { return false; }
+
+        // bank4_Palaces_Type_A_B_Palettes
+        if (0x10480 <= addr && addr < 0x10510) { return true; }
         // bank4_Area_Pointers_Palaces_Type_A
         if (0x10533 <= addr && addr < 0x1072b) { return false; }
         // bank4_Area_Data
@@ -244,6 +251,8 @@ internal class SpritePatcher
 
         // Blank data
         if (0x12775 <= addr && addr < 0x12910) { return true; }
+        // bank4_Palettes_for_Palaces1
+        if (0x13f10 <= addr && addr < 0x13f70) { return true; }
 
         // Palettes for Great Palace
         if (0x1401e <= addr && addr < 0x140fe) { return true; }
@@ -261,12 +270,17 @@ internal class SpritePatcher
 
         // bank5_table_intro_screen_text (Sprite credits stored at 0x16abb)
         if (0x16942 <= addr && addr < 0x16af5) { return true; }
-        
-        // Blank data
+
+        // bank5_Table_for_some_palettes
+        if (0x17c08 <= addr && addr < 0x17c28) { return true; }
+        // Blank data in bank 5
         if (0x17db1 <= addr && addr < 0x17f70) { return true; }
 
         // bank7_Table_for_Overworld_Palettes
         if (0x1c468 <= addr && addr < 0x1c48c) { return true; }
+        // palette set for Dark Link fight
+        if (0x1c48f <= addr && addr < 0x1c49f) { return true; }
+        if (0x1c4a3 <= addr && addr < 0x1c4b3) { return true; }
 
         // bank7_Table_for_some_Palettes
         if (0x1d0cd <= addr && addr < 0x1d0e1) { return true; }
