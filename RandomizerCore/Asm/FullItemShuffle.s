@@ -1,6 +1,6 @@
 .include "z2r.inc"
 
-.import FlagHudUpdate
+.import FlagHudUpdate, CheckAddItemTimestamp
 
 ; This is a list of items that are potentially replaced. The randomizer must set these values to the replacement value
 ;.import SHIELD_SPELL_ITEMLOC, JUMP_SPELL_ITEMLOC, LIFE_SPELL_ITEMLOC, FAIRY_SPELL_ITEMLOC
@@ -156,6 +156,25 @@ CheckIfWeAlreadyHaveItemForTown:
 
 .else # not _DO_SPELL_SHUFFLE_WIZARD_UPDATE
 
+; track non-item shuffle spell pickups
+; (and avoid double-tracking with AlreadyLearned for full shuffle)
+.org $b531
+    jsr LearnSpellAndTrackTimestamp
+.reloc
+LearnSpellAndTrackTimestamp:
+    lda $077b,y
+    bne @AlreadyLearned
+        tya
+        pha
+            lda TownToItemTable,y
+            jsr CheckAddItemTimestamp
+        pla
+        tay
+@AlreadyLearned:
+    lda #1
+    sta $077b,y
+    rts
+
 .if _CHECK_WIZARD_MAGIC_CONTAINER
 .org $b526
     lda $0783
@@ -267,7 +286,6 @@ GetItemDontKillEnemy:
 .segment "PRG7"
 
 ; Patch GetItem to add stat tracking
-.import CheckAddItemTimestamp
 .org GetItem
     jsr CheckAddItemTimestamp
 
