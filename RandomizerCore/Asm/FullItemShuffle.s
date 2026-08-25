@@ -1,5 +1,7 @@
 .include "z2r.inc"
 
+.import FlagHudUpdate
+
 ; This is a list of items that are potentially replaced. The randomizer must set these values to the replacement value
 ;.import SHIELD_SPELL_ITEMLOC, JUMP_SPELL_ITEMLOC, LIFE_SPELL_ITEMLOC, FAIRY_SPELL_ITEMLOC
 ;.import REFLECT_SPELL_ITEMLOC, FIRE_SPELL_ITEMLOC, SPELL_SPELL_ITEMLOC, THUNDER_SPELL_ITEMLOC
@@ -256,6 +258,9 @@ CheckGetItemCustomLocationMisc:
 GetItemDontKillEnemy:
     dec DontKillEnemyFlag
     jsr GetItem
+    ; 1ups and keys in town need to force a HUD update
+    jsr FlagHudUpdate
+    lda #0
     jmp DialogConditionsDefault
 
 
