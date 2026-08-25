@@ -16,14 +16,13 @@ public static class OutputFilenameFormatter
     private static readonly char[] InvalidFileNameChars =
         ['<', '>', ':', '"', '/', '\\', '|', '?', '*'];
 
-    public static string Format(string? template, string flags, string? seed, string hash, DateTime? timestamp = null, string? version = null)
+    public static string Format(string? template, string flags, string? seed, string hash, DateTime? timestamp = null, string? version = null, bool marioMode = false)
     {
         var resolvedTemplate = string.IsNullOrWhiteSpace(template) ? DefaultTemplate : template;
         var resolvedTimestamp = (timestamp ?? DateTime.Now).ToString("yyyy-MM-dd-HHmm", CultureInfo.InvariantCulture);
         var normalizedHash = string.Concat((hash ?? "").Where(c => !char.IsWhiteSpace(c)));
 
-        // add a Z2M option here once the Mario version is merged
-        var resolvedGame = "Z2";
+        var resolvedGame = marioMode ? "Z2M" : "Z2";
 
         var formatted = resolvedTemplate
             .Replace("%g", resolvedGame, StringComparison.Ordinal)
