@@ -101,7 +101,14 @@ Seed: {config.Seed}
                         var flags = config.SerializeFlags();
                         var version = Assembly.GetEntryAssembly()!.GetName().Version!;
                         var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
-                        var filename = OutputFilenameFormatter.Format(config.OutputFilenameTemplate, flags, config.Seed, randomizer.Hash, version: versionstr);
+                        var filename = OutputFilenameFormatter.Format(
+                            config.OutputFilenameTemplate,
+                            flags,
+                            config.Seed,
+                            randomizer.Hash,
+                            version: versionstr,
+                            marioMode: config.MarioMode
+                        );
                         var basename = Path.GetFileNameWithoutExtension(filename);
                         if (string.IsNullOrEmpty(basename))
                         {
