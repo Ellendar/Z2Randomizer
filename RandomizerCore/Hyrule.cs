@@ -3,6 +3,7 @@ using FtRandoLib.Importer;
 using js65;
 using NLog;
 using NLog.Targets;
+using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -140,7 +141,7 @@ public class Hyrule
 
     //DEBUG/STATS
 #pragma warning disable CS0414 // Field is assigned but its value is never used
-    private static int DEBUG_THRESHOLD = 200;
+    private static int DEBUG_THRESHOLD = 50;
 #pragma warning restore CS0414 // Field is assigned but its value is never used
     public DateTime startTime = DateTime.Now;
     // public DateTime startRandomizeStartingValuesTimestamp;
@@ -1662,38 +1663,19 @@ public class Hyrule
             }
         }
 
-        if (accessibleMagicContainers >= 1)
+        //Mario always runs fast and jumps high, so assume he always has access to jump and dash
+        //(even though they aren't collectable)
+        //Also mario implicitly has upstab as a requirementType because it means "can break blocks upward"
+        //but not in itemget because he can still get the upstab upgrade, which lets him POW
+        if(props.MarioMode)
         {
-            requireables.Add(RequirementType.ONE_CONTAINER);
+            requireables.Add(RequirementType.JUMP);
+            requireables.Add(RequirementType.DASH);
+            requireables.Add(RequirementType.UPSTAB);
         }
-        if (accessibleMagicContainers >= 2)
-        {
-            requireables.Add(RequirementType.TWO_CONTAINERS);
-        }
-        if (accessibleMagicContainers >= 3)
-        {
-            requireables.Add(RequirementType.THREE_CONTAINERS);
-        }
-        if (accessibleMagicContainers >= 4)
-        {
-            requireables.Add(RequirementType.FOUR_CONTAINERS);
-        }
-        if (accessibleMagicContainers >= 5)
-        {
-            requireables.Add(RequirementType.FIVE_CONTAINERS);
-        }
-        if (accessibleMagicContainers >= 6)
-        {
-            requireables.Add(RequirementType.SIX_CONTAINERS);
-        }
-        if (accessibleMagicContainers >= 7)
-        {
-            requireables.Add(RequirementType.SEVEN_CONTAINERS);
-        }
-        if (accessibleMagicContainers == 8)
-        {
-            requireables.Add(RequirementType.EIGHT_CONTAINERS);
-        }
+
+        requireables.AddRange(RequirementTypeExtensions.UpToXContainers(accessibleMagicContainers));
+       
         return requireables;
     }
 
@@ -2285,11 +2267,13 @@ public class Hyrule
         List<Location> unallocatedTowns = new List<Location> { westHyrule.rauru, westHyrule.ruto, westHyrule.sariaNorth, westHyrule.mido, 
             eastHyrule.nabooru, eastHyrule.darunia, eastHyrule.newKasuto, eastHyrule.oldKasuto };
 
-        var filteredToJustSpells = Enum.GetValues(typeof(Collectable)).Cast<Collectable>().Where(i => i.IsSpell());
+        var filteredToJustSpells = Enum.GetValues<Collectable>().Cast<Collectable>().Where(i => i.IsSpell());
         foreach (Collectable spell in filteredToJustSpells)
         {
             if (props.ReplaceFireWithDash && spell == Collectable.FIRE_SPELL
                 || !props.ReplaceFireWithDash && spell == Collectable.DASH_SPELL
+                || props.MarioMode && spell == Collectable.JUMP_SPELL
+                || !props.ReplaceFireWithDash && spell == Collectable.TANOOKI
                 || spell == Collectable.UPSTAB
                 || spell == Collectable.DOWNSTAB)
             {

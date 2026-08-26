@@ -625,6 +625,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements": [["HAMMER", "GLOVE"], ["TANOOKI", "GLOVE"]],
     "sideviewData": "24600E08D40860016B02D10E84919091D60860016B02D10E84919091D60860016B02D10E"
   },
   {
@@ -994,6 +995,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "duplicateGroup": "P3 Walled-off Jumps Over Lava Room",
     "sideviewData": "3760031016B6D200F011D203D600F012D303D300F011D2037020600F08DA00F012D303D400F012D303D400F011D203D300F012D30311B6"
   },
@@ -1082,6 +1084,7 @@
         "UPSTAB"
       ]
     ],
+	"marioRequirements": [["HAMMER", "GLOVE"]],
     "sideviewData": "35600310D600822F91915F2A8022617190918231822AD5093191509160919091522E832F359160919091D70C8427A30F0BD10B9073"
   },
   {
@@ -2504,6 +2507,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "duplicateGroup": "P3 Walled-off Jumps Over Lava Room",
     "sideviewData": "3760031016B6D200F011D203D600F012D303D300F011D2037020600F08DA00F012D303D400F012D303D400F011D203D300F012D30311B6"
   },
@@ -2558,6 +2562,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "tags": ["WalkthroughWall"],
     "sideviewData": "186000106F0980C26B0980C26B0980C2B3A3680980C219B9"
   },
@@ -2612,6 +2617,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements": [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "tags": ["LongDeadEnd"],
     "suppressWarning": ["DropZoneNoRespawnPoint"],
     "sideviewData": "1B600010E10018B91BB9D180DA0010B780709070DC02820F0CD20F"
@@ -6962,6 +6968,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "33600E108AB2D101D400F0136451A02C71506177F25080F1520F08F711A271F211A221F211A221F211A227D803D205D2064075"
   },
   {
@@ -7015,6 +7022,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "16600010DD0E80B2DC00DB0EF35000F1B071D5006001"
   },
   {
@@ -7042,6 +7050,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "37600F109173D20AF450702980F182279077F811D204020F1210B5D300F011D204D800F012D30412B5D300F012D30414B5D500F012D304"
   },
   {
@@ -7362,6 +7371,7 @@
       "GLOVE",
       "FAIRY"
     ],
+	"marioRequirements" : ["FAIRY", ["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "1C600F10F75000F1B073D20ED600DE0E909BDC0BD308D902D304D306"
   },
   {
@@ -7389,6 +7399,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"]],
     "sideviewData": "1E600E1084B2F35080F184B2187D3873D20050013201917F727D527CDC06"
   },
   {
@@ -11927,6 +11938,7 @@
       "GLOVE",
       "FAIRY"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "50600010D00FD20040B643916021A021D207F05080F1D701409160958099523174319431330025094021702780B1127D307A76B1907051228074857F127D502760B158B1702031246074D50A70719071"
   },
   {
@@ -11980,6 +11992,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"]],
     "sideviewData": "2D600310D901722F80914D2E900F0B51718071742E8491F650509180F1422F122F7191722FA22F5291D90B5074"
   },
   {
@@ -12007,6 +12020,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"]],
     "tags": ["NoMirror"],
     "sideviewData": "39600308107CDD054271D201402E722D84F1827868B161918091112C20714029732D310F0B26923092509281B1D20DA02FF75000D901D9D10F"
   },
@@ -14270,6 +14284,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": ["GLOVE"],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "2C600320107D307DDF02D101D100E20002729071742380B2F150607190F182B202729171DA01D102D103D104"
   },
   {
@@ -14298,6 +14313,7 @@
       "GLOVE",
       "FAIRY"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "54600E08D0E802CA0188440005CA33705070212070211126310080B2621090B1320080B2712121203170507056C536705070212070211126310080B2621090B1320080B2712121203170507003CA0188440005CA"
   },
   {
@@ -15108,6 +15124,7 @@
     "requirements": [
       "GLOVE"
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "2E600E08D408208B4B02D1021079307954917091D608208B40014B02D1021079307954917091D608208B4001DC0E"
   },
   {
@@ -15345,6 +15362,7 @@
         "GLOVE"
       ]
     ],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "22600F08D015D413D311D4103200DF05310012B411B43200D2103E00D311D413D315"
   },
   {
@@ -15562,6 +15580,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": ["GLOVE"],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "suppressWarning": ["EnemyTooCloseToEntrance"],
     "sideviewData": "34600D08A02903D4D1F074C2F117906778C2A02ED50D00D4AA2F923BD10B50218132623470307292D20D81309430A12F0AD4D1F0"
   },
@@ -16644,6 +16663,7 @@
     "hasDrop": false,
     "elevatorScreen": 2,
     "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
+	"marioRequirements" : [["GLOVE", "HAMMER"]],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B2B067D195A4610C533DE",
@@ -17075,6 +17095,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": ["GLOVE"],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0D89D086107B4008C7118F1E0F",
@@ -17200,6 +17221,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": ["FAIRY", "GLOVE"],
+	"marioRequirements" : [],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0B0A070F5A02CE7E9E8391",
@@ -17225,6 +17247,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": ["GLOVE"],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "tags": ["Expert"],
     "isDropZone": true,
     "hasItem": false,
@@ -17353,6 +17376,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": ["GLOVE"],
+	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0B5C073E4E77D95CC04705",
@@ -17781,6 +17805,7 @@
     "hasDrop": false,
     "elevatorScreen": 2,
     "requirements": ["GLOVE"],
+	"marioRequirements" : [["GLOVE", "HAMMER"]],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "09695E65D90A8D058D",
@@ -17958,6 +17983,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": ["JUMP", "FAIRY"],
+	"marioRequirements": ["FAIRY"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "097E8B0D0B72D12A85",
@@ -18682,6 +18708,7 @@
     "hasDrop": true,
     "elevatorScreen": 0,
     "requirements": ["FAIRY", "GLOVE"],
+	"marioRequirements" : [],
     "tags": ["NoMirror"],
     "isDropZone": false,
     "hasItem": false,

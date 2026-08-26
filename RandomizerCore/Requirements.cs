@@ -345,6 +345,11 @@ public class Requirements
                 return RequirementType.EIGHT_CONTAINERS;
         }
     }
+
+    public bool IsEmpty()
+    {
+        return IndividualRequirements.Length == 0 && CompositeRequirements.Length == 0;
+    }
 }
 
 public class RequirementsJsonConverter : JsonConverter<Requirements>

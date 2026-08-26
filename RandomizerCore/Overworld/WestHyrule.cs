@@ -1556,7 +1556,7 @@ public sealed class WestHyrule : World
         rauru.Town!.GetWizard()!.Collectable = Collectable.SHIELD_SPELL;
         rauru.Town!.GetWizard()!.CollectableIsShufflable = props.IncludeSpellsInShuffle;
 
-        ruto.Town!.GetWizard()!.Collectable = Collectable.JUMP_SPELL;
+        ruto.Town!.GetWizard()!.Collectable = props.MarioMode ? Collectable.TANOOKI : Collectable.JUMP_SPELL;
         ruto.Town!.GetWizard()!.CollectableIsShufflable = props.IncludeSpellsInShuffle;
 
         sariaNorth.Town!.GetWizard()!.Collectable = Collectable.LIFE_SPELL;

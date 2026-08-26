@@ -42,6 +42,7 @@ public enum Collectable
     SPELL_SPELL = 0x22,
     THUNDER_SPELL = 0x23,
     DASH_SPELL = 0x24,
+    TANOOKI = 0x25
 }
 
 
@@ -105,6 +106,7 @@ public static class CollectableExtensions
             Collectable.SPELL_SPELL => true,
             Collectable.THUNDER_SPELL => true,
             Collectable.DO_NOT_USE_ANTIFAIRY => false,
+            Collectable.TANOOKI => true,
             _ => throw new Exception("Invalid item type determining itemgets")
         };
     }
@@ -148,6 +150,7 @@ public static class CollectableExtensions
             Collectable.REFLECT_SPELL => "REFLECT$SPELL",
             Collectable.SPELL_SPELL => "SPELL$SPELL",
             Collectable.THUNDER_SPELL => "THUNDER$SPELL",
+            Collectable.TANOOKI => "TANOOKI$SUIT",
             _ => "MISSING"
         };
     }
@@ -191,6 +194,7 @@ public static class CollectableExtensions
             Collectable.REFLECT_SPELL => "REFLECT",
             Collectable.SPELL_SPELL => "SPELL",
             Collectable.THUNDER_SPELL => "THUNDER",
+            Collectable.TANOOKI => "TANOOKI",
             _ => "MISSING"
         };
     }
@@ -208,6 +212,7 @@ public static class CollectableExtensions
             Collectable.REFLECT_SPELL => true,
             Collectable.SPELL_SPELL => true,
             Collectable.THUNDER_SPELL => true,
+            Collectable.TANOOKI => true,
             _ => false
         };
     }
@@ -268,6 +273,8 @@ public static class CollectableExtensions
             Collectable.HAMMER => RequirementType.HAMMER,
             Collectable.BOOTS => RequirementType.BOOTS,
             Collectable.BAGUS_NOTE => RequirementType.BAGU_LETTER,
+            Collectable.TANOOKI => RequirementType.TANOOKI,
+            Collectable.SHIELD_SPELL => RequirementType.SHIELD,
             _ => null
         };
     }
@@ -278,6 +285,7 @@ public static class CollectableExtensions
         {
             Collectable.SHIELD_SPELL => 0,
             Collectable.JUMP_SPELL => 1,
+            Collectable.TANOOKI => 1,
             Collectable.LIFE_SPELL => 2,
             Collectable.FAIRY_SPELL => 3,
             Collectable.FIRE_SPELL => 4,

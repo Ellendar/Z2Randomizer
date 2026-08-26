@@ -41,7 +41,6 @@ public class RoomPoolTests
             Enemies = [0x01],
             ItemGetBits = [0x0F],
             Connections = connections,
-            Requirements = Requirements.NONE,
             Map = map
         };
         room.OnDeserialized();

@@ -126,7 +126,31 @@ public class Palaces
             palaces.Add(palace);
         }
 
-        palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.WithHardRequirement(RequirementType.REFLECT);
+        //Add boss room requirements
+        Requirements effectiveRequirements = palaces[3].BossRoom!.GetEffectiveRequirements(props.MarioMode);
+        palaces[3].BossRoom!.SetEffectiveRequirements(effectiveRequirements.WithHardRequirement(RequirementType.REFLECT), props.MarioMode);
+        if (props.MarioMode)
+        {
+            //Mario carock also requires the shield spell so you actually have a shield to reflect with
+            palaces[3].BossRoom!.SetEffectiveRequirements(
+                palaces[3].BossRoom!.GetEffectiveRequirements(true).WithHardRequirement(RequirementType.SHIELD), true);
+            //Also shield+reflect is kind of expensive so up the container requirement slightly to avoid excess grinding requirement
+            palaces[3].BossRoom!.SetEffectiveRequirements(
+                palaces[3].BossRoom!.GetEffectiveRequirements(true).WithHardRequirement(RequirementType.FIVE_CONTAINERS), true);
+            //Gooma is technically beatable with nothing by stomping into his hitbox but it is very hard
+            //technically this implementation breaks if we ever add a boss room with additional requirements
+            //but there's no way at present to easily logically add an OR requirement into existing requirements
+            palaces[4].BossRoom!.SetEffectiveRequirements(new Requirements([RequirementType.HAMMER, RequirementType.TANOOKI]), true);
+            //For now stomp-only barba is in logic. Maybe we change that later.
+
+            //Mario Tbird requires hammer (in addition to thunder)
+            if(palaces[6].TbirdRoom != null)
+            {
+                palaces[6].TbirdRoom?.SetEffectiveRequirements(
+                    palaces[6].TbirdRoom!.GetEffectiveRequirements(true).WithHardRequirement(RequirementType.HAMMER), true);
+            }
+        }
+
         foreach (Room room in palaces.SelectMany(i => i.ItemRooms).Where(i => i.Collectable == null))
         {
             room.Collectable = Collectable.LARGE_BAG;
@@ -323,7 +347,7 @@ public class Palaces
         {
             //If there is at least one palace that would be clearable with everything but the glove
             //that palace could contain the glove, so we're not deadlocked.
-            if (palaces[i].CanClearAllRooms(requireables, Collectable.GLOVE))
+            if (palaces[i].CanClearAllRooms(requireables, Collectable.GLOVE, props.MarioMode))
             {
                 return true;
             }
@@ -395,13 +419,13 @@ public class Palaces
                 ];
             }
             //If we can clear P2 with this stuff, we can also get the glove
-            if (palace2.CanClearAllRooms(requireables, Collectable.GLOVE))
+            if (palace2.CanClearAllRooms(requireables, Collectable.GLOVE, props.MarioMode))
             {
                 requireables.Add(RequirementType.GLOVE);
             }
             //If we can't clear 3 with all the items available on west/DM, we can never raft out, and so we're stuck forever
             //so start over
-            if (!palace3.CanClearAllRooms(requireables, Collectable.RAFT))
+            if (!palace3.CanClearAllRooms(requireables, Collectable.RAFT, props.MarioMode))
             {
                 return false;
             }

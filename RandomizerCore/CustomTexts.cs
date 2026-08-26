@@ -144,6 +144,7 @@ public class CustomTexts
     {
         { Collectable.SHIELD_SPELL, 15 },
         { Collectable.JUMP_SPELL, 24 },
+        { Collectable.TANOOKI, 24 },
         { Collectable.LIFE_SPELL, 35 },
         { Collectable.FAIRY_SPELL, 46 },
         { Collectable.FIRE_SPELL, 70 },
@@ -486,6 +487,7 @@ public class CustomTexts
     {
         { Collectable.SHIELD_SPELL, ["Have you$tried not$dying?", "I Already$Have One", "Is This$A Red$Ring?"] },
         { Collectable.JUMP_SPELL, ["I get up$and nothin$gets me$down", "Kris Kross$will make$you..."] },
+        { Collectable.TANOOKI, [] },
         { Collectable.LIFE_SPELL, ["have you$tried the$Healmore$spell?", "Dont$blame me$if this is$1 bar", "How Many$Bars Will$I Heal"] },
         { Collectable.FAIRY_SPELL, ["HEY!$LISTEN", "Just$dont say$Hey$listen!", "Watch Out$For Iron"] },
         { Collectable.FIRE_SPELL, ["this is$fine", "use this$to burn$gems", "This spell$is$worthless", "Goodness$Gracious!", "This one$goes out$to the one$I love"]},

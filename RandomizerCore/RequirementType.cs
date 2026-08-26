@@ -32,7 +32,10 @@ public enum RequirementType
     BOOTS,
     FLUTE,
     HAMMER,
-    BAGU_LETTER
+    BAGU_LETTER,
+    //Mario specific requireables
+    TANOOKI,
+    SHIELD
 }
 
 public static class RequirementTypeExtensions
@@ -61,6 +64,8 @@ public static class RequirementTypeExtensions
             RequirementType.HAMMER => Collectable.HAMMER,
             RequirementType.BOOTS => Collectable.BOOTS,
             RequirementType.BAGU_LETTER => Collectable.BAGUS_NOTE,
+            RequirementType.TANOOKI => Collectable.TANOOKI,
+            RequirementType.SHIELD => Collectable.SHIELD_SPELL,
             _ => null
         };
     }

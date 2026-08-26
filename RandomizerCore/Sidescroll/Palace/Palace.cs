@@ -999,7 +999,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         }
     }
 
-    public bool CanClearAllRooms(IReadOnlySet<RequirementType> requireables, Collectable palaceItem)
+    public bool CanClearAllRooms(IReadOnlySet<RequirementType> requireables, Collectable palaceItem, bool isMario)
     {
         //If the palace's item can be reached with the current items, it can be used to clear the rest of the palace.
         RequirementType? palaceItemRequirement = palaceItem.AsRequirement();
@@ -1015,8 +1015,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             else return false;
         }
 
-        List<Room> unclearableRooms = AllRooms.Where(i => !i.Requirements.AreSatisfiedBy(requireables)).ToList();
-        return unclearableRooms.Count == 0;
+        IEnumerable<Room> unclearableRooms = AllRooms.Where(i => !i.GetEffectiveRequirements(isMario).AreSatisfiedBy(requireables));
+        return !unclearableRooms.Any();
     }
 
     public bool HasDisallowedDrop(bool palacesContinueAfterBoss, PalaceDropStyle dropStyle, Random r)

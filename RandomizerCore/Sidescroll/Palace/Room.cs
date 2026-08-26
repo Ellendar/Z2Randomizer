@@ -105,8 +105,11 @@ public class Room : IJsonOnDeserialized
     public bool HasDrop { get; set; }
     public bool HasDroppableElevator { get; set; }
     public int ElevatorScreen { get; set; }
+    [JsonPropertyName("requirements")]
     [JsonConverter(typeof(RequirementsJsonConverter))]
-    public Requirements Requirements { get; set; }
+    private Requirements LinkRequirements { get; set; } = Requirements.NONE;
+    [JsonConverter(typeof(RequirementsJsonConverter))]
+    private Requirements MarioRequirements { get; set; } = Requirements.NONE;
     public bool IsDropZone { get; set; }
     public bool HasItem { get; set; }
     [JsonConverter(typeof(HexStringConverter))]
@@ -195,7 +198,7 @@ public class Room : IJsonOnDeserialized
         IsDropZone = room.IsDropZone;
         IsEntrance = room.IsEntrance;
         IsThunderBirdRoom = room.IsThunderBirdRoom;
-        Requirements = room.Requirements;
+        LinkRequirements = room.LinkRequirements;
         Name = room.Name;
         LinkedRoomName = room.LinkedRoomName;
         Author = room.Author;
@@ -226,6 +229,10 @@ public class Room : IJsonOnDeserialized
         HasDownExit = IsUpDownReversed ? Connections[2] < 0xFC : Connections[1] < 0xFC;
         HasUpExit = IsUpDownReversed ? Connections[1] < 0xFC : Connections[2] < 0xFC;
         HasRightExit = Connections[3] < 0xFC;
+        if (MarioRequirements == null || MarioRequirements.IsEmpty())
+        {
+            MarioRequirements = LinkRequirements;
+        }
     }
 
     public string Serialize()
@@ -491,7 +498,7 @@ public class Room : IJsonOnDeserialized
     }
     public bool IsTraversable(IReadOnlySet<RequirementType> requireables)
     {
-        return Requirements.AreSatisfiedBy(requireables);
+        return LinkRequirements.AreSatisfiedBy(requireables);
     }
 
     public string GetDebuggerDisplay()
@@ -846,6 +853,19 @@ public class Room : IJsonOnDeserialized
         )];
 
         return mirror;
+    }
+
+    public Requirements GetEffectiveRequirements(bool isMario)
+    {
+        return isMario ? MarioRequirements : LinkRequirements;
+    }
+    public void SetEffectiveRequirements(Requirements requirements, bool isMario)
+    {
+        if(isMario)
+        {
+            MarioRequirements = requirements;
+        }
+        else LinkRequirements = requirements;
     }
 
     public void UpdateSideviewItem(Collectable collectable)

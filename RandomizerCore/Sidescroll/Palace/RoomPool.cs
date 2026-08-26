@@ -250,6 +250,7 @@ public class RoomPool
                      && (palaceNumber >= 6 ? i.PalaceNumber == palaceNumber : i.PalaceNumber == null));
 
         RemoveBlockedRooms(palaceNumber, props);
+
     }
 
     static int RoomExitCount(Room room)
