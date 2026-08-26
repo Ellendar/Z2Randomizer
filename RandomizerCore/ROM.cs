@@ -1980,6 +1980,8 @@ SetDripperHp:
         var a = asm.Module();
         a.Code(/* lang=s */"""
 .include "z2r.inc"
+.import FlagHudUpdate
+
 .segment "PRG7"
 .org $e53b
 SetPostItemPickupVars:
@@ -1989,8 +1991,9 @@ SetPostItemPickupVars:
     beq SetPostItemPickupKeepVelocity  ; skip resetting velocity if 1-up
     lda #$00
     sta $70                            ; set Link's X velocity to zero
-    sta $57d                           ; set Link's Y velocity to zero
+    ;sta $57d                           ; set Link's Y velocity to zero
 SetPostItemPickupKeepVelocity:
+    jsr FlagHudUpdate
     lda #$00
     sta $a8,x                          ; clear item/enemy collision byte to prevent phantom damage
     rts
