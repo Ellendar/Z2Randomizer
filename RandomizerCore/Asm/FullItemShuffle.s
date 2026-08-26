@@ -279,7 +279,6 @@ GetItemDontKillEnemy:
     jsr GetItem
     ; 1ups and keys in town need to force a HUD update
     jsr FlagHudUpdate
-    lda #0
     jmp DialogConditionsDefault
 
 
