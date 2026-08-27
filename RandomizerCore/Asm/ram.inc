@@ -310,6 +310,7 @@ PpuAddrLo := $0303
 PpuTextLength := $0304
 PpuTextData := $0305
 PpuBuffer2Length := $0362
+PpuBuffer2Data := $0363
 
 Sprite_Y_Position := $200
 Sprite_Tilenumber := $201
@@ -408,6 +409,7 @@ SideviewObjectPage := $0717               ; 0-3 page of current sideview object 
 ScrollDirection := $071f                  ; Current scroll direction. 1=Scrolling right, 2=Scrolling left
 ColumnScrollDirection := $0720            ; Scroll direction that is updated only when scrolling crosses a column boundary
 ColumnScrollX := $0721                    ; Scroll position within the current tile column ($00-$1f)
+PpuMacroSelector := $0725
 DialogBoxDrawing := $0726                 ; >0 when drawing dialog and during black screen transitions
 ScrollFrozen := $0728                     ; 1=Screen scrolling frozen (for boss fights)
 ScrollLeftPage := $072a                   ; Which page the left-most pixel of the screen is on (0-3)

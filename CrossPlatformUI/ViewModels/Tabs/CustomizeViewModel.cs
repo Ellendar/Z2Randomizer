@@ -102,6 +102,16 @@ public class CustomizeViewModel : ReactiveObject
         }
     }
 
+    public bool DarkenThunderbird
+    {
+        get => Main.Config.DarkenThunderbird;
+        set
+        {
+            Main.Config.DarkenThunderbird = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
     public bool ShuffleSpritePalettes
     {
         get => Main.Config.ShuffleSpritePalettes;

@@ -108,6 +108,9 @@
 	<data name="RemoveFlashingToolTip" xml:space="preserve">
 <value>Removes rapid flashing that sometimes appears in the base game.</value>
 	</data>
+	<data name="DarkenThunderbirdToolTip" xml:space="preserve">
+<value>Blacks out the background bricks when thunder is cast in Thunderbird's room.</value>
+	</data>
 	<data name="DisableHUDFlashonLagToolTip" xml:space="preserve">
 <value>Prevents the HUD from flying all over the place when lag happens. Does not actually reduce
 the amount of lag.</value>
