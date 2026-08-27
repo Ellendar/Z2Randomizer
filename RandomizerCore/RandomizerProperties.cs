@@ -257,6 +257,7 @@ public class RandomizerProperties
         {
             Collectable.SHIELD_SPELL => StartShield,
             Collectable.JUMP_SPELL => StartJump,
+            Collectable.TANOOKI => StartJump,
             Collectable.LIFE_SPELL => StartLife,
             Collectable.FAIRY_SPELL => StartFairy,
             Collectable.FIRE_SPELL => StartFire,
@@ -284,7 +285,8 @@ public class RandomizerProperties
         {
             StartShield = starts;
         }
-        else if (collectable == Collectable.JUMP_SPELL)
+        else if (collectable == Collectable.JUMP_SPELL
+            || collectable == Collectable.TANOOKI)
         {
             StartJump = starts;
         }

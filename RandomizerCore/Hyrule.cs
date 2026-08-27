@@ -273,6 +273,8 @@ public class Hyrule
                 }
             }
             ItemGet.Remove(props.ReplaceFireWithDash ? Collectable.FIRE_SPELL : Collectable.DASH_SPELL);
+            ItemGet.Remove(
+                props.MarioMode ? Collectable.JUMP_SPELL : Collectable.TANOOKI);
 
             reachableAreas = new HashSet<string>();
             //areasByLocation = new SortedDictionary<string, List<Location>>();
@@ -690,7 +692,11 @@ public class Hyrule
         List<Location> possibleItemLocations = ItemLocations().ToList();
         List<Location> palaceLocations = AllLocations().Where(i => i.Palace != null).ToList();
 
-        spellListOrder = [Collectable.SHIELD_SPELL, Collectable.JUMP_SPELL, Collectable.LIFE_SPELL, Collectable.FAIRY_SPELL,
+        Collectable jump_collectable = props.MarioMode
+            ? Collectable.TANOOKI
+            : Collectable.JUMP_SPELL;
+        spellListOrder = [Collectable.SHIELD_SPELL, jump_collectable,
+            Collectable.LIFE_SPELL, Collectable.FAIRY_SPELL,
             props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL, Collectable.REFLECT_SPELL,
             Collectable.SPELL_SPELL, Collectable.THUNDER_SPELL];
 
@@ -732,7 +738,7 @@ public class Hyrule
         if (props.IncludeSpellsInShuffle)
         {
             shufflableItems.Add(Collectable.SHIELD_SPELL);
-            shufflableItems.Add(Collectable.JUMP_SPELL);
+            shufflableItems.Add(jump_collectable);
             shufflableItems.Add(Collectable.LIFE_SPELL);
             shufflableItems.Add(Collectable.FAIRY_SPELL);
             shufflableItems.Add(props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL);
@@ -893,7 +899,7 @@ public class Hyrule
             Collectable.MAGIC_KEY];
         List<Collectable> possibleStartSpells = [
             Collectable.SHIELD_SPELL,
-            Collectable.JUMP_SPELL,
+            jump_collectable,
             Collectable.LIFE_SPELL,
             Collectable.FAIRY_SPELL,
             Collectable.FIRE_SPELL,
@@ -1161,7 +1167,7 @@ public class Hyrule
                 Collectable.HAMMER,
                 Collectable.FLUTE,
                 Collectable.UPSTAB,
-                Collectable.JUMP_SPELL,
+                jump_collectable,
             ];
 
             importantItemsToDuplicate = importantItemsToDuplicate.Where(shufflableItems.Contains).ToList();
@@ -2273,7 +2279,7 @@ public class Hyrule
             if (props.ReplaceFireWithDash && spell == Collectable.FIRE_SPELL
                 || !props.ReplaceFireWithDash && spell == Collectable.DASH_SPELL
                 || props.MarioMode && spell == Collectable.JUMP_SPELL
-                || !props.ReplaceFireWithDash && spell == Collectable.TANOOKI
+                || !props.MarioMode && spell == Collectable.TANOOKI
                 || spell == Collectable.UPSTAB
                 || spell == Collectable.DOWNSTAB)
             {

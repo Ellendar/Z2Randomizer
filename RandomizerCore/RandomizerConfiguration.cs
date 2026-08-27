@@ -1751,6 +1751,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         {
             Collectable.SHIELD_SPELL => startWithShield,
             Collectable.JUMP_SPELL => startWithJump,
+            Collectable.TANOOKI => startWithJump,
             Collectable.LIFE_SPELL => startWithLife,
             Collectable.FAIRY_SPELL => startWithFairy,
             Collectable.FIRE_SPELL => startWithFire,
