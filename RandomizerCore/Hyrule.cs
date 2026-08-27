@@ -273,6 +273,7 @@ public class Hyrule
                 }
             }
             ItemGet.Remove(props.ReplaceFireWithDash ? Collectable.FIRE_SPELL : Collectable.DASH_SPELL);
+            ItemGet.Remove(props.MarioMode ? Collectable.JUMP_SPELL : Collectable.TANOOKI);
 
             reachableAreas = new HashSet<string>();
             //areasByLocation = new SortedDictionary<string, List<Location>>();
