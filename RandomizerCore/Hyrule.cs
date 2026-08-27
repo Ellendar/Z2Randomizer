@@ -141,7 +141,7 @@ public class Hyrule
 
     //DEBUG/STATS
 #pragma warning disable CS0414 // Field is assigned but its value is never used
-    private static int DEBUG_THRESHOLD = 50;
+    private static int DEBUG_THRESHOLD = 111;
 #pragma warning restore CS0414 // Field is assigned but its value is never used
     public DateTime startTime = DateTime.Now;
     // public DateTime startRandomizeStartingValuesTimestamp;
@@ -691,9 +691,14 @@ public class Hyrule
         List<Location> possibleItemLocations = ItemLocations().ToList();
         List<Location> palaceLocations = AllLocations().Where(i => i.Palace != null).ToList();
 
-        spellListOrder = [Collectable.SHIELD_SPELL, Collectable.JUMP_SPELL, Collectable.LIFE_SPELL, Collectable.FAIRY_SPELL,
-            props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL, Collectable.REFLECT_SPELL,
-            Collectable.SPELL_SPELL, Collectable.THUNDER_SPELL];
+        spellListOrder = [Collectable.SHIELD_SPELL,
+            props.MarioMode ? Collectable.TANOOKI : Collectable.JUMP_SPELL,
+            Collectable.LIFE_SPELL, 
+            Collectable.FAIRY_SPELL,
+            props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL, 
+            Collectable.REFLECT_SPELL,
+            Collectable.SPELL_SPELL, 
+            Collectable.THUNDER_SPELL];
 
         //Non-pbag, non-wizard, non-palace items are inherently in the global shuffle pool
         List<Collectable> shufflableItems = [Collectable.TROPHY, Collectable.MEDICINE, Collectable.HEART_CONTAINER, Collectable.MAGIC_CONTAINER,
@@ -733,7 +738,7 @@ public class Hyrule
         if (props.IncludeSpellsInShuffle)
         {
             shufflableItems.Add(Collectable.SHIELD_SPELL);
-            shufflableItems.Add(Collectable.JUMP_SPELL);
+            shufflableItems.Add(props.MarioMode ? Collectable.TANOOKI : Collectable.JUMP_SPELL);
             shufflableItems.Add(Collectable.LIFE_SPELL);
             shufflableItems.Add(Collectable.FAIRY_SPELL);
             shufflableItems.Add(props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL);
@@ -1495,7 +1500,6 @@ public class Hyrule
                     PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
                     //Debug.WriteLine(GenerateSpoiler());
                     //Debug.WriteLine(westHyrule.GetMapDebug());
-                    //XXX:
                     return false;
                 }
 //#endif
@@ -3043,8 +3047,14 @@ public class Hyrule
         sb.AppendLine("\nDROPS:\n");
         sb.AppendLine(randomizedDrops.GenerateSpoiler());
 
-        sb.AppendLine("\nSTATS:\n");
-        sb.AppendLine(randomizedStats.GenerateSpoiler());
+        //Currently randomizedStats only exists if stats were randomized.
+        //This should just be a characterStats object that holds the stats regardless of whether they
+        //are randomized or not
+        if(randomizedStats != null)
+        {
+            sb.AppendLine("\nSTATS:\n");
+            sb.AppendLine(randomizedStats.GenerateSpoiler());
+        }
 
         sb.AppendLine("\nDETAILS: ");
         sb.Append(JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties));
@@ -3179,6 +3189,7 @@ CustomFileSelectData:
                 sb.AppendLine(missingItem.ToString());
                 itemWasMissing = true;
             }
+            //Debug.WriteLine(GenerateSpoiler());
         }
 
         if(!itemWasMissing)

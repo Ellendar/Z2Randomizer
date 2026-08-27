@@ -639,8 +639,8 @@ public class CustomTexts
 
             if (props.SpellItemHints && props.IncludeSwordTechsInShuffle)
             {
-                var downstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
-                var upstabLoc = locations.First(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
+                Location? downstabLoc = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.DOWNSTAB));
+                Location? upstabLoc = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.UPSTAB));
                 Text hint;
                 if (props.StartWithDownstab)
                 {

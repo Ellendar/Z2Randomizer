@@ -20,7 +20,7 @@ namespace Z2Randomizer.Statistics;
 /// </summary>
 class Statistics
 {
-    private static readonly string FLAGS = "hEAAdgKyAs6WvqAssMcMmt6F8Bs++ceV4XnwWaCs7AATi+A"; //Random%
+    private static readonly string FLAGS = "hEABexKyA3zW5qAw0McNtW2oZSq++cfs9ZnssvWV7AAWCQ7A"; //Random%
     //private static readonly string FLAGS = "AAAA2dJALw3kToaJESXL#o4++o6WFU9WaAkyAAWAoh"; //Standard Swiss
     //private static readonly string FLAGS = "hEABexKyA3zWoqAw0LJidsqd2COQ+56swoE@WXss7AAWA+h"; //test
     //private static readonly string FLAGS = "g7+y2SHCACtOJ3hAAAAACsWhtocY+#caVWVprWmCQAABVAbh"; //short/short
@@ -28,7 +28,7 @@ class Statistics
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
     private static readonly string DB_PATH = "..\\..\\..\\..\\db\\1000random.sqlite";
-    private static readonly int LIMIT = 1;
+    private static readonly int LIMIT = 100;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     static void Main()
     {
