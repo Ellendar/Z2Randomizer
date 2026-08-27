@@ -824,9 +824,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool generateSpoiler = false;
 
     [Reactive]
+    [DifficultyOnly]
     private bool revealWalkthroughWalls = false;
 
     [Reactive]
+    [DifficultyOnly]
     private bool revealHiddenJars = false;
 
     [Reactive]
