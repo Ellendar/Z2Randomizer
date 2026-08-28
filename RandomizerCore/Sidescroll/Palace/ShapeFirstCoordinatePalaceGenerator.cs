@@ -154,37 +154,33 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
 
         Room? newRoom = null;
 
-        if (roomCandidates.Count > 0)
+        bool refillAllowed = duplicateProtection;
+        while (true)
         {
-            bool refillAllowed = duplicateProtection;
-            while (true)
+            if (roomCandidates.Count == 0)
             {
-                if (roomCandidates.Count == 0)
-                {
-                    if (!refillAllowed)
-                    {
-                        break;
-                    }
-
-                    logger.Debug($"Shape-first palace ran out of rooms of exit type: {roomExitType} in palace {palace.Number}. Starting to use duplicate rooms.");
-                    roomPool.RefillNormalRoomsForExitType(rooms, roomExitType);
-                    roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
-                    Debug.Assert(roomCandidates.Count() > 0);
-                    refillAllowed = false;
-                }
-
-                roomCandidates.FisherYatesShuffle(r);
-
-                newRoom = SelectRoomForCoord(palace, rooms, roomPool, palaceShape, roomCoords, dropZone, roomCandidates);
-                if (newRoom != null)
+                if (!refillAllowed)
                 {
                     break;
                 }
 
-                roomCandidates.Clear(); // clear after failure to force a refill and try again (once)
+                logger.Debug($"Shape-first palace ran out of rooms of exit type: {roomExitType} in palace {palace.Number}. Starting to use duplicate rooms.");
+                roomPool.RefillNormalRoomsForExitType(rooms, roomExitType);
+                roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
+                refillAllowed = false;
             }
-            if (newRoom != null && duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
+
+            roomCandidates.FisherYatesShuffle(r);
+
+            newRoom = SelectRoomForCoord(palace, rooms, roomPool, palaceShape, roomCoords, dropZone, roomCandidates);
+            if (newRoom != null)
+            {
+                break;
+            }
+
+            roomCandidates.Clear(); // clear after failure to force a refill and try again (once)
         }
+        if (newRoom != null && duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
 
         return newRoom;
     }

@@ -84,7 +84,6 @@ public class Palaces
                 _ => throw new Exception("Unrecognized palace style while generating palaces")
             };
 
-            bool oneWayDropToBossAllowed = !props.BossRoomsExitToPalace[currentPalace - 1];
             RoomPool roomPool;
             if (props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool())
             {

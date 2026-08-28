@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +16,13 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
         (2, 3),  // up
         (3, 8),  // right
     ]);
+
+    private static ImmutableHashSet<RoomExitType> UNMIRRORABLE_SHAPES = new HashSet<RoomExitType>([
+        RoomExitType.DROP_ELEVATOR_UP,
+        RoomExitType.DROP_RIGHT_T,
+        RoomExitType.DROP_LEFT_T,
+        RoomExitType.DROP_FOUR_WAY
+    ]).ToImmutableHashSet();
 
     protected override IWeightedSampler<int> GetDirectionWeights(int palaceNumber)
     {
@@ -81,6 +89,12 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
 
     protected override bool ValidateShape(Palace palace, Dictionary<Coord, RoomExitType> palaceShape)
     {
+        // reject unmirrorable drop shapes
+        if (UNMIRRORABLE_SHAPES.Intersect(palaceShape.Values).Any())
+        {
+            return false;
+        }
+
         int palaceSize = palaceShape.Count;
         int centerRooms = palaceShape.Count(pair => pair.Key.X == 0);
         if (centerRooms * 3.5 > palaceSize)

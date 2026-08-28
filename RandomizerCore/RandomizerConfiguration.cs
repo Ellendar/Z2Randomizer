@@ -1321,6 +1321,24 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
                 properties.BossRoomsExitToPalace[i] = bossRoomsExitType == BossRoomsExitType.PALACE;
             }
         }
+        // override BossRoomsExitToPalace when not supported
+        for (int i = 0; i < 6; i++)
+        {
+            switch (properties.PalaceStyles[i])
+            {
+                case PalaceStyle.VANILLA:
+                case PalaceStyle.TOWER:
+                    properties.BossRoomsExitToPalace[i] = false;
+                    break;
+                case PalaceStyle.MIRROR:
+                    if (!properties.AllowV4Rooms && !properties.AllowV5_0Rooms)
+                    {
+                        // Vanilla has no passthrough item rooms to match a passthrough boss room
+                        properties.BossRoomsExitToPalace[i] = false;
+                    }
+                    break;
+            }
+        }
         properties.BossRoomsExitToPalace[6] = false;
         properties.PalaceDropStyle = palaceDropStyle;
 
