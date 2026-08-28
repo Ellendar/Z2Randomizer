@@ -48,23 +48,27 @@
                 <Grid ColumnDefinitions="72,72,72" ColumnSpacing="8" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <NumericUpDown Grid.Column="0"
                                    Height="72"
+                                   Classes.DifficultyOnly="{Binding Config.ShareSeedAcrossDifficulty}"
                                    Name="AttackLevelCapSelector" Value="{Binding Config.AttackLevelCap}"
                                    FormatString="N0" ParsingNumberStyle="Integer"
                                    ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Attack"/>
                     <NumericUpDown Grid.Column="1"
                                    Height="72"
+                                   Classes.DifficultyOnly="{Binding Config.ShareSeedAcrossDifficulty}"
                                    Name="MagicLevelCapSelector" Value="{Binding Config.MagicLevelCap}"
                                    FormatString="N0" ParsingNumberStyle="Integer"
                                    ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Magic"/>
                     <NumericUpDown Grid.Column="2"
                                    Height="72"
+                                   Classes.DifficultyOnly="{Binding Config.ShareSeedAcrossDifficulty}"
                                    Name="LifeLevelCapSelector" Value="{Binding Config.LifeLevelCap}"
                                    FormatString="N0" ParsingNumberStyle="Integer"
                                    ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Life"/>
                 </Grid>
             </StackPanel>
 
-            <CheckBox IsChecked="{Binding Config.ScaleLevelRequirementsToCap}"
+            <CheckBox Classes.DifficultyOnly="{Binding Config.ShareSeedAcrossDifficulty}"
+                      IsChecked="{Binding Config.ScaleLevelRequirementsToCap}"
                       Content="Scale Level Requirements to Cap">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ScaleLevelRequirementstoCapToolTip}"/></ToolTip.Tip>
                 <CheckBox.IsEnabled>
@@ -78,6 +82,7 @@
         </StackPanel>
         <StackPanel Grid.Column="1">
             <ComboBox
+                Classes.DifficultyOnly="{Binding Config.ShareSeedAcrossDifficulty}"
                 Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Attack Effectiveness"
                 ItemsSource="{Binding Source={x:Static rc:Enums.AttackEffectivenessList}}"
@@ -94,6 +99,7 @@
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MagicEffectivenessToolTip}"/></ToolTip.Tip>
             </ComboBox>
             <ComboBox
+                Classes.DifficultyOnly="{Binding Config.ShareSeedAcrossDifficulty}"
                 Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Life Effectiveness"
                 ItemsSource="{Binding Source={x:Static rc:Enums.LifeEffectivenessList}}"

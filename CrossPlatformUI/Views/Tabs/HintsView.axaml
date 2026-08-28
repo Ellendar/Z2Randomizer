@@ -63,12 +63,14 @@
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateSpoilerToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
+                Classes.DifficultyOnly="{Binding Main.Config.ShareSeedAcrossDifficulty}"
                 IsChecked="{Binding Main.Config.RevealWalkthroughWalls}"
                 Content="Reveal Walkthrough Walls"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RevealWalkthroughWallsToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
+                Classes.DifficultyOnly="{Binding Main.Config.ShareSeedAcrossDifficulty}"
                 IsChecked="{Binding Main.Config.RevealHiddenJars}"
                 Content="Reveal Hidden Jars"
             >

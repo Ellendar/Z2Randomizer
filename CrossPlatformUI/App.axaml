@@ -48,7 +48,17 @@
             <Setter Property="Padding" Value="0 8"/>
             <Setter Property="Margin" Value="14 0 4 0"/>
         </Style>
-        
+
+        <Style Selector="CheckBox.DifficultyOnly">
+            <Setter Property="Background" Value="DarkBlue" />
+        </Style>
+        <Style Selector="ComboBox.DifficultyOnly">
+            <Setter Property="Background" Value="DarkBlue" />
+        </Style>
+        <Style Selector="NumericUpDown.DifficultyOnly">
+            <Setter Property="Background" Value="DarkBlue" />
+        </Style>
+
         <!-- Indeterminate state -->
         <Style Selector="CheckBox">
             <Style Selector="^:indeterminate /template/ Path#Graphic">

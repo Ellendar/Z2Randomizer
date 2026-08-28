@@ -989,6 +989,9 @@ Random selects a random number of starting lives between 2 and 5.</value>
 - Attack / magic / life level caps and "scale level requirements to cap"
 - Attack and life effectiveness
 - Enemy HP, boss HP, and enemy XP drop shuffle
+- Reveal walkthrough walls and hidden jars
+
+These settings are highlighted with a blue background when enabled.
 
 The last 2 characters of the hash still reflect these settings, so two seeds with different difficulty will share a prefix but differ in the suffix.
 
