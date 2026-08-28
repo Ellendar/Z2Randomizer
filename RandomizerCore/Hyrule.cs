@@ -565,7 +565,7 @@ public class Hyrule
         var asm = NewAssembler(assemblerOptions, false);
         asm.Callbacks = new Js65Callbacks
         {
-            OnFileReadText = AsmFileReadTextCallback,
+            OnFileResolveText = AsmFileResolveTextCallback,
         };
 
         asm.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.Init.s"), "__init.s");
@@ -573,9 +573,9 @@ public class Hyrule
         return asm;
     }
 
-    private string AsmFileReadTextCallback(string basePath, string path)
+    private Js65ResolvedText? AsmFileResolveTextCallback(IReadOnlyList<string> basePaths, string path)
     {
-        return Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
+        return new Js65ResolvedText(0, Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}"));
     }
 
     private static byte[] ConvertHash(byte[] hash)

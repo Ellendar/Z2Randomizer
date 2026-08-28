@@ -107,7 +107,7 @@ public class Room : IJsonOnDeserialized
     public int ElevatorScreen { get; set; }
     [JsonPropertyName("requirements")]
     [JsonConverter(typeof(RequirementsJsonConverter))]
-    private Requirements LinkRequirements { get; set; } = Requirements.NONE;
+    public Requirements LinkRequirements { get; set; } = Requirements.NONE;
     [JsonConverter(typeof(RequirementsJsonConverter))]
     private Requirements MarioRequirements { get; set; } = Requirements.NONE;
     public bool IsDropZone { get; set; }

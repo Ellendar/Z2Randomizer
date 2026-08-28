@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
@@ -23,13 +24,13 @@ internal sealed partial class Program
     [JSImport("globalThis.window.SetTitle")]
     internal static partial void SetTitle(string title);
 
-    private static string LoadTextFileCallback(string basePath, string relPath)
+    private static Js65ResolvedText? LoadTextFileCallback(IReadOnlyList<string> basePaths, string relPath)
     {
-        return _assembly.ReadResource(relPath);
+        return new Js65ResolvedText(0, _assembly.ReadResource(relPath));
     }
-    private static byte[] LoadBinaryFileCallback(string basePath, string relPath)
+    private static Js65ResolvedBinary? LoadBinaryFileCallback(IReadOnlyList<string> basePaths, string relPath)
     {
-        return _assembly.ReadBinaryResource(relPath);
+        return new Js65ResolvedBinary(0, _assembly.ReadBinaryResource(relPath));
     }
 
     private static readonly Assembly _assembly = typeof(RandomizerConfiguration).Assembly;
@@ -63,8 +64,8 @@ internal sealed partial class Program
     {
         var callbacks = new Js65Callbacks
         {
-            OnFileReadBinary = LoadBinaryFileCallback,
-            OnFileReadText = LoadTextFileCallback
+            OnFileResolveBinary = LoadBinaryFileCallback,
+            OnFileResolveText = LoadTextFileCallback
         };
         return new BrowserJsEngine(options, callbacks);
     }

@@ -454,7 +454,7 @@ PalaceEntrancePaletteOffsets:
     ldy PalaceNumber
     lda PalaceEntrancePaletteOffsets-1,y
     cpy #$07
-    beq $cd63  ; branch if Great Palace
+    beq $ce63  ; branch if Great Palace
     tay
     bpl $ce3a
     FREE_UNTIL $ce3a
@@ -847,6 +847,9 @@ GanonLaughingTeeHee:
 .org $9AFD
     jsr LoadAreaBGMetatile
 
+; This code HAS to be in $a000 or higher since we switch out the $8000 bank
+.segment "PRG0Upper" :mem $a000 :off $02010 :size $2000
+ 
 .reloc
 LoadAreaBGMetatile:
 ; guarantee the code is in a000 or higher otherwise we would switch this bank out from under itself
@@ -946,6 +949,8 @@ LoadAreaBGMetatile:
     ; switch back to 0 just in case
     jmp SwapToPRG0
 
+
+.segment "PRG0"
 ; Move sprites out of the last fixed bank
 ; Instead of using the blank tile sprites to cover the right 8px on the overworld, just use
 ; any other full color sprite (since the palette is all black this is fine)

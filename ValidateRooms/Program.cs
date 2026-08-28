@@ -297,7 +297,7 @@ void CheckDoorsKeyRequirement<T>(Room room, SideviewEditable<T> sv) where T : st
 {
     var lockedDoorCmds = sv.FindAll(o => o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LOCKED_DOOR);
 
-    if (lockedDoorCmds.Count > 0 && !room.Requirements.Contains(RequirementType.KEY)) { Warning(room, "LockedDoorNotInRequirements", $"Locked doors in GP are supposed to be in requirements."); }
+    if (lockedDoorCmds.Count > 0 && !room.LinkRequirements.Contains(RequirementType.KEY)) { Warning(room, "LockedDoorNotInRequirements", $"Locked doors in GP are supposed to be in requirements."); }
 }
 
 void CheckEnemyPlacements<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : struct, Enum where U : Enum
