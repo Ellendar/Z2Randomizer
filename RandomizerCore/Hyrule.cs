@@ -345,7 +345,7 @@ public class Hyrule
             if (props.DashAlwaysOn)
             {
                 ROMData.Put(0x13C3, [0x30, 0xD0]);
-            }
+                }
 
             if (props.PermanentBeam)
             {
@@ -519,18 +519,18 @@ public class Hyrule
                 z2Hash = CombineHashes(sharedHash, finalHash);
             }
             else
-            {
+                {
                 byte[] finalRngState = new byte[32];
                 r.NextBytes(finalRngState);
                 byte[] finalHash = CalculateHash(Flags, SeedHash, randoRomHash, finalRngState);
                 z2Hash = ConvertHash(finalHash);
                 SanitizeHashCharacters(z2Hash);
-            }
+                }
 
             if (Z2MarioModeEnabled && !IS_RANDOMIZED)
-            {
+                {
                 z2Hash = Util.ToGameText("VER. 2.0.0 ");
-            }
+                }
             ROMData.Put(0x17C2C, z2Hash);
             Hash = Util.FromGameText(z2Hash);
 
@@ -735,7 +735,7 @@ public class Hyrule
 
         //For now this is just for classic spell shuffle. Maybe this is extended later
         bool canReplaceStartingSpellsWithMinorItems = !props.ShuffleSpellLocations;
-        if (props.IncludeSpellsInShuffle)
+        if(props.IncludeSpellsInShuffle)
         {
             shufflableItems.Add(Collectable.SHIELD_SPELL);
             shufflableItems.Add(props.MarioMode ? Collectable.TANOOKI : Collectable.JUMP_SPELL);
@@ -748,7 +748,7 @@ public class Hyrule
             globalShuffleLocations.Add([westHyrule.rauru, westHyrule.ruto, westHyrule.sariaNorth, westHyrule.mido,
                 eastHyrule.nabooru, eastHyrule.darunia, eastHyrule.newKasuto, eastHyrule.oldKasuto]);
         }
-        else if (props.ShuffleSpellLocations)
+        else if(props.ShuffleSpellLocations)
         {
             ShuffleSpells();
             spellListOrder = possibleItemLocations.Where(i => i.Town != null && i?.Town?.Type != TownType.BAGU)
@@ -761,10 +761,10 @@ public class Hyrule
         if (props.IncludeQuestItemsInShuffle)
         {
             shufflableItems.Add(Collectable.BAGUS_NOTE);
-            shufflableItems.Add(Collectable.MIRROR);
-            shufflableItems.Add(Collectable.WATER);
+                shufflableItems.Add(Collectable.MIRROR);
+                shufflableItems.Add(Collectable.WATER);
             globalShuffleLocations.AddRange([westHyrule.bagu, westHyrule.sariaNorth, eastHyrule.nabooru]);
-        }
+            }
 
         if (props.IncludeSwordTechsInShuffle)
         {
@@ -775,7 +775,7 @@ public class Hyrule
             shufflableItems.Add(props.StartWithUpstab ? minorItems.Sample(r) : Collectable.UPSTAB);
             globalShuffleLocations.Add(eastHyrule.darunia);
         }
-        else if (props.SwapUpAndDownStab)
+        else if(props.SwapUpAndDownStab)
         {
             SwapUpAndDownstab();
         }
@@ -783,7 +783,7 @@ public class Hyrule
         int heartContainersInItemPool = props.MaxHearts - props.StartHearts;
         int magicContainersInItemPool = props.MaxMagicContainers - props.StartMagicContainers;
 
-        foreach (Collectable collectable in ItemGet.Keys)
+        foreach(Collectable collectable in ItemGet.Keys)
         {
             ItemGet[collectable] = props.StartsWithCollectable(collectable);
         }
@@ -807,16 +807,16 @@ public class Hyrule
                     {
                         collectables[index] = minorItems.Sample(r);
                         hcLocation.SetCollectables(collectables);
-                        heartContainersToRemove--;
+                    heartContainersToRemove--;
                         shufflableItems.Remove(Collectable.HEART_CONTAINER);
                         shufflableItems.Add(collectables[index]);
                         if (!collectables.Any(i => i == Collectable.HEART_CONTAINER))
                         {
                             heartContainerLocations.Remove(hcLocation);
-                        }
-                        break;
-                    }
                 }
+                        break;
+            }
+        }
             }
         }
 
@@ -837,16 +837,16 @@ public class Hyrule
                     {
                         collectables[index] = minorItems.Sample(r);
                         mcLocation.SetCollectables(collectables);
-                        magicContainersToRemove--;
+                    magicContainersToRemove--;
                         shufflableItems.Remove(Collectable.MAGIC_CONTAINER);
                         shufflableItems.Add(collectables[index]);
                         if (!collectables.Any(i => i == Collectable.MAGIC_CONTAINER))
                         {
                             magicContainerLocations.Remove(mcLocation);
-                        }
-                        break;
-                    }
                 }
+                        break;
+            }
+        }
             }
         }
 
@@ -855,38 +855,38 @@ public class Hyrule
         {
             Collectable[] spellItems = [Collectable.TROPHY, Collectable.MEDICINE, Collectable.CHILD, Collectable.MIRROR, Collectable.WATER];
             foreach (Collectable spellItem in spellItems)
-            {
+        {
                 int index = shufflableItems.IndexOf(spellItem);
                 if (index > -1)
-                {
+            {
                     shufflableItems[index] = minorItems.Sample(r);
-                }
+            }
                 else
-                {
+            {
                     Location? defaultLocation = possibleItemLocations.FirstOrDefault(i => i.GetAllCollectables().Contains(spellItem));
                     defaultLocation?.ReplaceCollectable(spellItem, minorItems.Sample(r));
-                }
+            }
                 ItemGet[spellItem] = true;
             }
         }
         else if (!props.IncludeSpellsInShuffle)
-        {
+            {
             List<Location> spellItemTowns = [westHyrule.ruto, westHyrule.mido, eastHyrule.darunia];
             if (props.IncludeQuestItemsInShuffle)
             {
                 spellItemTowns.Add([westHyrule.sariaNorth, eastHyrule.nabooru]);
-            }
+                    }
 
             foreach (Location location in spellItemTowns)
-            {
+                {
                 Collectable wizardCollectable = (Collectable)location.Town!.GetWizard()!.Collectable!;
                 if (props.StartsWithCollectable(wizardCollectable))
-                {
+                    {
                     ItemGet[wizardCollectable] = true;
                     location.Town!.GetWizard()!.Collectable = minorItems.Sample(r);
+                    }
                 }
             }
-        }
 
         List<Collectable> possibleStartItems = [
             Collectable.CANDLE,
@@ -908,28 +908,28 @@ public class Hyrule
             Collectable.SPELL_SPELL,
             Collectable.THUNDER_SPELL];
 
-        foreach (Collectable item in possibleStartItems)
+        foreach(Collectable item in possibleStartItems)
         {
             if (props.StartsWithCollectable(item) && (canReplaceStartingSpellsWithMinorItems || !item.IsSpell()))
             {
                 int index = shufflableItems.IndexOf(item);
                 if (index > -1)
-                {
-                    shufflableItems[index] = minorItems.Sample(r);
-                }
-            }
-        }
-
-        if (props.IncludeSpellsInShuffle)
         {
+                    shufflableItems[index] = minorItems.Sample(r);
+                    }
+                }
+                        }
+
+            if (props.IncludeSpellsInShuffle)
+            {
             foreach (Collectable item in possibleStartSpells)
             {
                 if (props.StartsWithCollectable(item) && shufflableItems.Contains(item))
                 {
                     shufflableItems[shufflableItems.IndexOf(item)] = minorItems.Sample(r);
+                    }
                 }
             }
-        }
 
         //Handle excess items
         List<Collectable> excessItems = [];
@@ -965,12 +965,12 @@ public class Hyrule
 
         List<int> minorItemIndexes = [];
         for(int i = 0; i < shufflableItems.Count; i++)
-        {
+                {
             if (shufflableItems[i].IsMinorItem())
             {
                 minorItemIndexes.Add(i);
+                }
             }
-        }
 
         //Add the auto pbag cave promotion
         List<Location> overflowLocations = [];
@@ -1014,11 +1014,11 @@ public class Hyrule
         {
             //This should probably always be true but safety
             if(props.ShufflePalaceItems)
-            {
+        {
                 List<Collectable> palaceCollectables = [.. palaceLocations.SelectMany(i => i.GetAllCollectables())];
                 shufflableItems.Add(palaceCollectables.Select(c => props.StartsWithCollectable(c) ? minorItems.Sample(r) : c));
                 globalShuffleLocations.Add(palaceLocations);
-            }
+        }
             duplicateItemPlacementCandidates.AddRange(globalShuffleLocations);
             DoShuffle(shufflableItems, globalShuffleLocations);
         }
@@ -1049,10 +1049,10 @@ public class Hyrule
                     for (int i = 0; i < collectables.Count; i++)
                     {
                         collectables[i] = props.StartsWithCollectable(collectables[i]) ? minorItems.Sample(r) : collectables[i];
-                    }
+                        }
                     palaceLocation.SetCollectables(collectables, false);
+                    }
                 }
-            }
 
             if (props.ShuffleOverworldItems)
             {
@@ -1066,8 +1066,8 @@ public class Hyrule
                         itemsToActuallyShuffle.Add(
                             props.StartsWithCollectable(collectable) && (!collectable.IsSpell() || canReplaceStartingSpellsWithMinorItems) 
                                 ? minorItems.Sample(r) : collectable);
-                    }
                 }
+            }
                 duplicateItemPlacementCandidates.AddRange(shufflableItemLocations);
                 DoShuffle(itemsToActuallyShuffle, shufflableItemLocations);
             }
@@ -1079,10 +1079,10 @@ public class Hyrule
                     for(int i = 0; i < collectables.Count; i++)
                     {
                         collectables[i] = props.StartsWithCollectable(collectables[i]) ? minorItems.Sample(r) : collectables[i];
-                    }
-                    nonPalaceLocation.SetCollectables(collectables, false);
                 }
+                    nonPalaceLocation.SetCollectables(collectables, false);
             }
+        }
         }
 
         //Assigning unshuffled locations can make the number of containers wrong, so re-adjust them
@@ -1095,21 +1095,21 @@ public class Hyrule
             Collectable minorItem = minorItems.Sample(r);
             if(!location.ReplaceCollectable(Collectable.HEART_CONTAINER, minorItem))
             {
-                heartContainerLocations.Remove(location);
+                    heartContainerLocations.Remove(location);
+                }
             }
-        }
 
         List<Location> minorItemLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Any(j => j.IsMinorItem())).ToList();
 
-        while (heartContainerCount < heartContainersInItemPool)
+        while(heartContainerCount < heartContainersInItemPool)
         {
             Location location = minorItemLocations.Sample(r)!;
             Collectable[] locationMinorItems = location.GetAllCollectables().Where(i => i.IsMinorItem()).ToArray();
             if(locationMinorItems.Length == 0)
             {
-                minorItemLocations.Remove(location);
+                    minorItemLocations.Remove(location);
                 continue;
-            }
+                }
             if (!location.ReplaceCollectable(locationMinorItems.Sample(r), Collectable.HEART_CONTAINER))
             {
                 heartContainerLocations.Remove(location);
@@ -1129,11 +1129,11 @@ public class Hyrule
                 continue;
             }
             if (!location.ReplaceCollectable(locationMinorItems.Sample(r), Collectable.MAGIC_CONTAINER))
-            {
-                magicContainerLocations.Remove(location);
-            }
+                {
+                    magicContainerLocations.Remove(location);
+                }
             magicContainerCount++;
-        }
+            }
 
         minorItemLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Any(j => j.IsMinorItem())).ToList();
 
@@ -1143,9 +1143,9 @@ public class Hyrule
             Collectable[] locationMinorItems = location.GetAllCollectables().Where(i => i.IsMinorItem()).ToArray();
             if (locationMinorItems.Length == 0)
             {
-                minorItemLocations.Remove(location);
+                    minorItemLocations.Remove(location);
                 continue;
-            }
+                }
             if (!location.ReplaceCollectable(locationMinorItems.Sample(r), Collectable.MAGIC_CONTAINER))
             {
                 magicContainerLocations.Remove(location);
@@ -1185,23 +1185,23 @@ public class Hyrule
                 List<int> collectableIndexes = Enumerable.Range(0, minorItemLocation.GetCollectableCount()).ToList();
                 collectableIndexes.FisherYatesShuffle(r);
                 foreach(int collectableIndex in collectableIndexes) 
-                {
+                    {
                     if(locationCollectables[collectableIndex].IsMinorItem())
                     {
                         locationCollectables[collectableIndex] = importantItemsToDuplicate[itemIndex];
                         minorItemLocation.SetCollectables(locationCollectables);
                         if(!locationCollectables.Any(c => c.IsMinorItem()))
                         {
-                            minorItemLocations.Remove(minorItemLocation);
-                        }
-                        break;
+                        minorItemLocations.Remove(minorItemLocation);
                     }
+                    break;
                 }
             }
         }
+    }
 
         if (props.PreventSpellItemChains)
-        {
+    {
             PreventSpellItemChains();
         }
     }
@@ -1209,7 +1209,7 @@ public class Hyrule
     // Disallow old men from holding other spell items, preventing long
     // item chains
     private void PreventSpellItemChains()
-    {
+        {
         //child, trophy, medicine, mirror, water
         List<Location> locationsThatContainWizards = [eastHyrule.darunia, westHyrule.ruto, westHyrule.mido, westHyrule.sariaNorth, eastHyrule.nabooru];
         if(!props.IncludeQuestItemsInShuffle)
@@ -1241,13 +1241,13 @@ public class Hyrule
                         //WTB C# 15 labeled continue
                         replaced = true;
                         break;
-                    }
+        }
                 }
                 if(replaced)
-                {
+        {
                     break;
-                }
-            }
+        }
+    }
         }
     }
 
@@ -1272,7 +1272,7 @@ public class Hyrule
             List<Collectable> newCollectables = itemsToShuffle.GetRange(itemIndex, collectableCount);
             itemIndex += collectableCount;
             location.SetCollectables(newCollectables, true);
-        }
+    }
     }
 
     private async Task<bool> FillPalaceRooms(AsmModule sideviewModule)
@@ -1600,7 +1600,7 @@ public class Hyrule
 
         //upstab guy entrance is unchanged because you drop into it, but still change the exit to lead directly out
         ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 45 * 4, (16 << 2) + 3);
-    }
+        }
 
     /// <summary>
     /// 
@@ -1629,7 +1629,7 @@ public class Hyrule
                 List<Collectable> gettableItems = location.GetGettableItems(requireables);
 
                 foreach(Collectable item in gettableItems)
-                {
+                    {
                     ItemGet[item] = true;
                     gottenItems.Add(item);
 
@@ -2363,11 +2363,11 @@ public class Hyrule
         {
             // Mario mode sprites and colors are too weird to allow changing it atm 
             // maybe after we fix the bugs with it...
-            rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
-            rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+        rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
+        rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
         }
         if (IS_RANDOMIZED)
-            rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
         else
         {
             // We need to move the "OF" graphics over the unused zelda graphics
@@ -2504,11 +2504,9 @@ public class Hyrule
 
         if (props.ShufflePalacePalettes)
         {
-            Shuffler.ShufflePalacePalettes(rom, r);
+            Palettes.ShufflePalacePalettes(rom, r);
         }
-
- 
-        }
+    }
 
     private static void ApplyBeepSettings(RandomizerProperties props, ROM rom)
     {
@@ -2580,11 +2578,7 @@ public class Hyrule
         if (props.ShuffleEnemyPalettes)
         {
             Random customizationRng = new Random(SeedHash);
-            RerollPaletteTable(RomMap.WEST_PALETTE_TABLE, customizationRng);
-            RerollPaletteTable(RomMap.EAST_PALETTE_TABLE, customizationRng);
-            RerollPaletteTable(RomMap.TOWN_PALETTE_TABLE, customizationRng);
-            RerollPaletteTable(RomMap.PALACE_PALETTE_TABLE_MAJOR, customizationRng);
-            RerollPaletteTable(RomMap.GP_PALETTE_TABLE_MAJOR, customizationRng);
+            Palettes.RerollSideviewPaletteTables(ROMData, customizationRng);
         }
 
         //WRITE UPDATES TO WIZARD/QUEST COLLECTABLES HERE
@@ -2802,104 +2796,6 @@ public class Hyrule
         }
     }
 
-    private void RerollPaletteTable(int paletteTableAddr, Random r)
-    {
-        byte dark, middle, light;
-
-        // we are NOT rolling the white color for magic/interface that should match the orange sprite light
-        // (white looks fine with all 2 other sprite colors anyway)
-        // int[] magicBgColorAddr = [paletteTableAddr + 0x01, paletteTableAddr + 0x11];
-        // we ARE rolling the red sprite and matching the red tile color for the life bars to it
-        // (it would limit the palette a lot if the red color has to stay red)
-        List<int> lifeBgColorAddr = [.. Enumerable.Range(0, 9).Select(i => paletteTableAddr + 0x10 * i + 0x03)];
-        List<int> orangeSpriteColorAddr = [paletteTableAddr + 0x94];
-        List<int> redSpriteColorAddr = [paletteTableAddr + 0x98];
-        List<int> blueSpriteColorAddr = [paletteTableAddr + 0x9c];
-
-        List<int> darkRangeFull = [.. Enumerable.Range(0x01, 12), .. Enumerable.Range(0x11, 13), 0x2d];
-        // we make the life color range slightly narrower, to not make the HUD look too awful
-        List<int> darkRangeLife = [.. Enumerable.Range(0x04, 3), .. Enumerable.Range(0x13, 5), .. Enumerable.Range(0x19, 4)];
-        // brighter dark colors do not look good in towns
-        List<int> darkRangeTown = [.. Enumerable.Range(0x01, 12), 0x1d];
-
-        if (paletteTableAddr == RomMap.PALACE_PALETTE_TABLE_MAJOR)
-        {
-            orangeSpriteColorAddr.AddRange(Enumerable.Range(0, 3).Select(i => paletteTableAddr + 0xa4 + 0x10 * i));
-            // additional per-palace palettes
-            lifeBgColorAddr.AddRange(Enumerable.Range(0, 6).Select(i => RomMap.PALACE_PALETTE_TABLE_ENTRANCES + 0x10 * i + 0x03));
-            lifeBgColorAddr.AddRange(Enumerable.Range(0, 6).Select(i => RomMap.PALACE_PALETTE_TABLE_PER_PALACE + 0x10 * i + 0x03));
-        }
-        if (paletteTableAddr == RomMap.GP_PALETTE_TABLE_MAJOR)
-        {
-            lifeBgColorAddr.Add(0x1c48f + 0x03); // palette PPU cmd when fading to Dark Link
-            lifeBgColorAddr.Add(0x1c4a3 + 0x03); // palette PPU cmd when Dark Link has been defeated
-            orangeSpriteColorAddr.Add(paletteTableAddr + 0xa4);
-            orangeSpriteColorAddr.Add(paletteTableAddr + 0xc4);
-            redSpriteColorAddr.Add(paletteTableAddr + 0xa8);
-            blueSpriteColorAddr.Add(paletteTableAddr + 0xac);
-        }
-        if (paletteTableAddr == RomMap.TOWN_PALETTE_TABLE)
-        {
-            var stabguy = paletteTableAddr + 0xac;
-            List<int> wizardAddr = [.. Enumerable.Range(0, 4).Select(i => paletteTableAddr + 0xa4 + 0x10 * i)];
-            orangeSpriteColorAddr.AddRange(wizardAddr);
-            (dark, middle, light) = NES.RollMatchingColorTriple(r, darkRangeFull);
-            ROMData.Put(stabguy + 1, dark);
-            ROMData.Put(stabguy + 2, middle);
-            ROMData.Put(stabguy + 3, light);
-        }
-        if (paletteTableAddr == RomMap.WEST_PALETTE_TABLE || paletteTableAddr == RomMap.EAST_PALETTE_TABLE)
-        {
-            orangeSpriteColorAddr.AddRange(Enumerable.Range(0, 4).Select(i => paletteTableAddr + 0xa4 + 0x10 * i));
-            redSpriteColorAddr.Add(paletteTableAddr + 0xa8);
-            blueSpriteColorAddr.Add(paletteTableAddr + 0xac);
-        }
-
-        List<List<int>> tripples = [orangeSpriteColorAddr, redSpriteColorAddr, blueSpriteColorAddr];
-        List<int> usedColors = [];
-        if (paletteTableAddr == RomMap.TOWN_PALETTE_TABLE)
-        {
-            usedColors.Add(0x22); // blue sky
-        }
-
-        foreach (List<int> list in tripples)
-        {
-            bool isOrange = list == orangeSpriteColorAddr;
-
-            List<int> darkRange = (paletteTableAddr, isOrange) switch
-            {
-                (RomMap.TOWN_PALETTE_TABLE, true) => darkRangeTown.Intersect(darkRangeLife).ToList(),
-                (RomMap.TOWN_PALETTE_TABLE, false) => darkRangeTown,
-                (RomMap.GP_PALETTE_TABLE_MAJOR, true) => darkRangeLife.Where(x => x != 0x14 && x != 0x15).ToList(),
-                (_, true) => darkRangeLife,
-                (_, false) => darkRangeFull,
-            };
-
-            do
-            {
-                (dark, middle, light) = NES.RollMatchingColorTriple(r, darkRange);
-            } while ((dark != 0x2d && usedColors.Contains(dark)) ||
-                     usedColors.Contains(middle) ||
-                     (light != 0x30 && usedColors.Contains(light)));
-
-            // prevent adjacent colors from being picked again
-            usedColors.AddRange(Enumerable.Range(-1, 3).Select(i => dark + i));
-            usedColors.AddRange(Enumerable.Range(-1, 3).Select(i => middle + i));
-            usedColors.AddRange(Enumerable.Range(-1, 3).Select(i => light + i));
-
-            foreach (var i in list)
-            {
-                ROMData.Put(i + 1, dark);
-                ROMData.Put(i + 2, middle);
-                if (list != orangeSpriteColorAddr) { ROMData.Put(i + 3, light); }
-            }
-            if (list == orangeSpriteColorAddr)
-            {
-                foreach (var j in lifeBgColorAddr) { ROMData.Put(j, dark); }
-            }
-        }
-    }
-
     public void RandomizeSmallItems(int bank, bool firstTable)
     {
         logger.Debug("Bank: " + bank);
@@ -3052,8 +2948,8 @@ public class Hyrule
         //are randomized or not
         if(randomizedStats != null)
         {
-            sb.AppendLine("\nSTATS:\n");
-            sb.AppendLine(randomizedStats.GenerateSpoiler());
+        sb.AppendLine("\nSTATS:\n");
+        sb.AppendLine(randomizedStats.GenerateSpoiler());
         }
 
         sb.AppendLine("\nDETAILS: ");
@@ -3182,15 +3078,15 @@ CustomFileSelectData:
         }
 
         if (!itemWasUnreachable)
-        {
+            {
             sb.AppendLine("One or more items were in ItemGet but in no location!");
             foreach (Collectable missingItem in ItemGet.Keys.Where(i => ItemGet[i] == false && !i.IsMinorItem()))
-            {
+                {
                 sb.AppendLine(missingItem.ToString());
                 itemWasMissing = true;
-            }
+                }
             //Debug.WriteLine(GenerateSpoiler());
-        }
+            }
 
         if(!itemWasMissing)
         {
@@ -3198,12 +3094,12 @@ CustomFileSelectData:
             foreach (Location location in ItemLocations().Where(l => !l.Reachable))
             {
                 sb.AppendLine(location.Name);
-            }
+        }
         }
         sb.AppendLine();
 
 
-logger.Error(sb.ToString());
+        logger.Error(sb.ToString());
     }
 
     private bool IsRaftAlwaysRequired(RandomizerProperties props)
@@ -3612,7 +3508,7 @@ EndTileComparisons = $8601
         if (texts.Count == 0)
         {
             return;
-        }
+    }
         var a = asm.Module();
         a.Assign("MOVING_DIALOG_COUNT", texts.Count);
         a.Segment("PRG3");
@@ -4004,10 +3900,10 @@ FlagHudUpdate:
         string[] modules = ["boss.s", "integration.s", "map.s", "mario.s", "metasprite.s", "sfx.s", "CustomTitleScreen.s"];
         foreach (var mod in modules)
         {
-            var a = asm.Module();
+        var a = asm.Module();
             a.Assign("ENABLE_Z2_MARIO", 1);
             a.Code(Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.z2mario.{mod}"), mod);
-        }
+    }
         // Rename JUMP to TANOOKI
         var m = asm.Module();
         m.Segment("PRG0");
@@ -4204,7 +4100,7 @@ FlagHudUpdate:
                 // have the same expectations for the game, so this will "unpatch" the
                 // extra lag routine, so that it uses the lag reduction code.
                 rom.Put(0x1ffec, 0xb4, 0xf2);
-            }
+        }
         }
 
         UpdateMovingNpcDialog(engine, CustomTexts.BuildMovingNpcDialogPool(props));
@@ -4222,24 +4118,24 @@ FlagHudUpdate:
             (eastHyrule?.locationAtPalace6.Palace!.Number ?? 6),
             (eastHyrule?.locationAtGP.Palace!.Number ?? 7)
         ];
-    }
+        }
 
     private void AssignPalaceLocations()
-    {
+        {
         List<Location> palaceLocations = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3,
                 mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6];
         if (props.PalacesCanSwapContinent)
         {
             if (props.P7shuffle)
-            {
+        {
                 palaceLocations.Add(eastHyrule.locationAtGP);
                 palaceLocations.FisherYatesShuffle(r);
-            }
+        }
             else
-            {
+        {
                 palaceLocations.FisherYatesShuffle(r);
                 palaceLocations.Add(eastHyrule.locationAtGP);
-            }
+        }
         }
         else
         {

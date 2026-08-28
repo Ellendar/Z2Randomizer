@@ -209,33 +209,6 @@ public static class CHR
     };
 }
 
-public static class Palettes
-{
-    public static int ORANGE = ROM.RomHdrSize + 0x100a2;
-
-    public static readonly Dictionary<Terrain, int> TERRAIN_ADDRS = new()
-    {
-        { Terrain.TOWN, 0x1c463 },
-        { Terrain.CAVE, 0x1c45f },
-        { Terrain.PALACE, 0x1c463 },
-        { Terrain.BRIDGE, 0x1c45f },
-        { Terrain.DESERT, 0x1c467 },
-        { Terrain.GRASS, 0x1c45b },
-        { Terrain.FOREST, 0x1c45b },
-        { Terrain.SWAMP, 0x1c45b },
-        { Terrain.GRAVE, 0x1c45f },
-        { Terrain.ROAD, 0x1c45f },
-        { Terrain.LAVA, 0x1c45f },
-        { Terrain.MOUNTAIN, 0x1c45f },
-        { Terrain.WATER, 0x100aa },
-        { Terrain.PREPLACED_WATER, 0x100aa },
-        { Terrain.WALKABLEWATER, 0x1c467 },
-        { Terrain.PREPLACED_WATER_WALKABLE, 0x1c467 },
-        { Terrain.ROCK, 0x1c45f },
-        { Terrain.RIVER_DEVIL, 0x1c45f },
-    };
-}
-
 public readonly record struct SpriteTilePlacement(
     /// X offset in 8-pixel units from sprite origin
     int X,

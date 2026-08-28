@@ -16,7 +16,7 @@ public class Spoiler
     public Spoiler(ROM rom)
     {
         this.rom = rom;
-        itemPalette = rom.GetBytes(Palettes.ORANGE, 4);
+        itemPalette = rom.GetBytes(Palettes.ORANGE_PALETTE_ADDR, 4);
         itemPalette[0] = 0x00;
 
         Dictionary<Terrain, byte[]> palettes = new();
@@ -28,7 +28,7 @@ public class Spoiler
             var chrAddr = kvp.Value;
             if (!palettes.TryGetValue(t, out var palette))
             {
-                palette = rom.GetBytes(ROM.RomHdrSize + Palettes.TERRAIN_ADDRS[t], 4);
+                palette = rom.GetBytes(ROM.RomHdrSize + Palettes.TERRAIN_PALETTE_ADDRS[t], 4);
                 palette[0] = 0x0f;
                 palettes[t] = palette;
             }
