@@ -86,6 +86,10 @@ function showError(msg) {
                 // much older than the deploy timestamp.
                 const lm = Date.parse(cachedFetchResult.headers.get("Last-Modified"));
                 staleCache = !lm || lm < deployTs - 180_000;
+                // any cached non-success counts as stale
+                if (cachedFetchResult.status >= 400) {
+                    staleCache = true;
+                }
             }
 
             if (!staleCache) {
