@@ -53,214 +53,214 @@ zp_0c = $0c
 zp_0d = $0d
 zp_0e = $0e
 zp_0f = $0f
-EnemyIndex = $10                         ; 0-5=Enemy index being processed
-EntityIndex = $11                        ; 0=Link, 1-6 - Enemy index(-1) being processed
-FrameCounter = $12
-FairyState = $13                         ; 0 = Not in Fairy state
-LinkXFrameDiff = $14
-LinkScreenX = $15                        ; Link's X position on the screen (not in the map)
-LinksShadowScreenX = $16
-LinkStanding = $17                       ; 0 = Link in ducked shield position, 1 = Link standing
-DarkLinkStanding = $18                   ; 0 = Dark Link ducking, 1 = Dark Link standing
-LinkYPositionHi = $19                    ; 0 = Invisible, 1 = Normal, 2-FF = Fall in hole   - [FILE] Cursor position
-Enemy0YPositionHi = $1a                  ; 0 = Enemy0 off the top of the screen, 1 = Normal - [FILE] Save file presence bits
-Enemy1YPositionHi = $1b
-Enemy2YPositionHi = $1c
-Enemy3YPositionHi = $1d
-Enemy4YPositionHi = $1e                  ; 0 = Enemy4 off the top of the screen, 1 = Normal - [FILE] File selection cursor
-Enemy5YPositionHi = $1f
-Enemy0Condition = $20
-Enemy1Condition = $21
-Enemy2Condition = $22
-Enemy3Condition = $23
-Enemy4Condition = $24
-Enemy5Condition = $25
-OverworldStepCounter = $26
-VramAddrHi = $27
-VramAddrLo = $28
-LinkYPos = $29
-EnemyYPositionLo = $2a
-Enemy0YPositionLo = $2a
-OverworldEnemyYPosition = $2a            ; base of overworld demon Y world position array, indexed by slot X
-Enemy1YPositionLo = $2b
-Enemy2YPositionLo = $2c
-Enemy3YPositionLo = $2d
-Enemy4YPositionLo = $2e
-Enemy5YPositionLo = $2f
-ProjectileYPosition = $30
-Projectile0YPosition = $30
-Projectile1YPosition = $31
-Projectile2YPosition = $32
-Projectile3YPosition = $33
-Projectile4YPosition = $34
-Projectile5YPosition = $35
-LinkProjectile0YPosition = $36
-LinkProjectile1YPosition = $37
-EndingDisplayTileY0 = $38
-LinkSwordYBreakableBlockAdjusted = $39   ; [SS] Link's sword hitbox Y as used for breakable blocks - [Ending] Y of tile 1 in ending sequence
-EndingDisplayTileY2 = $3a
-LinkXPositionHi = $3b                    ; [SS] Which page of the room Link is in                  - [Ending] X of tile 0 in ending sequence
-EnemyXPositionHi = $3c
-Enemy0XPositionHi = $3c                  ; [SS] Which page of the room Enemy0 is in                - [Ending] X of tile 1 in ending sequence
-Enemy1XPositionHi = $3d                  ; [SS] Which page of the room Enemy1 is in                - [Ending] X of tile 2 in ending sequence
-Enemy2XPositionHi = $3e
-Enemy3XPositionHi = $3f
-Enemy4XPositionHi = $40
-Enemy5XPositionHi = $41
-Projectile0XPositionHi = $42
-Projectile1XPositionHi = $43
-Projectile2XPositionHi = $44
-Projectile3XPositionHi = $45
-Projectile4XPositionHi = $46
-Projectile5XPositionHi = $47
-LinkProjectile0XPositionHi = $48
-LinkProjectile1XPositionHi = $49
+EnemyIndex := $10                         ; 0-5=Enemy index being processed
+EntityIndex := $11                        ; 0=Link, 1-6 - Enemy index(-1) being processed
+FrameCounter := $12
+FairyState := $13                         ; 0 = Not in Fairy state
+LinkXFrameDiff := $14
+LinkScreenX := $15                        ; Link's X position on the screen (not in the map)
+LinksShadowScreenX := $16
+LinkStanding := $17                       ; 0 = Link in ducked shield position, 1 = Link standing
+DarkLinkStanding := $18                   ; 0 = Dark Link ducking, 1 = Dark Link standing
+LinkYPositionHi := $19                    ; 0 = Invisible, 1 = Normal, 2-FF = Fall in hole   - [FILE] Cursor position
+Enemy0YPositionHi := $1a                  ; 0 = Enemy0 off the top of the screen, 1 = Normal - [FILE] Save file presence bits
+Enemy1YPositionHi := $1b
+Enemy2YPositionHi := $1c
+Enemy3YPositionHi := $1d
+Enemy4YPositionHi := $1e                  ; 0 = Enemy4 off the top of the screen, 1 = Normal - [FILE] File selection cursor
+Enemy5YPositionHi := $1f
+Enemy0Condition := $20
+Enemy1Condition := $21
+Enemy2Condition := $22
+Enemy3Condition := $23
+Enemy4Condition := $24
+Enemy5Condition := $25
+OverworldStepCounter := $26
+VramAddrHi := $27
+VramAddrLo := $28
+LinkYPos := $29
+EnemyYPositionLo := $2a
+Enemy0YPositionLo := $2a
+OverworldEnemyYPosition := $2a            ; base of overworld demon Y world position array, indexed by slot X
+Enemy1YPositionLo := $2b
+Enemy2YPositionLo := $2c
+Enemy3YPositionLo := $2d
+Enemy4YPositionLo := $2e
+Enemy5YPositionLo := $2f
+ProjectileYPosition := $30
+Projectile0YPosition := $30
+Projectile1YPosition := $31
+Projectile2YPosition := $32
+Projectile3YPosition := $33
+Projectile4YPosition := $34
+Projectile5YPosition := $35
+LinkProjectile0YPosition := $36
+LinkProjectile1YPosition := $37
+EndingDisplayTileY0 := $38
+LinkSwordYBreakableBlockAdjusted := $39   ; [SS] Link's sword hitbox Y as used for breakable blocks - [Ending] Y of tile 1 in ending sequence
+EndingDisplayTileY2 := $3a
+LinkXPositionHi := $3b                    ; [SS] Which page of the room Link is in                  - [Ending] X of tile 0 in ending sequence
+EnemyXPositionHi := $3c
+Enemy0XPositionHi := $3c                  ; [SS] Which page of the room Enemy0 is in                - [Ending] X of tile 1 in ending sequence
+Enemy1XPositionHi := $3d                  ; [SS] Which page of the room Enemy1 is in                - [Ending] X of tile 2 in ending sequence
+Enemy2XPositionHi := $3e
+Enemy3XPositionHi := $3f
+Enemy4XPositionHi := $40
+Enemy5XPositionHi := $41
+Projectile0XPositionHi := $42
+Projectile1XPositionHi := $43
+Projectile2XPositionHi := $44
+Projectile3XPositionHi := $45
+Projectile4XPositionHi := $46
+Projectile5XPositionHi := $47
+LinkProjectile0XPositionHi := $48
+LinkProjectile1XPositionHi := $49
 zp_4a = $4a                              ; Unused? (Likely leftover of Link having 3 projectiles)
-LinkSwordBreakableBlockAdjusted = $4b
+LinkSwordBreakableBlockAdjusted := $4b
 zp_4c = $4c                              ; Unused?
-LinkXPosition   = $4d
-LinkXPositionLo = $4d
-EnemyXPositionLo  = $4e
-Enemy0XPositionLo = $4e
-OverworldEnemyXPosition = $4e            ; base of overworld demon X world position array, indexed by slot X
-Enemy1XPositionLo = $4f
-Enemy2XPositionLo = $50
-Enemy3XPositionLo = $51
-Enemy4XPositionLo = $52
-Enemy5XPositionLo = $53
-Projectile0XPositionLo = $54
-Projectile1XPositionLo = $55
-Projectile2XPositionLo = $56
-Projectile3XPositionLo = $57
-Projectile4XPositionLo = $58
-Projectile5XPositionLo = $59
-LinkProjectile0XPositionLo = $5a
-LinkProjectile1XPositionLo = $5b
+LinkXPosition := $4d
+LinkXPositionLo := $4d
+EnemyXPositionLo := $4e
+Enemy0XPositionLo := $4e
+OverworldEnemyXPosition := $4e            ; base of overworld demon X world position array, indexed by slot X
+Enemy1XPositionLo := $4f
+Enemy2XPositionLo := $50
+Enemy3XPositionLo := $51
+Enemy4XPositionLo := $52
+Enemy5XPositionLo := $53
+Projectile0XPositionLo := $54
+Projectile1XPositionLo := $55
+Projectile2XPositionLo := $56
+Projectile3XPositionLo := $57
+Projectile4XPositionLo := $58
+Projectile5XPositionLo := $59
+LinkProjectile0XPositionLo := $5a
+LinkProjectile1XPositionLo := $5b
 zp_5c = $5c                              ; Unused?
-LinkSwordXBreakableBlockAdjusted = $5d
+LinkSwordXBreakableBlockAdjusted := $5d
 zp_5e = $5e                              ; Unused?
-LinkFacingDirection = $5f
-Enemy0XFacing = $60
-Enemy1XFacing = $61
-Enemy2XFacing = $62
-Enemy3XFacing = $63
-Enemy4XFacing = $64
-Enemy5XFacing = $65
-Projectile0XFacing = $66
-Projectile1XFacing = $67
-Projectile2XFacing = $68
-Projectile3XFacing = $69
-Projectile4XFacing = $6a
-Projectile5XFacing = $6b
+LinkFacingDirection := $5f
+Enemy0XFacing := $60
+Enemy1XFacing := $61
+Enemy2XFacing := $62
+Enemy3XFacing := $63
+Enemy4XFacing := $64
+Enemy5XFacing := $65
+Projectile0XFacing := $66
+Projectile1XFacing := $67
+Projectile2XFacing := $68
+Projectile3XFacing := $69
+Projectile4XFacing := $6a
+Projectile5XFacing := $6b
 zp_6c = $6c                              ; Unused?
-LinkProjectile0Facing = $6d
-LinkProjectile1Facing = $6e
+LinkProjectile0Facing := $6d
+LinkProjectile1Facing := $6e
 zp_6f = $6f                              ; Unused?
-LinkXVelocity = $70
-Enemy0XVelocity = $71
-Enemy1XVelocity = $72
-OverworldYPosition = $73                 ; Enemy2XVelocity / OverworldYPosition
-OverworldXPosition = $74                 ; Enemy3XVelocity / OverworldXPosition
-OverworldLinkYPosition = $75             ; Enemy4XVelocity / OverworldLinkYPosition
-OverworldLinkXPosition = $76             ; Enemy5XVelocity / OverworldLinkXPosition
-Projectile0XVelocity = $77
-Projectile1XVelocity = $78
-Projectile2XVelocity = $79
-Projectile3XVelocity = $7a
-Projectile4XVelocity = $7b
-Projectile5XVelocity = $7c
-LinkProjectile0XVelocity = $7d
-LinkProjectile1XVelocity = $7e
+LinkXVelocity := $70
+Enemy0XVelocity := $71
+Enemy1XVelocity := $72
+OverworldYPosition := $73                 ; Enemy2XVelocity / OverworldYPosition
+OverworldXPosition := $74                 ; Enemy3XVelocity / OverworldXPosition
+OverworldLinkYPosition := $75             ; Enemy4XVelocity / OverworldLinkYPosition
+OverworldLinkXPosition := $76             ; Enemy5XVelocity / OverworldLinkXPosition
+Projectile0XVelocity := $77
+Projectile1XVelocity := $78
+Projectile2XVelocity := $79
+Projectile3XVelocity := $7a
+Projectile4XVelocity := $7b
+Projectile5XVelocity := $7c
+LinkProjectile0XVelocity := $7d
+LinkProjectile1XVelocity := $7e
 zp_7f = $7f
-OverworldScrollY = $7f                   ; camera Y scroll offset; screen Y = world_Y - OverworldScrollY
-LinkAnimationFrame = $80
-OverworldCurrentSlot = $80              ; current overworld demon slot index during per-frame processing (0-7)
-Enemy0AnimationFrame = $81
-OverworldEnemy0Type = $82                ; Enemy1AnimationFrame / OverworldEnemy0Type, 1 = Weak, 2 = Strong, 3 = Fairy
-OverworldEnemy1Type = $83                ; Enemy2AnimationFrame / OverworldEnemy1Type
-OverworldEnemy2Type = $84                ; Enemy3AnimationFrame / OverworldEnemy2Type
-OverworldEnemy3Type = $85                ; Enemy4AnimationFrame / OverworldEnemy3Type
-OverworldEnemy4Type = $86                ; Enemy5AnimationFrame / OverworldEnemy4Type
-ProjectileType = $87
-Enemy_Flag = ProjectileType
-Projectile0Type = $87                    ; Projectile0Type / OverworldEnemy5Type
-Projectile1Type = $88                    ; Projectile1Type / OverworldEnemy6Type
-Projectile2Type = $89                    ; Projectile2Type / OverworldEnemy7Type
-Projectile3Type = $8a
-Projectile4Type = $8b
-Projectile5Type = $8c
-LinkProjectile0State = $8d
-LinkProjectile1State = $8e
+OverworldScrollY := $7f                   ; camera Y scroll offset; screen Y = world_Y - OverworldScrollY
+LinkAnimationFrame := $80
+OverworldCurrentSlot := $80              ; current overworld demon slot index during per-frame processing (0-7)
+Enemy0AnimationFrame := $81
+OverworldEnemy0Type := $82                ; Enemy1AnimationFrame / OverworldEnemy0Type, 1 = Weak, 2 = Strong, 3 = Fairy
+OverworldEnemy1Type := $83                ; Enemy2AnimationFrame / OverworldEnemy1Type
+OverworldEnemy2Type := $84                ; Enemy3AnimationFrame / OverworldEnemy2Type
+OverworldEnemy3Type := $85                ; Enemy4AnimationFrame / OverworldEnemy3Type
+OverworldEnemy4Type := $86                ; Enemy5AnimationFrame / OverworldEnemy4Type
+ProjectileType := $87
+Enemy_Flag := ProjectileType
+Projectile0Type := $87                    ; Projectile0Type / OverworldEnemy5Type
+Projectile1Type := $88                    ; Projectile1Type / OverworldEnemy6Type
+Projectile2Type := $89                    ; Projectile2Type / OverworldEnemy7Type
+Projectile3Type := $8a
+Projectile4Type := $8b
+Projectile5Type := $8c
+LinkProjectile0State := $8d
+LinkProjectile1State := $8e
 zp_8f = $8f                              ; Unused?
-SpriteShuffleOffsetLink = $90
-SpriteShuffleOffsetEnemy0 = $91
-SpriteShuffleOffsetEnemy1 = $92
-SpriteShuffleOffsetEnemy2 = $93
-SpriteShuffleOffsetEnemy3 = $94
-SpriteShuffleOffsetEnemy4 = $95
-SpriteShuffleOffsetEnemy5 = $96
-SpriteShuffleOffsetProjectile0 = $97
-SpriteShuffleOffsetProjectile1 = $98
-SpriteShuffleOffsetProjectile2 = $99
-SpriteShuffleOffsetProjectile3 = $9a
-SpriteShuffleOffsetProjectile4 = $9b
-SpriteShuffleOffsetProjectile5 = $9c
-SpriteShuffleOffsetLinkProjectile0 = $9d
-SpriteShuffleOffsetLinkProjectile1 = $9e
-DpadHorizontalState = $9f                ; 1 = Right, 2 = Left
-LinksShadowFacingDirection = $a0         ; Link's Shadow's facing direction when his shadow is displayed during a boss explosion and during the final battle
-EnemyType  = $a1
-Enemy0Type = $a1                         ; Enemy (Elevator) slot
-Enemy1Type = $a2                         ; Enemy (Locked door) slot
-Enemy2Type = $a3
-Enemy3Type = $a4
-Enemy4Type = $a5
-Enemy5Type = $a6                         ; Enemy (Boss) slot
-LinkCollisionBits = $a7                  ; 0000ABLR (above, below, left, right)
-EnemyState = $a8
-Enemy0State = $a8
-Enemy1State = $a9
-Enemy2State = $aa
-Enemy3State = $ab
-Enemy4State = $ac
-Enemy5State = $ad
-LinkWalkingAnimationFrame = $ae          ; 0-2 cycling
-Enemy0State2 = $af
-Enemy1State2 = $b0
-Enemy2State2 = $b1
-Enemy3State2 = $b2
-Enemy4State2 = $b3
-Enemy5State2 = $b4
-SideviewState = $b5                      ; 0 = Link enters room, 1 = Normal, 2 = Link dies in lava, 3 = Link slides left after killing Dark Link
-Enemy0Status = $b6                       ; 0 = No enemy, 1 = Alive, 2 = Exploding, 3 = Floating XP, 10 = Link takes drop exit
-Enemy1Status = $b7
-Enemy2Status = $b8
-Enemy3Status = $b9
-Enemy4Status = $ba
-Enemy5Status = $bb
-Enemy0Persistence = $bc                  ; Related to remembering that an enemy is defeated
-Enemy1Persistence = $bd
-Enemy2Persistence = $be
-Enemy3Persistence = $bf
-Enemy4Persistence = $c0
-Enemy5Persistence = $c1
-EnemyHP = $c2
-Enemy0HP = $c2
-Enemy1HP = $c3
-Enemy2HP = $c4
-Enemy3HP = $c5
-Enemy4HP = $c6
-Enemy5HP = $c7
-SideviewExitScreen = $c8                 ; 3 = Exit screen
-EnemyBitFlags = $c9
+SpriteShuffleOffsetLink := $90
+SpriteShuffleOffsetEnemy0 := $91
+SpriteShuffleOffsetEnemy1 := $92
+SpriteShuffleOffsetEnemy2 := $93
+SpriteShuffleOffsetEnemy3 := $94
+SpriteShuffleOffsetEnemy4 := $95
+SpriteShuffleOffsetEnemy5 := $96
+SpriteShuffleOffsetProjectile0 := $97
+SpriteShuffleOffsetProjectile1 := $98
+SpriteShuffleOffsetProjectile2 := $99
+SpriteShuffleOffsetProjectile3 := $9a
+SpriteShuffleOffsetProjectile4 := $9b
+SpriteShuffleOffsetProjectile5 := $9c
+SpriteShuffleOffsetLinkProjectile0 := $9d
+SpriteShuffleOffsetLinkProjectile1 := $9e
+DpadHorizontalState := $9f                ; 1 = Right, 2 = Left
+LinksShadowFacingDirection := $a0         ; Link's Shadow's facing direction when his shadow is displayed during a boss explosion and during the final battle
+EnemyType  := $a1
+Enemy0Type := $a1                         ; Enemy (Elevator) slot
+Enemy1Type := $a2                         ; Enemy (Locked door) slot
+Enemy2Type := $a3
+Enemy3Type := $a4
+Enemy4Type := $a5
+Enemy5Type := $a6                         ; Enemy (Boss) slot
+LinkCollisionBits := $a7                  ; 0000ABLR (above, below, left, right)
+EnemyState := $a8
+Enemy0State := $a8
+Enemy1State := $a9
+Enemy2State := $aa
+Enemy3State := $ab
+Enemy4State := $ac
+Enemy5State := $ad
+LinkWalkingAnimationFrame := $ae          ; 0-2 cycling
+Enemy0State2 := $af
+Enemy1State2 := $b0
+Enemy2State2 := $b1
+Enemy3State2 := $b2
+Enemy4State2 := $b3
+Enemy5State2 := $b4
+SideviewState := $b5                      ; 0 = Link enters room, 1 = Normal, 2 = Link dies in lava, 3 = Link slides left after killing Dark Link
+Enemy0Status := $b6                       ; 0 = No enemy, 1 = Alive, 2 = Exploding, 3 = Floating XP, 10 = Link takes drop exit
+Enemy1Status := $b7
+Enemy2Status := $b8
+Enemy3Status := $b9
+Enemy4Status := $ba
+Enemy5Status := $bb
+Enemy0Persistence := $bc                  ; Related to remembering that an enemy is defeated
+Enemy1Persistence := $bd
+Enemy2Persistence := $be
+Enemy3Persistence := $bf
+Enemy4Persistence := $c0
+Enemy5Persistence := $c1
+EnemyHP := $c2
+Enemy0HP := $c2
+Enemy1HP := $c3
+Enemy2HP := $c4
+Enemy3HP := $c5
+Enemy4HP := $c6
+Enemy5HP := $c7
+SideviewExitScreen := $c8                 ; 3 = Exit screen
+EnemyBitFlags := $c9
 zp_ca = $ca
 zp_cb = $cb
-LinkXScreenPosition = $cc
+LinkXScreenPosition := $cc
 zp_cd = $cd
 zp_ce = $ce
-LinkProjectileXScreenPosition = $cf
-JumpSpellActive = $d0                    ; 1 = Jump active
-SideviewWidth = $d1                      ; With of current sidescroll screen (1-3 pages)
+LinkProjectileXScreenPosition := $cf
+JumpSpellActive := $d0                    ; 1 = Jump active
+SideviewWidth := $d1                      ; With of current sidescroll screen (1-3 pages)
 zp_d2 = $d2
 zp_d3 = $d3
 zp_d4 = $d4
@@ -277,67 +277,67 @@ zp_de = $de
 zp_df = $df                              ; Enemy type temporary storage
 
 ; $e0-$ef are music and sound variables
-Z2NoiseSoundQueue = $ed
-Z2Square2SoundQueue = $ee
-Z2Square1SoundQueue = $ef
+Z2NoiseSoundQueue := $ed
+Z2Square2SoundQueue := $ee
+Z2Square1SoundQueue := $ef
 
-NoiseSoundQueue = $f0
-Square2SoundQueue = $f1
-Square1SoundQueue = $f2
+NoiseSoundQueue := $f0
+Square2SoundQueue := $f1
+Square1SoundQueue := $f2
 
 ; Potentially free zero page memory bytes at $f1-$f4 and since they are used by FDS BIOS but not the NES
-Controller1ButtonsPressed = $f5
-Controller2ButtonsPressed = $f6
-Controller1ButtonsHeld = $f7
-Controller2ButtonsHeld = $f8
+Controller1ButtonsPressed := $f5
+Controller2ButtonsPressed := $f6
+Controller1ButtonsHeld := $f7
+Controller2ButtonsHeld := $f8
 ; Free zero page memory bytes at $f9-$fb (would have been reserved for Famicom Disk System BIOS)
-OverworldXScroll = $fc
-ScrollPosShadow = $fd
-PpuCtrlShadow = $ff
+OverworldXScroll := $fc
+ScrollPosShadow := $fd
+PpuCtrlShadow := $ff
 
 ; $100-$1ff stack memory
 
 ; $200-$2ff OAM buffer
-SpriteYPosition = $200
-SpriteTilenumber = $201
-SpriteAttributes = $202
-SpriteXPosition = $203
-SpriteData = SpriteYPosition
+SpriteYPosition := $200
+SpriteTilenumber := $201
+SpriteAttributes := $202
+SpriteXPosition := $203
+SpriteData := SpriteYPosition
 
-PpuBufferLength = $0301
-PpuAddrHi = $0302
-PpuAddrLo = $0303
-PpuTextLength = $0304
-PpuTextData = $0305
-PpuBuffer2Length = $0362
+PpuBufferLength := $0301
+PpuAddrHi := $0302
+PpuAddrLo := $0303
+PpuTextLength := $0304
+PpuTextData := $0305
+PpuBuffer2Length := $0362
 
-Sprite_Y_Position = $200
-Sprite_Tilenumber = $201
-Sprite_Attributes = $202
-Sprite_X_Position = $203
-Sprite_Data = Sprite_Y_Position
+Sprite_Y_Position := $200
+Sprite_Tilenumber := $201
+Sprite_Attributes := $202
+Sprite_X_Position := $203
+Sprite_Data := Sprite_Y_Position
 
 
-BUFFER_OFF = $0301
-PPUADDR_HI = $0302
-PPUADDR_LO = $0303
-BUFFER_LEN = $0304
-BUFFER_DAT = $0305
+BUFFER_OFF := $0301
+PPUADDR_HI := $0302
+PPUADDR_LO := $0303
+BUFFER_LEN := $0304
+BUFFER_DAT := $0305
 
-LinkXSubpixel = $03d6
-Enemy0XSubpixel = $03d7
-Enemy1XSubpixel = $03d8
-Enemy2XSubpixel = $03d9
-Enemy3XSubpixel = $03da
-Enemy4XSubpixel = $03db
-Enemy5XSubpixel = $03dc
-LinkYVelocityLo = $03e6
+LinkXSubpixel := $03d6
+Enemy0XSubpixel := $03d7
+Enemy1XSubpixel := $03d8
+Enemy2XSubpixel := $03d9
+Enemy3XSubpixel := $03da
+Enemy4XSubpixel := $03db
+Enemy5XSubpixel := $03dc
+LinkYVelocityLo := $03e6
 
 ; This is where the buffers for breaking blocks are stored in vanilla. We increase the number of blocks that can be broken
 ; at the same time by expanding the number of blocks here, and then moving the extra fields to a different location in
 ; stack ram
 ; Expanded the block break list to hold up to 10 bricks at a time instead of just 5
-BREAKABLE_BLOCK_COUNT = 10
+BREAKABLE_BLOCK_COUNT := 10
 RelocatedRAMBase = $041A
 SET_RES_BASE RelocatedRAMBase
 RESV BlockBreakState, BREAKABLE_BLOCK_COUNT ; Vanilla addr $041a - bits 0-6 = timer; bit 7 set = step block. $00 means no brick breaking
@@ -345,190 +345,190 @@ RESV BlockBreakMapPage, BREAKABLE_BLOCK_COUNT ; Vanilla addr $041F - Nametable s
 RESV BlockBreakXCoord, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0424 - X Low Byte for collision table
 .assert RES_BASE + RES_OFFSET < $043E
 
-LinkSwordAttackFrame = $0400
-Enemy0HitState = $040e
-BackgroundColumnUpdateArray = $0464      ; Palette & Tile index for each y position 0 to 12
-LinkInAir = $0479                        ; 0 = On ground, 1 = Falling from walking off platform, 2 = Jumping
-LinkSwordXHitbox = $047e                 ; Link's sword's X position in screen space
-LinksShadowSwordXHitbox = $047f
-LinkSwordYHitbox = $0480                 ; 0xf8 when not attacking
-LinksShadowSwordYHitbox = $0481
-LandingAnimationTimer = $0497
-HitboxXCoord = $047e
-HitboxYCoord = $0480
-SpriteSlotShuffleCounter = $0485         ; 0-5
+LinkSwordAttackFrame := $0400
+Enemy0HitState := $040e
+BackgroundColumnUpdateArray := $0464      ; Palette & Tile index for each y position 0 to 12
+LinkInAir := $0479                        ; 0 = On ground, 1 = Falling from walking off platform, 2 = Jumping
+LinkSwordXHitbox := $047e                 ; Link's sword's X position in screen space
+LinksShadowSwordXHitbox := $047f
+LinkSwordYHitbox := $0480                 ; 0xf8 when not attacking
+LinksShadowSwordYHitbox := $0481
+LandingAnimationTimer := $0497
+HitboxXCoord := $047e
+HitboxYCoord := $0480
+SpriteSlotShuffleCounter := $0485         ; 0-5
 
-LinkIFrameTimer = $500
-timer_501 = $0501                        ; $501 through $50d are timers that are decreased each frame until 0
-LinkEntrySlideTime = $0503
-SwordAttackTimer = $050a
-InjuryTimer = $050c
-OverworldDemonTimer = $050e              ; overworld demon active flag/timer, indexed by slot X; non-zero = active
-EncounterSpawnTimer = $0516
-RNG = $051b
-MapNumber = $0561
-OverworldFacingDirection = $0562         ; Link's facing direction: $01=right, $02=left, $04=down, $08=up
-OverworldFacingTerrain = $0563           ; terrain type Link is currently facing
-TownNumber = $056b
-PalaceNumber = $056c                     ; [Z2R] Current post-shuffle palace number (1-7); [Z2] Palace index in continent (0-2)
-OverworldDemonYVelocity = $056d          ; overworld demon Y velocity, indexed by slot X (signed: $01=down, $FF=up)
-OverworldDemonXVelocity = $0575          ; overworld demon X velocity, indexed by slot X (signed: $01=right, $FF=left)
-LinkYVelocityHi = $057d
-EnemyYVelocity = $057e
-Enemy0YVelocity = $057e
-TownfolkTimer0 = $05bd
-TownfolkTimer1 = $05be
-TownfolkTimer2 = $05bf
-TownfolkTimer3 = $05c0
-TownfolkTimer4 = $05c1
-TownfolkTimer5 = $05c2
-LinkProjectile0Timer = $05ca
-LinkProjectile1Timer = $05cb             ; Always 0 since Fire projectiles don't expire
-SavedDoorExit1Page = $05d1               ; accessed as $5cc,X with X = 5
-SavedDoorExit1X = $05d8                  ; accessed as $5d3,X with X = 5
-SavedDoorExit2Page = $05d2               ; used for New Kasuto fireplace
-SavedDoorExit2X = $05d9
-SmallDropCount = $05df
-LargeDropCount = $05e0
+LinkIFrameTimer := $500
+timer_501 := $0501                        ; $501 through $50d are timers that are decreased each frame until 0
+LinkEntrySlideTime := $0503
+SwordAttackTimer := $050a
+InjuryTimer := $050c
+OverworldDemonTimer := $050e              ; overworld demon active flag/timer, indexed by slot X; non-zero = active
+EncounterSpawnTimer := $0516
+RNG := $051b
+MapNumber := $0561
+OverworldFacingDirection := $0562         ; Link's facing direction: $01=right, $02=left, $04=down, $08=up
+OverworldFacingTerrain := $0563           ; terrain type Link is currently facing
+TownNumber := $056b
+PalaceNumber := $056c                     ; [Z2R] Current post-shuffle palace number (1-7); [Z2] Palace index in continent (0-2)
+OverworldDemonYVelocity := $056d          ; overworld demon Y velocity, indexed by slot X (signed: $01=down, $FF=up)
+OverworldDemonXVelocity := $0575          ; overworld demon X velocity, indexed by slot X (signed: $01=right, $FF=left)
+LinkYVelocityHi := $057d
+EnemyYVelocity := $057e
+Enemy0YVelocity := $057e
+TownfolkTimer0 := $05bd
+TownfolkTimer1 := $05be
+TownfolkTimer2 := $05bf
+TownfolkTimer3 := $05c0
+TownfolkTimer4 := $05c1
+TownfolkTimer5 := $05c2
+LinkProjectile0Timer := $05ca
+LinkProjectile1Timer := $05cb             ; Always 0 since Fire projectiles don't expire
+SavedDoorExit1Page := $05d1               ; accessed as $5cc,X with X = 5
+SavedDoorExit1X := $05d8                  ; accessed as $5d3,X with X = 5
+SavedDoorExit2Page := $05d2               ; used for New Kasuto fireplace
+SavedDoorExit2X := $05d9
+SmallDropCount := $05df
+LargeDropCount := $05e0
 
-OverworldStepCounterHi = $06e0           ; [Z2R] Used for halved encounter rate to only trigger encounters every other time the steps are reached
+OverworldStepCounterHi := $06e0           ; [Z2R] Used for halved encounter rate to only trigger encounters every other time the steps are reached
 
-Lives = $0700
-NumberofLives = $0700
-EntryFacing = $0701                      ; Sideview entry facing direction. 0=Facing right (enter from the left), 1=Facing left (enter from the right)
-EnterFromElevatorAbove = $0704           ; >0 Link enters the room from the top
-EnterCentered = $0705                    ; >0 Link enters centered; like at North Palace, taking an elevator exit or entering a random encounter
-RegionNumber = $0706                     ; 0=West, 1=Death Mountain, 2=East, 3=Maze Island
-GoingOutsideFlag = $0709                 ; non-zero routes game mode 0 (load area data) out to the overworld via go_outside
-PreviousRegion = $070a                   ; RegionNumber Link came from
-WorldNumber = $0707                      ; 0=Caves & enemy encounters, 1=West towns, 2=East towns, 3=Palace 1/2/5, 4=Palace 3/4/6, 5=Great Palace
-PreviousRegionNumber = $070a             ; [Z2R] Unused; made obsolete by FixContinentTransitions; [Z2] PreviousRegionNumber
-PalaceChrBank2 = $070b                   ; [Z2R] Unused; [Z2] Written as CHR bank * 2 but never read
-SideviewObjectPage = $0717               ; 0-3 page of current sideview object being processed
-ScrollDirection = $071f                  ; Current scroll direction. 1=Scrolling right, 2=Scrolling left
-ColumnScrollDirection = $0720            ; Scroll direction that is updated only when scrolling crosses a column boundary
-ColumnScrollX = $0721                    ; Scroll position within the current tile column ($00-$1f)
-DialogBoxDrawing = $0726                 ; >0 when drawing dialog and during black screen transitions
-ScrollFrozen = $0728                     ; 1=Screen scrolling frozen (for boss fights)
-ScrollLeftPage = $072a                   ; Which page the left-most pixel of the screen is on (0-3)
-ScrollRightPage = $72b
-ScrollLeftX = $072c
-ScrollRightX = $072d
-ScrollLock = $0728
-ScreenLeft_PageLoc = $72a
-ScrollPage = $072a                       ; Which page the left-most pixel of the screen is on (0-3)
-ScreenRight_PageLoc = $72b
-ScreenEdge_PageLoc = ScreenLeft_PageLoc
-ScreenLeft_X_Pos = $72c
-ScreenRight_X_Pos = $72d
-ScreenEdge_X_Pos = ScreenLeft_X_Pos
-ScrollX = $072c
-SideviewCommandY = $0730
-SideviewCommandOp = $0731
-UpdateScrollColumnLeftPage = $0732
-UpdateScrollColumnRightPage = $0733
-UpdateScrollColumnLeftTile = $0734       ; Which left background column to update during scrolling
-UpdateScrollColumnRightTile = $0735      ; Which right background column to update during scrolling
-GameMode = $0736
-GameModeCurrent = $0737                  ; GameMode is compared to this and only triggered if it has changed
+Lives := $0700
+NumberofLives := $0700
+EntryFacing := $0701                      ; Sideview entry facing direction. 0=Facing right (enter from the left), 1=Facing left (enter from the right)
+EnterFromElevatorAbove := $0704           ; >0 Link enters the room from the top
+EnterCentered := $0705                    ; >0 Link enters centered; like at North Palace, taking an elevator exit or entering a random encounter
+RegionNumber := $0706                     ; 0=West, 1=Death Mountain, 2=East, 3=Maze Island
+GoingOutsideFlag := $0709                 ; non-zero routes game mode 0 (load area data) out to the overworld via go_outside
+PreviousRegion := $070a                   ; RegionNumber Link came from
+WorldNumber := $0707                      ; 0=Caves & enemy encounters, 1=West towns, 2=East towns, 3=Palace 1/2/5, 4=Palace 3/4/6, 5=Great Palace
+PreviousRegionNumber := $070a             ; [Z2R] Unused; made obsolete by FixContinentTransitions; [Z2] PreviousRegionNumber
+PalaceChrBank2 := $070b                   ; [Z2R] Unused; [Z2] Written as CHR bank * 2 but never read
+SideviewObjectPage := $0717               ; 0-3 page of current sideview object being processed
+ScrollDirection := $071f                  ; Current scroll direction. 1=Scrolling right, 2=Scrolling left
+ColumnScrollDirection := $0720            ; Scroll direction that is updated only when scrolling crosses a column boundary
+ColumnScrollX := $0721                    ; Scroll position within the current tile column ($00-$1f)
+DialogBoxDrawing := $0726                 ; >0 when drawing dialog and during black screen transitions
+ScrollFrozen := $0728                     ; 1=Screen scrolling frozen (for boss fights)
+ScrollLeftPage := $072a                   ; Which page the left-most pixel of the screen is on (0-3)
+ScrollRightPage := $72b
+ScrollLeftX := $072c
+ScrollRightX := $072d
+ScrollLock := $0728
+ScreenLeft_PageLoc := $72a
+ScrollPage := $072a                       ; Which page the left-most pixel of the screen is on (0-3)
+ScreenRight_PageLoc := $72b
+ScreenEdge_PageLoc := ScreenLeft_PageLoc
+ScreenLeft_X_Pos := $72c
+ScreenRight_X_Pos := $72d
+ScreenEdge_X_Pos := ScreenLeft_X_Pos
+ScrollX := $072c
+SideviewCommandY := $0730
+SideviewCommandOp := $0731
+UpdateScrollColumnLeftPage := $0732
+UpdateScrollColumnRightPage := $0733
+UpdateScrollColumnLeftTile := $0734       ; Which left background column to update during scrolling
+UpdateScrollColumnRightTile := $0735      ; Which right background column to update during scrolling
+GameMode := $0736
+GameModeCurrent := $0737                  ; GameMode is compared to this and only triggered if it has changed
 
-Controller1ABPressed = $0741             ; Controller1ButtonsPressed & 0b11000000
-Controller1LeftRightHeld = $0742         ; Controller1ButtonsHeld & 0b00000011
-Controller1UpDownHeld = $0743            ; Controller1ButtonsHeld & 0b00001100
-Controller1ButtonsHeldCopy = $0744
-LocationNumber = $0748                   ; Location index sideview exits to or $3e for random encounters
-MagicSelectorPosition = $0749
-LinkFlashingTimer = $074b                ; Link changes palette and this value is counted down until it's 0. 0b10000000 bit determines if the background changes color.
-CurrentDialogType = $074c                ; 0=None, 1 = Level Up, 2 = Talking
-HudSectionFlag = $074f                   ; 0x80=Draw Magic & Attack, 0x40=Draw Life & XP
-HudDrawState = $0750
-ExpToAddHi = $0755
-ExpToAddLo = $0756
-DoorDepth = $075b                        ; Used as an index for saving/loading your x position when you enter/leave (nested) doors
-EntryPage = $075c                        ; Page to enter a sideview on (0-3) or 4 for center
-EnterAreaFlag = $075f                    ; Set to 1 when entering a screen centered. Other values are sound and music related.
-CurrentPrgBank = $0769
-GameEvent = $076c                        ; 0=Restart with full lives, 1=Main game loop, 2=Link dying, 3=Wake up Zelda, 4=Roll credits, 06=Show lives left then restart the scene
-GameEventCurrent = $076d                 ; GameEvent is compared to this and only triggered if it has changed
-CurrentChrBank = $076e
-CurrentCHRBank = $076e
-FireSpellActive = $076f                  ; 0x10 = Fire spell active
-ExpForNextLevelHi = $0770
-ExpForNextLevelLo = $0771
-CurrentGameSlot = $0772
-CurrentMagic = $0773
-CurrentLife = $0774
-CurrentExpHi = $0775
-CurrentExpLo = $0776
-AttackLevel = $0777
-MagicLevel = $0778
-LifeLevel = $0779
-HaveShield = $077b
-HaveJump = $077c
-HaveLife = $077d
-HaveFairy = $077e
-HaveFire = $077f
-HaveReflect = $0780
-HaveSpell = $0781
-HaveThunder = $0782
-MagicContainers = $0783
-HeartContainers = $0784
-HaveCandle = $0785
-HaveGlove = $0786
-HaveRaft = $0787
-HaveBoot = $0788
-HaveFlute = $0789
-HaveCross = $078a
-HaveHammer = $078b
-HaveMagicKey = $078c
-Crystal1Placed = $078d                   ; crystal-placed flags, unused in randomizer
-Crystal2Placed = $078e
-Crystal3Placed = $078f
-Crystal4Placed = $0790
-Crystal5Placed = $0791
-Crystal6Placed = $0792
-Keys = $0793                             ; Current number of Keys
-Crystals = $0794                         ; Number of Crystals left
-HaveStabs = $0796                        ; 0x04 = Have Downstab | 0x10 = Have Upstab
-HaveTrophy = $0798                       ; 0x10 = Have Trophy
-HaveMirror = $0799                       ; 1 = Have Mirror
-HaveBagusNoteAndMedicine = $079a         ; 0x08 = Bagu's Note | 0x40 = Medicine
-HaveWater = $079b                        ; 1 = Have Water
-HaveChild = $079c                        ; 0x20 = Have Child
-HaveBasementAccess = $079d               ; 0x08 = Have New Kasuto Basement access
+Controller1ABPressed := $0741             ; Controller1ButtonsPressed & 0b11000000
+Controller1LeftRightHeld := $0742         ; Controller1ButtonsHeld & 0b00000011
+Controller1UpDownHeld := $0743            ; Controller1ButtonsHeld & 0b00001100
+Controller1ButtonsHeldCopy := $0744
+LocationNumber := $0748                   ; Location index sideview exits to or $3e for random encounters
+MagicSelectorPosition := $0749
+LinkFlashingTimer := $074b                ; Link changes palette and this value is counted down until it's 0. 0b10000000 bit determines if the background changes color.
+CurrentDialogType := $074c                ; 0=None, 1 = Level Up, 2 = Talking
+HudSectionFlag := $074f                   ; 0x80=Draw Magic & Attack, 0x40=Draw Life & XP
+HudDrawState := $0750
+ExpToAddHi := $0755
+ExpToAddLo := $0756
+DoorDepth := $075b                        ; Used as an index for saving/loading your x position when you enter/leave (nested) doors
+EntryPage := $075c                        ; Page to enter a sideview on (0-3) or 4 for center
+EnterAreaFlag := $075f                    ; Set to 1 when entering a screen centered. Other values are sound and music related.
+CurrentPrgBank := $0769
+GameEvent := $076c                        ; 0=Restart with full lives, 1=Main game loop, 2=Link dying, 3=Wake up Zelda, 4=Roll credits, 06=Show lives left then restart the scene
+GameEventCurrent := $076d                 ; GameEvent is compared to this and only triggered if it has changed
+CurrentChrBank := $076e
+CurrentCHRBank := $076e
+FireSpellActive := $076f                  ; 0x10 = Fire spell active
+ExpForNextLevelHi := $0770
+ExpForNextLevelLo := $0771
+CurrentGameSlot := $0772
+CurrentMagic := $0773
+CurrentLife := $0774
+CurrentExpHi := $0775
+CurrentExpLo := $0776
+AttackLevel := $0777
+MagicLevel := $0778
+LifeLevel := $0779
+HaveShield := $077b
+HaveJump := $077c
+HaveLife := $077d
+HaveFairy := $077e
+HaveFire := $077f
+HaveReflect := $0780
+HaveSpell := $0781
+HaveThunder := $0782
+MagicContainers := $0783
+HeartContainers := $0784
+HaveCandle := $0785
+HaveGlove := $0786
+HaveRaft := $0787
+HaveBoot := $0788
+HaveFlute := $0789
+HaveCross := $078a
+HaveHammer := $078b
+HaveMagicKey := $078c
+Crystal1Placed := $078d                   ; crystal-placed flags, unused in randomizer
+Crystal2Placed := $078e
+Crystal3Placed := $078f
+Crystal4Placed := $0790
+Crystal5Placed := $0791
+Crystal6Placed := $0792
+Keys := $0793                             ; Current number of Keys
+Crystals := $0794                         ; Number of Crystals left
+HaveStabs := $0796                        ; 0x04 = Have Downstab | 0x10 = Have Upstab
+HaveTrophy := $0798                       ; 0x10 = Have Trophy
+HaveMirror := $0799                       ; 1 = Have Mirror
+HaveBagusNoteAndMedicine := $079a         ; 0x08 = Bagu's Note | 0x40 = Medicine
+HaveWater := $079b                        ; 1 = Have Water
+HaveChild := $079c                        ; 0x20 = Have Child
+HaveBasementAccess := $079d               ; 0x08 = Have New Kasuto Basement access
 ; Bitlist of palaces cleared/towns visited/etc for flute warp mode
-FluteWarpFlags = $079e
-ContinuesUsed = $079f
+FluteWarpFlags := $079e
+ContinuesUsed := $079f
 
 ; New variables that use free memory
-ProjectileEnemyData = $07c0              ; [Z2R] 6 bytes for Hard Carock projectile type
+ProjectileEnemyData := $07c0              ; [Z2R] 6 bytes for Hard Carock projectile type
 
-BackgroundTilesPage1 = $6000
-BackgroundTilesPage2 = $60d0
-BackgroundTilesPage3 = $61a0
-BackgroundTilesPage4 = $6270
+BackgroundTilesPage1 := $6000
+BackgroundTilesPage2 := $60d0
+BackgroundTilesPage3 := $61a0
+BackgroundTilesPage4 := $6270
 ; These are new variables that use free memory
-Z2Noise_SfxLenCounter = $07f5
-Z2Squ2_SfxLenCounter = $07f7
-Z2Squ1_SfxLenCounter = $07f9
-Z2NoiseSoundBuffer = $07fd
-Z2Square2SoundBuffer = $07fe
-Z2Square1SoundBuffer = $07ff
+Z2Noise_SfxLenCounter := $07f5
+Z2Squ2_SfxLenCounter := $07f7
+Z2Squ1_SfxLenCounter := $07f9
+Z2NoiseSoundBuffer := $07fd
+Z2Square2SoundBuffer := $07fe
+Z2Square1SoundBuffer := $07ff
 
-SavedDoorExit1ScrollPage = $69aa         ; accessed as $69a5,X with X = 5
-SavedDoorExit1ScrollX = $69b1            ; accessed as $69ac,X with X = 5
-SavedDoorExit2ScrollPage = $69ab         ; used for New Kasuto fireplace
-SavedDoorExit2ScrollX = $69b2
+SavedDoorExit1ScrollPage := $69aa         ; accessed as $69a5,X with X = 5
+SavedDoorExit1ScrollX := $69b1            ; accessed as $69ac,X with X = 5
+SavedDoorExit2ScrollPage := $69ab         ; used for New Kasuto fireplace
+SavedDoorExit2ScrollX := $69b2
 
 ; LocationNumber will later be changed to the side-scrolling location
 ; index. z2ft needs this, at this specific address.
-AreaEntranceIndex = $69ff
+AreaEntranceIndex := $69ff
 
 ; We need a horizontal IRQ for gameplay and a vertical IRQ for the title screen
 ; so we manage to keep both by making a small `jmp Irq` in sram
-IRQTrampoline = $7ffd
-IRQTrampolineAddrLo = $7ffe
-IRQTrampolineAddrHi = $7fff
+IRQTrampoline := $7ffd
+IRQTrampolineAddrLo := $7ffe
+IRQTrampolineAddrHi := $7fff
 
 ; All Timestamp types listed below for reference
 TS_COUNT .set 0
@@ -729,14 +729,14 @@ BOSS_RAM_SIZE = RES_OFFSET - CUSTOM_BOSS_START - 1
 RESV MarioShadowXOffset
 
 EnemyProjectileOffset = 7
-EnemyProjectileType        = ObjectMetasprite     + EnemyProjectileOffset
-EnemyProjectile_X_Position = SprObject_X_Position + EnemyProjectileOffset
-EnemyProjectile_Y_Position = SprObject_Y_Position + EnemyProjectileOffset
-EnemyProjectile_PageLoc    = SprObject_PageLoc    + EnemyProjectileOffset
-EnemyProjectile_Y_HighPos  = SprObject_Y_HighPos  + EnemyProjectileOffset
-EnemyProjectile_X_Speed    = SprObject_X_Speed    + EnemyProjectileOffset
-EnemyProjectile_Y_Speed    = SprObject_Y_Speed    + EnemyProjectileOffset
-EnemyProjectile_SprAttrib  = SprObject_SprAttrib  + EnemyProjectileOffset
+EnemyProjectileType        := ObjectMetasprite     + EnemyProjectileOffset
+EnemyProjectile_X_Position := SprObject_X_Position + EnemyProjectileOffset
+EnemyProjectile_Y_Position := SprObject_Y_Position + EnemyProjectileOffset
+EnemyProjectile_PageLoc    := SprObject_PageLoc    + EnemyProjectileOffset
+EnemyProjectile_Y_HighPos  := SprObject_Y_HighPos  + EnemyProjectileOffset
+EnemyProjectile_X_Speed    := SprObject_X_Speed    + EnemyProjectileOffset
+EnemyProjectile_Y_Speed    := SprObject_Y_Speed    + EnemyProjectileOffset
+EnemyProjectile_SprAttrib  := SprObject_SprAttrib  + EnemyProjectileOffset
 ENEMY_PROJECTILE_COUNT     = 6
 
 ; MARIO SPECIFIC RAM LOCATIONS

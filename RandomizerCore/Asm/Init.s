@@ -2,31 +2,31 @@
 
 ;;; Initialization. This must come before all other modules.
 
-.segment "HEADER" :bank $00 :size $0010 :mem $0000 :off $00000
-.segment "PRG0"   :bank $00 :size $4000 :mem $8000 :off $00010
-.segment "PRG1"   :bank $01 :size $4000 :mem $8000 :off $04010
-.segment "PRG2"   :bank $02 :size $4000 :mem $8000 :off $08010
-.segment "PRG3"   :bank $03 :size $4000 :mem $8000 :off $0c010
-.segment "PRG4"   :bank $04 :size $4000 :mem $8000 :off $10010
-.segment "PRG5"   :bank $05 :size $4000 :mem $8000 :off $14010
-.segment "PRG6"   :bank $06 :size $4000 :mem $8000 :off $18010
-.segment "PRG7"   :bank $07 :size $4000 :mem $c000 :off $1c010
-.segment "PRG10"   :bank $10 :size $2000 :mem $8000 :off $20010
-.segment "PRG11"   :bank $11 :size $2000 :mem $8000 :off $22010
-.segment "PRG12"   :bank $12 :size $2000 :mem $8000 :off $24010
-.segment "PRG13"   :bank $13 :size $2000 :mem $8000 :off $26010
-.segment "PRG14"   :bank $14 :size $2000 :mem $8000 :off $28010
-.segment "PRG15"   :bank $15 :size $2000 :mem $8000 :off $2a010
-.segment "PRG16"   :bank $16 :size $2000 :mem $8000 :off $2c010
-.segment "PRG17"   :bank $17 :size $2000 :mem $8000 :off $2e010
-.segment "PRG18"   :bank $18 :size $2000 :mem $8000 :off $30010
-.segment "PRG19"   :bank $19 :size $2000 :mem $8000 :off $32010
-.segment "PRG1A"   :bank $1A :size $2000 :mem $8000 :off $34010
-.segment "PRG1B"   :bank $1B :size $2000 :mem $8000 :off $36010
-.segment "PRG1C"   :bank $1C :size $2000 :mem $8000 :off $38010 ; Using segment C and D for extended sideview data
-.segment "PRG1D"   :bank $1D :size $2000 :mem $a000 :off $3a010
-.segment "PRG1E"   :bank $1E :size $2000 :mem $c000 :off $3c010
-.segment "PRG1F"   :bank $1F :size $2000 :mem $e000 :off $3e010
+.segment "HEADER" :bank $00 :size $0010 :mem $0000 :off $00000 :dedupe
+.segment "PRG0"   :bank $00 :size $4000 :mem $8000 :off $00010 :dedupe
+.segment "PRG1"   :bank $01 :size $4000 :mem $8000 :off $04010 :dedupe
+.segment "PRG2"   :bank $02 :size $4000 :mem $8000 :off $08010 :dedupe
+.segment "PRG3"   :bank $03 :size $4000 :mem $8000 :off $0c010 :dedupe
+.segment "PRG4"   :bank $04 :size $4000 :mem $8000 :off $10010 :dedupe
+.segment "PRG5"   :bank $05 :size $4000 :mem $8000 :off $14010 :dedupe
+.segment "PRG6"   :bank $06 :size $4000 :mem $8000 :off $18010 :dedupe
+.segment "PRG7"   :bank $07 :size $4000 :mem $c000 :off $1c010 :dedupe
+.segment "PRG10"   :bank $10 :size $2000 :mem $8000 :off $20010 :dedupe
+.segment "PRG11"   :bank $11 :size $2000 :mem $8000 :off $22010 :dedupe
+.segment "PRG12"   :bank $12 :size $2000 :mem $8000 :off $24010 :dedupe
+.segment "PRG13"   :bank $13 :size $2000 :mem $8000 :off $26010 :dedupe
+.segment "PRG14"   :bank $14 :size $2000 :mem $8000 :off $28010 :dedupe
+.segment "PRG15"   :bank $15 :size $2000 :mem $8000 :off $2a010 :dedupe
+.segment "PRG16"   :bank $16 :size $2000 :mem $8000 :off $2c010 :dedupe
+.segment "PRG17"   :bank $17 :size $2000 :mem $8000 :off $2e010 :dedupe
+.segment "PRG18"   :bank $18 :size $2000 :mem $8000 :off $30010 :dedupe
+.segment "PRG19"   :bank $19 :size $2000 :mem $8000 :off $32010 :dedupe
+.segment "PRG1A"   :bank $1A :size $2000 :mem $8000 :off $34010 :dedupe
+.segment "PRG1B"   :bank $1B :size $2000 :mem $8000 :off $36010 :dedupe
+.segment "PRG1C"   :bank $1C :size $2000 :mem $8000 :off $38010 :dedupe ; Using segment C and D for extended sideview data
+.segment "PRG1D"   :bank $1D :size $2000 :mem $a000 :off $3a010 :dedupe
+.segment "PRG1E"   :bank $1E :size $2000 :mem $c000 :off $3c010 :dedupe
+.segment "PRG1F"   :bank $1F :size $2000 :mem $e000 :off $3e010 :dedupe
 .segment "CHR"    :size $20000 :off $40010 :out
 
 ; Mark unused areas in the ROM so the linker can place stuff here

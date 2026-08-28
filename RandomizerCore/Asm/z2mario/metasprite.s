@@ -219,16 +219,16 @@ Attr4 .set (Palette | ((>Spr4) >> 8))
 .ident( .sprintf("MetaspriteData_%s_%s_%s", Object, Animation, Direction) ):
   .byte   (Size * 4)
 .if DrawSprite1 <> 0
-  .byte   Tile1, Attr1, Y1, X1
+  .byte   <Tile1, <Attr1, <Y1, <X1
 .endif
 .if DrawSprite2 <> 0
-  .byte   Tile2, Attr2, Y1, X2
+  .byte   <Tile2, <Attr2, <Y1, <X2
 .endif
 .if DrawSprite3 <> 0
-  .byte   Tile3, Attr3, Y2, X1
+  .byte   <Tile3, <Attr3, <Y2, <X1
 .endif
 .if DrawSprite4 <> 0
-  .byte   Tile4, Attr4, Y2, X2
+  .byte   <Tile4, <Attr4, <Y2, <X2
 .endif
 .endmacro
 
@@ -258,17 +258,17 @@ Attr4 .set (Palette | ((>Spr4) >> 8))
 .endif
 
 .if .defined(.ident( .sprintf("%s_%s_Y_OFFSET", Object, Animation) ))
-  YOffset = <.ident( .sprintf("%s_%s_Y_OFFSET", Object, Animation) )
+  YOffset = .ident( .sprintf("%s_%s_Y_OFFSET", Object, Animation) )
 .elseif .defined(.ident( .sprintf("%s_Y_OFFSET", Object) ))
-  YOffset = <.ident( .sprintf("%s_Y_OFFSET", Object) )
+  YOffset = .ident( .sprintf("%s_Y_OFFSET", Object) )
 .else
   YOffset = 0
 .endif
 
 .if .defined(.ident( .sprintf("%s_%s_X_OFFSET", Object, Animation) ))
-  XOffset = <.ident( .sprintf("%s_%s_X_OFFSET", Object, Animation) )
+  XOffset = .ident( .sprintf("%s_%s_X_OFFSET", Object, Animation) )
 .elseif .defined(.ident( .sprintf("%s_X_OFFSET", Object) ))
-  XOffset = <.ident( .sprintf("%s_X_OFFSET", Object) )
+  XOffset = .ident( .sprintf("%s_X_OFFSET", Object) )
 .else
   XOffset = 0
 .endif

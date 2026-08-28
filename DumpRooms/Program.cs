@@ -92,7 +92,6 @@ for (int palaceGroup = 0; palaceGroup < 3; palaceGroup++)
             Map = (byte)map,
             ConnectionStartAddress = sideViewPtr,
             Name = "",
-            Requirements = new Requirements(),
             SideView = sideView,
         };
         // r.PalaceGroup = (PalaceGrouping)palaceGroup;
