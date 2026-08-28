@@ -289,12 +289,25 @@ public class RoomPool
 
         if (props.NoDuplicateRoomsBySideview)
         {
-            var sideviewBytes = roomThatWasUsed.SideView;
-            RemoveRooms(room => byteArrayEqualityComparer.Equals(room.SideView, sideviewBytes));
+            var dupeGroup = roomThatWasUsed.DuplicateGroup;
+            if (!string.IsNullOrWhiteSpace(dupeGroup))
+            {
+                RemoveRooms(room => room.DuplicateGroup == dupeGroup);
+            }
+            else
+            {
+                var name = roomThatWasUsed.Name;
+                RemoveRooms(room => room.Name == name);
+            }
+            //this logic gets messy with mirrored sideviews (using above solution instead)
+            //var sideviewBytes = roomThatWasUsed.SideView;
+            //RemoveRooms(room => byteArrayEqualityComparer.Equals(room.SideView, sideviewBytes));
         }
         else if (props.NoDuplicateRooms)
         {
-            RemoveRoom(roomThatWasUsed);
+            var name = roomThatWasUsed.Name;
+            RemoveRooms(room => room.Name == name);
+            //RemoveRoom(roomThatWasUsed);
         }
     }
 
