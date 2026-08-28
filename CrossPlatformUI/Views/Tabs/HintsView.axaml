@@ -57,7 +57,6 @@
         </StackPanel>
         <StackPanel Grid.Column="1">
             <CheckBox IsChecked="{Binding Main.Config.GenerateSpoiler}"
-                      Margin="14,4,4,4" Padding="0,4,0,4"
                       Background="{Binding HeaderBackgroundObservable^}"
                       Content="Generate Spoiler">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateSpoilerToolTip}"/></ToolTip.Tip>

@@ -45,18 +45,30 @@
             <!-- By default the checkbox stretched to fill the container, which made way too much clickable, so
                  No more stretching! Stick to left aligned content by default for checkboxes. -->
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="Padding" Value="0 8"/>
-            <Setter Property="Margin" Value="14 0 4 0"/>
+            <Setter Property="Padding" Value="0,4,0,4"/>
+            <Setter Property="Margin" Value="14,4,4,4"/>
+        </Style>
+        <Style Selector="CheckBox /template/ Border#PART_RootBorder">
+            <Setter Property="CornerRadius" Value="3" />
         </Style>
 
         <Style Selector="CheckBox.DifficultyOnly">
-            <Setter Property="Background" Value="DarkBlue" />
+            <Setter Property="Background" Value="#803376FF" />
         </Style>
-        <Style Selector="ComboBox.DifficultyOnly">
-            <Setter Property="Background" Value="DarkBlue" />
+
+        <Style Selector="ComboBox.DifficultyOnly /template/ Border#PART_Border">
+            <Setter Property="Background" Value="#803376FF" />
         </Style>
+        <!-- Move ComboBox label up a bit so it looks ok when the ComboBox has a background color -->
+        <Style Selector="ComboBox.DifficultyOnly:not(ComboBox.DifficultyOnly[SelectedIndex=-1]) /template/ Border#watermarkRoot">
+            <Setter Property="Margin" Value="18,-15,0,0" />
+        </Style>
+        <Style Selector="ComboBox.DifficultyOnly:not(ComboBox.DifficultyOnly[SelectedIndex=-1]) /template/ TextBlock#floatingWatermark">
+            <Setter Property="Margin" Value="0,0,0,0" />
+        </Style>
+
         <Style Selector="NumericUpDown.DifficultyOnly">
-            <Setter Property="Background" Value="DarkBlue" />
+            <Setter Property="Background" Value="#803376FF" />
         </Style>
 
         <!-- Indeterminate state -->

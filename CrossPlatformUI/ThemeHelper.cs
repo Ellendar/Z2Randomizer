@@ -13,7 +13,7 @@ public class ThemeHelper
     private static readonly Theme LightMaterialTheme;
 
     private static IBrush DarkNonStandardFlagEnabledBackground = SolidColorBrush.Parse("#80b10600");
-    private static IBrush LightNonStandardFlagEnabledBackground = SolidColorBrush.Parse("#d2b30000");
+    private static IBrush LightNonStandardFlagEnabledBackground = SolidColorBrush.Parse("#c8b30000");
 
     private static IBrush DarkInvalidFlagUnderline = SolidColorBrush.Parse("#b10600");
     private static IBrush LightInvalidFlagUnderline = SolidColorBrush.Parse("#b30000");
