@@ -159,6 +159,12 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
         if (mirrorRoom != null && mirrorRoom.CanBeMirrored())
         {
             Room? unmirrored = rooms.NormalRooms.SingleOrDefault(room => room.Name == mirrorRoom.Name);
+            //Stubs don't have a mirror in the pool, but their mirror is itself.
+            //
+            if(unmirrored == null && mirrorRoom.IsStub) 
+            {
+                unmirrored = mirrorRoom;
+            }
             Debug.Assert(unmirrored != null);
             // I don't think merging linked rooms here is needed
             return unmirrored;

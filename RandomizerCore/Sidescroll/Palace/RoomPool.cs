@@ -184,6 +184,10 @@ public class RoomPool
 
     void FinalizePool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
+        foreach (Room stub in palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS))
+        {
+            stub.IsStub = true;
+        }
         DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_DOWN, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).First(i => i.HasDownExit));
         DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_UP, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).First(i => i.HasUpExit));
 

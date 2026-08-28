@@ -134,6 +134,7 @@ public class Room : IJsonOnDeserialized
     public bool IsThunderBirdRoom { get; set; }
     public bool Enabled { get; set; }
     public bool IsEntrance { get; set; }
+    public bool IsStub { get; set; } = false;
     public int? PalaceNumber { get; set; }
     public string? LinkedRoomName { get; set; }
     //public int PageCount { get; private set; }
@@ -198,6 +199,7 @@ public class Room : IJsonOnDeserialized
         IsDropZone = room.IsDropZone;
         IsEntrance = room.IsEntrance;
         IsThunderBirdRoom = room.IsThunderBirdRoom;
+        IsStub = room.IsStub;
         LinkRequirements = room.LinkRequirements;
         Name = room.Name;
         LinkedRoomName = room.LinkedRoomName;

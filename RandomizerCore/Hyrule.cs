@@ -141,7 +141,7 @@ public class Hyrule
 
     //DEBUG/STATS
 #pragma warning disable CS0414 // Field is assigned but its value is never used
-    private static int DEBUG_THRESHOLD = 111;
+    private static int DEBUG_THRESHOLD = 200;
 #pragma warning restore CS0414 // Field is assigned but its value is never used
     public DateTime startTime = DateTime.Now;
     // public DateTime startRandomizeStartingValuesTimestamp;
