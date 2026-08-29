@@ -2172,6 +2172,45 @@ DarkenThunderbirdRoomCommand:
 
     }
 
+    // Don't soft-lock if tbird is killed by thunder
+    public void FixThunderbirdThunderDeath(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+.segment "PRG7"
+
+ExplosionHandler = $dcae
+TbirdDeathHandler = $a3db
+TbirdDeathFlag = $6e3f
+
+.org $d5f5
+    .word FixedTbirdExplosionHandler
+
+.reloc
+FixedTbirdExplosionHandler:
+    lda WorldNumber
+    cmp #$05
+    bne @Explosion
+
+    lda EnemyType,x
+    cmp #$22
+    bne @Explosion
+
+    ; let an in-progress tbird death sequence continue
+    lda TbirdDeathFlag
+    bmi @Explosion
+
+    ; Run the death setup skipped on a thunder-based kill.
+    jmp TbirdDeathHandler
+
+    @Explosion:
+        jmp ExplosionHandler
+
+""");
+    }
+
     // Allows Thunderbird room entry from left or right
     public void ThunderbirdEnterLeftFix(Assembler asm)
     {
