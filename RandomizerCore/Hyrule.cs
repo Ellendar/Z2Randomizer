@@ -2645,12 +2645,10 @@ public class Hyrule
         ROMData.Put(RomMap.MI_MAGIC_CONTAINER_DROP_COLLECTABLE, mazeIsland.magicContainerDrop.GetAllCollectables()[0].GetROMCollectableIndex());
         ROMData.Put(RomMap.MI_CHILD_DROP_COLLECTABLE, mazeIsland.childDrop.GetAllCollectables()[0].GetROMCollectableIndex());
 
-        if (props.PbagItemShuffle)
-        {
-            ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, westHyrule.pbagCave.GetAllCollectables()[0].GetROMCollectableIndex());
-            ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, eastHyrule.pbagCave1.GetAllCollectables()[0].GetROMCollectableIndex());
-            ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, eastHyrule.pbagCave2.GetAllCollectables()[0].GetROMCollectableIndex());
-        }
+
+        ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, westHyrule.pbagCave.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, eastHyrule.pbagCave1.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, eastHyrule.pbagCave2.GetAllCollectables()[0].GetROMCollectableIndex());
 
         foreach (Location location in pbagHearts)
         {
