@@ -2156,7 +2156,7 @@ DarkenThunderbirdRoom:
         sta PpuAddrHi,y
         inx
         iny
-        cpx #$05
+        cpx #$06
         bne @CopyCommand
 
     dey
@@ -2166,7 +2166,7 @@ DarkenThunderbirdRoom:
     rts
 
 DarkenThunderbirdRoomCommand:
-    .byte $3f, $06, $01, $0f, $ff
+    .byte $3f, $05, $02, $0f, $0f, $ff
 
 """);
 
