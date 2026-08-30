@@ -242,6 +242,7 @@ public class RandomizerProperties
     public NesColor ShieldColor { get; set; }
     public bool UpAC1 { get; set; }
     public bool RemoveFlashing { get; set; }
+    public bool DarkenThunderbird { get; set; }
     public bool UseCustomRooms { get; set; }
     public bool UpdatedHud { get; set; }
     public bool DisableHUDLag { get; set; }

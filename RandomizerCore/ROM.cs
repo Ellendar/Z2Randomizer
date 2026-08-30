@@ -2111,6 +2111,107 @@ ResetRedPalettePayload:
 """);
     }
 
+    // Makes the background black when thunder is cast for accessibility
+    public void DarkenThunderbirdRoom(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+.segment "PRG0"
+
+; Hook into the thunder cast routine to check if in tbird room
+.org $91e6
+    jsr DarkenThunderbirdRoomIfLoaded
+
+.segment "PRG7"
+
+.reloc
+DarkenThunderbirdRoomIfLoaded:
+    lda WorldNumber
+    cmp #$05
+    bne @Done
+
+    ; An empty slot can retain its previous enemy type.
+    lda Enemy5Status
+    cmp #$01
+    bne @Done
+
+    lda Enemy5Type
+    cmp #$22
+    beq DarkenThunderbirdRoom
+
+    @Done:
+        ; Re-run the instruction replaced by the hook.
+        lda FireSpellActive
+        rts
+
+DarkenThunderbirdRoom:
+    ; The flash command is already in this buffer. Append the background
+    ; color so the same NMI processes both commands.
+    ldy PpuBufferLength
+    ldx #$00
+    @CopyCommand:
+        lda DarkenThunderbirdRoomCommand,x
+        sta PpuAddrHi,y
+        inx
+        iny
+        cpx #$05
+        bne @CopyCommand
+
+    dey
+    sty PpuBufferLength
+
+    lda FireSpellActive
+    rts
+
+DarkenThunderbirdRoomCommand:
+    .byte $3f, $06, $01, $0f, $ff
+
+""");
+
+    }
+
+    // Don't soft-lock if tbird is killed by thunder
+    public void FixThunderbirdThunderDeath(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+.segment "PRG7"
+
+ExplosionHandler = $dcae
+TbirdDeathHandler = $a3db
+TbirdDeathFlag = $6e3f
+
+.org $d5f5
+    .word FixedTbirdExplosionHandler
+
+.reloc
+FixedTbirdExplosionHandler:
+    lda WorldNumber
+    cmp #$05
+    bne @Explosion
+
+    lda EnemyType,x
+    cmp #$22
+    bne @Explosion
+
+    ; let an in-progress tbird death sequence continue
+    lda TbirdDeathFlag
+    bmi @Explosion
+
+    ; Run the death setup skipped on a thunder-based kill.
+    jmp TbirdDeathHandler
+
+    @Explosion:
+        jmp ExplosionHandler
+
+""");
+    }
+
+    // Allows Thunderbird room entry from left or right
     public void ThunderbirdEnterLeftFix(Assembler asm)
     {
         var a = asm.Module();
@@ -2134,7 +2235,6 @@ ThunderbirdNoRoutine = $a3bd
 ; While it's not a problem, it feels a bit jank, so lets not draw Thunderbird pre-battle.
 .org $95a9
     .word ConditionalDrawThunderbird
-
 
 .org ThunderbirdMainRoutineStart
 FREE_UNTIL ThunderbirdMainRoutine

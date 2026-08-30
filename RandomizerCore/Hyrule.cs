@@ -3935,6 +3935,12 @@ FlagHudUpdate:
         rom.FixMinibossGlitchyAppearance(engine);
         rom.FixBossKillPaletteGlitch(engine);
         rom.ThunderbirdEnterLeftFix(engine);
+        rom.FixThunderbirdThunderDeath(engine);
+
+        if ( props.DarkenThunderbird ) {
+            rom.DarkenThunderbirdRoom(engine);
+        }
+
         rom.FixBigBubbleSplit(engine, randomizedStats);
         StatTracking(props, engine);
         AddCredits(engine, props);
