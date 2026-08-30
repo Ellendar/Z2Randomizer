@@ -2350,24 +2350,40 @@ public class Hyrule
         rom.Put(RomMap.START_MAGICAL_KEY, props.StartKey ? (byte)1 : (byte)0);
 
         rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.item_sprites.chr"));
-        //Linked fire/dash custom sprites replace fire's sprite. This lets us free up c7 for future use.
-        if(props.LinkedFireSpell != null)
+        //replace menu/non-wizard pickup icons
+        if (props.MarioMode)
         {
-            rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.linkedFire.chr"));
+            //These two are double wide normally but could just be single wide and mirrored. If we really need
+            //to save 2 slots in mario mode we can improve this
+            rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.FireFlower.chr"));
+            rom.Put(ROM.ChrRomOffset + 0x1a100, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.FireFlower.chr"));
+            rom.Put(ROM.ChrRomOffset + 0x1a120, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.Tanooki.chr"));
+            rom.Put(ROM.ChrRomOffset + 0x1a140, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.Tanooki.chr"));
+            rom.Put(ROM.ChrRomOffset + 0x1a200, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.Mario_Upstab_Varcal.chr"));
+            rom.Put(ROM.ChrRomOffset + 0x1a220, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.Mario_Downstab_Dude.chr"));
         }
-        else if(props.ReplaceFireWithDash)
+        else
         {
-            rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.dash.chr"));
-        }
-        if (!props.MarioMode)
-        {
+            //Linked fire/dash custom sprites replace fire's sprite. This lets us free up c7 for future use.
+            if (props.LinkedFireSpell != null)
+            {
+                rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.linkedFire.chr"));
+            }
+            else if (props.ReplaceFireWithDash)
+            {
+                rom.Put(ROM.ChrRomOffset + 0x1a0E0, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.dash.chr"));
+            }
+
             // Mario mode sprites and colors are too weird to allow changing it atm 
             // maybe after we fix the bugs with it...
-        rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
-        rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+            rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
+            rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
         }
+
         if (IS_RANDOMIZED)
-        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        {
+            rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        }
         else
         {
             // We need to move the "OF" graphics over the unused zelda graphics
