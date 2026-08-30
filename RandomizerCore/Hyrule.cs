@@ -914,11 +914,11 @@ public class Hyrule
             {
                 int index = shufflableItems.IndexOf(item);
                 if (index > -1)
-        {
+                {
                     shufflableItems[index] = minorItems.Sample(r);
                     }
                 }
-                        }
+            }
 
             if (props.IncludeSpellsInShuffle)
             {
@@ -927,9 +927,9 @@ public class Hyrule
                 if (props.StartsWithCollectable(item) && shufflableItems.Contains(item))
                 {
                     shufflableItems[shufflableItems.IndexOf(item)] = minorItems.Sample(r);
-                    }
                 }
             }
+        }
 
         //Handle excess items
         List<Collectable> excessItems = [];
@@ -965,12 +965,12 @@ public class Hyrule
 
         List<int> minorItemIndexes = [];
         for(int i = 0; i < shufflableItems.Count; i++)
-                {
+        {
             if (shufflableItems[i].IsMinorItem())
             {
                 minorItemIndexes.Add(i);
-                }
             }
+        }
 
         //Add the auto pbag cave promotion
         List<Location> overflowLocations = [];
@@ -1079,10 +1079,10 @@ public class Hyrule
                     for(int i = 0; i < collectables.Count; i++)
                     {
                         collectables[i] = props.StartsWithCollectable(collectables[i]) ? minorItems.Sample(r) : collectables[i];
-                }
+                    }
                     nonPalaceLocation.SetCollectables(collectables, false);
+                }
             }
-        }
         }
 
         //Assigning unshuffled locations can make the number of containers wrong, so re-adjust them
@@ -1095,9 +1095,9 @@ public class Hyrule
             Collectable minorItem = minorItems.Sample(r);
             if(!location.ReplaceCollectable(Collectable.HEART_CONTAINER, minorItem))
             {
-                    heartContainerLocations.Remove(location);
-                }
+                heartContainerLocations.Remove(location);
             }
+        }
 
         List<Location> minorItemLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Any(j => j.IsMinorItem())).ToList();
 
@@ -1107,9 +1107,9 @@ public class Hyrule
             Collectable[] locationMinorItems = location.GetAllCollectables().Where(i => i.IsMinorItem()).ToArray();
             if(locationMinorItems.Length == 0)
             {
-                    minorItemLocations.Remove(location);
+                minorItemLocations.Remove(location);
                 continue;
-                }
+            }
             if (!location.ReplaceCollectable(locationMinorItems.Sample(r), Collectable.HEART_CONTAINER))
             {
                 heartContainerLocations.Remove(location);
@@ -1129,11 +1129,11 @@ public class Hyrule
                 continue;
             }
             if (!location.ReplaceCollectable(locationMinorItems.Sample(r), Collectable.MAGIC_CONTAINER))
-                {
-                    magicContainerLocations.Remove(location);
-                }
-            magicContainerCount++;
+            {
+                magicContainerLocations.Remove(location);
             }
+            magicContainerCount++;
+        }
 
         minorItemLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Any(j => j.IsMinorItem())).ToList();
 
@@ -1143,9 +1143,9 @@ public class Hyrule
             Collectable[] locationMinorItems = location.GetAllCollectables().Where(i => i.IsMinorItem()).ToArray();
             if (locationMinorItems.Length == 0)
             {
-                    minorItemLocations.Remove(location);
+                minorItemLocations.Remove(location);
                 continue;
-                }
+            }
             if (!location.ReplaceCollectable(locationMinorItems.Sample(r), Collectable.MAGIC_CONTAINER))
             {
                 magicContainerLocations.Remove(location);
@@ -1192,16 +1192,16 @@ public class Hyrule
                         minorItemLocation.SetCollectables(locationCollectables);
                         if(!locationCollectables.Any(c => c.IsMinorItem()))
                         {
-                        minorItemLocations.Remove(minorItemLocation);
+                            minorItemLocations.Remove(minorItemLocation);
+                        }
+                        break;
                     }
-                    break;
                 }
             }
         }
-    }
 
         if (props.PreventSpellItemChains)
-    {
+        {
             PreventSpellItemChains();
         }
     }
@@ -1209,7 +1209,7 @@ public class Hyrule
     // Disallow old men from holding other spell items, preventing long
     // item chains
     private void PreventSpellItemChains()
-        {
+    {
         //child, trophy, medicine, mirror, water
         List<Location> locationsThatContainWizards = [eastHyrule.darunia, westHyrule.ruto, westHyrule.mido, westHyrule.sariaNorth, eastHyrule.nabooru];
         if(!props.IncludeQuestItemsInShuffle)
@@ -1241,13 +1241,13 @@ public class Hyrule
                         //WTB C# 15 labeled continue
                         replaced = true;
                         break;
-        }
+                    }
                 }
                 if(replaced)
-        {
-                    break;
-        }
-    }
+                {
+                            break;
+                }
+            }
         }
     }
 
@@ -1272,7 +1272,7 @@ public class Hyrule
             List<Collectable> newCollectables = itemsToShuffle.GetRange(itemIndex, collectableCount);
             itemIndex += collectableCount;
             location.SetCollectables(newCollectables, true);
-    }
+        }
     }
 
     private async Task<bool> FillPalaceRooms(AsmModule sideviewModule)
@@ -2599,15 +2599,15 @@ public class Hyrule
 
         //WRITE UPDATES TO WIZARD/QUEST COLLECTABLES HERE
 
-        ROMData.Put(RomMap.WEST_TROPHY_CAVE_COLLECTABLE, (byte)westHyrule.trophyCave.GetAllCollectables()[0]);
-        ROMData.Put(RomMap.WEST_MAGIC_CONTAINER_CAVE_COLLECTABLE, (byte)westHyrule.magicContainerCave.GetAllCollectables()[0]);
-        ROMData.Put(RomMap.WEST_HEART_CONTAINER_CAVE_COLLECTABLE, (byte)westHyrule.heartContainerCave.GetAllCollectables()[0]);
-        ROMData.Put(RomMap.WEST_MEDICINE_CAVE_COLLECTABLE, (byte)westHyrule.medicineCave.GetAllCollectables()[0]);
-        ROMData.Put(RomMap.WEST_GRASS_TILE_COLLECTABLE, (byte)westHyrule.grassTile.GetAllCollectables()[0]);
-        ROMData.Put(RomMap.DM_SPECTACLE_ROCK_COLLECTABLE, (byte)deathMountain.specRock.GetAllCollectables()[0]);
-        ROMData.Put(RomMap.DM_HAMMER_CAVE_COLLECTABLE, (byte)deathMountain.hammerCave.GetAllCollectables()[0]);
-        ROMData.Put(RomMap.EAST_WATER_TILE_COLLECTABLE, (byte)eastHyrule.waterTile.GetAllCollectables()[0]);
-        ROMData.Put(RomMap.EAST_DESERT_TILE_COLLECTABLE, (byte)eastHyrule.desertTile.GetAllCollectables()[0]);
+        ROMData.Put(RomMap.WEST_TROPHY_CAVE_COLLECTABLE, westHyrule.trophyCave.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.WEST_MAGIC_CONTAINER_CAVE_COLLECTABLE, westHyrule.magicContainerCave.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.WEST_HEART_CONTAINER_CAVE_COLLECTABLE, westHyrule.heartContainerCave.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.WEST_MEDICINE_CAVE_COLLECTABLE, westHyrule.medicineCave.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.WEST_GRASS_TILE_COLLECTABLE, westHyrule.grassTile.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.DM_SPECTACLE_ROCK_COLLECTABLE, deathMountain.specRock.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.DM_HAMMER_CAVE_COLLECTABLE, deathMountain.hammerCave.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.EAST_WATER_TILE_COLLECTABLE, eastHyrule.waterTile.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.EAST_DESERT_TILE_COLLECTABLE, eastHyrule.desertTile.GetAllCollectables()[0].GetROMCollectableIndex());
 
         // Update item rooms and entrances for all palaces
         Location[] palaceLocations = [
@@ -2635,33 +2635,37 @@ public class Hyrule
             ROMData.Put(loc.MemAddress + 0x7e, root.Map);
         }
 
-        ROMData.Put(RomMap.EAST_SPELL_TOWER_COLLECTABLE, (byte)eastHyrule.newKasuto.Town!.GetTownMap(VanillaTownMap.SPELL_TOWER_INTERIOR)!.Collectable!); 
-        ROMData.Put(RomMap.EAST_NEW_KASUTO_BASEMENT_COLLECTABLE, (byte)eastHyrule.newKasuto.Town!.GetTownMap(VanillaTownMap.GRANNYS_BASEMENT)!.Collectable!);
+        Collectable? collectable = (eastHyrule.newKasuto.Town!.GetTownMap(VanillaTownMap.SPELL_TOWER_INTERIOR)?.Collectable)
+            ?? throw new Exception("Unable to find spell tower while setting collectables");
+        ROMData.Put(RomMap.EAST_SPELL_TOWER_COLLECTABLE, ((Collectable)collectable).GetROMCollectableIndex());
+        collectable = eastHyrule.newKasuto.Town!.GetTownMap(VanillaTownMap.GRANNYS_BASEMENT)!.Collectable 
+            ?? throw new Exception("Unable to find granny's basement while setting collectables");
+        ROMData.Put(RomMap.EAST_NEW_KASUTO_BASEMENT_COLLECTABLE, ((Collectable)collectable).GetROMCollectableIndex());
 
-        ROMData.Put(RomMap.MI_MAGIC_CONTAINER_DROP_COLLECTABLE, (byte)mazeIsland.magicContainerDrop.GetAllCollectables()[0]);
-        ROMData.Put(RomMap.MI_CHILD_DROP_COLLECTABLE, (byte)mazeIsland.childDrop.GetAllCollectables()[0]);
+        ROMData.Put(RomMap.MI_MAGIC_CONTAINER_DROP_COLLECTABLE, mazeIsland.magicContainerDrop.GetAllCollectables()[0].GetROMCollectableIndex());
+        ROMData.Put(RomMap.MI_CHILD_DROP_COLLECTABLE, mazeIsland.childDrop.GetAllCollectables()[0].GetROMCollectableIndex());
 
         if (props.PbagItemShuffle)
         {
-            ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, (byte)westHyrule.pbagCave.GetAllCollectables()[0]);
-            ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, (byte)eastHyrule.pbagCave1.GetAllCollectables()[0]);
-            ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, (byte)eastHyrule.pbagCave2.GetAllCollectables()[0]);
+            ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, westHyrule.pbagCave.GetAllCollectables()[0].GetROMCollectableIndex());
+            ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, eastHyrule.pbagCave1.GetAllCollectables()[0].GetROMCollectableIndex());
+            ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, eastHyrule.pbagCave2.GetAllCollectables()[0].GetROMCollectableIndex());
         }
 
         foreach (Location location in pbagHearts)
         {
             if (location == westHyrule.pbagCave)
             {
-                ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, (byte)westHyrule.pbagCave.GetAllCollectables()[0]);
+                ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, westHyrule.pbagCave.GetAllCollectables()[0].GetROMCollectableIndex());
             }
 
             if (location == eastHyrule.pbagCave1)
             {
-                ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, (byte)eastHyrule.pbagCave1.GetAllCollectables()[0]);
+                ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, eastHyrule.pbagCave1.GetAllCollectables()[0].GetROMCollectableIndex());
             }
             if (location == eastHyrule.pbagCave2)
             {
-                ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, (byte)eastHyrule.pbagCave2.GetAllCollectables()[0]);
+                ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, eastHyrule.pbagCave2.GetAllCollectables()[0].GetROMCollectableIndex());
             }
         }
 
@@ -3146,10 +3150,13 @@ CustomFileSelectData:
         foreach (var collect in Enum.GetValues<Collectable>())
         {
             a.Set($"{collect.ToString().ToUpper()}_ITEMLOC", (int)collect);
+            Debug.WriteLine($"{collect.ToString().ToUpper()}_ITEMLOC " + (int)collect);
         }
+        Debug.WriteLine("");
         foreach (var loc in fullShuffleLocations)
         {
             a.Set(loc.Item1, loc.Item2);
+            Debug.WriteLine($"{loc.Item1} {loc.Item2}");
         }
         foreach (var val in Enum.GetValues<DialogWest>())
         {

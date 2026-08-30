@@ -893,7 +893,7 @@ public class Room : IJsonOnDeserialized
                 int collectableId = sideView[sideviewIndex + 2];
                 if (!((Collectable)collectableId).IsMinorItem())
                 {
-                    sideView[sideviewIndex + 2] = (byte)collectable;
+                    sideView[sideviewIndex + 2] = collectable.GetROMCollectableIndex();
                 }
                 sideviewIndex++;
             }

@@ -3320,7 +3320,7 @@ SetInitialEncounterTimer = $8879
             int byte3 = GetByte(sideviewRomPtr + offset++);
 
             if (((Collectable)byte3).IsMinorItem()) continue;
-            Put(sideviewRomPtr + offset - 1, (byte)item);
+                Put(sideviewRomPtr + offset - 1, item.GetROMCollectableIndex());
             return;
         } while (offset < sideviewLength);
         logger.Warn($"Could not write Collectable {item} to Item room {room.GetDebuggerDisplay()} in palace {room.PalaceNumber}");

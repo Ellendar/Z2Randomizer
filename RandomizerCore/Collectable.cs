@@ -306,4 +306,13 @@ public static class CollectableExtensions
             _ => false
         };
     }
+
+    public static byte GetROMCollectableIndex(this Collectable collectable)
+    {
+        return collectable switch { 
+            Collectable.DO_NOT_USE or Collectable.DO_NOT_USE_ANTIFAIRY => throw new Exception($"Collectable {collectable} cannot be placed"),
+            Collectable.TANOOKI => (byte)Collectable.JUMP_SPELL,
+            _ => (byte)collectable
+        };
+    }
 }

@@ -1757,7 +1757,7 @@ public sealed class EastHyrule : World
         sb.AppendLine("Darunia: \n" + darunia.Town!.GenerateSpoiler());
         sb.AppendLine("New Kasuto: \n" + newKasuto.Town!.GenerateSpoiler());
         sb.AppendLine("Old Kasuto: \n" + oldKasuto.Town!.GenerateSpoiler());
-
+        sb.AppendLine("Overworld:");
         sb.AppendLine("\tRisen Pbag Cave: " + pbagCave2.GetAllCollectables()[0].EnglishText());
         sb.AppendLine("\tSunken Pbag Cave: " + pbagCave1.GetAllCollectables()[0].EnglishText());
         sb.AppendLine("\tWater Tile: " + waterTile.GetAllCollectables()[0].EnglishText());
