@@ -1,5 +1,52 @@
 # Z2Randomizer Changelog
 
+## Version 5.2.0 - ???
+
+### New Features
+- Mario has found his way into the randomizer.
+	- Mario is always treated as having jump and dash for logical requirements.
+	- Some bosses have new logical requirements based on mario's abilities.
+	- Many rooms have their logical requirements changed.
+	- Some features are not supported in mario mode, mostly in cases where they wouldn't make sense.
+	- See <wiki link> for full details.
+- Added support for handicap races.
+	- Selecting "Allow difficulty levels" from the start tab allows multiple players to select different difficulty settings while keeping the rest of the seed the same.
+	- Affected settings will be highlighted blue when this is selected.
+	- All players will have the same 4 characters in the hash, but the final 2 characters will differ based on difficulty settings.
+- New palace style: Mirrored
+	- Mirrored palaces are always mirrored left to right across the middle, except for item rooms and boss rooms.
+	- This could result in previously unseed mirrored versions of rooms.
+- Improved the HUD to display 
+- Added an option to prevent spell item chains.
+- Added an option for hints to be town-specific or continent level. This is no longer automatically set based on spell shuffle setting.
+- Added new fire immunity options to disable immunities always or only when fire is linked to dash/fairy
+- Added an option to reveal hidden jars in statues
+- Added an option to enable/disable background during the thunderbird fight
+
+
+### Improvements
+- Added the ability to specify the output rom's name format in the customize tab.
+- Added flags for the 2026 Upstarts tournament.
+- Added new custom music uses: GameComplete, House, PalaceClear
+- Spoiler log now contains additional information about the seed.
+- Spoiler map now displays information about item locations
+- Duplicate detection by layout has been improved to cover a broader class of identical rooms.
+- Chaos and loopy palaces can now enter thunderbird going left.
+- New Sprite: Mina (the Hollower) - Thanks Baker
+
+### Bug Fixes
+- Fixed a bug were sometimes big bubbles would split instantly when entering a room.
+- Fixed a bug where level 9 XP requirements could be changed even when XP requirement shuffle was off.
+- Expanded the range of acceptable input roms
+- Fixed a bug where items were not properly written to the rom in cases where pbag shuffle was off and there were few enough spots that they had to be used anyway.
+- Fixed an issue where custom music could sometimes override fire spell sound effect.
+- Fixed an issue where unshuffled east Pbag caves were incorrectly only 200 points.
+- Fixed various small bugs related to trap tile placement in volcanoes
+- Encounter rate "Random" is now a random encounter rate per continent (and actually works instead of doing nothing)
+- Fixed a rare issue where 2 locations could overlap on the same space
+- Disabled custom music option in the web version. It didn't work anyway.
+- Fixed a bug where error responses could be cached in the browser version and persist after the error condition ended.
+
 ## Version 5.1.4 - May 16, 2026
 
 - Fixed 3 GP rooms that could cause the player to get stuck or die endlessly after dropping in and dying in certain places.
