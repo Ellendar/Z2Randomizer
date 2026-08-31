@@ -1,10 +1,15 @@
 ﻿using Z2Randomizer.RandomizerCore;
-using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
-public static class UpstartsTournamentPreset
+public static class Upstarts2025TournamentPreset
 {
+    public static string Name => "Upstarts Tournament 2025";
+
+    public static string Description => """
+Tournament preset for the final week of the Upstarts Tournament of 2025.
+""";
+
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start

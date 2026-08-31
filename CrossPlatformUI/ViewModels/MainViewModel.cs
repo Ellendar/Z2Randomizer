@@ -58,6 +58,8 @@ public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
         RomFileViewModel = new(this);
         GenerateRomViewModel = new(this);
         SaveNewPresetViewModel = new(this);
+        RemovePresetViewModel = new(this);
+        UpdatePresetViewModel = new(this);
         RandomizerViewModel = new(this);
         SubscribeExtensions.Subscribe(Router.Navigate.Execute(RandomizerViewModel));
 
@@ -123,7 +125,20 @@ public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
     [JsonIgnore]
     public bool SaveNewPresetDialogOpen { get => saveNewPresetDialogOpen; set => this.RaiseAndSetIfChanged(ref saveNewPresetDialogOpen, value); }
 
-    
+    [JsonIgnore]
+    public UpdatePresetViewModel UpdatePresetViewModel { get; }
+
+    private bool updatePresetDialogOpen = false;
+    [JsonIgnore]
+    public bool UpdatePresetDialogOpen { get => updatePresetDialogOpen; set => this.RaiseAndSetIfChanged(ref updatePresetDialogOpen, value); }
+
+    [JsonIgnore]
+    public RemovePresetViewModel RemovePresetViewModel { get; }
+
+    private bool removePresetDialogOpen = false;
+    [JsonIgnore]
+    public bool RemovePresetDialogOpen { get => removePresetDialogOpen; set => this.RaiseAndSetIfChanged(ref removePresetDialogOpen, value); }
+
     // Unique identifier for the routable view model.
     [JsonIgnore]
     public string UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];

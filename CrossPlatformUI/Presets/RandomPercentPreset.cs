@@ -5,6 +5,14 @@ namespace CrossPlatformUI.Presets;
 
 public static class RandomPercentPreset
 {
+    public static string Name => "Random%";
+
+    public static string Description => """
+Every setting possible is set to be indeterminate, meaning it has a 50-50 chance of being enabled.
+
+One safety it provides is that you start with at least 3 hearts.
+""";
+
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start
