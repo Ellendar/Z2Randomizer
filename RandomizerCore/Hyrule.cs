@@ -3148,13 +3148,10 @@ CustomFileSelectData:
         foreach (var collect in Enum.GetValues<Collectable>())
         {
             a.Set($"{collect.ToString().ToUpper()}_ITEMLOC", (int)collect);
-            Debug.WriteLine($"{collect.ToString().ToUpper()}_ITEMLOC " + (int)collect);
         }
-        Debug.WriteLine("");
         foreach (var loc in fullShuffleLocations)
         {
             a.Set(loc.Item1, loc.Item2);
-            Debug.WriteLine($"{loc.Item1} {loc.Item2}");
         }
         foreach (var val in Enum.GetValues<DialogWest>())
         {
