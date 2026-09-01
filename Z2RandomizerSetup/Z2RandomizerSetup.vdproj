@@ -1,4 +1,4 @@
-﻿"DeployProject"
+"DeployProject"
 {
 "VSVersion" = "3:800"
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
@@ -192,8 +192,8 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork"
-        "ProductCode" = "8:{5A761B6E-980D-455D-97A8-5944E30AC07C}"
-        "PackageCode" = "8:{ED702241-C3FE-462A-8530-420402B3FFB5}"
+        "ProductCode" = "8:{658911E1-9B5C-47C6-A04F-F0571880D505}"
+        "PackageCode" = "8:{106AB0C3-8DB3-4964-BDD2-3571E2B798B7}"
         "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
