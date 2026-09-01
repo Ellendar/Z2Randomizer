@@ -81,6 +81,7 @@ Starting items and spells: Candle, Downstab
         ShuffleSmallItems = true,
         RandomizeNewKasutoJarRequirements = true,
         ShufflePBagAmounts = true,
+        PreventSpellItemChains = true,
         IncludeSpellsInShuffle = true,
         IncludeQuestItemsInShuffle = true,
         ShuffleItemDropFrequency = true,

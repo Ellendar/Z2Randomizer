@@ -76,6 +76,7 @@ Starting items and spells: Candle, Shield, Downstab
         PalacesContainExtraKeys = true,
         RandomizeNewKasutoJarRequirements = true,
         ShufflePBagAmounts = true,
+        PreventSpellItemChains = true,
         ShuffleItemDropFrequency = true,
         RandomizeDrops = true,
         StandardizeDrops = true,

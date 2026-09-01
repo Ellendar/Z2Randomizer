@@ -506,7 +506,7 @@ CommonEnemyTileTable:
     .byte $C3, $C3 ; Crumble Block 2
     .byte $B2, $B2 ; Bot Frame 1
     .byte $B4, $B4 ; Bot Frame 2
-.ifdef ENABLE_Z2_MARIO
+.if ENABLE_Z2_MARIO
     .byte $48, $48 ; Spike top frame 1 (Relocated to another spot in z2mario)
 .else
     .byte $24, $24 ; Spike top frame 1

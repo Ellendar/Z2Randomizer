@@ -149,9 +149,10 @@ jobs:
         if: ${{ matrix.platform.type == 'installer' }}
         shell: pwsh
         run: |
+          dotnet publish -c Release -r win-x64 -o CrossPlatformUI.Desktop/bin/Release/net10.0/publish/win-x64 CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
           & "C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\IDE\devenv.com" Z2Randomizer.sln /build 'Release|x64' /project Z2RandomizerSetup
           cd Z2RandomizerSetup/Release
-          ren Setup.msi Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}.msi
+          ren Z2RandomizerSetup.msi Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}.msi
 
       - name: Build Browser
         if: ${{ matrix.platform.type == 'browser' }}

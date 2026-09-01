@@ -69,6 +69,7 @@ Starting items and spells: Candle, Life, Fairy, Downstab
         PalacesContainExtraKeys = true,
         RandomizeNewKasutoJarRequirements = true,
         ShufflePBagAmounts = true,
+        PreventSpellItemChains = true,
         ShuffleItemDropFrequency = true,
         RandomizeDrops = true,
         StandardizeDrops = true,
