@@ -150,7 +150,7 @@ jobs:
         shell: pwsh
         run: |
           & "C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\IDE\devenv.com" Z2Randomizer.sln /build 'Release|x64' /project Z2RandomizerSetup
-          cd Setup1/Release
+          cd Z2RandomizerSetup/Release
           ren Setup.msi Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}.msi
 
       - name: Build Browser
@@ -173,7 +173,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ inputs.version }}
-          files: Setup1/Release/*.msi
+          files: Z2RandomizerSetup/Release/*.msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
