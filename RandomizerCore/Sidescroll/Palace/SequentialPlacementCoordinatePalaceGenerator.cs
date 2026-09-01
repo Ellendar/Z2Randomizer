@@ -13,12 +13,14 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
     public static int[] stallFailureCounts = [0, 0, 0, 0, 0, 0, 0];
     public static int[] specialRoomFailureCounts = [0, 0, 0, 0, 0, 0, 0];
 
+    private static readonly RoomExitType[] ALLOWED_REFILL_TYPES = [RoomExitType.DEADEND_EXIT_LEFT, RoomExitType.DEADEND_EXIT_RIGHT];
+    private const int REFILL_SIZE_THRESHOLD = 50;
     private static readonly ItemRoomSelectionStrategy itemRoomSelectionStrategy = new RandomItemRoomSelectionStrategy();
 
     private const int STALL_LIMIT = 5000;
     public static int debug = 0;
 
-    private HashSet<Coord> openCoords = new();
+    private HashSet<Coord> openCoords = [];
     private Dictionary<Coord, Room> roomsByCoordinate = new();
     private int stallCount;
     private int openJunctionsCount;
@@ -36,6 +38,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         Palace palace = new(palaceNumber, props.ShufflePalaceItems);
         openCoords = [];
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
+        HashSet<RoomExitType> refilledTypes = [];
         roomPool = new(rooms);
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
         Room entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
@@ -120,116 +123,128 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
 
         //close stubs
-        if (openCoords.Count > 0)
+        roomsByExitType = roomPool.CategorizeNormalRoomExits();
+
+        //var openCoordsIter = openCoords.ToArray();
+        List<Coord> orderedOpenCoords = openCoords.ToList().OrderBy(c => c.X).ThenBy(c => c.Y).ToList();
+        foreach(Coord openCoord in orderedOpenCoords)
         {
-            roomsByExitType = roomPool.CategorizeNormalRoomExits();
-
-            var openCoordsIter = openCoords.ToArray();
-            foreach (var openCoord in openCoordsIter)
+            var (x, y) = openCoord;
+            Room? left = roomsByCoordinate.GetValueOrDefault(new Coord(x - 1, y));
+            Room? right = roomsByCoordinate.GetValueOrDefault(new Coord(x + 1, y));
+            Room? up = roomsByCoordinate.GetValueOrDefault(new Coord(x, y + 1));
+            Room? down = roomsByCoordinate.GetValueOrDefault(new Coord(x, y - 1));
+            if ((left is { HasRightExit: true } ? 1 : 0)
+                + (right is { HasLeftExit: true } ? 1 : 0)
+                + (up != null && (up.HasDownExit || up.HasDrop) ? 1 : 0)
+                + (down is { HasUpExit: true } ? 1 : 0) >= 2)
             {
-                var (x, y) = openCoord;
-                Room? left = roomsByCoordinate.GetValueOrDefault(new Coord(x - 1, y));
-                Room? right = roomsByCoordinate.GetValueOrDefault(new Coord(x + 1, y));
-                Room? up = roomsByCoordinate.GetValueOrDefault(new Coord(x, y + 1));
-                Room? down = roomsByCoordinate.GetValueOrDefault(new Coord(x, y - 1));
-                if ((left is { HasRightExit: true } ? 1 : 0)
-                    + (right is { HasLeftExit: true } ? 1 : 0)
-                    + (up != null && (up.HasDownExit || up.HasDrop) ? 1 : 0)
-                    + (down is { HasUpExit: true } ? 1 : 0) >= 2)
-                {
-                    throw new Exception("Junction remains in stub closing that should have been cleaned up");
-                }
+                throw new Exception("Junction remains in stub closing that should have been cleaned up");
+            }
 
-                RoomExitType exitType;
-                if (left is { HasRightExit: true })
+            RoomExitType exitType;
+            if (left is { HasRightExit: true })
+            {
+                exitType = RoomExitType.DEADEND_EXIT_LEFT;
+            }
+            else if (right is { HasLeftExit: true })
+            {
+                exitType = RoomExitType.DEADEND_EXIT_RIGHT;
+            }
+            else if (up is { HasDownExit: true })
+            {
+                if (up.HasDrop)
                 {
-                    exitType = RoomExitType.DEADEND_EXIT_LEFT;
-                }
-                else if (right is { HasLeftExit: true })
-                {
-                    exitType = RoomExitType.DEADEND_EXIT_RIGHT;
-                }
-                else if (up is { HasDownExit: true })
-                {
-                    if (up.HasDrop)
-                    {
-                        exitType = RoomExitType.NO_ESCAPE;
-                        dropFailureCounts[palaceNumber - 1]++;
-                        //logger.Debug("Drop stubs are currently unsupported. Ask discord how we feel about these");
-                        palace.IsValid = false;
-                        return palace;
-                    }
-                    else
-                    {
-                        exitType = RoomExitType.DEADEND_EXIT_UP;
-                    }
-                }
-                else if (down is { HasUpExit: true })
-                {
-                    exitType = RoomExitType.DEADEND_EXIT_DOWN;
+                    exitType = RoomExitType.NO_ESCAPE;
+                    dropFailureCounts[palaceNumber - 1]++;
+                    //logger.Debug("Drop stubs are currently unsupported. Ask discord how we feel about these");
+                    palace.IsValid = false;
+                    return palace;
                 }
                 else
                 {
-                    throw new ImpossibleException("Open coordinate has no adjacent exits");
+                    exitType = RoomExitType.DEADEND_EXIT_UP;
                 }
-                roomsByExitType.TryGetValue(exitType, out var possibleStubs);
-
-                bool placed = false;
-                do //while (placed == false)
-                {
-                    Room? newRoom = possibleStubs?.Sample(r);
-                    if (newRoom == null)
-                    {
-                        roomPool.DefaultStubsByDirection.TryGetValue(exitType, out newRoom);
-                    }
-                    //This should no longer be possible since default stubs aren't removable
-                    if (newRoom == null)
-                    {
-                        palace.IsValid = false;
-                        return palace;
-                    }
-
-                    newRoom = new(newRoom);
-                    //If the stub is a drop zone, pretend it isn't, otherwise junctions can appear
-                    //as a result of adding the stub.
-                    if (newRoom.IsDropZone)
-                    {
-                        newRoom.IsDropZone = false;
-                    }
-                    newRoom.coords = openCoord;
-                    roomsByCoordinate.Add(newRoom.coords, newRoom);
-                    palace.AllRooms.Add(newRoom);
-                    openCoords.Remove(openCoord);
-                    placed = true;
-
-                    if (left != null && newRoom.HasLeftExit)
-                    {
-                        newRoom.Left = left;
-                        left.Right = newRoom;
-                    }
-                    if (down != null && newRoom.HasDownExit)
-                    {
-                        newRoom.Down = down;
-                        down.Up = newRoom;
-                    }
-                    if (up != null && newRoom.HasUpExit)
-                    {
-                        newRoom.Up = up;
-                        up.Down = newRoom;
-                    }
-                    if (right != null && newRoom.HasRightExit)
-                    {
-                        newRoom.Right = right;
-                        right.Left = newRoom;
-                    }
-
-                    if (newRoom.Group != RoomGroup.STUBS)
-                    {
-                        if (duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
-                    }
-                } while (placed == false);
             }
+            else if (down is { HasUpExit: true })
+            {
+                exitType = RoomExitType.DEADEND_EXIT_DOWN;
+            }
+            else
+            {
+                throw new ImpossibleException("Open coordinate has no adjacent exits");
+            }
+
+            bool placed = false;
+            do //while (placed == false)
+            {
+                roomsByExitType.TryGetValue(exitType, out var possibleRooms);
+                Room? newRoom = possibleRooms?.Sample(r);
+                if (newRoom == null)
+                {
+                    roomPool.DefaultStubsByDirection.TryGetValue(exitType, out newRoom);
+                }
+                //In sufficiently large palaces, you can run out of horizontal dead ends very easily on more limited palace room sets
+                //so in very large palaces, some dead ends can be duplicated to fill stubs since they are less confusing than
+                //duplicate passthroughs / junctions. limit 1 refill per generation attempt per room type
+                if(newRoom == null 
+                    && ALLOWED_REFILL_TYPES.Contains(exitType) 
+                    && roomCount >= REFILL_SIZE_THRESHOLD
+                    && !refilledTypes.Contains(exitType))
+                {
+                    refilledTypes.Add(exitType);
+                    roomPool.RefillNormalRoomsForExitType(rooms, exitType);
+                    roomsByExitType = roomPool.CategorizeNormalRoomExits();
+                    continue;
+                }
+                //This should no longer be possible since default stubs aren't removable
+                if (newRoom == null)
+                {
+                    palace.IsValid = false;
+                    return palace;
+                }
+
+                newRoom = new(newRoom);
+                //If the stub is a drop zone, pretend it isn't, otherwise junctions can appear
+                //as a result of adding the stub.
+                if (newRoom.IsDropZone)
+                {
+                    newRoom.IsDropZone = false;
+                }
+                newRoom.coords = openCoord;
+                roomsByCoordinate.Add(newRoom.coords, newRoom);
+                palace.AllRooms.Add(newRoom);
+                openCoords.Remove(openCoord);
+                placed = true;
+
+                if (left != null && newRoom.HasLeftExit)
+                {
+                    newRoom.Left = left;
+                    left.Right = newRoom;
+                }
+                if (down != null && newRoom.HasDownExit)
+                {
+                    newRoom.Down = down;
+                    down.Up = newRoom;
+                }
+                if (up != null && newRoom.HasUpExit)
+                {
+                    newRoom.Up = up;
+                    up.Down = newRoom;
+                }
+                if (right != null && newRoom.HasRightExit)
+                {
+                    newRoom.Right = right;
+                    right.Left = newRoom;
+                }
+
+                if (newRoom.Group != RoomGroup.STUBS)
+                {
+                    if (duplicateProtection) { roomPool.RemoveDuplicates(props, newRoom); }
+                }
+            } while (placed == false);
         }
+
         //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
         if (roomsByCoordinate.Count > this.roomCount)
         {

@@ -8,7 +8,7 @@
 	- Some bosses have new logical requirements based on mario's abilities.
 	- Many rooms have their logical requirements changed.
 	- Some features are not supported in mario mode, mostly in cases where they wouldn't make sense.
-	- See <wiki link> for full details.
+	- See [The Wiki Page](https://github.com/Ellendar/Z2Randomizer/wiki/Z2Mario-Randomizer-Notes) for details.
 - Added support for handicap races.
 	- Selecting "Allow difficulty levels" from the start tab allows multiple players to select different difficulty settings while keeping the rest of the seed the same.
 	- Affected settings will be highlighted blue when this is selected.
@@ -16,7 +16,8 @@
 - New palace style: Mirrored
 	- Mirrored palaces are always mirrored left to right across the middle, except for item rooms and boss rooms.
 	- This could result in previously unseed mirrored versions of rooms.
-- Improved the HUD to display 
+- Added flute warp. Playing the flute can now teleport you to towns or palaces based on your selected option.
+- Improved the HUD to display keys/lives/gems.
 - Added an option to prevent spell item chains.
 - Added an option for hints to be town-specific or continent level. This is no longer automatically set based on spell shuffle setting.
 - Added new fire immunity options to disable immunities always or only when fire is linked to dash/fairy
