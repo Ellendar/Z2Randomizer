@@ -1,6 +1,6 @@
 # Z2Randomizer Changelog
 
-## Version 5.2.0 - ???
+## Version 5.2.0 - September 1, 2026
 
 ### New Features
 - Mario has found his way into the randomizer.
