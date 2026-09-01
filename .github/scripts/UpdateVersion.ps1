@@ -44,7 +44,7 @@ $file = "README.md"
     } | Set-Content $file
 git add $file
 
-$file = "Z2RandomizerSetup/Setup1.vdproj"
+$file = "Z2RandomizerSetup/Z2RandomizerSetup.vdproj"
 $newProductCode = [guid]::NewGuid().ToString("B").ToUpper()
 $newPackageCode = [guid]::NewGuid().ToString("B").ToUpper()
 $content = Get-Content $file
