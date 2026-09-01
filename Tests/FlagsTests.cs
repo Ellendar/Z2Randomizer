@@ -335,6 +335,53 @@ public class FlagsTests
         Assert.AreEqual(originalFlags, config.SerializeFlags());
     }
   
+    [TestMethod]
+    public void DiffReturnsNothingForIdenticalConfigs()
+    {
+        RandomizerConfiguration config = new();
+        var diffs = config.Diff(new RandomizerConfiguration(config.SerializeFlags()));
+        Assert.AreEqual(0, diffs.Count);
+    }
+
+    [TestMethod]
+    public void DiffReturnsChangedFieldsInDefinitionOrder()
+    {
+        RandomizerConfiguration config = new()
+        {
+            AttackLevelCap = 4,
+            StartWithGlove = true
+        };
+        RandomizerConfiguration other = new();
+
+        var diffs = config.Diff(other);
+
+        // StartWithGlove (defined before AttackLevelCap) must come first.
+        Assert.AreEqual(2, diffs.Count);
+        Assert.AreEqual("StartWithGlove", diffs[0].Field);
+        Assert.AreEqual(true, diffs[0].OldValue);
+        Assert.AreEqual(false, diffs[0].NewValue);
+        Assert.AreEqual("AttackLevelCap", diffs[1].Field);
+        Assert.AreEqual(4, diffs[1].OldValue);
+        Assert.AreEqual(8, diffs[1].NewValue);
+    }
+
+    [TestMethod]
+    public void DiffTreatsNullAsDistinctFromValue()
+    {
+        RandomizerConfiguration config = new()
+        {
+            PalacesCanSwapContinents = null
+        };
+        RandomizerConfiguration other = new();
+
+        var diffs = config.Diff(other);
+
+        Assert.AreEqual(1, diffs.Count);
+        Assert.AreEqual("PalacesCanSwapContinents", diffs[0].Field);
+        Assert.IsNull(diffs[0].OldValue);
+        Assert.AreEqual(false, diffs[0].NewValue);
+    }
+
     public void TestSgl2025EncodeCycle()
     {
         RandomizerConfiguration config = Sgl2025Preset.Preset;

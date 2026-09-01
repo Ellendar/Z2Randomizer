@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:CrossPlatformUI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="160"
+             x:DataType="viewModels:RemovePresetViewModel"
+             x:Class="CrossPlatformUI.Views.RemovePresetView">
+    <Grid RowDefinitions="*, Auto">
+        <StackPanel VerticalAlignment="Center" Spacing="8">
+            <TextBlock FontSize="16" Text="Remove this preset?"/>
+            <TextBlock Text="{Binding TargetName}" FontWeight="Bold" TextWrapping="Wrap"/>
+            <TextBlock Text="This cannot be undone." Foreground="{DynamicResource MaterialBodyLightBrush}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="Cancel" IsCancel="True" Classes="accent" Command="{Binding Cancel}" />
+            <Button Content="Remove" IsDefault="True" Command="{Binding Confirm}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

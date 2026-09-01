@@ -15,6 +15,8 @@
             <MultiBinding Converter="{x:Static BoolConverters.Or}">
                 <Binding Path="GenerateRomDialogOpen"/>
                 <Binding Path="SaveNewPresetDialogOpen"/>
+                <Binding Path="RemovePresetDialogOpen"/>
+                <Binding Path="UpdatePresetDialogOpen"/>
             </MultiBinding>
         </dialogHost:DialogHost.IsOpen>
         <dialogHost:DialogHost.DialogContent>
@@ -25,6 +27,12 @@
                 <views:SaveNewPresetView
                     IsVisible="{Binding $parent[dialogHost:DialogHost].((vm:MainViewModel)DataContext).SaveNewPresetDialogOpen, Mode=TwoWay}"
                     MinHeight="200" MinWidth="400" DataContext="{Binding SaveNewPresetViewModel}"/>
+                <views:RemovePresetView
+                    IsVisible="{Binding $parent[dialogHost:DialogHost].((vm:MainViewModel)DataContext).RemovePresetDialogOpen, Mode=TwoWay}"
+                    MinHeight="160" MinWidth="360" DataContext="{Binding RemovePresetViewModel}"/>
+                <views:UpdatePresetView
+                    IsVisible="{Binding $parent[dialogHost:DialogHost].((vm:MainViewModel)DataContext).UpdatePresetDialogOpen, Mode=TwoWay}"
+                    MinHeight="160" MinWidth="360" DataContext="{Binding UpdatePresetViewModel}"/>
             </Grid>
         </dialogHost:DialogHost.DialogContent>
         <Grid>

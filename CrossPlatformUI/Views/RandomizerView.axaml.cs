@@ -2,18 +2,14 @@
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
-using System.Reactive.Disposables;
-using System.Reactive.Disposables.Fluent;
-using System.Reactive.Linq;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
 using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Disposables;
-using CrossPlatformUI.ViewModels;
 using Z2Randomizer.RandomizerCore;
+using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
 
@@ -53,16 +49,6 @@ public partial class RandomizerView : ReactiveUserControl<RandomizerViewModel>
                     new ActionDisposable(() => flagInputTextBox.PastingFromClipboard -= PasteHandler)
                         .DisposeWith(disposables);
                 }
-
-                SubscribeExtensions.Subscribe(
-                    vm.SaveAsPreset,
-                    _ =>
-                    {
-                        Button presetsButton = this.FindControl<Button>("PresetsButton") ?? throw new System.Exception("Missing Required Validation Element");
-                        // close menu after saving preset
-                        presetsButton?.Flyout?.Hide();
-                    })
-                    .DisposeWith(disposables);
             }
         });
     }

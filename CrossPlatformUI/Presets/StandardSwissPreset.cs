@@ -5,6 +5,12 @@ namespace CrossPlatformUI.Presets;
 
 public static class StandardSwissPreset
 {
+    public static string Name => "Standard Tournament 2025 Swiss";
+
+    public static string Description => """
+Tournament preset for the swiss part of the Standard Tournament of 2026.
+""";
+
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start

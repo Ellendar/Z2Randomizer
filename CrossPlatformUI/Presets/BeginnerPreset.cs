@@ -7,6 +7,14 @@ namespace CrossPlatformUI.Presets;
 /// </summary>
 public static class BeginnerPreset
 {
+    public static string Name => "Beginner";
+
+    public static string Description => """
+Beginner preset with boosted player stats for easier combat.
+
+Contains a medium-sized newly generated overworld and newly generated palaces.
+""";
+
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start

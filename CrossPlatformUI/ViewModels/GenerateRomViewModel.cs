@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Disposables;
-using System.Reactive.Subjects;
 using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -16,9 +13,8 @@ using ReactiveUI;
 using ReactiveUI.Primitives.Disposables;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
-using Z2Randomizer.RandomizerCore.Sidescroll;
-using CrossPlatformUI.Services;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+using CrossPlatformUI.Services;
 
 namespace CrossPlatformUI.ViewModels;
 

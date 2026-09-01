@@ -2380,6 +2380,7 @@ public class Hyrule
             rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
         }
 
+#pragma warning disable CS0162 // Unreachable code detected
         if (IS_RANDOMIZED)
         {
             rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
@@ -2390,6 +2391,7 @@ public class Hyrule
             // to fit the new MARIO text (whether its used or not)
             rom.Put(ROM.ChrRomOffset + 0x1000, rom.GetBytes(ROM.ChrRomOffset + 0x1380, 0x13e0 - 0x1380));
         }
+#pragma warning restore CS0162 // Unreachable code detected
         if (props.MarioMode)
         {
             // Overwrite link's downstab animation with fireball explosion sprites

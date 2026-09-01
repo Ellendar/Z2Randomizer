@@ -58,14 +58,18 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
             this.RaiseAndSetIfChanged(ref themeVariantName, value);
         }
     }
-    private int currentTabIndex;
-    public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
-
     [JsonIgnore]
     public string AppVersion
     {
         get => $"Z2R {App.Version}";
     }
+
+    // Remembers the selected tab between app restarts.
+    private int currentTabIndex;
+    public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
+
+    // This remembers the preset you had selected in the list between app restarts (not which preset you *loaded*)
+    public string? SelectedPresetName { get; set; }
 
     [JsonConstructor]
 #pragma warning disable CS8618 
@@ -81,18 +85,12 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
         ItemsViewModel = new(Main);
         HintsViewModel = new(Main, this);
         CustomizeViewModel = new(Main);
+        PresetViewModel = new(Main);
         Activator = new ViewModelActivator();
 
         RerollSeed = ReactiveCommand.Create(() =>
         {
             Main.Config.Seed = new System.Random().Next(0, 999999999).ToString();
-        });
-        
-        LoadPreset = ReactiveCommand.Create<RandomizerConfiguration>(config =>
-        {
-            // By writing the flags like this, it will update all the reactive elements watching each
-            // individual fields.
-            Main.Config.DeserializeFlags(config.SerializeFlags());
         });
         
         LoadRom = ReactiveCommand.CreateFromObservable(
@@ -162,33 +160,6 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
             }
         });
 
-        SaveNewPreset = ReactiveCommand.Create(() =>
-        {
-            Main.SaveNewPresetDialogOpen = true;
-        });
-        SaveAsPreset = ReactiveCommand.Create((string name) =>
-        {
-            var updatedPreset = new CustomPreset(name, new RandomizerConfiguration(Main.Config.SerializeFlags()));
-            var collection = Main.SaveNewPresetViewModel.SavedPresets;
-            // makeshift FindIndex since ObservableCollection doesn't have one
-            int presetIndex = -1;
-            for (int i = 0; i < collection.Count; i++)
-            {
-                if (collection[i].Preset == name) { presetIndex = i; break; }
-            }
-            if (presetIndex == -1) { throw new Exception("Trying to overwrite preset that does not exist"); }
-            // the entire item has to be set so the ObservableCollection works correctly
-            collection[presetIndex] = updatedPreset;
-        });
-        ClearSavedPreset = ReactiveCommand.Create((string name) =>
-        {
-            var item = Main.SaveNewPresetViewModel.SavedPresets
-                .FirstOrDefault(x => x.Preset == name);
-            if (item != null)
-            {
-                Main.SaveNewPresetViewModel.SavedPresets.Remove(item);
-            }
-        });
         this.WhenActivated(OnActivate);
     }
 
@@ -344,6 +315,7 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     public ItemsViewModel ItemsViewModel { get; }
     public HintsViewModel HintsViewModel { get; }
     public CustomizeViewModel CustomizeViewModel { get; }
+    public PresetsViewModel PresetViewModel { get; }
     
     [JsonIgnore]
     public ReactiveCommand<RxVoid, RxVoid> RerollSeed { get; }
@@ -359,14 +331,6 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     public ReactiveCommand<Control, RxVoid> VisitDiscord { get; }
     [JsonIgnore]
     public ReactiveCommand<Control, RxVoid> VisitWiki { get; }
-    [JsonIgnore]
-    public ReactiveCommand<RxVoid, RxVoid> SaveNewPreset { get; }
-    [JsonIgnore]
-    public ReactiveCommand<string, RxVoid> SaveAsPreset { get; }
-    [JsonIgnore]
-    public ReactiveCommand<string, RxVoid> ClearSavedPreset { get; }
-    [JsonIgnore]
-    public ReactiveCommand<RandomizerConfiguration, RxVoid> LoadPreset { get; }
     [JsonIgnore]
     public ReactiveCommand<RxVoid, IRoutableViewModel> LoadRom { get; }
 

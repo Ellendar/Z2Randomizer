@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+             x:Class="CrossPlatformUI.Views.Tabs.PresetsView"
+             x:DataType="vmt:PresetsViewModel">
+    <Grid ColumnDefinitions="3*,5*" Margin="4">
+        <Grid Grid.Column="0" RowDefinitions="*,Auto">
+            <ListBox Grid.Row="0"
+                     ItemsSource="{Binding Presets}"
+                     SelectedItem="{Binding SelectedPreset}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vmt:PresetItem">
+                    <Grid>
+                        <TextBlock Text="{Binding Name}" IsVisible="{Binding IsCustom}" Foreground="{DynamicResource MaterialPrimaryMidBrush}"/>
+                        <TextBlock Text="{Binding Name}" IsVisible="{Binding !IsCustom}"/>
+                    </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Grid.Row="1" Margin="0 4" Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Content="Save Flags as New Preset" Command="{Binding SaveNewPreset}"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Column="1" Margin="16 0 0 0" RowDefinitions="Auto,Auto,Auto,Auto">
+            <TextBlock Grid.Row="0" Text="{Binding Title}" FontSize="18" FontWeight="Bold"/>
+
+            <TextBlock Grid.Row="1" Text="{Binding Description}"
+                       TextWrapping="Wrap"
+                       IsVisible="{Binding HasDescription}"/>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 8 0 16">
+                <Button Content="Load Preset" Command="{Binding LoadPreset}"/>
+                <Button Content="Update Preset" Command="{Binding UpdatePreset}"/>
+                <Button Content="Remove Preset" Command="{Binding RemovePreset}"/>
+            </StackPanel>
+
+            <Expander Grid.Row="3" Header="Compare To Current Flags" IsVisible="{Binding HasDiff}" Classes="DiffExpander">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="16 8" MaxHeight="280">
+                    <SelectableTextBlock Text="{Binding Diff}" TextWrapping="Wrap"/>
+                </ScrollViewer>
+            </Expander>
+        </Grid>
+    </Grid>
+</UserControl>
