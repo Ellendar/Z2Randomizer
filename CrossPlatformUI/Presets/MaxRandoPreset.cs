@@ -4,6 +4,13 @@ namespace CrossPlatformUI.Presets;
 
 public static class MaxRandoPreset
 {
+    public static string Name => "Max Rando Tournament 2026";
+
+    public static string Description => """
+Settings from the Max Rando tournament of 2026.
+
+Very high variance in difficulty. You may start with anything from 1 Heart Container and no items, to 8 Heart Containers and several items and spells.
+""";
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start

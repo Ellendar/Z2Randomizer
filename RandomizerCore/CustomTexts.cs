@@ -649,7 +649,7 @@ public class CustomTexts
                 }
                 else
                 {
-                    hint = Text.GenerateHelpfulHint(downstabLoc, Collectable.DOWNSTAB, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
+                    hint = Text.GenerateHelpfulHint(downstabLoc!, Collectable.DOWNSTAB, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE);
                 }
                 texts[downstabClosedDoorTextIndex] = hint;
                 if (props.StartWithUpstab)
@@ -659,7 +659,7 @@ public class CustomTexts
                 }
                 else
                 {
-                    hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
+                    hint = Text.GenerateHelpfulHint(upstabLoc!, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
                 }
                 texts[upstabClosedDoorTextIndex] = hint;
                 if (props.SwapUpAndDownStab)

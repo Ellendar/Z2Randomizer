@@ -12,7 +12,8 @@
              mc:Ignorable="d" d:DesignWidth="940" d:DesignHeight="750"
              x:Class="CrossPlatformUI.Views.Tabs.BiomesView"
              x:DataType="vmt:BiomesViewModel">
-    <Grid RowDefinitions="*, *">
+    <ScrollViewer>
+        <Grid RowDefinitions="*, *">
         <HyperlinkButton
             Margin="24 7 24 7"
             HorizontalAlignment="Right"
@@ -23,7 +24,7 @@
             Cursor="Hand"
             />
 
-        <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *, *" RowDefinitions="*, *, *, *, *">
+        <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *, *" RowDefinitions="*, *, *, *, *" RowSpacing="8" ColumnSpacing="8">
             <ComboBox Grid.Row="0" Grid.Column="0"
                       Margin="0 0" Padding="16 4 0 4" Theme="{StaticResource MaterialOutlineComboBox}"
                       ItemsSource="{x:Static rc:Enums.OverworldSizeList}"
@@ -148,5 +149,6 @@
                 </CheckBox>
             </StackPanel>
         </Grid>
-    </Grid>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

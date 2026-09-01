@@ -5,6 +5,12 @@ namespace CrossPlatformUI.Presets;
 
 public static class FullShufflePreset
 {
+    public static string Name => "Full Shuffle";
+
+    public static string Description => """
+Normal combat difficulty settings with every item, spell and sword technique in the item shuffle.
+""";
+
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start

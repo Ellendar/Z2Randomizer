@@ -1,109 +1,94 @@
 ﻿using Z2Randomizer.RandomizerCore;
-using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
-public static class StandardPreset
+public static class Upstarts2026Week6Preset
 {
-    public static string Name => "Standard Tournament 2025 Brackets";
+    public static string Name => "Upstarts Week 6 / Brackets";
 
     public static string Description => """
-Tournament preset for the brackets part of the Standard Tournament of 2026.
+Tournament preset for the sixth week and brackets of the 2026 Upstarts Tournament.
+
+Starting items and spells: Candle
+
+- Random biomes
+- Each continent will pick a biome independently
+- All biomes set to large except Death Mountain (Medium)
+- Random style palaces (random length normal palaces, short GP)
+- Each palace will pick a style independently
+- Anything goes continental connectors
+- Quest items and spells in the item pool
+- Quest locations are checks
 """;
 
     public static readonly RandomizerConfiguration Preset = new()
     {
-        //Start
-
-        //Overworld
+        StartWithCandle = true,
         PalacesCanSwapContinents = true,
         ShuffleGP = true,
-        ShuffleEncounters = true,
-        AllowUnsafePathEncounters = true,
-        IncludeLavaInEncounterShuffle = true,
         EncounterRate = EncounterRate.HALF,
-        RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
-        EastRocks = true,
-        GenerateBaguWoods = false,
-        AllowConnectionCavesToBeBlocked = true,
-        GoodBoots = true,
         HidePalace = null,
         HideKasuto = null,
-        ShuffleWhichLocationIsHidden = true,
+        AllowConnectionCavesToBeBlocked = true,
+        GoodBoots = true,
+        GenerateBaguWoods = false,
+        ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
+        DmSize = DmSizeOption.MEDIUM,
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
-        MazeBiome = Biome.VANILLALIKE,
         DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
-        ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
-
-        //Palaces
-        NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
-        GpStyle = PalaceStyle.RANDOM_WALK,
-        GpLength = PalaceLengthOption.SHORT,
+        MazeBiome = Biome.VANILLALIKE,
+        WestClimate = ClimateEnum.CLASSIC,
+        EastClimate = ClimateEnum.CLASSIC,
+        NormalPalaceStyle = PalaceStyle.RANDOM_PER_PALACE,
+        GpStyle = PalaceStyle.RANDOM,
         Includev4_0Rooms = true,
         Includev5_0Rooms = true,
-        IncludeExpertRooms = true,
+        BlockingRoomsInAnyPalace = true,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
-        RandomizeBossItemDrop = true,
-        PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
-        NoDuplicateRoomsByLayout = true,
-        BlockingRoomsInAnyPalace = true,
+        NoDuplicateRoomsByEnemies = true,
         HardBosses = true,
-        PalaceItemRoomCount = PalaceItemRoomCount.RANDOM_INCLUDE_ZERO,
-        DarkLinkMinDistance = BossRoomMinDistance.MEDIUM,
-
-        //Levels
         ShuffleAttackExperience = true,
         ShuffleMagicExperience = true,
         ShuffleLifeExperience = true,
-
         AttackEffectiveness = AttackEffectiveness.AVERAGE,
         MagicEffectiveness = MagicEffectiveness.AVERAGE,
         LifeEffectiveness = LifeEffectiveness.AVERAGE,
-
-        //Spells
-        ShuffleLifeRefillAmount = true,
         ShuffleSpellLocations = true,
         DisableMagicContainerRequirements = true,
         RandomizeSpellSpellEnemy = true,
         FireOption = FireOption.PAIR_WITH_RANDOM,
-
-        //Enemies
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
+        DripperEnemyOption = DripperEnemyOption.ANY_GROUND_ENEMY,
         MixLargeAndSmallEnemies = true,
-
         ShuffleEnemyHP = EnemyLifeOption.MEDIUM,
         ShuffleBossHP = EnemyLifeOption.MEDIUM,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,
-        SwordImmunityOption = SwordImmunityOption.SHUFFLE,
         EnemyXPDrops = XPEffectiveness.RANDOM,
-
-        //Items
         ShufflePalaceItems = true,
         ShuffleOverworldItems = true,
         MixOverworldAndPalaceItems = true,
         IncludePBagCavesInItemShuffle = true,
-        IncludeQuestItemsInShuffle = true,
-        IncludeSpellsInShuffle = true,
-
         ShuffleSmallItems = true,
         RandomizeNewKasutoJarRequirements = true,
-        PreventSpellItemChains = false,
-
-        //Drops
+        ShufflePBagAmounts = true,
+        IncludeSpellsInShuffle = true,
+        IncludeQuestItemsInShuffle = true,
         ShuffleItemDropFrequency = true,
         RandomizeDrops = true,
         StandardizeDrops = true,
-
-        //Hints
         HelpfulHints = HelpfulHintOption.TOWNS_SEPARATE,
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
-
+        GpLength = PalaceLengthOption.SHORT,
+        NormalPalaceLength = PalaceLengthOption.RANDOM,
+        RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
+        RevealWalkthroughWalls = true,
+        RevealHiddenJars = true,
     };
 }

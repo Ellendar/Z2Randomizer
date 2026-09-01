@@ -284,6 +284,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         GenerateSerializeMethod(sb, classInfo.SerializedFields, indent);
         GenerateDeserializeMethod(sb, classInfo.SerializedFields, indent);
         GenerateWithMethod(sb, classInfo.ClassName, classInfo.ReactiveFields, indent);
+        GenerateDiffMethod(sb, classInfo.ClassName, classInfo.SerializedFields, indent);
 
         // Generate helper methods for enum serialization
         GenerateSerializerList(sb, classInfo.SerializedFields, indent);
@@ -425,6 +426,28 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
 
         sb.AppendLine();
         sb.AppendLine($"{indent}        return result;");
+        sb.AppendLine($"{indent}    }}");
+    }
+
+    private static void GenerateDiffMethod(StringBuilder sb, string className, List<SerializedFieldInfo> fields, string indent)
+    {
+        sb.AppendLine();
+        sb.AppendLine($"{indent}    public global::System.Collections.Generic.IReadOnlyList<(string Field, object? OldValue, object? NewValue)> Diff({className} other)");
+        sb.AppendLine($"{indent}    {{");
+        sb.AppendLine($"{indent}        var diffs = new global::System.Collections.Generic.List<(string Field, object? OldValue, object? NewValue)>();");
+        sb.AppendLine();
+
+        foreach (var field in fields)
+        {
+            var propName = GetPropertyName(field.FieldName);
+            sb.AppendLine($"{indent}        if (!Equals({propName}, other.{propName}))");
+            sb.AppendLine($"{indent}        {{");
+            sb.AppendLine($"{indent}            diffs.Add((Field: \"{propName}\", OldValue: {propName}, NewValue: other.{propName}));");
+            sb.AppendLine($"{indent}        }}");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine($"{indent}        return diffs;");
         sb.AppendLine($"{indent}    }}");
     }
 

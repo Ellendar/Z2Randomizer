@@ -4,6 +4,14 @@ namespace CrossPlatformUI.Presets;
 
 public static class Sgl2025Preset
 {
+    public static string Name => "SGL 2025";
+
+    public static string Description => """
+Tournament preset used for SpeedGaming Live 2025.
+
+A challenging preset focused on combat, with low XP gains and slightly lower than vanilla stats.
+""";
+
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start
