@@ -807,7 +807,7 @@ public class Hyrule
         if (props.MixOverworldPalaceItems)
         {
 
-            if(props.ShufflePalaceItems)
+            if (props.ShufflePalaceItems)
             {
                 List<Collectable> palaceCollectables = [.. palaceLocations.SelectMany(i => i.GetAllCollectables())];
                 shufflableItems.Add(palaceCollectables.Select(c => props.StartsWithCollectable(c) ? minorItems.Sample(r) : c));
@@ -818,6 +818,9 @@ public class Hyrule
         }
         else
         {
+            List<Location> palaceItemLocs = possibleItemLocations.Where(i => i.Palace != null).ToList();
+            List<Location> nonPalaceItemLocs = possibleItemLocations.Where(i => i.Palace == null).ToList();
+
             List<Collectable> itemsToActuallyShuffle;
             List<Location> shufflableItemLocations;
 
@@ -825,7 +828,7 @@ public class Hyrule
             {
                 itemsToActuallyShuffle = [];
                 shufflableItemLocations = [];
-                foreach (Location palaceLocation in possibleItemLocations.Where(i => i.Palace != null))
+                foreach (Location palaceLocation in palaceItemLocs)
                 {
                     shufflableItemLocations.Add(palaceLocation);
                     itemsToActuallyShuffle.Add(palaceLocation.GetAllCollectables());
@@ -835,10 +838,10 @@ public class Hyrule
             }
             else //vanilla palace items
             {
-                foreach (Location palaceLocation in possibleItemLocations.Where(i => i.Palace != null && i.Palace.Number < 7))
+                foreach (Location palaceLocation in palaceItemLocs.Where(i => i.Palace!.Number < 7))
                 {
-                    int palaceNumber = palaceLocation.Palace!.Number;
-                    List<Collectable> collectables = palaceLocation.Palace!.GetVanillaCollectables(palaceLocation.Palace!.ItemRooms.Count);
+                    Palace palace = palaceLocation.Palace!;
+                    List<Collectable> collectables = palace.GetVanillaCollectables(palace.ItemRooms.Count);
 
                     for (int i = 0; i < collectables.Count; i++)
                     {
@@ -852,13 +855,13 @@ public class Hyrule
             {
                 itemsToActuallyShuffle = [];
                 shufflableItemLocations = [];
-                foreach (Location nonPalaceLocation in possibleItemLocations.Where(i => i.Palace == null))
+                foreach (Location nonPalaceLocation in nonPalaceItemLocs)
                 {
                     shufflableItemLocations.Add(nonPalaceLocation);
-                    foreach(Collectable collectable in nonPalaceLocation.GetShufflableCollectables())
+                    foreach (Collectable collectable in nonPalaceLocation.GetShufflableCollectables())
                     {
                         itemsToActuallyShuffle.Add(
-                            props.StartsWithCollectable(collectable) && (!collectable.IsSpell() || canReplaceStartingSpellsWithMinorItems) 
+                            props.StartsWithCollectable(collectable) && (!collectable.IsSpell() || canReplaceStartingSpellsWithMinorItems)
                                 ? minorItems.Sample(r) : collectable);
                     }
                 }
@@ -867,7 +870,7 @@ public class Hyrule
             }
             else
             {
-                foreach (Location nonPalaceLocation in possibleItemLocations.Where(i => i.Palace == null))
+                foreach (Location nonPalaceLocation in nonPalaceItemLocs)
                 {
                     List<Collectable> collectables = nonPalaceLocation.GetAllCollectables();
                     for (int i = 0; i < collectables.Count; i++)
@@ -966,9 +969,7 @@ public class Hyrule
             excessItems.Add(Collectable.MAGIC_CONTAINER);
         }
         //Palace items that didn't get placed in palaces are excess
-        List<Collectable> palaceItems = [Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT,
-            Collectable.BOOTS, Collectable.FLUTE, Collectable.CROSS];
-        foreach (Collectable palaceItem in palaceItems)
+        foreach (Collectable palaceItem in Enum.GetValues<Collectable>().Where(c => c.IsPalaceItem()))
         {
             if (!possibleItemLocations.SelectMany(l => l.GetAllCollectables()).Any(c => c == palaceItem)
                 && !props.StartsWithCollectable(palaceItem))

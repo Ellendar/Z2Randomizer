@@ -359,46 +359,90 @@ public class RandomizerProperties
 
     public bool HasEnoughSpaceToAllocateItems()
     {
-        //The 3 pbag caves are either explicitly minor items or allowable as overflow locations
-        //so they are counted either way.
-        int minorItemCount = 3;
+        int overworldMinorItemCount = 0;
+        int palaceMinorItemCount = 0;
 
-        //more or less than 4 containers in the seed adds/removes minor items
-        minorItemCount -= MaxHearts - StartHearts - 4;
-        minorItemCount -= MaxMagicContainers - StartMagicContainers - 4;
+        //The 3 pbag caves are either explicitly minor items or allowable as overflow locations
+        //so they are counted either way (only if overworld items are actually shuffled).
+        if (ShuffleOverworldItems && WestBiome.InItemShuffle())
+        {
+            overworldMinorItemCount += 1;
+        }
+        if (ShuffleOverworldItems && EastBiome.InItemShuffle())
+        {
+            overworldMinorItemCount += 2;
+        }
+
+        //more or less than 4 containers in the seed adds/removes overworld minor items
+        overworldMinorItemCount -= MaxHearts - StartHearts - 4;
+        overworldMinorItemCount -= MaxMagicContainers - StartMagicContainers - 4;
 
         //palace items other than 1 adjusts the count
-        minorItemCount += PalaceItemRoomCounts.Take(6).Sum(c => c - 1);
+        palaceMinorItemCount += PalaceItemRoomCounts.Take(6).Sum(c => c - 1);
 
-        //Start items add 1 to the count
-        minorItemCount += StartCandle ? 1 : 0;
-        minorItemCount += StartBoots ? 1 : 0;
-        minorItemCount += StartCross ? 1 : 0;
-        minorItemCount += StartFlute ? 1 : 0;
-        minorItemCount += StartGlove ? 1 : 0;
-        minorItemCount += StartHammer ? 1 : 0;
-        minorItemCount += StartKey ? 1 : 0;
-        minorItemCount += StartRaft ? 1 : 0;
-
-        if(IncludeSpellsInShuffle)
+        //Start items add 1 to the count, bucketed by whether they sit in a palace or the overworld
+        if (ShufflePalaceItems && WestBiome.InItemShuffle())
         {
-            minorItemCount += StartShield ? 1 : 0;
-            minorItemCount += StartJump ? 1 : 0;
-            minorItemCount += StartLife ? 1 : 0;
-            minorItemCount += StartFairy ? 1 : 0;
-            minorItemCount += StartFire ? 1 : 0;
-            minorItemCount += StartReflect ? 1 : 0;
-            minorItemCount += StartSpell ? 1 : 0;
-            minorItemCount += StartThunder ? 1 : 0;
+            palaceMinorItemCount += StartCandle ? 1 : 0;
+            palaceMinorItemCount += StartGlove ? 1 : 0;
+            palaceMinorItemCount += StartRaft ? 1 : 0;
+        }
+        if (ShuffleOverworldItems && DmBiome.InItemShuffle())
+        {
+            overworldMinorItemCount += StartHammer ? 1 : 0;
+        }
+        if (ShufflePalaceItems && MazeBiome.InItemShuffle())
+        {
+            palaceMinorItemCount += StartBoots ? 1 : 0;
+        }
+        if (ShufflePalaceItems && EastBiome.InItemShuffle())
+        {
+            palaceMinorItemCount += StartCross ? 1 : 0;
+            palaceMinorItemCount += StartFlute ? 1 : 0;
+        }
+        if (ShuffleOverworldItems && EastBiome.InItemShuffle())
+        {
+            overworldMinorItemCount += StartKey ? 1 : 0;
         }
 
-        if(IncludeSwordTechsInShuffle)
+        if (IncludeSpellsInShuffle)
         {
-            minorItemCount += StartWithDownstab ? 1 : 0;
-            minorItemCount += StartWithUpstab ? 1 : 0;
+            if (WestBiome.InItemShuffle())
+            {
+                overworldMinorItemCount += StartShield ? 1 : 0;
+                overworldMinorItemCount += StartJump ? 1 : 0;
+                overworldMinorItemCount += StartLife ? 1 : 0;
+                overworldMinorItemCount += StartFairy ? 1 : 0;
+            }
+            if (EastBiome.InItemShuffle())
+            {
+                overworldMinorItemCount += StartFire ? 1 : 0;
+                overworldMinorItemCount += StartReflect ? 1 : 0;
+                overworldMinorItemCount += StartSpell ? 1 : 0;
+                overworldMinorItemCount += StartThunder ? 1 : 0;
+            }
         }
 
+        if (IncludeSwordTechsInShuffle)
+        {
+            if (WestBiome.InItemShuffle())
+            {
+                overworldMinorItemCount += StartWithDownstab ? 1 : 0;
+            }
+            if (EastBiome.InItemShuffle())
+            {
+                overworldMinorItemCount += StartWithUpstab ? 1 : 0;
+            }
+        }
 
-        return minorItemCount >= 0;
+        if (MixOverworldPalaceItems)
+        {
+            var minorItemCount = overworldMinorItemCount + palaceMinorItemCount;
+            return minorItemCount >= 0;
+        }
+        else
+        {
+            return overworldMinorItemCount >= 0 && palaceMinorItemCount >= 0;
+        }
     }
 }
