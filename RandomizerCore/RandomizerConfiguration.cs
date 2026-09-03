@@ -999,9 +999,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
             properties.DarkLinkMinDistance = GetDarkLinkMinDistance();
 
-            //Palace item counts and prerequisites.
-            properties.ShufflePalaceItems = shufflePalaceItems ?? GetIndeterminateFlagValue(r);
-            properties.MixOverworldPalaceItems = mixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r);
+            //Properties that may affect item pool/location count are set together so
+            //HasEnoughSpaceToAllocateItems() can evaluate each bucket independently.
+            AssignItemPoolProps(properties, r);
             AssignPalaceItemCounts(properties, r);
 
             //Other starting attributes
@@ -1389,19 +1389,13 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.ScaleLevels = includeDifficulty && scaleLevelRequirementsToCap;
 
         //Items
-        properties.ShuffleOverworldItems = shuffleOverworldItems ?? GetIndeterminateFlagValue(r);
-        //ShufflePalaceItems and MixOverworldPalaceItems moved up so they can be calculated before item room counts
+        //Also see fields set in AssignItemPoolProps()
         properties.RandomizeSmallItems = shuffleSmallItems;
         properties.ExtraKeys = palacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
         properties.NewKasutoBasementRequirement = randomizeNewKasutoJarRequirements ? r.Next(5,8) : 7;
         properties.AllowImportantItemDuplicates = allowImportantItemDuplicates;
-        properties.PbagItemShuffle = includePBagCavesInItemShuffle ?? GetIndeterminateFlagValue(r);
-        properties.StartWithSpellItems = removeSpellItems ?? GetIndeterminateFlagValue(r);
         properties.ShufflePbagXp = shufflePBagAmounts ?? GetIndeterminateFlagValue(r);
-        properties.IncludeQuestItemsInShuffle = includeQuestItemsInShuffle ?? GetIndeterminateFlagValue(r);
         properties.PreventSpellItemChains = preventSpellItemChains;
-        properties.IncludeSpellsInShuffle = includeSpellsInShuffle ?? GetIndeterminateFlagValue(r);
-        properties.IncludeSwordTechsInShuffle = includeSwordTechsInShuffle ?? GetIndeterminateFlagValue(r);
 
         //Drops
         properties.ShuffleItemDropFrequency = shuffleItemDropFrequency;
@@ -1626,6 +1620,21 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.EnemyXPDrops = enemyXPDrops;
     }
 
+    //Set properties that may affect item pool/location count. These must be set within the
+    //allocation loop so HasEnoughSpaceToAllocateItems() can validate the overworld and palace
+    //buckets independently before the item locations are finalized.
+    private void AssignItemPoolProps(RandomizerProperties properties, Random r)
+    {
+        properties.ShuffleOverworldItems = shuffleOverworldItems ?? GetIndeterminateFlagValue(r);
+        properties.ShufflePalaceItems = shufflePalaceItems ?? GetIndeterminateFlagValue(r);
+        properties.MixOverworldPalaceItems = mixOverworldAndPalaceItemsIncluded() && (mixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r));
+        properties.IncludeSpellsInShuffle = includeSpellsInShuffle ?? GetIndeterminateFlagValue(r);
+        properties.IncludeSwordTechsInShuffle = includeSwordTechsInShuffle ?? GetIndeterminateFlagValue(r);
+        properties.IncludeQuestItemsInShuffle = includeQuestItemsInShuffle ?? GetIndeterminateFlagValue(r);
+        properties.StartWithSpellItems = removeSpellItems ?? GetIndeterminateFlagValue(r);
+        properties.PbagItemShuffle = includePBagCavesInItemShuffle ?? GetIndeterminateFlagValue(r);
+    }
+
     public void AssignPalaceItemCounts(RandomizerProperties properties, Random r)
     {
         //I'm not sure whether I like the bias introduced in generating random values and then capping them
@@ -1722,10 +1731,31 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     /// scenario should work.
     public void CheckForFlagConflicts()
     {
-        int requiredMinorItemReplacements = Math.Max(0, 4 - ((startingHeartContainersMax ?? 4)));
-        if (CountPossibleMinorItems() < requiredMinorItemReplacements)
+        int requiredOverworldMinorItemReplacements = 0;
+        int requiredPalaceMinorItemReplacements = 0;
+        var heartsInPool = maxHeartContainers.HeartsInPool(startingHeartContainersMax ?? 8);
+        requiredOverworldMinorItemReplacements += heartsInPool - 4;
+        var magicContainersInPool = 8 - (startingMagicContainersMax ?? 8);
+        requiredOverworldMinorItemReplacements += magicContainersInPool - 4;
+
+        (int overworldMinorItemCount, int palaceMinorItemCount) = CountPossibleMinorItems();
+        if (mixOverworldAndPalaceItems == true)
         {
-            throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for removed palace items.\n\nAdd more starting items or more palace items.");
+            if (overworldMinorItemCount + palaceMinorItemCount < requiredOverworldMinorItemReplacements + requiredPalaceMinorItemReplacements)
+            {
+                throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for removed palace items.\n\nAdd more starting items or more palace items.");
+            }
+        }
+        else
+        {
+            if (overworldMinorItemCount < requiredOverworldMinorItemReplacements)
+            {
+                throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for overworld items.\n\nAdd more starting Heart/Magic containers.");
+            }
+            if (palaceMinorItemCount < requiredPalaceMinorItemReplacements)
+            {
+                throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for removed palace items.\n\nAdd more starting items or more palace items.");
+            }
         }
 
         if (noDuplicateRoomsByLayout || noDuplicateRoomsByEnemies)
@@ -1939,82 +1969,93 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         };
     }
 
-    private int CountPossibleMinorItems()
+    internal (int OverworldMinorItemCount, int PalaceMinorItemCount) CountPossibleMinorItems()
     {
-        int count = 3, hardStartItemsCount = 0;
+        int overworldMinorItemCount = 0;
+        int palaceMinorItemCount = 0;
+        int mustExistContainers = 0;
 
-        hardStartItemsCount += !shareSeedAcrossDifficulty && (shuffleStartingItems || startWithCandle) ? 1 : 0;
-        hardStartItemsCount += shuffleStartingItems || startWithBoots ? 1 : 0;
-        hardStartItemsCount += !shareSeedAcrossDifficulty && (shuffleStartingItems || startWithCross) ? 1 : 0;
-        hardStartItemsCount += shuffleStartingItems || startWithFlute ? 1 : 0;
-        hardStartItemsCount += shuffleStartingItems || startWithGlove ? 1 : 0;
-        hardStartItemsCount += shuffleStartingItems || startWithHammer ? 1 : 0;
-        hardStartItemsCount += shuffleStartingItems || startWithMagicKey ? 1 : 0;
-        hardStartItemsCount += shuffleStartingItems || startWithRaft ? 1 : 0;
-
-        int possibleStartItemLimit = shareSeedAcrossDifficulty
-            ? Math.Min(startItemsLimit.AsInt(), POSSIBLE_SHARED_STARTING_ITEMS.Length)
-            : startItemsLimit.AsInt();
-        count += Math.Max(hardStartItemsCount, shuffleStartingItems ? possibleStartItemLimit : 0);
-
-        if(includeSpellsInShuffle ?? true)
+        //The pbag caves are either explicitly minor items or allowable as overflow locations
+        //so they are counted either way (only if overworld items are actually shuffled).
+        if (shuffleOverworldItems != false && westBiome.InItemShuffle())
         {
-            hardStartItemsCount = 0;
-            hardStartItemsCount += shuffleStartingSpells || startWithShield ? 1 : 0;
-            hardStartItemsCount += shuffleStartingSpells || startWithJump ? 1 : 0;
-            hardStartItemsCount += shuffleStartingSpells || startWithLife ? 1 : 0;
-            hardStartItemsCount += shuffleStartingSpells || startWithFairy ? 1 : 0;
-            hardStartItemsCount += shuffleStartingSpells || startWithFire ? 1 : 0;
-            hardStartItemsCount += shuffleStartingSpells || startWithReflect ? 1 : 0;
-            hardStartItemsCount += shuffleStartingSpells || startWithSpellSpell ? 1 : 0;
-            hardStartItemsCount += shuffleStartingSpells || startWithThunder ? 1 : 0;
-
-            count += Math.Max(hardStartItemsCount, shuffleStartingItems ? startItemsLimit.AsInt() : 0);
+            overworldMinorItemCount += 1;
+        }
+        else
+        {
+            mustExistContainers += 2;
+        }
+        if (shuffleOverworldItems != false && eastBiome.InItemShuffle())
+        {
+            overworldMinorItemCount += 2;
+        }
+        else
+        {
+            mustExistContainers += 2;
         }
 
-        if(includeSwordTechsInShuffle ?? true)
+        int overworldStartMinorItemCount = 0;
+        int palaceStartMinorItemCount = 0;
+        if (shufflePalaceItems != false && westBiome.InItemShuffle())
         {
-            hardStartItemsCount += startingTechniques switch
-            {
-                StartingTechs.DOWNSTAB => 1,
-                StartingTechs.UPSTAB => 1,
-                StartingTechs.BOTH => 2,
-                StartingTechs.RANDOM => 2,
-                StartingTechs.NONE => 0,
-                _ => throw new Exception("Unrecognized starting tech option")
-            };
+            palaceStartMinorItemCount += !shareSeedAcrossDifficulty && (shuffleStartingItems || startWithCandle) ? 1 : 0;
+            palaceStartMinorItemCount += shuffleStartingItems || startWithGlove ? 1 : 0;
+            palaceStartMinorItemCount += shuffleStartingItems || startWithRaft ? 1 : 0;
+        }
+        if (shuffleOverworldItems != false && dmBiome.InItemShuffle())
+        {
+            overworldStartMinorItemCount += shuffleStartingItems || startWithHammer ? 1 : 0;
+        }
+        if (shufflePalaceItems != false && mazeBiome.InItemShuffle())
+        {
+            palaceStartMinorItemCount += shuffleStartingItems || startWithBoots ? 1 : 0;
+        }
+        if (shufflePalaceItems != false && eastBiome.InItemShuffle())
+        {
+            palaceStartMinorItemCount += shuffleStartingItems || startWithFlute ? 1 : 0;
+            palaceStartMinorItemCount += !shareSeedAcrossDifficulty && (shuffleStartingItems || startWithCross) ? 1 : 0;
+        }
+        if (shuffleOverworldItems != false && eastBiome.InItemShuffle())
+        {
+            overworldStartMinorItemCount += shuffleStartingItems || startWithMagicKey ? 1 : 0;
         }
 
-        int heartContainerReplacementSmallItemsCount = maxHeartContainers switch
+        int startItemsOverflow = Math.Min(0, palaceStartMinorItemCount + overworldStartMinorItemCount - (shuffleStartingItems ? startItemsLimit.AsInt() : 0));
+        // overflow distribution between overworld items and palace items could be improved here (but needed for when the pools are not mixed)
+        overworldMinorItemCount += Math.Max(0, overworldStartMinorItemCount - startItemsOverflow); 
+        palaceMinorItemCount += Math.Max(0, palaceStartMinorItemCount - startItemsOverflow);
+
+        if (includeSpellsInShuffle ?? true)
         {
-            MaxHeartsOption.EIGHT => 4 - (8 - (startingHeartContainersMax ?? 8)),
-            MaxHeartsOption.SEVEN => 4 - (7 - (startingHeartContainersMax ?? 8)),
-            MaxHeartsOption.SIX => 4 - (6 - (startingHeartContainersMax ?? 8)),
-            MaxHeartsOption.FIVE => 4 - (5 - (startingHeartContainersMax ?? 8)),
-            MaxHeartsOption.FOUR => 4 - (4 - (startingHeartContainersMax ?? 8)),
-            MaxHeartsOption.THREE => 4 - (3 - (startingHeartContainersMax ?? 8)),
-            MaxHeartsOption.TWO => 4 - (2 - (startingHeartContainersMax ?? 8)),
-            MaxHeartsOption.ONE => 4 - (1 - (startingHeartContainersMax ?? 8)),
-            MaxHeartsOption.PLUS_ONE => 3,
-            MaxHeartsOption.PLUS_TWO => 2,
-            MaxHeartsOption.PLUS_THREE => 1,
-            MaxHeartsOption.PLUS_FOUR => 0,
-            MaxHeartsOption.RANDOM => 4 - (startingHeartContainersMax ?? 1),
-            _ => throw new Exception("Unrecognized Max Hearts in CountPossibleMinorItems")
-        };
+            int spellStartMinorItemCount = 0;
+            spellStartMinorItemCount += shuffleStartingSpells || startWithShield ? 1 : 0;
+            spellStartMinorItemCount += shuffleStartingSpells || startWithJump ? 1 : 0;
+            spellStartMinorItemCount += shuffleStartingSpells || startWithLife ? 1 : 0;
+            spellStartMinorItemCount += shuffleStartingSpells || startWithFairy ? 1 : 0;
+            spellStartMinorItemCount += shuffleStartingSpells || startWithFire ? 1 : 0;
+            spellStartMinorItemCount += shuffleStartingSpells || startWithReflect ? 1 : 0;
+            spellStartMinorItemCount += shuffleStartingSpells || startWithSpellSpell ? 1 : 0;
+            spellStartMinorItemCount += shuffleStartingSpells || startWithThunder ? 1 : 0;
 
-        count += heartContainerReplacementSmallItemsCount;
+            overworldMinorItemCount += Math.Min(shuffleStartingItems ? 8 : spellStartMinorItemCount, startSpellsLimit.AsInt());
+        }
 
-        count += 4 - (8 - (startingMagicContainersMax ?? 8));
+        if (8 - (startingHeartContainersMax ?? 4) < mustExistContainers)
+        {
+            throw new UserFacingException("Heart Container Mismatch", "Unshuffled West and East must each contain their two vanilla Heart Containers. Your starting container configuration does not allow this.");
+        }
+        if (8 - (startingMagicContainersMax ?? 4) < mustExistContainers)
+        {
+            throw new UserFacingException("Magic Container Mismatch", "Unshuffled West and East must each contain their two vanilla Magic Containers. Your starting container configuration does not allow this.");
+        }
 
         var palaceLengthsMax = Palaces.VANILLA_LENGTHS[..6].Select(n => Palaces.MaxLengthRoll(n, normalPalaceLength)).ToArray();
         var itemCountMaxRoll = GetPalaceItemRoomMaxCounts(palaceItemRoomCount, palaceLengthsMax);
         var itemCountLimit = GetPalaceItemRoomLimits(Enumerable.Repeat(normalPalaceStyle, 6).ToArray());
         var palaceItemsMaxDiff = itemCountMaxRoll.Zip(itemCountLimit, Math.Min).Sum(n => n - 1);
+        palaceMinorItemCount += palaceItemsMaxDiff;
 
-        count += palaceItemsMaxDiff;
-
-        return count;
+        return (overworldMinorItemCount, palaceMinorItemCount);
     }
 
     private int GetDarkLinkMinDistance()

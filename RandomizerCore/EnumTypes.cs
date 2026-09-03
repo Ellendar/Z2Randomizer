@@ -38,6 +38,33 @@ public enum MaxHeartsOption
     RANDOM = 13,
 }
 
+public static class MaxHeartsOptionExtensions
+{
+    public static int HeartsInPool(this MaxHeartsOption option, int startingHearts)
+    {
+        return option switch
+        {
+            MaxHeartsOption.ONE => 0,
+            MaxHeartsOption.TWO => Math.Max(0, 2 - startingHearts),
+            MaxHeartsOption.THREE => Math.Max(0, 3 - startingHearts),
+            MaxHeartsOption.FOUR => Math.Max(0, 4 - startingHearts),
+            MaxHeartsOption.FIVE => Math.Max(0, 5 - startingHearts),
+            MaxHeartsOption.SIX => Math.Max(0, 6 - startingHearts),
+            MaxHeartsOption.SEVEN => Math.Max(0, 7 - startingHearts),
+            MaxHeartsOption.EIGHT => Math.Max(0, 8 - startingHearts),
+
+            MaxHeartsOption.PLUS_ONE => Math.Max(0, Math.Min(1, 8 - startingHearts)),
+            MaxHeartsOption.PLUS_TWO => Math.Max(0, Math.Min(2, 8 - startingHearts)),
+            MaxHeartsOption.PLUS_THREE => Math.Max(0, Math.Min(3, 8 - startingHearts)),
+            MaxHeartsOption.PLUS_FOUR => Math.Max(0, Math.Min(4, 8 - startingHearts)),
+
+            MaxHeartsOption.RANDOM => throw new ArgumentOutOfRangeException(nameof(option), option, null),
+
+            _ => throw new ArgumentOutOfRangeException(nameof(option), option, null)
+        };
+    }
+}
+
 [DefaultValue(NONE)]
 public enum StartingTechs
 {
@@ -404,6 +431,12 @@ static class BiomeExtensions
             Biome.VANILLA_SHUFFLE => true,
             _ => false
         };
+    }
+
+    //This is for "Vanilla Everything" compatability / future different shuffle options.
+    public static bool InItemShuffle(this Biome biome)
+    {
+        return true;
     }
 
     public static bool IsWestBiome(this Biome biome)
