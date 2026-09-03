@@ -358,7 +358,7 @@ public class RandomizerProperties
         minorItemCount -= MaxMagicContainers - StartMagicContainers - 4;
 
         //palace items other than 1 adjusts the count
-        minorItemCount += PalaceItemRoomCounts.Select(c => c - 1).Sum();
+        minorItemCount += PalaceItemRoomCounts.Take(6).Sum(c => c - 1);
 
         //Start items add 1 to the count
         minorItemCount += StartCandle ? 1 : 0;

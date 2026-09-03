@@ -46,7 +46,6 @@ public enum ProgressEnum
     LINKING_ASSEMBLY,
     FINISHING_UP,
 }
-
 public class Hyrule
 {
     public delegate Assembler NewAssemblerFn(Js65Options? options = null, bool debugJavaScript = false);
@@ -103,8 +102,6 @@ public class Hyrule
     public HashSet<String> reachableAreas;
     //Which vanilla spell corresponds with which shuffled spell
     //private Dictionary<Town, Collectable> WizardCollectables { get; set; }
-    //Locations that are pbags in vanilla that are turned into hearts because maxhearts - startinghearts > 4
-    private List<Location> pbagHearts;
     //Continent connectors
     protected (Location, Location)[] connections = new (Location, Location)[4];
 
@@ -131,7 +128,6 @@ public class Hyrule
     public EastHyrule eastHyrule;
     private MazeIsland mazeIsland;
     private DeathMountain deathMountain;
-
     private RandomizerProperties props;
     public List<World> worlds;
     public List<Palace> palaces;
@@ -764,7 +760,7 @@ public class Hyrule
                 shufflableItems.Add(Collectable.MIRROR);
                 shufflableItems.Add(Collectable.WATER);
             globalShuffleLocations.AddRange([westHyrule.bagu, westHyrule.sariaNorth, eastHyrule.nabooru]);
-            }
+        }
 
         if (props.IncludeSwordTechsInShuffle)
         {
@@ -780,74 +776,9 @@ public class Hyrule
             SwapUpAndDownstab();
         }
 
-        int heartContainersInItemPool = props.MaxHearts - props.StartHearts;
-        int magicContainersInItemPool = props.MaxMagicContainers - props.StartMagicContainers;
-
-        foreach(Collectable collectable in ItemGet.Keys)
+        foreach (Collectable collectable in ItemGet.Keys)
         {
             ItemGet[collectable] = props.StartsWithCollectable(collectable);
-        }
-
-        pbagHearts = [];
-        List<Location> heartContainerLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Contains(Collectable.HEART_CONTAINER)).ToList();
-
-        //Replace any unused heart containers with small items
-        if (heartContainersInItemPool < 4)
-        {
-            int heartContainersToRemove = 4 - heartContainersInItemPool;
-            while (heartContainersToRemove > 0)
-            {
-                Location hcLocation = heartContainerLocations.Sample(r)!;
-                List<Collectable> collectables = hcLocation.GetAllCollectables();
-                List<int> order = Enumerable.Range(0, collectables.Count).ToList();
-                order.FisherYatesShuffle(r);
-                foreach (int index in order)
-                {
-                    if (collectables[index] == Collectable.HEART_CONTAINER)
-                    {
-                        collectables[index] = minorItems.Sample(r);
-                        hcLocation.SetCollectables(collectables);
-                    heartContainersToRemove--;
-                        shufflableItems.Remove(Collectable.HEART_CONTAINER);
-                        shufflableItems.Add(collectables[index]);
-                        if (!collectables.Any(i => i == Collectable.HEART_CONTAINER))
-                        {
-                            heartContainerLocations.Remove(hcLocation);
-                }
-                        break;
-            }
-        }
-            }
-        }
-
-        List<Location> magicContainerLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Contains(Collectable.MAGIC_CONTAINER)).ToList();
-        //Replace any unused magic containers with small items
-        if (magicContainersInItemPool < 4)
-        {
-            int magicContainersToRemove = 4 - magicContainersInItemPool;
-            while (magicContainersToRemove > 0)
-            {
-                Location mcLocation = magicContainerLocations.Sample(r)!;
-                List<Collectable> collectables = mcLocation.GetAllCollectables();
-                List<int> order = Enumerable.Range(0, collectables.Count).ToList();
-                order.FisherYatesShuffle(r);
-                foreach (int index in order)
-                {
-                    if (collectables[index] == Collectable.MAGIC_CONTAINER)
-                    {
-                        collectables[index] = minorItems.Sample(r);
-                        mcLocation.SetCollectables(collectables);
-                    magicContainersToRemove--;
-                        shufflableItems.Remove(Collectable.MAGIC_CONTAINER);
-                        shufflableItems.Add(collectables[index]);
-                        if (!collectables.Any(i => i == Collectable.MAGIC_CONTAINER))
-                        {
-                            magicContainerLocations.Remove(mcLocation);
-                }
-                        break;
-            }
-        }
-            }
         }
 
         //Spell Item handling
@@ -855,38 +786,38 @@ public class Hyrule
         {
             Collectable[] spellItems = [Collectable.TROPHY, Collectable.MEDICINE, Collectable.CHILD, Collectable.MIRROR, Collectable.WATER];
             foreach (Collectable spellItem in spellItems)
-        {
+            {
                 int index = shufflableItems.IndexOf(spellItem);
                 if (index > -1)
-            {
+                {
                     shufflableItems[index] = minorItems.Sample(r);
-            }
+                }
                 else
-            {
+                {
                     Location? defaultLocation = possibleItemLocations.FirstOrDefault(i => i.GetAllCollectables().Contains(spellItem));
                     defaultLocation?.ReplaceCollectable(spellItem, minorItems.Sample(r));
-            }
+                }
                 ItemGet[spellItem] = true;
             }
         }
         else if (!props.IncludeSpellsInShuffle)
-            {
+        {
             List<Location> spellItemTowns = [westHyrule.ruto, westHyrule.mido, eastHyrule.darunia];
             if (props.IncludeQuestItemsInShuffle)
             {
                 spellItemTowns.Add([westHyrule.sariaNorth, eastHyrule.nabooru]);
-                    }
+            }
 
             foreach (Location location in spellItemTowns)
-                {
+            {
                 Collectable wizardCollectable = (Collectable)location.Town!.GetWizard()!.Collectable!;
                 if (props.StartsWithCollectable(wizardCollectable))
-                    {
+                {
                     ItemGet[wizardCollectable] = true;
                     location.Town!.GetWizard()!.Collectable = minorItems.Sample(r);
-                    }
                 }
             }
+        }
 
         List<Collectable> possibleStartItems = [
             Collectable.CANDLE,
@@ -916,12 +847,12 @@ public class Hyrule
                 if (index > -1)
                 {
                     shufflableItems[index] = minorItems.Sample(r);
-                    }
                 }
             }
+        }
 
-            if (props.IncludeSpellsInShuffle)
-            {
+        if (props.IncludeSpellsInShuffle)
+        {
             foreach (Collectable item in possibleStartSpells)
             {
                 if (props.StartsWithCollectable(item) && shufflableItems.Contains(item))
@@ -931,94 +862,18 @@ public class Hyrule
             }
         }
 
-        //Handle excess items
-        List<Collectable> excessItems = [];
-
-        //Heart containers over 4 are excess
-        for (int i = 4; i < heartContainersInItemPool; i++)
-        {
-            excessItems.Add(Collectable.HEART_CONTAINER);
-        }
-        //Magic containers over 4 are excess
-        for (int i = 4; i < magicContainersInItemPool; i++)
-        {
-            excessItems.Add(Collectable.MAGIC_CONTAINER);
-        }
-
-        List<Collectable> vanillaPalaceItems = [Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT, Collectable.BOOTS, Collectable.FLUTE, Collectable.CROSS];
-
-        //No palace items handling
-        for (int i = 0; i < 6; i++)
-        {
-            if (props.PalaceItemRoomCounts[i] == 0)
-            {
-                var vanillaPalaceItem = vanillaPalaceItems[i];
-
-                //If we didn't start with the item that should have been here, it still has to be somewhere,
-                //so add it to the excess items and it will eventually replace a minor item
-                if (!props.StartsWithCollectable(vanillaPalaceItem))
-                {
-                    excessItems.Add(vanillaPalaceItem);
-                }
-            }
-        }
-
-        List<int> minorItemIndexes = [];
-        for(int i = 0; i < shufflableItems.Count; i++)
-        {
-            if (shufflableItems[i].IsMinorItem())
-            {
-                minorItemIndexes.Add(i);
-            }
-        }
-
-        //Add the auto pbag cave promotion
-        List<Location> overflowLocations = [];
-        if (!props.PbagItemShuffle)
-        {
-            overflowLocations.AddRange([westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2]);
-        }
-        int overflowLocationsRequired = excessItems.Count - minorItemIndexes.Count;
-
-
-        if (overflowLocationsRequired > overflowLocations.Count)
-        {
-            throw new Exception("Insufficient locations to place excess items. The validation should have caught this.");
-        }
-
-        for(int i = 0; i < overflowLocationsRequired; i++)
-        {
-            Location overflowLocation = overflowLocations.Sample(r)!;
-            overflowLocation.CollectablesAreShufflable = true;
-            globalShuffleLocations.Add(overflowLocation);
-            shufflableItems.Add(Collectable.SMALL_BAG);
-            minorItemIndexes.Add(shufflableItems.Count - 1);
-            overflowLocations.Remove(overflowLocation);
-        }
-
-        while(excessItems.Count > 0)
-        {
-            int minorItemIndexIndex = r.Next(0, minorItemIndexes.Count);
-            int minorItemIndex = minorItemIndexes[minorItemIndexIndex];
-            int excessItemIndex = r.Next(0, excessItems.Count);
-
-            shufflableItems[minorItemIndex] = excessItems[excessItemIndex];
-            minorItemIndexes.RemoveAt(minorItemIndexIndex);
-            excessItems.RemoveAt(excessItemIndex);
-        }
-
         //Do the actual shuffling
         List<Location> duplicateItemPlacementCandidates = [];
 
         if (props.MixOverworldPalaceItems)
         {
-            //This should probably always be true but safety
+
             if(props.ShufflePalaceItems)
-        {
+            {
                 List<Collectable> palaceCollectables = [.. palaceLocations.SelectMany(i => i.GetAllCollectables())];
                 shufflableItems.Add(palaceCollectables.Select(c => props.StartsWithCollectable(c) ? minorItems.Sample(r) : c));
                 globalShuffleLocations.Add(palaceLocations);
-        }
+            }
             duplicateItemPlacementCandidates.AddRange(globalShuffleLocations);
             DoShuffle(shufflableItems, globalShuffleLocations);
         }
@@ -1049,10 +904,10 @@ public class Hyrule
                     for (int i = 0; i < collectables.Count; i++)
                     {
                         collectables[i] = props.StartsWithCollectable(collectables[i]) ? minorItems.Sample(r) : collectables[i];
-                        }
-                    palaceLocation.SetCollectables(collectables, false);
                     }
+                    palaceLocation.SetCollectables(collectables, false);
                 }
+            }
 
             if (props.ShuffleOverworldItems)
             {
@@ -1066,8 +921,8 @@ public class Hyrule
                         itemsToActuallyShuffle.Add(
                             props.StartsWithCollectable(collectable) && (!collectable.IsSpell() || canReplaceStartingSpellsWithMinorItems) 
                                 ? minorItems.Sample(r) : collectable);
+                    }
                 }
-            }
                 duplicateItemPlacementCandidates.AddRange(shufflableItemLocations);
                 DoShuffle(itemsToActuallyShuffle, shufflableItemLocations);
             }
@@ -1085,74 +940,126 @@ public class Hyrule
             }
         }
 
-        //Assigning unshuffled locations can make the number of containers wrong, so re-adjust them
-        heartContainerLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Contains(Collectable.HEART_CONTAINER)).ToList();
-        int heartContainerCount = heartContainerLocations.SelectMany(i => i.GetAllCollectables()).Count(i => i == Collectable.HEART_CONTAINER);
-        while(heartContainerCount > heartContainersInItemPool)
+
+        int heartContainersInItemPool = props.MaxHearts - props.StartHearts;
+        int magicContainersInItemPool = props.MaxMagicContainers - props.StartMagicContainers;
+
+        List<Location> heartContainerLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Contains(Collectable.HEART_CONTAINER)).ToList();
+
+        //If there are more starting containers than vanilla, replace some containers with small items
+        if (heartContainersInItemPool < 4)
         {
-            Location location = heartContainerLocations.Sample(r)!;
-            Debug.Assert(location != null);
-            Collectable minorItem = minorItems.Sample(r);
-            if(!location.ReplaceCollectable(Collectable.HEART_CONTAINER, minorItem))
+            int heartContainersToRemove = 4 - heartContainersInItemPool;
+            while (heartContainersToRemove > 0)
             {
-                heartContainerLocations.Remove(location);
+                Location hcLocation = heartContainerLocations.Sample(r)!;
+                List<Collectable> collectables = hcLocation.GetAllCollectables();
+                List<int> order = Enumerable.Range(0, collectables.Count).ToList();
+                order.FisherYatesShuffle(r);
+                foreach (int index in order)
+                {
+                    if (collectables[index] == Collectable.HEART_CONTAINER)
+                    {
+                        collectables[index] = minorItems.Sample(r);
+                        hcLocation.SetCollectables(collectables);
+                        heartContainersToRemove--;
+                        shufflableItems.Remove(Collectable.HEART_CONTAINER);
+                        shufflableItems.Add(collectables[index]);
+                        if (!collectables.Any(i => i == Collectable.HEART_CONTAINER))
+                        {
+                            heartContainerLocations.Remove(hcLocation);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        List<Location> magicContainerLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Contains(Collectable.MAGIC_CONTAINER)).ToList();
+        if (magicContainersInItemPool < 4)
+        {
+            int magicContainersToRemove = 4 - magicContainersInItemPool;
+            while (magicContainersToRemove > 0)
+            {
+                Location mcLocation = magicContainerLocations.Sample(r)!;
+                List<Collectable> collectables = mcLocation.GetAllCollectables();
+                List<int> order = Enumerable.Range(0, collectables.Count).ToList();
+                order.FisherYatesShuffle(r);
+                foreach (int index in order)
+                {
+                    if (collectables[index] == Collectable.MAGIC_CONTAINER)
+                    {
+                        collectables[index] = minorItems.Sample(r);
+                        mcLocation.SetCollectables(collectables);
+                        magicContainersToRemove--;
+                        shufflableItems.Remove(Collectable.MAGIC_CONTAINER);
+                        shufflableItems.Add(collectables[index]);
+                        if (!collectables.Any(i => i == Collectable.MAGIC_CONTAINER))
+                        {
+                            magicContainerLocations.Remove(mcLocation);
+                        }
+                        break;
+                    }
+                }
             }
         }
 
-        List<Location> minorItemLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Any(j => j.IsMinorItem())).ToList();
-
-        while(heartContainerCount < heartContainersInItemPool)
+        //Excess items are items that need to be placed beyond the normal vanilla items
+        //these could be containers if more than 4 need to be placed, or palace items that were removed from palaces
+        //This does mean if mixed items is off, palace items can still be shuffled into the overworld
+        //Additionally if excess item placements are needed and pbag cave shuffle is off, they can be promoted to real item locations.
+        //This is consistent with how old versions work, though the things that can be placed there have expanded.
+        List<Collectable> excessItems = [];
+        int minorItemCount = possibleItemLocations.SelectMany(l => l.GetShufflableCollectables())
+            .Count(c => c.IsMinorItem());
+        //Heart containers over 4 are excess
+        for (int i = 4; i < heartContainersInItemPool; i++)
         {
-            Location location = minorItemLocations.Sample(r)!;
-            Collectable[] locationMinorItems = location.GetAllCollectables().Where(i => i.IsMinorItem()).ToArray();
-            if(locationMinorItems.Length == 0)
+            excessItems.Add(Collectable.HEART_CONTAINER);
+        }
+        //Magic containers over 4 are excess
+        for (int i = 4; i < magicContainersInItemPool; i++)
+        {
+            excessItems.Add(Collectable.MAGIC_CONTAINER);
+        }
+        //Palace items that didn't get placed in palaces are excess
+        List<Collectable> palaceItems = [Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT,
+            Collectable.BOOTS, Collectable.FLUTE, Collectable.CROSS];
+        foreach (Collectable palaceItem in palaceItems)
+        {
+            if (!possibleItemLocations.SelectMany(l => l.GetAllCollectables()).Any(c => c == palaceItem)
+                && !props.StartsWithCollectable(palaceItem))
             {
-                minorItemLocations.Remove(location);
-                continue;
+                excessItems.Add(palaceItem);
             }
-            if (!location.ReplaceCollectable(locationMinorItems.Sample(r), Collectable.HEART_CONTAINER))
-            {
-                heartContainerLocations.Remove(location);
-            }
-            heartContainerCount++;
         }
 
-        magicContainerLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Contains(Collectable.MAGIC_CONTAINER)).ToList();
-        int magicContainerCount = magicContainerLocations.SelectMany(i => i.GetAllCollectables()).Count(i => i == Collectable.MAGIC_CONTAINER);
-        while (magicContainerCount > magicContainersInItemPool)
+        List<Location> minorItemLocations = possibleItemLocations.Where(l => l.GetShufflableCollectables().Any(c => c.IsMinorItem())).ToList();
+        int overflowLocationsRequired = excessItems.Count - minorItemCount;
+
+        //Add the auto pbag cave promotion
+        List<Location> promotableLocations = [westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2];
+        while (excessItems.Count > minorItemCount)
         {
-            Location location = minorItemLocations.Sample(r)!;
-            Collectable[] locationMinorItems = location.GetAllCollectables().Where(i => i.IsMinorItem()).ToArray();
-            if (locationMinorItems.Length == 0)
+            Location promotionLocation = promotableLocations.Sample(r)
+                ?? throw new Exception("Insufficient locations to place excess items. The validation should have caught this.");
+            Collectable replacementCollectable = excessItems.Sample(r);
+            promotionLocation.SetCollectables([replacementCollectable]);
+            excessItems.Remove(replacementCollectable);
+        }
+        Debug.Assert(excessItems.Count <= minorItemCount);
+        foreach(Collectable excessItem in excessItems)
+        {
+            Location minorItemLocation = minorItemLocations.Sample(r) ?? throw new ImpossibleException("No minor item to replace after promotion???");
+            Collectable minorItem = minorItemLocation.GetShufflableCollectables().Where(i => i.IsMinorItem()).ToList().Sample(r);
+            minorItemLocation.ReplaceCollectable(minorItem, excessItem, r);
+            if(!minorItemLocation.GetShufflableCollectables().Any(i => i.IsMinorItem()))
             {
-                minorItemLocations.Remove(location);
-                continue;
+                minorItemLocations.Remove(minorItemLocation);
             }
-            if (!location.ReplaceCollectable(locationMinorItems.Sample(r), Collectable.MAGIC_CONTAINER))
-            {
-                magicContainerLocations.Remove(location);
-            }
-            magicContainerCount++;
         }
 
-        minorItemLocations = possibleItemLocations.Where(i => i.GetAllCollectables().Any(j => j.IsMinorItem())).ToList();
-
-        while (magicContainerCount < magicContainersInItemPool)
-        {
-            Location location = minorItemLocations.Sample(r)!;
-            Collectable[] locationMinorItems = location.GetAllCollectables().Where(i => i.IsMinorItem()).ToArray();
-            if (locationMinorItems.Length == 0)
-            {
-                minorItemLocations.Remove(location);
-                continue;
-            }
-            if (!location.ReplaceCollectable(locationMinorItems.Sample(r), Collectable.MAGIC_CONTAINER))
-            {
-                magicContainerLocations.Remove(location);
-            }
-            magicContainerCount++;
-        }
-
+        //If allow item duplicates is on, as many duplicates of these items will be added as possible, up to the number
+        //of minor items that can be replaced, in this order
         if (props.AllowImportantItemDuplicates)
         {
             List<Collectable> importantItemsToDuplicate = [ /* in (non-random) priority order */
@@ -1169,6 +1076,25 @@ public class Hyrule
                 Collectable.UPSTAB,
                 Collectable.JUMP_SPELL,
             ];
+
+            //Mario mode has different priority because the relative value of upgrades is very different
+            if(props.MarioMode)
+            {
+                importantItemsToDuplicate = [
+                Collectable.GLOVE,
+                Collectable.HAMMER,
+                Collectable.TANOOKI,
+                Collectable.FAIRY_SPELL,
+                Collectable.THUNDER_SPELL,
+                Collectable.REFLECT_SPELL,
+                Collectable.DOWNSTAB,
+                Collectable.MAGIC_KEY,
+                Collectable.RAFT,
+                Collectable.BOOTS,
+                Collectable.FLUTE,
+                Collectable.UPSTAB,
+                ];
+            }
 
             importantItemsToDuplicate = importantItemsToDuplicate.Where(shufflableItems.Contains).ToList();
 
@@ -1292,6 +1218,7 @@ public class Hyrule
         //with multiple pointers, but then when the item update happens later, it will affect all the rooms,
         //so do a first pass with distinct items so all item rooms are always separate sideviews
         int itemRoomIndex = 0;
+        Collectable[] temporaryCollectables = Enum.GetValues<Collectable>().Where(i => !i.IsInternalUse() && !i.IsMinorItem()).ToArray();
         foreach(Palace palace in palaces)
         {
             foreach(Room itemRoom in palace.ItemRooms)
@@ -1300,7 +1227,7 @@ public class Hyrule
                 {
                     itemRoomIndex++;
                 }
-                itemRoom.UpdateSideviewItem((Collectable)itemRoomIndex++);
+                itemRoom.UpdateSideviewItem(temporaryCollectables[itemRoomIndex++]);
             }
         }
         //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
@@ -2647,27 +2574,9 @@ public class Hyrule
         ROMData.Put(RomMap.MI_MAGIC_CONTAINER_DROP_COLLECTABLE, mazeIsland.magicContainerDrop.GetAllCollectables()[0].GetROMCollectableIndex());
         ROMData.Put(RomMap.MI_CHILD_DROP_COLLECTABLE, mazeIsland.childDrop.GetAllCollectables()[0].GetROMCollectableIndex());
 
-
         ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, westHyrule.pbagCave.GetAllCollectables()[0].GetROMCollectableIndex());
         ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, eastHyrule.pbagCave1.GetAllCollectables()[0].GetROMCollectableIndex());
         ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, eastHyrule.pbagCave2.GetAllCollectables()[0].GetROMCollectableIndex());
-
-        foreach (Location location in pbagHearts)
-        {
-            if (location == westHyrule.pbagCave)
-            {
-                ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, westHyrule.pbagCave.GetAllCollectables()[0].GetROMCollectableIndex());
-            }
-
-            if (location == eastHyrule.pbagCave1)
-            {
-                ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, eastHyrule.pbagCave1.GetAllCollectables()[0].GetROMCollectableIndex());
-            }
-            if (location == eastHyrule.pbagCave2)
-            {
-                ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, eastHyrule.pbagCave2.GetAllCollectables()[0].GetROMCollectableIndex());
-            }
-        }
 
         //Update raft animation
         bool firstRaft = false;
