@@ -145,6 +145,12 @@ public sealed partial class App : Application // , IDisposable
 
         ThemeHelper.SetTheme(main.RandomizerViewModel.ThemeVariantName);
 
+        // If system theme changes, call SetTheme again with the saved theme.
+        // If light or dark has been set specifically, this will change nothing.
+        // If it's unset, it will change to the new system theme.
+        ActualThemeVariantChanged += (_, _) =>
+            ThemeHelper.SetTheme(main.RandomizerViewModel.ThemeVariantName);
+
         base.OnFrameworkInitializationCompleted();
     }
 

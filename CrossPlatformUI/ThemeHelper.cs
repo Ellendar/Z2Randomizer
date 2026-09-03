@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using Material.Styles.Themes;
 
@@ -39,8 +40,13 @@ public class ThemeHelper
                 {
                     return false;
                 }
-                var actualTheme = app.ActualThemeVariant;
-                return actualTheme == ThemeVariant.Dark;
+                // Workaround for `ActualThemeVariant` not being set yet on startup in Linux 
+                var platformTheme = app.PlatformSettings?.GetColorValues().ThemeVariant;
+                if (platformTheme is not null)
+                {
+                    return platformTheme == PlatformThemeVariant.Dark;
+                }
+                return app.ActualThemeVariant == ThemeVariant.Dark;
         }
     }
 
