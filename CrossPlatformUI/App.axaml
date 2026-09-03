@@ -117,6 +117,18 @@
                 </BehaviorCollectionTemplate>
             </Setter>
         </Style>
+        <Style Selector="ComboBox:disabled /template/ Border#PART_Border">
+            <Setter Property="BorderBrush" Value="#60808080" />
+        </Style>
+        <Style Selector="ComboBox:disabled:not(ComboBox[SelectedIndex=-1]) /template/ TextBlock#floatingWatermark">
+            <Setter Property="Foreground" Value="#90808080" />
+        </Style>
+        <Style Selector="ComboBox:disabled /template/ ContentPresenter#contentPresenter">
+            <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="ComboBox:disabled /template/ Path#arrow">
+            <Setter Property="Opacity" Value="0" />
+        </Style>
         <Style Selector="NumericUpDown">
             <Setter Property="(Interaction.Behaviors)">
                 <BehaviorCollectionTemplate>

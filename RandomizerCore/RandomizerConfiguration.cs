@@ -1069,6 +1069,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             default:
                 throw new Exception("Illegal Fire option");
         }
+        if (marioMode)
+        {
+            properties.LinkedFireSpell = null;
+            properties.ReplaceFireWithDash = false;
+        }
 
         ResolveStartingTechniques(properties, r, includeDifficulty);
         properties.SwapUpAndDownStab = swapUpAndDownStab ?? GetIndeterminateFlagValue(r);

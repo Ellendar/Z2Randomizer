@@ -50,6 +50,7 @@
             <ComboBox 
                 Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Fire Spell"
+                IsEnabled="{Binding FireOptionEnabledObservable^}"
                 ItemsSource="{Binding Source={x:Static rc:Enums.FireOptionList}}"
                 SelectedItem="{Binding Main.Config.FireOption, Converter={x:Static ui:Util.EnumConvert}}"
             >
