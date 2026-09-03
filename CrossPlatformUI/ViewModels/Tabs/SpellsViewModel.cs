@@ -12,10 +12,16 @@ public class SpellsViewModel : ReactiveObject, IActivatableViewModel
     public ViewModelActivator Activator { get; }
     public MainViewModel Main { get; }
 
+    public IObservable<bool> FireOptionEnabledObservable { get; }
+
     public SpellsViewModel(MainViewModel main)
     {
         Main = main;
         Activator = new();
+
+        FireOptionEnabledObservable = Main.FlagsChanged
+            .Select(_ => !Main.Config.MarioMode)
+            .DistinctUntilChanged();
 
         this.WhenActivated(OnActivate);
     }
