@@ -362,13 +362,13 @@ public class RandomizerProperties
         int overworldMinorItemCount = 0;
         int palaceMinorItemCount = 0;
 
-        //The 3 pbag caves are either explicitly minor items or allowable as overflow locations
-        //so they are counted either way (only if overworld items are actually shuffled).
-        if (ShuffleOverworldItems && WestBiome.InItemShuffle())
+        // The pbag caves are available only if they are included in the item shuffle.
+        // When excluded, items may no longer overflow into them like in the old versions.
+        if (ShuffleOverworldItems && PbagItemShuffle && WestBiome.InItemShuffle())
         {
             overworldMinorItemCount += 1;
         }
-        if (ShuffleOverworldItems && EastBiome.InItemShuffle())
+        if (ShuffleOverworldItems && PbagItemShuffle && EastBiome.InItemShuffle())
         {
             overworldMinorItemCount += 2;
         }

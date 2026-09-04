@@ -1975,21 +1975,22 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         int palaceMinorItemCount = 0;
         int mustExistContainers = 0;
 
-        //The pbag caves are either explicitly minor items or allowable as overflow locations
-        //so they are counted either way (only if overworld items are actually shuffled).
-        if (shuffleOverworldItems != false && westBiome.InItemShuffle())
+        // The pbag caves are available only if they are included in the item shuffle.
+        // When excluded, items may no longer overflow into them like in the old versions.
+        if (shuffleOverworldItems != false && includePBagCavesInItemShuffle != false && westBiome.InItemShuffle())
         {
             overworldMinorItemCount += 1;
         }
-        else
-        {
-            mustExistContainers += 2;
-        }
-        if (shuffleOverworldItems != false && eastBiome.InItemShuffle())
+        if (shuffleOverworldItems != false && includePBagCavesInItemShuffle != false && eastBiome.InItemShuffle())
         {
             overworldMinorItemCount += 2;
         }
-        else
+        //Unshuffled regions must still contain their two vanilla Heart/Magic containers.
+        if (shuffleOverworldItems == false || !westBiome.InItemShuffle())
+        {
+            mustExistContainers += 2;
+        }
+        if (shuffleOverworldItems == false || !eastBiome.InItemShuffle())
         {
             mustExistContainers += 2;
         }
