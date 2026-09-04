@@ -952,9 +952,8 @@ public class Hyrule
 
         //Excess items are items that need to be placed beyond the normal vanilla items
         //these could be containers if more than 4 need to be placed, or palace items that were removed from palaces
-        //Additionally if excess item placements are needed and pbag cave shuffle is off, they can be promoted to real item locations.
-        int minorItemCount = possibleItemLocations.SelectMany(l => l.GetShufflableCollectables())
-            .Count(c => c.IsMinorItem());
+        int minorItemCount = possibleItemLocations.SelectMany(loc => loc.GetShufflableCollectables())
+            .Count(item => item.IsMinorItem());
         //Heart containers over 4 are excess (overworld bucket)
         List<Collectable> overworldExcessItems = [];
         for (int i = 4; i < heartContainersInItemPool; i++)
@@ -990,15 +989,9 @@ public class Hyrule
         List<Location> minorItemLocations = possibleItemLocations.Where(l => l.GetShufflableCollectables().Any(c => c.IsMinorItem())).ToList();
         int overflowLocationsRequired = excessItems.Count - minorItemCount;
 
-        //Add the auto pbag cave promotion
-        List<Location> promotableLocations = [westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2];
-        while (excessItems.Count > minorItemCount)
+        if (excessItems.Count > minorItemCount)
         {
-            Location promotionLocation = promotableLocations.Sample(r)
-                ?? throw new Exception("Insufficient locations to place excess items. The validation should have caught this.");
-            Collectable replacementCollectable = excessItems.Sample(r);
-            promotionLocation.SetCollectables([replacementCollectable]);
-            excessItems.Remove(replacementCollectable);
+            throw new Exception("Insufficient locations to place excess items. The validation should have caught this.");
         }
         Debug.Assert(excessItems.Count <= minorItemCount);
         foreach(Collectable excessItem in excessItems)
@@ -2976,6 +2969,10 @@ CustomFileSelectData:
     public IEnumerable<Location> ItemLocations()
     {
         List<Location> possibleItemLocations = AllLocations().Where(i => i.GetCollectableCount() > 0).ToList();
+        if (!props.PbagItemShuffle)
+        {
+            possibleItemLocations.RemoveMany([westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2]);
+        }
         possibleItemLocations.Remove(westHyrule.sariaSouth);
         return possibleItemLocations;
     }

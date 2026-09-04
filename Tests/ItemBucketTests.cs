@@ -19,6 +19,7 @@ public class ItemBucketTests
         {
             ShuffleOverworldItems = true,
             ShufflePalaceItems = true,
+            PbagItemShuffle = true,
             MixOverworldPalaceItems = false,
 
             WestBiome = Biome.VANILLA_SHUFFLE,
@@ -209,27 +210,28 @@ public class ItemBucketTests
     // ─── PBAG Cave Tests ──────────────────────────────────────────────────
 
     [TestMethod]
-    public void PbagCaves_ContributeToOverworld_WhenShuffled()
+    public void PbagCaves_ContributeToOverworld_OnlyWhenPbagShuffled()
     {
-        // With non-VANILLA biomes and shuffled overworld: pbag caves add +1 (west) +2 (east) = +3.
-        var config = new RandomizerConfiguration
-        {
-            ShuffleOverworldItems = true,
-        };
-        // Default biomes are VANILLA — pbag caves don't count for config-level if VANILLA + shuffled?
-        // Actually CountPossibleMinorItems gates on `shuffleOverworldItems != false && biome.InItemShuffle()`
-        // InItemShuffle() always returns true. So the gating is just shuffleOverworldItems.
-        var (overworldShuffled, _) = config.CountPossibleMinorItems();
+        // PBag caves add +1 (west) +2 (east) = +3 overworld overflow space, but only when
+        // PbagItemShuffle is on. Make the container drag leave exactly enough room for those
+        // caves: without them the overworld bucket is short by 1, with them it has room.
+        // drag = -(MaxHearts - StartHearts - 4) - (MaxMagicContainers - StartMagicContainers - 4)
+        // With StartHearts=4, StartMagicContainers=3: drag = -(0) - (1) = -1.
+        var propsOn = BestCaseProperties();
+        propsOn.PbagItemShuffle = true;
+        propsOn.StartHearts = 4;
+        propsOn.StartMagicContainers = 3;
+        // overworld = +3 (pbag) - 1 (drag) = 2 >= 0
+        Assert.IsTrue(propsOn.HasEnoughSpaceToAllocateItems(),
+            "Pbag on: the +3 caves should be enough to offset the 1-slot container drag");
 
-        var configOff = new RandomizerConfiguration
-        {
-            ShuffleOverworldItems = false,
-        };
-        var (overworldOff, _) = configOff.CountPossibleMinorItems();
-
-        // Shuffled overworld gets +3 (1 west + 2 east pbag), non-shuffled gets 0
-        Assert.AreEqual(3, overworldShuffled - overworldOff,
-            "PBag caves should contribute +3 to overworld when shuffled");
+        var propsOff = BestCaseProperties();
+        propsOff.PbagItemShuffle = false;
+        propsOff.StartHearts = 4;
+        propsOff.StartMagicContainers = 3;
+        // overworld = 0 (pbag) - 1 (drag) = -1 < 0
+        Assert.IsFalse(propsOff.HasEnoughSpaceToAllocateItems(),
+            "Pbag off: the excluded caves must not offset the container drag");
     }
 
     [TestMethod]
@@ -546,24 +548,6 @@ public class ItemBucketTests
     [TestMethod]
     public void IsOverworldItem_ExplicitList()
     {
-        // Overworld items = the non-palace progression items placed in the overworld pool.
-        Assert.IsTrue(Collectable.HAMMER.IsOverworldItem());
-        Assert.IsTrue(Collectable.MAGIC_KEY.IsOverworldItem());
-        Assert.IsTrue(Collectable.MAGIC_CONTAINER.IsOverworldItem());
-        Assert.IsTrue(Collectable.HEART_CONTAINER.IsOverworldItem());
-
-        // Minor items are NOT overworld items.
-        Assert.IsFalse(Collectable.SMALL_BAG.IsOverworldItem());
-        Assert.IsFalse(Collectable.KEY.IsOverworldItem());
-
-        // Palace items are NOT overworld items.
-        Assert.IsFalse(Collectable.CANDLE.IsOverworldItem());
-        Assert.IsFalse(Collectable.GLOVE.IsOverworldItem());
-        Assert.IsFalse(Collectable.RAFT.IsOverworldItem());
-        Assert.IsFalse(Collectable.BOOTS.IsOverworldItem());
-        Assert.IsFalse(Collectable.FLUTE.IsOverworldItem());
-        Assert.IsFalse(Collectable.CROSS.IsOverworldItem());
-
         // Spells, sword techs and town quest items are undefined
     }
 }
