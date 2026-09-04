@@ -2199,7 +2199,7 @@ public class Hyrule
             if (props.ReplaceFireWithDash && spell == Collectable.FIRE_SPELL
                 || !props.ReplaceFireWithDash && spell == Collectable.DASH_SPELL
                 || props.MarioMode && spell == Collectable.JUMP_SPELL
-                || !props.ReplaceFireWithDash && spell == Collectable.TANOOKI
+                || !props.MarioMode && spell == Collectable.TANOOKI
                 || spell == Collectable.UPSTAB
                 || spell == Collectable.DOWNSTAB)
             {
