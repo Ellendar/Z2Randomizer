@@ -952,31 +952,40 @@ public class Hyrule
 
         //Excess items are items that need to be placed beyond the normal vanilla items
         //these could be containers if more than 4 need to be placed, or palace items that were removed from palaces
-        //This does mean if mixed items is off, palace items can still be shuffled into the overworld
         //Additionally if excess item placements are needed and pbag cave shuffle is off, they can be promoted to real item locations.
-        //This is consistent with how old versions work, though the things that can be placed there have expanded.
-        List<Collectable> excessItems = [];
         int minorItemCount = possibleItemLocations.SelectMany(l => l.GetShufflableCollectables())
             .Count(c => c.IsMinorItem());
-        //Heart containers over 4 are excess
+        //Heart containers over 4 are excess (overworld bucket)
+        List<Collectable> overworldExcessItems = [];
         for (int i = 4; i < heartContainersInItemPool; i++)
         {
-            excessItems.Add(Collectable.HEART_CONTAINER);
+            overworldExcessItems.Add(Collectable.HEART_CONTAINER);
         }
-        //Magic containers over 4 are excess
         for (int i = 4; i < magicContainersInItemPool; i++)
         {
-            excessItems.Add(Collectable.MAGIC_CONTAINER);
+            overworldExcessItems.Add(Collectable.MAGIC_CONTAINER);
         }
-        //Palace items that didn't get placed in palaces are excess
+        //Palace items that didn't get placed in palaces are excess (palace bucket)
+        List<Collectable> palaceExcessItems = [];
         foreach (Collectable palaceItem in Enum.GetValues<Collectable>().Where(c => c.IsPalaceItem()))
         {
             if (!possibleItemLocations.SelectMany(l => l.GetAllCollectables()).Any(c => c == palaceItem)
                 && !props.StartsWithCollectable(palaceItem))
             {
-                excessItems.Add(palaceItem);
+                palaceExcessItems.Add(palaceItem);
             }
         }
+
+        //When the Overworld and Palace pools are mixed, palace excess items are free to
+        //spill into overworld locations. When they are separate, palace items must stay
+        //in palaces, so any that cannot be placed there make the seed infeasible.
+        if (!props.MixOverworldPalaceItems && props.ShufflePalaceItems && palaceExcessItems.Count > 0)
+        {
+            throw new Exception("Insufficient locations to place excess Palace items. The validation should have caught this.");
+        }
+        List<Collectable> excessItems = props.MixOverworldPalaceItems
+            ? [.. overworldExcessItems, .. palaceExcessItems]
+            : overworldExcessItems;
 
         List<Location> minorItemLocations = possibleItemLocations.Where(l => l.GetShufflableCollectables().Any(c => c.IsMinorItem())).ToList();
         int overflowLocationsRequired = excessItems.Count - minorItemCount;
