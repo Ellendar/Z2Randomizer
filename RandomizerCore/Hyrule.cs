@@ -1647,64 +1647,54 @@ public class Hyrule
                 if (props.ContinentConnections == ContinentConnectionType.NORMAL)
                 {
                     connections = [
-                        (westHyrule.LoadCave1(ROMData, Continent.WEST, Continent.DM), deathMountain.LoadCave1(ROMData, Continent.DM, Continent.WEST)),
-                        (westHyrule.LoadCave2(ROMData, Continent.WEST, Continent.DM), deathMountain.LoadCave2(ROMData, Continent.DM, Continent.WEST)),
-                        (westHyrule.LoadRaft(ROMData, Continent.WEST, Continent.EAST), eastHyrule.LoadRaft(ROMData, Continent.EAST, Continent.WEST)),
-                        (eastHyrule.LoadBridge(ROMData, Continent.EAST, Continent.MAZE), mazeIsland.LoadBridge(ROMData, Continent.MAZE, Continent.EAST))
+                        (westHyrule.LoadCave1(ROMData, Continent.DM), deathMountain.LoadCave1(ROMData, Continent.WEST)),
+                        (westHyrule.LoadCave2(ROMData, Continent.DM), deathMountain.LoadCave2(ROMData, Continent.WEST)),
+                        (westHyrule.LoadRaft(ROMData, Continent.EAST), eastHyrule.LoadRaft(ROMData, Continent.WEST)),
+                        (eastHyrule.LoadBridge(ROMData, Continent.MAZE), mazeIsland.LoadBridge(ROMData, Continent.EAST))
                     ];
                 }
                 else if (props.ContinentConnections == ContinentConnectionType.TRANSPORTATION_SHUFFLE)
                 {
-                    List<int> chosen = [];
-                    int type = r.Next(4);
-                    if (props.WestBiome.UsesVanillaMap()
-                        || props.DmBiome.UsesVanillaMap())
+                    // 1 = raft, 2 = bridge, 3 = cave1, 4 = cave2
+                    List<int> available = [1, 2, 3, 4];
+
+                    // Remove all vanilla-forced types before any random picks
+                    if (props.WestBiome.UsesVanillaMap() || props.DmBiome.UsesVanillaMap())
                     {
-                        type = 3;
+                        available.Remove(3); // west<->DM: cave1
+                        available.Remove(4); // west<->DM: cave2
+                    }
+                    if (props.WestBiome.UsesVanillaMap() || props.EastBiome.UsesVanillaMap())
+                    {
+                        available.Remove(1); // west<->east: raft
+                    }
+                    if (props.EastBiome.UsesVanillaMap() || props.MazeBiome.UsesVanillaMap())
+                    {
+                        available.Remove(2); // east<->maze: bridge
                     }
 
+                    int PickRandomType()
+                    {
+                        int idx = r.Next(available.Count);
+                        int t = available[idx];
+                        available.RemoveAt(idx);
+                        return t;
+                    }
+
+                    // west<->DM 1
+                    int type = props.WestBiome.UsesVanillaMap() || props.DmBiome.UsesVanillaMap() ? 3 : PickRandomType();
                     SetTransportation(0, 1, type);
-                    chosen.Add(type);
-                    if (props.WestBiome.UsesVanillaMap()
-                        || props.DmBiome.UsesVanillaMap())
-                    {
-                        type = 0;
-                    }
-                    else
-                    {
-                        do
-                        {
-                            type = r.Next(4);
-                        } while (chosen.Contains(type));
-                    }
+
+                    // west<->DM 2
+                    type = props.WestBiome.UsesVanillaMap() || props.DmBiome.UsesVanillaMap() ? 4 : PickRandomType();
                     SetTransportation(0, 1, type);
-                    chosen.Add(type);
-                    if (props.WestBiome.UsesVanillaMap()
-                        || props.EastBiome.UsesVanillaMap())
-                    {
-                        type = 1;
-                    }
-                    else
-                    {
-                        do
-                        {
-                            type = r.Next(4);
-                        } while (chosen.Contains(type));
-                    }
+
+                    // west<->east
+                    type = props.WestBiome.UsesVanillaMap() || props.EastBiome.UsesVanillaMap() ? 1 : PickRandomType();
                     SetTransportation(0, 2, type);
-                    chosen.Add(type);
-                    if (props.EastBiome.UsesVanillaMap()
-                        || props.MazeBiome.UsesVanillaMap())
-                    {
-                        type = 2;
-                    }
-                    else
-                    {
-                        do
-                        {
-                            type = r.Next(4);
-                        } while (chosen.Contains(type));
-                    }
+
+                    // east<->maze
+                    type = props.EastBiome.UsesVanillaMap() || props.MazeBiome.UsesVanillaMap() ? 2 : PickRandomType();
                     SetTransportation(2, 3, type);
                 }
                 else if(props.ContinentConnections == ContinentConnectionType.ANYTHING_GOES)
@@ -1755,8 +1745,8 @@ public class Hyrule
                         } while (raftw1 == raftw2 || doNotPick.Contains(raftw2));
                     }
 
-                    l1 = worlds[raftw1].LoadRaft(ROMData, (Continent)raftw1, (Continent)raftw2);
-                    l2 = worlds[raftw2].LoadRaft(ROMData, (Continent)raftw2, (Continent)raftw1);
+                    l1 = worlds[raftw1].LoadRaft(ROMData, (Continent)raftw2);
+                    l2 = worlds[raftw2].LoadRaft(ROMData, (Continent)raftw1);
                     connections[0] = (l1, l2);
 
                     int bridgew1 = r.Next(worlds.Count);
@@ -1784,8 +1774,8 @@ public class Hyrule
                         } while (bridgew1 == bridgew2 || doNotPick.Contains(bridgew2));
                     }
 
-                    l1 = worlds[bridgew1].LoadBridge(ROMData, (Continent)bridgew1, (Continent)bridgew2);
-                    l2 = worlds[bridgew2].LoadBridge(ROMData, (Continent)bridgew2, (Continent)bridgew1);
+                    l1 = worlds[bridgew1].LoadBridge(ROMData, (Continent)bridgew2);
+                    l2 = worlds[bridgew2].LoadBridge(ROMData, (Continent)bridgew1);
                     connections[1] = (l1, l2);
 
                     int c1w1 = r.Next(worlds.Count);
@@ -1813,8 +1803,8 @@ public class Hyrule
                         } while (c1w1 == c1w2 || doNotPick.Contains(c1w2));
                     }
 
-                    l1 = worlds[c1w1].LoadCave1(ROMData, (Continent)c1w1, (Continent)c1w2);
-                    l2 = worlds[c1w2].LoadCave1(ROMData, (Continent)c1w2, (Continent)c1w1);
+                    l1 = worlds[c1w1].LoadCave1(ROMData, (Continent)c1w2);
+                    l2 = worlds[c1w2].LoadCave1(ROMData, (Continent)c1w1);
                     connections[2] = (l1, l2);
 
                     int c2w1 = r.Next(worlds.Count);
@@ -1842,8 +1832,8 @@ public class Hyrule
                         } while (c2w1 == c2w2 || doNotPick.Contains(c2w2));
                     }
 
-                    l1 = worlds[c2w1].LoadCave2(ROMData, (Continent)c2w1, (Continent)c2w2);
-                    l2 = worlds[c2w2].LoadCave2(ROMData, (Continent)c2w2, (Continent)c2w1);
+                    l1 = worlds[c2w1].LoadCave2(ROMData, (Continent)c2w2);
+                    l2 = worlds[c2w2].LoadCave2(ROMData, (Continent)c2w1);
                     connections[3] = (l1, l2);
                 }
                 else
@@ -2032,33 +2022,37 @@ public class Hyrule
         }
     }
 
-    /// <param name="type">1 = raft, 2 = bridge, 3 = cave1, 4/other = cave2</param>
+    /// <param name="type">1 = raft, 2 = bridge, 3 = cave1, 4 = cave2</param>
     private void SetTransportation(int w1, int w2, int type)
     {
         Location l1, l2;
         if (type == 1)
         {
-            l1 = worlds[w1].LoadRaft(ROMData, (Continent)w1, (Continent)w2);
-            l2 = worlds[w2].LoadRaft(ROMData, (Continent)w2, (Continent)w1);
+            l1 = worlds[w1].LoadRaft(ROMData, (Continent)w2);
+            l2 = worlds[w2].LoadRaft(ROMData, (Continent)w1);
             connections[0] = (l1, l2);
         }
         else if (type == 2)
         {
-            l1 = worlds[w1].LoadBridge(ROMData, (Continent)w1, (Continent)w2);
-            l2 = worlds[w2].LoadBridge(ROMData, (Continent)w2, (Continent)w1);
+            l1 = worlds[w1].LoadBridge(ROMData, (Continent)w2);
+            l2 = worlds[w2].LoadBridge(ROMData, (Continent)w1);
             connections[1] = (l1, l2);
         }
         else if (type == 3)
         {
-            l1 = worlds[w1].LoadCave1(ROMData, (Continent)w1, (Continent)w2);
-            l2 = worlds[w2].LoadCave1(ROMData, (Continent)w2, (Continent)w1);
+            l1 = worlds[w1].LoadCave1(ROMData, (Continent)w2);
+            l2 = worlds[w2].LoadCave1(ROMData, (Continent)w1);
             connections[2] = (l1, l2);
+        }
+        else if (type == 4)
+        {
+            l1 = worlds[w1].LoadCave2(ROMData, (Continent)w2);
+            l2 = worlds[w2].LoadCave2(ROMData, (Continent)w1);
+            connections[3] = (l1, l2);
         }
         else
         {
-            l1 = worlds[w1].LoadCave2(ROMData, (Continent)w1, (Continent)w2);
-            l2 = worlds[w2].LoadCave2(ROMData, (Continent)w2, (Continent)w1);
-            connections[3] = (l1, l2);
+            throw new ArgumentOutOfRangeException();
         }
     }
 
