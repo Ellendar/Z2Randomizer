@@ -20072,6 +20072,7 @@
     "sideviewData": "2C600E08D70DDA0ED2F0A220F11990694A205071707290738720742064205420D2050071D20FF05800D601D6",
     "bitmask": "00",
     "requirements": ["FAIRY"],
+    "tags": ["NoMirror"],
     "suppressWarning": ["FallingBlockGenerator"],
     "hasItem": false,
     "hasBoss": false,
