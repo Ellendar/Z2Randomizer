@@ -627,11 +627,13 @@ TitleEnd:
 
 """, "randomizer_title_gamename.s");
 
-        // Also update the text on the title screen to our hot new L O R E
-        // There's 15 lines with 29 columns of tiles, with $fd as the 29th tile
-        // Realistically we can use 26 or so letters a line for it to be readable
-        // cause of the wall of sprites on the right
-        var titleText = """
+        if (marioMode)
+        {
+            // Also update the text on the title screen to our hot new L O R E
+            // There's 15 lines with 29 columns of tiles, with $fd as the 29th tile
+            // Realistically we can use 26 or so letters a line for it to be readable
+            // cause of the wall of sprites on the right
+            var titleText = """
 IN A LOCAL MILK BAR, MARIO
 AND LINK TRADED TALES OF
 PRINCESS PROBLEMS. MARIO
@@ -646,15 +648,16 @@ TO HYRULE TO PROVE LINK
 WRONG. BUT CAN HE ACTUALLY
 SAVE PRINCESS ZELDA...
 """.Trim();
-        var a = asm.Module();
-        a.Segment("PRG5");
-        foreach (var (line, i) in titleText.Split('\n').Select((item, index) => (item, index)))
-        {
-            var blankLine = Enumerable.Repeat((byte)0xf4,29).ToArray();
-            StringToZ2Bytes(line.Trim()).CopyTo(blankLine, 0);
-            blankLine[28] = 0xfd;
-            a.Org((ushort) (0xA932 + i * 29));
-            a.Byt(blankLine);
+            var a = asm.Module();
+            a.Segment("PRG5");
+            foreach (var (line, i) in titleText.Split('\n').Select((item, index) => (item, index)))
+            {
+                var blankLine = Enumerable.Repeat((byte)0xf4,29).ToArray();
+                StringToZ2Bytes(line.Trim()).CopyTo(blankLine, 0);
+                blankLine[28] = 0xfd;
+                a.Org((ushort) (0xA932 + i * 29));
+                a.Byt(blankLine);
+            }
         }
     }
 

@@ -2009,14 +2009,14 @@ public abstract class World
         raft.CanShuffle = false;
     }
 
-    public Location LoadRaft(ROM rom, Continent continent, Continent connectedContinent)
+    public Location LoadRaft(ROM rom, Continent connectedContinent)
     {
-        Debug.Assert(continent == continentId); // we can remove param if this is always true
-        var newRaft = rom.LoadLocation(LocationIDUtils.FromIndex(continent, Location.CONNECTOR_RAFT_ID), Terrain.BRIDGE);
+        var locId = LocationIDUtils.FromIndex(continentId, Location.CONNECTOR_RAFT_ID);
+        var newRaft = rom.LoadLocation(locId, Terrain.BRIDGE);
         AddLocation(newRaft);
-        raft = GetLocation(continent, Location.CONNECTOR_RAFT_ID);
+        raft = GetLocation(locId);
         Debug.Assert(newRaft == raft);
-        Debug.Assert(raft.Continent == continent);
+        Debug.Assert(raft.Continent == continentId);
         raft.ConnectedContinent = connectedContinent;
         raft.IsExternalWorld = true;
         raft.Map = Location.CONNECTOR_RAFT_ID;
@@ -2028,16 +2028,16 @@ public abstract class World
         return raft;
     }
 
-    public Location LoadBridge(ROM rom, Continent continent, Continent connectedContinent)
+    public Location LoadBridge(ROM rom, Continent connectedContinent)
     {
-        Debug.Assert(continent == continentId); // we can remove param if this is always true
-        var newBridge = rom.LoadLocation(LocationIDUtils.FromIndex(continent, Location.CONNECTOR_BRIDGE_ID), Terrain.BRIDGE, false);
-        Debug.Assert(newBridge.IsPassthrough == false);
-        Debug.Assert(newBridge.WasPassthrough == false);
+        var locId = LocationIDUtils.FromIndex(continentId, Location.CONNECTOR_BRIDGE_ID);
+        var newBridge = rom.LoadLocation(locId, Terrain.BRIDGE, false);
         AddLocation(newBridge);
-        bridge = GetLocation(continent, Location.CONNECTOR_BRIDGE_ID);
+        bridge = GetLocation(locId);
         Debug.Assert(newBridge == bridge);
-        Debug.Assert(bridge.Continent == continent);
+        Debug.Assert(bridge.Continent == continentId);
+        Debug.Assert(bridge.IsPassthrough == false);
+        Debug.Assert(bridge.WasPassthrough == false);
         bridge.ConnectedContinent = connectedContinent;
         bridge.IsExternalWorld = true;
         bridge.Map = Location.CONNECTOR_BRIDGE_ID;
@@ -2048,14 +2048,14 @@ public abstract class World
         return bridge;
     }
 
-    public Location LoadCave1(ROM rom, Continent world, Continent connectedContinent)
+    public Location LoadCave1(ROM rom, Continent connectedContinent)
     {
-        Debug.Assert(world == continentId); // we can remove param if this is always true
-        var newCave = rom.LoadLocation(LocationIDUtils.FromIndex(world, Location.CONNECTOR_CAVE1_ID), Terrain.CAVE);
+        var locId = LocationIDUtils.FromIndex(continentId, Location.CONNECTOR_CAVE1_ID);
+        var newCave = rom.LoadLocation(locId, Terrain.CAVE);
         AddLocation(newCave);
-        cave1 = GetLocation(world, Location.CONNECTOR_CAVE1_ID);
+        cave1 = GetLocation(locId);
         Debug.Assert(newCave == cave1);
-        Debug.Assert(cave1.Continent == world);
+        Debug.Assert(cave1.Continent == continentId);
         cave1.ConnectedContinent = connectedContinent;
         cave1.IsExternalWorld = true;
         cave1.Map = Location.CONNECTOR_CAVE1_ID;
@@ -2067,17 +2067,16 @@ public abstract class World
         return cave1;
     }
 
-    public Location LoadCave2(ROM rom, Continent world, Continent connectedContinent)
+    public Location LoadCave2(ROM rom, Continent connectedContinent)
     {
-        Debug.Assert(world == continentId); // we can remove param if this is always true
-        var newCave = rom.LoadLocation(LocationIDUtils.FromIndex(world, Location.CONNECTOR_CAVE2_ID), Terrain.CAVE);
+        var locId = LocationIDUtils.FromIndex(continentId, Location.CONNECTOR_CAVE2_ID);
+        var newCave = rom.LoadLocation(locId, Terrain.CAVE);
         AddLocation(newCave);
-        cave2 = GetLocation(world, Location.CONNECTOR_CAVE2_ID);
+        cave2 = GetLocation(locId);
         Debug.Assert(newCave == cave2);
-        Debug.Assert(cave2.Continent == world);
+        Debug.Assert(cave2.Continent == continentId);
         cave2.ConnectedContinent = connectedContinent;
         cave2.IsExternalWorld = true;
-        cave2.Continent = world;
         cave2.Map = Location.CONNECTOR_CAVE2_ID;
         Debug.Assert(cave2.TerrainType == Terrain.CAVE);
         cave2.CanShuffle = true;
