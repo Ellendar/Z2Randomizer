@@ -15,7 +15,7 @@ public class PalaceTests
         (PalaceLengthOption.SHORT, false,  [9, 10, 9, 10, 12, 12, 28],   [12, 15, 13, 15, 17, 17, 37]),
         (PalaceLengthOption.MEDIUM, false, [10, 13, 10, 13, 16, 15, 33], [14, 18, 14, 18, 22, 21, 45]),
         (PalaceLengthOption.FULL, false,   [12, 18, 13, 18, 24, 23, 47], [17, 25, 18, 25, 21, 20, 61]),
-        (PalaceLengthOption.RANDOM, false, [7, 10, 8, 10, 14, 14, 28],   [17, 25, 18, 25, 21, 20, 61]),
+        (PalaceLengthOption.RANDOM, false, [8, 10, 8, 10, 14, 14, 28],   [17, 25, 18, 25, 21, 20, 61]),
     ];
 
     [TestMethod]

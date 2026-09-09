@@ -199,7 +199,7 @@ public class Palaces
         bool ShouldRollForGP() => conf.GpLength != PalaceLengthOption.FULL || !props.PalaceStyles[6].UsesVanillaRoomPool();
         // Helper functions that makes sure that Vanilla palace lengths are
         // within the range that `Shorten()` can deliver.
-        int LowerLimit(int i) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_MIN_PALACE_LENGTHS[i] : 2;
+        int LowerLimit(int i) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_MIN_PALACE_LENGTHS[i] : 8;
         int UpperLimit(int i, int limit = 63) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_LENGTHS[i] : limit;
 
         // when shortening, remove proportionally more rooms from longer palaces
