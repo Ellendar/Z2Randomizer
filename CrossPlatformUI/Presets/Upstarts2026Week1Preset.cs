@@ -15,7 +15,7 @@ Starting items and spells: Candle, Life, Fairy, Downstab
 - Random Walk short palaces
 - Vanilla continent connectors
 - Spells in towns
-- Quest items in vanilla locations
+- Bagu's Letter, Mirror, Water in their vanilla locations
 - River Devil blocks path
 """;
 
@@ -45,6 +45,8 @@ Starting items and spells: Candle, Life, Fairy, Downstab
         RemoveLongDeadEnds = true,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
+        ShuffleOverworldEnemies = true,
+        ShufflePalaceEnemies = true,
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
         NoDuplicateRoomsByLayout = true,
