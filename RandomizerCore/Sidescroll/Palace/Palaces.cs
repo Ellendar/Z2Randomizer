@@ -189,7 +189,7 @@ public class Palaces
         return palaces;
     }
 
-    public static int[] RollPalaceLengths(RandomizerConfiguration conf, RandomizerProperties props, Random r)
+    public static int[] RollPalaceLengths(RandomizerConfiguration conf, RandomizerProperties props, IRandom r)
     {
         int[] sizes = [.. VANILLA_LENGTHS];
         double[] rollBase = [.. VANILLA_LENGTHS];
@@ -308,7 +308,7 @@ public class Palaces
         return sizes;
     }
 
-    public static int RollPalaceLength(Random random, double baseLength, PalaceLengthOption length, int hardMin = 2, int hardMax = 61)
+    public static int RollPalaceLength(IRandom random, double baseLength, PalaceLengthOption length, int hardMin = 2, int hardMax = 61)
     {
         var rr = length.GetRandomRangeDouble()!;
         int intMin = (int)Math.Round(rr.Low * baseLength);
