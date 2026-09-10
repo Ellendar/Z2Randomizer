@@ -404,6 +404,10 @@ ExpandedGetItem:
         tya
         sec
         sbc #ITEM_SHIELD_SPELL
+.if SHUFFLED_SPELL_LIST
+        tay
+        lda ShuffledSpellList,Y
+.endif
         pha
         ; Now check to see if this is the first spell we've learned.
         ; if it is, then we want to update the cursor to its position

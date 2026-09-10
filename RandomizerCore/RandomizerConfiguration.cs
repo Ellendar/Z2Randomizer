@@ -1583,7 +1583,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             Debug.Assert(properties.LinkedFireSpell == null);
         }
 
-        //If spells are in the shuffle pool, shuffle spells means nothing, so diable it
+        //If spells are in the shuffle pool, shuffle spells means nothing, so disable it
         if(properties.IncludeSpellsInShuffle)
         {
             properties.ShuffleSpellLocations = false;

@@ -3067,9 +3067,22 @@ CustomFileSelectData:
         {
             a.Set($"{val.ToString()}_DIALOG_EAST_INDEX", (int)val);
         }
+        if (props.ShuffleSpellLocations)
+        {
+            var spellBytes = new byte[8];
+            for (byte i = 0; i < 8; i++)
+            {
+                spellBytes[spellListOrder[i].VanillaSpellOrder()] = i;
+            }
+            a.Segment("PRG7");
+            a.Reloc();
+            a.Label("ShuffledSpellList");
+            a.Byt(spellBytes);
+        }
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
         a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", 1); // always on now, so starting spells can be replaced by minor items
+        a.Set("SHUFFLED_SPELL_LIST", props.ShuffleSpellLocations ? 1 : 0);
         a.Assign("ENABLE_Z2_MARIO", props.MarioMode ? 1 : 0);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }

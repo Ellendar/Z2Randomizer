@@ -857,9 +857,11 @@ styles.</value>
 3. This amount is always the same throughout the seed.</value>
 	</data>
 	<data name="ShuffleSpellLocationsToolTip" xml:space="preserve">
-<value>Spells will be shuffled into random towns. This also changes the spell order on the menu
-so each spell is in the slot corresponding to the town you got it. Has no effect if used
-with &quot;Include spells in shuffle&quot;</value>
+<value>Without "Include spells in shuffle", spells are shuffled among the town wizards.
+The spell menu is also reordered so that each spell appears in the slot corresponding
+to the town where you obtained it.
+
+With "Include spells in shuffle", this has no effect.</value>
 	</data>
 	<data name="DisableMagicContainerRequirementsToolTip" xml:space="preserve">
 <value>Removes the requirement to have 5/6/7/8 magic containers to visit the wizard in the
