@@ -808,7 +808,8 @@ public class Hyrule
                 spellItemTowns.Add([westHyrule.sariaNorth, eastHyrule.nabooru]);
             }
 
-            foreach (Location location in spellItemTowns)
+            var allTowns = possibleItemLocations.Where(i => i.Town != null && i?.Town?.Type != TownType.BAGU);
+            foreach (Location location in allTowns)
             {
                 Collectable wizardCollectable = (Collectable)location.Town!.GetWizard()!.Collectable!;
                 if (props.StartsWithCollectable(wizardCollectable))
@@ -3068,7 +3069,7 @@ CustomFileSelectData:
         }
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
-        a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", props.IncludeSpellsInShuffle ? 1 : 0);
+        a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", 1); // always on now, so starting spells can be replaced by minor items
         a.Assign("ENABLE_Z2_MARIO", props.MarioMode ? 1 : 0);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
