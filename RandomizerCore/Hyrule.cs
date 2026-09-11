@@ -747,10 +747,16 @@ public class Hyrule
         else if(props.ShuffleSpellLocations)
         {
             ShuffleSpells();
-            spellListOrder = possibleItemLocations.Where(i => i.Town != null && i?.Town?.Type != TownType.BAGU)
-                .OrderBy(i => (int)i.Town!.Type!)
-                .Select(i => (Collectable)i.Town!.GetWizard()!.Collectable!)
-                .ToList();
+            //Mario's spell list is inherently always vanilla (until we either update mario to not break with a shuffled spell list)
+            //or we add the option to choose vanilla spell order, in which case properties should always set that to true for mario
+            //and this conditional should be that one
+            if(!props.MarioMode)
+            {
+                spellListOrder = possibleItemLocations.Where(i => i.Town != null && i?.Town?.Type != TownType.BAGU)
+                    .OrderBy(i => (int)i.Town!.Type!)
+                    .Select(i => (Collectable)i.Town!.GetWizard()!.Collectable!)
+                    .ToList();
+            }
         }
 
 

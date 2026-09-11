@@ -258,6 +258,7 @@ public class RandomizerProperties
         {
             Collectable.SHIELD_SPELL => StartShield,
             Collectable.JUMP_SPELL => StartJump,
+            Collectable.TANOOKI => StartJump,
             Collectable.LIFE_SPELL => StartLife,
             Collectable.FAIRY_SPELL => StartFairy,
             Collectable.FIRE_SPELL => StartFire,
