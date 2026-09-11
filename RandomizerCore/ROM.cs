@@ -1798,6 +1798,23 @@ ActualLavaDeath:                     ; original code that we replaced
     {
         a.Code(/* lang=s */$"""
 .include "z2r.inc"
+
+; Carock gets shuffled around in all potential enemy sprite slots.
+; This is normal for sideview enemies, but not for bosses.
+; Other bosses override the shuffled sprite offset with a fixed number
+; to prevent the enemy sprites overwriting the HP bar sprites.
+.segment "PRG4"
+.org $ae7b
+    jsr PinCarockSpriteSlot
+.reloc
+PinCarockSpriteSlot:
+    lda #$58
+    sta SpriteShuffleOffsetEnemy0,x
+    jmp $b20d  ; continue to original jsr
+""");
+
+        a.Code(/* lang=s */$"""
+.include "z2r.inc"
 .segment "PRG4"
 .reloc
 Bank4BossHpDivisorLo:
@@ -1824,8 +1841,10 @@ Bank4BossHpDivisorHi:
     jsr DoDivisionByRepeatedSubtraction
     nop
 .assert * = $9C51
+
 .org $9C7A
-    jmp HandleOverHP 
+    jmp HandleOverHP
+
 .reloc
 HandleOverHP:
     dey ; 1 or below means that the boss is 100% or less HP, so no over health
