@@ -189,7 +189,7 @@ public class Palaces
         return palaces;
     }
 
-    public static int[] RollPalaceLengths(RandomizerConfiguration conf, RandomizerProperties props, Random r)
+    public static int[] RollPalaceLengths(RandomizerConfiguration conf, RandomizerProperties props, IRandom r)
     {
         int[] sizes = [.. VANILLA_LENGTHS];
         double[] rollBase = [.. VANILLA_LENGTHS];
@@ -199,7 +199,7 @@ public class Palaces
         bool ShouldRollForGP() => conf.GpLength != PalaceLengthOption.FULL || !props.PalaceStyles[6].UsesVanillaRoomPool();
         // Helper functions that makes sure that Vanilla palace lengths are
         // within the range that `Shorten()` can deliver.
-        int LowerLimit(int i) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_MIN_PALACE_LENGTHS[i] : 2;
+        int LowerLimit(int i) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_MIN_PALACE_LENGTHS[i] : 8;
         int UpperLimit(int i, int limit = 63) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_LENGTHS[i] : limit;
 
         // when shortening, remove proportionally more rooms from longer palaces
@@ -308,7 +308,7 @@ public class Palaces
         return sizes;
     }
 
-    public static int RollPalaceLength(Random random, double baseLength, PalaceLengthOption length, int hardMin = 2, int hardMax = 61)
+    public static int RollPalaceLength(IRandom random, double baseLength, PalaceLengthOption length, int hardMin = 2, int hardMax = 61)
     {
         var rr = length.GetRandomRangeDouble()!;
         int intMin = (int)Math.Round(rr.Low * baseLength);

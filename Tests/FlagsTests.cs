@@ -305,7 +305,7 @@ public class FlagsTests
         var formatted = OutputFilenameFormatter.Format("%d-%f-%s-%h.nes", "FLAGS", "0123", "HA SH", timestamp);
 
         Assert.AreEqual("2026-05-31-1953-FLAGS-0123-HASH.nes", formatted);
-        Assert.AreEqual("Z2-FLAGS-0123-HASH.nes", OutputFilenameFormatter.Format("", "FLAGS", "0123", "HASH", timestamp));
+        Assert.AreEqual("Z2-0123-HASH-FLAGS.nes", OutputFilenameFormatter.Format("", "FLAGS", "0123", "HASH", timestamp));
     }
 
     [TestMethod]

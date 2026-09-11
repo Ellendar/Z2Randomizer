@@ -969,10 +969,9 @@ public class CustomTexts
         List<Collectable> items = locations.SelectMany(i => i.GetAllCollectables()).ToList();
         items = items.Where(i => !i.IsInternalUse()).ToList();
 
-        if (props.SpellItemHints && props.IncludeSwordTechsInShuffle)
+        if (!props.IncludeSpellsInShuffle)
         {
-            items.Remove(Collectable.DOWNSTAB);
-            items.Remove(Collectable.UPSTAB);
+            items.RemoveAll(o => o.IsSpell());
         }
 
         if (props.StartWithSpellItems || props.SpellItemHints)
@@ -982,10 +981,20 @@ public class CustomTexts
             items.Remove(Collectable.MEDICINE);
         }
 
-        if(props.SpellItemHints && props.IncludeSpellsInShuffle)
+        if (!props.IncludeQuestItemsInShuffle || props.SpellItemHints)
         {
             items.Remove(Collectable.MIRROR);
             items.Remove(Collectable.WATER);
+        }
+        if (!props.IncludeQuestItemsInShuffle)
+        {
+            items.Remove(Collectable.BAGUS_NOTE);
+        }
+
+        if (!props.IncludeSwordTechsInShuffle || props.SpellItemHints)
+        {
+            items.Remove(Collectable.DOWNSTAB);
+            items.Remove(Collectable.UPSTAB);
         }
 
         int hintsCount = HELPFUL_HINTS_COUNT;

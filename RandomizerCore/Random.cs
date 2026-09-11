@@ -16,7 +16,12 @@ using System.Runtime.InteropServices;
 
 namespace Z2Randomizer.RandomizerCore;
 
-public class Random
+public interface IRandom
+{
+    public int Next(int minValue, int maxValue);
+}
+
+public class Random : IRandom
 {
     private ulong _s0, _s1, _s2, _s3;
 

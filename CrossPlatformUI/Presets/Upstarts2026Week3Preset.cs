@@ -16,7 +16,7 @@ Starting items and spells: Candle, Shield, Downstab
 - River Devil blocks cave
 - Palaces can swap continents, GP in Valley of Death
 - Shuffle enemies, not mixed
-- Attack and life levels set to random
+- Attack and life effectiveness set to random
 """;
 
     public static readonly RandomizerConfiguration Preset = new()
@@ -67,6 +67,7 @@ Starting items and spells: Candle, Shield, Downstab
         DripperEnemyOption = DripperEnemyOption.ANY_GROUND_ENEMY,
         ShuffleEnemyHP = EnemyLifeOption.MEDIUM,
         ShuffleBossHP = EnemyLifeOption.MEDIUM,
+        SwordImmunityOption = SwordImmunityOption.SHUFFLE,
         EnemyXPDrops = XPEffectiveness.RANDOM,
         ShufflePalaceItems = true,
         ShuffleOverworldItems = true,
