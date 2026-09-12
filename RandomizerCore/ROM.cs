@@ -2164,6 +2164,98 @@ NewLinkHitRoutine:
     sta EnemyState,x
     jmp LinkHitRoutine
 
+
+Test_Link_Hitbox = $e9f9
+
+; Code to fix enemies with shields falling into pits and phantom-colliding
+; with Link's sword repeatedly. Also clamps hitboxes vertically so they can't
+; screen-wrap. Horizontal screen-wraps are preserved.
+;
+; 2-column indexed AABB test
+; X = pass/axis: 0=horizontal, 1=vertical
+;
+; Both passes must set carry for an overlap.
+; Carry set on exit = hit.
+;
+; This is called multiple times for Link's body, sword and shield.
+; zp_00 - Link's hitbox left
+; zp_01 - Link's hitbox top
+; zp_02 - Link's hitbox width   - 05 for Link's shield, 0D for Link
+; zp_03 - Link's hitbox height  - 0C for Link's shield, 1D for Link
+; zp_04 - Enemy hitbox left
+; zp_05 - Enemy hitbox top
+; zp_06 - Enemy hitbox width
+; zp_07 - Enemy hitbox height
+
+.org Test_Link_Hitbox
+
+    ; This function is called for Link's sword even when its
+    ; Y position is $F8 (=off-screen sprite, not in use).
+    ; Quick return for that case to avoid collisions with
+    ; enemies at the bottom of the screen.
+    ; This is the important fix. I tried the other things before
+    ; I figured this out, but they are probably still improvements.
+    lda zp_01
+    cmp #$f8
+    bcs @Clear
+
+    ; Link's (body/sword/shield) vertical hitbox must not wrap.
+    ; Clip Link's height if it would overflow.
+    ; CLC is implied since BCS failed
+    adc zp_03
+    bcc @NoLinkOverflow
+
+    lda #$ff
+    ; SEC is implied since BCC failed
+    sbc zp_01
+    sta zp_03
+
+@NoLinkOverflow:
+    ; Clip enemy's vertical hitbox if would overflow.
+    lda zp_05
+    clc
+    adc zp_07
+    jmp Test_Link_Hitbox_Continued
+
+@Clear:
+    clc
+    ; X wasn't touched, don't load it
+    rts
+
+FREE_UNTIL $ea14
+
+.reloc
+Test_Link_Hitbox_Continued:
+    bcc @CollisionMath
+
+    lda #$ff
+    ; SEC is implied since BCC failed
+    sbc zp_05
+    sta zp_07
+
+@CollisionMath:
+    ldx #$01
+@CollisionLoop:
+    lda zp_04,x
+    clc
+    adc zp_06,x
+    sec
+    sbc zp_00,x
+    sta zp_0f
+
+    lda zp_02,x
+    clc
+    adc zp_06,x
+    cmp zp_0f
+    bcc @ExitNew
+
+    dex
+    bpl @CollisionLoop
+
+@ExitNew:
+    ldx EnemyIndex
+    rts
+
 """);
     }
 
