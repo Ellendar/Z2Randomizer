@@ -2141,6 +2141,32 @@ ResetRedPalettePayload:
 """);
     }
 
+    public void CollisionFixes(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+.segment "PRG7"
+
+LinkHitRoutine = $e2ef
+
+; Fix rare repeated phantom damage occuring if an enemy (Rebonack)
+; collides with Link one frame and goes off-screen the next,
+; leaving the collision bit set.
+.org $d6c7
+    jmp NewLinkHitRoutine
+
+.reloc
+NewLinkHitRoutine:
+    lda EnemyState,x
+    and #$ef            ; clear enemy colliding with Link bit (...x ....) before collision logic runs
+    sta EnemyState,x
+    jmp LinkHitRoutine
+
+""");
+    }
+
     // Makes the background black when thunder is cast for accessibility
     public void DarkenThunderbirdRoom(Assembler asm)
     {
