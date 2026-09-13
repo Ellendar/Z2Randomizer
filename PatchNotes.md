@@ -1,5 +1,17 @@
 # Z2Randomizer Changelog
 
+## Version 5.2.1 - September 12, 2026
+- Updated Upstarts flags
+- Fixed several item shuffle bugs that could cause seeds to not generate.
+- Increased the global minimum palace size from 6 to 8 rooms.
+- Fixed small items not replacing starting spells on wizards when spells are not included in shuffle.
+- Fixed a bug where helpful hints could be for unshuffled items.
+- Fixed carock's HP bar sometimes flickering.
+- Fixed a bug where hints for items held by bagu could be incorrect.
+- Fixed a bug where Linux users sometimes loaded an incorrect theme on the UI.
+- Fixed a bug where Mario's lore crawl could appear for Link.
+- Fixed a bug where Mario couldn't start with the tanooki Spell
+
 ## Version 5.2.0 - September 1, 2026
 
 ### New Features
