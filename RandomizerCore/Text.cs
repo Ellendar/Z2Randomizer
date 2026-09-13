@@ -85,7 +85,7 @@ public class Text : IEquatable<Text>
         return true;
     }
 
-    public static Text GenerateHelpfulHint(Location location, Collectable collectable, bool useTownSpecificHints)
+    public static Text GenerateHelpfulHint(Location location, Collectable collectable, bool useTownSpecificHints, bool baguIsTown)
     {
         string? hint = null;
         if (location.Palace?.Number == 1)
@@ -112,7 +112,8 @@ public class Text : IEquatable<Text>
         {
             hint = "barba$slithers$with the$%%";
         }
-        else if (useTownSpecificHints && location.Town != null)
+        else if (useTownSpecificHints && location.Town != null
+            && (baguIsTown || location.Town.Type != TownType.BAGU))
         {
             hint = $"{((TownType)location.Town.Type!).HintName()}$has the$%%";
         }

@@ -50,6 +50,7 @@ public static class TownExtensions
             TownType.DARUNIA => "DARUNIA",
             TownType.NEW_KASUTO => "NEW KASUTO",
             TownType.OLD_KASUTO => "OLD KASUTO",
+            TownType.BAGU => "BAGU",
             _ => "UNKNOWN"
         };
     }
