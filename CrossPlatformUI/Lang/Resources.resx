@@ -604,11 +604,15 @@ Remember to use the flute again on the way out.</value>
 <value>If enabled, 0-2 of the path blocks on the east may be rocks.</value>
 	</data>
 	<data name="RestrictConnectionCaveShuffleToolTip" xml:space="preserve">
-<value>When this option is selected, passthrough caves will be placed in a more logical way, such
-that the entrance of a cave will point to where the other side of the cave is. For
-example, if you enter a cave going north, you know that when you exit the other side of
-the cave you will be directly north of where you went in. The distance between cave exits
-is also restricted, such that you can often see the exit before entering the cave.
+<value>When this option is selected, passthrough caves will be placed in a more logical way.
+
+  • The cave entrances and exits will always face each other.
+  • The exit can be offset by a maximum of 3 tiles perpendicular to the direction of the cave.
+    For example, for a right-facing cave, the exit can be at most 3 tiles above or below
+    the entrance on the horizontal axis.
+  • In Death Mountain only: The terrain immediately outside the entrance and exit must match.
+    For example, if the entrance of a cave has grass directly in front of it, the
+    corresponding exit will also have grass in front of it.
 
 It is not recommended to disable this.</value>
 	</data>
