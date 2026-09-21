@@ -2234,7 +2234,7 @@ FixedTbirdExplosionHandler:
     }
 
     // Allows Thunderbird room entry from left or right
-    public void ThunderbirdEnterLeftFix(Assembler asm)
+    public void ThunderbirdEnterGoingLeftFix(Assembler asm)
     {
         var a = asm.Module();
         a.Code(/* lang=s */"""
@@ -2276,7 +2276,7 @@ ThunderbirdFixedScrollCheck:
         jsr ElevatorBossFix      ; will freeze the scrolling (and more)
         lda #$90
         sta $0504,x              ; set timer for Thunderbird to begin
-    
+
     @TimerRunning:
     lda ScrollLeftX
     beq @NoScroll

@@ -3864,7 +3864,7 @@ FlagHudUpdate:
         rom.FixItemPickup(engine);
         rom.FixMinibossGlitchyAppearance(engine);
         rom.FixBossKillPaletteGlitch(engine);
-        rom.ThunderbirdEnterLeftFix(engine);
+        rom.ThunderbirdEnterGoingLeftFix(engine);
         rom.FixThunderbirdThunderDeath(engine);
 
         if ( props.DarkenThunderbird ) {
