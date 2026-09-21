@@ -84,17 +84,17 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         }
     }
 
-    public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false, bool allowBossEnterLeft = false)
+    public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false, bool allowBossEnterGoingLeft = false)
     {
         if (Entrance == null)
         {
             throw new Exception("Palace Entrance is missing");
         }
-        if (!allowBossEnterLeft)
+        if (!allowBossEnterGoingLeft)
         {
             foreach (Room r in AllRooms)
             {
-                if (r.HasBoss && CanEnterBossFromLeft(r))
+                if (r.HasBoss && CanEnterBossGoingLeft(r))
                 {
                     return [Entrance];
                 }
@@ -108,7 +108,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             var (room, originDirection) = roomsToCheck.Pop();
 
             //For required thunderbird, you can't path backwards into tbird room
-            if (!allowBossEnterLeft)
+            if (!allowBossEnterGoingLeft)
             {
                 if ((Number == 7 && room.IsThunderBirdRoom) || (Number < 7 && room.IsBossRoom))
                 {
@@ -238,13 +238,13 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false; // Boss room not found?
     }
 
-    public bool AllReachable(bool allowBacktracking = false, bool allowBossEnterLeft = false)
+    public bool AllReachable(bool allowBacktracking = false, bool allowBossEnterGoingLeft = false)
     {
-        var reachableRooms = GetReachableRooms(allowBacktracking: allowBacktracking, allowBossEnterLeft: allowBossEnterLeft);
+        var reachableRooms = GetReachableRooms(allowBacktracking: allowBacktracking, allowBossEnterGoingLeft: allowBossEnterGoingLeft);
         return AllRooms.All(i => reachableRooms.Contains(i));
     }
 
-    private bool CanEnterBossFromLeft(Room b)
+    private bool CanEnterBossGoingLeft(Room b)
     {
         HashSet<Room> reachable = [];
         Stack<Room> roomsToCheck = [];

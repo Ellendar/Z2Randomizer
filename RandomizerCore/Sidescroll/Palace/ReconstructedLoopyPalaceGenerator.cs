@@ -38,6 +38,6 @@ public class ReconstructedLoopyPalaceGenerator(CancellationToken ct) : Reconstru
 
     public override bool AllReachable(Palace palace)
     {
-        return palace.AllReachable(allowBossEnterLeft: palace.Number == 7);
+        return palace.AllReachable(allowBossEnterGoingLeft: palace.Number == 7);
     }
 }
