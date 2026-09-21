@@ -345,7 +345,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
     public virtual bool AllReachable(Palace palace)
     {
-        return palace.AllReachable(allowBossEnterLeft: false);
+        return palace.AllReachable(allowBossEnterGoingLeft: false);
     }
 
     /// <summary>
