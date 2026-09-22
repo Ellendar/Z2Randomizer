@@ -2360,14 +2360,87 @@ FixedTbirdExplosionHandler:
 
 .segment "PRG4"
 
+REBO_UNHORSED = $0a
+REBONAK = $20
+BARBA = $21
+CAROCK = $22
+
+; Replacing this subroutine to remove hardcoding of page 1
+bank4_Enemy_Init_Routines_Horsehead__Rebonack = $bca1
+CheckItemPresenceBitXInRoom = $c2a6
+.org bank4_Enemy_Init_Routines_Horsehead__Rebonack
+FREE_UNTIL $bcbc
+
+.reloc
+; output: carry set if this boss is already dead (slot freed)
+BossCheckPresenceBit:
+    lda EnemyXPositionHi,x
+    tax
+    jsr CheckItemPresenceBitXInRoom
+    bne @Alive
+        ldx EnemyIndex
+        sta EnemyStatus,x              ; A is 0 here from jsr
+        sec
+        rts
+    @Alive:
+    ldx EnemyIndex
+    clc
+    rts
+
+.reloc
+BossCheckBitsAndSetup:
+    jsr BossCheckPresenceBit
+    bcs @BossCheckBitsAndSetupDone
+    ldy EnemyType,x
+    lda #$02
+    sta EnemyVulnerabilityDamageCodes,x
+    lda #$07
+    sta EnemySizeCodesRamCopy,y
+@BossCheckBitsAndSetupDone:
+    rts
+
+.org $9485
+    .word BossCheckBitsAndSetup
+.org $bc7e
+    jsr BossCheckBitsAndSetup
+
+; replace vanilla hardcoded page 1 code
+P346RebonackInitRoutine = $af91
+.org P346RebonackInitRoutine
+    jsr BossCheckPresenceBit
+    bcs @Done
+    lda #$00
+    sta $0504,x                     ; clear timer like vanilla
+    lda #$ac                        ; rebo vanilla X start position
+    sta EnemyYPositionLo,x
+    inc EnemyXPositionHi,x          ; push Rebo one page right (off-screen if coming from the left)
+@Done:
+    rts
+FREE_UNTIL $afb3                    ; $afb3 is used in a couple of places as the closest RTS - must keep
+
+; Rebo unhorsed "size code" was set dynamically but always to 0 - just set it in the table
+bank4_Enemy_Size_Codes1 = $aa1d
+.org bank4_Enemy_Size_Codes1 + REBO_UNHORSED
+    .byt $00
+
+bank4_Enemy_Routines1_Iron_Knuckle = $9e45
+ReboUnhorsedEnemyRoutine = $af12
+; just save some bytes here (the vanilla code is stupid)
+.org ReboUnhorsedEnemyRoutine
+    ldy #$80
+    sty SpriteShuffleOffsetEnemy0,x          ; fix sprite slot to respect boss HP bar
+    jmp bank4_Enemy_Routines1_Iron_Knuckle
+FREE_UNTIL $af22                             ; might need to be $af21 if the table that follows is ever referenced at 0
+
+P346BarbaInitRoutine = $b0fe
+P346CarockInitRoutine = $b107    ; also drop-through from Barba routine
+.org P346CarockInitRoutine
+    jmp BossCheckPresenceBit
+FREE_UNTIL $b115
+
 P125BossRoutineStart = $be8b   ; (Horsehead/Helmethead/Gooma)
 P125BossRoutineMain = $be9c
 P125BossRoutineEnd = $bef0
-
-P346BossRoutineStart = $b20d   ; (Carock/Rebonack/Barba)
-P346BossRoutineMain = $b225
-P346BossRoutineEnd = $b23c
-
 .org P125BossRoutineStart
     jsr BossFixedScrollCheck
     bcs P125BossRoutineEnd
@@ -2375,8 +2448,11 @@ P346BossRoutineEnd = $b23c
     bne P125BossRoutineMain    ; skip setup when ScrollFrozen != 0
 .assert * = $be95
 
+P346BossRoutineStart = $b20d   ; (Carock/Rebonack/Barba)
+P346BossRoutineMain = $b225
+P346BossRoutineEnd = $b23c
 .org P346BossRoutineStart
-    jsr BossFixedScrollCheck
+    jsr P346CallScrollCheck
     bcs P346BossRoutineEnd
     jsr ScrollScreenXToZero
     bne P346BossRoutineMain    ; skip setup when ScrollFrozen != 0
@@ -2384,20 +2460,43 @@ P346BossRoutineEnd = $b23c
 
 .reloc
 ; Finer scroll position check to determine if boss should trigger
-; Carry will be clear when boss should be triggered
+; output: Carry clear <=> Boss should be triggered
 BossFixedScrollCheck:
+    lda ScrollFrozen
+    bne @AlreadyFrozen
     lda ScrollLeftPage
-    cmp #$01
-    bne @InWrongPage
+    cmp EnemyXPositionHi,x       ; trigger when the screen scrolls onto the current enemy's page
+    bne @NotInPosition
+    lda LinkXPositionLo
+    bmi @NotInPosition
+    cmp #$6f                     ; additional check to make page 0 bosses work
+    bcc @NotInPosition
     lda ScrollLeftX
     cmp #$04                     ; need at least 3 pixel margin so dash speed can't skip the trigger point
     rts                          ; result of CMP determines if boss will spawn
-    @InWrongPage:
+    @AlreadyFrozen:
+    clc                          ; carry clear = continue boss routine
+    rts
+    @NotInPosition:
     sec                          ; carry set = don't spawn boss
     rts
 
+; this is reached while the boss is suspended (as in Rebo before he charges in)
+; his regular routine is not called during this time, so this is hooked to settle the scroll
+EnemySuspended = $afcb
+bank7_Display = $ef11
+.org EnemySuspended
+    jsr EnemySuspendHook
+
 .reloc
-; input: ScrollLeftX must be in A
+EnemySuspendHook:
+    lda ScrollFrozen
+    beq @EnemySuspendTickReturn
+    jsr ScrollScreenXToZero
+@EnemySuspendTickReturn:
+    jmp bank7_Display             ; go to the jsr the hook overwrote
+
+; output: ScrollFrozen in A
 ScrollScreenXToZero:
     lda ScrollLeftPage
     beq @NoScroll
@@ -2406,15 +2505,27 @@ ScrollScreenXToZero:
     bne @NoScroll                ; slow down screen scroll to every other frame
     clc                          ; ensure sbc subtracts 1 regardless of carry state on entry
     lda ScrollLeftX
-    sbc #$00
+    sbc #$00                     ; A-=1 (due to sbc with carry clear)
     bcs @SetScrollX
         lda #$00                 ; clamp to 0
-    @SetScrollX:
+@SetScrollX:
     sta ScrollLeftX
     sta ScrollPosShadow
-    @NoScroll:
+@NoScroll:
     lda ScrollFrozen
     rts
+
+.reloc
+P346CallScrollCheck:
+    lda EnemyType,x
+    cmp #REBONAK
+    bne @NoPageOffset
+    dec EnemyXPositionHi,x
+    jsr BossFixedScrollCheck
+    inc EnemyXPositionHi,x
+    rts
+@NoPageOffset:
+    jmp BossFixedScrollCheck
 
 .org $b220 ; Screen lock set at bank 4 B220 (0x13230)
     jsr ElevatorBossFix          ; will freeze the scrolling (and more)
@@ -2422,17 +2533,41 @@ ScrollScreenXToZero:
 .org $be99 ; Screen lock set at bank 4 BE99 (0x13ea9)
     jsr ElevatorBossFix          ; will freeze the scrolling (and more)
 
-; Horsehead mini-boss despawn bug fix.
-; For some reason in vanilla, killing horsehead also eliminates *ALL* loaded objects in the enemy slots
-; This includes custom rando rooms with items like pbags that are loaded into enemy slots.
-; The patch simply changes a hardcoded `ldx #5` which is used to loop through all object slots to `tax nop`
-; as `a` holds the current object ID (horsehead) and we want to just run the death code from horsehead to 0
-; keeping the item (pbag etc) in the room alive since it spawns in a later slot (#5).
-; The floating heads still die when Helmethead dies (which is the purpose of the code) since their slot
-; is lower than Helmethead.
-.org $beb1
-    tax
-    nop
+HELMETHEAD_HEAD = $22                ; Unambiguous in P125
+
+ENEMY_STATUS_ALIVE = 1
+
+; Do not kill every other enemy when a P125 boss dies, only floating heads.
+P125BossDefeatSweep = $beb1
+P125BossDefeatFinish = $bee8
+bank7_ApplyDamage = $e726
+bank7_BuildSpriteScreenX_And_OffscreenMask = $f27d
+
+.org P125BossDefeatSweep
+    ldx #$05
+@P125BossDefeatSweepLoop:
+    lda #$00
+    sta Projectile0Type,x
+    lda EnemyType,x
+    cmp #HELMETHEAD_HEAD
+    bne @P125BossDefeatSweepNext
+    stx EnemyIndex
+    lda EnemyStatus,x
+    cmp #ENEMY_STATUS_ALIVE
+    bne @P125BossDefeatSweepNext
+    inx
+    ldy #$01
+    jsr bank7_BuildSpriteScreenX_And_OffscreenMask
+    ldx EnemyIndex
+    ldy #$0a                        ; do 10 damage to floating heads per frame (vanilla)
+    jsr bank7_ApplyDamage
+@P125BossDefeatSweepNext:
+    dex
+    bpl @P125BossDefeatSweepLoop
+    bmi P125BossDefeatFinish
+FREE_UNTIL P125BossDefeatFinish
+
+; (P346 bosses do not need to be patched, they don't clear anything on death)
 
 """);
     }
@@ -2461,6 +2596,20 @@ ThunderbirdNoRoutine = $a3bd
 ; While it's not a problem, it feels a bit jank, so lets not draw Thunderbird pre-battle.
 .org $95a9
     .word ConditionalDrawThunderbird
+
+; Only clear projectiles when Thunderbird dies. Saves a lot of bytes - no logic change
+; (Also makes it possible to put a King Bot in the empty space behind Thunderbird ;) )
+ThunderbirdBossDefeatSweep = $a37e
+ThunderbirdBossDefeatFinish = $a3b5
+.org ThunderbirdBossDefeatSweep
+    ldx #$05
+    lda #$00
+@ThunderbirdBossDefeatLoop:
+    sta Projectile0Type,x
+    dex
+    bpl @ThunderbirdBossDefeatLoop
+    bmi ThunderbirdBossDefeatFinish
+FREE_UNTIL ThunderbirdBossDefeatFinish
 
 .org ThunderbirdMainRoutineStart
 FREE_UNTIL ThunderbirdMainRoutine
