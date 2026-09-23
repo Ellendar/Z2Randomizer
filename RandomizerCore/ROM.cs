@@ -2034,6 +2034,42 @@ Test_Link_Hitbox_Continued:
 """);
     }
 
+    public void FixSideviewEntryFacing(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+; Make it possible to have 3-page wide rooms by making it so that you enter
+; from the left only when the page is 0. The original code simply used the
+; last bit, meaning entering page 0 and page 2 were both treated as lefts,
+; meaning entering page 2 left you a glitched scroll position.
+
+.include "z2r.inc"
+
+.segment "PRG7"
+
+LoadMapNumberAndPage := $cc97  ; bank7_Get_Area_Code__Enter_Code_and_Direction
+.org $cca9
+    jmp DetermineFacing
+FREE_UNTIL $ccaf
+
+GameMode10_TakeSideExit := $cf4c
+GameMode10_EnterNewSideview := $cfb2
+.org $cfc2
+    and #$03             ; ensure we have A=EntryPage even for drops/elevators (not important, but need to fill the bytes anyway)
+    jsr DetermineFacing
+
+.reloc
+; A=EntryPage; store facing 0 if EntryPage == 0, else 1.
+DetermineFacing:
+    beq @FacingZero
+    lda #$01
+@FacingZero:
+    sta EntryFacing
+    rts
+
+""", "FixSideviewEntryFacing.s");
+    }
+
     public void BuffCarrock(Assembler a)
     {
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
