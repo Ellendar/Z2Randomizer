@@ -8,6 +8,7 @@ on:
     - extras
     - sgl
     - '5.2'
+    - '5.3'
   pull_request:
 
 env:

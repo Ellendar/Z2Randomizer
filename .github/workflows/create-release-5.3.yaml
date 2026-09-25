@@ -1,4 +1,4 @@
-name: Create Release 5.2
+name: Create Release 5.3
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         required: true
         type: string
       version:
-        description: 'Version [Format: 5.2.x]'
+        description: 'Version [Format: 5.3.x]'
         required: true
         type: string
 
@@ -51,15 +51,15 @@ jobs:
     - name: Check version
       run: |
         version="${{ inputs.version }}"
-        if [[ "$version" =~ ^5\.2\.([0-9]+)$ ]]; then
+        if [[ "$version" =~ ^5\.3\.([0-9]+)$ ]]; then
           revision="${BASH_REMATCH[1]}"
         else
-          echo "Error: version '$version' does not match required format: 5.2.x"
+          echo "Error: version '$version' does not match required format: 5.3.x"
           exit 1
         fi
         if [[ "$revision" != "0" ]]; then
           revisionMinusOne=$((revision - 1))
-          versionMinusOne="5.2.${revisionMinusOne}"
+          versionMinusOne="5.3.${revisionMinusOne}"
           tagExists=$(git tag --list "$versionMinusOne")
           if [[ -z "$tagExists" ]]; then
             echo "Error: previous version '$versionMinusOne' does not exist. Skipping a revision is not allowed."
@@ -197,8 +197,8 @@ jobs:
         with:
           tag_name: ${{ inputs.version }}
           draft: false
-          prerelease: false
-          make_latest: true
+          prerelease: true
+          make_latest: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -8,6 +8,7 @@ on:
     - extras
     - sgl
     - '5.2'
+    - '5.3'
 
 env:
   # I'm not a fan of the telemetry as-is, but this also suppresses some lines in the build log.
