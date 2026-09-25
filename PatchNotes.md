@@ -1,6 +1,6 @@
 # Z2Randomizer Changelog
 
-## Version 5.2.2 - September 24, 2026
+## Version 5.2.3 - September 24, 2026
 
 - Fixed a bug where starting spells were replaced with small items when spells are not included in shuffle.
 - Fixed a bug that could cause starting items to sometimes still appear instead of small items.

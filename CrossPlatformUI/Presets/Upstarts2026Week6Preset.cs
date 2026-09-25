@@ -14,7 +14,7 @@ Starting items and spells: Candle
 - Random biomes
 - Each continent will pick a biome independently
 - All biomes set to large except Death Mountain (Medium)
-- Random style palaces (random length normal palaces, short GP)
+- Random style palaces (medium normal palaces, short GP)
 - Each palace will pick a style independently
 - Anything goes continental connectors
 - Quest items and spells in the item pool
@@ -87,7 +87,7 @@ Starting items and spells: Candle
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
         GpLength = PalaceLengthOption.SHORT,
-        NormalPalaceLength = PalaceLengthOption.RANDOM,
+        NormalPalaceLength = PalaceLengthOption.MEDIUM,
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         RevealWalkthroughWalls = true,
         RevealHiddenJars = true,
