@@ -266,8 +266,10 @@ public class RandomizerProperties
             Collectable.REFLECT_SPELL => StartReflect,
             Collectable.SPELL_SPELL => StartSpell,
             Collectable.THUNDER_SPELL => StartThunder,
+
             Collectable.UPSTAB => StartWithUpstab,
             Collectable.DOWNSTAB => StartWithDownstab,
+
             Collectable.CANDLE => StartCandle,
             Collectable.GLOVE => StartGlove,
             Collectable.RAFT => StartRaft,
@@ -276,6 +278,13 @@ public class RandomizerProperties
             Collectable.CROSS => StartCross,
             Collectable.HAMMER => StartHammer,
             Collectable.MAGIC_KEY => StartKey,
+
+            Collectable.TROPHY => StartWithSpellItems,
+            Collectable.MEDICINE => StartWithSpellItems,
+            Collectable.CHILD => StartWithSpellItems,
+            Collectable.MIRROR => StartWithSpellItems,
+            Collectable.WATER => StartWithSpellItems,
+
             _ => false
         };
     }
