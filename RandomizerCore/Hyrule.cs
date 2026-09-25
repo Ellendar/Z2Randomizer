@@ -63,8 +63,6 @@ public class Hyrule
 
     private const int TERRAIN_GENERATION_ATTEMPT_LIMIT = 50000;
 
-    //private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
-
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private MusicRandomizer? musicRandomizer = null;
@@ -72,57 +70,19 @@ public class Hyrule
     private readonly int[] palPalettes = [0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60];
     private readonly int[] palGraphics = [0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06];
 
-    /*
-    private static readonly Collectable[] SHUFFLABLE_STARTING_ITEMS = [
-        Collectable.CANDLE, Collectable.GLOVE,
-        Collectable.RAFT,
-        Collectable.BOOTS,
-        Collectable.FLUTE,
-        Collectable.CROSS,
-        Collectable.HAMMER,
-        Collectable.MAGIC_KEY
-    ];
-    */
-
-    //private ROM romData;
     private const int overworldXOff = 0x3F;
     private const int overworldMapOff = 0x7E;
     private const int overworldWorldOff = 0xBD;
 
-    /*
-    private static readonly List<Town> spellTowns = new List<Town>() { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
-        Town.MIDO_CHURCH, Town.NABOORU, Town.DARUNIA_WEST, Town.DARUNIA_ROOF, Town.NEW_KASUTO, Town.OLD_KASUTO};
-    */
-
-    //Unused
-    //private Dictionary<int, int> spellEnters;
-    //Unused
-    //private Dictionary<int, int> spellExits;
-    //Unused
     public HashSet<String> reachableAreas;
-    //Which vanilla spell corresponds with which shuffled spell
-    //private Dictionary<Town, Collectable> WizardCollectables { get; set; }
     //Continent connectors
     protected (Location, Location)[] connections = new (Location, Location)[4];
 
-    //public SortedDictionary<String, List<Location>> areasByLocation;
-    //public Dictionary<Location, String> section;
     private int accessibleMagicContainers;
     private int accessibleHeartContainers;
-    /*
-    private int startHearts;
-    private int startMagicContainers = 4; //Not for long maybe
-    private int maxHearts;
-    private int maxMagicContainers = 8; //Probably true for much longer
-    private int heartContainersInItemPool;
-    */
-
-
-    //private Character character;
 
     public Dictionary<Collectable, bool> ItemGet { get; set; }
     private List<Collectable> spellListOrder { get; set; }
-    //private bool[] spellGet;
 
     public WestHyrule westHyrule;
     public EastHyrule eastHyrule;
@@ -134,6 +94,11 @@ public class Hyrule
     public List<Room> rooms;
     public StatRandomizer randomizedStats;
     public DropRandomizer randomizedDrops;
+
+    private static readonly Collectable[] minorItems = [Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG,
+            Collectable.MEDIUM_BAG, Collectable.LARGE_BAG, Collectable.XL_BAG, Collectable.ONEUP, Collectable.KEY];
+    private static readonly Collectable[] spellItems = [Collectable.TROPHY, Collectable.MEDICINE, Collectable.CHILD, Collectable.MIRROR, Collectable.WATER];
+
 
     //DEBUG/STATS
 #pragma warning disable CS0414 // Field is assigned but its value is never used
@@ -294,13 +259,6 @@ public class Hyrule
                 {
                     continue;
                 }
-
-                /*
-                if(!palaces.SelectMany(i => i.AllRooms).Any(i => i.Name.Contains("Lava or pit")))
-                {
-                    continue;
-                }
-                */
 
                 //Randomize Enemies
                 if (props.ShufflePalaceEnemies)
@@ -704,9 +662,6 @@ public class Hyrule
             westHyrule.grassTile, deathMountain.hammerCave, deathMountain.specRock, eastHyrule.desertTile, eastHyrule.waterTile, eastHyrule.newKasuto,
             mazeIsland.childDrop, mazeIsland.magicContainerDrop];
 
-        List<Collectable> minorItems = [Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG,
-            Collectable.MEDIUM_BAG, Collectable.LARGE_BAG, Collectable.XL_BAG, Collectable.ONEUP, Collectable.KEY];
-
         if (props.PbagItemShuffle)
         {
             Collectable collectable = (Collectable)ROMData.GetByte(RomMap.WEST_PBAG_CAVE_COLLECTABLE);
@@ -729,7 +684,6 @@ public class Hyrule
             eastHyrule.pbagCave2.SetCollectables([Collectable.XL_BAG]);
         }
 
-        //For now this is just for classic spell shuffle. Maybe this is extended later
         bool canReplaceStartingSpellsWithMinorItems = !props.ShuffleSpellLocations;
         if(props.IncludeSpellsInShuffle)
         {
@@ -787,10 +741,12 @@ public class Hyrule
             ItemGet[collectable] = props.StartsWithCollectable(collectable);
         }
 
+
         //Spell Item handling
-        if (props.StartWithSpellItems)
+
+        //Remove 
+        if(props.StartWithSpellItems)
         {
-            Collectable[] spellItems = [Collectable.TROPHY, Collectable.MEDICINE, Collectable.CHILD, Collectable.MIRROR, Collectable.WATER];
             foreach (Collectable spellItem in spellItems)
             {
                 int index = shufflableItems.IndexOf(spellItem);
@@ -798,33 +754,9 @@ public class Hyrule
                 {
                     shufflableItems[index] = minorItems.Sample(r);
                 }
-                else
-                {
-                    Location? defaultLocation = possibleItemLocations.FirstOrDefault(i => i.GetAllCollectables().Contains(spellItem));
-                    defaultLocation?.ReplaceCollectable(spellItem, minorItems.Sample(r));
-                }
-                ItemGet[spellItem] = true;
             }
         }
-        else if (!props.IncludeSpellsInShuffle)
-        {
-            List<Location> spellItemTowns = [westHyrule.ruto, westHyrule.mido, eastHyrule.darunia];
-            if (props.IncludeQuestItemsInShuffle)
-            {
-                spellItemTowns.Add([westHyrule.sariaNorth, eastHyrule.nabooru]);
-            }
-
-            var allTowns = possibleItemLocations.Where(i => i.Town != null && i?.Town?.Type != TownType.BAGU);
-            foreach (Location location in allTowns)
-            {
-                Collectable wizardCollectable = (Collectable)location.Town!.GetWizard()!.Collectable!;
-                if (props.StartsWithCollectable(wizardCollectable))
-                {
-                    ItemGet[wizardCollectable] = true;
-                    location.Town!.GetWizard()!.Collectable = minorItems.Sample(r);
-                }
-            }
-        }
+        HandleStartingSpellItems(possibleItemLocations);
 
         List<Collectable> possibleStartItems = [
             Collectable.CANDLE,
@@ -938,14 +870,19 @@ public class Hyrule
                 foreach (Location nonPalaceLocation in possibleItemLocations.Where(i => i.Palace == null))
                 {
                     List<Collectable> collectables = nonPalaceLocation.GetAllCollectables();
-                    for(int i = 0; i < collectables.Count; i++)
+                    for (int i = 0; i < collectables.Count; i++)
                     {
-                        collectables[i] = props.StartsWithCollectable(collectables[i]) ? minorItems.Sample(r) : collectables[i];
+                        bool isMinorItem = props.StartsWithCollectable(collectables[i])
+                            && (!collectables[i].IsSpell() || canReplaceStartingSpellsWithMinorItems);
+                        collectables[i] = isMinorItem ? minorItems.Sample(r) : collectables[i];
                     }
                     nonPalaceLocation.SetCollectables(collectables, false);
                 }
             }
         }
+
+        //Placing unmixed vanilla locations could have replaced unwanted spell items, so recheck them
+        HandleStartingSpellItems(ItemLocations().ToList());
 
 
         int heartContainersInItemPool = props.MaxHearts - props.StartHearts;
@@ -1136,6 +1073,40 @@ public class Hyrule
         if (props.PreventSpellItemChains)
         {
             PreventSpellItemChains();
+        }
+    }
+
+    private void HandleStartingSpellItems(List<Location> possibleItemLocations)
+    {
+        if (props.StartWithSpellItems)
+        {
+            foreach (Collectable spellItem in spellItems)
+            {
+                Location? defaultLocation = possibleItemLocations.FirstOrDefault(i => i.GetAllCollectables().Contains(spellItem));
+                defaultLocation?.ReplaceCollectable(spellItem, minorItems.Sample(r));
+                ItemGet[spellItem] = true;
+            }
+        }
+        else
+        {
+            List<Location> spellItemTowns = [westHyrule.ruto, westHyrule.mido, eastHyrule.darunia];
+            if (props.IncludeQuestItemsInShuffle)
+            {
+                spellItemTowns.Add([westHyrule.sariaNorth, eastHyrule.nabooru]);
+            }
+
+            //var allTowns = possibleItemLocations.Where(i => i.Town != null && i?.Town?.Type != TownType.BAGU);
+            for (int i = 0; i < spellItemTowns.Count; i++)
+            {
+                Collectable wizardCollectable = (Collectable)spellItemTowns[i].Town!.GetWizard()!.Collectable!;
+                if (props.StartsWithCollectable(wizardCollectable))
+                {
+                    ItemGet[spellItems[i]] = true;
+                    Location? spellItemLocation = 
+                        possibleItemLocations.FirstOrDefault(location => location.GetAllCollectables().Contains(spellItems[i]));
+                    spellItemLocation?.ReplaceCollectable(spellItems[i], minorItems.Sample(r));
+                }
+            }
         }
     }
 
@@ -2247,7 +2218,7 @@ public class Hyrule
         if (props.SpellEnemy)
         {
             //3, 4, 6, 7, 14, 16, 17, 18, 24, 25, 26
-            List<int> enemies = new List<int> { 3, 4, 6, 7, 0x0E, 0x10, 0x11, 0x12, 0x18, 0x19, 0x1A };
+            List<int> enemies = [3, 4, 6, 7, 0x0E, 0x10, 0x11, 0x12, 0x18, 0x19, 0x1A];
             rom.Put(0x11ef, (byte)enemies[r.Next(enemies.Count)]);
         }
         if (props.BossItem)
@@ -2256,18 +2227,34 @@ public class Hyrule
         }
 
         //neither of these starting item handlings really belong here, but this is good enough.
-        if (props.StartWithSpellItems)
+
+        //Instead of patching out the checks for the spell items, actually update the default save data so you start with them.
+        if(props.StartsWithCollectable(Collectable.TROPHY) || props.StartsWithCollectable(westHyrule.ruto.GetAllCollectables()[0]))
         {
-            //ROMData.Put(0xF584, 0xA9);
-            //ROMData.Put(0xF585, 0x01);
-            //ROMData.Put(0xF586, 0xEA);
-            //Instead of patching out the checks for the spell items, actually update the default save data so you start with them.
             rom.Put(0x17b14, 0x10); //Trophy
+        }
+
+        if (props.StartsWithCollectable(Collectable.MIRROR)
+            || props.StartsWithCollectable(westHyrule.sariaNorth.Town!.GetTownMap(VanillaTownMap.SARIA_WIZARD)!.Collectable))
+        {
             rom.Put(0x17b15, 0x01); //Mirror
+        }
+        if (props.StartsWithCollectable(Collectable.MEDICINE)
+            || props.StartsWithCollectable(westHyrule.mido.Town!.GetTownMap(VanillaTownMap.MIDO_WIZARD)!.Collectable))
+        {
             rom.Put(0x17b16, 0x40); //Medicine
+        }
+        if (props.StartsWithCollectable(Collectable.WATER)
+            || props.StartsWithCollectable(eastHyrule.nabooru.Town!.GetTownMap(VanillaTownMap.NABOORU_WIZARD)!.Collectable))
+        {
             rom.Put(0x17b17, 0x01); //Water
+        }
+        if (props.StartsWithCollectable(Collectable.CHILD) 
+            || props.StartsWithCollectable(eastHyrule.darunia.Town!.GetTownMap(VanillaTownMap.DARUNIA_WIZARD)!.Collectable))
+        {
             rom.Put(0x17b18, 0x20); //Child
         }
+
         rom.Put(RomMap.START_CANDLE, props.StartCandle ? (byte)1 : (byte)0);
         rom.Put(RomMap.START_GLOVE, props.StartGlove ? (byte)1 : (byte)0);
         rom.Put(RomMap.START_RAFT, props.StartRaft ? (byte)1 : (byte)0);

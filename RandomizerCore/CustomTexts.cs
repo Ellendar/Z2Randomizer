@@ -963,7 +963,7 @@ public class CustomTexts
     {
         List<int> placedIndex = [];
 
-         List<Collectable> placedItems = [];
+        List<Collectable> placedItems = [];
 
         List<int> placedTowns = [];
 

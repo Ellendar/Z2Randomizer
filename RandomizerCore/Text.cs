@@ -112,8 +112,7 @@ public class Text : IEquatable<Text>
         {
             hint = "barba$slithers$with the$%%";
         }
-        else if (useTownSpecificHints && location.Town != null
-            && (baguIsTown || location.Town.Type != TownType.BAGU))
+        else if (useTownSpecificHints && location.Town != null && (baguIsTown || location.Town.Type != TownType.BAGU))
         {
             hint = $"{((TownType)location.Town.Type!).HintName()}$has the$%%";
         }

@@ -1,5 +1,16 @@
 # Z2Randomizer Changelog
 
+## Version 5.2.2 - September 24, 2026
+
+- Fixed a bug where starting spells were replaced with small items when spells are not included in shuffle.
+- Fixed a bug that could cause starting items to sometimes still appear instead of small items.
+- Fixed a bug where starting with a spell that requires a spell item would sometimes not start with that item.
+- Updated Week 6 Upstarts flags.
+
+## Version 5.2.2 - September 13, 2026
+
+- Fixed the bagu hint fix that was unintentionally excluded from the previous release.
+
 ## Version 5.2.1 - September 12, 2026
 - Updated Upstarts flags
 - Fixed several item shuffle bugs that could cause seeds to not generate.
