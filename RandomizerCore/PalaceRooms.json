@@ -10603,7 +10603,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
-    "tag": ["Expert"],
+    "tags": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10630,7 +10630,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
-    "tag": ["Expert"],
+    "tags": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10657,7 +10657,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
-    "tag": ["Expert"],
+    "tags": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -10684,7 +10684,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [],
-    "tag": ["Expert"],
+    "tags": ["Expert"],
     "duplicateGroup": "triforceOfCourageGP M31",
     "sideviewData": "22600F08D20E0506B090F0500106B090D80010AF9994F51312AF929BFC1312AF9294"
   },
@@ -17726,6 +17726,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["Expert"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0B04C709076E4E19561497",
