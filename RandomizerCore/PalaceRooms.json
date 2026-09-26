@@ -7367,12 +7367,9 @@
     "name": "winterSolstice M56",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-      "GLOVE",
-      "FAIRY"
-    ],
-	"marioRequirements" : ["FAIRY", ["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
-    "sideviewData": "1C600F10F75000F1B073D20ED600DE0E909BDC0BD308D902D304D306"
+    "requirements": ["GLOVE", "FAIRY"],
+    "marioRequirements" : ["FAIRY", ["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
+    "sideviewData": "1C600F10F75000F1B071D20ED600DE0E909BDC0BD308D902D304D306"
   },
   {
     "author": "winterSolstice",
@@ -11279,14 +11276,13 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
+    "name": "Split top/bottom item room A",
     "linkedRoomName": "Split top/bottom item room B",
     "map": 69,
     "memoryAddress": 74280,
-    "name": "Split top/bottom item room A",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
     "sideviewData": "31600610F75080F1D200502F60206B20617482C2522F61206B2061748205512C6220A344920F026322717391744802D10E"
   },
   {
@@ -11443,7 +11439,8 @@
     "palaceNumber": null,
     "requirements": [],
     "tags": ["Easy"],
-    "sideviewData": "38609000007F907F23C627C6067F907F21C627C627C6017FA046B046C046237940796029F45000F1A048B048C048097F20C6907F26C626C6"
+    "sideviewData": "38609000007F907F23C627C6067F907F21C627C627C6017FA046B046C046237940796029F45000F1A048B048C048097F20C6907F26C626C6",
+    "mirrorSideviewData": "38609000007F907F23C626C626C6017FA046B046C046237940796029F45000F1A048B048C048097F20C6907F27C627C6027F907F25C627C6"
   },
   {
     "author": "benthicKing",
@@ -11596,9 +11593,8 @@
     "name": "benthicKing M4",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
-    "sideviewData": "33600010809DA03D37008773A02312C6D180819FA03F3600A00F0DD700D60EF25000F1B073D4008373A07311C6839DA03D3600"
+    "requirements": [],
+    "sideviewData": "33600010809DA03D37008773A02312C6D180819FA03F3600A00F0DD700D60EF25000F1B071D4008373A07311C6839DA03D3600"
   },
   {
     "author": "benthicKing",
@@ -13799,14 +13795,14 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
-    "linkedRoomName": "Split top/bottom item room A",
     "map": 8,
     "memoryAddress": 74280,
     "name": "Split top/bottom item room B",
+    "linkedRoomName": "Split top/bottom item room A",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "31600610F75080F1D200502F60206B20617482C2522F61206B2061748205512C6220A344920F026322717391744802D10E"
   },
   {
@@ -18836,6 +18832,7 @@
     "hasDrop": false,
     "elevatorScreen": 2,
     "requirements": [],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "037795",

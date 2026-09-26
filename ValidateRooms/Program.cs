@@ -570,10 +570,13 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
         }
     }
 
-    foreach (var elevator in exitElevators)
+    if (room.HasDownExit)
     {
-        dropTiles.Remove(elevator.AbsX);
-        dropTiles.Remove(elevator.AbsX + 1);
+        foreach (var elevator in exitElevators)
+        {
+            dropTiles.Remove(elevator.AbsX);
+            dropTiles.Remove(elevator.AbsX + 1);
+        }
     }
 
     if (!room.HasDrop)
