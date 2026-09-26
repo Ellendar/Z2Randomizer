@@ -2096,32 +2096,40 @@ CheckIfHorseheadReboshark:
 """);
     }
 
-    public void FixBossKillPaletteGlitch(Assembler asm)
+    public void BossKillFixes(Assembler asm)
     {
-        // Restore red palette color that is set to black for Link's shadow during boss explosions
         var a = asm.Module();
         a.Code(/* lang=s */"""
+.include "z2r.inc"
+
 .segment "PRG7"
-.org $DE1A
+.org $de1a
 HookIntoSpawnBossItem:
-    jmp RestorePaletteAfterBossKill
+    jmp BossKillFixes
 
 .reloc
-RestorePaletteAfterBossKill:
+BossKillFixes:
     sta $af,x ; command overwritten by jmp
+
+    ; Patch boss death to spawn the key on the frozen page instead of the boss's actual page
+    ; This prevents softlocks when Rebonack dies off-screen.
+    lda ScrollLeftPage
+    sta EnemyXPositionHi,x
+
+    ; Restore red palette color that is set to black for Link's shadow during boss explosions
     ldx #$00
-    ldy $362
+    ldy PpuBuffer2Length
 @CopyLoop:
     lda ResetRedPalettePayload,x
-    sta $0363,y
+    sta PpuBuffer2Data,y
     inx
     iny
     cpx #$08
     bne @CopyLoop
     lda #$02
-    sta $0725 ; setting PPU macro 2
+    sta PpuMacroSelector ; setting PPU macro 2
     dey
-    sty $362
+    sty PpuBuffer2Length
     ldx $10
     rts
 
