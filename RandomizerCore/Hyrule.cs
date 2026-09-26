@@ -3884,7 +3884,7 @@ FlagHudUpdate:
         rom.ChangeLavaKillPosition(engine);
         rom.FixItemPickup(engine);
         rom.FixMinibossGlitchyAppearance(engine);
-        rom.FixBossKillPaletteGlitch(engine);
+        rom.BossKillFixes(engine);
         rom.ThunderbirdEnterGoingLeftFix(engine);
         rom.FixThunderbirdThunderDeath(engine);
 
