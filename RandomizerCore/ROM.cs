@@ -865,14 +865,6 @@ SAVE PRINCESS ZELDA...
 
         //300 point XP reward is actually 300 and not 301
         Put(0x1DDDC, 0x2C);
-		
-        // Horsehead mini-boss despawn bug fix.
-        // For some reason in vanilla, killing horsehead also eliminates *ALL* loaded objects in the enemy slots
-        // This includes custom rando rooms with items like pbags that are loaded into enemy slots.
-        // The patch simply changes a hardcoded `ldx #5` which is used to loop through all object slots to `tax nop`
-        // as `a` holds the current object ID (horsehead) and we want to just run the death code from horsehead to 0
-        // keeping the item (pbag etc) in the room alive since it spawns in a later slot (#5)
-        Put(0x13ec1, [0xaa, 0xea]); // tax nop
 
         // In vanilla Darunia there is written text on a wall inside one
         // of the houses. With the changes for FullItemShuffle and changes
@@ -2358,6 +2350,92 @@ FixedTbirdExplosionHandler:
 """);
     }
 
+    public void RegularBossEnterGoingLeftFix(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import ElevatorBossFix
+
+.segment "PRG4"
+
+P125BossRoutineStart = $be8b   ; (Horsehead/Helmethead/Gooma)
+P125BossRoutineMain = $be9c
+P125BossRoutineEnd = $bef0
+
+P346BossRoutineStart = $b20d   ; (Carock/Rebonack/Barba)
+P346BossRoutineMain = $b225
+P346BossRoutineEnd = $b23c
+
+.org P125BossRoutineStart
+    jsr BossFixedScrollCheck
+    bcs P125BossRoutineEnd
+    jsr ScrollScreenXToZero
+    bne P125BossRoutineMain    ; skip setup when ScrollFrozen != 0
+.assert * = $be95
+
+.org P346BossRoutineStart
+    jsr BossFixedScrollCheck
+    bcs P346BossRoutineEnd
+    jsr ScrollScreenXToZero
+    bne P346BossRoutineMain    ; skip setup when ScrollFrozen != 0
+.assert * = $b217
+
+.reloc
+; Finer scroll position check to determine if boss should trigger
+; Carry will be clear when boss should be triggered
+BossFixedScrollCheck:
+    lda ScrollLeftPage
+    cmp #$01
+    bne @InWrongPage
+    lda ScrollLeftX
+    cmp #$04                     ; need at least 3 pixel margin so dash speed can't skip the trigger point
+    rts                          ; result of CMP determines if boss will spawn
+    @InWrongPage:
+    sec                          ; carry set = don't spawn boss
+    rts
+
+.reloc
+; input: ScrollLeftX must be in A
+ScrollScreenXToZero:
+    lda ScrollLeftPage
+    beq @NoScroll
+    lda FrameCounter
+    and #$01
+    bne @NoScroll                ; slow down screen scroll to every other frame
+    clc                          ; ensure sbc subtracts 1 regardless of carry state on entry
+    lda ScrollLeftX
+    sbc #$00
+    bcs @SetScrollX
+        lda #$00                 ; clamp to 0
+    @SetScrollX:
+    sta ScrollLeftX
+    sta ScrollPosShadow
+    @NoScroll:
+    lda ScrollFrozen
+    rts
+
+.org $b220 ; Screen lock set at bank 4 B220 (0x13230)
+    jsr ElevatorBossFix          ; will freeze the scrolling (and more)
+
+.org $be99 ; Screen lock set at bank 4 BE99 (0x13ea9)
+    jsr ElevatorBossFix          ; will freeze the scrolling (and more)
+
+; Horsehead mini-boss despawn bug fix.
+; For some reason in vanilla, killing horsehead also eliminates *ALL* loaded objects in the enemy slots
+; This includes custom rando rooms with items like pbags that are loaded into enemy slots.
+; The patch simply changes a hardcoded `ldx #5` which is used to loop through all object slots to `tax nop`
+; as `a` holds the current object ID (horsehead) and we want to just run the death code from horsehead to 0
+; keeping the item (pbag etc) in the room alive since it spawns in a later slot (#5).
+; The floating heads still die when Helmethead dies (which is the purpose of the code) since their slot
+; is lower than Helmethead.
+.org $beb1
+    tax
+    nop
+
+""");
+    }
+
     // Allows Thunderbird room entry from left or right
     public void ThunderbirdEnterGoingLeftFix(Assembler asm)
     {
@@ -2636,18 +2714,6 @@ DontSwitchMusicIfInPalace2:
         a.Code(/* lang=s */"""
 .include "z2r.inc"
 
-.segment "PRG4"
-.org $b220
-    jsr ElevatorBossFix
-
-.org $be99 ; Screen lock set at bank 4 BE99 (0x13ea9)
-    jsr ElevatorBossFix
-
-; Screen lock tbird set at bank 5 A363 (0x16373)
-; ThunderbirdEnterLeftFix does this call now
-;.segment "PRG5"
-;.org $a363
-;    jsr ElevatorBossFix
 
 .segment "PRG7"
 
@@ -2672,6 +2738,7 @@ ElevatorBossFix:
         sta Enemy0YPositionLo
     @Exit:
         rts
+
 .export ElevatorBossFix
 
 """);
