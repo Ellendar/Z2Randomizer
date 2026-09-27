@@ -1,11 +1,16 @@
 # Z2Randomizer Changelog
 
+## Version 5.2.4 - September 26, 2026
+
+- Fixed an issue where elevators in mirrored rooms were sometimes incorrect.
+- Fixed a bug where "disable spell items" did not work properly
+- Updated Week 6 Upstarts flags. (For real this time)
+
 ## Version 5.2.3 - September 24, 2026
 
 - Fixed a bug where starting spells were replaced with small items when spells are not included in shuffle.
 - Fixed a bug that could cause starting items to sometimes still appear instead of small items.
 - Fixed a bug where starting with a spell that requires a spell item would sometimes not start with that item.
-- Updated Week 6 Upstarts flags.
 
 ## Version 5.2.2 - September 13, 2026
 
