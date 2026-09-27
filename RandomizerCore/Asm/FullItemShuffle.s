@@ -467,7 +467,7 @@ ExpandedGetItem:
 @Exit:
     jmp GetItemReturn
 @StabTable:
-    ;     Down, Up
+    ; Up, Down
     .byte $04, $10
 
 ; Repoint the pointers that went to the original enemy/item tile table
@@ -478,7 +478,7 @@ ExpandedGetItem:
 .org $f221
     lda CommonEnemyTileTable+1,x
 .org $f22e
-    lda CommonEnemyTileTable+1,x 
+    lda CommonEnemyTileTable+1,x
 
 
 ; Clear out the space from the original enemy and item tile table
