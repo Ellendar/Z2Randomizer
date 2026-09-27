@@ -3322,17 +3322,17 @@ FREE_UNTIL $C285
 ; one for World != 0, where the RegionNumber does not actually matter.
 .reloc
 bank7_Pointer_table_for_Item_Presence_World0_ByRegion:
-    .byte .lobyte($0600)  ; West Caves                           (Region 0)
-    .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 1)
-    .byte .lobyte($0640)  ; East Caves                           (Region 2)
-    .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 3)
+    .byte .lobyte(ItemPresenceBitsWest)  ; West Caves                           (Region 0)
+    .byte .lobyte(ItemPresenceBitsDmMi)  ; Death Mountain / Maze Island Caves   (Region 1)
+    .byte .lobyte(ItemPresenceBitsEast)  ; East Caves                           (Region 2)
+    .byte .lobyte(ItemPresenceBitsDmMi)  ; Death Mountain / Maze Island Caves   (Region 3)
 .reloc
 bank7_Pointer_table_for_Item_Presence_ByWorld: ; this is referenced as -1, as index 0 would use the table above
-    .byte .lobyte($0660)  ; Towns         (World 1)
-    .byte .lobyte($0660)  ; Towns         (World 2)
-    .byte .lobyte($0680)  ; Palace 125    (World 3)
-    .byte .lobyte($06A0)  ; Palace 346    (World 4)
-    .byte .lobyte($06C0)  ; Great Palace  (World 5)
+    .byte .lobyte(ItemPresenceBitsTowns)  ; Towns         (World 1)
+    .byte .lobyte(ItemPresenceBitsTowns)  ; Towns         (World 2)
+    .byte .lobyte(ItemPresenceBitsP125)   ; Palace 125    (World 3)
+    .byte .lobyte(ItemPresenceBitsP346)   ; Palace 346    (World 4)
+    .byte .lobyte(ItemPresenceBitsGP)     ; Great Palace  (World 5)
 
 .org $c2b3
 ; The vanilla index calculation was 5 * RegionNumber + WorldNumber, and was
