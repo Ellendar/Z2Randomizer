@@ -3865,6 +3865,7 @@ FlagHudUpdate:
         rom.FixMinibossGlitchyAppearance(engine);
         rom.BossKillFixes(engine);
         rom.CollisionFixes(engine);
+        rom.RegularBossEnterGoingLeftFix(engine);
         rom.ThunderbirdEnterGoingLeftFix(engine);
         rom.FixThunderbirdThunderDeath(engine);
 
