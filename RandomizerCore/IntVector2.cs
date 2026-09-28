@@ -138,7 +138,10 @@ public readonly struct IntVector2 : IEquatable<IntVector2>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(X, Y);
+        int hash = 17;
+        hash = hash * 31 + X;
+        hash = hash * 31 + Y;
+        return hash;
     }
 
     public override string ToString()

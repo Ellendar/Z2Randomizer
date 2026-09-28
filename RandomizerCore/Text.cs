@@ -161,7 +161,7 @@ public class Text : IEquatable<Text>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(EncodedText);
+        return byteArrayEqualityComparer.GetHashCode(EncodedText);
     }
 
     public Text Clone()
