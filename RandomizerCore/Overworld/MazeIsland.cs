@@ -139,7 +139,7 @@ sealed class MazeIsland : World
             {
                 location.CanShuffle = true;
                 location.IsPassthrough = location.WasPassthrough;
-                location.ResetCoords();
+                location.ResetCoords(biome.UsesVanillaMap());
             }
             while (bytesWritten > MAP_SIZE_BYTES)
             {

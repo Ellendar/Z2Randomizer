@@ -220,7 +220,7 @@ sealed class DeathMountain : World
         {
             location.CanShuffle = true;
             location.IsPassthrough = location.WasPassthrough;
-            location.ResetCoords();
+            location.ResetCoords(biome.UsesVanillaMap());
         }
         if (biome.UsesVanillaMap())
         {

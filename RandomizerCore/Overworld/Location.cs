@@ -214,9 +214,9 @@ public class Location
             + '[' + string.Join(", ", GetAllCollectables().Select(i => i.ToString())) + ']';
     }
 
-    public void ResetCoords()
+    public void ResetCoords(bool isVanilla)
     {
-        (Y, Xpos) = VanillaCoords;
+        (Y, Xpos) = isVanilla ? VanillaCoords : (0, 0);
     }
 
     public int GetWorld()

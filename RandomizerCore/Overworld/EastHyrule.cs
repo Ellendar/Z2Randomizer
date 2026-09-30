@@ -13,7 +13,7 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 //6A35 - address in memory of palace 6 y coord
 public sealed class EastHyrule : World
 {
-    int debug = 0;
+    static int debug = 0;
     private static readonly new Logger logger = LogManager.GetCurrentClassLogger();
 
     private readonly SortedDictionary<LocationID, Terrain> terrains = new()
@@ -312,12 +312,13 @@ public sealed class EastHyrule : World
         {
             location.CanShuffle = true;
             location.IsPassthrough = location.WasPassthrough;
-            location.ResetCoords();
+            location.ResetCoords(biome.UsesVanillaMap());
             location.AccessRequirements = location.AccessRequirements.Without([RequirementType.HAMMER, RequirementType.FLUTE]);
             if (location != raft && location != bridge && location != cave1 && location != cave2)
             {
                 location.TerrainType = terrains[location.ID];
             }
+            //XXX: FIX HERE
         }
         if (props.LessImportantLocationsOption != LessImportantLocationsOption.ISOLATE)
         {
@@ -616,7 +617,7 @@ public sealed class EastHyrule : World
                     }
                 }
                 //Debug.WriteLine(GetMapDebug());
-                debug++;
+
                 if (props.HiddenPalace)
                 {
                     bool hp = RandomizeHiddenPalace(rom, props.ShuffleHidden, props.HiddenKasuto);
@@ -1163,14 +1164,14 @@ public sealed class EastHyrule : World
                 }
 
                 // advance forward (or retreat if an existing location blocks the path)
-                if (GetLocationAt(currentPos + delta) != null)
+                if (GetLocationAt(currentPos + delta) == null)
                 {
-                    map[currentPos] = Terrain.MOUNTAIN;
-                    currentPos -= delta;
+                    currentPos += delta;
                 }
                 else
                 {
-                    currentPos += delta;
+                    map[currentPos] = Terrain.MOUNTAIN;
+                    currentPos -= delta;
                 }
             }
 
