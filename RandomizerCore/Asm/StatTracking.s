@@ -114,12 +114,12 @@ StatTrackDownStab:
 
 .segment "PRG4"
 
-.org $9B0F ; dec $0794
-    jsr SaveTimestampForPalace
+.org $9b1a
+    jmp SaveTimestampForPalace
+FREE_UNTIL $9b2a  ; clean up unused vanilla cleared palaces code
 
 .reloc
 SaveTimestampForPalace:
-    dec $0794
     jsr FlagHudUpdate
     ldy PalaceNumber
 .ifdef FLUTE_WARP_CLEARED_PALACES
