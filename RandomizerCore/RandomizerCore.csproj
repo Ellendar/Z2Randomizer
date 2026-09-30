@@ -30,6 +30,7 @@
     <None Remove="Asm\Recoil.s" />
     <None Remove="Asm\StatTracking.s" />
     <None Remove="Asm\z2ft.s" />
+    <None Remove="Asm\Bosses.s" />
     <None Remove="Asm\BuffCarock.s" />
     <None Remove="Asm\MMC5.s" />
     <None Remove="Asm\ram.inc" />
