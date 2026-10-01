@@ -14,6 +14,5 @@
     <TrimMode>partial</TrimMode>
 <!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
-    <EnableWorkloadRestore>true</EnableWorkloadRestore>
   </PropertyGroup>
 </Project>
