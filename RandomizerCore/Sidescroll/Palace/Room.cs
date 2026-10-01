@@ -271,13 +271,17 @@ public class Room : IJsonOnDeserialized
         //though repositioned into the place it belongs.
         if (PalaceGroup == PalaceGrouping.Palace125 && HasBoss && !IsBossRoom)
         {
+            // this sets Horsehead's vanilla X pos (within the page) and Y pos
             NewEnemies[1] = 0x6C;
         }
+        // Rebonak's X pos (within the page) is hardcoded in the game asm. 
+        // Rebonak's Y pos is assumed to be the value already in enemy room data
 
         if (NewEnemies.Length > 1 && PalaceGroup == PalaceGrouping.Palace346)
         {
             for (var i = 2; i < NewEnemies.Length; i += 2)
             {
+                // Replace any "Rebo Unhorsed" enemies, as that's a generator in P125
                 if ((NewEnemies[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
                 {
                     NewEnemies[i] = (byte)(0x0F + (NewEnemies[i] & 0xC0));
@@ -705,6 +709,14 @@ public class Room : IJsonOnDeserialized
         return true;
     }
 
+    public IEnumerable<Room?> GetNeighborsOutgoing()
+    {
+        if (HasLeftExit) { yield return Up; }
+        if (HasRightExit) { yield return Right; }
+        if (HasUpExit) { yield return Up; }
+        if (HasDownExit) { yield return Down; }
+    }
+
     public bool ConnectRandomly(Room otherRoom, Random r)
     {
         Direction[] directons = [Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST];
@@ -800,7 +812,6 @@ public class Room : IJsonOnDeserialized
     {
         if (HasTag("NoMirror")) { return false; }
         if (!IsNormalRoom()) { return false; }
-        if (HasBoss) { return false; }
         if (HasDrop && HasUpExit) { return false; }
         return true;
     }

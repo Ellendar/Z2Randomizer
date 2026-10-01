@@ -12,7 +12,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
     protected abstract ItemRoomSelectionStrategy GetItemRoomSelectionStrategy();
 
-    protected static bool AddSpecialRoomsByReplacement(Palace palace, RoomPool roomPool, Random r, RandomizerProperties props, ItemRoomSelectionStrategy itemRoomSelector)
+    protected bool AddSpecialRoomsByReplacement(Palace palace, RoomPool roomPool, Random r, RandomizerProperties props, ItemRoomSelectionStrategy itemRoomSelector)
     {
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palace.Number);
 
@@ -139,7 +139,7 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
         //Maybe we use ShuffleRooms()?
         //So for now we suffer lesser performance (but still way better than Reconstructed so do we care?)
         if (props.RequireTbird) { Debug.Assert(!props.RemoveTbird); }
-        if (!palace.AllReachable()
+        if (!AllReachable(props, palace)
             || (palace.Number == 7 && props.RequireTbird && !palace.RequiresThunderbird())
             || (palace.Number == 7 && !palace.IsBossRoomAtLeastMinDistance(props.DarkLinkMinDistance))
         )
