@@ -1,26 +1,23 @@
-﻿using DynamicData;
+using DynamicData;
 using FtRandoLib.Importer;
 using js65;
 using NLog;
-using NLog.Targets;
 using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
-using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
+using static js65.AsmModule;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -414,8 +411,8 @@ public class Hyrule
                     yamlLibPaths = new();
                 if (Directory.Exists(musicDir))
                 {
-                    var jsonExts = Z2Importer.JsonExtensions();
-                    var yamlExts = Z2Importer.YamlExtensions();
+                    var jsonExts = Importer.JsonExtensions();
+                    var yamlExts = Importer.YamlExtensions();
 
                     foreach (string path in Directory.EnumerateFiles(musicDir))
                     {
@@ -3431,8 +3428,8 @@ EndTileComparisons = $8601
         // Update the pointers to the text tables
         a.Segment("PRG3");
         a.Org(0xB423);
-        a.Word(a.Symbol("Towns_in_West_Hyrule"));
-        a.Word(a.Symbol("Towns_in_East_Hyrule"));
+        a.Word(Symbol("Towns_in_West_Hyrule"));
+        a.Word(Symbol("Towns_in_East_Hyrule"));
 
         for (var i = 0; i < hints.Count; i++) {
             var hint = hints[i];
@@ -3446,14 +3443,14 @@ EndTileComparisons = $8601
         // There are 52 texts in this first table
         for (var i = 0; i < CustomTexts.WEST_TEXT_COUNT; i++) {
             var hint = hints[i];
-            a.Word(a.Symbol($"HintText{i}"));
+            a.Word(Symbol($"HintText{i}"));
         }
         // and the rest are in this table
         a.Reloc();
         a.Label("Towns_in_East_Hyrule");
         for (var i = CustomTexts.WEST_TEXT_COUNT; i < hints.Count; i++) {
             var hint = hints[i];
-            a.Word(a.Symbol($"HintText{i}"));
+            a.Word(Symbol($"HintText{i}"));
         }
     }
 
@@ -3470,7 +3467,7 @@ EndTileComparisons = $8601
         a.Label("MovingDialogTable");
         for (var i = 0; i < texts.Count; i++)
         {
-            a.Word(a.Symbol($"MovingDialogText{i}"));
+            a.Word(Symbol($"MovingDialogText{i}"));
         }
         for (var i = 0; i < texts.Count; i++)
         {
@@ -3812,13 +3809,13 @@ FlagHudUpdate:
         a.Word(vanillaEntries);
         if (props.MarioMode)
         {
-            a.Word(a.Symbol("MarioRole1")); a.Word(a.Symbol("MarioName1"));
-            a.Word(a.Symbol("MarioRole2")); a.Word(a.Symbol("MarioName2"));
-            a.Word(a.Symbol("MarioRole3")); a.Word(a.Symbol("MarioName3"));
-            a.Word(a.Symbol("MarioRole4")); a.Word(a.Symbol("MarioName4"));
+            a.Word(Symbol("MarioRole1")); a.Word(Symbol("MarioName1"));
+            a.Word(Symbol("MarioRole2")); a.Word(Symbol("MarioName2"));
+            a.Word(Symbol("MarioRole3")); a.Word(Symbol("MarioName3"));
+            a.Word(Symbol("MarioRole4")); a.Word(Symbol("MarioName4"));
         }
-        a.Word(a.Symbol("NewCreditsHeader"));
-        a.Word(a.Symbol("NewCreditsBody"));
+        a.Word(Symbol("NewCreditsHeader"));
+        a.Word(Symbol("NewCreditsBody"));
 
         a.Code($$"""
 .include "z2r.inc"
