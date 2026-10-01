@@ -261,6 +261,15 @@
                           Content="Aggressive Thunderbird">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AggressiveThunderbirdToolTip}"/></ToolTip.Tip>
                 </CheckBox>
+
+                <CheckBox IsChecked="{Binding Main.Config.DropsMayBypassBosses}"
+                          Name="DropsMayBypassBossesCheckbox"
+                          IsThreeState="False"
+                          IsEnabled="{Binding DropsMayBypassBossesIncludedObservable^}">
+                    <TextBlock>Drops May Bypass Bosses</TextBlock>
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DropsMayBypassBossesTooltip}"/></ToolTip.Tip>
+                </CheckBox>
+
                 <Separator Margin="16 10 18 10"/>
 
                 <!-- misc -->

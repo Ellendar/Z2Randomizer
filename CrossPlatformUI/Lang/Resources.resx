@@ -840,6 +840,12 @@ Tower palace style always exits after the boss and is not affected by this setti
   • Anything: No restrictions on drops. This allows drops to lead to areas without an exit,
     requiring a Game Over or Up+A to get out.</value>
 	</data>
+	<data name="DropsMayBypassBossesTooltip" xml:space="preserve">
+<value>Allows a palace drop to bring the player behind a mini-boss. The mini-boss must also
+be reachable the normal way (by going right from another path).
+
+For now this only applies to mini-bosses, including Thunderbird when it is not required.</value>
+	</data>
 	<data name="HarderCarockToolTip" xml:space="preserve">
 <value>Tired of just ducking in the corner and blocking? This option enables carock shooting
 high/low/wave beams, but he won&apos;t teleport on top of you anymore.</value>

@@ -1,4 +1,4 @@
-﻿using NLog;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -84,21 +84,54 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         }
     }
 
-    public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false, bool allowBossEnterGoingLeft = false)
+    /// A mini boss is a boss that is not the final boss of the palace:
+    /// a boss in a passthrough or item room, or
+    /// Thunderbird when Thunderbird is not required.
+    public static bool IsMiniBoss(Room r, bool tBirdRequired)
+    {
+        if (r.IsBossRoom)
+        {
+            return false;
+        }
+        if (r.IsThunderBirdRoom && tBirdRequired)
+        {
+            return false;
+        }
+        return r.HasBoss || r.IsThunderBirdRoom;
+    }
+
+    private static bool AllowEnterGoingLeft(Room bossRoom, bool tBirdRequired, bool allowMiniBossEnterGoingLeft, bool allowFinalBossEnterGoingLeft)
+        => IsMiniBoss(bossRoom, tBirdRequired) ? allowMiniBossEnterGoingLeft : allowFinalBossEnterGoingLeft;
+
+    private static bool DropsMayBypass(Room bossRoom, bool dropsMayBypassMiniBosses, bool dropsMayBypassFinalBosses, bool tBirdRequired)
+        => IsMiniBoss(bossRoom, tBirdRequired) ? dropsMayBypassMiniBosses : dropsMayBypassFinalBosses;
+
+    public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false,
+                                               bool allowMiniBossEnterGoingLeft = false,
+                                               bool allowFinalBossEnterGoingLeft = false,
+                                               bool dropsMayBypassMiniBosses = false,
+                                               bool dropsMayBypassFinalBosses = false,
+                                               bool tBirdRequired = false)
     {
         if (Entrance == null)
         {
             throw new Exception("Palace Entrance is missing");
         }
-        if (!allowBossEnterGoingLeft)
+        foreach (Room r in AllRooms.Where(r => r.HasBoss || r.IsThunderBirdRoom))
         {
-            foreach (Room r in AllRooms)
+            if (AllowEnterGoingLeft(r, tBirdRequired, allowMiniBossEnterGoingLeft, allowFinalBossEnterGoingLeft))
             {
-                if (r.HasBoss && CanEnterBossGoingLeft(r))
-                {
-                    return [Entrance];
-                }
+                continue;
             }
+
+            if (AreThereAlternatePathsToTheRightOfRoom(r, DropsMayBypass(r, dropsMayBypassMiniBosses, dropsMayBypassFinalBosses, tBirdRequired)))
+            {
+                return [Entrance];
+            }
+        }
+        if (!AllBossRoomsHaveValidEntry(dropsMayBypassMiniBosses, dropsMayBypassFinalBosses, tBirdRequired, allowMiniBossEnterGoingLeft, allowFinalBossEnterGoingLeft))
+        {
+            return [Entrance];
         }
         HashSet<Room> reachedRooms = [];
         Stack<(Room, Direction)> roomsToCheck = [];
@@ -106,18 +139,6 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         while (roomsToCheck.Count > 0)
         {
             var (room, originDirection) = roomsToCheck.Pop();
-
-            //For required thunderbird, you can't path backwards into tbird room
-            if (!allowBossEnterGoingLeft)
-            {
-                if ((Number == 7 && room.IsThunderBirdRoom) || (Number < 7 && room.IsBossRoom))
-                {
-                    if (originDirection == Direction.EAST)
-                    {
-                        return [Entrance];
-                    }
-                }
-            }
 
             // This will return false if the room is already added, so then we go to the next room to check
             if (!reachedRooms.Add(room))
@@ -238,63 +259,141 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false; // Boss room not found?
     }
 
-    public bool AllReachable(bool allowBacktracking = false, bool allowBossEnterGoingLeft = false)
+    public bool AllReachable(bool allowBacktracking = false,
+                             bool allowMiniBossEnterGoingLeft = false,
+                             bool allowFinalBossEnterGoingLeft = false,
+                             bool dropsMayBypassBosses = false,
+                             bool dropsMayBypassFinalBosses = false,
+                             bool tBirdRequired = false)
     {
-        var reachableRooms = GetReachableRooms(allowBacktracking: allowBacktracking, allowBossEnterGoingLeft: allowBossEnterGoingLeft);
+        var reachableRooms = GetReachableRooms(allowBacktracking: allowBacktracking,
+                                               allowMiniBossEnterGoingLeft: allowMiniBossEnterGoingLeft,
+                                               allowFinalBossEnterGoingLeft: allowFinalBossEnterGoingLeft,
+                                               dropsMayBypassMiniBosses: dropsMayBypassBosses,
+                                               dropsMayBypassFinalBosses: dropsMayBypassFinalBosses,
+                                               tBirdRequired: tBirdRequired);
         return AllRooms.All(i => reachableRooms.Contains(i));
     }
 
-    private bool CanEnterBossGoingLeft(Room b)
+    /// <summary>
+    /// Determines whether the room to the right of <paramref name="bossRoom"/>
+    /// can be reached without passing through <paramref name="bossRoom"/>.
+    ///
+    /// When <paramref name="excludingDrops"/> is set (drops may bypass bosses), routes
+    /// that take a drop are ignored, so only a route that gets there without dropping
+    /// counts as an alternate path.
+    /// </summary>
+    private bool AreThereAlternatePathsToTheRightOfRoom(Room bossRoom, bool excludingDrops)
     {
-        HashSet<Room> reachable = [];
+        HashSet<Room> reached = [];
         Stack<Room> roomsToCheck = [];
 
-        Room Entrance = AllRooms.First(i => i.IsEntrance);
+        roomsToCheck.Push(Entrance!);
 
-        if (Entrance.Down != null)
+        while (roomsToCheck.Count > 0)
         {
-            reachable.Add(Entrance.Down);
-            roomsToCheck.Push(Entrance.Down);
+            Room room = roomsToCheck.Pop();
+            if (room.Left is not null && room.Left == bossRoom)
+            {
+                return true;
+            }
+            foreach (Room? neighbor in room.GetNeighborsOutgoing())
+            {
+                if (neighbor is null || neighbor == bossRoom)
+                {
+                    continue;
+                }
+                if (excludingDrops && room.HasDrop && neighbor == room.Down)
+                {
+                    continue;
+                }
+                if (reached.Add(neighbor))
+                {
+                    roomsToCheck.Push(neighbor);
+                }
+            }
         }
 
-        if (Entrance.Up != null)
+        return false;
+    }
+
+    private bool AllBossRoomsHaveValidEntry(bool dropsMayBypassMiniBosses, bool dropsMayBypassFinalBosses, bool tBirdRequired, bool allowMiniBossEnterGoingLeft, bool allowFinalBossEnterGoingLeft)
+    {
+        HashSet<Room> enteredValid = [];
+        HashSet<(Room room, Direction enteredFrom, bool hasDropped)> reached = [];
+        Stack<(Room room, Direction enteredFrom, bool hasDropped)> roomsToCheck = [];
+
+        roomsToCheck.Push((Entrance!, Direction.WEST, false));
+
+        bool IsBoss(Room room) => room.HasBoss || room.IsThunderBirdRoom;
+
+        bool IsLeftEntryAllowed(Room room)
         {
-            reachable.Add(Entrance.Up);
-            roomsToCheck.Push(Entrance.Up);
+            return AllowEnterGoingLeft(room, tBirdRequired, allowMiniBossEnterGoingLeft, allowFinalBossEnterGoingLeft);
         }
 
-        if (Entrance.Right != null)
+        bool CanBypassWithDrop(Room room, bool hasDropped)
         {
-            reachable.Add(Entrance.Right);
-            roomsToCheck.Push(Entrance.Right);
+            return hasDropped && DropsMayBypass(room, dropsMayBypassMiniBosses, dropsMayBypassFinalBosses, tBirdRequired);
+        }
+
+        void TryPush(Room room, Direction enteredFrom, bool hasDropped)
+        {
+            if (IsBoss(room))
+            {
+                if (enteredFrom == Direction.EAST)
+                {
+                    if (!IsLeftEntryAllowed(room) && !CanBypassWithDrop(room, hasDropped))
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    enteredValid.Add(room);
+                }
+            }
+
+            roomsToCheck.Push((room, enteredFrom, hasDropped));
         }
 
         while (roomsToCheck.Count > 0)
         {
-            Room c = roomsToCheck.Pop();
-            if (c.Left is not null && c.Left == b)
+            var (room, enteredFrom, hasDropped) = roomsToCheck.Pop();
+
+            if (!reached.Add((room, enteredFrom, hasDropped)))
             {
-                return true;
+                continue;
             }
-            if (c.Left is not null && reachable.Add(c.Left))
+
+            if (room.Left != null && enteredFrom != Direction.WEST)
             {
-                roomsToCheck.Push(c.Left);
+                TryPush(room.Left, Direction.EAST, hasDropped);
             }
-            if (c.Right is not null && c.Right != b && reachable.Add(c.Right))
+
+            if (room.Right != null && enteredFrom != Direction.EAST)
             {
-                roomsToCheck.Push(c.Right);
+                TryPush(room.Right, Direction.WEST, hasDropped);
             }
-            if (c.Up is not null && c.Up != b && reachable.Add(c.Up))
+
+            if (room.Up != null && enteredFrom != Direction.NORTH)
             {
-                roomsToCheck.Push(c.Up);
+                TryPush(room.Up, Direction.SOUTH, hasDropped);
             }
-            if (c.Down is not null && c.Down != b && reachable.Add(c.Down))
+
+            if (room.Down != null && enteredFrom != Direction.SOUTH)
             {
-                roomsToCheck.Push(c.Down);
+                bool neighborHasDropped = hasDropped || room.HasDrop;
+                TryPush(room.Down, Direction.NORTH, neighborHasDropped);
             }
         }
-        return false;
+
+        return AllRooms
+            .Where(room => room.HasBoss || room.IsThunderBirdRoom)
+            .Where(room => !IsLeftEntryAllowed(room))
+            .All(enteredValid.Contains);
     }
+
     public void ShuffleRooms(Random r)
     {
         List<Room> roomsWithUpExits = AllRooms.Where(i => i.HasUpExit).ToList();
@@ -1520,6 +1619,10 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         else if (room.IsThunderBirdRoom)
                         {
                             sb.Append('T');
+                        }
+                        else if (room.HasBoss)
+                        {
+                            sb.Append('b');
                         }
                         else
                         {
