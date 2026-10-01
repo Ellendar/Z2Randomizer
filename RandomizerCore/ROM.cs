@@ -7,12 +7,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
-using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
+using static js65.AsmModule;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -275,7 +274,7 @@ public class ROM
         a.Label(label);
         a.Byt(bytes);
         a.Org((ushort)nesPtr);
-        a.Word(a.Symbol(label));
+        a.Word(Symbol(label));
     }
 
     public byte[] ReadSprite(int spriteAddr, int tilesWide, int tilesHigh, byte[] palette)
