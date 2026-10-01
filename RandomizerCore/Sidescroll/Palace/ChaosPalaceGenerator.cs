@@ -161,7 +161,11 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         ;
 
         //Chaos palaces do not check for inescapable drops. They are inherently insane and not remotely beginner-friendly.
-        palace.IsValid = palace.AllReachable(allowBacktracking: true, allowBossEnterGoingLeft: palace.Number == 7);
+        palace.IsValid = palace.AllReachable(allowBacktracking: true,
+                                             allowMiniBossEnterGoingLeft: true,
+                                             allowFinalBossEnterGoingLeft: false,
+                                             dropsMayBypassBosses: props.DropsMayBypassBosses,
+                                             tBirdRequired: props.RequireTbird);
         return palace;
     }
 }

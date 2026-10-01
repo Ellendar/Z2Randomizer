@@ -225,7 +225,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
 
         //Some percentage of the time, dropifying some rooms causes part of the palace to become
         //unreachable because up was the only way to get there.
-        if (!palace.AllReachable())
+        if (!AllReachable(props, palace))
         {
             return false;
         }
@@ -243,7 +243,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         return true;
     }
 
-    private static async Task ConnectRooms(Palace palace)
+    public static async Task ConnectRooms(Palace palace)
     {
         //Connect adjacent rooms if they exist
         foreach (Room room in palace.AllRooms)

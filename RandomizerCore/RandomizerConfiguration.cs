@@ -402,6 +402,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
     [Reactive]
     [ConditionallyIncludeInFlags]
+    private bool dropsMayBypassBosses = false;
+    public bool dropsMayBypassBossesIncluded() => palaceStylesAreNotAllVanilla();
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool removeLongDeadEnds = false;
     public bool removeLongDeadEndsIncluded() => includev5_0RoomsIncluded() && includev5_0Rooms is not false;
 
@@ -1379,6 +1384,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         }
         properties.BossRoomsExitToPalace[6] = false;
         properties.PalaceDropStyle = palaceDropStyle;
+        properties.DropsMayBypassBosses = dropsMayBypassBosses;
 
         properties.NoDuplicateRooms = noDuplicateRoomsByEnemies;
         properties.NoDuplicateRoomsBySideview = noDuplicateRoomsByLayout;
