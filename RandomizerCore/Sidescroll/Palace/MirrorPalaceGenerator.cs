@@ -10,10 +10,13 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
 {
+    private const float DROP_CHANCE = 0.3f;
+    private readonly float? MINI_BOSS_CHANCE = 0.2f;
+    private const float MIN_EFFECTIVE_PALACE = 1.0f;
     private static readonly TableWeightedRandom<int> WeightedRandomDirections = new([
-        (0, 8),  // left
-        (1, 3),  // down
-        (2, 3),  // up
+        (0, 14),  // left
+        (1, 6),  // down
+        (2, 6),  // up
         (3, 8),  // right
     ]);
 
@@ -55,6 +58,7 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
         return palaceShape;
     }
 
+    /// build the shape of the right side only - don't allow expanding left of center
     protected override bool CanExpandTo(Coord currentCoord, Coord nextCoord, Room entrance)
     {
         return !(nextCoord == Coord.Uninitialized
@@ -96,8 +100,16 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
         }
 
         int palaceSize = palaceShape.Count;
-        int centerRooms = palaceShape.Count(pair => pair.Key.X == 0);
-        if (centerRooms * 3.5 > palaceSize)
+        var centerRooms = palaceShape.Where(pair => pair.Key.X == 0);
+        int centerRoomCount = centerRooms.Count();
+        if (centerRoomCount * 2 > palaceSize)
+        {
+            return false;
+        }
+
+        var center4Ways = centerRooms.Where(pair => pair.Value == RoomExitType.FOUR_WAY);
+        int center4WayCount = center4Ways.Count();
+        if (center4WayCount > 0)
         {
             return false;
         }
@@ -106,14 +118,18 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
         var verticalCount = shapeCounts.GetValueOrDefault(RoomExitType.VERTICAL_PASSTHROUGH, 0);
         //var fourwayCount = shapeCounts.GetValueOrDefault(RoomExitType.FOUR_WAY, 0);
         // disallow too many vertical rooms
-        if (verticalCount * 6 > palaceSize)
+        if (verticalCount * 7 > palaceSize)
         {
             return false;
         }
 
         // pretty strong effective palace check to force boss and items to be spread out
-        return VanillaWeightedPalaceGenerator.EffectivePalaceCheck(palace, palaceShape, palaceSize, 2.0);
+        return VanillaWeightedPalaceGenerator.EffectivePalaceCheck(palace, palaceShape, palaceSize, MIN_EFFECTIVE_PALACE);
     }
+
+    protected override float GetDropChance() => DROP_CHANCE;
+
+    protected override float? GetMiniBossChance() => MINI_BOSS_CHANCE;
 
     protected override List<Room> GetNormalRoomsForExitType(RoomPool roomPool, Coord roomCoords, RoomExitType roomExitType)
     {
