@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using ReactiveUI;
+using RUISG = ReactiveUI.SourceGenerators;
 using ReactiveUI.Primitives.Disposables;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
@@ -19,14 +20,14 @@ using CrossPlatformUI.Services;
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("")]
-public class GenerateRomViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
+public partial class GenerateRomViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
 
-#pragma warning disable CS8618
+#pragma warning disable CS8618, CS9264
 
     [JsonConstructor]
     public GenerateRomViewModel() {}
-#pragma warning restore CS8618 
+#pragma warning restore CS8618, CS9264
     public GenerateRomViewModel(MainViewModel main)
     {
         Main = main;
@@ -71,8 +72,8 @@ Seed: {config.Seed}
             HasError = false;
             IsComplete = false;
             tokenSource = new CancellationTokenSource();
-            ProgressHeading = "";
-            ProgressBody = "";
+            ProgressHeading = "Generating";
+            ProgressBody = "Starting Seed Generation";
             await App.PersistState();
             var createAsm = App.Current?.Services?.GetService<Hyrule.NewAssemblerFn>();
             var files = App.Current?.Services?.GetService<IFileSystemService>();
@@ -198,20 +199,13 @@ Seed: {config.Seed}
         return Dispatcher.UIThread.InvokeAsync(() => { ProgressHeading = heading; ProgressBody = body; }).GetTask();
     }
 
-    private string progressHeading = "";
     [JsonIgnore]
-    public string ProgressHeading
-    {
-        get => string.IsNullOrEmpty(progressHeading) ? "Generating" : progressHeading;
-        set => this.RaiseAndSetIfChanged(ref progressHeading, value);
-    }
+    [RUISG.Reactive]
+    public partial string ProgressHeading { get; set; } = "";
 
-    private string progressBody = "";
     [JsonIgnore]
-    public string ProgressBody {
-        get => string.IsNullOrEmpty(progressBody) ? "Starting Seed Generation" : progressBody;
-        set => this.RaiseAndSetIfChanged(ref progressBody, value);
-    }
+    [RUISG.Reactive]
+    public partial string ProgressBody { get; set; } = "";
 
     [JsonIgnore]
     public ReactiveCommand<RxVoid, RxVoid> CancelGeneration { get; }
@@ -219,18 +213,18 @@ Seed: {config.Seed}
     public ReactiveCommand<RxVoid, RxVoid> CopyError { get; }
 
     private readonly SemaphoreSlim runningMutex = new SemaphoreSlim(1, 1);
-    private bool isRunning;
-    public bool IsRunning { get => isRunning; set => this.RaiseAndSetIfChanged(ref isRunning, value); }
+    [RUISG.Reactive]
+    public partial bool IsRunning { get; set; }
 
     private CancellationTokenSource? tokenSource;
 
     private Exception? lastError;
-    private bool hasError;
     [JsonIgnore]
-    public bool HasError { get => hasError; set => this.RaiseAndSetIfChanged(ref hasError, value); }
-    private bool isComplete;
+    [RUISG.Reactive]
+    public partial bool HasError { get; set; }
     [JsonIgnore]
-    public bool IsComplete { get => isComplete; set => this.RaiseAndSetIfChanged(ref isComplete, value); }
+    [RUISG.Reactive]
+    public partial bool IsComplete { get; set; }
 
     [JsonIgnore]
     public MainViewModel Main { get; }

@@ -41,14 +41,15 @@
     <PackageVersion Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
     <!-- ReactiveUI -->
     <PackageVersion Include="DynamicData" Version="9.4.33" />
-    <PackageVersion Include="ReactiveUI" Version="24.1.0" />
-    <PackageVersion Include="ReactiveUI.Avalonia" Version="12.1.1" />
-    <PackageVersion Include="ReactiveUI.Primitives" Version="7.2.0" />
+    <PackageVersion Include="ReactiveUI" Version="25.1.1" />
+    <PackageVersion Include="ReactiveUI.Avalonia" Version="12.1.5" />
+    <PackageVersion Include="ReactiveUI.Primitives" Version="8.4.0" />
+    <PackageVersion Include="ReactiveUI.SourceGenerators" Version="4.2.0" />
     <!-- Misc -->
     <PackageVersion Include="Aigamo.ResXGenerator" Version="4.4.0" />
     <PackageVersion Include="NLog" Version="6.2.1" />
     <PackageVersion Include="SD.Tools.Algorithmia" Version="1.4.0" />
-    <PackageVersion Include="Xaml.Behaviors.Interactions" Version="12.0.5" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions" Version="12.0.7" />
     <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="5.1.0" />
     <!-- FtRandoLib -->
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
