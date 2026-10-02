@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using ReactiveUI;
+using RUISG = ReactiveUI.SourceGenerators;
 using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Disposables;
 using ReactiveUI.Primitives.Signals;
@@ -12,7 +13,7 @@ using Z2Randomizer.RandomizerCore;
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("")]
-public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
+public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
 {
     public string? OutputFilePath { get; set; }
     private RandomizerConfiguration config = new();
@@ -23,7 +24,8 @@ public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
     public IObservable<String> FlagsObservable { get; }
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public RandomizerConfiguration Config { get => config; set => this.RaiseAndSetIfChanged(ref config, value); }
+    [RUISG.Reactive]
+    public partial RandomizerConfiguration Config { get; set; } = new();
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public RomFileViewModel RomFileViewModel { get; set; }
@@ -34,9 +36,11 @@ public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public SaveNewPresetViewModel SaveNewPresetViewModel { get; set; }
 
-    public CustomPixelPoint WindowPosition { get => windowPosition; set => this.RaiseAndSetIfChanged(ref windowPosition, value); }
+    [RUISG.Reactive]
+    public partial CustomPixelPoint WindowPosition { get; set; }
 
-    public CustomSize WindowSize { get => windowSize; set => this.RaiseAndSetIfChanged(ref windowSize, value); }
+    [RUISG.Reactive]
+    public partial CustomSize WindowSize { get; set; }
 
     public MainViewModel()
     {
@@ -96,13 +100,9 @@ public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
     //     App.Main = this;
     // }
 
-    private bool shuffleAllExp;
     [JsonIgnore]
-    public bool ShuffleAllExpState
-    {
-        get => shuffleAllExp;
-        set => this.RaiseAndSetIfChanged(ref shuffleAllExp, value);
-    }
+    [RUISG.Reactive]
+    public partial bool ShuffleAllExpState { get; set; }
     
     // The Router associated with this Screen.
     // Required by the IScreen interface.
@@ -116,28 +116,28 @@ public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
     [JsonIgnore]
     public GenerateRomViewModel GenerateRomViewModel { get; }
 
-    private bool generateRomDialogOpen = false;
     [JsonIgnore]
-    public bool GenerateRomDialogOpen { get => generateRomDialogOpen; set => this.RaiseAndSetIfChanged(ref generateRomDialogOpen, value); }
+    [RUISG.Reactive]
+    public partial bool GenerateRomDialogOpen { get; set; }
 
 
-    private bool saveNewPresetDialogOpen = false;
     [JsonIgnore]
-    public bool SaveNewPresetDialogOpen { get => saveNewPresetDialogOpen; set => this.RaiseAndSetIfChanged(ref saveNewPresetDialogOpen, value); }
+    [RUISG.Reactive]
+    public partial bool SaveNewPresetDialogOpen { get; set; }
 
     [JsonIgnore]
     public UpdatePresetViewModel UpdatePresetViewModel { get; }
 
-    private bool updatePresetDialogOpen = false;
     [JsonIgnore]
-    public bool UpdatePresetDialogOpen { get => updatePresetDialogOpen; set => this.RaiseAndSetIfChanged(ref updatePresetDialogOpen, value); }
+    [RUISG.Reactive]
+    public partial bool UpdatePresetDialogOpen { get; set; }
 
     [JsonIgnore]
     public RemovePresetViewModel RemovePresetViewModel { get; }
 
-    private bool removePresetDialogOpen = false;
     [JsonIgnore]
-    public bool RemovePresetDialogOpen { get => removePresetDialogOpen; set => this.RaiseAndSetIfChanged(ref removePresetDialogOpen, value); }
+    [RUISG.Reactive]
+    public partial bool RemovePresetDialogOpen { get; set; }
 
     // Unique identifier for the routable view model.
     [JsonIgnore]

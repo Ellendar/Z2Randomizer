@@ -167,21 +167,21 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
                 // x => x.Main.Config.BeamSprite,
             )
             .Select(t => (
-                t.Item1?.DisplayName, // making selected Sprite a string compare instead of an object compare
-                t.Item2,
-                t.Item3,
-                t.Item4
+                t.Property1?.DisplayName, // making selected Sprite a string compare instead of an object compare
+                t.Property2,
+                t.Property3,
+                t.Property4
             ))
             .DistinctUntilChanged() // filter emits where nothing has changed
             .Throttle(TimeSpan.FromMilliseconds(20));
 
-        var hasRomObservable = Main.RomFileViewModel.ObservableForProperty(x => x.HasRomData, false, false);
+        var hasRomObservable = Main.RomFileViewModel.HasRomDataObservable;
         var optionsObservable = options.Connect().ToCollection();
 
         SubscribeExtensions.Subscribe(
             settingsObservable
                 .CombineLatest(hasRomObservable, optionsObservable, (settings, hasRom, options) => (settings, hasRom, options))
-                .Where(t => t.hasRom.Value && t.options.Count > 0),
+                .Where(t => t.hasRom && t.options.Count > 0),
             t =>
             {
                 SubscribeExtensions.Subscribe(

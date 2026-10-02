@@ -40,6 +40,7 @@
     <PackageReference Include="Aigamo.ResXGenerator">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="ReactiveUI.SourceGenerators" />
     <PackageReference Include="Xaml.Behaviors.Interactions" />
   </ItemGroup>
   <ItemGroup>
