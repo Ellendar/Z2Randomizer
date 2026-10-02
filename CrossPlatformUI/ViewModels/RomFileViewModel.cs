@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
+using RUISG = ReactiveUI.SourceGenerators;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
 using SD.Tools.BCLExtensions.CollectionsRelated;
 using Z2Randomizer.RandomizerCore;
@@ -13,7 +14,7 @@ using CrossPlatformUI.Services;
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
-public class RomFileViewModel : ViewModelBase, IRoutableViewModel
+public partial class RomFileViewModel : ViewModelBase, IRoutableViewModel
 {
     private byte[] romData = [];
     public byte[] RomData
@@ -26,13 +27,9 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
         }
     }
 
-    private string message { get; set; } = "Select your Zelda 2 ROM to get started!";
     [JsonIgnore]
-    public string Message
-    {
-        get => message;
-        set { message = value; this.RaisePropertyChanged(); }
-    }
+    [RUISG.Reactive]
+    public partial string Message { get; set; } = "Select your Zelda 2 ROM to get started!";
 
     [JsonIgnore]
     public IObservable<byte[]> RomDataObservable => this.WhenAnyValue(x => x.RomData);
