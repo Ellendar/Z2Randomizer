@@ -12,6 +12,7 @@ public class ItemsViewModel : ReactiveObject, IActivatableViewModel
     public ViewModelActivator Activator { get; }
     public MainViewModel Main { get; }
 
+
     public ItemsViewModel(MainViewModel main)
     {
         Main = main;

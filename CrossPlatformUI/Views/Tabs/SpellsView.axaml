@@ -2,94 +2,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
-             xmlns:ui="clr-namespace:CrossPlatformUI"
-             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
-             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.Tabs.SpellsView"
              x:DataType="vmt:SpellsViewModel">
     <Grid ColumnDefinitions="*, *">
         <StackPanel Grid.Column="0">
-            <CheckBox
-                IsChecked="{Binding Main.Config.ShuffleLifeRefillAmount}"
-                Content="Shuffle Life Refill Amount"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleLifeRefillAmountToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Main.Config.ShuffleSpellLocations}"
-                Content="Shuffle Spell Locations"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleSpellLocationsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Main.Config.DisableMagicContainerRequirements}"
-                Content="Disable Magic Container Requirements"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DisableMagicContainerRequirementsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Main.Config.RandomizeSpellSpellEnemy}"
-                Content="Randomize Spell Spell Enemy"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RandomizeSpellSpellEnemyToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Main.Config.SwapUpAndDownStab}"
-                Content="Swap Upstab and Downstab Location"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.SwapUpstabandDownstabLocationToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <ComboBox 
-                Theme="{StaticResource MaterialOutlineComboBox}"
-                assists:ComboBoxAssist.Label="Fire Spell"
-                IsEnabled="{Binding FireOptionEnabledObservable^}"
-                ItemsSource="{Binding Source={x:Static rc:Enums.FireOptionList}}"
-                SelectedItem="{Binding Main.Config.FireOption, Converter={x:Static ui:Util.EnumConvert}}"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.FireSpellToolTip}"/></ToolTip.Tip>
-            </ComboBox>
+            <gen:ShuffleLifeRefillAmount />
+            <gen:ShuffleSpellLocations />
+            <gen:DisableMagicContainerRequirements />
+            <gen:RandomizeSpellSpellEnemy />
+            <gen:SwapUpAndDownStab />
+            <gen:FireOption />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <CheckBox
-                IsChecked="{Binding Main.Config.JumpAlwaysOn}"
-                Content="Jump Always On"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.JumpAlwaysOnToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsChecked="{Binding Main.Config.DashAlwaysOn}"
-                Content="Dash Always On"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DashAlwaysOnToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsChecked="{Binding Main.Config.PermanentBeamSword}"
-                Content="Permanent Beam Sword"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.PermanentBeamSwordToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsChecked="{Binding Main.Config.MarioMode}"
-                Content="Mario Mode"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MarioModeToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <ComboBox
-                Theme="{StaticResource MaterialOutlineComboBox}"
-                assists:ComboBoxAssist.Label="Flute Warp"
-                ItemsSource="{Binding Source={x:Static rc:Enums.FluteWarpModeList}}"
-                SelectedItem="{Binding Main.Config.FluteWarpMode, Converter={x:Static ui:Util.EnumConvert}}"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.FluteTwisterWarpToolTip}"/></ToolTip.Tip>
-            </ComboBox>
+            <gen:JumpAlwaysOn />
+            <gen:DashAlwaysOn />
+            <gen:PermanentBeamSword />
+            <gen:MarioMode />
+            <gen:FluteWarpMode />
         </StackPanel>
     </Grid>
 </UserControl>
