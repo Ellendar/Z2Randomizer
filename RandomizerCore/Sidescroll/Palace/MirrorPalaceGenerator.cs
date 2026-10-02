@@ -10,11 +10,13 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
 {
+    private const float DROP_CHANCE = 0.4f;
+    private const float MIN_EFFECTIVE_PALACE = 1.5f;
     private static readonly TableWeightedRandom<int> WeightedRandomDirections = new([
-        (0, 8),  // left
-        (1, 3),  // down
-        (2, 3),  // up
-        (3, 8),  // right
+        (0, 10),  // left
+        (1, 6),  // down
+        (2, 6),  // up
+        (3, 10),  // right
     ]);
 
     private static ImmutableHashSet<RoomExitType> UNMIRRORABLE_SHAPES = new HashSet<RoomExitType>([
@@ -112,7 +114,12 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
         }
 
         // pretty strong effective palace check to force boss and items to be spread out
-        return VanillaWeightedPalaceGenerator.EffectivePalaceCheck(palace, palaceShape, palaceSize, 2.0);
+        return VanillaWeightedPalaceGenerator.EffectivePalaceCheck(palace, palaceShape, palaceSize, MIN_EFFECTIVE_PALACE);
+    }
+
+    protected override float GetDropChance()
+    {
+        return DROP_CHANCE;
     }
 
     protected override List<Room> GetNormalRoomsForExitType(RoomPool roomPool, Coord roomCoords, RoomExitType roomExitType)
@@ -173,5 +180,13 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
         {
             return base.SelectRoomForCoord(palace, rooms, roomPool, palaceShape, roomCoords, dropZone, nonLinkedCandidates);
         }
+    }
+
+    public override bool AllReachable(RandomizerProperties props, Palace palace)
+    {
+        return palace.AllReachable(allowMiniBossEnterGoingLeft: true,
+                                   allowFinalBossEnterGoingLeft: false,
+                                   dropsMayBypassBosses: props.DropsMayBypassBosses,
+                                   tBirdRequired: props.RequireTbird);
     }
 }
