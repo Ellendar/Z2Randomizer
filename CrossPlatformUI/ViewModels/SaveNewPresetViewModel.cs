@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using DynamicData.Binding;
 using ReactiveUI;
+using RUISG = ReactiveUI.SourceGenerators;
 using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Disposables;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
@@ -12,11 +13,10 @@ using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 
-public class CustomPreset : ReactiveObject
+public partial class CustomPreset : ReactiveObject
 {
-    /// name of preset
-    private string preset = "";
-    public string Preset { get => preset; set => this.RaiseAndSetIfChanged(ref preset, value); }
+    [RUISG.Reactive]
+    public partial string Preset { get; set; } = "";
 
     private RandomizerConfiguration? config;
 
@@ -53,10 +53,12 @@ public class CustomPreset : ReactiveObject
         }
     }
 
+#pragma warning disable CS8618, CS9264
     /// empty constructor for serialization only
     public CustomPreset()
     {
     }
+#pragma warning restore CS8618, CS9264
 
     public CustomPreset(string preset, RandomizerConfiguration config)
     {
@@ -66,14 +68,14 @@ public class CustomPreset : ReactiveObject
 }
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
-public class SaveNewPresetViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
+public partial class SaveNewPresetViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
 
-#pragma warning disable CS8618
+#pragma warning disable CS8618, CS9264
     [JsonConstructor]
     public SaveNewPresetViewModel() {}
-#pragma warning restore CS8618
-    
+#pragma warning restore CS8618, CS9264
+
     public SaveNewPresetViewModel(MainViewModel main)
     {
         Main = main;
@@ -101,17 +103,17 @@ public class SaveNewPresetViewModel : ReactiveObject, IRoutableViewModel, IActiv
             .ToProperty(this, x => x.HasSavedPresets, out hasSavedPresets);
     }
     
-    private ObservableCollection<CustomPreset> savedPresets = new ();
-    public ObservableCollection<CustomPreset> SavedPresets { get => savedPresets; set => this.RaiseAndSetIfChanged(ref savedPresets, value); }
+    [RUISG.Reactive]
+    public partial ObservableCollection<CustomPreset> SavedPresets { get; set; } = new();
 
     [JsonIgnore]
     private readonly ObservableAsPropertyHelper<bool> hasSavedPresets;
     [JsonIgnore]
     public bool HasSavedPresets => hasSavedPresets.Value;
 
-    private string presetName = "";
     [JsonIgnore]
-    public string PresetName { get => presetName; set => this.RaiseAndSetIfChanged(ref presetName, value); }
+    [RUISG.Reactive]
+    public partial string PresetName { get; set; } = "";
     
     [JsonIgnore]
     private MainViewModel Main { get; }
