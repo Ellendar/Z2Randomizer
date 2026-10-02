@@ -183,10 +183,10 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
     {
         var loadedFlags = Main.Config.SerializeFlags(); // this serializes the configuration
         var defaultFlags = new RandomizerConfiguration().SerializeFlags();
-        // If the flags are entirely default, use the beginner preset
+        // If the flags are entirely default, use the vanilla preset
         if (loadedFlags == defaultFlags)
         {
-            Main.Config.DeserializeFlags(BeginnerPreset.Preset.SerializeFlags());
+            Main.Config.DeserializeFlags(VanillaPreset.Preset.SerializeFlags());
         }
 
         // flag updates from RandomizerConfiguration always overwrites our flag input
