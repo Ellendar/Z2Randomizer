@@ -16,6 +16,7 @@
             <TextBlock Text="Accessibility" Classes="SectionHeader" />
             <z:Z2CheckBox Flag="RemoveFlashing" />
             <z:Z2CheckBox Flag="DarkenThunderbird" />
+            <z:Z2CheckBox Flag="HorizontalBossBarsGP" />
             <z:Z2CheckBox Flag="DisableHUDLag" />
 
             <TextBlock Text="Quality of Life" Classes="SectionHeader" />

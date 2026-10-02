@@ -415,6 +415,39 @@ PinCarockSpriteSlot:
     jmp $b20d  ; continue to original jsr
 
 
+; HorizontalBossBars (author initsu)
+; ============================================
+.if HORIZONTAL_BOSS_BARS_GP
+
+; Horizontal HP bar
+HP_X_STEP = $0a
+HP_X_START = $81 + HP_X_STEP * 4
+HP_Y = $d0
+
+;.segment "PRG4"
+;.org $9c53 -- can copy-paste code here if we want horizontal HP bars for all palaces
+
+.segment "PRG5"
+.org $a4f7
+    lda #HP_X_START
+    sta zp_00
+    lda #$70
+    dey
+    bmi @KeepTile70
+        lda #$6e
+    @KeepTile70:
+    sta $02c1,X
+    lda #$01
+    sta $02c2,X
+    lda #HP_Y
+    sta $02c0,X
+    lda zp_00
+    sbc #HP_X_STEP
+    sta zp_00
+    sta $02c3,X
+.assert * = $a518
+.endif
+
 ; BossEnterGoingLeftFix (author initsu)
 ; =====================================
 .segment "PRG4"

@@ -2456,6 +2456,7 @@ DetermineFacing:
         a.Assign("RANDOM_BOSS_ITEM", props.BossItem ? 1 : 0);
         a.Assign("AGGRESSIVE_TBIRD", props.AggressiveTbird ? 1 : 0);
         a.Assign("DARKEN_TBIRD_ROOM", props.DarkenThunderbird ? 1 : 0);
+        a.Assign("HORIZONTAL_BOSS_BARS_GP", props.HorizontalBossBarsGP ? 1 : 0);
         a.Code(Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.Bosses.s"), "Bosses.s");
     }
 

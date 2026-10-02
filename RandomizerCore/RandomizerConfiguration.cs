@@ -813,6 +813,10 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
     [Reactive]
     [IgnoreInFlags]
+    private bool horizontalBossBarsGP = false;
+
+    [Reactive]
+    [IgnoreInFlags]
     private CharacterSprite sprite = CharacterSprite.LINK;
 
     [Reactive]
@@ -1495,6 +1499,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.ShieldColor = shieldTunic;
         properties.UpAC1 = upAOnController1;
         properties.DarkenThunderbird = darkenThunderbird;
+        properties.HorizontalBossBarsGP = horizontalBossBarsGP;
         properties.RemoveFlashing = removeFlashing;
         //Removed the option to select this for now.
         properties.UseCustomRooms = false;

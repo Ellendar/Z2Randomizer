@@ -111,6 +111,10 @@
 	<data name="DarkenThunderbirdToolTip" xml:space="preserve">
 <value>Blacks out the background bricks when thunder is cast in Thunderbird's room.</value>
 	</data>
+	<data name="HorizontalBossBarsGPToolTip" xml:space="preserve">
+<value>Increase visibility when fighting Thunderbird by moving the health bars away.
+This removes some of the flickering caused by the NES sprites per scanline limit.</value>
+	</data>
 	<data name="DisableHUDLagToolTip" xml:space="preserve">
 <value>Prevents the HUD from flying all over the place when lag happens. Does not actually reduce
 the amount of lag.</value>
@@ -1304,6 +1308,9 @@ This is a wildly different gameplay experience, so be warned when setting this f
 	</data>
 	<data name="DarkenThunderbird" xml:space="preserve">
 		<value>Dark Thunderbird Background</value>
+	</data>
+	<data name="HorizontalBossBarsGP" xml:space="preserve">
+		<value>Horizontal Boss HP Bars in GP</value>
 	</data>
 	<data name="DashAlwaysOn" xml:space="preserve">
 		<value>Dash Always On</value>
