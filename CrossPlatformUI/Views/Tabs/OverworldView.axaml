@@ -2,122 +2,44 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
-             xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
-             xmlns:overworld="clr-namespace:Z2Randomizer.RandomizerCore.Overworld;assembly=RandomizerCore"
-             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.Tabs.OverworldView"
              x:DataType="vm:MainViewModel">
     <Grid RowDefinitions="*, *">
         <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *">
             <StackPanel Margin="0 0">
-                <ComboBox Grid.Row="0" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.ContinentConnectionTypeList}}"
-                          SelectedItem="{Binding Config.ContinentConnectionType, Converter={x:Static ui:Util.EnumConvert}}"
-                          assists:ComboBoxAssist.Label="Continent Connectors">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ContinentConnectorsToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-                <ComboBox Grid.Row="0" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.LessImportantLocationsOptionList}}"
-                          SelectedItem="{Binding Config.LessImportantLocationsOption, Converter={x:Static ui:Util.EnumConvert}}"
-                          assists:ComboBoxAssist.Label="Less Important Locations">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LessImportantLocationsToolTip}"/></ToolTip.Tip>
-                </ComboBox>
+                <gen:ContinentConnectionType />
+                <gen:LessImportantLocationsOption />
                 <!-- Only West option -->
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Config.GenerateBaguWoods}"
-                          Content="Generate Bagu's Woods">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateBagusWoodsToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Config.RestrictConnectionCaveShuffle}"
-                          Content="Restrict Connection Cave Shuffle">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RestrictConnectionCaveShuffleToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox IsChecked="{Binding Config.AllowConnectionCavesToBeBlocked}"
-                          Content="Allow Connection Caves to Be Blocked">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowConnectionCavestoBeBlockedToolTip}"/></ToolTip.Tip>
-                </CheckBox>
+                <gen:GenerateBaguWoods />
+                <gen:RestrictConnectionCaveShuffle />
+                <gen:AllowConnectionCavesToBeBlocked />
             </StackPanel>
 
-            <!-- East -->
+            <!-- East options -->
             <StackPanel Grid.Column="1" Margin="0 0">
-                <ComboBox Grid.Row="0" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.RiverDevilBlockerOptionList}}"
-                          SelectedItem="{Binding Config.RiverDevilBlockerOption, Converter={x:Static ui:Util.EnumConvert}}"
-                          assists:ComboBoxAssist.Label="River Devil Blocks">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RiverDevilBlocksToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Config.EastRocks}"
-                          Content="Allow Rock Blocks on the East">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowRockBlocksontheEastToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Config.HidePalace}"
-                          Name="GenerateThreeEyedRock"
-                          Content="Generate Three-Eyed Rock">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateThreeEyedRockToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Config.HideKasuto}"
-                          Name="GenerateHiddenKasutoTile"
-                          Content="Generate Hidden Kasuto Tile">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateHiddenKasutoTileToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Config.ShuffleWhichLocationIsHidden}"
-                          Name="ShuffleWhichLocationsAreHidden"
-                          Content="Shuffle Which Locations Are Hidden">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleWhichLocationsAreHiddenToolTip}"/></ToolTip.Tip>
-                </CheckBox>
+                <gen:RiverDevilBlockerOption />
+                <gen:EastRocks />
+                <gen:HidePalace />
+                <gen:HideKasuto />
+                <gen:ShuffleWhichLocationIsHidden />
             </StackPanel>
         </Grid>
 
         <Grid Grid.Row="1" Margin="0 12 0 0" ColumnDefinitions="*, *">
             <StackPanel Grid.Column="0" Margin="0 0">
                 <Separator />
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Config.PalacesCanSwapContinents}"
-                          Content="Allow Palaces to Swap Continents">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowPalacestoSwapContinentsToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox IsThreeState="True"
-                          Name="IncludeGPInShuffleCheckbox"
-                          IsChecked="{Binding Config.ShuffleGP}"
-                          IsEnabled="{Binding Config.PalacesCanSwapContinents}"
-                          Content="Include Great Palace in Shuffle">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeGreatPalaceinShuffleToolTip}"/></ToolTip.Tip>
-                </CheckBox>
+                <gen:PalacesCanSwapContinents />
+                <gen:ShuffleGP />
             </StackPanel>
             <StackPanel Grid.Column="1" Margin="0 0">
                 <Separator />
-                <ComboBox Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.EncounterRateList}}"
-                          SelectedItem="{Binding Config.EncounterRate, Converter={x:Static ui:Util.EnumConvert}}"
-                          assists:ComboBoxAssist.Label="Encounter Rate">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EncounterRateToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-                <CheckBox IsThreeState="True"
-                          IsChecked="{Binding Config.ShuffleEncounters}"
-                          Content="Shuffle Encounter Terrains">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleEncountersToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox Name="AllowUnsafePathEncountersCheckbox"
-                          IsEnabled="{Binding Config.ShuffleEncounters}"
-                          IsChecked="{Binding Config.AllowUnsafePathEncounters}"
-                          Content="Allow Unsafe Path Encounters">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowUnsafePathEncountersToolTip}"/></ToolTip.Tip>
-                </CheckBox>
-                <CheckBox Name="AllowLavaInShuffleCheckbox"
-                          IsEnabled="{Binding Config.ShuffleEncounters}"
-                          IsChecked="{Binding Config.IncludeLavaInEncounterShuffle}"
-                          Content="Include Lava in Shuffle">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeLavainShuffleToolTip}"/></ToolTip.Tip>
-                </CheckBox>
+                <gen:EncounterRate />
+                <gen:ShuffleEncounters />
+                <gen:AllowUnsafePathEncounters />
+                <gen:IncludeLavaInEncounterShuffle />
             </StackPanel>
         </Grid>
     </Grid>

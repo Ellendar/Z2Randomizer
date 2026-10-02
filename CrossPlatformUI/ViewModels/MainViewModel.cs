@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
@@ -16,12 +16,16 @@ namespace CrossPlatformUI.ViewModels;
 public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
 {
     public string? OutputFilePath { get; set; }
-    private RandomizerConfiguration config = new();
+    private readonly RandomizerConfiguration config = new();
     /// Useful inexpensive shared observable for views to attach onto
     /// for chaining change detection logic
     public IObservable<RxVoid> FlagsChanged { get; }
 
     public IObservable<String> FlagsObservable { get; }
+
+    public IObservable<bool> ShuffleAttackExperienceEnabledObservable { get; }
+    public IObservable<bool> ShuffleMagicExperienceEnabledObservable { get; }
+    public IObservable<bool> ShuffleLifeExperienceEnabledObservable { get; }
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     [RUISG.Reactive]
@@ -58,6 +62,15 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
             .DistinctUntilChanged()
             .Replay(1)
             .RefCount();
+
+        var anyExperienceShuffle = this.WhenAnyValue(x => x.ShuffleAllExpState)
+            .Select(shuffleAll => !shuffleAll)
+            .DistinctUntilChanged()
+            .Replay(1).RefCount();
+
+        ShuffleAttackExperienceEnabledObservable = anyExperienceShuffle;
+        ShuffleMagicExperienceEnabledObservable = anyExperienceShuffle;
+        ShuffleLifeExperienceEnabledObservable = anyExperienceShuffle;
 
         RomFileViewModel = new(this);
         GenerateRomViewModel = new(this);

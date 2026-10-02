@@ -111,7 +111,7 @@
 	<data name="DarkenThunderbirdToolTip" xml:space="preserve">
 <value>Blacks out the background bricks when thunder is cast in Thunderbird's room.</value>
 	</data>
-	<data name="DisableHUDFlashonLagToolTip" xml:space="preserve">
+	<data name="DisableHUDLagToolTip" xml:space="preserve">
 <value>Prevents the HUD from flying all over the place when lag happens. Does not actually reduce
 the amount of lag.</value>
 	</data>
@@ -124,9 +124,15 @@ into the spell menu. This can be good for people watching you play as it'll be e
 <value>If selected, you can press select to cast a spell multiple times without re-entering the
 menu.</value>
 	</data>
-	<data name="RemapUpAtoUpSelectonController1ToolTip" xml:space="preserve">
+	<data name="UpAOnController1ToolTip" xml:space="preserve">
 <value>Changes the control to automatically game over/reset from Up+A on the 2P controller to
 Up+Select on the 1P controller while paused.</value>
+	</data>
+	<data name="BeepThreshold" xml:space="preserve">
+<value>Beep Threshold</value>
+	</data>
+	<data name="BeepFrequency" xml:space="preserve">
+<value>Beep Frequency</value>
 	</data>
 	<data name="BeepThresholdToolTip" xml:space="preserve">
 <value>Controls how many bars of health Link has before the warning beep will start.</value>
@@ -140,12 +146,12 @@ Up+Select on the 1P controller while paused.</value>
 	<data name="DisableMusicToolTip" xml:space="preserve">
 <value>Disables in-game music</value>
 	</data>
-	<data name="UseCustomMusicIfAnyToolTip" xml:space="preserve">
+	<data name="RandomizeMusicToolTip" xml:space="preserve">
 <value>Enables playing custom music tracks. Music will be randomly selected from any music
 libraries found in the Music directory. See the Wiki for information on how to set this
 up.</value>
 	</data>
-	<data name="MixCustomandOriginalMusicToolTip" xml:space="preserve">
+	<data name="MixCustomAndOriginalMusicToolTip" xml:space="preserve">
 <value>Also include original tracks in the selection when using custom music. If disabled,
 original tracks will only be selected when no custom tracks exist for a given usage.</value>
 	</data>
@@ -178,6 +184,9 @@ or undesirable, you can disable it here.</value>
     <data name="ShieldColorToolTip" xml:space="preserve">
 <value>Changes the base color of the character sprite when the shield spell is cast.</value>
 	</data>
+	<data name="BeamSprite" xml:space="preserve">
+<value>Beam Sprite</value>
+	</data>
 	<data name="BeamSpriteToolTip" xml:space="preserve">
 <value>Changes the sprite of Link&apos;s sword beams.</value>
 	</data>
@@ -202,7 +211,10 @@ on the continents they normally appear on.</value>
 <value>Shuffles which enemies appear in each palace room. Enemies can still only appear within
 the palace group they normally appear in (1/2/5, 3/4/6, and GP)</value>
 	</data>
-	<data name="ShuffleDripperEnemyToolTip" xml:space="preserve">
+	<data name="DripperEnemyOption" xml:space="preserve">
+<value>Shuffle Dripper Enemy</value>
+	</data>
+	<data name="DripperEnemyOptionToolTip" xml:space="preserve">
 <value>Randomizes which enemies can spawn from drippers in palaces.
 
 The enemy that appears normally has the HP of a Bot, unless you enable the Full HP option.
@@ -210,7 +222,7 @@ The enemy that appears normally has the HP of a Bot, unless you enable the Full 
 Easier Ground Enemies include: small enemies, Tinsuits, orange Iron Knuckles, and both Stalfos.
 (With Full HP enabled, armored Stalfos from drippers will use the unarmored HP value.)</value>
 	</data>
-	<data name="MixLargeandSmallEnemiesToolTip" xml:space="preserve">
+	<data name="MixLargeAndSmallEnemiesToolTip" xml:space="preserve">
 <value>Normally, when shuffling enemies small enemies are replaced by small and large enemies are
 replaced by large. With this flag, any small or large enemy can be replaced with any large
 or small enemy. Flying enemies are still only replaced with other flying enemies.</value>
@@ -223,22 +235,31 @@ right side of the room are always the same.</value>
 <value>Greatly changes knockback in unpredictable ways. This is not limited to knockback from
 taking damage. Play at your own risk.</value>
 	</data>
+	<data name="ShuffleEnemyHP" xml:space="preserve">
+<value>Regular Enemy HP</value>
+	</data>
 	<data name="ShuffleEnemyHPToolTip" xml:space="preserve">
 <value>If selected, each enemy type will have between 50% and 150% of its vanilla HP value.</value>
+	</data>
+	<data name="ShuffleBossHP" xml:space="preserve">
+<value>Boss Enemy HP</value>
 	</data>
 	<data name="ShuffleBossHPToolTip" xml:space="preserve">
 <value>Choose how boss HP is randomized. HP will always be capped at 255.
 
 Great Palace bosses are not included.</value>
 	</data>
-	<data name="ShuffleWhichEnemiesStealEXPToolTip" xml:space="preserve">
+	<data name="ShuffleXPStealersToolTip" xml:space="preserve">
 <value>Randomly reassigns which enemies steal EXP. The number of enemies that steal EXP in each
 group is the same as the number in that group that steal EXP in vanilla.</value>
 	</data>
-	<data name="ShuffleAmountofEXPStolenToolTip" xml:space="preserve">
+	<data name="ShuffleXPStolenAmountToolTip" xml:space="preserve">
 <value>If selected, the amount of EXP each stealer steals is between 50% and 150% of the vanilla
 amount.</value>
 	</data>
+	<data name="SwordImmunityOption" xml:space="preserve">
+    <value>Enemy Sword Immunities</value>
+  </data>
 	<data name="SwordImmunityOptionToolTip" xml:space="preserve">
 <value>Vanilla:
 Uses the game's original sword immunities. (Tektites and Zoras)
@@ -259,7 +280,10 @@ Removes all sword immunities.</value>
 
 Does *not* change what is visible in caves without a candle.</value>
 	</data>
-	<data name="EnemyExperienceDropsToolTip" xml:space="preserve">
+	<data name="EnemyXPDrops" xml:space="preserve">
+<value>Enemy Experience Drops</value>
+	</data>
+	<data name="EnemyXPDropsToolTip" xml:space="preserve">
 <value>Controls how much experience enemies give.
 
 The possible experience values for an enemy are:
@@ -273,6 +297,9 @@ the minimum XP it could give is 20 and the maximum is 100.
 
 Also note that XP values are randomized per enemy table and can differ in a single seed. For example
 Red Iron Knuckle XP in P1/P2/P5 could roll down while Red Iron Knuckle XP in P3/P4/P6 rolls up.</value>
+	</data>
+	<data name="HelpfulHints" xml:space="preserve">
+<value>Helpful Hints</value>
 	</data>
 	<data name="HelpfulHintsToolTip" xml:space="preserve">
 <value>When enabled, helpful hints are scattered throughout the world. These hints are provided
@@ -332,24 +359,24 @@ general item if &quot;Mix Overworld and Palace Items&quot; is selected). This in
   • Water tile, desert tile, and 2 New Kasuto items on the east continent
   • 2 drop tiles on Maze Island</value>
 	</data>
-	<data name="MixOverworldandPalaceItemsToolTip" xml:space="preserve">
+	<data name="MixOverworldAndPalaceItemsToolTip" xml:space="preserve">
 <value>Normally palace items will only appear in palaces and non-palace items only outside of
 palaces. This setting allows all items to be found anywhere.</value>
 	</data>
-	<data name="IncludePBagCavesinItemShuffleToolTip" xml:space="preserve">
+	<data name="IncludePBagCavesInItemShuffleToolTip" xml:space="preserve">
 <value>Adds the 1 cave in the west and the 2 caves on the east that normally contain P-Bags to
 the item pool. Those locations can contain any item and 3 P-Bags (2 medium and 1 large)
 are added to the pool of possible items.</value>
 	</data>
-	<data name="IncludeSpellsinShuffleToolTip" xml:space="preserve">
+	<data name="IncludeSpellsInShuffleToolTip" xml:space="preserve">
 <value>Allows the 8 wizards in town who grant spells to instead grant any item, and adds all 8
 spells to the pool of items that can appear in general locations.</value>
 	</data>
-	<data name="IncludeSwordTechniquesinShuffleToolTip" xml:space="preserve">
+	<data name="IncludeSwordTechsInShuffleToolTip" xml:space="preserve">
 <value>Allows the sword technique teachers in Mido and Darunia to instead grant any item, and
 adds the Up and Down stabs to the general item pool.</value>
 	</data>
-	<data name="IncludeTownQuestItemsinShuffleToolTip" xml:space="preserve">
+	<data name="IncludeQuestItemsInShuffleToolTip" xml:space="preserve">
 <value>Adds Bagu&apos;s letter (allowing passage of the Saria moat), the mirror (allowing the spell in
 Saria), and the water (allowing the spell in Nabooru) to be added to the general pool. An
 item from the general pool will replace them when you talk to Bagu, check under the table,
@@ -360,7 +387,7 @@ or check the fountain.</value>
 item. This includes item locations in the shuffle pool and general locations not shuffled
 that contain small items.</value>
 	</data>
-	<data name="StartWithSpellItemsToolTip" xml:space="preserve">
+	<data name="RemoveSpellItemsToolTip" xml:space="preserve">
 <value>Link starts with the Trophy, Medicine, Child, Water, and Mirror and random small items are
 added to the item pool to replace the number of those items that were in the shuffle pool.</value>
 	</data>
@@ -376,7 +403,7 @@ added to the item pool to replace the number of those items that were in the shu
 If you have insufficient containers, the lady blocking the door will tell you the
 requirement.</value>
 	</data>
-	<data name="AllowDuplicatesofImportantItemsToolTip" xml:space="preserve">
+	<data name="AllowImportantItemDuplicatesToolTip" xml:space="preserve">
 <value>After the normal item shuffle is done, this feature will go through the items, and make
 one copy of each important item, replacing minor items (like P-Bags), as space allows.
 There can only be as many duplicates as there are minor items to replace.
@@ -393,6 +420,15 @@ Boots</value>
 requirement is +/- up to 25% of the vanilla requirement.
 The &quot;Shuffle all Experience&quot; box just checks all 3 shuffle EXP boxes.</value>
 	</data>
+	<data name="AttackLevelCap" xml:space="preserve">
+<value>Attack</value>
+	</data>
+	<data name="MagicLevelCap" xml:space="preserve">
+<value>Magic</value>
+	</data>
+	<data name="LifeLevelCap" xml:space="preserve">
+<value>Life</value>
+	</data>
 	<data name="LevelCapToolTip" xml:space="preserve">
 <value>Sets a maximum level for the specified attribute. Any levels gained beyond this cap will
 instead grant 1-ups.
@@ -405,9 +441,12 @@ the vanilla game, this behavior is still allowed if the cap is set to 8.
 but not have this be exploited to reach high amounts of exp quickly using palace
 crystals.)</value>
 	</data>
-	<data name="ScaleLevelRequirementstoCapToolTip" xml:space="preserve">
+	<data name="ScaleLevelRequirementsToCapToolTip" xml:space="preserve">
 <value>If selected, the experience requirement for each level will increase to be proportional to
 what percentage of the max level it represents</value>
+	</data>
+	<data name="AttackEffectiveness" xml:space="preserve">
+<value>Attack Effectiveness</value>
 	</data>
 	<data name="AttackEffectivenessToolTip" xml:space="preserve">
 <value>Determines how effective Link&apos;s sword attack is. In all cases, the damage of the next
@@ -437,6 +476,9 @@ Each attack level is 150% of the vanilla value.
 Instant Kill:
 All sword attacks will instantly kill all enemies, regardless of level.</value>
 	</data>
+	<data name="MagicEffectiveness" xml:space="preserve">
+<value>Magic Effectiveness</value>
+	</data>
 	<data name="MagicEffectivenessToolTip" xml:space="preserve">
 <value>Determines the cost of spells. Each spell&apos;s cost at each level is guaranteed to be at most
 the same cost as the previous level, even if randomized. When randomized, the cost of each
@@ -463,6 +505,9 @@ Each spell is 50% of the vanilla cost.
 
 Free Spells:
 Spells do not cost MP and can be cast an unlimited number of times.</value>
+	</data>
+	<data name="LifeEffectiveness" xml:space="preserve">
+<value>Life Effectiveness</value>
 	</data>
 	<data name="LifeEffectivenessToolTip" xml:space="preserve">
 <value>Each life level controls the amount of damage Link takes from each of the 7 different
@@ -492,7 +537,7 @@ Damage taken is 50% of the vanilla amount.
 Invincible:
 Link does not take damage. He can still be killed by effects that instantly kill.</value>
 	</data>
-	<data name="AllowPalacestoSwapContinentsToolTip" xml:space="preserve">
+	<data name="PalacesCanSwapContinentsToolTip" xml:space="preserve">
 <value>In vanilla, palaces 1, 2, and 3 are found on the west continent, 4 is on Maze Island, and
 5, 6 are on the east continent. If enabled, any regular palace can be shuffled to any
 continent.
@@ -500,7 +545,7 @@ continent.
 Each continent will still have the same number of palaces: 3 in the west, 1 on Maze
 Island, and 3 in the east.</value>
 	</data>
-	<data name="IncludeGreatPalaceinShuffleToolTip" xml:space="preserve">
+	<data name="ShuffleGPToolTip" xml:space="preserve">
 <value>If enabled, the Great Palace is included in the palace location shuffle, and can appear at
 any palace location (within the rules of &quot;Allow Palaces to Swap Continents&quot;).
 
@@ -514,17 +559,23 @@ example you might get a swamp large enemy encounter from a small enemy on the de
 <value>If enabled, road tiles are also included in the encounter shuffle, meaning roads may be
 unsafe (and non-roads may be safe).</value>
 	</data>
-	<data name="IncludeLavainShuffleToolTip" xml:space="preserve">
+	<data name="IncludeLavaInEncounterShuffleToolTip" xml:space="preserve">
 <value>If enabled, lava tiles (like those in the Valley of Death) are also included in the
 encounter shuffle.</value>
 	</data>
+	<data name="EncounterRate" xml:space="preserve">
+    <value>Encounter Rate</value>
+  </data>
 	<data name="EncounterRateToolTip" xml:space="preserve">
 <value>Controls how frequently overworld enemies spawn.
   • On Half, both the timer encounter and step encounter take twice as long to trigger.
   • On None, no overworld enemies will spawn. (Trap tiles still function as normal).
   • On Random, one of the three other options will be selected at equal chance.</value>
 	</data>
-	<data name="RiverDevilBlocksToolTip" xml:space="preserve">
+	<data name="RiverDevilBlockerOption" xml:space="preserve">
+<value>River Devil Blocks</value>
+	</data>
+	<data name="RiverDevilBlockerOptionToolTip" xml:space="preserve">
 <value>Controls what the river devil in the east blocks.
 Blocks Path: River devil blocks a road/bridge. This is identical to how he worked in
 previous versions.
@@ -533,7 +584,7 @@ That cave may or may not be required.
 Blocks Town: River devils have besieged a town and you&apos;ll need the flute to get past them.
 Remember to use the flute again on the way out.</value>
 	</data>
-	<data name="AllowRockBlocksontheEastToolTip" xml:space="preserve">
+	<data name="EastRocksToolTip" xml:space="preserve">
 <value>If enabled, 0-2 of the path blocks on the east may be rocks.</value>
 	</data>
 	<data name="RestrictConnectionCaveShuffleToolTip" xml:space="preserve">
@@ -545,18 +596,21 @@ is also restricted, such that you can often see the exit before entering the cav
 
 It is not recommended to disable this.</value>
 	</data>
-	<data name="AllowConnectionCavestoBeBlockedToolTip" xml:space="preserve">
+	<data name="AllowConnectionCavesToBeBlockedToolTip" xml:space="preserve">
 <value>If selected, caves that connect from one part of the continent to another or between
 continents can be blocked by rocks. Otherwise, rocks can only block item caves.</value>
 	</data>
-	<data name="GenerateBagusWoodsToolTip" xml:space="preserve">
+	<data name="GenerateBaguWoodsToolTip" xml:space="preserve">
 <value>If enabled, one of the woods in the west will have a cluster of encounters and Bagu&apos;s
 cabin similar to vanilla.
 
 If disabled, Bagu&apos;s cabin is an isolated forest tile surrounded on all sides by other
 terrain.</value>
 	</data>
-	<data name="LessImportantLocationsToolTip" xml:space="preserve">
+	<data name="LessImportantLocationsOption" xml:space="preserve">
+<value>Less Important Locations</value>
+	</data>
+	<data name="LessImportantLocationsOptionToolTip" xml:space="preserve">
 <value>How to handle overworld tiles that contain minor things like red jars, fairies or P-bags.
 
 Blend In:
@@ -572,25 +626,25 @@ Remove these tiles from the game.
 Random:
 Pick one of the above at random.</value>
 	</data>
-	<data name="AllWaterIsWalkableWithBootsToolTip" xml:space="preserve">
+	<data name="GoodBootsToolTip" xml:space="preserve">
 <value>If enabled, all water tiles can be walked on with boots. If unselected, the only walkable
 water will be on water paths marked with a road tile on either end.
 This flag has no effect on the Vanilla or Vanilla(shuffle) biomes.</value>
 	</data>
-	<data name="GenerateThreeEyedRockToolTip" xml:space="preserve">
+	<data name="HidePalaceToolTip" xml:space="preserve">
 <value>If enabled, one palace will be hidden beneath Three-Eyed Rock and will require the flute
 to access. Look for the same rock formation as in the vanilla game.
 
 Which location is hidden beneath may change if Shuffle Which Locations Are Hidden is enabled.</value>
 	</data>
-	<data name="GenerateHiddenKasutoTileToolTip" xml:space="preserve">
+	<data name="HideKasutoToolTip" xml:space="preserve">
 <value>If enabled, New Kasuto will be hidden beneath a forest tile somewhere in the east and will
 require the hammer to access. The hidden tile will always be a single forest tile
 surrounded by other terrain.
 
 Which location is hidden beneath may change if Shuffle Which Locations Are Hidden is enabled.</value>
 	</data>
-	<data name="ShuffleWhichLocationsAreHiddenToolTip" xml:space="preserve">
+	<data name="ShuffleWhichLocationIsHiddenToolTip" xml:space="preserve">
 <value>If enabled, what is hidden under Three-Eyed Rock and the New Kasuto forest tile can be any
 random location in the east.</value>
 	</data>
@@ -601,6 +655,15 @@ In the West and East continents, no locations are currently removed for smaller 
 
 (Large is the map size that was used before v5.1.)</value>
 	</data>
+<data name="WestSize" xml:space="preserve">
+    <value>West Continent Size</value>
+	</data>
+	<data name="EastSize" xml:space="preserve">
+    <value>East Continent Size</value>
+	</data>
+	<data name="DmSize" xml:space="preserve">
+    <value>Death Mountain Size</value>
+	</data>
     <data name="DmSizeToolTip" xml:space="preserve">
 <value>Set the map size of Death Mountain.
 
@@ -609,6 +672,9 @@ duplicate cave passthroughs. The cave count does not include continent connector
 
 (Large is the map size that was used before v5.1.)</value>
 	</data>
+    <data name="MazeSize" xml:space="preserve">
+    <value>Maze Island Size</value>
+  </data>
     <data name="MazeSizeToolTip" xml:space="preserve">
 <value>Set the map size of Maze Island.
 
@@ -616,16 +682,37 @@ With smaller sizes, some trap tiles are removed from the maze.
 
 (Large is the map size that was used before v5.1.)</value>
 	</data>
-    <data name="WestContinentBiomeToolTip" xml:space="preserve">
+	<data name="WestBiome" xml:space="preserve">
+<value>West Continent Biome</value>
+	</data>
+	<data name="EastBiome" xml:space="preserve">
+<value>East Continent Biome</value>
+	</data>
+	<data name="DmBiome" xml:space="preserve">
+<value>Death Mountain Biome</value>
+	</data>
+	<data name="MazeBiome" xml:space="preserve">
+<value>Maze Island Biome</value>
+	</data>
+	<data name="WestClimate" xml:space="preserve">
+<value>West Continent Climate</value>
+	</data>
+	<data name="EastClimate" xml:space="preserve">
+<value>East Continent Climate</value>
+	</data>
+	<data name="DmClimate" xml:space="preserve">
+<value>Death Mountain Climate</value>
+	</data>
+    <data name="WestBiomeToolTip" xml:space="preserve">
 <value>See the Wiki for a description of what each biome does.</value>
 	</data>
-	<data name="EastContinentBiomeToolTip" xml:space="preserve">
+	<data name="EastBiomeToolTip" xml:space="preserve">
 <value>See the Wiki for a description of what each biome does.</value>
 	</data>
-	<data name="DeathMountainBiomeToolTip" xml:space="preserve">
+	<data name="DmBiomeToolTip" xml:space="preserve">
 <value>See the Wiki for a description of what each biome does.</value>
 	</data>
-	<data name="MazeIslandBiomeToolTip" xml:space="preserve">
+	<data name="MazeBiomeToolTip" xml:space="preserve">
 <value>See the Wiki for a description of what each biome does.</value>
 	</data>
 	<data name="ClimateToolTip" xml:space="preserve">
@@ -653,7 +740,10 @@ Water is less frequent, but much larger. Enjoy more forests but not much desert.
 Scrubland:
 Dry and open. More desert and no swamp, with scattered graves dotting the landscape.</value>
 	</data>
-	<data name="ContinentConnectorsToolTip" xml:space="preserve">
+	<data name="ContinentConnectionType" xml:space="preserve">
+<value>Continent Connectors</value>
+	</data>
+	<data name="ContinentConnectionTypeToolTip" xml:space="preserve">
 <value>Controls how continents are connected to each other. There are always 2 connection caves,
 1 bridge, and 1 raft connection between continents, but this option controls where they
 can be.
@@ -683,17 +773,26 @@ The overworld tile remains unchanged even though the underlying location has bee
 
 Enable at your own risk.</value>
 	</data>
+	<data name="NormalPalaceStyle" xml:space="preserve">
+    <value>Normal Palace Style</value>
+  </data>
 	<data name="NormalPalaceStyleToolTip" xml:space="preserve">
 <value>Sets the palace generator for palaces 1 through 6. See the Wiki for more details.</value>
 	</data>
-	<data name="ShortenToolTip" xml:space="preserve">
+	<data name="NormalPalaceLength" xml:space="preserve">
+<value>Normal Length</value>
+	</data>
+	<data name="NormalPalaceLengthToolTip" xml:space="preserve">
 <value>If selected, palaces will be fewer rooms. The exact way this is handled varies by palace
 style, but on average the palace is 25% to 50% fewer rooms than otherwise.</value>
 	</data>
-	<data name="RandomAllowsVanillaTooltip" xml:space="preserve">
+	<data name="RandomStylesAllowVanillaToolTip" xml:space="preserve">
 <value>If selected, random palace styles can include vanilla or vanilla(shuffled).</value>
 	</data>
-	<data name="MinimumPathToDarkLinkToolTip" xml:space="preserve">
+	<data name="DarkLinkMinDistance" xml:space="preserve">
+<value>Minimum Path to Dark Link</value>
+	</data>
+	<data name="DarkLinkMinDistanceToolTip" xml:space="preserve">
 <value>If you think a short Great Palace at the end of the game is anticlimactic, this is the
 flag for you! The shortest path to Dark Link (and to finish the game) will be at least
 this many rooms from the entrance. (Doesn&apos;t affect Thunderbird.)
@@ -706,7 +805,10 @@ This increases seed generation time if it&apos;s set high, as the palace will ha
 regenerated a lot. Setting it very high also makes it likely the Great Palace is more
 linear.</value>
 	</data>
-	<data name="ItemRoomsPerPalaceToolTip" xml:space="preserve">
+	<data name="PalaceItemRoomCount" xml:space="preserve">
+<value>Item Rooms Per Palace</value>
+	</data>
+	<data name="PalaceItemRoomCountToolTip" xml:space="preserve">
 <value>Lets you select the number of item rooms per palace: 0-2 or Random.
 
  • Extra palace items (beyond the first) default to 200 P-Bags, but can be replaced or
@@ -732,40 +834,43 @@ Random Item Rooms Per Palace:
 rooms from palaces 1-6 may be found in any of those palaces. Has no effect on vanilla or
 vanilla shuffle styles.</value>
 	</data>
-	<data name="Include40RoomsToolTip" xml:space="preserve">
+	<data name="Includev4_0RoomsToolTip" xml:space="preserve">
 <value>If selected, the first batch of community-designed custom rooms from version 4.0 will be
 available. Has no effect on vanilla or vanilla shuffle styles.</value>
 	</data>
-	<data name="Include50RoomsToolTip" xml:space="preserve">
+	<data name="Includev5_0RoomsToolTip" xml:space="preserve">
 <value>If selected, the second batch of community-designed custom rooms from version 5.0 will be
 available. Has no effect on vanilla or vanilla shuffle styles.</value>
 	</data>
-	<data name="ThunderbirdRequiredToolTip" xml:space="preserve">
+	<data name="TBirdRequiredToolTip" xml:space="preserve">
 <value>If selected, the path to Dark Link in Great Palace must go through Thunderbird&apos;s room.
 The thunder spell will be required to beat the game. When unselected, Thunderbird still
 appears in GP, and may be required anyway if the palace style or randomized layout
 requires it.</value>
 	</data>
-	<data name="RemoveThunderbirdToolTip" xml:space="preserve">
+	<data name="RemoveTBirdToolTip" xml:space="preserve">
 <value>If selected, Thunderbird will not appear in Great Palace. For vanilla styles, his room
 will be removed and bypassed. For generated styles, one additional normal room will appear
 instead.</value>
 	</data>
-	<data name="UseCustomRoomsFileToolTip" xml:space="preserve">
+	<data name="UseCustomRoomsToolTip" xml:space="preserve">
 <value>If selected, rooms will be based on the file CustomRooms.json instead of PalaceRooms.json
 . You may edit this file to control which rooms you want to use, or create your own rooms
 that can appear. For more details, contact Ellendar or ask on the Discord.</value>
 	</data>
-	<data name="NumberofPalacestoCompleteToolTip" xml:space="preserve">
+	<data name="PalacesToComplete" xml:space="preserve">
+<value>Number of Palaces to Complete</value>
+	</data>
+	<data name="PalacesToCompleteToolTip" xml:space="preserve">
 <value>This is the number of gems you start the game with and therefor the number of palaces that
 must be completed before being able to enter the Great Palace. The number of required
 palaces is a random value between Min and Max (inclusive of both endpoints).</value>
 	</data>
-	<data name="RestartatPalacesonGameOverToolTip" xml:space="preserve">
+	<data name="RestartAtPalacesOnGameOverToolTip" xml:space="preserve">
 <value>If selected, on Game Over (or Up+A) you will restart at the beginning of the palace. If
 unselected, this will happen only in GP (like in vanilla)</value>
 	</data>
-	<data name="FiftyFiftyStatueCyclesBetweenJarandKnightToolTip" xml:space="preserve">
+	<data name="Global5050JarDropToolTip" xml:space="preserve">
 <value>If selected, 50/50 statues in palaces that include them will always alternate between
 dropping a red jar or spawning a red Ironknuckle. If unselected, the spawning is randomly
 determined each stab like in vanilla.</value>
@@ -775,7 +880,7 @@ determined each stab like in vanilla.</value>
 After a blue drip, the next 4 are guaranteed red.
 (All drippers share the same count.)</value>
 	</data>
-	<data name="ChangePalacePalettesToolTip" xml:space="preserve">
+	<data name="ChangePalacePallettesToolTip" xml:space="preserve">
 <value>Changes the color palette of each palace to a new random one.</value>
 	</data>
 	<data name="RandomizeBossItemDropToolTip" xml:space="preserve">
@@ -790,13 +895,13 @@ small (like when using only one room group), duplicate rooms may be included any
 would otherwise likely be impossible to produce a palace. Does not completely prevent
 duplicates for Random Walk generated palaces.</value>
 	</data>
-	<data name="NoDuplicateRoomsByLayoutEnemiesToolTip" xml:space="preserve">
+	<data name="NoDuplicateRoomsByEnemiesToolTip" xml:space="preserve">
 <value>Prevents palace generation from creating duplicate rooms. For this setting, all different
 variants of a room (same layout with different enemy sets, Fairy/No Fairy, etc.) are *not*
 considered duplicates of each other. Has no effect on vanilla palaces. Does not completely
 prevent duplicates for Random Walk generated palaces.</value>
 	</data>
-	<data name="BlockingRoomsinAnyPalaceToolTip" xml:space="preserve">
+	<data name="BlockingRoomsInAnyPalaceToolTip" xml:space="preserve">
 <value>Allows rooms that cannot be passed without a specific item or spell to appear in any palace.
 Otherwise, the allowed requirements for rooms in palaces are based on the items and spells
 needed to pass through every room in that palace in vanilla (from either direction).
@@ -818,7 +923,10 @@ This option is only available when the 5.0 room pool is enabled
   • Repeated required 3-tile-high jumps</value>
 	</data>
 
-    <data name="BossRoomsExitToToolTip" xml:space="preserve">
+    <data name="BossRoomsExitType" xml:space="preserve">
+<value>Boss Rooms Exit to</value>
+	</data>
+	<data name="BossRoomsExitTypeToolTip" xml:space="preserve">
 <value>Selects whether the boss room exits into the overworld (like in vanilla), or more palace
 rooms. This can be selected for all palaces, Randomly per palace, or Random but the same
 selection for all palaces. When a palace continues outside, there will always be an
@@ -829,7 +937,10 @@ If the palace continues after the boss, palace item rooms may be behind the boss
 
 Tower palace style always exits after the boss and is not affected by this setting.</value>
 	</data>
-	<data name="DropStyleTooltip" xml:space="preserve">
+	<data name="PalaceDropStyle" xml:space="preserve">
+<value>Drops Must Connect to</value>
+	</data>
+	<data name="PalaceDropStyleToolTip" xml:space="preserve">
 <value>Selects the required eventual destinations for palace drops.
 (Has no effect in Vanilla/Shuffled palaces.)
 
@@ -840,17 +951,31 @@ Tower palace style always exits after the boss and is not affected by this setti
   • Anything: No restrictions on drops. This allows drops to lead to areas without an exit,
     requiring a Game Over or Up+A to get out.</value>
 	</data>
-	<data name="HarderCarockToolTip" xml:space="preserve">
+	<data name="HardBossesToolTip" xml:space="preserve">
 <value>Tired of just ducking in the corner and blocking? This option enables carock shooting
 high/low/wave beams, but he won&apos;t teleport on top of you anymore.</value>
 	</data>
-	<data name="AggressiveThunderbirdToolTip" xml:space="preserve">
+	<data name="AggressiveTbirdToolTip" xml:space="preserve">
 <value>Starts Thunderbird in its aggressive phase, rather than waiting until half its health is gone.</value>
 	</data>
 
 	<data name="GPPalaceStyleToolTip" xml:space="preserve">
 <value>Sets the palace generator for the Great Palace. See the Wiki for more details about palace
 styles.</value>
+	</data>
+	<data name="GpStyle" xml:space="preserve">
+<value>GP Palace Style</value>
+	</data>
+	<data name="GpStyleToolTip" xml:space="preserve">
+<value>Sets the palace generator for the Great Palace. See the Wiki for more details about palace
+styles.</value>
+	</data>
+	<data name="GpLength" xml:space="preserve">
+<value>GP Length</value>
+	</data>
+	<data name="GpLengthToolTip" xml:space="preserve">
+<value>If selected, palaces will be fewer rooms. The exact way this is handled varies by palace
+style, but on average the palace is 25% to 50% fewer rooms than otherwise.</value>
 	</data>
 	<data name="ShuffleLifeRefillAmountToolTip" xml:space="preserve">
 <value>Causes the life spell to recover a random amount between 1-5 bars instead of the vanilla
@@ -870,11 +995,14 @@ eastern towns.</value>
 	<data name="RandomizeSpellSpellEnemyToolTip" xml:space="preserve">
 <value>Changes which enemy enemies are transformed into when the spell spell is used.</value>
 	</data>
-	<data name="SwapUpstabandDownstabLocationToolTip" xml:space="preserve">
+	<data name="SwapUpAndDownStabToolTip" xml:space="preserve">
 <value>Swaps the location of the sword techniques with each other. Has no effect if used with
 &quot;Include sword techniques in shuffle&quot;</value>
 	</data>
-	<data name="FireSpellToolTip" xml:space="preserve">
+	<data name="FireOption" xml:space="preserve">
+<value>Fire Spell</value>
+	</data>
+	<data name="FireOptionToolTip" xml:space="preserve">
 <value>Controls how the fire spell is treated.
   • Normal: No effect. Fire spell works like normal.
   • Pair with Random: Pairs the fire spell with a randomly selected non-fire spell. When
@@ -895,7 +1023,10 @@ dash, the Dash spell will still appear, but do nothing.</value>
 	<data name="PermanentBeamSwordToolTip" xml:space="preserve">
 <value>Link will always shoot beams from his sword, regardless of life.</value>
 	</data>
-	<data name="FluteTwisterWarpToolTip" xml:space="preserve">
+	<data name="FluteWarpMode" xml:space="preserve">
+<value>Flute Warp</value>
+	</data>
+	<data name="FluteWarpModeToolTip" xml:space="preserve">
 <value>Flute works like the Zelda 1 flute and spawns a twister you can walk into to warp the player.
 Facing up or right takes you to the next destination in order; facing down or left takes you to the previous one.
 Available Modes:
@@ -910,7 +1041,7 @@ Available Modes:
   • Checked items are always included (unless you&apos;ve checked more than the limit below).
   • Unchecked items each have a 25% chance to be included.</value>
 	</data>
-	<data name="StartingItemLimitToolTip" xml:space="preserve">
+	<data name="StartItemsLimitToolTip" xml:space="preserve">
 <value>Sets an upper limit on the number of starting items.
 
   • If you check fewer or equal to the limit, all checked items are guaranteed.
@@ -929,7 +1060,7 @@ the results of the random rolls.)
   • Checked spells are always included (unless you&apos;ve checked more than the limit below).
   • Unchecked spells each have a 25% chance to be included.</value>
 	</data>
-	<data name="StartingSpellLimitToolTip" xml:space="preserve">
+	<data name="StartSpellsLimitToolTip" xml:space="preserve">
 <value>Sets an upper limit on the number of starting spells.
 
   • If you check fewer or equal to the limit, all checked spells are guaranteed.
@@ -974,10 +1105,40 @@ randomly selected between these values (inclusive).
 
 </value>
 	</data>
+	<data name="StartingAttackLevel" xml:space="preserve">
+<value>Attack</value>
+	</data>
+	<data name="StartingMagicLevel" xml:space="preserve">
+<value>Magic</value>
+	</data>
+	<data name="StartingLifeLevel" xml:space="preserve">
+<value>Life</value>
+	</data>
+	<data name="StartItemsLimit" xml:space="preserve">
+<value>Starting Item Limit</value>
+	</data>
+	<data name="StartSpellsLimit" xml:space="preserve">
+<value>Starting Spell Limit</value>
+	</data>
+	<data name="StartingLives" xml:space="preserve">
+<value>Starting Lives</value>
+	</data>
+	<data name="StartingTechniques" xml:space="preserve">
+<value>Starting Sword Techniques</value>
+	</data>
+	<data name="IndeterminateOptionRate" xml:space="preserve">
+<value>Random Flag Rate</value>
+	</data>
+	<data name="MaxHeartContainers" xml:space="preserve">
+<value>Seed Max</value>
+	</data>
+	<data name="MaxHeartContainersToolTip" xml:space="preserve">
+<value>Maximum number of heart containers that can be obtained in one seed.</value>
+	</data>
 	<data name="StartingLevelsToolTip" xml:space="preserve">
 <value>Select Link&apos;s starting Attack / Magic / Life levels.</value>
 	</data>
-	<data name="StartingSwordTechniquesToolTip" xml:space="preserve">
+	<data name="StartingTechniquesToolTip" xml:space="preserve">
 <value>Select which sword techniques to begin with.</value>
 	</data>
 	<data name="StartingLivesToolTip" xml:space="preserve">
@@ -1002,7 +1163,7 @@ The last 2 characters of the hash still reflect these settings, so two seeds wit
 
 Use this only when everyone intentionally wants the same base seed with different handicaps.</value>
 	</data>
-	<data name="RandomFlagRateToolTip" xml:space="preserve">
+	<data name="IndeterminateOptionRateToolTip" xml:space="preserve">
 <value>For flags set to an indeterminate value (question mark), those flags will be on or off at
 random, at the freqency specified by this flag.</value>
 	</data>
@@ -1010,5 +1171,483 @@ random, at the freqency specified by this flag.</value>
 		<value>Play as Mario from SMB1 using 100% authentic Mario physics and controls!
 
 This is a wildly different gameplay experience, so be warned when setting this flag.</value>
+	</data>
+	<data name="AggressiveTbird" xml:space="preserve">
+		<value>Aggressive Thunderbird</value>
+	</data>
+	<data name="AllowConnectionCavesToBeBlocked" xml:space="preserve">
+		<value>Allow Connection Caves to Be Blocked</value>
+	</data>
+	<data name="AllowImportantItemDuplicates" xml:space="preserve">
+		<value>Allow Duplicates of Important Items</value>
+	</data>
+	<data name="AllowUnsafePathEncounters" xml:space="preserve">
+		<value>Allow Unsafe Path Encounters</value>
+	</data>
+	<data name="BlockingRoomsInAnyPalace" xml:space="preserve">
+		<value>Blocking Rooms in Any Palace</value>
+	</data>
+	<data name="ChangeItemSprites" xml:space="preserve">
+		<value>Change Item Sprites</value>
+	</data>
+	<data name="ChangePalacePallettes" xml:space="preserve">
+		<value>Change Palace Palettes</value>
+	</data>
+	<data name="DarkenThunderbird" xml:space="preserve">
+		<value>Dark Thunderbird Background</value>
+	</data>
+	<data name="DashAlwaysOn" xml:space="preserve">
+		<value>Dash Always On</value>
+	</data>
+	<data name="DisableHUDLag" xml:space="preserve">
+		<value>Disable HUD Flash on Lag</value>
+	</data>
+	<data name="DisableMagicContainerRequirements" xml:space="preserve">
+		<value>Disable Magic Container Requirements</value>
+	</data>
+	<data name="DisableMusic" xml:space="preserve">
+		<value>Disable Music</value>
+	</data>
+	<data name="DisableUnsafeMusic" xml:space="preserve">
+		<value>Disable Unsafe Music</value>
+	</data>
+	<data name="EastRocks" xml:space="preserve">
+		<value>Allow Rock Blocks on the East</value>
+	</data>
+	<data name="EnableSpellItemHints" xml:space="preserve">
+		<value>Enable Spell Item Hints</value>
+	</data>
+	<data name="EnableTownNameHints" xml:space="preserve">
+		<value>Enable Town Name Hints</value>
+	</data>
+	<data name="FastSpellCasting" xml:space="preserve">
+		<value>Fast Spell Casting</value>
+	</data>
+	<data name="GenerateBaguWoods" xml:space="preserve">
+		<value>Generate Bagu's Woods</value>
+	</data>
+	<data name="GenerateSpoiler" xml:space="preserve">
+		<value>Generate Spoiler</value>
+	</data>
+	<data name="GeneratorsAlwaysMatch" xml:space="preserve">
+		<value>Generators Always Match</value>
+	</data>
+	<data name="Global5050JarDrop" xml:space="preserve">
+		<value>50/50 Palace Statue Cycles Between Jar and Iron Knuckle</value>
+	</data>
+	<data name="GoodBoots" xml:space="preserve">
+		<value>All Water Is Walkable With Boots</value>
+	</data>
+	<data name="HardBosses" xml:space="preserve">
+		<value>Harder Carock</value>
+	</data>
+	<data name="HideKasuto" xml:space="preserve">
+		<value>Generate Hidden Kasuto Tile</value>
+	</data>
+	<data name="HidePalace" xml:space="preserve">
+		<value>Generate Three-Eyed Rock</value>
+	</data>
+	<data name="IncludeDiverseMusic" xml:space="preserve">
+		<value>Include Diverse Music</value>
+	</data>
+	<data name="IncludeExpertRooms" xml:space="preserve">
+		<value>Include Expert Rooms</value>
+	</data>
+	<data name="IncludeLavaInEncounterShuffle" xml:space="preserve">
+		<value>Include Lava in Shuffle</value>
+	</data>
+	<data name="IncludePBagCavesInItemShuffle" xml:space="preserve">
+		<value>Include P-Bag Caves in Item Shuffle</value>
+	</data>
+	<data name="IncludeQuestItemsInShuffle" xml:space="preserve">
+		<value>Include Town Quest Items in Shuffle</value>
+	</data>
+	<data name="IncludeSpellsInShuffle" xml:space="preserve">
+		<value>Include Spells in Shuffle</value>
+	</data>
+	<data name="IncludeSwordTechsInShuffle" xml:space="preserve">
+		<value>Include Sword Techniques in Shuffle</value>
+	</data>
+	<data name="Includev4_0Rooms" xml:space="preserve">
+		<value>Include 4.0 Rooms</value>
+	</data>
+	<data name="Includev5_0Rooms" xml:space="preserve">
+		<value>Include 5.0 Rooms</value>
+	</data>
+	<data name="IncludeVanillaRooms" xml:space="preserve">
+		<value>Include Vanilla Rooms</value>
+	</data>
+	<data name="JumpAlwaysOn" xml:space="preserve">
+		<value>Jump Always On</value>
+	</data>
+	<data name="LargeEnemiesCanDrop1up" xml:space="preserve">
+		<value>1 Up</value>
+	</data>
+	<data name="LargeEnemiesCanDrop1upToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="LargeEnemiesCanDropBlueJar" xml:space="preserve">
+		<value>Blue Jar</value>
+	</data>
+	<data name="LargeEnemiesCanDropBlueJarToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="LargeEnemiesCanDropKey" xml:space="preserve">
+		<value>Key</value>
+	</data>
+	<data name="LargeEnemiesCanDropKeyToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="LargeEnemiesCanDropLargeBag" xml:space="preserve">
+		<value>200 Bag</value>
+	</data>
+	<data name="LargeEnemiesCanDropLargeBagToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="LargeEnemiesCanDropMediumBag" xml:space="preserve">
+		<value>100 Bag</value>
+	</data>
+	<data name="LargeEnemiesCanDropMediumBagToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="LargeEnemiesCanDropRedJar" xml:space="preserve">
+		<value>Red Jar</value>
+	</data>
+	<data name="LargeEnemiesCanDropRedJarToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="LargeEnemiesCanDropSmallBag" xml:space="preserve">
+		<value>50 Bag</value>
+	</data>
+	<data name="LargeEnemiesCanDropSmallBagToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="LargeEnemiesCanDropXLBag" xml:space="preserve">
+		<value>500 Bag</value>
+	</data>
+	<data name="LargeEnemiesCanDropXLBagToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="LegacyVanillaShuffledLocations" xml:space="preserve">
+		<value>Legacy Vanilla Shuffled Locations</value>
+	</data>
+	<data name="MarioMode" xml:space="preserve">
+		<value>Mario Mode</value>
+	</data>
+	<data name="MixCustomAndOriginalMusic" xml:space="preserve">
+		<value>Mix Custom and Original Music</value>
+	</data>
+	<data name="MixLargeAndSmallEnemies" xml:space="preserve">
+		<value>Mix Large and Small Enemies</value>
+	</data>
+	<data name="MixOverworldAndPalaceItems" xml:space="preserve">
+		<value>Mix Overworld and Palace Items</value>
+	</data>
+	<data name="NoDuplicateRoomsByEnemies" xml:space="preserve">
+		<value>No Duplicate Rooms (By Layout and Enemy Set)</value>
+	</data>
+	<data name="NoDuplicateRoomsByLayout" xml:space="preserve">
+		<value>No Duplicate Rooms (By Layout)</value>
+	</data>
+	<data name="PalacesCanSwapContinents" xml:space="preserve">
+		<value>Allow Palaces to Swap Continents</value>
+	</data>
+	<data name="PalacesContainExtraKeys" xml:space="preserve">
+		<value>Palaces Contain Extra Keys</value>
+	</data>
+	<data name="PermanentBeamSword" xml:space="preserve">
+		<value>Permanent Beam Sword</value>
+	</data>
+	<data name="PreventSpellItemChains" xml:space="preserve">
+		<value>Prevent Spell Item Chains</value>
+	</data>
+	<data name="RandomizeBossItemDrop" xml:space="preserve">
+		<value>Randomize Boss Item Drop</value>
+	</data>
+	<data name="RandomizeDrops" xml:space="preserve">
+		<value>Randomize Drops</value>
+	</data>
+	<data name="RandomizeKnockback" xml:space="preserve">
+		<value>Randomize Knockback</value>
+	</data>
+	<data name="RandomizeMusic" xml:space="preserve">
+		<value>Use Custom Music If Any</value>
+	</data>
+	<data name="RandomizeNewKasutoJarRequirements" xml:space="preserve">
+		<value>Randomize New Kasuto Jar Requirements</value>
+	</data>
+	<data name="RandomizeSpellSpellEnemy" xml:space="preserve">
+		<value>Randomize Spell Spell Enemy</value>
+	</data>
+	<data name="RandomStylesAllowVanilla" xml:space="preserve">
+		<value>Random Styles Allow Vanilla</value>
+	</data>
+	<data name="ReduceDripperVariance" xml:space="preserve">
+		<value>Reduce Dripper Variance</value>
+	</data>
+	<data name="RemoveFlashing" xml:space="preserve">
+		<value>Remove Flashing</value>
+	</data>
+	<data name="RemoveLongDeadEnds" xml:space="preserve">
+		<value>Remove Long Dead End Rooms</value>
+	</data>
+	<data name="RemoveSpellItems" xml:space="preserve">
+		<value>Start With Spell Items</value>
+	</data>
+	<data name="RemoveTBird" xml:space="preserve">
+		<value>Remove Thunderbird</value>
+	</data>
+	<data name="RestartAtPalacesOnGameOver" xml:space="preserve">
+		<value>Restart at Palaces on Game Over</value>
+	</data>
+	<data name="RestrictConnectionCaveShuffle" xml:space="preserve">
+		<value>Restrict Connection Cave Shuffle</value>
+	</data>
+	<data name="RevealHiddenJars" xml:space="preserve">
+		<value>Reveal Hidden Jars</value>
+	</data>
+	<data name="RevealWalkthroughWalls" xml:space="preserve">
+		<value>Reveal Walkthrough Walls</value>
+	</data>
+	<data name="ScaleLevelRequirementsToCap" xml:space="preserve">
+		<value>Scale Level Requirements to Cap</value>
+	</data>
+	<data name="ShareSeedAcrossDifficulty" xml:space="preserve">
+		<value>Allow Difficulty Levels</value>
+	</data>
+	<data name="ShuffleAttackExperience" xml:space="preserve">
+		<value>Shuffle Attack Experience</value>
+	</data>
+	<data name="ShuffleAttackExperienceToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="ShuffleEncounters" xml:space="preserve">
+		<value>Shuffle Encounter Terrains</value>
+	</data>
+	<data name="ShuffleGP" xml:space="preserve">
+		<value>Include Great Palace in Shuffle</value>
+	</data>
+	<data name="ShuffleItemDropFrequency" xml:space="preserve">
+		<value>Shuffle Item Drop Frequency</value>
+	</data>
+	<data name="ShuffleLifeExperience" xml:space="preserve">
+		<value>Shuffle Life Experience</value>
+	</data>
+	<data name="ShuffleLifeExperienceToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="ShuffleLifeRefillAmount" xml:space="preserve">
+		<value>Shuffle Life Refill Amount</value>
+	</data>
+	<data name="ShuffleMagicExperience" xml:space="preserve">
+		<value>Shuffle Magic Experience</value>
+	</data>
+	<data name="ShuffleMagicExperienceToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="ShuffleOverworldEnemies" xml:space="preserve">
+		<value>Shuffle Overworld Enemies</value>
+	</data>
+	<data name="ShuffleOverworldItems" xml:space="preserve">
+		<value>Shuffle Overworld Items</value>
+	</data>
+	<data name="ShufflePalaceEnemies" xml:space="preserve">
+		<value>Shuffle Palace Enemies</value>
+	</data>
+	<data name="ShufflePalaceItems" xml:space="preserve">
+		<value>Shuffle Palace Items</value>
+	</data>
+	<data name="ShufflePBagAmounts" xml:space="preserve">
+		<value>Shuffle P-Bag Amounts</value>
+	</data>
+	<data name="ShuffleSmallItems" xml:space="preserve">
+		<value>Shuffle Small Items</value>
+	</data>
+	<data name="ShuffleSpellLocations" xml:space="preserve">
+		<value>Shuffle Spell Locations</value>
+	</data>
+	<data name="ShuffleSpritePalettes" xml:space="preserve">
+		<value>Shuffle Sprite Palettes</value>
+	</data>
+	<data name="ShuffleStartingItems" xml:space="preserve">
+		<value>Shuffle Starting Items</value>
+	</data>
+	<data name="ShuffleStartingSpells" xml:space="preserve">
+		<value>Shuffle Starting Spells</value>
+	</data>
+	<data name="ShuffleWhichLocationIsHidden" xml:space="preserve">
+		<value>Shuffle Which Locations Are Hidden</value>
+	</data>
+	<data name="ShuffleXPStealers" xml:space="preserve">
+		<value>Shuffle Which Enemies Steal EXP</value>
+	</data>
+	<data name="ShuffleXPStolenAmount" xml:space="preserve">
+		<value>Shuffle Amount of EXP Stolen</value>
+	</data>
+	<data name="SmallEnemiesCanDrop1up" xml:space="preserve">
+		<value>1 Up</value>
+	</data>
+	<data name="SmallEnemiesCanDrop1upToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="SmallEnemiesCanDropBlueJar" xml:space="preserve">
+		<value>Blue Jar</value>
+	</data>
+	<data name="SmallEnemiesCanDropBlueJarToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="SmallEnemiesCanDropKey" xml:space="preserve">
+		<value>Key</value>
+	</data>
+	<data name="SmallEnemiesCanDropKeyToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="SmallEnemiesCanDropLargeBag" xml:space="preserve">
+		<value>200 Bag</value>
+	</data>
+	<data name="SmallEnemiesCanDropLargeBagToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="SmallEnemiesCanDropMediumBag" xml:space="preserve">
+		<value>100 Bag</value>
+	</data>
+	<data name="SmallEnemiesCanDropMediumBagToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="SmallEnemiesCanDropRedJar" xml:space="preserve">
+		<value>Red Jar</value>
+	</data>
+	<data name="SmallEnemiesCanDropRedJarToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="SmallEnemiesCanDropSmallBag" xml:space="preserve">
+		<value>50 Bag</value>
+	</data>
+	<data name="SmallEnemiesCanDropSmallBagToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="SmallEnemiesCanDropXLBag" xml:space="preserve">
+		<value>500 Bag</value>
+	</data>
+	<data name="SmallEnemiesCanDropXLBagToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StandardizeDrops" xml:space="preserve">
+		<value>Standardize Drops</value>
+	</data>
+	<data name="StartWithBoots" xml:space="preserve">
+		<value>Boots</value>
+	</data>
+	<data name="StartWithBootsToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithCandle" xml:space="preserve">
+		<value>Candle</value>
+	</data>
+	<data name="StartWithCandleToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithCross" xml:space="preserve">
+		<value>Cross</value>
+	</data>
+	<data name="StartWithCrossToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithFairy" xml:space="preserve">
+		<value>Fairy</value>
+	</data>
+	<data name="StartWithFairyToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithFire" xml:space="preserve">
+		<value>Fire</value>
+	</data>
+	<data name="StartWithFireToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithFlute" xml:space="preserve">
+		<value>Flute</value>
+	</data>
+	<data name="StartWithFluteToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithGlove" xml:space="preserve">
+		<value>Glove</value>
+	</data>
+	<data name="StartWithGloveToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithHammer" xml:space="preserve">
+		<value>Hammer</value>
+	</data>
+	<data name="StartWithHammerToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithJump" xml:space="preserve">
+		<value>Jump</value>
+	</data>
+	<data name="StartWithJumpToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithLife" xml:space="preserve">
+		<value>Life</value>
+	</data>
+	<data name="StartWithLifeToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithMagicKey" xml:space="preserve">
+		<value>Magic Key</value>
+	</data>
+	<data name="StartWithMagicKeyToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithRaft" xml:space="preserve">
+		<value>Raft</value>
+	</data>
+	<data name="StartWithRaftToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithReflect" xml:space="preserve">
+		<value>Reflect</value>
+	</data>
+	<data name="StartWithReflectToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithShield" xml:space="preserve">
+		<value>Shield</value>
+	</data>
+	<data name="StartWithShieldToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithSpellSpell" xml:space="preserve">
+		<value>Spell</value>
+	</data>
+	<data name="StartWithSpellSpellToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="StartWithThunder" xml:space="preserve">
+		<value>Thunder</value>
+	</data>
+	<data name="StartWithThunderToolTip" xml:space="preserve">
+		<value></value>
+	</data>
+	<data name="SwapUpAndDownStab" xml:space="preserve">
+		<value>Swap Upstab and Downstab Location</value>
+	</data>
+	<data name="TBirdRequired" xml:space="preserve">
+		<value>Thunderbird Required</value>
+	</data>
+	<data name="UpAOnController1" xml:space="preserve">
+		<value>Remap Up+A to Up+Select
+on Controller 1</value>
+	</data>
+	<data name="UpdatedHud" xml:space="preserve">
+		<value>Use Updated HUD</value>
+	</data>
+	<data name="UseCommunityText" xml:space="preserve">
+		<value>Use Community Text</value>
+	</data>
+	<data name="UseCustomRooms" xml:space="preserve">
+		<value>Use Custom Rooms File</value>
 	</data>
 </root>

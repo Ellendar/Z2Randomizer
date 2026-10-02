@@ -220,9 +220,9 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         foreach (var attr in field.GetAttributes())
         {
             // Look for attributes with "property:" target
-            if (attr.AttributeClass == null) continue;
+            if (attr.AttributeClass == null) { continue; }
             var attrName = attr.AttributeClass.Name;
-            if (attrName.StartsWith("Reactive") || attrName.StartsWith("CustomFlagSerializer") || attrName.StartsWith("DifficultyOnly")) continue;
+            if (attrName.StartsWith("Reactive") || attrName.StartsWith("CustomFlagSerializer")) { continue; }
             // if (attrName.EndsWith("Attribute"))
             //     attrName = attrName[..^9];
 

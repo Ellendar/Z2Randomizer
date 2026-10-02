@@ -152,21 +152,25 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
+    [UiNumericPair("Start Min", nameof(startingHeartContainersMax))]
     private int? startingHeartContainersMin = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
+    [UiNumericPair("Start Max", nameof(startingHeartContainersMin))]
     private int? startingHeartContainersMax = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
+    [UiNumericPair("Start Min", nameof(startingMagicContainersMax))]
     private int? startingMagicContainersMin = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
+    [UiNumericPair("Start Max", nameof(startingMagicContainersMin))]
     private int? startingMagicContainersMax = 4;
 
     [Reactive]
@@ -258,9 +262,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private ContinentConnectionType continentConnectionType = ContinentConnectionType.NORMAL;
 
     [Reactive]
+    [TooltipResource("OverworldSizeToolTip")]
     private OverworldSizeOption westSize = OverworldSizeOption.LARGE;
 
     [Reactive]
+    [TooltipResource("OverworldSizeToolTip")]
     private OverworldSizeOption eastSize = OverworldSizeOption.LARGE;
 
     [Reactive]
@@ -282,12 +288,15 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private Biome mazeBiome = Biome.VANILLA;
 
     [Reactive]
+    [TooltipResource("ClimateToolTip")]
     private ClimateEnum westClimate = ClimateEnum.VANILLA_WEIGHTED;
 
     [Reactive]
+    [TooltipResource("ClimateToolTip")]
     private ClimateEnum eastClimate = ClimateEnum.VANILLA_WEIGHTED;
 
     [Reactive]
+    [TooltipResource("ClimateToolTip")]
     private ClimateEnum dmClimate = ClimateEnum.CLASSIC;
 
     [Reactive]
@@ -442,12 +451,14 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [Minimum(0)]
     [Maximum(6)]
+    [UiNumericPair("Min", nameof(palacesToCompleteMax))]
     private int palacesToCompleteMin = 6;
 
     [Reactive]
     [Minimum(0)]
     [Maximum(6)]
     [ConditionallyIncludeInFlags]
+    [UiNumericPair("Max", nameof(palacesToCompleteMin))]
     private int palacesToCompleteMax = 6;
     public bool palacesToCompleteMaxIncluded() => palacesToCompleteMin != 6;
 

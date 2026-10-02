@@ -4,8 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:tabs="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
-             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              xmlns:views="clr-namespace:CrossPlatformUI.Views"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -34,9 +33,9 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <CheckBox Margin="16" IsChecked="{Binding ChangeItemSprites}" Content="Change Item Sprites">
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ChangeItemSpritesToolTip}"/></ToolTip.Tip>
-            </CheckBox>
+
+            <gen:ChangeItemSprites Margin="16" />
+
             <views:NesColorDropdown Label="Tunic Color"
                                     SelectedColorIndex="{Binding TunicColor}"
                                     DefaultColorIndex="{Binding SpriteTunicColor}">
@@ -58,11 +57,7 @@
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShieldColorToolTip}"/></ToolTip.Tip>
             </views:NesColorDropdown>
 
-            <ComboBox assists:ComboBoxAssist.Label="Beam Sprite" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.BeamSpritesList}}"
-                      SelectedItem="{Binding BeamSprite, Converter={x:Static ui:Util.EnumConvert}}">
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.BeamSpriteToolTip}"/></ToolTip.Tip>
-            </ComboBox>
+            <gen:BeamSprite />
 
             <Separator Margin="0 8 0 0"/>
 
