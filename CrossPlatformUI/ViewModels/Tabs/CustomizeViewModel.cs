@@ -22,7 +22,7 @@ public class CustomizeViewModel : ReactiveObject
 
         _randomizeMusicEnabled = Main.Config
             .WhenAnyValue(c => c.DisableMusic, c => c.RandomizeMusic)
-            .Select(tuple => !tuple.Item1 && tuple.Item2)
+            .Select(tuple => !tuple.Property1 && tuple.Property2)
             .ToProperty(this, t => t.RandomizeMusicEnabled);
     }
 

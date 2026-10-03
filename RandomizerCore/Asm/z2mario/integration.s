@@ -1917,7 +1917,7 @@ DownstabPierceShieldCollision:
     beq @normal
       ; check if we want to stab this kinda enemy
       ldx $10
-      lda $0444,x ; enemy vulnerability.
+      lda EnemyVulnerabilityDamageCodes,x
       cmp #6 ; type 6 is the type goomas head uses. wanna bounce on him still
       beq @normal
         clc ; downstab on a shield style enemy

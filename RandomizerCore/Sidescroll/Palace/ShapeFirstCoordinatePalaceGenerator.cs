@@ -225,7 +225,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
 
         //Some percentage of the time, dropifying some rooms causes part of the palace to become
         //unreachable because up was the only way to get there.
-        if (!palace.AllReachable())
+        if (!AllReachable(props, palace))
         {
             return false;
         }

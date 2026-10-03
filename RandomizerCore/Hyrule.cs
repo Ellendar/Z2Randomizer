@@ -2221,10 +2221,6 @@ public class Hyrule
             List<int> enemies = [3, 4, 6, 7, 0x0E, 0x10, 0x11, 0x12, 0x18, 0x19, 0x1A];
             rom.Put(0x11ef, (byte)enemies[r.Next(enemies.Count)]);
         }
-        if (props.BossItem)
-        {
-            rom.HandleRandomBossDrop(a);
-        }
 
         //neither of these starting item handlings really belong here, but this is good enough.
 
@@ -3080,39 +3076,6 @@ CustomFileSelectData:
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     
-    private void FixHelmetheadBossRoom(Assembler asm)
-    {
-        byte helmetRoom = (byte)palaces[1].BossRoom!.Map;
-
-        var a = asm.Module();
-        a.Assign("HelmetRoom", helmetRoom);
-        a.Code("""
-.include "z2r.inc"
-
-.segment "PRG4"
-
-.reloc
-HelmetHeadGoomaFix:
-    lda #<HelmetRoom
-    eor MapNumber
-    rts
-
-.org $bac3
-    jsr HelmetHeadGoomaFix
-.org $bc83
-    jsr HelmetHeadGoomaFix
-.org $bd75
-    jsr HelmetHeadGoomaFix
-
-.org $9b27
-; Also fix a key glitch
-    nop
-    nop
-    nop
-
-""", "helmethead_gooma_fix.s");
-    }
-
     private static void RestartWithPalaceUpA(Assembler a) {
         a.Module().Code("""
 .include "z2r.inc"
@@ -3322,17 +3285,17 @@ FREE_UNTIL $C285
 ; one for World != 0, where the RegionNumber does not actually matter.
 .reloc
 bank7_Pointer_table_for_Item_Presence_World0_ByRegion:
-    .byte .lobyte($0600)  ; West Caves                           (Region 0)
-    .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 1)
-    .byte .lobyte($0640)  ; East Caves                           (Region 2)
-    .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 3)
+    .byte .lobyte(ItemPresenceBitsWest)  ; West Caves                           (Region 0)
+    .byte .lobyte(ItemPresenceBitsDmMi)  ; Death Mountain / Maze Island Caves   (Region 1)
+    .byte .lobyte(ItemPresenceBitsEast)  ; East Caves                           (Region 2)
+    .byte .lobyte(ItemPresenceBitsDmMi)  ; Death Mountain / Maze Island Caves   (Region 3)
 .reloc
 bank7_Pointer_table_for_Item_Presence_ByWorld: ; this is referenced as -1, as index 0 would use the table above
-    .byte .lobyte($0660)  ; Towns         (World 1)
-    .byte .lobyte($0660)  ; Towns         (World 2)
-    .byte .lobyte($0680)  ; Palace 125    (World 3)
-    .byte .lobyte($06A0)  ; Palace 346    (World 4)
-    .byte .lobyte($06C0)  ; Great Palace  (World 5)
+    .byte .lobyte(ItemPresenceBitsTowns)  ; Towns         (World 1)
+    .byte .lobyte(ItemPresenceBitsTowns)  ; Towns         (World 2)
+    .byte .lobyte(ItemPresenceBitsP125)   ; Palace 125    (World 3)
+    .byte .lobyte(ItemPresenceBitsP346)   ; Palace 346    (World 4)
+    .byte .lobyte(ItemPresenceBitsGP)     ; Great Palace  (World 5)
 
 .org $c2b3
 ; The vanilla index calculation was 5 * RegionNumber + WorldNumber, and was
@@ -3851,10 +3814,8 @@ FlagHudUpdate:
         rom.AddRandomizerToTitle(engine, props.MarioMode, IS_RANDOMIZED);
         AddCropGuideBoxesToFileSelect(engine);
         rom.SetEncounterRate(engine, props, r);
-        FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetFullShuffleLocationCollectables());
         rom.DontCountExpDuringTalking(engine);
-        rom.ElevatorBossFix(engine, props.BossItem);
         rom.FixElevatorPositionInFallRooms(engine);
         rom.AllowForChangingDoorYPosition(engine);
         rom.AllowForChangingElevatorYPosition(engine);
@@ -3862,19 +3823,11 @@ FlagHudUpdate:
         CustomHud(engine, props.UpdatedHud);
         rom.ChangeLavaKillPosition(engine);
         rom.FixItemPickup(engine);
-        rom.FixMinibossGlitchyAppearance(engine);
-        rom.FixBossKillPaletteGlitch(engine);
-        rom.ThunderbirdEnterLeftFix(engine);
-        rom.FixThunderbirdThunderDeath(engine);
-
-        if ( props.DarkenThunderbird ) {
-            rom.DarkenThunderbirdRoom(engine);
-        }
-
+        rom.CollisionFixes(engine);
         rom.FixBigBubbleSplit(engine, randomizedStats);
+        rom.ApplyBossPatches(engine, props, randomizedStats, palaces);
         StatTracking(props, engine);
         AddCredits(engine, props);
-        rom.SetBossHpBarDivisors(engine, randomizedStats);
 
         if (props.MarioMode)
         {
@@ -3935,11 +3888,6 @@ FlagHudUpdate:
         if (props.HardBosses)
         {
             rom.BuffCarrock(engine);
-        }
-
-        if (props.AggressiveTbird)
-        {
-            rom.AggressiveThunderbird();
         }
 
         if (props.ReplaceFireWithDash)

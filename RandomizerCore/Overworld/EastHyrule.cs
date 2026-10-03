@@ -13,7 +13,9 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 //6A35 - address in memory of palace 6 y coord
 public sealed class EastHyrule : World
 {
+#pragma warning disable CS0414
     static int debug = 0;
+#pragma warning restore CS0414
     private static readonly new Logger logger = LogManager.GetCurrentClassLogger();
 
     private readonly SortedDictionary<LocationID, Terrain> terrains = new()

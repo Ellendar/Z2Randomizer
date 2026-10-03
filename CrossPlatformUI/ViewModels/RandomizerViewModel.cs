@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ReactiveUI;
+using RUISG = ReactiveUI.SourceGenerators;
 using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Disposables;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
@@ -18,7 +19,7 @@ using CrossPlatformUI.ViewModels.Tabs;
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
-public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
+public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
     [JsonIgnore]
     public IObservable<bool> CanGenerateObservable { get; private set; }
@@ -26,8 +27,8 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     [JsonIgnore]
     public IObservable<IBrush> FlagInputUnderlineObservable { get; }
 
-    private bool flagsValid = true;
-    private bool FlagsValid { get => flagsValid; set => this.RaiseAndSetIfChanged(ref flagsValid, value); }
+    [RUISG.Reactive]
+    public partial bool FlagsValid { get; set; } = true;
 
     private static bool IsFlagStringValid(string flags) => FlagPasteParser.IsValidFlagString(flags);
 
@@ -46,16 +47,17 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     }
 
     private string themeVariantName = "";
-    public string ThemeVariantName 
+    public string ThemeVariantName
     {
-        get
-        {
-            return themeVariantName;
-        }
+        get => themeVariantName;
         set
         {
-            ThemeHelper.SetTheme(value);
-            this.RaiseAndSetIfChanged(ref themeVariantName, value);
+            if (themeVariantName != value)
+            {
+                themeVariantName = value;
+                this.RaisePropertyChanged();
+                ThemeHelper.SetTheme(value);
+            }
         }
     }
     [JsonIgnore]
@@ -65,8 +67,8 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     }
 
     // Remembers the selected tab between app restarts.
-    private int currentTabIndex;
-    public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
+    [RUISG.Reactive]
+    public partial int CurrentTabIndex { get; set; }
 
     // This remembers the preset you had selected in the list between app restarts (not which preset you *loaded*)
     public string? SelectedPresetName { get; set; }
@@ -124,12 +126,14 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
             }
         });
 
-        var seedValidObservable = this.WhenAnyValue(x => x.Main.Config.Seed, seed => !string.IsNullOrWhiteSpace(seed));
+        var seedValidObservable = Main.WhenAnyValue(x => x.Config.Seed)
+            .Select(seed => !string.IsNullOrWhiteSpace(seed))
+            .DistinctUntilChanged();
 
-        CanGenerateObservable = this.WhenAnyValue(x => x.FlagsValid).CombineLatest(
+        CanGenerateObservable = this.WhenAnyValue(vm => vm.FlagsValid).CombineLatest(
             seedValidObservable,
             Main.RomFileViewModel.HasRomDataObservable,
-            Main.GenerateRomViewModel.WhenAnyValue(x => x.IsRunning),
+            Main.GenerateRomViewModel.WhenAnyValue(vm => vm.IsRunning),
             (flagsValid, seedValid, hasRom, isRunning) =>
                 flagsValid && seedValid && hasRom && !isRunning);
 
@@ -179,10 +183,10 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     {
         var loadedFlags = Main.Config.SerializeFlags(); // this serializes the configuration
         var defaultFlags = new RandomizerConfiguration().SerializeFlags();
-        // If the flags are entirely default, use the beginner preset
+        // If the flags are entirely default, use the vanilla preset
         if (loadedFlags == defaultFlags)
         {
-            Main.Config.DeserializeFlags(BeginnerPreset.Preset.SerializeFlags());
+            Main.Config.DeserializeFlags(VanillaPreset.Preset.SerializeFlags());
         }
 
         // flag updates from RandomizerConfiguration always overwrites our flag input

@@ -87,6 +87,7 @@ FREE "PRG6" [$ac21, $c000)
 ; FREE "PRG7" [$f369, $fcfb)
 ; allow code in the ganon laugh sfx but not the hurt sfx
 ; This is fine because we now put the ganon laugh in PRG1F instead
+FREE "PRG7" [$f300, $f3d0)
 FREE "PRG7" [$f3d0, $fcfb)
 ; carve around the ganon sfx and hope it still fits
 ; FREE "PRG7" [$f581, $f700)

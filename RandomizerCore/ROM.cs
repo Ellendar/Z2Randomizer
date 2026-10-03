@@ -866,14 +866,6 @@ SAVE PRINCESS ZELDA...
 
         //300 point XP reward is actually 300 and not 301
         Put(0x1DDDC, 0x2C);
-		
-        // Horsehead mini-boss despawn bug fix.
-        // For some reason in vanilla, killing horsehead also eliminates *ALL* loaded objects in the enemy slots
-        // This includes custom rando rooms with items like pbags that are loaded into enemy slots.
-        // The patch simply changes a hardcoded `ldx #5` which is used to loop through all object slots to `tax nop`
-        // as `a` holds the current object ID (horsehead) and we want to just run the death code from horsehead to 0
-        // keeping the item (pbag etc) in the room alive since it spawns in a later slot (#5)
-        Put(0x13ec1, [0xaa, 0xea]); // tax nop
 
         // In vanilla Darunia there is written text on a wall inside one
         // of the houses. With the changes for FullItemShuffle and changes
@@ -1787,120 +1779,8 @@ ActualLavaDeath:                     ; original code that we replaced
 """);
     }
 
-    /**
-     * The function in bank 4 $9C45 (file offset 0x11c55) and bank 5 $A4E9 (file offset 0x164f9)
-     * are divide functions that are used to display the HP bar for bosses and split it into 8 segments.
-     * Inputs - A = divisor; X = enemy slot
-     *
-     * This function updates all the call sites to these two functions to match the HP for the boss.
-     */
-    private void UpdateAllBossHpDivisor(AsmModule a)
+    public void SetBossHpBarDivisors(AsmModule a, StatRandomizer randomizedStats)
     {
-        a.Code(/* lang=s */$"""
-.include "z2r.inc"
-
-; Carock gets shuffled around in all potential enemy sprite slots.
-; This is normal for sideview enemies, but not for bosses.
-; Other bosses override the shuffled sprite offset with a fixed number
-; to prevent the enemy sprites overwriting the HP bar sprites.
-.segment "PRG4"
-.org $ae7b
-    jsr PinCarockSpriteSlot
-.reloc
-PinCarockSpriteSlot:
-    lda #$58
-    sta SpriteShuffleOffsetEnemy0,x
-    jmp $b20d  ; continue to original jsr
-""");
-
-        a.Code(/* lang=s */$"""
-.include "z2r.inc"
-.segment "PRG4"
-.reloc
-Bank4BossHpDivisorLo:
-    .byte BOSS_0_HP_DIVISOR_LO, BOSS_1_HP_DIVISOR_LO, BOSS_2_HP_DIVISOR_LO
-    .byte BOSS_3_HP_DIVISOR_LO, BOSS_4_HP_DIVISOR_LO, BOSS_5_HP_DIVISOR_LO
-    .byte BOSS_6_HP_DIVISOR_LO
-
-.reloc
-Bank4BossHpDivisorHi:
-    .byte BOSS_0_HP_DIVISOR_HI, BOSS_1_HP_DIVISOR_HI, BOSS_2_HP_DIVISOR_HI
-    .byte BOSS_3_HP_DIVISOR_HI, BOSS_4_HP_DIVISOR_HI, BOSS_5_HP_DIVISOR_HI
-    .byte BOSS_6_HP_DIVISOR_HI
-
-.define BossHpLo $00
-.define BossHpHi $01
-.define DivisorLo $02
-.define DivisorHi $03
-
-.org $9C45
-    tay
-    lda $C2,x ; Boss HP
-    sta BossHpHi
-    lda Bank4BossHpDivisorLo,y
-    jsr DoDivisionByRepeatedSubtraction
-    nop
-.assert * = $9C51
-
-.org $9C7A
-    jmp HandleOverHP
-
-.reloc
-HandleOverHP:
-    dey ; 1 or below means that the boss is 100% or less HP, so no over health
-    bmi @Exit
-        ; Change the tile ID to represent over health on a boss.
-        ldx #$1c
-        lda #$c5
-@overhp:
-        sta $02c1, x
-        dex
-        dex
-        dex
-        dex
-        dey
-        bpl @overhp  
-@Exit:
-    ; Do the original code
-    ldx $10
-    rts
-
-.reloc
-DoDivisionByRepeatedSubtraction:
-    sta DivisorLo
-    lda Bank4BossHpDivisorHi,y
-    sta DivisorHi
-    ldy #0
-    sty BossHpLo
-    clc ; intentionally subtract an extra 1 which makes the math line up better
-    @loop:
-        lda BossHpLo
-        sbc DivisorLo
-        sta BossHpLo
-        lda BossHpHi
-        sbc DivisorHi
-        sta BossHpHi
-        iny
-        bcs @loop
-    rts
-
-.org $BAD3
-FixHelmetHeadHpDivisorOnNonWest:
-    ; Skip over a vanilla check for gooma/helmethead split which breaks the HP divisor update
-    jmp $BADA
-
-""");
-        foreach (var (hpaddr, divisoraddr) in RomMap.bossHpDivisorMap)
-        {
-            int hp = GetByte(hpaddr);
-            Put(divisoraddr, (byte)(hp / 8));
-        }
-    }
-
-    public void SetBossHpBarDivisors(Assembler asm, StatRandomizer randomizedStats)
-    {
-        var a = asm.Module();
-
         for (int idx = 0; idx < RomMap.bossHpAddresses.Count; idx++)
         {
             var bossHpAddr = RomMap.bossHpAddresses[idx];
@@ -1918,8 +1798,11 @@ FixHelmetHeadHpDivisorOnNonWest:
             a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % originalDivisor) * (256 / originalDivisor));
         }
 
-        // Add the new HP divisors for the bosses
-        UpdateAllBossHpDivisor(a);
+        foreach (var (hpaddr, divisoraddr) in RomMap.bossHpDivisorMap)
+        {
+            int hp = GetByte(hpaddr);
+            Put(divisoraddr, (byte)(hp / 8));
+        }
     }
 
     public void UseOHKOMode(Assembler asm)
@@ -2025,285 +1908,121 @@ FREE_UNTIL $e54f
 """);
     }
 
-    public void FixMinibossGlitchyAppearance(Assembler asm)
+    public void CollisionFixes(Assembler asm)
     {
         var a = asm.Module();
         a.Code(/* lang=s */"""
 .include "z2r.inc"
-.import SwapCHR
 
 .segment "PRG7"
 
-; Patch the start of the sideview initialization to check if the enemy is loaded in the first screen
-; This is after switching the CHR banks for the sideview
-.org $C638
-    jmp CheckToOverwriteChrBank
+LinkHitRoutine = $e2ef
+
+; Fix rare repeated phantom damage occuring if an enemy (Rebonack)
+; collides with Link one frame and goes off-screen the next,
+; leaving the collision bit set.
+.org $d6c7
+    jmp NewLinkHitRoutine
 
 .reloc
-CheckToOverwriteChrBank:
-; If A = $20 then we are horsehead/rebo
-    ldx #6
-@loop:
-        lda $a1 - 1,x
-        cmp #$20
-        bne @NotHorsehead
-            jsr OverwriteSpriteCHRBank
-@NotHorsehead:
-        dex
-        bne @loop
-    jmp NewSideviewInit
+NewLinkHitRoutine:
+    lda EnemyState,x
+    and #$ef            ; clear enemy colliding with Link bit (...x ....) before collision logic runs
+    sta EnemyState,x
+    jmp LinkHitRoutine
 
-.reloc
-OverwriteSpriteCHRBank:
-    ; We are loading that enemy, so switch the sprite banks based on which palace we are in
-    lda WorldNumber ; 3 = palace group 1,2,5 ; 4 = palace group 3,4,6
-    cmp #$03 ; we are fighting a Horsehead since this is palace set 4
-    beq @LoadHorsehead
-        cmp #4
-        bne @Exit
-        lda #$18 * 4 + 4 ; CHR bank for rebo as mini boss
-        bne @WriteCHRBanks ; unconditional (we can't use BIT $abs here safely)
-@LoadHorsehead:
-    lda #$0a * 4 + 4 ; CHR bank for horsehead as mini boss
-@WriteCHRBanks:
-    ; switch two banks which is enough for both mini bosses
-    sta SpChrBank4Reg
+
+Test_Link_Hitbox = $e9f9
+
+; Code to fix enemies with shields falling into pits and phantom-colliding
+; with Link's sword repeatedly. Also clamps hitboxes vertically so they can't
+; screen-wrap. Horizontal screen-wraps are preserved.
+;
+; 2-column indexed AABB test
+; X = pass/axis: 0=horizontal, 1=vertical
+;
+; Both passes must set carry for an overlap.
+; Carry set on exit = hit.
+;
+; This is called multiple times for Link's body, sword and shield.
+; zp_00 - Link's hitbox left
+; zp_01 - Link's hitbox top
+; zp_02 - Link's hitbox width   - 05 for Link's shield, 0D for Link
+; zp_03 - Link's hitbox height  - 0C for Link's shield, 1D for Link
+; zp_04 - Enemy hitbox left
+; zp_05 - Enemy hitbox top
+; zp_06 - Enemy hitbox width
+; zp_07 - Enemy hitbox height
+
+.org Test_Link_Hitbox
+
+    ; This function is called for Link's sword even when its
+    ; Y position is $F8 (=off-screen sprite, not in use).
+    ; Quick return for that case to avoid collisions with
+    ; enemies at the bottom of the screen.
+    ; This is the important fix. I tried the other things before
+    ; I figured this out, but they are probably still improvements.
+    lda zp_01
+    cmp #$f8
+    bcs @Clear
+
+    ; Link's (body/sword/shield) vertical hitbox must not wrap.
+    ; Clip Link's height if it would overflow.
+    ; CLC is implied since BCS failed
+    adc zp_03
+    bcc @NoLinkOverflow
+
+    lda #$ff
+    ; SEC is implied since BCC failed
+    sbc zp_01
+    sta zp_03
+
+@NoLinkOverflow:
+    ; Clip enemy's vertical hitbox if would overflow.
+    lda zp_05
     clc
-    adc #1
-    sta SpChrBank5Reg
-    ; due to an MMC5 issue, we need to write a bg bank as well.
-    lda CurrentCHRBank
-    asl
-    asl
-    ; clc ; carry is clear here
-    adc #4
-    sta BgChrBank0Reg
-@Exit:
+    adc zp_07
+    jmp Test_Link_Hitbox_Continued
+
+@Clear:
+    clc
+    ; X wasn't touched, don't load it
     rts
 
-; Patch the enemy loading routine to check if the enemy is horsehead/rebo
-.org $D68B
-    jsr CheckIfHorseheadReboshark
-.reloc
-CheckIfHorseheadReboshark:
-    ; If A = $20 then we are horsehead/rebo
-    cmp #$20
-    bne @Exit
-        jsr OverwriteSpriteCHRBank
-@Exit:
-    jmp EnemyFacingDirection
-
-""");
-    }
-
-    public void FixBossKillPaletteGlitch(Assembler asm)
-    {
-        // Restore red palette color that is set to black for Link's shadow during boss explosions
-        var a = asm.Module();
-        a.Code(/* lang=s */"""
-.segment "PRG7"
-.org $DE1A
-HookIntoSpawnBossItem:
-    jmp RestorePaletteAfterBossKill
+FREE_UNTIL $ea14
 
 .reloc
-RestorePaletteAfterBossKill:
-    sta $af,x ; command overwritten by jmp
-    ldx #$00
-    ldy $362
-@CopyLoop:
-    lda ResetRedPalettePayload,x
-    sta $0363,y
-    inx
-    iny
-    cpx #$08
-    bne @CopyLoop
-    lda #$02
-    sta $0725 ; setting PPU macro 2
-    dey
-    sty $362
-    ldx $10
+Test_Link_Hitbox_Continued:
+    bcc @CollisionMath
+
+    lda #$ff
+    ; SEC is implied since BCC failed
+    sbc zp_05
+    sta zp_07
+
+@CollisionMath:
+    ldx #$01
+@CollisionLoop:
+    lda zp_04,x
+    clc
+    adc zp_06,x
+    sec
+    sbc zp_00,x
+    sta zp_0f
+
+    lda zp_02,x
+    clc
+    adc zp_06,x
+    cmp zp_0f
+    bcc @ExitNew
+
+    dex
+    bpl @CollisionLoop
+
+@ExitNew:
+    ldx EnemyIndex
     rts
 
-.reloc
-ResetRedPalettePayload:
-    ; 8 byte palette payload for PPU macro
-    .byte $3f, $18, $04, $0f, $06, $16, $30, $ff
-
-""");
-    }
-
-    // Makes the background black when thunder is cast for accessibility
-    public void DarkenThunderbirdRoom(Assembler asm)
-    {
-        var a = asm.Module();
-        a.Code(/* lang=s */"""
-.include "z2r.inc"
-
-.segment "PRG0"
-
-; Hook into the thunder cast routine to check if in tbird room
-.org $91e6
-    jsr DarkenThunderbirdRoomIfLoaded
-
-.segment "PRG7"
-
-.reloc
-DarkenThunderbirdRoomIfLoaded:
-    lda WorldNumber
-    cmp #$05
-    bne @Done
-
-    ; An empty slot can retain its previous enemy type.
-    lda Enemy5Status
-    cmp #$01
-    bne @Done
-
-    lda Enemy5Type
-    cmp #$22
-    beq DarkenThunderbirdRoom
-
-    @Done:
-        ; Re-run the instruction replaced by the hook.
-        lda FireSpellActive
-        rts
-
-DarkenThunderbirdRoom:
-    ; The flash command is already in this buffer. Append the background
-    ; color so the same NMI processes both commands.
-    ldy PpuBufferLength
-    ldx #$00
-    @CopyCommand:
-        lda DarkenThunderbirdRoomCommand,x
-        sta PpuAddrHi,y
-        inx
-        iny
-        cpx #$06
-        bne @CopyCommand
-
-    dey
-    sty PpuBufferLength
-
-    lda FireSpellActive
-    rts
-
-DarkenThunderbirdRoomCommand:
-    .byte $3f, $05, $02, $0f, $0f, $ff
-
-""");
-
-    }
-
-    // Don't soft-lock if tbird is killed by thunder
-    public void FixThunderbirdThunderDeath(Assembler asm)
-    {
-        var a = asm.Module();
-        a.Code(/* lang=s */"""
-.include "z2r.inc"
-
-.segment "PRG7"
-
-ExplosionHandler = $dcae
-TbirdDeathHandler = $a3db
-TbirdDeathFlag = $6e3f
-
-.org $d5f5
-    .word FixedTbirdExplosionHandler
-
-.reloc
-FixedTbirdExplosionHandler:
-    lda WorldNumber
-    cmp #$05
-    bne @Explosion
-
-    lda EnemyType,x
-    cmp #$22
-    bne @Explosion
-
-    ; let an in-progress tbird death sequence continue
-    lda TbirdDeathFlag
-    bmi @Explosion
-
-    ; Run the death setup skipped on a thunder-based kill.
-    jmp TbirdDeathHandler
-
-    @Explosion:
-        jmp ExplosionHandler
-
-""");
-    }
-
-    // Allows Thunderbird room entry from left or right
-    public void ThunderbirdEnterLeftFix(Assembler asm)
-    {
-        var a = asm.Module();
-        a.Code(/* lang=s */"""
-.include "z2r.inc"
-.import ElevatorBossFix
-
-.segment "PRG5"
-
-DrawThunderbird = $9ebf
-ThunderbirdMainRoutineStart = $a359
-ThunderbirdMainRoutine = $a36b
-ThunderbirdNoRoutine = $a3bd
-
-; Do a much finer scroll position check so we can get into position
-; when entering from the right as well.
-.org $94d1
-    .word ThunderbirdFixedScrollCheck
-
-; When entering from the right, Thunderbird would be visible before the combat starts.
-; While it's not a problem, it feels a bit jank, so lets not draw Thunderbird pre-battle.
-.org $95a9
-    .word ConditionalDrawThunderbird
-
-.org ThunderbirdMainRoutineStart
-FREE_UNTIL ThunderbirdMainRoutine
-
-.reloc
-ThunderbirdFixedScrollCheck:
-    lda ScrollLeftPage
-    cmp #$01
-    bne @DontSpawn
-
-    lda ScrollLeftX
-    cmp #$04                     ; need at least 3 pixel margin so dash speed can't skip the trigger point
-    bcs @DontSpawn
-
-    lda ScrollFrozen
-    bne @TimerRunning
-        jsr ElevatorBossFix      ; will freeze the scrolling (and more)
-        lda #$90
-        sta $0504,x              ; set timer for Thunderbird to begin
-    
-    @TimerRunning:
-    lda ScrollLeftX
-    beq @NoScroll
-
-    lda FrameCounter
-    and #$01 
-    bne @NoScroll                ; slow down screen scroll to every other frame
-
-    lda ScrollLeftX
-    sbc #$00                     ; subtracts 1 because carry is cleared by cmp
-    bcs @SetScrollX
-        lda #$00                 ; clamp to 0
-    @SetScrollX:
-    sta ScrollLeftX
-    sta ScrollPosShadow
-    @NoScroll:
-        jmp ThunderbirdMainRoutine
-    @DontSpawn:
-        jmp ThunderbirdNoRoutine
-
-.reloc
-ConditionalDrawThunderbird:
-    lda ScrollFrozen
-    beq @NotInBattle
-        jmp DrawThunderbird
-    @NotInBattle:
-        rts
 """);
     }
 
@@ -2312,6 +2031,7 @@ ConditionalDrawThunderbird:
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
     }
 
+    /*
     public void AggressiveThunderbird()
     {
         const byte thunderBirdHP = 192;
@@ -2326,6 +2046,7 @@ ConditionalDrawThunderbird:
         // 0x16403 - Hard Mode if HP < this value (vanilla half HP)
         Put(0x16413, thunderBirdHP);
     }
+    */
 
     public static void FluteTwisterWarp(Assembler asm, FluteWarpMode mode, int[] palaceOrder)
     {
@@ -2439,117 +2160,16 @@ ConditionalDrawThunderbird:
         Put(0x11af5, new byte[] { 0x47, 0x9b, 0x56, 0x9b, 0x35, 0x9b });
     }
 
-    public void HandleRandomBossDrop(Assembler asm)
+    public void ApplyBossPatches(Assembler asm, RandomizerProperties props, StatRandomizer randomizedStats, List<Palace> palaces)
     {
         var a = asm.Module();
-        a.Code(/* lang=s */"""
-.include "z2r.inc"
-.import ElevatorBossFix
-
-.segment "PRG7"
-.org $e79a
-    ; Branch if scroll frozen
-    lda ScrollFrozen
-    beq +
-        ; freeze scroll
-        lda #0
-        jsr ElevatorBossFix
-        ; branch if the music is already playing
-        lda $07fb
-        bne +
-            ; otherwise resume the previous track (palace theme)
-            lda #2
-            sta $eb
-    +
-    ; Write the "grab item" sound effect to the sfx queue
-    lda #8
-    sta Z2Square1SoundQueue
-    ; Branch if the item we are getting is NOT a key
-    cpy #8
-    bne +
-        ; increment number of keys and carry on
-        inc Keys
-        jmp $e797  ; always overwritten by full_item_shuffle anyway
-    +
-    ; Otherwise continue to $E7BB which is the start of the get item code
-    .assert * = $E7BB
-
-; Patch a few locations to make sure the music returns to normal after getting an item
-.org $e80c
-    jsr DontSwitchMusicIfInPalace1
-    nop
-
-.org $e84b
-    jsr DontSwitchMusicIfInPalace2
-    nop
-
-.reloc
-DontSwitchMusicIfInPalace1:
-    lda $eb
-    cmp #$02
-    beq +
-        ; Restore track 16
-        lda #$10
-        sta $eb
-+   rts
-
-DontSwitchMusicIfInPalace2:
-    lda $eb
-    cmp #$02
-    beq +
-        ; Restore track 0
-        lda #$00
-        sta $eb
-+   rts
-""");
-    }
-
-    public void ElevatorBossFix(Assembler asm, bool randomBossItem)
-    {
-        var a = asm.Module();
-        a.Assign("RANDOM_BOSS_ITEM", randomBossItem ? 1 : 0);
-        a.Code(/* lang=s */"""
-.include "z2r.inc"
-
-.segment "PRG4"
-.org $b220
-    jsr ElevatorBossFix
-
-.org $be99 ; Screen lock set at bank 4 BE99 (0x13ea9)
-    jsr ElevatorBossFix
-
-; Screen lock tbird set at bank 5 A363 (0x16373)
-; ThunderbirdEnterLeftFix does this call now
-;.segment "PRG5"
-;.org $a363
-;    jsr ElevatorBossFix
-
-.segment "PRG7"
-
-; Screen lock released at bank 7 E7A9 (0x1e7b9)
-.if !RANDOM_BOSS_ITEM
-    .org $e7a9
-        jsr ElevatorBossFix
-.endif
-
-.org $f340  ; this should probably be free'd and realloc'd
-ElevatorBossFix:
-    lda #$01
-    eor ScrollFrozen  ; unfreeze scrolling if frozen, otherwise freeze it
-    sta ScrollFrozen
-    lda #$13
-    cmp Enemy0Type
-    bne @Exit
-        lda #$01
-        eor Enemy0Status
-        sta Enemy0Status
-        lda #$a0
-        sta Enemy0YPositionLo
-    @Exit:
-        rts
-.export ElevatorBossFix
-
-""");
+        byte helmetRoom = palaces[1].BossRoom!.Map;
+        a.Assign("HelmetRoom", helmetRoom);
+        SetBossHpBarDivisors(a, randomizedStats);
+        a.Assign("RANDOM_BOSS_ITEM", props.BossItem ? 1 : 0);
+        a.Assign("AGGRESSIVE_TBIRD", props.AggressiveTbird ? 1 : 0);
+        a.Assign("DARKEN_TBIRD_ROOM", props.DarkenThunderbird ? 1 : 0);
+        a.Code(Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.Bosses.s"), "Bosses.s");
     }
 
     public void AdjustGpProjectileDamage()
