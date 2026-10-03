@@ -807,7 +807,7 @@ public class Hyrule
         if (props.MixOverworldPalaceItems)
         {
 
-            if(props.ShufflePalaceItems)
+            if (props.ShufflePalaceItems)
             {
                 List<Collectable> palaceCollectables = [.. palaceLocations.SelectMany(i => i.GetAllCollectables())];
                 shufflableItems.Add(palaceCollectables.Select(c => props.StartsWithCollectable(c) ? minorItems.Sample(r) : c));
@@ -818,6 +818,9 @@ public class Hyrule
         }
         else
         {
+            List<Location> palaceItemLocs = possibleItemLocations.Where(i => i.Palace != null).ToList();
+            List<Location> nonPalaceItemLocs = possibleItemLocations.Where(i => i.Palace == null).ToList();
+
             List<Collectable> itemsToActuallyShuffle;
             List<Location> shufflableItemLocations;
 
@@ -825,7 +828,7 @@ public class Hyrule
             {
                 itemsToActuallyShuffle = [];
                 shufflableItemLocations = [];
-                foreach (Location palaceLocation in possibleItemLocations.Where(i => i.Palace != null))
+                foreach (Location palaceLocation in palaceItemLocs)
                 {
                     shufflableItemLocations.Add(palaceLocation);
                     itemsToActuallyShuffle.Add(palaceLocation.GetAllCollectables());
@@ -835,10 +838,10 @@ public class Hyrule
             }
             else //vanilla palace items
             {
-                foreach (Location palaceLocation in possibleItemLocations.Where(i => i.Palace != null && i.Palace.Number < 7))
+                foreach (Location palaceLocation in palaceItemLocs.Where(i => i.Palace!.Number < 7))
                 {
-                    int palaceNumber = palaceLocation.Palace!.Number;
-                    List<Collectable> collectables = palaceLocation.Palace!.GetVanillaCollectables(palaceLocation.Palace!.ItemRooms.Count);
+                    Palace palace = palaceLocation.Palace!;
+                    List<Collectable> collectables = palace.GetVanillaCollectables(palace.ItemRooms.Count);
 
                     for (int i = 0; i < collectables.Count; i++)
                     {
@@ -852,13 +855,13 @@ public class Hyrule
             {
                 itemsToActuallyShuffle = [];
                 shufflableItemLocations = [];
-                foreach (Location nonPalaceLocation in possibleItemLocations.Where(i => i.Palace == null))
+                foreach (Location nonPalaceLocation in nonPalaceItemLocs)
                 {
                     shufflableItemLocations.Add(nonPalaceLocation);
-                    foreach(Collectable collectable in nonPalaceLocation.GetShufflableCollectables())
+                    foreach (Collectable collectable in nonPalaceLocation.GetShufflableCollectables())
                     {
                         itemsToActuallyShuffle.Add(
-                            props.StartsWithCollectable(collectable) && (!collectable.IsSpell() || canReplaceStartingSpellsWithMinorItems) 
+                            props.StartsWithCollectable(collectable) && (!collectable.IsSpell() || canReplaceStartingSpellsWithMinorItems)
                                 ? minorItems.Sample(r) : collectable);
                     }
                 }
@@ -867,7 +870,7 @@ public class Hyrule
             }
             else
             {
-                foreach (Location nonPalaceLocation in possibleItemLocations.Where(i => i.Palace == null))
+                foreach (Location nonPalaceLocation in nonPalaceItemLocs)
                 {
                     List<Collectable> collectables = nonPalaceLocation.GetAllCollectables();
                     for (int i = 0; i < collectables.Count; i++)
@@ -949,46 +952,46 @@ public class Hyrule
 
         //Excess items are items that need to be placed beyond the normal vanilla items
         //these could be containers if more than 4 need to be placed, or palace items that were removed from palaces
-        //This does mean if mixed items is off, palace items can still be shuffled into the overworld
-        //Additionally if excess item placements are needed and pbag cave shuffle is off, they can be promoted to real item locations.
-        //This is consistent with how old versions work, though the things that can be placed there have expanded.
-        List<Collectable> excessItems = [];
-        int minorItemCount = possibleItemLocations.SelectMany(l => l.GetShufflableCollectables())
-            .Count(c => c.IsMinorItem());
-        //Heart containers over 4 are excess
+        int minorItemCount = possibleItemLocations.SelectMany(loc => loc.GetShufflableCollectables())
+            .Count(item => item.IsMinorItem());
+        //Heart containers over 4 are excess (overworld bucket)
+        List<Collectable> overworldExcessItems = [];
         for (int i = 4; i < heartContainersInItemPool; i++)
         {
-            excessItems.Add(Collectable.HEART_CONTAINER);
+            overworldExcessItems.Add(Collectable.HEART_CONTAINER);
         }
-        //Magic containers over 4 are excess
         for (int i = 4; i < magicContainersInItemPool; i++)
         {
-            excessItems.Add(Collectable.MAGIC_CONTAINER);
+            overworldExcessItems.Add(Collectable.MAGIC_CONTAINER);
         }
-        //Palace items that didn't get placed in palaces are excess
-        List<Collectable> palaceItems = [Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT,
-            Collectable.BOOTS, Collectable.FLUTE, Collectable.CROSS];
-        foreach (Collectable palaceItem in palaceItems)
+        //Palace items that didn't get placed in palaces are excess (palace bucket)
+        List<Collectable> palaceExcessItems = [];
+        foreach (Collectable palaceItem in Enum.GetValues<Collectable>().Where(c => c.IsPalaceItem()))
         {
             if (!possibleItemLocations.SelectMany(l => l.GetAllCollectables()).Any(c => c == palaceItem)
                 && !props.StartsWithCollectable(palaceItem))
             {
-                excessItems.Add(palaceItem);
+                palaceExcessItems.Add(palaceItem);
             }
         }
+
+        //When the Overworld and Palace pools are mixed, palace excess items are free to
+        //spill into overworld locations. When they are separate, palace items must stay
+        //in palaces, so any that cannot be placed there make the seed infeasible.
+        if (!props.MixOverworldPalaceItems && props.ShufflePalaceItems && palaceExcessItems.Count > 0)
+        {
+            throw new Exception("Insufficient locations to place excess Palace items. The validation should have caught this.");
+        }
+        List<Collectable> excessItems = props.MixOverworldPalaceItems
+            ? [.. overworldExcessItems, .. palaceExcessItems]
+            : overworldExcessItems;
 
         List<Location> minorItemLocations = possibleItemLocations.Where(l => l.GetShufflableCollectables().Any(c => c.IsMinorItem())).ToList();
         int overflowLocationsRequired = excessItems.Count - minorItemCount;
 
-        //Add the auto pbag cave promotion
-        List<Location> promotableLocations = [westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2];
-        while (excessItems.Count > minorItemCount)
+        if (excessItems.Count > minorItemCount)
         {
-            Location promotionLocation = promotableLocations.Sample(r)
-                ?? throw new Exception("Insufficient locations to place excess items. The validation should have caught this.");
-            Collectable replacementCollectable = excessItems.Sample(r);
-            promotionLocation.SetCollectables([replacementCollectable]);
-            excessItems.Remove(replacementCollectable);
+            throw new Exception("Insufficient locations to place excess items. The validation should have caught this.");
         }
         Debug.Assert(excessItems.Count <= minorItemCount);
         foreach(Collectable excessItem in excessItems)
@@ -2966,6 +2969,10 @@ CustomFileSelectData:
     public IEnumerable<Location> ItemLocations()
     {
         List<Location> possibleItemLocations = AllLocations().Where(i => i.GetCollectableCount() > 0).ToList();
+        if (!props.PbagItemShuffle)
+        {
+            possibleItemLocations.RemoveMany([westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2]);
+        }
         possibleItemLocations.Remove(westHyrule.sariaSouth);
         return possibleItemLocations;
     }

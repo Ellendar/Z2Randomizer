@@ -251,6 +251,21 @@ public static class CollectableExtensions
         };
     }
 
+    /// The six vanilla Palace items
+    public static bool IsPalaceItem(this Collectable collectable)
+    {
+        return collectable switch
+        {
+            Collectable.CANDLE => true,
+            Collectable.GLOVE => true,
+            Collectable.RAFT => true,
+            Collectable.BOOTS => true,
+            Collectable.FLUTE => true,
+            Collectable.CROSS => true,
+            _ => false
+        };
+    }
+
     public static RequirementType? AsRequirement(this Collectable collectable)
     {
         return collectable switch
