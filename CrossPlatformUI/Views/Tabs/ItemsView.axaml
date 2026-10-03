@@ -21,6 +21,7 @@
             <z:Z2CheckBox Flag="IncludeSpellsInShuffle" />
             <z:Z2CheckBox Flag="IncludeSwordTechsInShuffle" />
             <z:Z2CheckBox Flag="IncludeQuestItemsInShuffle" />
+            <z:Z2CheckBox Flag="TownQuestLocationsAreMinorItems" />
             <z:Z2CheckBox Flag="IncludeBagusNoteInShuffle" />
             <z:Z2CheckBox Flag="PreventSpellItemChains" />
         </StackPanel>

@@ -639,6 +639,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     private bool? includeBagusNoteInShuffle = false;
 
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool townQuestLocationsAreMinorItems = false;
+    public bool townQuestLocationsAreMinorItemsIncluded() => shuffleOverworldItems != false && (includeSwordTechsInShuffle != false || includeQuestItemsInShuffle != false);
+
     //Drops
     [Reactive]
     private bool shuffleItemDropFrequency = false;
@@ -1658,6 +1663,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.IncludeQuestItemsInShuffle = includeQuestItemsInShuffle ?? GetIndeterminateFlagValue(r);
         properties.StartWithSpellItems = removeSpellItems ?? GetIndeterminateFlagValue(r);
         properties.PbagItemShuffle = includePBagCavesInItemShuffle ?? GetIndeterminateFlagValue(r);
+        properties.TownQuestLocationsAreMinorItems = townQuestLocationsAreMinorItemsIncluded() && townQuestLocationsAreMinorItems;
     }
 
     public void AssignPalaceItemCounts(RandomizerProperties properties, Random r)
@@ -1987,7 +1993,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         };
     }
 
-    internal (int OverworldMinorItemCount, int PalaceMinorItemCount) CountPossibleMinorItems()
+    public (int OverworldMinorItemCount, int PalaceMinorItemCount) CountPossibleMinorItems()
     {
         int overworldMinorItemCount = 0;
         int palaceMinorItemCount = 0;
@@ -2057,6 +2063,20 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             spellStartMinorItemCount += shuffleStartingSpells || startWithThunder ? 1 : 0;
 
             overworldMinorItemCount += Math.Min(shuffleStartingItems ? 8 : spellStartMinorItemCount, startSpellsLimit.AsInt());
+        }
+
+        if (townQuestLocationsAreMinorItemsIncluded() && townQuestLocationsAreMinorItems)
+        {
+            if (includeQuestItemsInShuffle != false)
+            {
+                if (westBiome.InItemShuffle()) { overworldMinorItemCount -= 1; }
+                if (eastBiome.InItemShuffle()) { overworldMinorItemCount -= 1; }
+            }
+            if (includeSwordTechsInShuffle != false)
+            {
+                if (westBiome.InItemShuffle()) { overworldMinorItemCount -= 1; }
+                if (eastBiome.InItemShuffle()) { overworldMinorItemCount -= 1; }
+            }
         }
 
         if (8 - (startingHeartContainersMax ?? 4) < mustExistContainers)
