@@ -71,6 +71,11 @@
                       Content="Include Mirror &amp; Water in Shuffle">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeTownQuestItemsinShuffleToolTip}"/></ToolTip.Tip>
             </CheckBox>
+            <CheckBox IsChecked="{Binding Main.Config.TownQuestLocationsAreMinorItems}"
+                      IsVisible="{Binding TownQuestLocationsAreMinorItemsIncludedObservable^}"
+                      Content="Town Quest Item Locations Replaced by Minor Items">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.TownQuestLocationsAreMinorItemsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
             <CheckBox IsChecked="{Binding Main.Config.IncludeBagusNoteInShuffle}"
                       IsThreeState="True"
                       Content="Include Bagu's Letter in Shuffle">

@@ -178,6 +178,8 @@ public class RandomizerProperties
     //Fountain water / Saria mirror
     public bool IncludeQuestItemsInShuffle { get; set; }
     public bool IncludeBagusNoteInShuffle { get; set; }
+    //Saria mirror table / Nabooru fountain / Downstab guy / Upstab guy hold minor items if they are shuffled
+    public bool TownQuestLocationsAreMinorItems { get; set; }
     //Spell items may not be required to obtain another spell item
     public bool PreventSpellItemChains { get; set; }
     public bool RandomizeSmallItems { get; set; }
@@ -429,10 +431,30 @@ public class RandomizerProperties
             if (WestBiome.InItemShuffle())
             {
                 overworldMinorItemCount += StartWithDownstab ? 1 : 0;
+                if (TownQuestLocationsAreMinorItems)
+                {
+                    overworldMinorItemCount -= 1;
+                }
             }
             if (EastBiome.InItemShuffle())
             {
                 overworldMinorItemCount += StartWithUpstab ? 1 : 0;
+                if (TownQuestLocationsAreMinorItems)
+                {
+                    overworldMinorItemCount -= 1;
+                }
+            }
+        }
+
+        if (IncludeQuestItemsInShuffle && TownQuestLocationsAreMinorItems)
+        {
+            if (WestBiome.InItemShuffle())
+            {
+                overworldMinorItemCount -= 1;
+            }
+            if (EastBiome.InItemShuffle())
+            {
+                overworldMinorItemCount -= 1;
             }
         }
 

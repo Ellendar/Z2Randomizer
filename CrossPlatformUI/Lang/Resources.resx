@@ -358,6 +358,10 @@ under the table, or check the fountain.</value>
 <value>Adds Bagu&apos;s letter (allowing passage of the Saria moat) to the general pool. An item
 from the general pool will replace the item you get when you talk to Bagu.</value>
 	</data>
+    <data name="TownQuestLocationsAreMinorItemsToolTip" xml:space="preserve">
+<value>With Town Quest Items and/or Sword Techniques shuffled, you can enable this option to avoid
+major items being shuffled into their locations. (This does not include Bagu.)</value>
+	</data>
     <data name="ShuffleSmallItemsToolTip" xml:space="preserve">
 <value>Replaces each small item (red/blue jar, key, 1-up, or P-Bag) with another random small
 item. This includes item locations in the shuffle pool and general locations not shuffled

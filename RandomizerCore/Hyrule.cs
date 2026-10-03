@@ -662,6 +662,9 @@ public class Hyrule
             westHyrule.grassTile, deathMountain.hammerCave, deathMountain.specRock, eastHyrule.desertTile, eastHyrule.waterTile, eastHyrule.newKasuto,
             mazeIsland.childDrop, mazeIsland.magicContainerDrop];
 
+        //Items that have no location of their own and must be put in a location before the shuffle
+        List<Collectable> overworldExcessItems = [];
+
         if (props.PbagItemShuffle)
         {
             Collectable collectable = (Collectable)ROMData.GetByte(RomMap.WEST_PBAG_CAVE_COLLECTABLE);
@@ -719,21 +722,39 @@ public class Hyrule
             shufflableItems.Add(Collectable.BAGUS_NOTE);
             globalShuffleLocations.Add(westHyrule.bagu);
         }
+
         if (props.IncludeQuestItemsInShuffle)
         {
-            shufflableItems.Add(Collectable.MIRROR);
-            shufflableItems.Add(Collectable.WATER);
-            globalShuffleLocations.AddRange([westHyrule.sariaNorth, eastHyrule.nabooru]);
+            if (props.TownQuestLocationsAreMinorItems)
+            {
+                ReplaceWithUnshuffledMinorItem(westHyrule.sariaNorth.Town!.GetTownMap(VanillaTownMap.SARIA_TABLE)!);
+                ReplaceWithUnshuffledMinorItem(eastHyrule.nabooru.Town!.GetTownMap(VanillaTownMap.NABOORU_MID)!);
+                if (!props.StartsWithCollectable(Collectable.MIRROR)) { overworldExcessItems.Add(Collectable.MIRROR); }
+                if (!props.StartsWithCollectable(Collectable.WATER)) { overworldExcessItems.Add(Collectable.WATER); }
+            }
+            else
+            {
+                shufflableItems.Add(props.StartsWithCollectable(Collectable.MIRROR) ? minorItems.Sample(r) : Collectable.MIRROR);
+                shufflableItems.Add(props.StartsWithCollectable(Collectable.WATER) ? minorItems.Sample(r) : Collectable.WATER);
+                globalShuffleLocations.AddRange([westHyrule.sariaNorth, eastHyrule.nabooru]);
+            }
         }
 
         if (props.IncludeSwordTechsInShuffle)
         {
-            TownMap? townMap = westHyrule.mido.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER);
-            shufflableItems.Add(props.StartWithDownstab ? minorItems.Sample(r) : Collectable.DOWNSTAB);
-            globalShuffleLocations.Add(westHyrule.mido);
-            townMap = eastHyrule.darunia.Town!.GetTownMap(VanillaTownMap.DARUNIA_TRAINER);
-            shufflableItems.Add(props.StartWithUpstab ? minorItems.Sample(r) : Collectable.UPSTAB);
-            globalShuffleLocations.Add(eastHyrule.darunia);
+            if (props.TownQuestLocationsAreMinorItems)
+            {
+                ReplaceWithUnshuffledMinorItem(westHyrule.mido.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER)!);
+                ReplaceWithUnshuffledMinorItem(eastHyrule.darunia.Town!.GetTownMap(VanillaTownMap.DARUNIA_TRAINER)!);
+                if (!props.StartWithDownstab) { overworldExcessItems.Add(Collectable.DOWNSTAB); }
+                if (!props.StartWithUpstab) { overworldExcessItems.Add(Collectable.UPSTAB); }
+            }
+            else
+            {
+                shufflableItems.Add(props.StartWithDownstab ? minorItems.Sample(r) : Collectable.DOWNSTAB);
+                shufflableItems.Add(props.StartWithUpstab ? minorItems.Sample(r) : Collectable.UPSTAB);
+                globalShuffleLocations.AddRange([westHyrule.mido, eastHyrule.darunia]);
+            }
         }
         else if(props.SwapUpAndDownStab)
         {
@@ -965,7 +986,6 @@ public class Hyrule
             .SelectMany(loc => loc.GetShufflableCollectables())
             .Count(item => item.IsMinorItem());
         //Heart containers over 4 are excess (overworld bucket)
-        List<Collectable> overworldExcessItems = [];
         for (int i = 4; i < heartContainersInItemPool; i++)
         {
             overworldExcessItems.Add(Collectable.HEART_CONTAINER);
@@ -1098,6 +1118,12 @@ public class Hyrule
         {
             PreventSpellItemChains();
         }
+    }
+
+    private void ReplaceWithUnshuffledMinorItem(TownMap townMap)
+    {
+        townMap.Collectable = minorItems.Sample(r);
+        townMap.CollectableIsShufflable = false;
     }
 
     private void HandleStartingSpellItems(List<Location> possibleItemLocations)
