@@ -401,10 +401,10 @@ sealed class MazeIsland : World
                 }
 
                 //check bytes and adjust
-                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
+                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES);
             }
         }
-        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
+        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES);
         foreach (var lid in LocationIDUtils.Enumerate(Continent.MAZE))
         {
             if(!terrains.Keys.Contains(lid))

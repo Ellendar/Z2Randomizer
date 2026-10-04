@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
+using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
@@ -75,9 +76,8 @@ public sealed class EastHyrule : World
     public Location pbagCave1;
     public Location pbagCave2;
     private bool canyonShort;
-    public Location hiddenPalaceLocation;
-    public Location hiddenKasutoLocation;
-    public (int, int) hiddenPalaceCoords;
+    public Location? hiddenPalaceLocation;
+    public Location? hiddenKasutoLocation;
     private const int MAP_ADDR = 0xb480;
 
     private readonly List<Location> valleyOfDeathLocations;
@@ -162,8 +162,6 @@ public sealed class EastHyrule : World
         waterTile = GetLocation(LocationID.EAST_WATER);
         waterTile.AccessRequirements = new Requirements([RequirementType.BOOTS]);
         desertTile = GetLocation(LocationID.EAST_DESERT);
-
-        hiddenPalaceCoords = (0, 0);
 
         sideviewPtrTable = 0x8533;
         sideviewBank = 2;
@@ -294,8 +292,10 @@ public sealed class EastHyrule : World
         };
         newKasuto.IsExternalWorld = true;
         locationAtPalace6.IsExternalWorld = true;
-        hiddenPalaceLocation = locationAtPalace6;
-        hiddenKasutoLocation = newKasuto;
+        //hiddenPalaceLocation = locationAtPalace6;
+        //hiddenKasutoLocation = newKasuto;
+        hiddenPalaceLocation = null;
+        hiddenKasutoLocation = null;
 
         //Climate filtering
         climate = Climates.Create(continentId, props.EastClimate);
@@ -341,6 +341,9 @@ public sealed class EastHyrule : World
             Debug.Assert(MapRows == 75);
             Debug.Assert(MapColumns == 64);
             map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
+
+            hiddenPalaceLocation = locationAtPalace6;
+            hiddenKasutoLocation = newKasuto;
 
             if (biome == Biome.VANILLA_SHUFFLE)
             {
@@ -618,14 +621,6 @@ public sealed class EastHyrule : World
                 }
                 //Debug.WriteLine(GetMapDebug());
 
-                if (props.HiddenPalace)
-                {
-                    bool hp = RandomizeHiddenPalace(rom, props.ShuffleHidden, props.HiddenKasuto);
-                    if (!hp)
-                    {
-                        return false;
-                    }
-                }
                 Direction raftDirection = Direction.WEST;
                 if (props.ContinentConnections != ContinentConnectionType.NORMAL && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                 {
@@ -664,15 +659,31 @@ public sealed class EastHyrule : World
                     DrawOcean(bridgeDirection, preplacedWater);
                 }
 
+                // Bug #124 has us in a chicken/egg situation: they cannot be at the same X-coord,
+                // but we have to place one first. Hidden Kasuto location is pulled from the location list,
+                // and Hidden Palace has code to move its location based on terrain. So we make sure to place
+                // Hidden Kasuto first, let Hidden Palace check against it and set itself in a nice location,
+                // and PlaceLocations will make sure we do not re-shuffle Hidden Kasuto to the same X coord.
                 if (props.HiddenKasuto)
                 {
+                    // sets hiddenKasutoLocation
                     RandomizeHiddenKasuto(props.ShuffleHidden);
+                }
+
+                if (props.HiddenPalace)
+                {
+                    // sets hiddenPalaceLocation
+                    bool hp = RandomizeHiddenPalace(rom, props.ShuffleHidden, props.HiddenKasuto);
+                    if (!hp)
+                    {
+                        return false;
+                    }
                 }
 
                 bool placeLocationsResult;
                 if (props.HiddenKasuto && props.HiddenPalace)
                 {
-                    placeLocationsResult = PlaceLocations(riverTerrain, props.SaneCaves, hiddenKasutoLocation, hiddenPalaceLocation.Xpos);
+                    placeLocationsResult = PlaceLocations(riverTerrain, props.SaneCaves, hiddenKasutoLocation, hiddenPalaceLocation);
                 }
                 else
                 {
@@ -779,7 +790,7 @@ public sealed class EastHyrule : World
                         location.CanShuffle = false;
                     }
                 }
-                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Y, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
+                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation, hiddenKasutoLocation);
                 rom.Put(RomMap.NORTH_SOUTH_SEPARATOR_EAST, (byte)(northSouthEncounterSeparator + 30));
                 //logger.Debug("East:" + bytesWritten);
             }
@@ -797,17 +808,25 @@ public sealed class EastHyrule : World
 
         if (props.HiddenPalace)
         {
-            rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCoords, hiddenPalaceLocation, !props.LegacyVanillaShuffledLocations);
-            hiddenPalaceLocation.AccessRequirements = hiddenPalaceLocation.AccessRequirements.WithHardRequirement(RequirementType.FLUTE);        }
+            if (hiddenPalaceLocation is null)
+            {
+                throw new ImpossibleException("Failure in hidden palace shuffle");
+            }
+            rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceLocation, !props.LegacyVanillaShuffledLocations);
+            hiddenPalaceLocation.AccessRequirements = hiddenPalaceLocation.AccessRequirements.WithHardRequirement(RequirementType.FLUTE);
+        }
         if (props.HiddenKasuto)
         {
+            if (hiddenKasutoLocation is null)
+            {
+                throw new ImpossibleException("Failure in hidden Kasuto shuffle");
+            }
             rom.UpdateKasuto(hiddenKasutoLocation, biome,
                 baseAddr, terrains[hiddenKasutoLocation.ID], !props.LegacyVanillaShuffledLocations);
-            hiddenKasutoLocation.AccessRequirements = hiddenPalaceLocation.AccessRequirements.WithHardRequirement(RequirementType.HAMMER);
+            hiddenKasutoLocation.AccessRequirements = hiddenKasutoLocation.AccessRequirements.WithHardRequirement(RequirementType.HAMMER);
         }
 
-        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Y, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
-
+        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation, hiddenKasutoLocation);
 
         visitation = new bool[MapRows, MapColumns];
         for (int i = 0; i < MapRows; i++)
@@ -1267,6 +1286,10 @@ public sealed class EastHyrule : World
 
     private bool RandomizeHiddenPalace(ROM rom, bool shuffleHidden, bool hiddenKasuto)
     {
+        if(hiddenKasuto && hiddenKasutoLocation is null)
+        {
+            throw new ImpossibleException("If hidden Kasuto is on, RandomizeHiddenKasuto must be run before RadomizeHiddenPalace");
+        }
         bool done = false;
         int xpos = RNG.Next(6, MapColumns - 6);
         int ypos = RNG.Next(6, MapRows - 6);
@@ -1300,7 +1323,7 @@ public sealed class EastHyrule : World
             xpos = RNG.Next(6, MapColumns - 6);
             ypos = RNG.Next(6, MapRows - 6);
             //#124 - Hidden palace and hidden kasuto on the same X-coordinate causes a wrong warp when leaving hidden palace
-            if (hiddenKasuto && xpos == hiddenKasutoLocation.Xpos)
+            if (hiddenKasuto && xpos == hiddenKasutoLocation!.Xpos)
             {
                 continue;
             }
@@ -1320,10 +1343,6 @@ public sealed class EastHyrule : World
         if (!done)
         {
             return false;
-        }
-        if(hiddenPalaceLocation == null || hiddenKasutoLocation == null)
-        {
-            throw new ImpossibleException("Failure in hidden location shuffle");
         }
         Terrain t = climate.GetRandomTerrain(RNG, walkableTerrains);
         while (t == Terrain.FOREST)
@@ -1348,7 +1367,6 @@ public sealed class EastHyrule : World
         //map[hpLoc.Y, hpLoc.Xpos] = map[hpLoc.Y + 1, hpLoc.Xpos];
         hiddenPalaceLocation.Xpos = xpos;
         hiddenPalaceLocation.Y = ypos + 2;
-        hiddenPalaceCoords = (ypos + 30, xpos);
         //This is the only thing requiring a reference to the rom here and I have no idea what the fuck it is doing.
         rom.Put(0x1df70, (byte)t);
         hiddenPalaceLocation.CanShuffle = false;
@@ -1374,7 +1392,7 @@ public sealed class EastHyrule : World
     }
 
     private void BlockCaves(bool connectionsCanBeBlocked, bool riverDevilBlocks, bool rockBlock, 
-        IEnumerable<Location> disallowedLocations)
+        IEnumerable<Location?> disallowedLocations)
     {
         if(!riverDevilBlocks && !rockBlock) { return; }
 
@@ -1729,14 +1747,19 @@ public sealed class EastHyrule : World
 
         if(hiddenPalace)
         {
+            if (hiddenPalaceLocation is null)
+            {
+                throw new ImpossibleException("Failure in hidden Palace shuffle");
+            }
             requiredLocations.Add(hiddenPalaceLocation);
-            //support for the hidden palace call spot is extremely spotty. It effectively doesn't exist in the logic
-            //and is only created to hold coordinates that are later written to the rom. Ignoring it for now.
-            //requiredLocations.Add(hiddenPalaceCallSpot);
         }
 
         if(hiddenKasuto)
         {
+            if (hiddenKasutoLocation is null)
+            {
+                throw new ImpossibleException("Failure in hidden Kasuto shuffle");
+            }
             requiredLocations.Add(hiddenKasutoLocation);
         }
 

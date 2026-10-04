@@ -2925,13 +2925,30 @@ DrawHiddenJarBank5:
         }
     }
 
+    static readonly Dictionary<Terrain, byte[]> hiddenPalaceTiles = new()
+    {
+        // corresponds to ROM locations [0x1df7d, 0x1df82, 0x1df7e, 0x1df83]
+        // and no i don't know why they're in that order
+        [Terrain.PALACE]        = [0x60, 0x61, 0x62, 0x63],
+        [Terrain.SWAMP]         = [0x6F, 0x6F, 0x6F, 0x6F],
+        [Terrain.LAVA]          = [0x6E, 0x6E, 0x6E, 0x6E],
+        [Terrain.WALKABLEWATER] = [0x6E, 0x6E, 0x6E, 0x6E],
+        [Terrain.FOREST]        = [0x68, 0x69, 0x6A, 0x6B],
+        [Terrain.GRAVE]         = [0x70, 0x71, 0x7F, 0x7F],
+        [Terrain.ROAD]          = [0xFE, 0xFE, 0xFE, 0xFE],
+        [Terrain.BRIDGE]        = [0x5A, 0x5B, 0x5A, 0x5B],
+        [Terrain.CAVE]          = [0x72, 0x73, 0x72, 0x73],
+        [Terrain.DESERT]        = [0x6C, 0x6C, 0x6C, 0x6C],
+        [Terrain.TOWN]          = [0x5C, 0x5D, 0x5E, 0x5F],
+    };
+
     //This was refactored out of EastHyrule. The signature/timing/structure needs work.
-    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, bool vanillaShuffleUsesActualTerrain)
+    public void UpdateHiddenPalaceSpot(Biome biome, Location hiddenPalaceLocation, bool vanillaShuffleUsesActualTerrain)
     {
         if (!biome.UsesVanillaMap())
         {
-            Put(0x8382, (byte)hiddenPalaceCoords.Item1);
-            Put(0x8388, (byte)hiddenPalaceCoords.Item2);
+            Put(0x8382, (byte)(hiddenPalaceLocation.Y + 2));
+            Put(0x8388, (byte)hiddenPalaceLocation.Xpos);
         }
         int pos = hiddenPalaceLocation.YRaw;
 
@@ -2943,95 +2960,12 @@ DrawHiddenJarBank5:
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
             Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
-            if (hiddenPalaceLocation.TerrainType == Terrain.PALACE)
+            if (hiddenPalaceTiles.TryGetValue(hiddenPalaceLocation.TerrainType, out var tiles))
             {
-                Put(0x1df7d, 0x60);
-                Put(0x1df82, 0x61);
-
-                Put(0x1df7e, 0x62);
-
-                Put(0x1df83, 0x63);
-            }
-            else if (hiddenPalaceLocation.TerrainType == Terrain.SWAMP)
-            {
-                Put(0x1df7d, 0x6F);
-                Put(0x1df82, 0x6F);
-
-                Put(0x1df7e, 0x6F);
-
-                Put(0x1df83, 0x6F);
-            }
-            else if (hiddenPalaceLocation.TerrainType == Terrain.LAVA || hiddenPalaceLocation.TerrainType == Terrain.WALKABLEWATER)
-            {
-                Put(0x1df7d, 0x6E);
-                Put(0x1df82, 0x6E);
-
-                Put(0x1df7e, 0x6E);
-
-                Put(0x1df83, 0x6E);
-            }
-            else if (hiddenPalaceLocation.TerrainType == Terrain.FOREST)
-            {
-                Put(0x1df7d, 0x68);
-                Put(0x1df82, 0x69);
-
-                Put(0x1df7e, 0x6A);
-
-                Put(0x1df83, 0x6B);
-            }
-            else if (hiddenPalaceLocation.TerrainType == Terrain.GRAVE)
-            {
-                Put(0x1df7d, 0x70);
-                Put(0x1df82, 0x71);
-
-                Put(0x1df7e, 0x7F);
-
-                Put(0x1df83, 0x7F);
-            }
-            else if (hiddenPalaceLocation.TerrainType == Terrain.ROAD)
-            {
-                Put(0x1df7d, 0xFE);
-                Put(0x1df82, 0xFE);
-
-                Put(0x1df7e, 0xFE);
-
-                Put(0x1df83, 0xFE);
-            }
-            else if (hiddenPalaceLocation.TerrainType == Terrain.BRIDGE)
-            {
-                Put(0x1df7d, 0x5A);
-                Put(0x1df82, 0x5B);
-
-                Put(0x1df7e, 0x5A);
-
-                Put(0x1df83, 0x5B);
-            }
-            else if (hiddenPalaceLocation.TerrainType == Terrain.CAVE)
-            {
-                Put(0x1df7d, 0x72);
-                Put(0x1df82, 0x73);
-
-                Put(0x1df7e, 0x72);
-
-                Put(0x1df83, 0x73);
-            }
-            else if (hiddenPalaceLocation.TerrainType == Terrain.DESERT)
-            {
-                Put(0x1df7d, 0x6C);
-                Put(0x1df82, 0x6C);
-
-                Put(0x1df7e, 0x6C);
-
-                Put(0x1df83, 0x6C);
-            }
-            else if (hiddenPalaceLocation.TerrainType == Terrain.TOWN)
-            {
-                Put(0x1df7d, 0x5C);
-                Put(0x1df82, 0x5D);
-
-                Put(0x1df7e, 0x5E);
-
-                Put(0x1df83, 0x5F);
+                Put(0x1df7d, tiles[0]);
+                Put(0x1df82, tiles[1]);
+                Put(0x1df7e, tiles[2]);
+                Put(0x1df83, tiles[3]);
             }
         }
 
