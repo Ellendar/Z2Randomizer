@@ -292,8 +292,6 @@ public sealed class EastHyrule : World
         };
         newKasuto.IsExternalWorld = true;
         locationAtPalace6.IsExternalWorld = true;
-        //hiddenPalaceLocation = locationAtPalace6;
-        //hiddenKasutoLocation = newKasuto;
         hiddenPalaceLocation = null;
         hiddenKasutoLocation = null;
 
