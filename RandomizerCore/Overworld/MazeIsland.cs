@@ -609,7 +609,7 @@ sealed class MazeIsland : World
         //DebugVisitation();
         foreach (Location location in AllLocations)
         {
-            if (visitation[location.Y, location.Xpos])
+            if (visitation[location.Y, location.Xpos] && location.AccessRequirements.AreSatisfiedBy(requireables))
             {
                 location.Reachable = true;
             }
