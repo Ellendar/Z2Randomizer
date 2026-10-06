@@ -1731,28 +1731,21 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     /// scenario should work.
     public void CheckForFlagConflicts()
     {
-        int requiredOverworldMinorItemReplacements = 0;
-        int requiredPalaceMinorItemReplacements = 0;
-        var heartsInPool = maxHeartContainers.HeartsInPool(startingHeartContainersMax ?? 8);
-        requiredOverworldMinorItemReplacements += heartsInPool - 4;
-        var magicContainersInPool = 8 - (startingMagicContainersMax ?? 8);
-        requiredOverworldMinorItemReplacements += magicContainersInPool - 4;
-
         (int overworldMinorItemCount, int palaceMinorItemCount) = CountPossibleMinorItems();
         if (mixOverworldAndPalaceItems == true)
         {
-            if (overworldMinorItemCount + palaceMinorItemCount < requiredOverworldMinorItemReplacements + requiredPalaceMinorItemReplacements)
+            if (overworldMinorItemCount + palaceMinorItemCount < 0)
             {
                 throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for removed palace items.\n\nAdd more starting items or more palace items.");
             }
         }
         else
         {
-            if (overworldMinorItemCount < requiredOverworldMinorItemReplacements)
+            if (overworldMinorItemCount < 0)
             {
                 throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for overworld items.\n\nAdd more starting Heart/Magic containers.");
             }
-            if (palaceMinorItemCount < requiredPalaceMinorItemReplacements)
+            if (palaceMinorItemCount < 0)
             {
                 throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for removed palace items.\n\nAdd more starting items or more palace items.");
             }
@@ -2049,6 +2042,12 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         {
             throw new UserFacingException("Magic Container Mismatch", "Unshuffled West and East must each contain their two vanilla Magic Containers. Your starting container configuration does not allow this.");
         }
+
+        var effectiveMaxHearts = maxHeartContainers == MaxHeartsOption.RANDOM ? MaxHeartsOption.ONE : maxHeartContainers;
+        var minHeartsInPool = effectiveMaxHearts.HeartsInPool(startingHeartContainersMax ?? 8);
+        overworldMinorItemCount += 4 - minHeartsInPool;
+        var minMagicContainersInPool = 8 - (startingMagicContainersMax ?? 8);
+        overworldMinorItemCount += 4 - minMagicContainersInPool;
 
         var palaceLengthsMax = Palaces.VANILLA_LENGTHS[..6].Select(n => Palaces.MaxLengthRoll(n, normalPalaceLength)).ToArray();
         var itemCountMaxRoll = GetPalaceItemRoomMaxCounts(palaceItemRoomCount, palaceLengthsMax);
