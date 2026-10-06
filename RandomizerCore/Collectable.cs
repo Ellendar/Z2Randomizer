@@ -252,7 +252,7 @@ public static class CollectableExtensions
     }
 
     /// The six vanilla Palace items
-    public static bool IsPalaceItem(this Collectable collectable)
+    public static bool IsVanillaPalaceItem(this Collectable collectable)
     {
         return collectable switch
         {

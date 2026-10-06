@@ -525,7 +525,7 @@ public class ItemBucketTests
         ];
         foreach (Collectable item in palaceItems)
         {
-            Assert.IsTrue(item.IsPalaceItem(), $"{item} should be a palace item");
+            Assert.IsTrue(item.IsVanillaPalaceItem(), $"{item} should be a palace item");
         }
 
         Collectable[] nonPalaceItems = [
@@ -541,7 +541,7 @@ public class ItemBucketTests
         ];
         foreach (Collectable item in nonPalaceItems)
         {
-            Assert.IsFalse(item.IsPalaceItem(), $"{item} should NOT be a palace item");
+            Assert.IsFalse(item.IsVanillaPalaceItem(), $"{item} should NOT be a palace item");
         }
     }
 
