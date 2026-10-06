@@ -446,6 +446,7 @@ public static class LocationIDExtensions
 
 }
 
+// This function written by Claude.ai
 public static class LocationIDDescriptions
 {
     static readonly Dictionary<LocationID, string> cache =
