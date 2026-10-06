@@ -560,7 +560,7 @@ sealed class DeathMountain : World
                 }
 
                 //check bytes and adjust
-                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
+                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES);
             }
         }
         visitation = new bool[MapRows, MapColumns];
@@ -571,7 +571,7 @@ sealed class DeathMountain : World
             return false;
         }
 
-        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
+        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES);
         rom.Put(RomMap.NORTH_SOUTH_SEPARATOR_DM, (byte)(northSouthEncounterSeparator + 30));
 
         for (int i = 0; i < MapRows; i++)

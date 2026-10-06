@@ -372,11 +372,16 @@ public abstract class World
 
     protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves)
     {
-        return PlaceLocations(riverTerrain, saneCaves, null, -1);
+        return PlaceLocations(riverTerrain, saneCaves, null, null);
     }
-    protected bool PlaceLocations(Terrain crossingTerrain, bool saneCaves, Location? hiddenKasutoLocation, int hiddenPalaceX)
+    protected bool PlaceLocations(Terrain crossingTerrain, bool saneCaves, Location? hiddenKasutoLocation, Location? hiddenPalaceLocation)
     {
         int placementAttempt = 0;
+        // make sure we can't shuffle hidden palace
+        if(hiddenPalaceLocation is { CanShuffle: true })
+        {
+            throw new ImpossibleException("In PlaceLocations we should not be able to shuffle the hidden palace location");
+        }
         foreach (Location location in AllLocations.Where(loc => loc.AppearsOnMap))
         {
             if ((location.TerrainType != Terrain.BRIDGE
@@ -408,10 +413,11 @@ public abstract class World
                     || map[y, x - 1] != Terrain.NONE
                     || map[y - 1, x - 1] != Terrain.NONE
                     //#124
-                    || (x == hiddenPalaceX && location == hiddenKasutoLocation)
+                    || (location == hiddenKasutoLocation && x == hiddenPalaceLocation?.Xpos)
                 );
 
                 map[y, x] = location.TerrainType;
+
                 //If the location is a cave, connect it
                 if (location.TerrainType == Terrain.CAVE)
                 {
@@ -1491,7 +1497,7 @@ public abstract class World
     /// <param name="total">Total number of bytes to write</param>
     /// <param name="h1">For east: Hidden Palace Y - 30</param>
     /// <param name="h2">For east: Hidden palace X</param>
-    protected int WriteMapToRom(ROM romData, bool doWrite, int loc, int total, int h1, int h2, bool hiddenPalace, bool hiddenKasuto)
+    protected int WriteMapToRom(ROM romData, bool doWrite, int loc, int total, Location? hiddenPalaceLocation = null, Location? hiddenKasutoLocation = null)
     {
         int bytesWritten = 0; //Number of bytes written so far
         Terrain currentTerrain = map[0, 0];
@@ -1501,9 +1507,9 @@ public abstract class World
         {
             for (int x = 0; x < MAP_COLS_FULL; x++)
             {
-                //These two conditionals ABSOLUTELY should not be processed here.
-                //Refactor them and remove the excess boolean parameters.
-                if (hiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
+                // Do we know if something in the game breaks if we don't write the map like this?
+                // If not, we can delete these conditionals altogether
+                if (hiddenPalaceLocation is not null && y == hiddenPalaceLocation.Y && x == hiddenPalaceLocation.Xpos)
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + currentTerrain.RomValue();
@@ -1518,7 +1524,7 @@ public abstract class World
                     bytesWritten += 2;
                     continue;
                 }
-                if (hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && biome.UsesVanillaMap())
+                if (hiddenKasutoLocation is not null && y == 51 && x == 61 && biome.UsesVanillaMap())
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + currentTerrain.RomValue();
@@ -1553,7 +1559,7 @@ public abstract class World
                 else
                 {
                     currentTerrainCount++;
-            }
+                }
             }
             //Write the last Terrain segment for this row
             currentTerrainCount--;
