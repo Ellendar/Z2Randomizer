@@ -306,26 +306,28 @@ public class ItemBucketTests
     [TestMethod]
     public void ContainerAdjustment_ConfigLevel_Matches()
     {
-        // Config-level: heartContainerReplacementSmallItemsCount = 4 - HeartsInPool
-        // With EIGHT: HeartsInPool(EIGHT, start) = max(0, 8-start)
-        // When start=4: replacement = 4-(8-4)=0
-        // When start=2: replacement = 4-(8-2)=-2
-        var config4 = new RandomizerConfiguration { ShuffleOverworldItems = true };
-        // Default startingHeartContainersMax=4
-        var (ow4, _) = config4.CountPossibleMinorItems();
+        var config1 = new RandomizerConfiguration { ShuffleOverworldItems = true };
+        var (ow1, _) = config1.CountPossibleMinorItems();
+        Assert.AreEqual(0, ow1, "Non-pbag shuffle settings should have 0 available items");
+
+        var config4 = new RandomizerConfiguration
+        {
+            ShuffleOverworldItems = true,
+            IncludePBagCavesInItemShuffle = true,
+        };
+        var (ow5, _) = config4.CountPossibleMinorItems();
+        Assert.AreEqual(3, ow5, "P-bag shuffle settings should have 3 available items");
 
         var config2 = new RandomizerConfiguration
         {
             ShuffleOverworldItems = true,
+            IncludePBagCavesInItemShuffle = true,
             StartingHeartContainersMin = 2,
             StartingHeartContainersMax = 2,
         };
         var (ow2, _) = config2.CountPossibleMinorItems();
 
-        // With start=2: heartsInPool = 6, replacement = 4-6 = -2
-        // magic: 4-(8-4)=0 (unchanged)
-        Assert.AreEqual(-2, ow2 - ow4,
-            "Heart container adjustment should drag overworld by -2 when starting hearts drop from 4 to 2");
+        Assert.AreEqual(1, ow2, "Heart container adjustment should lower possible minor items by 2");
     }
 
     [TestMethod]
