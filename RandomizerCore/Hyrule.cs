@@ -966,7 +966,7 @@ public class Hyrule
         }
         //Palace items that didn't get placed in palaces are excess (palace bucket)
         List<Collectable> palaceExcessItems = [];
-        foreach (Collectable palaceItem in Enum.GetValues<Collectable>().Where(c => c.IsPalaceItem()))
+        foreach (Collectable palaceItem in Enum.GetValues<Collectable>().Where(c => c.IsVanillaPalaceItem()))
         {
             if (!possibleItemLocations.SelectMany(l => l.GetAllCollectables()).Any(c => c == palaceItem)
                 && !props.StartsWithCollectable(palaceItem))
