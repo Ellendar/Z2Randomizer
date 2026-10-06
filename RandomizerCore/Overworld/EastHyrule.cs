@@ -1785,6 +1785,18 @@ public sealed class EastHyrule : World
         sb.AppendLine("\tWater Tile: " + waterTile.GetAllCollectables()[0].EnglishText());
         sb.AppendLine("\tDesert tile: " + desertTile.GetAllCollectables()[0].EnglishText());
 
+        if(hiddenPalaceLocation is not null)
+        {
+            var palaceDescription = hiddenPalaceLocation.Palace is null ? "" : " (" + hiddenPalaceLocation.Palace!.Number + ")";
+            sb.AppendLine("\tThree-Eyed Rock: " + hiddenPalaceLocation.ID.GetDescription() + palaceDescription);
+        }
+
+        if(hiddenKasutoLocation is not null)
+        {
+            var palaceDescription = hiddenKasutoLocation.Palace is null ? "" : " (" + hiddenKasutoLocation.Palace!.Number + ")";
+            sb.AppendLine("\tHidden Kasuto Tile: " + hiddenKasutoLocation.ID.GetDescription() + palaceDescription);
+        }
+
         sb.Append("\tPalace 5 (" + locationAtPalace5.Palace!.Number + "): ");
         sb.AppendLine(locationAtPalace5.GetAllCollectables().Count == 0 ? "No Items" : string.Join(", ", locationAtPalace5.GetAllCollectables().Select(c => c.EnglishText())));
 
