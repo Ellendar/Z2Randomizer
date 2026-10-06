@@ -952,7 +952,13 @@ public class Hyrule
 
         //Excess items are items that need to be placed beyond the normal vanilla items
         //these could be containers if more than 4 need to be placed, or palace items that were removed from palaces
-        int minorItemCount = possibleItemLocations.SelectMany(loc => loc.GetShufflableCollectables())
+        int overworldMinorItemCount = possibleItemLocations
+            .Where(loc => loc.Palace == null)
+            .SelectMany(loc => loc.GetShufflableCollectables())
+            .Count(item => item.IsMinorItem());
+        int palaceMinorItemCount = possibleItemLocations
+            .Where(loc => loc.Palace != null)
+            .SelectMany(loc => loc.GetShufflableCollectables())
             .Count(item => item.IsMinorItem());
         //Heart containers over 4 are excess (overworld bucket)
         List<Collectable> overworldExcessItems = [];
@@ -968,41 +974,52 @@ public class Hyrule
         List<Collectable> palaceExcessItems = [];
         foreach (Collectable palaceItem in Enum.GetValues<Collectable>().Where(c => c.IsVanillaPalaceItem()))
         {
-            if (!possibleItemLocations.SelectMany(l => l.GetAllCollectables()).Any(c => c == palaceItem)
-                && !props.StartsWithCollectable(palaceItem))
+            if (!possibleItemLocations
+                .SelectMany(l => l.GetAllCollectables())
+                .Any(c => c == palaceItem) && !props.StartsWithCollectable(palaceItem))
             {
                 palaceExcessItems.Add(palaceItem);
             }
         }
 
-        //When the Overworld and Palace pools are mixed, palace excess items are free to
-        //spill into overworld locations. When they are separate, palace items must stay
-        //in palaces, so any that cannot be placed there make the seed infeasible.
-        if (!props.MixOverworldPalaceItems && props.ShufflePalaceItems && palaceExcessItems.Count > 0)
-        {
-            throw new Exception("Insufficient locations to place excess Palace items. The validation should have caught this.");
-        }
-        List<Collectable> excessItems = props.MixOverworldPalaceItems
-            ? [.. overworldExcessItems, .. palaceExcessItems]
-            : overworldExcessItems;
+        List<Location> overworldMinorItemLocations = [.. possibleItemLocations
+            .Where(loc => loc.Palace == null)
+            .Where(l => l.GetShufflableCollectables()
+            .Any(c => c.IsMinorItem()))];
+        List<Location> palaceMinorItemLocations = [.. possibleItemLocations
+            .Where(loc => loc.Palace != null)
+            .Where(l => l.GetShufflableCollectables()
+            .Any(c => c.IsMinorItem()))];
+        List<Location> minorItemLocationsJoined = [.. overworldMinorItemLocations, .. palaceMinorItemLocations];
 
-        List<Location> minorItemLocations = possibleItemLocations.Where(l => l.GetShufflableCollectables().Any(c => c.IsMinorItem())).ToList();
-        int overflowLocationsRequired = excessItems.Count - minorItemCount;
-
-        if (excessItems.Count > minorItemCount)
+        void PlaceExcessItems(int minorItemCount, List<Collectable> excessItems, List<Location> minorItemLocations)
         {
-            throw new Exception("Insufficient locations to place excess items. The validation should have caught this.");
-        }
-        Debug.Assert(excessItems.Count <= minorItemCount);
-        foreach(Collectable excessItem in excessItems)
-        {
-            Location minorItemLocation = minorItemLocations.Sample(r) ?? throw new ImpossibleException("No minor item to replace after promotion???");
-            Collectable minorItem = minorItemLocation.GetShufflableCollectables().Where(i => i.IsMinorItem()).ToList().Sample(r);
-            minorItemLocation.ReplaceCollectable(minorItem, excessItem, r);
-            if(!minorItemLocation.GetShufflableCollectables().Any(i => i.IsMinorItem()))
+            if (excessItems.Count > minorItemCount)
             {
-                minorItemLocations.Remove(minorItemLocation);
+                throw new Exception("Insufficient locations to place excess items. The validation should have caught this.");
             }
+            foreach (Collectable excessItem in excessItems)
+            {
+                Location minorItemLocation = minorItemLocations.Sample(r) ?? throw new ImpossibleException("No minor item to replace after promotion???");
+                Collectable minorItem = minorItemLocation.GetShufflableCollectables().Where(i => i.IsMinorItem()).ToList().Sample(r);
+                minorItemLocation.ReplaceCollectable(minorItem, excessItem, r);
+                if (!minorItemLocation.GetShufflableCollectables().Any(i => i.IsMinorItem()))
+                {
+                    minorItemLocations.Remove(minorItemLocation);
+                }
+            }
+        }
+
+        if (props.MixOverworldPalaceItems)
+        {
+            int minorItemCountJoined = overworldMinorItemCount + palaceMinorItemCount;
+            List<Collectable> excessItemsJoined = [.. overworldExcessItems, .. palaceExcessItems];
+            PlaceExcessItems(minorItemCountJoined, excessItemsJoined, minorItemLocationsJoined);
+        }
+        else
+        {
+            PlaceExcessItems(overworldMinorItemCount, overworldExcessItems, overworldMinorItemLocations);
+            PlaceExcessItems(palaceMinorItemCount, palaceExcessItems, palaceMinorItemLocations);
         }
 
         //If allow item duplicates is on, as many duplicates of these items will be added as possible, up to the number
@@ -1045,7 +1062,7 @@ public class Hyrule
 
             importantItemsToDuplicate = importantItemsToDuplicate.Where(shufflableItems.Contains).ToList();
 
-            minorItemLocations = duplicateItemPlacementCandidates.Where(i => i.GetShufflableCollectables().Any(c => c.IsMinorItem())).ToList();
+            var minorItemLocations = duplicateItemPlacementCandidates.Where(i => i.GetShufflableCollectables().Any(c => c.IsMinorItem())).ToList();
             int replaceableMinorItemCount = duplicateItemPlacementCandidates.Sum(l => l.GetShufflableCollectables().Count(c => c.IsMinorItem()));
             importantItemsToDuplicate = importantItemsToDuplicate.GetRange(0, int.Min(replaceableMinorItemCount, importantItemsToDuplicate.Count));
             importantItemsToDuplicate.FisherYatesShuffle(r);
