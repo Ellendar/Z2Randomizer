@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using ReactiveUI;
 using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Disposables;
@@ -32,18 +33,43 @@ public class PresetItem
     public RandomizerConfiguration Config { get; }
 }
 
-public sealed class PresetDiffRow
+public sealed class PresetDiffRow : ReactiveObject
 {
-    public PresetDiffRow(Control? control, string value)
+    public PresetDiffRow(string field, Control? control, string value)
     {
+        Field = field;
         Control = control;
-        Value = value;
+        this.value = value;
     }
+
+    public string Field { get; }
 
     [JsonIgnore]
     public Control? Control { get; }
 
-    public string Value { get; }
+    private string value;
+    public string Value
+    {
+        get => value;
+        set
+        {
+            if (this.value == value) { return; }
+            this.value = value;
+            this.RaisePropertyChanged(nameof(Value));
+        }
+    }
+
+    private bool isRemoving;
+    public bool IsRemoving
+    {
+        get => isRemoving;
+        set
+        {
+            if (isRemoving == value) { return; }
+            isRemoving = value;
+            this.RaisePropertyChanged(nameof(IsRemoving));
+        }
+    }
 }
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
@@ -64,6 +90,7 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
         get => selectedPreset;
         set
         {
+            suppressDiffAnimations = true;
             this.RaiseAndSetIfChanged(ref selectedPreset, value);
             SetDiff();
             this.RaisePropertyChanged(nameof(Description));
@@ -91,6 +118,18 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
     // and a detached control holds no config subscription.
     private readonly Dictionary<string, Control> controlCache = new();
 
+    // Keep in sync with the Opacity DoubleTransition duration in PresetsView.axaml.
+    private const int RemovalFadeMilliseconds = 250;
+
+    // Config changes arrive one property at a time
+    // (Load Preset deserializes every flag), so coalesce them into a single reconcile.
+    private readonly DispatcherTimer diffTimer;
+    private readonly Dictionary<PresetDiffRow, DispatcherTimer> pendingRemovals = new();
+
+    // Set when the selected preset changes so the reconcile that follows swaps
+    // the whole list at once instead of fading and collapsing every old row.
+    private bool suppressDiffAnimations;
+
     private bool isDiffExpanded;
     public bool IsDiffExpanded
     {
@@ -104,39 +143,147 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
 
     public void SetDiff()
     {
-        DiffRows.Clear();
+        diffTimer.Stop();
+        diffTimer.Start();
+    }
+
+    private void ReconcileDiff()
+    {
+        bool suppressAnimations = suppressDiffAnimations;
+        suppressDiffAnimations = false;
 
         if (SelectedPreset is not { } other)
         {
+            ClearRows();
             HasDiff = false;
             return;
         }
 
         var d = Main.Config.Diff(other.Config);
-        HasDiff = d.Count > 0;
 
+        // Collapsed: drop rows immediately, there is nothing visible to fade.
         if (!IsDiffExpanded)
         {
+            ClearRows();
+            HasDiff = d.Count > 0;
             return;
         }
 
-        string arrow = OperatingSystem.IsBrowser() ? "->" : "\u2192"; // Unicode arrow doesn't draw in browser build
-        foreach (var t in d)
+        // Preset switch: rebuild the whole list at once instead of fading and
+        // collapsing every old row.
+        if (suppressAnimations)
         {
-            var control = GetControl(t.Field);
-            if (control is not null)
+            ClearRows();
+            if (d.Count == 0)
             {
-                DiffRows.Add(new PresetDiffRow(
-                    control,
-                    $"{arrow}    {FormatDiffValue(t.NewValue)}"));
+                HasDiff = false;
+                return;
+            }
+        }
+
+        var positionOf = new Dictionary<string, int>(d.Count);
+        for (int i = 0; i < d.Count; i++)
+        {
+            positionOf[d[i].Field] = i;
+        }
+
+        var rowsByField = new Dictionary<string, PresetDiffRow>();
+        foreach (var row in DiffRows)
+        {
+            rowsByField[row.Field] = row;
+        }
+
+        string arrow = OperatingSystem.IsBrowser() ? "->" : "\u2192"; // Unicode arrow doesn't draw in browser build
+        var liveRows = new HashSet<PresetDiffRow>();
+
+        for (int i = 0; i < d.Count; i++)
+        {
+            var t = d[i];
+            if (rowsByField.TryGetValue(t.Field, out var row))
+            {
+                // Still different: revive a fading row and refresh its value in place.
+                CancelRemoval(row);
+                row.IsRemoving = false;
+                row.Value = FormatRowValue(arrow, row.Control, t);
+                liveRows.Add(row);
             }
             else
             {
-                DiffRows.Add(new PresetDiffRow(
-                    null,
-                    FormatDiffLine(t)));
+                var control = GetControl(t.Field);
+                row = new PresetDiffRow(t.Field, control, FormatRowValue(arrow, control, t));
+                liveRows.Add(row);
+                DiffRows.Insert(InsertionIndex(positionOf, i), row);
             }
         }
+
+        // Anything no longer different fades out, then is dropped once invisible.
+        foreach (var row in DiffRows)
+        {
+            if (!liveRows.Contains(row))
+            {
+                StartRemoval(row);
+            }
+        }
+
+        // Keep the expander visible while the last rows are still fading.
+        HasDiff = d.Count > 0 || DiffRows.Count > 0;
+    }
+
+    private int InsertionIndex(Dictionary<string, int> positionOf, int position)
+    {
+        for (int i = 0; i < DiffRows.Count; i++)
+        {
+            if (positionOf.TryGetValue(DiffRows[i].Field, out var p) && p > position)
+            {
+                return i;
+            }
+        }
+        return DiffRows.Count;
+    }
+
+    private void StartRemoval(PresetDiffRow row)
+    {
+        if (pendingRemovals.ContainsKey(row)) { return; }
+
+        row.IsRemoving = true;
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(RemovalFadeMilliseconds) };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            pendingRemovals.Remove(row);
+            DiffRows.Remove(row);
+            if (DiffRows.Count == 0)
+            {
+                HasDiff = false;
+            }
+        };
+        pendingRemovals[row] = timer;
+        timer.Start();
+    }
+
+    private void CancelRemoval(PresetDiffRow row)
+    {
+        if (pendingRemovals.Remove(row, out var timer))
+        {
+            timer.Stop();
+        }
+    }
+
+    private void ClearRows()
+    {
+        foreach (var timer in pendingRemovals.Values)
+        {
+            timer.Stop();
+        }
+        pendingRemovals.Clear();
+        DiffRows.Clear();
+    }
+
+    private static string FormatRowValue(string arrow, Control? control, (string Field, object? OldValue, object? NewValue) t)
+    {
+        return control is not null
+            ? $"{arrow}    {FormatDiffValue(t.NewValue)}"
+            : FormatDiffLine(t);
     }
 
     private Control? GetControl(string field)
@@ -202,9 +349,19 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
         Main = main;
         Activator = new();
 
+        diffTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(120) };
+        diffTimer.Tick += (_, _) =>
+        {
+            diffTimer.Stop();
+            ReconcileDiff();
+        };
+
         LoadPreset = ReactiveCommand.Create(() =>
         {
             if (SelectedPreset is null) { return; }
+            // Applying a preset makes every diff row disappear at once, so swap it
+            // instantly instead of fading the whole list out.
+            suppressDiffAnimations = true;
             // By writing the flags like this, it will update all the reactive elements watching each
             // individual field.
             Main.Config.DeserializeFlags(SelectedPreset.Config.SerializeFlags());
