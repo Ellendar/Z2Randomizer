@@ -1,13 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.Json.Serialization;
+using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Disposables;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
+using CrossPlatformUI.Controls.Generated;
 using CrossPlatformUI.Presets;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
@@ -24,9 +28,22 @@ public class PresetItem
 
     public string Name { get; }
     public string? Description { get; }
-    public string Diff { get; set; } = "";
     public bool IsCustom { get; }
     public RandomizerConfiguration Config { get; }
+}
+
+public sealed class PresetDiffRow
+{
+    public PresetDiffRow(Control? control, string value)
+    {
+        Control = control;
+        Value = value;
+    }
+
+    [JsonIgnore]
+    public Control? Control { get; }
+
+    public string Value { get; }
 }
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
@@ -61,20 +78,98 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
 
     public bool HasDescription => !string.IsNullOrEmpty(SelectedPreset?.Description);
 
-    public string Diff => SelectedPreset?.Diff ?? "";
-
     private bool hasDiff;
     public bool HasDiff { get => hasDiff; set => this.RaiseAndSetIfChanged(ref hasDiff, value); }
 
+    [JsonIgnore]
+    public ObservableCollection<PresetDiffRow> DiffRows { get; } = new();
+
+    // A generated control is expensive to build (resource lookups, item lists,
+    // theme resolution) and a field always maps to the same control type, so
+    // build each field's control once and reuse it across rebuilds. Reuse is
+    // safe: a field appears at most once per diff, rows are the only consumer,
+    // and a detached control holds no config subscription.
+    private readonly Dictionary<string, Control> controlCache = new();
+
+    private bool isDiffExpanded;
+    public bool IsDiffExpanded
+    {
+        get => isDiffExpanded;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref isDiffExpanded, value);
+            SetDiff();
+        }
+    }
+
     public void SetDiff()
     {
-        if (SelectedPreset is { } other)
+        DiffRows.Clear();
+
+        if (SelectedPreset is not { } other)
         {
-            var d = Main.Config.Diff(other.Config);
-            HasDiff = d.Count > 0;
-            other.Diff = d.Count == 0 ? "" : string.Join("\n", d.Select(t => FormatDiffLine(t)));
+            HasDiff = false;
+            return;
         }
-        this.RaisePropertyChanged(nameof(Diff));
+
+        var d = Main.Config.Diff(other.Config);
+        HasDiff = d.Count > 0;
+
+        if (!IsDiffExpanded)
+        {
+            return;
+        }
+
+        string arrow = OperatingSystem.IsBrowser() ? "->" : "\u2192"; // Unicode arrow doesn't draw in browser build
+        foreach (var t in d)
+        {
+            var control = GetControl(t.Field);
+            if (control is not null)
+            {
+                DiffRows.Add(new PresetDiffRow(
+                    control,
+                    $"{arrow}    {FormatDiffValue(t.NewValue)}"));
+            }
+            else
+            {
+                DiffRows.Add(new PresetDiffRow(
+                    null,
+                    FormatDiffLine(t)));
+            }
+        }
+    }
+
+    private Control? GetControl(string field)
+    {
+        if (controlCache.TryGetValue(field, out var cached))
+        {
+            return cached;
+        }
+
+        var control = FlagControlFactory.Create(field);
+        if (control is null)
+        {
+            return null;
+        }
+
+        // Explicit DataContext: inside the ItemsControl template the inherited
+        // one would be the row, which the resolver can't turn into a config.
+        // Main resolves (value.Config), so the control shows the live config.
+        control.DataContext = Main;
+        controlCache.Add(field, control);
+        return control;
+    }
+
+    private static string FormatDiffValue(object? value)
+    {
+        return value switch
+        {
+            Enum e => e.ToDescription().ToString(),
+            true => "Enabled",
+            false => "Disabled",
+            null => "Random",
+            _ => value.ToString() ?? "?"
+        };
     }
 
     private static string FormatDiffLine((string Field, object? OldValue, object? NewValue) t)
@@ -90,8 +185,8 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
         };
         return $"{t.Field} = {value},";
 #else
-        string oldString = t.OldValue is Enum oldEnum ? oldEnum.ToDescription().ToString() : t.OldValue?.ToString() ?? "?";
-        string newString = t.NewValue is Enum newEnum ? newEnum.ToDescription().ToString() : t.NewValue?.ToString() ?? "?";
+        string oldString = FormatDiffValue(t.OldValue);
+        string newString = FormatDiffValue(t.NewValue);
         string arrow = OperatingSystem.IsBrowser() ? "->" : "\u2192"; // Unicode arrow doesn't draw in browser build
         return $"{t.Field}: {oldString} {arrow} {newString}";
 #endif
