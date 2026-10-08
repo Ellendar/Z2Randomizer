@@ -544,6 +544,47 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
             sb.AppendLine("}");
         }
 
+        sb.AppendLine();
+        sb.AppendLine("/// <summary>");
+        sb.AppendLine("/// Creates the generated control for a config property from its name alone,");
+        sb.AppendLine("/// for callers that only have the name at runtime (the preset diff). Null");
+        sb.AppendLine("/// when the field has no generated control: a gated ComboBox/numeric, or a");
+        sb.AppendLine("/// flag whose control was deliberately left hand-written.");
+        sb.AppendLine("/// </summary>");
+        sb.AppendLine("internal static class FlagControlFactory");
+        sb.AppendLine("{");
+        sb.AppendLine(
+            "    public static global::Avalonia.Controls.Control? Create(string fieldName)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        switch (fieldName)");
+        sb.AppendLine("        {");
+
+        foreach (var field in classInfo.ControlFields
+                     .OrderBy(f => f.PropertyName, StringComparer.Ordinal))
+        {
+            if (field.Kind == ControlKind.NumericPair && field.PairMembers is not null)
+            {
+                // Diff reports the Min/Max config properties individually; both ends
+                // share the one merged control, named after the Min field minus Min.
+                foreach (var member in field.PairMembers)
+                {
+                    sb.AppendLine($"            case \"{member.PropertyName}\":");
+                }
+            }
+            else
+            {
+                sb.AppendLine($"            case \"{field.PropertyName}\":");
+            }
+
+            sb.AppendLine($"                return new {field.PropertyName}();");
+        }
+
+        sb.AppendLine("            default:");
+        sb.AppendLine("                return null;");
+        sb.AppendLine("        }");
+        sb.AppendLine("    }");
+        sb.AppendLine("}");
+
         return sb.ToString();
     }
 
