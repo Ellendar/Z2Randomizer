@@ -1780,6 +1780,7 @@ ActualLavaDeath:                     ; original code that we replaced
 
     public void SetBossHpBarDivisors(AsmModule a, StatRandomizer randomizedStats)
     {
+        randomizedStats.AssertHasRandomized();
         for (int idx = 0; idx < RomMap.bossHpAddresses.Count; idx++)
         {
             var bossHpAddr = RomMap.bossHpAddresses[idx];
@@ -1795,12 +1796,20 @@ ActualLavaDeath:                     ; original code that we replaced
             a.Assign($"BOSS_{idx}_HP_DIVISOR_HI", originalDivisor);
             // Take the remainder, and convert it into a fractional value out of 256 values
             a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % originalDivisor) * (256 / originalDivisor));
-        }
-
-        foreach (var (hpaddr, divisoraddr) in RomMap.bossHpDivisorMap)
-        {
-            int hp = GetByte(hpaddr);
-            Put(divisoraddr, (byte)(hp / 8));
+            a.Assign($"BOSS_{idx}_HP", newVal);
+            a.RomOrg(bossHpAddr);
+            a.Byt(newVal);
+            if (idx == 2 /* Rebo */)
+            {
+                continue; // Rebo's code is replaced; set in Bosses.s
+            }
+            a.RomOrg(bossHpBarAddr);
+            // the code here didn't make sense.
+            // the value put here will be loaded into A and then used for a HP divisor table lookup
+            // but every value > 6 would overflow the table (which would be most bosses).
+            // so basically every boss HP bar divisor has just been based on an arbitrary overflowed byte?
+            // a.Byt((byte)(newVal / 8));
+            a.Byt((byte)idx);
         }
     }
 

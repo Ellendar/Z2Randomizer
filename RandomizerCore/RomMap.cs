@@ -114,6 +114,7 @@ class RomMap
         0x12A06, // Barba              (regular Palace 346 enemy table)
         0x15507, // Thunderbird        (regular GP enemy table)
     ];
+    /// The ROM addr where A is set before the call to update the HP bar
     public static readonly List<(int, int)> bossHpDivisorMap = [
         (bossHpAddresses[0], 0x13b80), // Horsehead
         (bossHpAddresses[1], 0x13ae2), // Helmethead

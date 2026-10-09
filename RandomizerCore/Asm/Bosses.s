@@ -538,7 +538,7 @@ bank7_Display := $ef11
 .org bank4_Enemy_Routines_Rebonak
     lda ScrollFrozen
     beq @RebonakPostDraw                   ; skip more code here to not draw Rebo pre-fight
-    lda #$09
+    lda #$02                               ; Rebo's index in the boss table
     jsr bank4_Update_Boss_HP_Bar_Segments
     lda EnemySuspendTimer
     jsr RebonakSuspendedScrollHook
