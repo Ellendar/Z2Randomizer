@@ -166,7 +166,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
 
                 logger.Debug($"Shape-first palace ran out of rooms of exit type: {roomExitType} in palace {palace.Number}. Starting to use duplicate rooms.");
                 roomPool.RefillNormalRoomsForExitType(rooms, roomExitType);
-                roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
+                roomCandidates = GetNormalRoomsForExitType(roomPool, roomCoords, roomExitType);
                 refillAllowed = false;
             }
 
@@ -254,7 +254,12 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
             Room[] upRooms = palace.AllRooms.Where(i => i.coords == room.coords with { Y = room.coords.Y + 1 }).ToArray();
             Room[] rightRooms = palace.AllRooms.Where(i => i.coords == room.coords with { X = room.coords.X + 1 }).ToArray();
 
-            foreach(Room left in leftRooms)
+            Debug.Assert(leftRooms.Count() < 2);
+            Debug.Assert(downRooms.Count() < 2);
+            Debug.Assert(upRooms.Count() < 2);
+            Debug.Assert(rightRooms.Count() < 2);
+
+            foreach (Room left in leftRooms)
             {
                 if (left != null && room.FitsWithLeft(left) > 0)
                 {
