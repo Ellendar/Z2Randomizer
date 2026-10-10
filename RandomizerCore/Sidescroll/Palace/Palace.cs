@@ -263,14 +263,13 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                              bool allowMiniBossEnterGoingLeft = false,
                              bool allowFinalBossEnterGoingLeft = false,
                              bool dropsMayBypassBosses = false,
-                             bool dropsMayBypassFinalBosses = false,
                              bool tBirdRequired = false)
     {
         var reachableRooms = GetReachableRooms(allowBacktracking: allowBacktracking,
                                                allowMiniBossEnterGoingLeft: allowMiniBossEnterGoingLeft,
                                                allowFinalBossEnterGoingLeft: allowFinalBossEnterGoingLeft,
                                                dropsMayBypassMiniBosses: dropsMayBypassBosses,
-                                               dropsMayBypassFinalBosses: dropsMayBypassFinalBosses,
+                                               dropsMayBypassFinalBosses: dropsMayBypassBosses && Number < 7,
                                                tBirdRequired: tBirdRequired);
         return AllRooms.All(i => reachableRooms.Contains(i));
     }

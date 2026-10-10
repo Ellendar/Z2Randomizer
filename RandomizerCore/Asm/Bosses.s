@@ -628,6 +628,26 @@ FREE_UNTIL P125BossDefeatFinish
 
 ; (P346 bosses do not need to be patched, they don't clear anything on death)
 
+; Do not allow crystal to be placed while boss is alive
+EnemyTouchingLinkDetection := $e4d9
+PalaceCrystalUnplacedRoutine := $9aeb
+.org $9af4  ; was jsr EnemyTouchingLinkDetection
+    jsr CrystalCheckIfBossDead
+
+.reloc
+CrystalCheckIfBossDead:
+    ldx #1   ; unsure how to not hardcode page 1 here
+    jsr CheckItemPresenceBitXInRoom
+    beq @BossDead
+    ldx zp_10
+    pla      ; skip one return layer
+    pla
+    rts
+@BossDead:
+    ldx zp_10
+    jmp EnemyTouchingLinkDetection
+
+
 .segment "PRG5"
 
 DrawThunderbird := $9ebf
