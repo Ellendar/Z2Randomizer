@@ -155,6 +155,71 @@ public class FlagsTests
     }
 
     [TestMethod]
+    public void TownQuestLocationsAreMinorItems_IsIncludedWithQuestItems()
+    {
+        var config = new RandomizerConfiguration
+        {
+            ShuffleOverworldItems = true,
+            IncludeQuestItemsInShuffle = true,
+            TownQuestLocationsAreMinorItems = true,
+        };
+        Assert.IsTrue(config.townQuestLocationsAreMinorItemsIncluded());
+
+        string flags = config.SerializeFlags();
+        var config2 = new RandomizerConfiguration(flags);
+        Assert.IsTrue(config2.TownQuestLocationsAreMinorItems,
+            $"The option should survive a flag round trip: {flags}");
+        Assert.IsTrue(config2.IncludeQuestItemsInShuffle);
+    }
+
+    [TestMethod]
+    public void TownQuestLocationsAreMinorItems_IsIncludedWithSwordTechniques()
+    {
+        var config = new RandomizerConfiguration
+        {
+            ShuffleOverworldItems = true,
+            IncludeSwordTechsInShuffle = true,
+            TownQuestLocationsAreMinorItems = true,
+        };
+        Assert.IsTrue(config.townQuestLocationsAreMinorItemsIncluded());
+
+        var config2 = new RandomizerConfiguration(config.SerializeFlags());
+        Assert.IsTrue(config2.TownQuestLocationsAreMinorItems);
+        Assert.IsTrue(config2.IncludeSwordTechsInShuffle);
+    }
+
+    [TestMethod]
+    public void TownQuestLocationsAreMinorItems_IsExcludedWithoutQuestItemsOrStabs()
+    {
+        // The flag isn't written at all in this configuration, so it can't be turned on.
+        Assert.IsFalse(new RandomizerConfiguration().townQuestLocationsAreMinorItemsIncluded());
+
+        var config = new RandomizerConfiguration { TownQuestLocationsAreMinorItems = true };
+        var config2 = new RandomizerConfiguration(config.SerializeFlags());
+        Assert.IsFalse(config2.TownQuestLocationsAreMinorItems,
+            "An excluded flag must not turn the option on");
+
+        // The same flag string must mean different things depending on the condition, so adding
+        // the flag to a config that includes it has to change the string.
+        var withQuest = new RandomizerConfiguration
+        {
+            ShuffleOverworldItems = true,
+            IncludeQuestItemsInShuffle = true,
+            TownQuestLocationsAreMinorItems = true,
+        };
+        Assert.AreNotEqual(withQuest.SerializeFlags(), config2.SerializeFlags());
+
+        // And a config that includes the category but leaves the option off must not gain the bit.
+        var optionOff = new RandomizerConfiguration
+        {
+            ShuffleOverworldItems = true,
+            IncludeQuestItemsInShuffle = true,
+        };
+        Assert.AreEqual(optionOff.SerializeFlags(),
+            new RandomizerConfiguration(optionOff.SerializeFlags()).SerializeFlags());
+    }
+
+    [TestMethod]
     public void TestMaxRandoEncodeCycle()
     {
         RandomizerConfiguration config = MaxRando2025Preset.Preset;
