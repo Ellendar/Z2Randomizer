@@ -106,7 +106,7 @@ public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGen
             {
                 continue;
             }
-            double dropChance = DROP_CHANCE;
+            double dropChance = GetDropChance();
             //if we dropped into this room
             if (walkGraph.TryGetValue(new Coord(x, y + 1), out RoomExitType upRoomType) && upRoomType.ContainsDrop())
             {
@@ -164,6 +164,11 @@ public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGen
             || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(0, 1) && !entrance.HasUpExit)
             || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(0, -1) && !entrance.HasDownExit)
         );
+    }
+
+    protected virtual float GetDropChance()
+    {
+        return DROP_CHANCE;
     }
 
     protected override ItemRoomSelectionStrategy GetItemRoomSelectionStrategy()

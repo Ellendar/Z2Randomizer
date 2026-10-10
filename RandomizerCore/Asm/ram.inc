@@ -217,7 +217,7 @@ Enemy3Type := $a4
 Enemy4Type := $a5
 Enemy5Type := $a6                         ; Enemy (Boss) slot
 LinkCollisionBits := $a7                  ; 0000ABLR (above, below, left, right)
-EnemyState := $a8
+EnemyState := $a8                         ; 00SCABLR (Link's sword colliding with enemy, Link's body colliding with enemy, above, below, left, right) 
 Enemy0State := $a8
 Enemy1State := $a9
 Enemy2State := $aa
@@ -232,18 +232,19 @@ Enemy3State2 := $b2
 Enemy4State2 := $b3
 Enemy5State2 := $b4
 SideviewState := $b5                      ; 0 = Link enters room, 1 = Normal, 2 = Link dies in lava, 3 = Link slides left after killing Dark Link
-Enemy0Status := $b6                       ; 0 = No enemy, 1 = Alive, 2 = Exploding, 3 = Floating XP, 10 = Link takes drop exit
+EnemyStatus := $b6                        ; 0 = No enemy, 1 = Alive, 2 = Exploding, 3 = Floating XP, 10 = Link takes drop exit
+Enemy0Status := $b6
 Enemy1Status := $b7
 Enemy2Status := $b8
 Enemy3Status := $b9
 Enemy4Status := $ba
 Enemy5Status := $bb
-Enemy0Persistence := $bc                  ; Related to remembering that an enemy is defeated
-Enemy1Persistence := $bd
-Enemy2Persistence := $be
-Enemy3Persistence := $bf
-Enemy4Persistence := $c0
-Enemy5Persistence := $c1
+Enemy0DataIndex := $bc                    ; index of this enemy's entry in the room's enemy data list, indexed via (EnemyDataPtr); bit 7 set = dead
+Enemy1DataIndex := $bd
+Enemy2DataIndex := $be
+Enemy3DataIndex := $bf
+Enemy4DataIndex := $c0
+Enemy5DataIndex := $c1
 EnemyHP := $c2
 Enemy0HP := $c2
 Enemy1HP := $c3
@@ -263,10 +264,10 @@ JumpSpellActive := $d0                    ; 1 = Jump active
 SideviewWidth := $d1                      ; With of current sidescroll screen (1-3 pages)
 zp_d2 = $d2
 zp_d3 = $d3
-zp_d4 = $d4
-zp_d5 = $d5
-zp_d6 = $d6
-zp_d7 = $d7
+SideviewDataPtr := $d4
+SideviewDataPtrHi := $d5
+EnemyDataPtr := $d6
+EnemyDataPtrHi := $d7
 zp_d8 = $d8
 zp_d9 = $d9
 zp_da = $da
@@ -277,6 +278,9 @@ zp_de = $de
 zp_df = $df                              ; Enemy type temporary storage
 
 ; $e0-$ef are music and sound variables
+TitleTrackToPlay := $ea
+TrackToPlay := $eb
+ComplexSfxToPlay := $ec
 Z2NoiseSoundQueue := $ed
 Z2Square2SoundQueue := $ee
 Z2Square1SoundQueue := $ef
@@ -299,31 +303,36 @@ PpuCtrlShadow := $ff
 
 ; $200-$2ff OAM buffer
 SpriteYPosition := $200
-SpriteTilenumber := $201
-SpriteAttributes := $202
-SpriteXPosition := $203
-SpriteData := SpriteYPosition
-
-PpuBufferLength := $0301
-PpuAddrHi := $0302
-PpuAddrLo := $0303
-PpuTextLength := $0304
-PpuTextData := $0305
-PpuBuffer2Length := $0362
-PpuBuffer2Data := $0363
-
 Sprite_Y_Position := $200
+SpriteTilenumber := $201
 Sprite_Tilenumber := $201
+SpriteAttributes := $202
 Sprite_Attributes := $202
+SpriteXPosition := $203
 Sprite_X_Position := $203
+SpriteData := SpriteYPosition
 Sprite_Data := Sprite_Y_Position
 
-
+PpuBufferLength := $0301
 BUFFER_OFF := $0301
+PpuBuffer1Data := $0302
+PpuAddrHi := $0302
 PPUADDR_HI := $0302
+PpuAddrLo := $0303
 PPUADDR_LO := $0303
+PpuTextLength := $0304
 BUFFER_LEN := $0304
+PpuTextData := $0305
 BUFFER_DAT := $0305
+PpuBuffer1Last := $0361
+
+PpuBuffer2Length := $0362
+PpuBuffer2Data := $0363
+PpuBuffer2Last := $03a2
+
+PpuBuffer3Length := $03a3
+PpuBuffer3Data := $03a4
+PpuBuffer3Last := $03d5
 
 LinkXSubpixel := $03d6
 Enemy0XSubpixel := $03d7
@@ -338,7 +347,7 @@ LinkYVelocityLo := $03e6
 ; at the same time by expanding the number of blocks here, and then moving the extra fields to a different location in
 ; stack ram
 ; Expanded the block break list to hold up to 10 bricks at a time instead of just 5
-BREAKABLE_BLOCK_COUNT := 10
+BREAKABLE_BLOCK_COUNT = 10
 RelocatedRAMBase = $041A
 SET_RES_BASE RelocatedRAMBase
 RESV BlockBreakState, BREAKABLE_BLOCK_COUNT ; Vanilla addr $041a - bits 0-6 = timer; bit 7 set = step block. $00 means no brick breaking
@@ -348,24 +357,40 @@ RESV BlockBreakXCoord, BREAKABLE_BLOCK_COUNT ; Vanilla addr $0424 - X Low Byte f
 
 LinkSwordAttackFrame := $0400
 Enemy0HitState := $040e
+EnemyVulnerabilityDamageCodes := $0444
+Enemy0VulnerabilityDamageCodes := $0444   ; has values for enemy type in slot 0 from the current PRG table at $94f9, except Palace Group 2 at $a9f9
+Enemy1VulnerabilityDamageCodes := $0445   ; xx.. .... which drop table this belongs to
+Enemy2VulnerabilityDamageCodes := $0446   ; ..x. .... projectile immunity
+Enemy3VulnerabilityDamageCodes := $0447   ; .... xxxx damage table index
+Enemy4VulnerabilityDamageCodes := $0448
+Enemy5VulnerabilityDamageCodes := $0449
 BackgroundColumnUpdateArray := $0464      ; Palette & Tile index for each y position 0 to 12
 LinkInAir := $0479                        ; 0 = On ground, 1 = Falling from walking off platform, 2 = Jumping
 LinkSwordXHitbox := $047e                 ; Link's sword's X position in screen space
 LinksShadowSwordXHitbox := $047f
 LinkSwordYHitbox := $0480                 ; 0xf8 when not attacking
+OverworldVerticalTileBuffer = $0480
 LinksShadowSwordYHitbox := $0481
-LandingAnimationTimer := $0497
 HitboxXCoord := $047e
 HitboxYCoord := $0480
 SpriteSlotShuffleCounter := $0485         ; 0-5
+LandingAnimationTimer := $0497
+BarbaState := $0499                       ; 0=hidden, 1=rising, 2=oscillating, 3=sinking
+OverworldHorizontalTileBuffer := $04d0
+OverworldHorizontalTileBuffer17 := $04e7
 
-LinkIFrameTimer := $500
+TimerUpdateCountdown := $500              ; Counter that decreases timers $50E-$519 every 15 frames
 timer_501 := $0501                        ; $501 through $50d are timers that are decreased each frame until 0
 LinkEntrySlideTime := $0503
 SwordAttackTimer := $050a
 InjuryTimer := $050c
+EnemySuspendTimer := $050d                ; countdown for bosses (Rebo, Barba, Dark Link) before they activate
 OverworldDemonTimer := $050e              ; overworld demon active flag/timer, indexed by slot X; non-zero = active
 EncounterSpawnTimer := $0516
+LinkIFrameTimer := $0518
+PpuMenuRowDrawCount := $0525              ; number of menu text rows; a PRG0 table of 3 values ($a688) is loaded into this
+PpuMenuRowTiles := $053e
+PpuMenuBlinkRow := $0543
 RNG := $051b
 MapNumber := $0561
 OverworldFacingDirection := $0562         ; Link's facing direction: $01=right, $02=left, $04=down, $08=up
@@ -392,6 +417,13 @@ SavedDoorExit2X := $05d9
 SmallDropCount := $05df
 LargeDropCount := $05e0
 
+ItemPresenceBitsWest := $0600
+ItemPresenceBitsDmMi := $0620
+ItemPresenceBitsEast := $0640
+ItemPresenceBitsTowns := $0660
+ItemPresenceBitsP125 := $0680
+ItemPresenceBitsP346 := $06a0
+ItemPresenceBitsGP := $06c0
 OverworldStepCounterHi := $06e0           ; [Z2R] Used for halved encounter rate to only trigger encounters every other time the steps are reached
 
 Lives := $0700
@@ -409,7 +441,7 @@ SideviewObjectPage := $0717               ; 0-3 page of current sideview object 
 ScrollDirection := $071f                  ; Current scroll direction. 1=Scrolling right, 2=Scrolling left
 ColumnScrollDirection := $0720            ; Scroll direction that is updated only when scrolling crosses a column boundary
 ColumnScrollX := $0721                    ; Scroll position within the current tile column ($00-$1f)
-PpuMacroSelector := $0725
+PpuMacroSelector := $0725                 ; The NMI ($C0CA) picks ONE buffer per frame via PpuMacroSelector * 2 and runs it through $D2EC
 DialogBoxDrawing := $0726                 ; >0 when drawing dialog and during black screen transitions
 ScrollFrozen := $0728                     ; 1=Screen scrolling frozen (for boss fights)
 ScrollLeftPage := $072a                   ; Which page the left-most pixel of the screen is on (0-3)
@@ -442,6 +474,7 @@ LocationNumber := $0748                   ; Location index sideview exits to or 
 MagicSelectorPosition := $0749
 LinkFlashingTimer := $074b                ; Link changes palette and this value is counted down until it's 0. 0b10000000 bit determines if the background changes color.
 CurrentDialogType := $074c                ; 0=None, 1 = Level Up, 2 = Talking
+PausePanePage := $074e                    ; pause/level-up pane page, 0-3
 HudSectionFlag := $074f                   ; 0x80=Draw Magic & Attack, 0x40=Draw Life & XP
 HudDrawState := $0750
 ExpToAddHi := $0755
@@ -521,6 +554,8 @@ SavedDoorExit1ScrollPage := $69aa         ; accessed as $69a5,X with X = 5
 SavedDoorExit1ScrollX := $69b1            ; accessed as $69ac,X with X = 5
 SavedDoorExit2ScrollPage := $69ab         ; used for New Kasuto fireplace
 SavedDoorExit2ScrollX := $69b2
+
+EnemySizeCodesRamCopy := $6e1d            ; copied from $951d in the current bank
 
 ; LocationNumber will later be changed to the side-scrolling location
 ; index. z2ft needs this, at this specific address.

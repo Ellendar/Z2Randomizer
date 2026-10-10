@@ -1,26 +1,23 @@
-﻿using DynamicData;
+using DynamicData;
 using FtRandoLib.Importer;
 using js65;
 using NLog;
-using NLog.Targets;
 using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
-using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
+using static js65.AsmModule;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -414,8 +411,8 @@ public class Hyrule
                     yamlLibPaths = new();
                 if (Directory.Exists(musicDir))
                 {
-                    var jsonExts = Z2Importer.JsonExtensions();
-                    var yamlExts = Z2Importer.YamlExtensions();
+                    var jsonExts = Importer.JsonExtensions();
+                    var yamlExts = Importer.YamlExtensions();
 
                     foreach (string path in Directory.EnumerateFiles(musicDir))
                     {
@@ -2241,10 +2238,6 @@ public class Hyrule
             List<int> enemies = [3, 4, 6, 7, 0x0E, 0x10, 0x11, 0x12, 0x18, 0x19, 0x1A];
             rom.Put(0x11ef, (byte)enemies[r.Next(enemies.Count)]);
         }
-        if (props.BossItem)
-        {
-            rom.HandleRandomBossDrop(a);
-        }
 
         //neither of these starting item handlings really belong here, but this is good enough.
 
@@ -3104,39 +3097,6 @@ CustomFileSelectData:
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     
-    private void FixHelmetheadBossRoom(Assembler asm)
-    {
-        byte helmetRoom = (byte)palaces[1].BossRoom!.Map;
-
-        var a = asm.Module();
-        a.Assign("HelmetRoom", helmetRoom);
-        a.Code("""
-.include "z2r.inc"
-
-.segment "PRG4"
-
-.reloc
-HelmetHeadGoomaFix:
-    lda #<HelmetRoom
-    eor MapNumber
-    rts
-
-.org $bac3
-    jsr HelmetHeadGoomaFix
-.org $bc83
-    jsr HelmetHeadGoomaFix
-.org $bd75
-    jsr HelmetHeadGoomaFix
-
-.org $9b27
-; Also fix a key glitch
-    nop
-    nop
-    nop
-
-""", "helmethead_gooma_fix.s");
-    }
-
     private static void RestartWithPalaceUpA(Assembler a) {
         a.Module().Code("""
 .include "z2r.inc"
@@ -3346,17 +3306,17 @@ FREE_UNTIL $C285
 ; one for World != 0, where the RegionNumber does not actually matter.
 .reloc
 bank7_Pointer_table_for_Item_Presence_World0_ByRegion:
-    .byte .lobyte($0600)  ; West Caves                           (Region 0)
-    .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 1)
-    .byte .lobyte($0640)  ; East Caves                           (Region 2)
-    .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 3)
+    .byte .lobyte(ItemPresenceBitsWest)  ; West Caves                           (Region 0)
+    .byte .lobyte(ItemPresenceBitsDmMi)  ; Death Mountain / Maze Island Caves   (Region 1)
+    .byte .lobyte(ItemPresenceBitsEast)  ; East Caves                           (Region 2)
+    .byte .lobyte(ItemPresenceBitsDmMi)  ; Death Mountain / Maze Island Caves   (Region 3)
 .reloc
 bank7_Pointer_table_for_Item_Presence_ByWorld: ; this is referenced as -1, as index 0 would use the table above
-    .byte .lobyte($0660)  ; Towns         (World 1)
-    .byte .lobyte($0660)  ; Towns         (World 2)
-    .byte .lobyte($0680)  ; Palace 125    (World 3)
-    .byte .lobyte($06A0)  ; Palace 346    (World 4)
-    .byte .lobyte($06C0)  ; Great Palace  (World 5)
+    .byte .lobyte(ItemPresenceBitsTowns)  ; Towns         (World 1)
+    .byte .lobyte(ItemPresenceBitsTowns)  ; Towns         (World 2)
+    .byte .lobyte(ItemPresenceBitsP125)   ; Palace 125    (World 3)
+    .byte .lobyte(ItemPresenceBitsP346)   ; Palace 346    (World 4)
+    .byte .lobyte(ItemPresenceBitsGP)     ; Great Palace  (World 5)
 
 .org $c2b3
 ; The vanilla index calculation was 5 * RegionNumber + WorldNumber, and was
@@ -3431,8 +3391,8 @@ EndTileComparisons = $8601
         // Update the pointers to the text tables
         a.Segment("PRG3");
         a.Org(0xB423);
-        a.Word(a.Symbol("Towns_in_West_Hyrule"));
-        a.Word(a.Symbol("Towns_in_East_Hyrule"));
+        a.Word(Symbol("Towns_in_West_Hyrule"));
+        a.Word(Symbol("Towns_in_East_Hyrule"));
 
         for (var i = 0; i < hints.Count; i++) {
             var hint = hints[i];
@@ -3446,14 +3406,14 @@ EndTileComparisons = $8601
         // There are 52 texts in this first table
         for (var i = 0; i < CustomTexts.WEST_TEXT_COUNT; i++) {
             var hint = hints[i];
-            a.Word(a.Symbol($"HintText{i}"));
+            a.Word(Symbol($"HintText{i}"));
         }
         // and the rest are in this table
         a.Reloc();
         a.Label("Towns_in_East_Hyrule");
         for (var i = CustomTexts.WEST_TEXT_COUNT; i < hints.Count; i++) {
             var hint = hints[i];
-            a.Word(a.Symbol($"HintText{i}"));
+            a.Word(Symbol($"HintText{i}"));
         }
     }
 
@@ -3470,7 +3430,7 @@ EndTileComparisons = $8601
         a.Label("MovingDialogTable");
         for (var i = 0; i < texts.Count; i++)
         {
-            a.Word(a.Symbol($"MovingDialogText{i}"));
+            a.Word(Symbol($"MovingDialogText{i}"));
         }
         for (var i = 0; i < texts.Count; i++)
         {
@@ -3812,13 +3772,13 @@ FlagHudUpdate:
         a.Word(vanillaEntries);
         if (props.MarioMode)
         {
-            a.Word(a.Symbol("MarioRole1")); a.Word(a.Symbol("MarioName1"));
-            a.Word(a.Symbol("MarioRole2")); a.Word(a.Symbol("MarioName2"));
-            a.Word(a.Symbol("MarioRole3")); a.Word(a.Symbol("MarioName3"));
-            a.Word(a.Symbol("MarioRole4")); a.Word(a.Symbol("MarioName4"));
+            a.Word(Symbol("MarioRole1")); a.Word(Symbol("MarioName1"));
+            a.Word(Symbol("MarioRole2")); a.Word(Symbol("MarioName2"));
+            a.Word(Symbol("MarioRole3")); a.Word(Symbol("MarioName3"));
+            a.Word(Symbol("MarioRole4")); a.Word(Symbol("MarioName4"));
         }
-        a.Word(a.Symbol("NewCreditsHeader"));
-        a.Word(a.Symbol("NewCreditsBody"));
+        a.Word(Symbol("NewCreditsHeader"));
+        a.Word(Symbol("NewCreditsBody"));
 
         a.Code($$"""
 .include "z2r.inc"
@@ -3875,10 +3835,8 @@ FlagHudUpdate:
         rom.AddRandomizerToTitle(engine, props.MarioMode, IS_RANDOMIZED);
         AddCropGuideBoxesToFileSelect(engine);
         rom.SetEncounterRate(engine, props, r);
-        FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetFullShuffleLocationCollectables());
         rom.DontCountExpDuringTalking(engine);
-        rom.ElevatorBossFix(engine, props.BossItem);
         rom.FixElevatorPositionInFallRooms(engine);
         rom.AllowForChangingDoorYPosition(engine);
         rom.AllowForChangingElevatorYPosition(engine);
@@ -3886,19 +3844,11 @@ FlagHudUpdate:
         CustomHud(engine, props.UpdatedHud);
         rom.ChangeLavaKillPosition(engine);
         rom.FixItemPickup(engine);
-        rom.FixMinibossGlitchyAppearance(engine);
-        rom.FixBossKillPaletteGlitch(engine);
-        rom.ThunderbirdEnterLeftFix(engine);
-        rom.FixThunderbirdThunderDeath(engine);
-
-        if ( props.DarkenThunderbird ) {
-            rom.DarkenThunderbirdRoom(engine);
-        }
-
+        rom.CollisionFixes(engine);
         rom.FixBigBubbleSplit(engine, randomizedStats);
+        rom.ApplyBossPatches(engine, props, randomizedStats, palaces);
         StatTracking(props, engine);
         AddCredits(engine, props);
-        rom.SetBossHpBarDivisors(engine, randomizedStats);
 
         if (props.MarioMode)
         {
@@ -3959,11 +3909,6 @@ FlagHudUpdate:
         if (props.HardBosses)
         {
             rom.BuffCarrock(engine);
-        }
-
-        if (props.AggressiveTbird)
-        {
-            rom.AggressiveThunderbird();
         }
 
         if (props.ReplaceFireWithDash)

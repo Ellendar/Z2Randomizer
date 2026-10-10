@@ -13,6 +13,7 @@ public class PalacesViewModel : ReactiveObject, IActivatableViewModel
     public MainViewModel Main { get; }
 
     public IObservable<bool> BossRoomsExitTypeIncludedObservable { get; }
+    public IObservable<bool> DropsMayBypassBossesIncludedObservable { get; }
     public IObservable<bool> NoDuplicateRoomsByLayoutIncludedObservable { get; }
     public IObservable<bool> NoDuplicateRoomsByEnemiesIncludedObservable { get; }
     public IObservable<bool> RandomStylesAllowVanillaIncludedObservable { get; }
@@ -76,6 +77,10 @@ public class PalacesViewModel : ReactiveObject, IActivatableViewModel
 
         TBirdRequiredIncludedObservable = Main.FlagsChanged
             .Select(_ => Main.Config.tBirdRequiredIncluded())
+            .DistinctUntilChanged();
+
+        DropsMayBypassBossesIncludedObservable = Main.FlagsChanged
+            .Select(_ => Main.Config.dropsMayBypassBossesIncluded())
             .DistinctUntilChanged();
 
         this.WhenActivated(OnActivate);
