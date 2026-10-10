@@ -40,6 +40,7 @@
     <PackageReference Include="Aigamo.ResXGenerator">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="ReactiveUI.SourceGenerators" />
     <PackageReference Include="Xaml.Behaviors.Interactions" />
   </ItemGroup>
   <ItemGroup>
@@ -48,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
+    <ProjectReference Include="..\CrossPlatformUI.SourceGenerator\CrossPlatformUI.SourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
   <Target Name="GenerateGitInfo" BeforeTargets="BeforeBuild">
     <MakeDir Directories="$(IntermediateOutputPath)" />

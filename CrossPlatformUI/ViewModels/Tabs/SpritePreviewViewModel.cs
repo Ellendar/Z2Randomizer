@@ -27,15 +27,14 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 {
     private CancellationTokenSource backgroundUpdateTask = new ();
 
-    public string? SpriteName {
-        get => Main.Config.SpriteName ?? "Link";
-        set { Main.Config.SpriteName = value ?? "Link"; this.RaisePropertyChanged(); }
-    }
-    public bool ChangeItemSprites
+    public string? SpriteName
     {
-        get => Main.Config.ChangeItemSprites;
-        set { Main.Config.ChangeItemSprites = value; this.RaisePropertyChanged(); }
+        get => Main.Config.SpriteName ?? "Link";
+        // No notification: nothing binds this view model property
+        // Config raises PropertyChanged for SpriteName itself.
+        set => Main.Config.SpriteName = value ?? "Link";
     }
+
     public NesColor TunicColor
     {
         get => Main.Config.Tunic;
@@ -56,41 +55,38 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         get => Main.Config.ShieldTunic;
         set { Main.Config.ShieldTunic = value; this.RaisePropertyChanged(); }
     }
-    public BeamSprites BeamSprite
-    {
-        get => Main.Config.BeamSprite;
-        set { Main.Config.BeamSprite = value; this.RaisePropertyChanged(); }
-    }
-
     public string OutputFilenameTemplate
     {
         get => Main.Config.OutputFilenameTemplate;
         set { Main.Config.OutputFilenameTemplate = value; this.RaisePropertyChanged(); }
     }
 
-    public byte spriteTunicColor { get; private set; }
-    public byte spriteSkinTone { get; private set; }
-    public byte spriteOutlineColor { get; private set; }
-    public byte spriteShieldColor { get; private set; }
+    private byte spriteTunicColor;
     public byte SpriteTunicColor
     {
         get => spriteTunicColor;
-        set { spriteTunicColor = value; this.RaisePropertyChanged(); }
+        set => this.RaiseAndSetIfChanged(ref spriteTunicColor, value);
     }
+
+    private byte spriteSkinTone;
     public byte SpriteSkinTone
     {
         get => spriteSkinTone;
-        set { spriteSkinTone = value; this.RaisePropertyChanged(); }
+        set => this.RaiseAndSetIfChanged(ref spriteSkinTone, value);
     }
+
+    private byte spriteOutlineColor;
     public byte SpriteOutlineColor
     {
         get => spriteOutlineColor;
-        set { spriteOutlineColor = value; this.RaisePropertyChanged(); }
+        set => this.RaiseAndSetIfChanged(ref spriteOutlineColor, value);
     }
+
+    private byte spriteShieldColor;
     public byte SpriteShieldColor
     {
         get => spriteShieldColor;
-        set { spriteShieldColor = value; this.RaisePropertyChanged(); }
+        set => this.RaiseAndSetIfChanged(ref spriteShieldColor, value);
     }
 
     [JsonIgnore]
@@ -167,21 +163,21 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
                 // x => x.Main.Config.BeamSprite,
             )
             .Select(t => (
-                t.Item1?.DisplayName, // making selected Sprite a string compare instead of an object compare
-                t.Item2,
-                t.Item3,
-                t.Item4
+                t.Property1?.DisplayName, // making selected Sprite a string compare instead of an object compare
+                t.Property2,
+                t.Property3,
+                t.Property4
             ))
             .DistinctUntilChanged() // filter emits where nothing has changed
             .Throttle(TimeSpan.FromMilliseconds(20));
 
-        var hasRomObservable = Main.RomFileViewModel.ObservableForProperty(x => x.HasRomData, false, false);
+        var hasRomObservable = Main.RomFileViewModel.HasRomDataObservable;
         var optionsObservable = options.Connect().ToCollection();
 
         SubscribeExtensions.Subscribe(
             settingsObservable
                 .CombineLatest(hasRomObservable, optionsObservable, (settings, hasRom, options) => (settings, hasRom, options))
-                .Where(t => t.hasRom.Value && t.options.Count > 0),
+                .Where(t => t.hasRom && t.options.Count > 0),
             t =>
             {
                 SubscribeExtensions.Subscribe(

@@ -2,12 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
-             xmlns:ui="clr-namespace:CrossPlatformUI"
-             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
-             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.Tabs.HintsView"
              x:DataType="vmt:HintsViewModel">
@@ -23,58 +19,14 @@
                 Cursor="Hand"
             />
 
-			<ComboBox Theme="{StaticResource MaterialOutlineComboBox}"
-                      Padding="16 4 0 4"
-                      ItemsSource="{x:Static rc:Enums.HelpfulHintsOptionList}"
-                      SelectedItem="{Binding Main.Config.HelpfulHints, Converter={x:Static ui:Util.EnumConvert}}"
-                      assists:ComboBoxAssist.Label="Helpful Hints">
-				<ComboBox.ItemTemplate>
-					<DataTemplate>
-						<Grid ColumnDefinitions="Auto, *">
-							<TextBlock Grid.Column="0" Text="{Binding Description}"/>
-							<TextBlock Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Info}"/>
-						</Grid>
-					</DataTemplate>
-				</ComboBox.ItemTemplate>
-				<ToolTip.Tip>
-					<TextBlock Text="{x:Static lang:Resources.HelpfulHintsToolTip}"/>
-				</ToolTip.Tip>
-			</ComboBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Main.Config.EnableSpellItemHints}"
-                Content="Enable Spell Item Hints"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnableSpellItemHintsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Main.Config.EnableTownNameHints}"
-                Content="Enable Town Name Hints"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnableTownNameHintsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
+            <gen:HelpfulHints />
+            <gen:EnableSpellItemHints />
+            <gen:EnableTownNameHints />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <CheckBox IsChecked="{Binding Main.Config.GenerateSpoiler}"
-                      Background="{Binding HeaderBackgroundObservable^}"
-                      Content="Generate Spoiler">
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateSpoilerToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                Classes.DifficultyOnly="{Binding Main.Config.ShareSeedAcrossDifficulty}"
-                IsChecked="{Binding Main.Config.RevealWalkthroughWalls}"
-                Content="Reveal Walkthrough Walls"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RevealWalkthroughWallsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                Classes.DifficultyOnly="{Binding Main.Config.ShareSeedAcrossDifficulty}"
-                IsChecked="{Binding Main.Config.RevealHiddenJars}"
-                Content="Reveal Hidden Jars"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RevealHiddenJarsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
+            <gen:GenerateSpoiler />
+            <gen:RevealWalkthroughWalls />
+            <gen:RevealHiddenJars />
         </StackPanel>
     </Grid>
 </UserControl>
