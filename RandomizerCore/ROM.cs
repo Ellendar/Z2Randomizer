@@ -2327,7 +2327,7 @@ ConditionalDrawThunderbird:
         Put(0x16413, thunderBirdHP);
     }
 
-    public static void FluteTwisterWarp(Assembler asm, FluteWarpMode mode, int[] palaceOrder)
+    public static void FluteTwisterWarp(Assembler asm, FluteWarpMode mode, int[] palaceOrder, bool marioMode)
     {
         var a = asm.Module();
         // Exactly one mode define is set so Flute.s only assembles that mode's code paths.
@@ -2349,6 +2349,7 @@ ConditionalDrawThunderbird:
             default:
                 throw new ArgumentOutOfRangeException(nameof(mode), mode, "NONE must not assemble Flute.s");
         }
+        a.Assign("MARIO_MODE", marioMode ? 1 : 0);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.Flute.s"), "flute.s");
     }
 
@@ -3122,21 +3123,23 @@ DrawHiddenJarBank5:
 
 .segment "PRG0"
 
-EncounterTerrainTimerTable = $823f
-OverworldEncounterTick = $8284
-VanillaRegionCheck = $8287
-CheckStepCounter = $828f
-CheckTimer = $8293
-SpawnEncounter = $8298
-SetTerrainEncounterTimer = $82b4
-HammerTileTable = $84ad
-OverworldMainJsr = $8563
-SetInitialEncounterTimer = $8879
+EncounterTerrainTimerTable := $823f
+OverworldEncounterTick := $8284
+VanillaRegionCheck := $8287
+CheckStepCounter := $828f
+CheckTimer := $8293
+SpawnEncounter := $8298
+SetTerrainEncounterTimer := $82b4
+HammerTileTable := $84ad
+OverworldMainJsr := $8563
+SetInitialEncounterTimer := $8879
 
 .if NO_ENCOUNTERS
     .org OverworldEncounterTick
         rts
-        FREE_UNTIL HammerTileTable
+        ; don't free space, it breaks Flute warping, and there is
+        ; no point optimizing space for a niche setting like this
+        ; FREE_UNTIL HammerTileTable
 .endif
 
 .if ENCOUNTER_RATE_PER_CONTINENT
