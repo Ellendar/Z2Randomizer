@@ -4,42 +4,43 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.Tabs.OverworldView"
              x:DataType="vm:MainViewModel">
     <Grid RowDefinitions="*, *">
         <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *">
             <StackPanel Margin="0 0">
-                <gen:ContinentConnectionType />
-                <gen:LessImportantLocationsOption />
+                <z:Z2ComboBox Flag="ContinentConnectionType" />
+                <z:Z2ComboBox Flag="LessImportantLocationsOption" />
                 <!-- Only West option -->
-                <gen:GenerateBaguWoods />
-                <gen:RestrictConnectionCaveShuffle />
-                <gen:AllowConnectionCavesToBeBlocked />
+                <z:Z2CheckBox Flag="GenerateBaguWoods" />
+                <z:Z2CheckBox Flag="RestrictConnectionCaveShuffle" />
+                <z:Z2CheckBox Flag="AllowConnectionCavesToBeBlocked" />
             </StackPanel>
 
             <!-- East options -->
             <StackPanel Grid.Column="1" Margin="0 0">
-                <gen:RiverDevilBlockerOption />
-                <gen:EastRocks />
-                <gen:HidePalace />
-                <gen:HideKasuto />
-                <gen:ShuffleWhichLocationIsHidden />
+                <z:Z2ComboBox Flag="RiverDevilBlockerOption" />
+                <z:Z2CheckBox Flag="EastRocks" />
+                <z:Z2CheckBox Flag="HidePalace" />
+                <z:Z2CheckBox Flag="HideKasuto" />
+                <z:Z2CheckBox Flag="ShuffleWhichLocationIsHidden" />
             </StackPanel>
         </Grid>
 
         <Grid Grid.Row="1" Margin="0 12 0 0" ColumnDefinitions="*, *">
             <StackPanel Grid.Column="0" Margin="0 0">
                 <Separator />
-                <gen:PalacesCanSwapContinents />
-                <gen:ShuffleGP />
+                <z:Z2CheckBox Flag="PalacesCanSwapContinents" />
+                <z:Z2CheckBox Flag="ShuffleGP" />
             </StackPanel>
             <StackPanel Grid.Column="1" Margin="0 0">
                 <Separator />
-                <gen:EncounterRate />
-                <gen:ShuffleEncounters />
-                <gen:AllowUnsafePathEncounters />
-                <gen:IncludeLavaInEncounterShuffle />
+                <z:Z2ComboBox Flag="EncounterRate" />
+                <z:Z2CheckBox Flag="ShuffleEncounters" />
+                <z:Z2CheckBox Flag="AllowUnsafePathEncounters" />
+                <z:Z2CheckBox Flag="IncludeLavaInEncounterShuffle" />
             </StackPanel>
         </Grid>
     </Grid>

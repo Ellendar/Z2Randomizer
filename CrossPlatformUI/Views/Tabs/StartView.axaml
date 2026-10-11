@@ -4,64 +4,67 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.StartView">
     <Grid ColumnDefinitions="*, *, 358">
         <StackPanel Grid.Column="0">
-            <gen:ShuffleStartingItems Margin="14 8 4 8" />
+            <z:Z2CheckBox Flag="ShuffleStartingItems" Margin="14 8 4 8" />
             <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1"
                     Margin="17 0 17 0"
                     Padding="14 8" CornerRadius="4">
                 <UniformGrid Rows="0" Columns="1" RowSpacing="8">
-                    <gen:StartWithCandle />
-                    <gen:StartWithGlove />
-                    <gen:StartWithRaft />
-                    <gen:StartWithBoots />
-                    <gen:StartWithFlute />
-                    <gen:StartWithCross />
-                    <gen:StartWithHammer />
-                    <gen:StartWithMagicKey />
+                    <z:Z2CheckBox Flag="StartWithCandle" />
+                    <z:Z2CheckBox Flag="StartWithGlove" />
+                    <z:Z2CheckBox Flag="StartWithRaft" />
+                    <z:Z2CheckBox Flag="StartWithBoots" />
+                    <z:Z2CheckBox Flag="StartWithFlute" />
+                    <z:Z2CheckBox Flag="StartWithCross" />
+                    <z:Z2CheckBox Flag="StartWithHammer" />
+                    <z:Z2CheckBox Flag="StartWithMagicKey" />
                 </UniformGrid>
             </Border>
-            <gen:StartItemsLimit />
-			<gen:IndeterminateOptionRate />
+            <z:Z2ComboBox Flag="StartItemsLimit" />
+			<z:Z2ComboBox Flag="IndeterminateOptionRate" />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <gen:ShuffleStartingSpells Margin="14 8 4 8" />
+            <z:Z2CheckBox Flag="ShuffleStartingSpells" Margin="14 8 4 8" />
             <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1"
                     Margin="17 0 17 0"
                     Padding="14 8" CornerRadius="4">
                 <UniformGrid Rows="0" Columns="1" RowSpacing="8">
-                    <gen:StartWithShield />
-                    <gen:StartWithJump />
-                    <gen:StartWithLife />
-                    <gen:StartWithFairy />
-                    <gen:StartWithFire />
-                    <gen:StartWithReflect />
-                    <gen:StartWithSpellSpell />
-                    <gen:StartWithThunder />
+                    <z:Z2CheckBox Flag="StartWithShield" />
+                    <z:Z2CheckBox Flag="StartWithJump" />
+                    <z:Z2CheckBox Flag="StartWithLife" />
+                    <z:Z2CheckBox Flag="StartWithFairy" />
+                    <z:Z2CheckBox Flag="StartWithFire" />
+                    <z:Z2CheckBox Flag="StartWithReflect" />
+                    <z:Z2CheckBox Flag="StartWithSpellSpell" />
+                    <z:Z2CheckBox Flag="StartWithThunder" />
                 </UniformGrid>
             </Border>
-          <gen:StartSpellsLimit />
+          <z:Z2ComboBox Flag="StartSpellsLimit" />
             <Separator/>
-            <gen:ShareSeedAcrossDifficulty Margin="14 8 4 8" />
+            <z:Z2CheckBox Flag="ShareSeedAcrossDifficulty" Margin="14 8 4 8" />
         </StackPanel>
         <StackPanel Grid.Column="2">
             <StackPanel Margin="26 10 26 0" HorizontalAlignment="Left">
                 <TextBlock>Heart Containers</TextBlock>
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.HeartContainersToolTip}"/></ToolTip.Tip>
                 <Grid ColumnDefinitions="72,72,144" ColumnSpacing="8" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <gen:StartingHeartContainers Grid.Column="0" Grid.ColumnSpan="2" Height="72" />
-                    <gen:MaxHeartContainers Grid.Column="2" Height="78" Margin="-16 -4 0 24" />
+                    <z:Z2NumericUpDown Flag="StartingHeartContainersMin" Grid.Column="0" />
+                    <z:Z2NumericUpDown Flag="StartingHeartContainersMax" Grid.Column="1" />
+                    <z:Z2ComboBox Flag="MaxHeartContainers" Grid.Column="2" Height="78" Margin="-16 -4 0 24" />
                 </Grid>
             </StackPanel>
             <StackPanel Margin="26 0" HorizontalAlignment="Left">
                 <TextBlock>Magic Containers</TextBlock>
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MagicContainersToolTip}"/></ToolTip.Tip>
                 <Grid ColumnDefinitions="72,72,144" ColumnSpacing="8" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <gen:StartingMagicContainers Grid.Column="0" Grid.ColumnSpan="2" />
+                    <z:Z2NumericUpDown Flag="StartingMagicContainersMin" Grid.Column="0" />
+                    <z:Z2NumericUpDown Flag="StartingMagicContainersMax" Grid.Column="1" />
                 </Grid>
             </StackPanel>
             <Separator/>
@@ -69,14 +72,14 @@
                 <TextBlock>Starting Levels</TextBlock>
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.StartingLevelsToolTip}"/></ToolTip.Tip>
                 <Grid ColumnDefinitions="72,72,72" ColumnSpacing="8" VerticalAlignment="Top">
-                    <gen:StartingAttackLevel Grid.Column="0" />
-                    <gen:StartingMagicLevel Grid.Column="1" />
-                    <gen:StartingLifeLevel Grid.Column="2" />
+                    <z:Z2NumericUpDown Flag="StartingAttackLevel" Grid.Column="0" />
+                    <z:Z2NumericUpDown Flag="StartingMagicLevel" Grid.Column="1" />
+                    <z:Z2NumericUpDown Flag="StartingLifeLevel" Grid.Column="2" />
                 </Grid>
             </StackPanel>
             <Separator/>
-            <gen:StartingTechniques />
-            <gen:StartingLives />
+            <z:Z2ComboBox Flag="StartingTechniques" />
+            <z:Z2ComboBox Flag="StartingLives" />
         </StackPanel>
     </Grid>
 </UserControl>

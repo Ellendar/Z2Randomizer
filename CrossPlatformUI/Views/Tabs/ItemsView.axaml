@@ -8,27 +8,28 @@
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.Tabs.ItemsView"
-             x:DataType="vmt:ItemsViewModel">
+             x:DataType="vm:MainViewModel">
     <Grid ColumnDefinitions="*, *">
         <StackPanel Grid.Column="0">
-            <gen:ShufflePalaceItems />
-            <gen:ShuffleOverworldItems />
-            <gen:MixOverworldAndPalaceItems />
-            <gen:IncludePBagCavesInItemShuffle />
-            <gen:IncludeSpellsInShuffle />
-            <gen:IncludeSwordTechsInShuffle />
-            <gen:IncludeQuestItemsInShuffle />
-            <gen:PreventSpellItemChains />
+            <z:Z2CheckBox Flag="ShufflePalaceItems" />
+            <z:Z2CheckBox Flag="ShuffleOverworldItems" />
+            <z:Z2CheckBox Flag="MixOverworldAndPalaceItems" />
+            <z:Z2CheckBox Flag="IncludePBagCavesInItemShuffle" />
+            <z:Z2CheckBox Flag="IncludeSpellsInShuffle" />
+            <z:Z2CheckBox Flag="IncludeSwordTechsInShuffle" />
+            <z:Z2CheckBox Flag="IncludeQuestItemsInShuffle" />
+            <z:Z2CheckBox Flag="PreventSpellItemChains" />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <gen:ShuffleSmallItems />
-            <gen:RemoveSpellItems />
-            <gen:ShufflePBagAmounts />
-            <gen:PalacesContainExtraKeys />
-            <gen:RandomizeNewKasutoJarRequirements />
-            <gen:AllowImportantItemDuplicates />
+            <z:Z2CheckBox Flag="ShuffleSmallItems" />
+            <z:Z2CheckBox Flag="RemoveSpellItems" />
+            <z:Z2CheckBox Flag="ShufflePBagAmounts" />
+            <z:Z2CheckBox Flag="PalacesContainExtraKeys" />
+            <z:Z2CheckBox Flag="RandomizeNewKasutoJarRequirements" />
+            <z:Z2CheckBox Flag="AllowImportantItemDuplicates" />
         </StackPanel>
     </Grid>
 </UserControl>

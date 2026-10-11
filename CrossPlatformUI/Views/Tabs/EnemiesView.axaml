@@ -4,31 +4,32 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.EnemiesView">
     <Grid ColumnDefinitions="*, *, *">
         <StackPanel Grid.Column="0">
-            <gen:ShuffleOverworldEnemies />
-            <gen:ShufflePalaceEnemies />
-            <gen:MixLargeAndSmallEnemies />
-            <gen:GeneratorsAlwaysMatch />
-            <gen:DripperEnemyOption />
+            <z:Z2CheckBox Flag="ShuffleOverworldEnemies" />
+            <z:Z2CheckBox Flag="ShufflePalaceEnemies" />
+            <z:Z2CheckBox Flag="MixLargeAndSmallEnemies" />
+            <z:Z2CheckBox Flag="GeneratorsAlwaysMatch" />
+            <z:Z2ComboBox Flag="DripperEnemyOption" />
         </StackPanel>
 
         <StackPanel Grid.Column="1">
-            <gen:ShuffleEnemyHP />
-            <gen:ShuffleBossHP />
+            <z:Z2ComboBox Flag="ShuffleEnemyHP" />
+            <z:Z2ComboBox Flag="ShuffleBossHP" />
 
-            <gen:ShuffleXPStealers />
-            <gen:ShuffleXPStolenAmount />
-            <gen:SwordImmunityOption />
+            <z:Z2CheckBox Flag="ShuffleXPStealers" />
+            <z:Z2CheckBox Flag="ShuffleXPStolenAmount" />
+            <z:Z2ComboBox Flag="SwordImmunityOption" />
         </StackPanel>
 
         <StackPanel Grid.Column="2">
-            <gen:EnemyXPDrops />
+            <z:Z2ComboBox Flag="EnemyXPDrops" />
 
-            <gen:RandomizeKnockback />
+            <z:Z2CheckBox Flag="RandomizeKnockback" />
         </StackPanel>
     </Grid>
 </UserControl>

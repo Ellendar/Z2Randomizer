@@ -2,11 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.PalacesView"
-             x:DataType="vmt:PalacesViewModel">
+             x:DataType="vm:MainViewModel">
     <Grid RowDefinitions="*, *">
         <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *, *" RowDefinitions="*, *, *">
             <HyperlinkButton
@@ -19,62 +21,68 @@
                 Cursor="Hand"
             />
             <!-- Row 0 -->
-            <gen:NormalPalaceStyle Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" />
-            <gen:NormalPalaceLength Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" />
-            <gen:BossRoomsExitType Grid.Column="2" Grid.Row="0" VerticalAlignment="Top" />
+            <z:Z2ComboBox Flag="NormalPalaceStyle" Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" />
+            <z:Z2ComboBox Flag="NormalPalaceLength" Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" />
+            <z:Z2ComboBox Flag="BossRoomsExitType" Grid.Column="2" Grid.Row="0" VerticalAlignment="Top" />
 
             <!-- Row 1 -->
-            <gen:GpStyle Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" />
-            <gen:GpLength Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" />
-            <gen:DarkLinkMinDistance Grid.Column="2" Grid.Row="1" VerticalAlignment="Top" />
+            <z:Z2ComboBox Flag="GpStyle" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" />
+            <z:Z2ComboBox Flag="GpLength" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" />
+            <z:Z2ComboBox Flag="DarkLinkMinDistance" Grid.Column="2" Grid.Row="1" VerticalAlignment="Top" />
 
             <!-- Row 2 -->
-            <gen:PalaceItemRoomCount Grid.Column="0" Grid.Row="2" VerticalAlignment="Top" />
-            <gen:PalaceDropStyle Grid.Column="1" Grid.Row="2" VerticalAlignment="Top" />
+            <z:Z2ComboBox Flag="PalaceItemRoomCount" Grid.Column="0" Grid.Row="2" VerticalAlignment="Top" />
+            <z:Z2ComboBox Flag="PalaceDropStyle" Grid.Column="1" Grid.Row="2" VerticalAlignment="Top" />
 
-            <gen:PalacesToComplete Grid.Column="2" Grid.Row="2" Margin="15 8 15 0" />
+            <StackPanel Grid.Column="2" Grid.Row="2" Margin="15 8 15 0">
+                <TextBlock Text="{x:Static lang:Resources.PalacesToCompleteMinCaption}" TextWrapping="Wrap" />
+                <Grid ColumnDefinitions="72,72" ColumnSpacing="8" Margin="0 4 0 0">
+                    <z:Z2NumericUpDown Flag="PalacesToCompleteMin" Grid.Column="0" />
+                    <z:Z2NumericUpDown Flag="PalacesToCompleteMax" Grid.Column="1" />
+                </Grid>
+            </StackPanel>
                 </Grid>
 
         <Grid Grid.Row="1" Margin="0 16 0 0" ColumnDefinitions="*, *, *">
             <StackPanel Grid.Column="0" Margin="0 0">
                 <!-- general behavior -->
-                <gen:RandomStylesAllowVanilla />
+                <z:Z2CheckBox Flag="RandomStylesAllowVanilla" />
 
-                <gen:NoDuplicateRoomsByLayout />
-                <gen:NoDuplicateRoomsByEnemies />
+                <z:Z2CheckBox Flag="NoDuplicateRoomsByLayout" />
+                <z:Z2CheckBox Flag="NoDuplicateRoomsByEnemies" />
                 <Separator Margin="16 10 18 10"/>
 
                 <!-- QoL -->
-                <gen:RestartAtPalacesOnGameOver />
-                <gen:Global5050JarDrop />
-                <gen:ReduceDripperVariance />
+                <z:Z2CheckBox Flag="RestartAtPalacesOnGameOver" />
+                <z:Z2CheckBox Flag="Global5050JarDrop" />
+                <z:Z2CheckBox Flag="ReduceDripperVariance" />
             </StackPanel>
 
             <StackPanel Grid.Column="1" Margin="0 0">
                 <!-- room pool -->
-                <gen:IncludeVanillaRooms Classes="DisabledMeansChecked" />
-                <gen:Includev4_0Rooms />
-                <gen:Includev5_0Rooms />
-                <!-- <gen:UseCustomRooms />-->
+                <z:Z2CheckBox Flag="IncludeVanillaRooms" Classes="DisabledMeansChecked" />
+                <z:Z2CheckBox Flag="Includev4_0Rooms" />
+                <z:Z2CheckBox Flag="Includev5_0Rooms" />
+                <!-- <z:Z2CheckBox Flag="UseCustomRooms" />-->
                 <Separator Margin="16 10 18 10"/>
 
                 <!-- room pool tuning -->
-                <gen:BlockingRoomsInAnyPalace />
-                <gen:RemoveLongDeadEnds />
-                <gen:IncludeExpertRooms />
+                <z:Z2CheckBox Flag="BlockingRoomsInAnyPalace" />
+                <z:Z2CheckBox Flag="RemoveLongDeadEnds" />
+                <z:Z2CheckBox Flag="IncludeExpertRooms" />
             </StackPanel>
 
             <StackPanel Grid.Column="2" Margin="0 0">
                 <!-- boss-related -->
-                <gen:RandomizeBossItemDrop />
-                <gen:HardBosses />
-                <gen:TBirdRequired Classes="DisabledMeansChecked" />
-                <gen:AggressiveTbird />
-                <gen:RemoveTBird />
+                <z:Z2CheckBox Flag="RandomizeBossItemDrop" />
+                <z:Z2CheckBox Flag="HardBosses" />
+                <z:Z2CheckBox Flag="TBirdRequired" Classes="DisabledMeansChecked" />
+                <z:Z2CheckBox Flag="AggressiveTbird" />
+                <z:Z2CheckBox Flag="RemoveTBird" />
 
                 <Separator Margin="16 10 18 10"/>
                 <!-- misc -->
-                <gen:ChangePalacePallettes />
+                <z:Z2CheckBox Flag="ChangePalacePallettes" />
             </StackPanel>
         </Grid>
     </Grid>

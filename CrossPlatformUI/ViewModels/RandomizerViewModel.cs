@@ -27,6 +27,9 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
     [JsonIgnore]
     public IObservable<IBrush> FlagInputUnderlineObservable { get; }
 
+    [JsonIgnore]
+    public IObservable<IBrush> HeaderBackgroundObservable { get; }
+
     [RUISG.Reactive]
     public partial bool FlagsValid { get; set; } = true;
 
@@ -81,12 +84,6 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
     {
         Main = main;
         HostScreen = Main;
-        BiomesViewModel = new(Main);
-        PalacesViewModel = new(Main);
-        SpellsViewModel = new(Main);
-        ItemsViewModel = new(Main);
-        HintsViewModel = new(Main, this);
-        CustomizeViewModel = new(Main);
         PresetViewModel = new(Main);
         Activator = new ViewModelActivator();
 
@@ -140,6 +137,11 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
         FlagInputUnderlineObservable = this.WhenAnyValue(x => x.ThemeVariantName)
             .CombineLatest(this.WhenAnyValue(x => x.FlagsValid), (theme, valid) =>
                 ThemeHelper.GetFlagUnderlineBrush(theme, valid));
+
+        HeaderBackgroundObservable = this.WhenAnyValue(x => x.ThemeVariantName)
+            .CombineLatest(
+                Main.FlagsChanged.Select(_ => Main.Config.GenerateSpoiler).DistinctUntilChanged(),
+                (theme, alert) => ThemeHelper.GetFlagAlertBackgroundBrush(theme, alert));
 
         Generate = ReactiveCommand.Create(() =>
         {
@@ -221,23 +223,18 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             })
             .DisposeWith(disposables);
 
-        Main.Config.PropertyChanged += (sender, args) =>
-        {
-            switch (args.PropertyName)
-            {
-                case "Seed":
-                    this.RaisePropertyChanged(nameof(Seed));
-                    break;
-            }
-        };
+        SubscribeExtensions.Subscribe(
+            Main.Config.ObservableForProperty(x => x.Seed),
+            _ => this.RaisePropertyChanged(nameof(Seed)))
+            .DisposeWith(disposables);
 
         // ReactiveUI.Validation (latest 7.1.0) is not updated to ReactiveUI 24 and can't be used
         // this.ValidationRule(viewModel => viewModel.FlagsValid, this.WhenAnyValue(x => x.FlagsValid), "Invalid Flags");
 
-        AddValidationRules();
+        AddValidationRules(disposables);
     }
 
-    private void AddValidationRules()
+    private void AddValidationRules(MultipleDisposable disposables)
     {
         SubscribeExtensions.Subscribe(
             Main.Config.WhenAnyValue(
@@ -258,7 +255,8 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
                 Main.Config.DripperEnemyOption = DripperEnemyOption.ONLY_BOTS;
                 Main.Config.GeneratorsAlwaysMatch = false;
             }
-        });
+        })
+            .DisposeWith(disposables);
 
         // When PalaceItems and OverworldItems are off, then don't allow MixingOverworldAndPalaceItems
         SubscribeExtensions.Subscribe(
@@ -274,14 +272,16 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             {
                 Main.Config.MixOverworldAndPalaceItems = false;
             }
-        });
+        })
+            .DisposeWith(disposables);
 
         // If shuffle overworld items is off, turn off pbag cave item shuffle too
         SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems), x =>
         {
             if (x.Value ?? true) return;
             Main.Config.IncludePBagCavesInItemShuffle = false;
-        });
+        })
+            .DisposeWith(disposables);
         
         // If Palaces can't swap continents 
         SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleEncounters), x =>
@@ -289,14 +289,16 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             if (x.Value ?? true) return;
             Main.Config.IncludeLavaInEncounterShuffle = false;
             Main.Config.AllowUnsafePathEncounters = false;
-        });
+        })
+            .DisposeWith(disposables);
 
         // If shuffle palaces is off, then don't allow shuffling GP
         SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.PalacesCanSwapContinents), x =>
             {
                 if (x.Value ?? true) return;
                 Main.Config.ShuffleGP = false;
-            });
+            })
+            .DisposeWith(disposables);
 
         SubscribeExtensions.Subscribe(Main.ObservableForProperty(x => x.ShuffleAllExpState), x =>
         {
@@ -304,7 +306,24 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             Main.Config.ShuffleAttackExperience = true;
             Main.Config.ShuffleMagicExperience = true;
             Main.Config.ShuffleLifeExperience = true;
-        });
+        })
+            .DisposeWith(disposables);
+
+        // At most one of the "no duplicate rooms" settings may be on:
+        // checking either clears the other (was view code-behind before).
+        SubscribeExtensions.Subscribe(Main.Config.WhenAnyValue(x => x.NoDuplicateRoomsByLayout), byLayout =>
+        {
+            if (byLayout)
+                Main.Config.NoDuplicateRoomsByEnemies = false;
+        })
+            .DisposeWith(disposables);
+
+        SubscribeExtensions.Subscribe(Main.Config.WhenAnyValue(x => x.NoDuplicateRoomsByEnemies), byEnemies =>
+        {
+            if (byEnemies)
+                Main.Config.NoDuplicateRoomsByLayout = false;
+        })
+            .DisposeWith(disposables);
     }
 
     [JsonIgnore]
@@ -312,13 +331,6 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
 
     [JsonIgnore]
     public MainViewModel Main { get; }
-    [JsonIgnore]
-    public BiomesViewModel BiomesViewModel { get; }
-    public PalacesViewModel PalacesViewModel { get; }
-    public SpellsViewModel SpellsViewModel { get; }
-    public ItemsViewModel ItemsViewModel { get; }
-    public HintsViewModel HintsViewModel { get; }
-    public CustomizeViewModel CustomizeViewModel { get; }
     public PresetsViewModel PresetViewModel { get; }
     
     [JsonIgnore]

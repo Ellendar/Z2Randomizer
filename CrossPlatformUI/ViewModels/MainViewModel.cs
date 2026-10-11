@@ -9,11 +9,12 @@ using ReactiveUI.Primitives.Disposables;
 using ReactiveUI.Primitives.Signals;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
+using CrossPlatformUI.ViewModels.Tabs;
 
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("")]
-public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
+public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel, IFlagHost
 {
     public string? OutputFilePath { get; set; }
     private readonly RandomizerConfiguration config = new();
@@ -39,6 +40,9 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public SaveNewPresetViewModel SaveNewPresetViewModel { get; set; }
+
+    [JsonIgnore]
+    public SpritePreviewViewModel SpritePreviewViewModel { get; }
 
     [RUISG.Reactive]
     public partial CustomPixelPoint WindowPosition { get; set; }
@@ -78,6 +82,7 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
         RemovePresetViewModel = new(this);
         UpdatePresetViewModel = new(this);
         RandomizerViewModel = new(this);
+        SpritePreviewViewModel = new(this);
         SubscribeExtensions.Subscribe(Router.Navigate.Execute(RandomizerViewModel));
 
         GenerateRom = ReactiveCommand.CreateFromObservable(

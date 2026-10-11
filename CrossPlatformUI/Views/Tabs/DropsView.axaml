@@ -7,14 +7,15 @@
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.DropsView">
     <Grid ColumnDefinitions="*, *, *">
         <StackPanel Grid.Column="0">
-            <gen:ShuffleItemDropFrequency />
-            <gen:RandomizeDrops />
-            <gen:StandardizeDrops />
+            <z:Z2CheckBox Flag="ShuffleItemDropFrequency" />
+            <z:Z2CheckBox Flag="RandomizeDrops" />
+            <z:Z2CheckBox Flag="StandardizeDrops" />
         </StackPanel>
         <StackPanel Grid.Column="1">
             <TextBlock Margin="17 8">Small Enemy Pool</TextBlock>
@@ -22,14 +23,14 @@
                     Margin="17 0 17 0"
                     Padding="14 8" CornerRadius="4">
                 <UniformGrid Rows="0" Columns="1" RowSpacing="8">
-                    <gen:SmallEnemiesCanDropBlueJar />
-                    <gen:SmallEnemiesCanDropRedJar />
-                    <gen:SmallEnemiesCanDropSmallBag />
-                    <gen:SmallEnemiesCanDropMediumBag />
-                    <gen:SmallEnemiesCanDropLargeBag />
-                    <gen:SmallEnemiesCanDropXLBag />
-                    <gen:SmallEnemiesCanDrop1up />
-                    <gen:SmallEnemiesCanDropKey />
+                    <z:Z2CheckBox Flag="SmallEnemiesCanDropBlueJar" />
+                    <z:Z2CheckBox Flag="SmallEnemiesCanDropRedJar" />
+                    <z:Z2CheckBox Flag="SmallEnemiesCanDropSmallBag" />
+                    <z:Z2CheckBox Flag="SmallEnemiesCanDropMediumBag" />
+                    <z:Z2CheckBox Flag="SmallEnemiesCanDropLargeBag" />
+                    <z:Z2CheckBox Flag="SmallEnemiesCanDropXLBag" />
+                    <z:Z2CheckBox Flag="SmallEnemiesCanDrop1up" />
+                    <z:Z2CheckBox Flag="SmallEnemiesCanDropKey" />
                 </UniformGrid>
             </Border>
         </StackPanel>
@@ -39,14 +40,14 @@
                     Margin="17 0 17 0"
                     Padding="14 8" CornerRadius="4">
                 <UniformGrid Rows="0" Columns="1" RowSpacing="8">
-                    <gen:LargeEnemiesCanDropBlueJar />
-                    <gen:LargeEnemiesCanDropRedJar />
-                    <gen:LargeEnemiesCanDropSmallBag />
-                    <gen:LargeEnemiesCanDropMediumBag />
-                    <gen:LargeEnemiesCanDropLargeBag />
-                    <gen:LargeEnemiesCanDropXLBag />
-                    <gen:LargeEnemiesCanDrop1up />
-                    <gen:LargeEnemiesCanDropKey />
+                    <z:Z2CheckBox Flag="LargeEnemiesCanDropBlueJar" />
+                    <z:Z2CheckBox Flag="LargeEnemiesCanDropRedJar" />
+                    <z:Z2CheckBox Flag="LargeEnemiesCanDropSmallBag" />
+                    <z:Z2CheckBox Flag="LargeEnemiesCanDropMediumBag" />
+                    <z:Z2CheckBox Flag="LargeEnemiesCanDropLargeBag" />
+                    <z:Z2CheckBox Flag="LargeEnemiesCanDropXLBag" />
+                    <z:Z2CheckBox Flag="LargeEnemiesCanDrop1up" />
+                    <z:Z2CheckBox Flag="LargeEnemiesCanDropKey" />
                 </UniformGrid>
             </Border>
         </StackPanel>

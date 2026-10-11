@@ -858,10 +858,19 @@ instead.</value>
 . You may edit this file to control which rooms you want to use, or create your own rooms
 that can appear. For more details, contact Ellendar or ask on the Discord.</value>
 	</data>
-	<data name="PalacesToComplete" xml:space="preserve">
+	<data name="PalacesToCompleteMin" xml:space="preserve">
+<value>Min</value>
+	</data>
+	<data name="PalacesToCompleteMinCaption" xml:space="preserve">
 <value>Number of Palaces to Complete</value>
 	</data>
-	<data name="PalacesToCompleteToolTip" xml:space="preserve">
+	<data name="PalacesToCompleteMax" xml:space="preserve">
+<value>Max</value>
+	</data>
+	<data name="PalacesToCompleteMaxCaption" xml:space="preserve">
+<value>Number of Palaces to Complete</value>
+	</data>
+	<data name="PalacesToCompleteMinToolTip" xml:space="preserve">
 <value>This is the number of gems you start the game with and therefor the number of palaces that
 must be completed before being able to enter the Great Palace. The number of required
 palaces is a random value between Min and Max (inclusive of both endpoints).</value>
@@ -1104,6 +1113,30 @@ Adjust the minimum and maximum starting magic containers. The actual starting nu
 randomly selected between these values (inclusive).
 
 </value>
+	</data>
+	<data name="StartingHeartContainersMin" xml:space="preserve">
+<value>Start Min</value>
+	</data>
+	<data name="StartingHeartContainersMinCaption" xml:space="preserve">
+<value>Heart Containers</value>
+	</data>
+	<data name="StartingHeartContainersMax" xml:space="preserve">
+<value>Start Max</value>
+	</data>
+	<data name="StartingHeartContainersMaxCaption" xml:space="preserve">
+<value>Heart Containers</value>
+	</data>
+	<data name="StartingMagicContainersMin" xml:space="preserve">
+<value>Start Min</value>
+	</data>
+	<data name="StartingMagicContainersMinCaption" xml:space="preserve">
+<value>Magic Containers</value>
+	</data>
+	<data name="StartingMagicContainersMax" xml:space="preserve">
+<value>Start Max</value>
+	</data>
+	<data name="StartingMagicContainersMaxCaption" xml:space="preserve">
+<value>Magic Containers</value>
 	</data>
 	<data name="StartingAttackLevel" xml:space="preserve">
 <value>Attack</value>

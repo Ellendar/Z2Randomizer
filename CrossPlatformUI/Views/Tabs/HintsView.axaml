@@ -2,11 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.Tabs.HintsView"
-             x:DataType="vmt:HintsViewModel">
+             x:DataType="vm:MainViewModel">
     <Grid ColumnDefinitions="*, *">
         <StackPanel Grid.Column="0">
             <HyperlinkButton
@@ -19,14 +20,14 @@
                 Cursor="Hand"
             />
 
-            <gen:HelpfulHints />
-            <gen:EnableSpellItemHints />
-            <gen:EnableTownNameHints />
+            <z:Z2ComboBox Flag="HelpfulHints" />
+            <z:Z2CheckBox Flag="EnableSpellItemHints" />
+            <z:Z2CheckBox Flag="EnableTownNameHints" />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <gen:GenerateSpoiler />
-            <gen:RevealWalkthroughWalls />
-            <gen:RevealHiddenJars />
+            <z:Z2CheckBox Flag="GenerateSpoiler" />
+            <z:Z2CheckBox Flag="RevealWalkthroughWalls" />
+            <z:Z2CheckBox Flag="RevealHiddenJars" />
         </StackPanel>
     </Grid>
 </UserControl>

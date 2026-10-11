@@ -1,10 +1,9 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using ReactiveUI;
-using RUISG = ReactiveUI.SourceGenerators;
-using ReactiveUI.Primitives;
-using RxVoid = ReactiveUI.Primitives.RxVoid;
+using System;
+using System.Diagnostics.CodeAnalysis;
 using Z2Randomizer.RandomizerCore;
+using RUISG = ReactiveUI.SourceGenerators;
+using RxVoid = ReactiveUI.Primitives.RxVoid;
 
 namespace CrossPlatformUI.ViewModels;
 

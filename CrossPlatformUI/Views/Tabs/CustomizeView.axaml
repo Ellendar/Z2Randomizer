@@ -3,27 +3,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:tabs="clr-namespace:CrossPlatformUI.Views.Tabs"
-             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.CustomizeView"
-             x:DataType="vmt:CustomizeViewModel">
+             x:DataType="vm:MainViewModel">
     <Grid ColumnDefinitions="*,2*" Margin="4">
         <StackPanel Grid.Column="0" Orientation="Vertical">
-            <gen:RemoveFlashing />
-            <gen:DarkenThunderbird />
-            <gen:UpdatedHud />
-            <gen:DisableHUDLag />
-            <gen:FastSpellCasting />
-            <gen:UpAOnController1 />
-            <gen:BeepThreshold />
-            <gen:BeepFrequency />
-            <gen:UseCommunityText />
-            <gen:ShuffleSpritePalettes />
+            <z:Z2CheckBox Flag="RemoveFlashing" />
+            <z:Z2CheckBox Flag="DarkenThunderbird" />
+            <z:Z2CheckBox Flag="UpdatedHud" />
+            <z:Z2CheckBox Flag="DisableHUDLag" />
+            <z:Z2CheckBox Flag="FastSpellCasting" />
+            <z:Z2CheckBox Flag="UpAOnController1" />
+            <z:Z2ComboBox Flag="BeepThreshold" />
+            <z:Z2ComboBox Flag="BeepFrequency" />
+            <z:Z2CheckBox Flag="UseCommunityText" />
+            <z:Z2CheckBox Flag="ShuffleSpritePalettes" />
 
             <Separator/>
 
-            <gen:DisableMusic />
+            <z:Z2CheckBox Flag="DisableMusic" />
 
             <StackPanel Margin="0 0" Orientation="Vertical" IsVisible="{OnPlatform Default=True, Browser=False}">
                 <HyperlinkButton
@@ -36,10 +37,10 @@
                     Cursor="Hand"
                 />
 
-                <gen:RandomizeMusic />
-                <gen:MixCustomAndOriginalMusic />
-                <gen:IncludeDiverseMusic />
-                <gen:DisableUnsafeMusic />
+                <z:Z2CheckBox Flag="RandomizeMusic" />
+                <z:Z2CheckBox Flag="MixCustomAndOriginalMusic" />
+                <z:Z2CheckBox Flag="IncludeDiverseMusic" />
+                <z:Z2CheckBox Flag="DisableUnsafeMusic" />
             </StackPanel>
         </StackPanel>
         <tabs:SpritePreviewView Grid.Column="1" DataContext="{Binding SpritePreviewViewModel}" />

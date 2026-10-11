@@ -2,11 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              mc:Ignorable="d" d:DesignWidth="940" d:DesignHeight="750"
              x:Class="CrossPlatformUI.Views.Tabs.BiomesView"
-             x:DataType="vmt:BiomesViewModel">
+             x:DataType="vm:MainViewModel">
     <ScrollViewer>
         <Grid RowDefinitions="*, *">
         <HyperlinkButton
@@ -20,28 +21,28 @@
             />
 
         <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *, *" RowDefinitions="*, *, *, *, *" RowSpacing="8" ColumnSpacing="8">
-            <gen:WestSize Grid.Row="0" Grid.Column="0" />
-            <gen:EastSize Grid.Row="1" Grid.Column="0" />
-            <gen:DmSize   Grid.Row="2" Grid.Column="0" />
-            <gen:MazeSize Grid.Row="3" Grid.Column="0" />
+            <z:Z2ComboBox Flag="WestSize" Grid.Row="0" Grid.Column="0" />
+            <z:Z2ComboBox Flag="EastSize" Grid.Row="1" Grid.Column="0" />
+            <z:Z2ComboBox Flag="DmSize"   Grid.Row="2" Grid.Column="0" />
+            <z:Z2ComboBox Flag="MazeSize" Grid.Row="3" Grid.Column="0" />
 
-            <gen:WestBiome Grid.Row="0" Grid.Column="1" />
-            <gen:EastBiome Grid.Row="1" Grid.Column="1" />
-            <gen:DmBiome   Grid.Row="2" Grid.Column="1" />
-            <gen:MazeBiome Grid.Row="3" Grid.Column="1" />
+            <z:Z2ComboBox Flag="WestBiome" Grid.Row="0" Grid.Column="1" />
+            <z:Z2ComboBox Flag="EastBiome" Grid.Row="1" Grid.Column="1" />
+            <z:Z2ComboBox Flag="DmBiome"   Grid.Row="2" Grid.Column="1" />
+            <z:Z2ComboBox Flag="MazeBiome" Grid.Row="3" Grid.Column="1" />
 
-            <gen:WestClimate Grid.Row="0" Grid.Column="2" />
-            <gen:EastClimate Grid.Row="1" Grid.Column="2" />
-            <gen:DmClimate   Grid.Row="2" Grid.Column="2" />
+            <z:Z2ComboBox Flag="WestClimate" Grid.Row="0" Grid.Column="2" />
+            <z:Z2ComboBox Flag="EastClimate" Grid.Row="1" Grid.Column="2" />
+            <z:Z2ComboBox Flag="DmClimate"   Grid.Row="2" Grid.Column="2" />
         </Grid>
 
         <Grid Grid.Row="1" ColumnDefinitions="*, *, *">
             <StackPanel Grid.Column="0" Margin="0 0">
-                <gen:GoodBoots />
+                <z:Z2CheckBox Flag="GoodBoots" />
             </StackPanel>
 
             <StackPanel Grid.Column="1" Margin="0 0">
-                <gen:LegacyVanillaShuffledLocations />
+                <z:Z2CheckBox Flag="LegacyVanillaShuffledLocations" />
             </StackPanel>
         </Grid>
         </Grid>

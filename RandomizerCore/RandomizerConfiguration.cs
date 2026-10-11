@@ -152,25 +152,25 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
-    [UiNumericPair("Start Min", nameof(startingHeartContainersMax))]
+    [UiNumericPair(nameof(startingHeartContainersMax))]
     private int? startingHeartContainersMin = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
-    [UiNumericPair("Start Max", nameof(startingHeartContainersMin))]
+    [UiNumericPair(nameof(startingHeartContainersMin))]
     private int? startingHeartContainersMax = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
-    [UiNumericPair("Start Min", nameof(startingMagicContainersMax))]
+    [UiNumericPair(nameof(startingMagicContainersMax))]
     private int? startingMagicContainersMin = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
-    [UiNumericPair("Start Max", nameof(startingMagicContainersMin))]
+    [UiNumericPair(nameof(startingMagicContainersMin))]
     private int? startingMagicContainersMax = 4;
 
     [Reactive]
@@ -451,14 +451,14 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [Minimum(0)]
     [Maximum(6)]
-    [UiNumericPair("Min", nameof(palacesToCompleteMax))]
+    [UiNumericPair(nameof(palacesToCompleteMax))]
     private int palacesToCompleteMin = 6;
 
     [Reactive]
     [Minimum(0)]
     [Maximum(6)]
     [ConditionallyIncludeInFlags]
-    [UiNumericPair("Max", nameof(palacesToCompleteMin))]
+    [UiNumericPair(nameof(palacesToCompleteMin))]
     private int palacesToCompleteMax = 6;
     public bool palacesToCompleteMaxIncluded() => palacesToCompleteMin != 6;
 
@@ -540,7 +540,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool? swapUpAndDownStab = false;
 
     [Reactive]
+    // Add [ConditionallyIncludeInFlags] for next minor release.
     private FireOption fireOption = FireOption.NORMAL;
+    public bool fireOptionIncluded() => !marioMode;
 
     //Enemies
     [Reactive]
@@ -737,18 +739,22 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [IgnoreInFlags]
     private bool randomizeMusic = false;
+    public bool randomizeMusicIncluded() => !disableMusic;
 
     [Reactive]
     [IgnoreInFlags]
     private bool mixCustomAndOriginalMusic = false;
-    
+    public bool mixCustomAndOriginalMusicIncluded() => !disableMusic && randomizeMusic;
+
     [Reactive]
     [IgnoreInFlags]
     private bool includeDiverseMusic = false;
+    public bool includeDiverseMusicIncluded() => !disableMusic && randomizeMusic;
 
     [Reactive]
     [IgnoreInFlags]
     private bool disableUnsafeMusic = false;
+    public bool disableUnsafeMusicIncluded() => !disableMusic && randomizeMusic;
 
     [Reactive]
     [IgnoreInFlags]
@@ -789,18 +795,22 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
     [Reactive]
     [IgnoreInFlags]
+    [IgnoreInFlagControls]
     private NesColor tunic = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
+    [IgnoreInFlagControls]
     private NesColor skinTone = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
+    [IgnoreInFlagControls]
     private NesColor tunicOutline = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
+    [IgnoreInFlagControls]
     private NesColor shieldTunic = NesColor.Default;
 
     [Reactive]

@@ -2,74 +2,63 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
 namespace CrossPlatformUI.SourceGenerator;
 
 /// <summary>
-/// Emits one bound Avalonia control per user-settable flag on a
-/// <c>[FlagSerialize]</c> config, in namespace
-/// <c>CrossPlatformUI.Controls.Generated</c>. The control kind follows the
-/// property type:
+/// Emits, for every user-settable flag on a <c>[FlagSerialize]</c> config, the
+/// metadata a shared control needs, in namespace
+/// <c>CrossPlatformUI.Controls.Generated</c>: the <c>FlagRegistry</c> table, the
+/// per-config <c>FlagIncludedResolver</c>, and the <c>FlagControlFactory</c>. The
+/// <c>ConfigFlag</c> enum those name is emitted into RandomizerCore by
+/// CoreSourceGenerator, which owns the config the members are named after.
+/// The control kind follows the property type:
 ///
-/// - <c>bool</c> / <c>bool?</c>  →  <c>CheckBox</c>
-/// - Enum  →  <c>ComboBox</c>
-/// - <c>int</c> / <c>int?</c> with <c>[Minimum]</c> + <c>[Maximum]</c>  →  <c>NumericUpDown</c>
-/// - a <c>[UiNumericPair]</c> pair of fields  →  one <c>StackPanel</c> holding both boxes
+/// - <c>bool</c> / <c>bool?</c>  →  <c>Z2CheckBox</c>
+/// - Enum  →  <c>Z2ComboBox</c>
+/// - <c>int</c> / <c>int?</c> with <c>[Minimum]</c> + <c>[Maximum]</c>  →  <c>Z2NumericUpDown</c>
+///
+/// A <c>[UiNumericPair]</c> field is just an ordinary numeric: the two ends are two
+/// separate boxes, cross-limited through <c>PartnerFlag</c> so each box's far bound
+/// follows the other.
 ///
 /// A view can then use:
 ///
 /// <code>
-/// &lt;gen:RestartAtPalacesOnGameOver /&gt;
-/// &lt;gen:Global5050JarDrop /&gt;
+/// &lt;z:Z2CheckBox Flag="RestartAtPalacesOnGameOver" /&gt;
+/// &lt;z:Z2ComboBox Flag="GpLength" /&gt;
 /// </code>
 ///
-/// Resource names are derived from the generated property name:
+/// No per-flag control class is generated. A flag is addressed by its enum member
+/// and its behaviour comes from the <c>FlagRegistry</c> entry, whose members are
+/// literal references (<c>Resources.Foo</c>, <c>c =&gt; c.Foo</c>) so a missing
+/// resource or a renamed property is a build error.
+///
+/// Resource names are derived from the flag name:
 /// <c>Resources.Foo</c> for content and <c>Resources.FooToolTip</c> for the
-/// tooltip. Numeric captions and tooltips are lazy <c>ResourceManager</c>
-/// lookups instead, so their keys are optional.
+/// tooltip. A <c>[UiNumericPair]</c> end's caption/tooltip are lazy
+/// <c>ResourceManager</c> lookups instead (<c>Resources.&lt;Field&gt;Caption</c>,
+/// one shared <c>Resources.&lt;MinField&gt;ToolTip</c> for both ends), so those keys
+/// are optional.
 ///
 /// <c>bool?</c> additionally gets <c>IsThreeState = true</c>.
 ///
-/// The generated control uses a direct <c>INotifyPropertyChanged</c> bridge
-/// instead of reflection or string-path Avalonia bindings. This also avoids
-/// depending on ReactiveUI's generated binding members across generator
-/// boundaries.
+/// The shared controls keep config and control in sync through a direct
+/// <c>INotifyPropertyChanged</c> bridge instead of reflection or string-path
+/// Avalonia bindings. This also avoids depending on ReactiveUI's generated
+/// binding members across generator boundaries.
 ///
+/// The XAML attributes are applied after the control's constructor, so anything
+/// set on the element wins over the control's defaults.
 ///
-/// The generated constructor runs before the view's XAML attributes are
-/// applied, so anything set on the <c>&lt;gen:X /&gt;</c> element wins over the
-/// constructor defaults.
-///
-/// <code>
-/// &lt;gen:StartItemsLimit Grid.Column="2" Height="78" Margin="-16 -4 0 24" /&gt;
-/// </code>
-///
-/// <b>Theming and structure live in the generator.</b>
-///
-/// Each control kind is emitted by one method as a single string template.
-/// Every flag of that kind is therefore identical at runtime:
-///
-/// - <see cref="GenerateControl"/>         — checkbox
-/// - <see cref="GenerateComboBox"/>        — combo
-/// - <see cref="GenerateNumeric"/>         — single box
-/// - <see cref="GenerateNumericPair"/>     — pair of boxes
-///
-/// The combos' theme is a constant inside <c>GenerateComboBox</c>:
-/// <c>const string ThemeKey = "MaterialOutlineComboBox"</c>.
-///
-/// The same method chooses the base type with
-/// <c>StyleKeyOverride => typeof(ComboBox)</c> — the type Avalonia themes and
-/// style selectors match on — and carries the rest of the class as verbatim
-/// <c>sb.AppendLine</c> strings.
-///
-/// <b>Theming one control only</b>: a type selector naming a generated type never
-/// matches (matching is on <c>StyleKey</c>, never on the concrete class). Give
-/// the element a class in the view and style that class in <c>App.axaml</c>:
+/// <b>Theming one control only</b>: a type selector naming the shared control never
+/// matches a concrete <c>z:</c> type (matching is on <c>StyleKey</c>, never on the
+/// concrete class). Give the element a class in the view and style that class in
+/// <c>App.axaml</c>:
 ///
 /// <code>
-/// &lt;gen:StartWithCandle Classes="WideAndAiry" /&gt;
+/// &lt;z:Z2CheckBox Flag="StartWithCandle" Classes="WideAndAiry" /&gt;
 /// ...
 /// &lt;Style Selector="CheckBox.WideAndAiry"&gt;
 ///     &lt;Setter Property="MinWidth" Value="140"/&gt;
@@ -77,13 +66,16 @@ namespace CrossPlatformUI.SourceGenerator;
 /// </code>
 ///
 /// This is the same shape as the existing <c>Selector="CheckBox.DifficultyOnly"</c>
-/// rules, which the generator already relies on for <c>[DifficultyOnly]</c>
+/// rules, which the shared controls already rely on for <c>[DifficultyOnly]</c>
 /// flags.
 /// </summary>
 [Generator]
 public sealed class FlagsControlsGenerator : IIncrementalGenerator
 {
     private const string Namespace = "CrossPlatformUI.Controls.Generated";
+
+    // ConfigFlag itself is emitted into RandomizerCore by CoreSourceGenerator.
+    private const string FlagsNamespace = "Z2Randomizer.RandomizerCore.Flags";
 
     private const string FlagSerialize = "FlagSerializeAttribute";
     private const string EnabledObservableSuffix = "EnabledObservable";
@@ -95,39 +87,26 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
     private const string MinimumAttribute = "MinimumAttribute";
     private const string MaximumAttribute = "MaximumAttribute";
     private const string NumericPairAttribute = "UiNumericPairAttribute";
+    private const string IgnoreInFlagControls = "IgnoreInFlagControlsAttribute";
 
     internal static readonly SymbolDisplayFormat FullyQualified =
         SymbolDisplayFormat.FullyQualifiedFormat;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // The .resx files are surfaced as additional files (see Aigamo.ResXGenerator's
-        // build props), so the names of the strongly-typed Resources members are
-        // available here even though the Resources class itself is source-generated.
-        var resourceTexts = context.AdditionalTextsProvider
-            .Where(static file => file.Path.EndsWith(
-                "Resources.resx",
-                StringComparison.OrdinalIgnoreCase))
-            .Select(static (file, cancellationToken) =>
-                file.GetText(cancellationToken)?.ToString() ?? string.Empty)
-            .Collect();
-
         context.RegisterSourceOutput(
-            context.CompilationProvider.Combine(resourceTexts),
-            static (spc, source) =>
+            context.CompilationProvider,
+            static (spc, compilation) =>
             {
-                var (compilation, texts) = source;
-
-                var resourceNames = new HashSet<string>(StringComparer.Ordinal);
-                foreach (var text in texts)
-                    CollectResourceNames(text, resourceNames);
+                // Flags whose control is addressed by name from XAML, collected across
+                // config types for the shared FlagRegistry.
+                var flagFields = new List<FlagFieldInfo>();
 
                 foreach (var configType in FindConfigTypes(compilation))
                 {
                     var classInfo = GetClassGenerationInfo(
                         compilation,
-                        configType,
-                        resourceNames);
+                        configType);
                     if (classInfo is null)
                         continue;
 
@@ -137,20 +116,25 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
 
                     foreach (var field in classInfo.ControlFields)
                     {
-                        spc.AddSource(
-                            $"{field.PropertyName}.g.cs",
-                            GenerateControl(classInfo, field));
+                        // Every kind is served by a shared control
+                        // (Z2CheckBox/Z2ComboBox/Z2NumericUpDown) that reads the
+                        // flag's metadata from FlagRegistry: no per-flag class is
+                        // generated for any of them.
+                        flagFields.Add(new FlagFieldInfo
+                        {
+                            ConfigType = classInfo.ConfigType,
+                            Field = field,
+                        });
                     }
                 }
-            });
-    }
 
-    private static void CollectResourceNames(
-        string resx,
-        HashSet<string> names)
-    {
-        foreach (Match match in Regex.Matches(resx, "<data\\s+name=\"([^\"]+)\""))
-            names.Add(match.Groups[1].Value);
+                if (flagFields.Count > 0)
+                {
+                    spc.AddSource(
+                        "FlagRegistry.g.cs",
+                        GenerateFlagRegistry(flagFields));
+                }
+            });
     }
 
     private static IEnumerable<INamedTypeSymbol> FindConfigTypes(Compilation compilation)
@@ -177,8 +161,7 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
 
     private static ClassGenerationInfo? GetClassGenerationInfo(
         Compilation compilation,
-        INamedTypeSymbol classSymbol,
-        HashSet<string> resourceNames)
+        INamedTypeSymbol classSymbol)
     {
         var controlFields = new List<ControlFieldInfo>();
         var numericCandidates = new List<NumericCandidate>();
@@ -197,6 +180,9 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
             if (property.GetMethod is null || property.SetMethod is null)
                 continue;
 
+            if (HasAttribute(property.GetAttributes(), IgnoreInFlagControls))
+                continue;
+
             if (TryGetNumeric(property, out var numeric))
             {
                 numericCandidates.Add(numeric);
@@ -213,13 +199,10 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
                 continue;
             }
 
-            // ComboBoxes are opt-in by convention: a caption resource and a matching
-            // Enums.<PropertyName>List must both exist. Until a caption is written the
-            // view keeps its hand-written ComboBox.
-            if (isEnum &&
-                (!resourceNames.Contains(property.Name) ||
-                 enumsType is null ||
-                 !HasEnumList(enumsType, property.Name)))
+            // Every enum property becomes a ComboBox, like every bool becomes a
+            // checkbox. Its caption (Resources.<PropertyName>) and items
+            // (Enums.<PropertyName>List) are referenced unconditionally.
+            if (isEnum && enumsType is null)
             {
                 continue;
             }
@@ -245,9 +228,7 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
             });
         }
 
-        foreach (var numericField in ResolveNumericCandidates(
-                     numericCandidates,
-                     resourceNames))
+        foreach (var numericField in ResolveNumericCandidates(numericCandidates))
         {
             controlFields.Add(numericField);
         }
@@ -259,8 +240,7 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
         {
             ClassName = classSymbol.Name,
             ConfigType = classSymbol.ToDisplayString(FullyQualified),
-            ControlFields = controlFields,
-            Resolvers = BuildConfigResolvers(compilation, classSymbol)
+            ControlFields = controlFields
         };
 
         // Wire enablement. A hand-written <c>FooEnabledObservable</c> on a view model
@@ -282,30 +262,16 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
             classInfo.IncludedResolvers.Select(r => r.ControlPropertyName),
             StringComparer.Ordinal);
 
-        foreach (var included in BuildGeneratedEnablers(
-                     classSymbol,
-                     controlFields,
-                     classInfo.Resolvers,
-                     handWired))
-        {
-            included.ResolverMethod = "Resolve" + included.ControlPropertyName +
-                "Included";
-
-            var field = controlFields.First(f =>
-                f.PropertyName == included.ControlPropertyName);
-            field.IncludedResolverMethod = included.ResolverMethod;
-
-            classInfo.IncludedResolvers.Add(included);
-        }
+        ApplyGeneratedEnablers(classSymbol, controlFields, handWired);
 
         return classInfo;
     }
 
     /// <summary>
-    /// Builds enablement rules for flags that need none of their own. If the config
+    /// Records enablement for flags that need none of their own. If the config
     /// declares a predicate <c>fooIncluded()</c> then the control is live exactly when
-    /// that predicate holds, so the observable can be derived instead of written:
-    /// <c>FlagsChanged.Select(_ =&gt; config.fooIncluded()).DistinctUntilChanged()</c>.
+    /// that predicate holds, so the registry derives the observable at bind time:
+    /// <c>FlagEnablement.Build(ctx, static c =&gt; c.fooIncluded())</c>.
     /// Applies to every control kind except numerics, which are never auto-disabled.
     /// </summary>
     /// <remarks>
@@ -325,55 +291,27 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
     /// from <c>null</c> to <c>false</c>) disables the control precisely when it should
     /// remain reachable.
     /// </remarks>
-    private static List<IncludedResolverInfo> BuildGeneratedEnablers(
+    private static void ApplyGeneratedEnablers(
         INamedTypeSymbol configSymbol,
         List<ControlFieldInfo> controlFields,
-        Dictionary<string, ConfigResolverInfo> configResolvers,
         HashSet<string> handWired)
     {
-        var result = new List<IncludedResolverInfo>();
-
         foreach (var field in controlFields)
         {
             if (handWired.Contains(field.PropertyName))
                 continue;
 
-            if (field.Kind is ControlKind.Numeric or
-                ControlKind.NumericPair)
-            {
+            if (field.Kind is ControlKind.Numeric)
                 continue;
-            }
 
-if (IncludedPredicateName(configSymbol, field.PropertyName)
+            if (IncludedPredicateName(configSymbol, field.PropertyName)
                 is not { } predicate)
             {
                 continue;
             }
 
-            var owners = new List<ConfigResolverInfo>();
-
-            foreach (var resolver in configResolvers.Values)
-            {
-                if (FlagsChangedExpression(resolver.OwnerType) is not { } flagsChanged)
-                    continue;
-
-                owners.Add(new ConfigResolverInfo(
-                    resolver.OwnerType,
-                    $"{flagsChanged}.Select(_ => {resolver.ConfigExpression}." +
-                    $"{predicate}()).DistinctUntilChanged()"));
-            }
-
-            if (owners.Count == 0)
-                continue;
-
-            result.Add(new IncludedResolverInfo
-            {
-                ControlPropertyName = field.PropertyName,
-                Owners = owners
-            });
+            field.GeneratedIncludedPredicate = predicate;
         }
-
-        return result;
     }
 
     /// <summary>
@@ -437,27 +375,6 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
         return null;
     }
 
-    /// <summary>
-    /// The expression reaching <c>FlagsChanged</c> from a DataContext of the given
-    /// type: directly on the root view model, or via its <c>Main</c>. Null when the
-    /// type exposes neither.
-    /// </summary>
-    private static string? FlagsChangedExpression(INamedTypeSymbol candidate)
-    {
-        if (PublicInstanceProperty(candidate, "FlagsChanged") is not null)
-            return "value.FlagsChanged";
-
-        var main = PublicInstanceProperty(candidate, "Main");
-
-        if (main?.Type is INamedTypeSymbol mainType &&
-            PublicInstanceProperty(mainType, "FlagsChanged") is not null)
-        {
-            return "value.Main.FlagsChanged";
-        }
-
-        return null;
-    }
-
     private static string GenerateResolver(ClassGenerationInfo classInfo)
     {
         var sb = new StringBuilder();
@@ -466,45 +383,21 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
         sb.AppendLine("// <auto-generated/>");
         sb.AppendLine("#nullable enable");
         sb.AppendLine();
-        // Select/DistinctUntilChanged for the generated enablement observables.
-        // Not System.Reactive.Linq: this repo takes them from ReactiveUI.Primitives.
-        sb.AppendLine("using ReactiveUI.Primitives;");
+        sb.AppendLine($"using {FlagsNamespace};");
         sb.AppendLine();
         sb.AppendLine($"namespace {Namespace};");
         sb.AppendLine();
         sb.AppendLine("/// <summary>");
-        sb.AppendLine($"/// Resolves the <c>{configType}</c> behind a view's DataContext.");
+        sb.AppendLine($"/// Resolves the <c>{configType}</c> behind a view's DataContext. Every");
+        sb.AppendLine("/// DataContext that can host a flag control implements IFlagHost, so this is");
+        sb.AppendLine("/// a single cast rather than a per-type switch.");
         sb.AppendLine("/// </summary>");
         sb.AppendLine("internal static class RandomizerConfigResolver");
         sb.AppendLine("{");
-
-        if (classInfo.Resolvers.Count == 0)
-        {
-            sb.AppendLine(
-                $"    public static {configType}? Resolve(object? dataContext) => null;");
-        }
-        else
-        {
-            sb.AppendLine(
-                $"    public static {configType}? Resolve(object? dataContext)");
-            sb.AppendLine("    {");
-            sb.AppendLine("        switch (dataContext)");
-            sb.AppendLine("        {");
-
-            foreach (var resolver in classInfo.Resolvers.Values.OrderBy(r => r.DataContextType, StringComparer.Ordinal))
-            {
-                sb.AppendLine(
-                    $"            case {resolver.DataContextType} value:");
-                sb.AppendLine(
-                    $"                return {resolver.ConfigExpression};");
-            }
-
-            sb.AppendLine("            default:");
-            sb.AppendLine("                return null;");
-            sb.AppendLine("        }");
-            sb.AppendLine("    }");
-        }
-
+        sb.AppendLine($"    public static {configType}? Resolve(object? dataContext)");
+        sb.AppendLine(
+            "        => (dataContext as " +
+            "global::CrossPlatformUI.ViewModels.IFlagHost)?.Config;");
         sb.AppendLine("}");
 
         if (classInfo.IncludedResolvers.Count > 0)
@@ -512,7 +405,11 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
             sb.AppendLine();
             sb.AppendLine("/// <summary>");
             sb.AppendLine(
-                "/// Resolves the observable that drives a control's IsEnabled.");
+                "/// Resolves the observable that drives a control's IsEnabled for the");
+            sb.AppendLine(
+                "/// few flags whose rule is hand-written on view-model state (a");
+            sb.AppendLine(
+                "/// &lt;c&gt;FooEnabledObservable&lt;/c&gt; property), not a config predicate.");
             sb.AppendLine("/// </summary>");
             sb.AppendLine("internal static class FlagIncludedResolver");
             sb.AppendLine("{");
@@ -546,37 +443,49 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
 
         sb.AppendLine();
         sb.AppendLine("/// <summary>");
-        sb.AppendLine("/// Creates the generated control for a config property from its name alone,");
-        sb.AppendLine("/// for callers that only have the name at runtime (the preset diff). Null");
-        sb.AppendLine("/// when the field has no generated control: a gated ComboBox/numeric, or a");
-        sb.AppendLine("/// flag whose control was deliberately left hand-written.");
+        sb.AppendLine("/// Creates the shared control for a config flag from its <c>ConfigFlag</c>,");
+        sb.AppendLine("/// for the preset diff (which names changed fields by that enum). Each");
+        sb.AppendLine("/// Min/Max pair end maps to its own box, with the end's optional caption");
+        sb.AppendLine("/// shown above it. Null when the field has no control (an opt-out numeric,");
+        sb.AppendLine("/// or a flag whose control was deliberately left hand-written).");
         sb.AppendLine("/// </summary>");
         sb.AppendLine("internal static class FlagControlFactory");
         sb.AppendLine("{");
         sb.AppendLine(
-            "    public static global::Avalonia.Controls.Control? Create(string fieldName)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        switch (fieldName)");
+            "    public static global::Avalonia.Controls.Control? Create(ConfigFlag flag)");
+        sb.AppendLine("        {");
+        sb.AppendLine(
+            "        // ConfigFlag is a dense enum (implicit 0..N), so Roslyn lowers this");
+        sb.AppendLine(
+            "        // switch to an IL switch jump table - O(1), not a linear scan.");
+        sb.AppendLine("        switch (flag)");
         sb.AppendLine("        {");
 
         foreach (var field in classInfo.ControlFields
                      .OrderBy(f => f.PropertyName, StringComparer.Ordinal))
         {
-            if (field.Kind == ControlKind.NumericPair && field.PairMembers is not null)
+            sb.AppendLine($"            case ConfigFlag.{field.PropertyName}:");
+
+            if (field.Kind == ControlKind.Numeric)
             {
-                // Diff reports the Min/Max config properties individually; both ends
-                // share the one merged control, named after the Min field minus Min.
-                foreach (var member in field.PairMembers)
-                {
-                    sb.AppendLine($"            case \"{member.PropertyName}\":");
-                }
-            }
-            else
-            {
-                sb.AppendLine($"            case \"{field.PropertyName}\":");
+                // A numeric gets the diff composite (optional caption + one box) so
+                // a Min/Max end shown on its own still carries its caption.
+                sb.AppendLine(
+                    "                return global::CrossPlatformUI.Controls" +
+                    $".NumericDiffControl.Build(ConfigFlag.{field.PropertyName});");
+                continue;
             }
 
-            sb.AppendLine($"                return new {field.PropertyName}();");
+            var controlType = field.Kind switch
+            {
+                ControlKind.CheckBox => "Z2CheckBox",
+                ControlKind.ComboBox => "Z2ComboBox",
+                _ => "Z2CheckBox",
+            };
+
+            sb.AppendLine(
+                $"                return new global::CrossPlatformUI.Controls.{controlType} " +
+                $"{{ Flag = ConfigFlag.{field.PropertyName} }};");
         }
 
         sb.AppendLine("            default:");
@@ -588,1187 +497,164 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
         return sb.ToString();
     }
 
-    private static string GenerateControl(
-        ClassGenerationInfo classInfo,
-        ControlFieldInfo field)
+    /// <summary>
+    /// Emits the <c>ConfigFlag</c> -&gt; <see cref="FlagFieldInfo"/>-derived metadata
+    /// table the shared controls read at attach time. Config accessors are literal
+    /// references (<c>c =&gt; c.X</c>), so a renamed property is a build error, which
+    /// is the whole point of generating this rather than looking the flag up by
+    /// reflection. Captions/tooltips are compile-time <c>Resources.X</c> references,
+    /// except for a Min/Max pair end, whose caption and shared tooltip are optional
+    /// and therefore read late through <c>ResourceManager</c>.
+    /// </summary>
+    private static string GenerateFlagRegistry(List<FlagFieldInfo> fields)
     {
-        if (field.Kind == ControlKind.ComboBox)
-            return GenerateComboBox(classInfo, field);
-
-        if (field.Kind == ControlKind.Numeric)
-            return GenerateNumeric(classInfo, field);
-
-        if (field.Kind == ControlKind.NumericPair)
-            return GenerateNumericPair(classInfo, field);
-
         var sb = new StringBuilder();
-        var configType = classInfo.ConfigType;
 
         sb.AppendLine("// <auto-generated/>");
         sb.AppendLine("#nullable enable");
-        sb.AppendLine("using Avalonia;");
-        sb.AppendLine("using Avalonia.Controls;");
-        sb.AppendLine("using Avalonia.VisualTree;");
-        sb.AppendLine("using System;");
-        sb.AppendLine("using System.ComponentModel;");
+        sb.AppendLine();
+        // ConfigFlag is emitted into RandomizerCore next to the config it names.
+        sb.AppendLine($"using {FlagsNamespace};");
         sb.AppendLine();
         sb.AppendLine($"namespace {Namespace};");
         sb.AppendLine();
-
         sb.AppendLine("/// <summary>");
-        sb.AppendLine(
-            $"/// Binds <c>{configType}.{field.PropertyName}</c> to a CheckBox.");
-        sb.AppendLine(
-            $"/// Tri-state: {(field.IsNullable ? "yes (bool?)" : "no (bool)")}.");
+        sb.AppendLine("/// Maps each <c>ConfigFlag</c> to the metadata its control needs.");
         sb.AppendLine("/// </summary>");
-        sb.AppendLine(
-            $"public sealed class {field.PropertyName} : CheckBox");
+        sb.AppendLine("internal static class FlagRegistry");
         sb.AppendLine("{");
-        sb.AppendLine();
         sb.AppendLine(
-            "    // Avalonia's type selectors (Selector=\"CheckBox\", including the one");
+            "    private static readonly global::System.Collections.Generic.Dictionary<");
         sb.AppendLine(
-            "    // Material.Avalonia uses to supply the template) match on StyleKey, which");
-        sb.AppendLine(
-            "    // defaults to the *concrete* type. Without this override every CheckBox style");
-        sb.AppendLine(
-            "    // and the theme are skipped: the control still handles clicks and still shows");
-        sb.AppendLine(
-            "    // its Content, but has no template, so the box itself never draws.");
-        sb.AppendLine("    protected override Type StyleKeyOverride => typeof(CheckBox);");
-        sb.AppendLine();
-
-        sb.AppendLine(
-            $"    private const string ConfigPropertyName = " +
-            $"nameof({configType}.{field.PropertyName});");
-        sb.AppendLine();
-
-        if (field.IsDifficultyOnly)
-        {
-            sb.AppendLine(
-                "    private const string ShareSeedPropertyName = " +
-                $"nameof({configType}.ShareSeedAcrossDifficulty);");
-            sb.AppendLine();
-            sb.AppendLine(
-                "    private const string DifficultyOnlyClassName = \"DifficultyOnly\";");
-            sb.AppendLine();
-        }
-
-        sb.AppendLine($"    private {configType}? _config;");
-        sb.AppendLine(
-            "    private PropertyChangedEventHandler? _configPropertyChanged;");
-        sb.AppendLine("    private bool _syncing;");
-
-        if (field.IncludedResolverMethod is not null)
-        {
-            sb.AppendLine(
-                "    private global::System.IDisposable? _includedSubscription;");
-        }
-
-        sb.AppendLine();
-
-        sb.AppendLine($"    public {field.PropertyName}()");
-        sb.AppendLine("    {");
-        sb.AppendLine(
-            "        // A wrapping TextBlock, not a bare string: Avalonia renders string content");
-        sb.AppendLine("        // with TextWrapping=NoWrap, so long labels get clipped at the panel edge");
-        sb.AppendLine(
-            "        // instead of wrapping. This is what the hand-written <LineBreak/>s in the");
-        sb.AppendLine("        // views were working around.");
-        sb.AppendLine("        Content = new Avalonia.Controls.TextBlock");
-        sb.AppendLine("        {");
-        sb.AppendLine(
-            $"            Text = global::{ResourcesNamespace}.Resources.{field.PropertyName},");
-        sb.AppendLine("            TextWrapping = Avalonia.Media.TextWrapping.Wrap,");
-        sb.AppendLine("        };");
-        sb.AppendLine();
-        sb.AppendLine(
-            "        var toolTip = " +
-            $"global::{ResourcesNamespace}.Resources.{field.TooltipResourceName};");
-        sb.AppendLine();
-        sb.AppendLine(
-            "        // An empty resource means \"no tooltip\": Avalonia would otherwise show");
-        sb.AppendLine(
-            "        // an empty popup for every property that has no description yet.");
-        sb.AppendLine(
-            "        if (!string.IsNullOrEmpty(toolTip))");
-        sb.AppendLine("            ToolTip.SetTip(this, toolTip);");
-        sb.AppendLine();
-        sb.AppendLine(
-            $"        IsThreeState = {(field.IsNullable ? "true" : "false")};");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        // DataContext can change before or after attachment. Rebind when it changes,
-        // but let attachment perform the initial bind when the control enters a tree.
-        sb.AppendLine(
-            "    protected override void OnDataContextChanged(EventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnDataContextChanged(e);");
-        sb.AppendLine();
-        sb.AppendLine("        if (VisualRoot is not null)");
-        sb.AppendLine("            Rebind(DataContext);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        sb.AppendLine(
-            "    protected override void OnAttachedToVisualTree(");
-        sb.AppendLine(
-            "        VisualTreeAttachmentEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnAttachedToVisualTree(e);");
-        sb.AppendLine();
-        sb.AppendLine("        Rebind(DataContext);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        sb.AppendLine(
-            "    protected override void OnDetachedFromVisualTree(");
-        sb.AppendLine(
-            "        VisualTreeAttachmentEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        Unbind();");
-        sb.AppendLine();
-        sb.AppendLine("        base.OnDetachedFromVisualTree(e);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        sb.AppendLine("    protected override void OnPropertyChanged(");
-        sb.AppendLine("        AvaloniaPropertyChangedEventArgs change)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnPropertyChanged(change);");
-        sb.AppendLine();
-        sb.AppendLine(
-            "        if (_syncing || _config is null || " +
-            "change.Property != IsCheckedProperty)");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-
-        if (field.IsNullable)
-        {
-            sb.AppendLine(
-                $"        _config.{field.PropertyName} = IsChecked;");
-        }
-        else
-        {
-            sb.AppendLine(
-                $"        _config.{field.PropertyName} = IsChecked is true;");
-        }
-
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        sb.AppendLine("    private void Rebind(object? dataContext)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        Unbind();");
-        sb.AppendLine();
-
-        if (field.IncludedResolverMethod is not null)
-        {
-            sb.AppendLine(
-                "        // This flag only participates while its <c>Included</c> guard is");
-            sb.AppendLine(
-                "        // on. The observable is StartWith-ed, so the initial value lands");
-            sb.AppendLine(
-                "        // synchronously and the box is never briefly enabled or stale.");
-            sb.AppendLine(
-                $"        _includedSubscription = FlagIncludedResolver.{field.IncludedResolverMethod}(" +
-                "dataContext)");
-            sb.AppendLine("            ?.Subscribe(onNext: value => IsEnabled = value);");
-            sb.AppendLine();
-        }
-
-        sb.AppendLine(
-            "        var config = RandomizerConfigResolver.Resolve(dataContext);");
-        sb.AppendLine("        if (config is null)");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-        sb.AppendLine("        _config = config;");
-        sb.AppendLine(
-            "        _configPropertyChanged = OnConfigPropertyChanged;");
-        sb.AppendLine(
-            "        _config.PropertyChanged += _configPropertyChanged;");
-        sb.AppendLine();
-        sb.AppendLine("        PushConfigToControl();");
-
-        if (field.IsDifficultyOnly)
-        {
-            sb.AppendLine("        UpdateDifficultyOnlyClass();");
-        }
-
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        sb.AppendLine("    private void Unbind()");
+            "        ConfigFlag, global::CrossPlatformUI.Controls.FlagEntry> Entries = new()");
         sb.AppendLine("    {");
 
-        if (field.IncludedResolverMethod is not null)
+        foreach (var info in fields.OrderBy(
+                     f => f.Field.PropertyName,
+                     StringComparer.Ordinal))
         {
-            sb.AppendLine("        _includedSubscription?.Dispose();");
-            sb.AppendLine("        _includedSubscription = null;");
-            sb.AppendLine();
-        }
+            var field = info.Field;
+            var name = field.PropertyName;
 
-        sb.AppendLine(
-            "        if (_config is not null && " +
-            "_configPropertyChanged is not null)");
-        sb.AppendLine("        {");
-        sb.AppendLine(
-            "            _config.PropertyChanged -= _configPropertyChanged;");
-        sb.AppendLine("        }");
-        sb.AppendLine();
-        sb.AppendLine("        _config = null;");
-        sb.AppendLine("_configPropertyChanged = null;");
-
-        if (field.IsDifficultyOnly)
-        {
-            // No config means no answer for ShareSeedAcrossDifficulty, so the class
-            // comes off rather than staying stale from a previous DataContext.
-            sb.AppendLine("        UpdateDifficultyOnlyClass();");
-        }
-
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        sb.AppendLine(
-            "    private void OnConfigPropertyChanged(");
-        sb.AppendLine(
-            "        object? sender, PropertyChangedEventArgs e)");
-        sb.AppendLine("    {");
-
-        if (field.IsDifficultyOnly)
-        {
             sb.AppendLine(
-                "        if (e.PropertyName == ShareSeedPropertyName)");
+                $"        [ConfigFlag.{name}] = " +
+                "new global::CrossPlatformUI.Controls.FlagEntry");
             sb.AppendLine("        {");
-            sb.AppendLine("            UpdateDifficultyOnlyClass();");
-            sb.AppendLine("            return;");
-            sb.AppendLine("        }");
-            sb.AppendLine();
-        }
 
-        sb.AppendLine(
-            "        if (e.PropertyName != ConfigPropertyName)");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-        sb.AppendLine("        PushConfigToControl();");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        sb.AppendLine("    private void PushConfigToControl()");
-        sb.AppendLine("    {");
-        sb.AppendLine("        if (_config is null)");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-        sb.AppendLine("        _syncing = true;");
-        sb.AppendLine("        try");
-        sb.AppendLine("        {");
-        sb.AppendLine(
-            $"            IsChecked = _config.{field.PropertyName};");
-        sb.AppendLine("        }");
-        sb.AppendLine("        finally");
-        sb.AppendLine("        {");
-        sb.AppendLine("            _syncing = false;");
-        sb.AppendLine("        }");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        AppendDifficultyOnlyEmitter(sb, field);
-
-        sb.AppendLine("}");
-
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Emits the members that keep the "DifficultyOnly" style class in sync with
-    /// <c>ShareSeedAcrossDifficulty</c>, for a control whose config field carries
-    /// <c>[DifficultyOnly]</c>. No-op for every other field, so nothing is emitted
-    /// unless the attribute is actually there.
-    /// </summary>
-    private static void AppendDifficultyOnlyEmitter(
-        StringBuilder sb,
-        ControlFieldInfo field)
-    {
-        if (!field.IsDifficultyOnly)
-            return;
-
-        sb.AppendLine("    /// <summary>");
-        sb.AppendLine(
-            "    /// Difficulty-only flags are shown read-only while the seed is shared");
-        sb.AppendLine(
-            "    /// across difficulties: App.axaml's <c>.DifficultyOnly</c> selectors do");
-        sb.AppendLine(
-            "    /// the graying, and this control only has to keep the class in sync, so");
-        sb.AppendLine(
-            "    /// no view has to repeat the binding.");
-        sb.AppendLine("    /// </summary>");
-        sb.AppendLine("    private void UpdateDifficultyOnlyClass()");
-        sb.AppendLine("    {");
-        sb.AppendLine(
-            "        var difficultyOnly = " +
-            "_config?.ShareSeedAcrossDifficulty ?? false;");
-        sb.AppendLine(
-            "        if (difficultyOnly == " +
-            "Classes.Contains(DifficultyOnlyClassName))");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-        sb.AppendLine("        if (difficultyOnly)");
-        sb.AppendLine("            Classes.Add(DifficultyOnlyClassName);");
-        sb.AppendLine("        else");
-        sb.AppendLine("            Classes.Remove(DifficultyOnlyClassName);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-    }
-
-    private static string GenerateComboBox(
-        ClassGenerationInfo classInfo,
-        ControlFieldInfo field)
-    {
-        var sb = new StringBuilder();
-        var configType = classInfo.ConfigType;
-        var enumType = field.EnumType!;
-        const string enumDescription =
-            "global::Z2Randomizer.RandomizerCore.EnumDescription";
-        const string ThemeKey = "MaterialOutlineComboBox";
-        var itemsSource =
-            "global::Z2Randomizer.RandomizerCore.Enums." +
-            field.PropertyName + "List";
-
-        sb.AppendLine("// <auto-generated/>");
-        sb.AppendLine("#nullable enable");
-        sb.AppendLine("using Avalonia;");
-        sb.AppendLine("using Avalonia.Controls;");
-        sb.AppendLine("using Avalonia.Controls.Templates;");
-        sb.AppendLine("using Avalonia.Layout;");
-        sb.AppendLine("using Avalonia.VisualTree;");
-        sb.AppendLine("using System;");
-        sb.AppendLine("using System.ComponentModel;");
-        sb.AppendLine("using System.Linq;");
-        sb.AppendLine();
-        sb.AppendLine($"namespace {Namespace};");
-        sb.AppendLine();
-        sb.AppendLine("/// <summary>");
-        sb.AppendLine(
-            $"/// Binds <c>{configType}.{field.PropertyName}</c> to a ComboBox.");
-        sb.AppendLine("/// </summary>");
-        sb.AppendLine($"public sealed class {field.PropertyName} : ComboBox");
-        sb.AppendLine("{");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    // Avalonia style selectors match on StyleKey; without this override");
-        sb.AppendLine(
-            "    // the theme's ComboBox template would not be applied.");
-        sb.AppendLine(
-            "    protected override Type StyleKeyOverride => typeof(ComboBox);");
-        sb.AppendLine();
-        sb.AppendLine(
-            $"    private const string ConfigPropertyName = " +
-            $"nameof({configType}.{field.PropertyName});");
-        sb.AppendLine();
-
-        if (field.IsDifficultyOnly)
-        {
-            sb.AppendLine(
-                "    private const string ShareSeedPropertyName = " +
-                $"nameof({configType}.ShareSeedAcrossDifficulty);");
-            sb.AppendLine();
-            sb.AppendLine(
-                "    private const string DifficultyOnlyClassName = \"DifficultyOnly\";");
-            sb.AppendLine();
-        }
-
-        sb.AppendLine(
-            "    private readonly global::System.Collections.Generic.List<" +
-            $"{enumDescription}> _items;");
-        sb.AppendLine();
-        sb.AppendLine($"    private {configType}? _config;");
-        sb.AppendLine(
-            "    private PropertyChangedEventHandler? _configPropertyChanged;");
-        sb.AppendLine("    private bool _syncing;");
-
-        if (field.IncludedResolverMethod is not null)
-        {
-            sb.AppendLine(
-                "    private global::System.IDisposable? _includedSubscription;");
-        }
-
-        sb.AppendLine();
-        sb.AppendLine($"    public {field.PropertyName}()");
-        sb.AppendLine("    {");
-        sb.AppendLine($"        _items = {itemsSource}.ToList();");
-        sb.AppendLine("        ItemsSource = _items;");
-        sb.AppendLine();
-        sb.AppendLine(
-            "        // Material's outline variant. Resolved from the Application resource");
-        sb.AppendLine(
-            "        // host, which is the same lookup the XAML compiler performs for");
-        sb.AppendLine(
-            "        // Theme=\"{StaticResource MaterialOutlineComboBox}\".");
-        sb.AppendLine(
-            "        if (global::Avalonia.Application.Current is { } app &&");
-        sb.AppendLine(
-            $"            app.TryFindResource(\"{ThemeKey}\", out var outline) &&");
-        sb.AppendLine(
-            "            outline is global::Avalonia.Styling.ControlTheme outlineTheme)");
-        sb.AppendLine("        {");
-        sb.AppendLine("            Theme = outlineTheme;");
-        sb.AppendLine("        }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "        var toolTip = " +
-            $"global::{ResourcesNamespace}.Resources.{field.TooltipResourceName};");
-        sb.AppendLine("        if (!string.IsNullOrEmpty(toolTip))");
-        sb.AppendLine("            ToolTip.SetTip(this, toolTip);");
-        sb.AppendLine();
-        sb.AppendLine(
-            "        var label = " +
-            $"global::{ResourcesNamespace}.Resources.{field.PropertyName};");
-        sb.AppendLine("        if (!string.IsNullOrEmpty(label))");
-        sb.AppendLine(
-            "            global::Material.Styles.Assists.ComboBoxAssist.SetLabel(this, label);");
-
-        if (field.HasInfo)
-        {
-            sb.AppendLine();
-            sb.AppendLine(
-                "        // Options may carry a right-aligned detail column: the");
-            sb.AppendLine(
-                "        // text after the ';' in the enum member's [Description].");
-            sb.AppendLine(
-                $"        ItemTemplate = new FuncDataTemplate<{enumDescription}>(");
-            sb.AppendLine("            (data, _) =>");
-            sb.AppendLine("            {");
-            sb.AppendLine("                if (data is null)");
-            sb.AppendLine("                {");
-            sb.AppendLine(
-                "                    // The closed ComboBox runs the template for a null");
-            sb.AppendLine(
-                "                    // selection while PushConfigToControl clears it.");
-            sb.AppendLine("                    return null;");
-            sb.AppendLine("                }");
-            sb.AppendLine();
-            sb.AppendLine(
-                "                var grid = new Grid { ColumnDefinitions = " +
-                "new ColumnDefinitions(\"Auto, *\") };");
-            sb.AppendLine(
-                "                var description = new TextBlock { Text = data.Description };");
-            sb.AppendLine("                Grid.SetColumn(description, 0);");
-            sb.AppendLine("                grid.Children.Add(description);");
-            sb.AppendLine(
-                "                if (!string.IsNullOrEmpty(data.Info))");
-            sb.AppendLine("                {");
-            sb.AppendLine(
-                "                    var info = new TextBlock");
-            sb.AppendLine("                    {");
-            sb.AppendLine("                        Text = data.Info,");
-            sb.AppendLine(
-                "                        HorizontalAlignment = HorizontalAlignment.Right,");
-            sb.AppendLine("                    };");
-            sb.AppendLine("                    Grid.SetColumn(info, 1);");
-            sb.AppendLine("                    grid.Children.Add(info);");
-            sb.AppendLine("                }");
-            sb.AppendLine("                return grid;");
-            sb.AppendLine("            });");
-        }
-
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    protected override void OnDataContextChanged(EventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnDataContextChanged(e);");
-        sb.AppendLine();
-        sb.AppendLine("        if (VisualRoot is not null)");
-        sb.AppendLine("            Rebind(DataContext);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    protected override void OnAttachedToVisualTree(");
-        sb.AppendLine(
-            "        VisualTreeAttachmentEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnAttachedToVisualTree(e);");
-        sb.AppendLine();
-        sb.AppendLine("        Rebind(DataContext);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    protected override void OnDetachedFromVisualTree(");
-        sb.AppendLine(
-            "        VisualTreeAttachmentEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        Unbind();");
-        sb.AppendLine();
-        sb.AppendLine("        base.OnDetachedFromVisualTree(e);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    protected override void OnPropertyChanged(");
-        sb.AppendLine("        AvaloniaPropertyChangedEventArgs change)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnPropertyChanged(change);");
-        sb.AppendLine();
-        sb.AppendLine(
-            "        if (_syncing || _config is null || " +
-            "change.Property != SelectedItemProperty)");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-        sb.AppendLine(
-            $"        if (SelectedItem is {enumDescription} item && " +
-            $"item.Value is {enumType} value)");
-        sb.AppendLine($"            _config.{field.PropertyName} = value;");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void Rebind(object? dataContext)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        Unbind();");
-        sb.AppendLine();
-
-        if (field.IncludedResolverMethod is not null)
-        {
-            sb.AppendLine(
-                "        // This flag only participates while its <c>Included</c> guard is");
-            sb.AppendLine(
-                "        // on. The observable is StartWith-ed, so the initial value lands");
-            sb.AppendLine(
-                "        // synchronously and the list is never briefly enabled or stale.");
-            sb.AppendLine(
-                $"        _includedSubscription = FlagIncludedResolver.{field.IncludedResolverMethod}(" +
-                "dataContext)");
-            sb.AppendLine(
-                "            ?.Subscribe(onNext: value => IsEnabled = value);");
-            sb.AppendLine();
-        }
-
-        sb.AppendLine(
-            "        var config = RandomizerConfigResolver.Resolve(dataContext);");
-        sb.AppendLine("        if (config is null)");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-        sb.AppendLine("        _config = config;");
-        sb.AppendLine(
-            "        _configPropertyChanged = OnConfigPropertyChanged;");
-        sb.AppendLine(
-            "        _config.PropertyChanged += _configPropertyChanged;");
-        sb.AppendLine();
-        sb.AppendLine("        PushConfigToControl();");
-
-        if (field.IsDifficultyOnly)
-        {
-            sb.AppendLine("        UpdateDifficultyOnlyClass();");
-        }
-
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void Unbind()");
-        sb.AppendLine("    {");
-
-        if (field.IncludedResolverMethod is not null)
-        {
-            sb.AppendLine("        _includedSubscription?.Dispose();");
-            sb.AppendLine("        _includedSubscription = null;");
-            sb.AppendLine();
-        }
-
-        sb.AppendLine(
-            "        if (_config is not null && " +
-            "_configPropertyChanged is not null)");
-        sb.AppendLine("        {");
-        sb.AppendLine(
-            "            _config.PropertyChanged -= _configPropertyChanged;");
-        sb.AppendLine("        }");
-        sb.AppendLine();
-        sb.AppendLine("        _config = null;");
-        sb.AppendLine("        _configPropertyChanged = null;");
-
-        if (field.IsDifficultyOnly)
-        {
-            // No config means no answer for ShareSeedAcrossDifficulty, so the class
-            // comes off rather than staying stale from a previous DataContext.
-            sb.AppendLine("        UpdateDifficultyOnlyClass();");
-        }
-
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    private void OnConfigPropertyChanged(");
-        sb.AppendLine(
-            "        object? sender, PropertyChangedEventArgs e)");
-        sb.AppendLine("    {");
-
-        if (field.IsDifficultyOnly)
-        {
-            sb.AppendLine(
-                "        if (e.PropertyName == ShareSeedPropertyName)");
-            sb.AppendLine("        {");
-            sb.AppendLine("            UpdateDifficultyOnlyClass();");
-            sb.AppendLine("            return;");
-            sb.AppendLine("        }");
-            sb.AppendLine();
-        }
-
-        sb.AppendLine(
-            "        if (e.PropertyName != ConfigPropertyName)");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-        sb.AppendLine("        PushConfigToControl();");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void PushConfigToControl()");
-        sb.AppendLine("    {");
-        sb.AppendLine("        if (_config is null)");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-        sb.AppendLine("        _syncing = true;");
-        sb.AppendLine("        try");
-        sb.AppendLine("        {");
-        sb.AppendLine(
-            $"            var value = _config.{field.PropertyName};");
-        sb.AppendLine("            SelectedItem = null;");
-        sb.AppendLine("            foreach (var item in _items)");
-        sb.AppendLine("            {");
-        sb.AppendLine("                if (Equals(item.Value, value))");
-        sb.AppendLine("                {");
-        sb.AppendLine("                    SelectedItem = item;");
-        sb.AppendLine("                    break;");
-        sb.AppendLine("                }");
-        sb.AppendLine("            }");
-        sb.AppendLine("        }");
-        sb.AppendLine("        finally");
-        sb.AppendLine("        {");
-        sb.AppendLine("            _syncing = false;");
-        sb.AppendLine("        }");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        AppendDifficultyOnlyEmitter(sb, field);
-
-        sb.AppendLine("}");
-
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Emits an integer NumericUpDown bound to a single <c>int</c>/<c>int?</c> config
-    /// field. Bounds are read from the field's <c>[Minimum]</c>/<c>[Maximum]</c>, the
-    /// Material hint (floating label) from <c>Resources.&lt;PropertyName&gt;</c>.
-    /// </summary>
-    private static string GenerateNumeric(
-        ClassGenerationInfo classInfo,
-        ControlFieldInfo field)
-    {
-        var sb = new StringBuilder();
-        var configType = classInfo.ConfigType;
-        var typeName = field.PropertyName;
-
-        sb.AppendLine("// <auto-generated/>");
-        sb.AppendLine("#nullable enable");
-        sb.AppendLine("using Avalonia;");
-        sb.AppendLine("using Avalonia.Controls;");
-        sb.AppendLine("using Avalonia.VisualTree;");
-        sb.AppendLine("using System;");
-        sb.AppendLine("using System.ComponentModel;");
-        sb.AppendLine();
-        sb.AppendLine($"namespace {Namespace};");
-        sb.AppendLine();
-        sb.AppendLine("/// <summary>");
-        sb.AppendLine($"/// Binds <c>{configType}.{typeName}</c> to an integer NumericUpDown.");
-        sb.AppendLine("/// </summary>");
-        sb.AppendLine($"public sealed class {typeName} : NumericUpDown");
-        sb.AppendLine("{");
-        sb.AppendLine(
-            "    // The Material theme selects NumericUpDown templates on StyleKey;");
-        sb.AppendLine(
-            "    // without this override the concrete type has no template.");
-        sb.AppendLine(
-            "    protected override Type StyleKeyOverride => typeof(NumericUpDown);");
-        sb.AppendLine();
-        sb.AppendLine(
-            $"    private const string ConfigPropertyName = nameof({configType}.{typeName});");
-        sb.AppendLine();
-
-        if (field.IsDifficultyOnly)
-        {
-            sb.AppendLine(
-                "    private const string ShareSeedPropertyName = " +
-                $"nameof({configType}.ShareSeedAcrossDifficulty);");
-            sb.AppendLine();
-            sb.AppendLine(
-                "    private const string DifficultyOnlyClassName = \"DifficultyOnly\";");
-            sb.AppendLine();
-        }
-
-        sb.AppendLine($"    private {configType}? _config;");
-        sb.AppendLine(
-            "    private PropertyChangedEventHandler? _configPropertyChanged;");
-        sb.AppendLine("    private bool _syncing;");
-        sb.AppendLine();
-        sb.AppendLine($"    public {typeName}()");
-        sb.AppendLine("    {");
-        sb.AppendLine("        FormatString = \"N0\";");
-        sb.AppendLine(
-            "        ParsingNumberStyle = global::System.Globalization.NumberStyles.Integer;");
-        sb.AppendLine("        ClipValueToMinMax = true;");
-        sb.AppendLine($"        Minimum = {field.NumericMinimum};");
-        sb.AppendLine($"        Maximum = {field.NumericMaximum};");
-        sb.AppendLine("        Height = 72;");
-        sb.AppendLine();
-        sb.AppendLine(
-            $"        global::Material.Styles.Assists.TextFieldAssist.SetHints(" +
-            $"this, global::{ResourcesNamespace}.Resources.{typeName});");
-        sb.AppendLine();
-        sb.AppendLine(
-            $"        var toolTip = global::{ResourcesNamespace}.Resources.ResourceManager" +
-            $".GetString(\"{field.TooltipResourceName}\");");
-        sb.AppendLine("        if (!string.IsNullOrEmpty(toolTip))");
-        sb.AppendLine("            ToolTip.SetTip(this, toolTip);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    protected override void OnDataContextChanged(EventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnDataContextChanged(e);");
-        sb.AppendLine("        if (VisualRoot is not null)");
-        sb.AppendLine("            Rebind(DataContext);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    protected override void OnAttachedToVisualTree(");
-        sb.AppendLine(
-            "        VisualTreeAttachmentEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnAttachedToVisualTree(e);");
-        sb.AppendLine("        Rebind(DataContext);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    protected override void OnDetachedFromVisualTree(");
-        sb.AppendLine(
-            "        VisualTreeAttachmentEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        Unbind();");
-        sb.AppendLine("        base.OnDetachedFromVisualTree(e);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    protected override void OnPropertyChanged(");
-        sb.AppendLine("        AvaloniaPropertyChangedEventArgs change)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnPropertyChanged(change);");
-        sb.AppendLine(
-            "        if (_syncing || _config is null || change.Property != ValueProperty)");
-        sb.AppendLine("            return;");
-        sb.AppendLine();
-
-        if (field.IsNumericNullable)
-        {
-            sb.AppendLine($"        _config.{typeName} = (int?)Value;");
-        }
-        else
-        {
-            sb.AppendLine($"        if (Value is {{ }} value)");
-            sb.AppendLine($"            _config.{typeName} = (int)value;");
-        }
-
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void Rebind(object? dataContext)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        Unbind();");
-        sb.AppendLine("        var config = RandomizerConfigResolver.Resolve(dataContext);");
-        sb.AppendLine("        if (config is null)");
-        sb.AppendLine("            return;");
-        sb.AppendLine("        _config = config;");
-        sb.AppendLine(
-            "        _configPropertyChanged = OnConfigPropertyChanged;");
-        sb.AppendLine("        _config.PropertyChanged += _configPropertyChanged;");
-        sb.AppendLine();
-        sb.AppendLine("        PushConfigToControl();");
-
-        if (field.IsDifficultyOnly)
-        {
-            sb.AppendLine("        UpdateDifficultyOnlyClass();");
-        }
-
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void Unbind()");
-        sb.AppendLine("    {");
-        sb.AppendLine(
-            "        if (_config is not null && _configPropertyChanged is not null)");
-        sb.AppendLine("        {");
-        sb.AppendLine("            _config.PropertyChanged -= _configPropertyChanged;");
-        sb.AppendLine("        }");
-        sb.AppendLine("        _config = null;");
-        sb.AppendLine("        _configPropertyChanged = null;");
-
-        if (field.IsDifficultyOnly)
-        {
-            sb.AppendLine("        UpdateDifficultyOnlyClass();");
-        }
-
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void OnConfigPropertyChanged(");
-        sb.AppendLine("        object? sender, PropertyChangedEventArgs e)");
-        sb.AppendLine("    {");
-
-        if (field.IsDifficultyOnly)
-        {
-            sb.AppendLine("        if (e.PropertyName == ShareSeedPropertyName)");
-            sb.AppendLine("        {");
-            sb.AppendLine("            UpdateDifficultyOnlyClass();");
-            sb.AppendLine("            return;");
-            sb.AppendLine("        }");
-            sb.AppendLine();
-        }
-
-        sb.AppendLine("        if (e.PropertyName != ConfigPropertyName)");
-        sb.AppendLine("            return;");
-        sb.AppendLine("        PushConfigToControl();");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void PushConfigToControl()");
-        sb.AppendLine("    {");
-        sb.AppendLine("        if (_config is null)");
-        sb.AppendLine("            return;");
-        sb.AppendLine("        _syncing = true;");
-        sb.AppendLine("        try");
-        sb.AppendLine("        {");
-        sb.AppendLine($"            Value = _config.{typeName};");
-        sb.AppendLine("        }");
-        sb.AppendLine("        finally");
-        sb.AppendLine("        {");
-        sb.AppendLine("            _syncing = false;");
-        sb.AppendLine("        }");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-
-        AppendDifficultyOnlyEmitter(sb, field);
-
-        sb.AppendLine("}");
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Emits a two-box Min/Max pair bound to two sibling config fields
-    /// (<c>[UiNumericPair]</c>). The Min box's upper bound tracks the Max field and
-    /// vice versa, mirroring the hand-written
-    /// <c>Minimum="&#123;Binding ...Max&#125;"</c> cross-bindings. An optional caption
-    /// is shown when <c>Resources.&lt;ControlName&gt;</c> is non-empty.
-    /// </summary>
-    private static string GenerateNumericPair(
-        ClassGenerationInfo classInfo,
-        ControlFieldInfo field)
-    {
-        var sb = new StringBuilder();
-        var configType = classInfo.ConfigType;
-        var typeName = field.PropertyName;
-        var minMember = field.PairMembers![0];
-        var maxMember = field.PairMembers[1];
-
-        sb.AppendLine("// <auto-generated/>");
-        sb.AppendLine("#nullable enable");
-        sb.AppendLine("using Avalonia;");
-        sb.AppendLine("using Avalonia.Controls;");
-        sb.AppendLine("using Avalonia.Layout;");
-        sb.AppendLine("using Avalonia.VisualTree;");
-        sb.AppendLine("using System;");
-        sb.AppendLine("using System.ComponentModel;");
-        sb.AppendLine();
-        sb.AppendLine($"namespace {Namespace};");
-        sb.AppendLine();
-        sb.AppendLine("/// <summary>");
-        sb.AppendLine(
-            $"/// Binds <c>{configType}.{minMember.PropertyName}</c> and");
-        sb.AppendLine(
-            $"/// <c>{configType}.{maxMember.PropertyName}</c> to two cross-bounded");
-        sb.AppendLine("/// NumericUpDowns.");
-        sb.AppendLine("/// </summary>");
-        sb.AppendLine($"public sealed class {typeName} : StackPanel");
-        sb.AppendLine("{");
-        sb.AppendLine(
-            $"    private const string ConfigMinPropertyName = " +
-            $"nameof({configType}.{minMember.PropertyName});");
-        sb.AppendLine(
-            $"    private const string ConfigMaxPropertyName = " +
-            $"nameof({configType}.{maxMember.PropertyName});");
-        sb.AppendLine();
-        sb.AppendLine("    private readonly NumericUpDown _min;");
-        sb.AppendLine("    private readonly NumericUpDown _max;");
-        sb.AppendLine($"    private {configType}? _config;");
-        sb.AppendLine(
-            "    private PropertyChangedEventHandler? _configPropertyChanged;");
-        sb.AppendLine("    private bool _syncing;");
-        sb.AppendLine();
-        sb.AppendLine($"    public {typeName}()");
-        sb.AppendLine("    {");
-        sb.AppendLine("        Orientation = global::Avalonia.Layout.Orientation.Vertical;");
-        sb.AppendLine();
-        sb.AppendLine(
-            $"        var caption = global::{ResourcesNamespace}.Resources.ResourceManager" +
-            $".GetString(\"{typeName}\");");
-        sb.AppendLine("        if (!string.IsNullOrEmpty(caption))");
-        sb.AppendLine("        {");
-        sb.AppendLine("            Children.Add(new TextBlock");
-        sb.AppendLine("            {");
-        sb.AppendLine("                Text = caption,");
-        sb.AppendLine("                Margin = new global::Avalonia.Thickness(2, 0, 0, 4),");
-        sb.AppendLine(
-            "                TextWrapping = global::Avalonia.Media.TextWrapping.Wrap,");
-        sb.AppendLine("            });");
-        sb.AppendLine();
-        sb.AppendLine(
-            $"            var toolTip = global::{ResourcesNamespace}.Resources" +
-            $".ResourceManager.GetString(\"{typeName}ToolTip\");");
-        sb.AppendLine("            if (!string.IsNullOrEmpty(toolTip))");
-        sb.AppendLine("                ToolTip.SetTip(this, toolTip);");
-        sb.AppendLine("        }");
-        sb.AppendLine();
-        sb.AppendLine("        var values = new Grid");
-        sb.AppendLine("        {");
-        sb.AppendLine("            ColumnDefinitions = new ColumnDefinitions(\"72,72\"),");
-        sb.AppendLine("            ColumnSpacing = 8,");
-        sb.AppendLine("            Margin = new global::Avalonia.Thickness(2, 0, 0, 0),");
-        sb.AppendLine("        };");
-        sb.AppendLine();
-        sb.AppendLine(
-            $"        _min = CreateNumericBox(\"{minMember.Label}\", " +
-            $"{minMember.Minimum}, {minMember.Maximum});");
-        sb.AppendLine(
-            $"        _max = CreateNumericBox(\"{maxMember.Label}\", " +
-            $"{maxMember.Minimum}, {maxMember.Maximum});");
-        sb.AppendLine("        _min.PropertyChanged += OnMinValueChanged;");
-        sb.AppendLine("        _max.PropertyChanged += OnMaxValueChanged;");
-        sb.AppendLine("        Grid.SetColumn(_min, 0);");
-        sb.AppendLine("        Grid.SetColumn(_max, 1);");
-        sb.AppendLine("        values.Children.Add(_min);");
-        sb.AppendLine("        values.Children.Add(_max);");
-        sb.AppendLine("        Children.Add(values);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    private static NumericUpDown CreateNumericBox(" +
-            "string hint, decimal minimum, decimal maximum)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        var box = new NumericUpDown");
-        sb.AppendLine("        {");
-        sb.AppendLine("            FormatString = \"N0\",");
-        sb.AppendLine(
-            "            ParsingNumberStyle = global::System.Globalization.NumberStyles.Integer,");
-        sb.AppendLine("            ClipValueToMinMax = true,");
-        sb.AppendLine("            Minimum = minimum,");
-        sb.AppendLine("            Maximum = maximum,");
-        sb.AppendLine("            Height = 72,");
-        sb.AppendLine("        };");
-        sb.AppendLine(
-            "        global::Material.Styles.Assists.TextFieldAssist.SetHints(box, hint);");
-        sb.AppendLine("        return box;");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void OnMinValueChanged(");
-        sb.AppendLine("        object? sender, AvaloniaPropertyChangedEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        if (e.Property != NumericUpDown.ValueProperty)");
-        sb.AppendLine("            return;");
-        sb.AppendLine("        if (_syncing || _config is null)");
-        sb.AppendLine("            return;");
-        AppendPairWriteBack(sb, "_min", "_config", minMember);
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void OnMaxValueChanged(");
-        sb.AppendLine("        object? sender, AvaloniaPropertyChangedEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        if (e.Property != NumericUpDown.ValueProperty)");
-        sb.AppendLine("            return;");
-        sb.AppendLine("        if (_syncing || _config is null)");
-        sb.AppendLine("            return;");
-        AppendPairWriteBack(sb, "_max", "_config", maxMember);
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    protected override void OnDataContextChanged(EventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnDataContextChanged(e);");
-        sb.AppendLine("        if (VisualRoot is not null)");
-        sb.AppendLine("            Rebind(DataContext);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    protected override void OnAttachedToVisualTree(");
-        sb.AppendLine(
-            "        VisualTreeAttachmentEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        base.OnAttachedToVisualTree(e);");
-        sb.AppendLine("        Rebind(DataContext);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine(
-            "    protected override void OnDetachedFromVisualTree(");
-        sb.AppendLine(
-            "        VisualTreeAttachmentEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        Unbind();");
-        sb.AppendLine("        base.OnDetachedFromVisualTree(e);");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void Rebind(object? dataContext)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        Unbind();");
-        sb.AppendLine("        var config = RandomizerConfigResolver.Resolve(dataContext);");
-        sb.AppendLine("        if (config is null)");
-        sb.AppendLine("            return;");
-        sb.AppendLine("        _config = config;");
-        sb.AppendLine(
-            "        _configPropertyChanged = OnConfigPropertyChanged;");
-        sb.AppendLine("        _config.PropertyChanged += _configPropertyChanged;");
-        sb.AppendLine("        PushConfigToControl();");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void Unbind()");
-        sb.AppendLine("    {");
-        sb.AppendLine(
-            "        if (_config is not null && _configPropertyChanged is not null)");
-        sb.AppendLine("        {");
-        sb.AppendLine("            _config.PropertyChanged -= _configPropertyChanged;");
-        sb.AppendLine("        }");
-        sb.AppendLine("        _config = null;");
-        sb.AppendLine("        _configPropertyChanged = null;");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void OnConfigPropertyChanged(");
-        sb.AppendLine("        object? sender, PropertyChangedEventArgs e)");
-        sb.AppendLine("    {");
-        sb.AppendLine("        if (e.PropertyName is not (ConfigMinPropertyName or " +
-            "ConfigMaxPropertyName))");
-        sb.AppendLine("            return;");
-        sb.AppendLine("        PushConfigToControl();");
-        sb.AppendLine("    }");
-        sb.AppendLine();
-        sb.AppendLine("    private void PushConfigToControl()");
-        sb.AppendLine("    {");
-        sb.AppendLine("        if (_config is null)");
-        sb.AppendLine("            return;");
-        sb.AppendLine("        _syncing = true;");
-        sb.AppendLine("        try");
-        sb.AppendLine("        {");
-        sb.AppendLine($"            _min.Value = _config.{minMember.PropertyName};");
-        sb.AppendLine($"            _max.Value = _config.{maxMember.PropertyName};");
-        sb.AppendLine(
-            "            // Cross-bounds: each box's far edge follows the sibling field,");
-        sb.AppendLine(
-            "            // replacing the hand-written Maximum/Minimum bindings.");
-        sb.AppendLine(
-            $"            _min.Maximum = {NullableBoundExpression(maxMember, "_config", maxMember.Maximum)};");
-        sb.AppendLine(
-            $"            _max.Minimum = {NullableBoundExpression(minMember, "_config", minMember.Minimum)};");
-        sb.AppendLine("        }");
-        sb.AppendLine("        finally");
-        sb.AppendLine("        {");
-        sb.AppendLine("            _syncing = false;");
-        sb.AppendLine("        }");
-        sb.AppendLine("    }");
-        sb.AppendLine("}");
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Emits the config write-back for one Min/Max box: nullable members store a
-    /// cleared box as null (the "roll randomly" state), non-nullable members only
-    /// write back when a value is present.
-    /// </summary>
-    private static void AppendPairWriteBack(
-        StringBuilder sb,
-        string box,
-        string config,
-        NumericPairMemberInfo member)
-    {
-        if (member.IsNullable)
-        {
-            sb.AppendLine($"        {config}.{member.PropertyName} = (int?){box}.Value;");
-        }
-        else
-        {
-            sb.AppendLine($"        if ({box}.Value is {{ }} value)");
-            sb.AppendLine($"            {config}.{member.PropertyName} = (int)value;");
-        }
-    }
-
-    private static string NullableBoundExpression(
-        NumericPairMemberInfo member,
-        string config,
-        int fallback)
-    {
-        return member.IsNullable
-            ? $"{config}.{member.PropertyName} ?? {fallback}"
-            : $"{config}.{member.PropertyName}";
-    }
-
-    /// <summary>
-    /// Finds the known RandomizerCore config plus UI-side types that expose it through
-    /// either Config or Main.Config.
-    /// </summary>
-    private static Dictionary<string, ConfigResolverInfo> BuildConfigResolvers(
-        Compilation compilation,
-        INamedTypeSymbol configSymbol)
-    {
-        var resolvers = new Dictionary<string, ConfigResolverInfo>(
-            StringComparer.Ordinal);
-
-        // The Config type itself comes from RandomizerCore, while the view models
-        // that expose it live in the consuming UI compilation.
-        foreach (var candidate in AllTypes(compilation, configSymbol.ContainingAssembly))
-        {
-            if (candidate.TypeKind != TypeKind.Class ||
-                candidate.IsAbstract ||
-                candidate.IsGenericType)
+            if (field.Kind == ControlKind.Numeric)
             {
-                continue;
+                sb.AppendLine(
+                    $"            PropertyName = nameof({info.ConfigType}.{name}),");
+
+                if (field.PartnerPropertyName is not null)
+                {
+                    // A [UiNumericPair] end: like a single, the box hint is a
+                    // compile-time Resources.<PropertyName> reference (so a missing
+                    // key is a build error); the caption and shared tooltip are
+                    // optional lazy lookups keyed off the field names, and the
+                    // partner lets the box cross-limit the other end.
+                    sb.AppendLine($"            Label = () => global::{ResourcesNamespace}.Resources.{name},");
+                    sb.AppendLine(
+                        "            Caption = () => " +
+                        $"global::{ResourcesNamespace}.Resources.ResourceManager" +
+                        $".GetString(\"{field.CaptionResourceKey}\"),");
+                    sb.AppendLine(
+                        "            ToolTip = () => " +
+                        $"global::{ResourcesNamespace}.Resources.ResourceManager" +
+                        $".GetString(\"{field.SharedTooltipResourceKey}\"),");
+                    sb.AppendLine(
+                        $"            PartnerPropertyName = nameof({info.ConfigType}.{field.PartnerPropertyName}),");
+                    sb.AppendLine(
+                        $"            PartnerFlag = ConfigFlag.{field.PartnerPropertyName},");
+                    sb.AppendLine(
+                        $"            IsMinEnd = {(field.IsMinEnd ? "true" : "false")},");
+                }
+                else
+                {
+                    sb.AppendLine(
+                        $"            Label = () => " +
+                        $"global::{ResourcesNamespace}.Resources.{name},");
+                    sb.AppendLine(
+                        "            ToolTip = () => " +
+                        $"global::{ResourcesNamespace}.Resources" +
+                        $".ResourceManager.GetString(\"{field.TooltipResourceName}\"),");
+                }
+
+                sb.AppendLine(
+                    "            Numeric = new global::CrossPlatformUI.Controls.NumericMember");
+                sb.AppendLine("            {");
+                sb.AppendLine($"                Read = c => c.{name},");
+                sb.AppendLine(
+                    field.IsNumericNullable
+                        ? $"                Write = (c, v) => c.{name} = v,"
+                        : "                Write = (c, v) => { if (v is { } value) c." +
+                          $"{name} = value; }},");
+                sb.AppendLine($"                Minimum = {field.NumericMinimum ?? 0},");
+                sb.AppendLine($"                Maximum = {field.NumericMaximum ?? 0},");
+                sb.AppendLine("            },");
+            }
+            else
+            {
+                sb.AppendLine(
+                    $"            PropertyName = nameof({info.ConfigType}.{name}),");
+                sb.AppendLine(
+                    $"            Label = () => " +
+                    $"global::{ResourcesNamespace}.Resources.{name},");
+                sb.AppendLine(
+                    $"            ToolTip = () => " +
+                    $"global::{ResourcesNamespace}.Resources.{field.TooltipResourceName},");
+
+                if (field.Kind == ControlKind.ComboBox)
+                {
+                    sb.AppendLine(
+                        $"            Items = () => " +
+                        $"global::Z2Randomizer.RandomizerCore.Enums.{name}List,");
+
+                    if (field.HasInfo)
+                        sb.AppendLine("            HasInfoColumn = true,");
+
+                    sb.AppendLine($"            ReadValue = c => c.{name},");
+                    sb.AppendLine(
+                        $"            WriteValue = (c, v) => c.{name} = " +
+                        $"({field.EnumType})v!,");
+                }
+                else
+                {
+                    sb.AppendLine(
+                        $"            IsThreeState = {(field.IsNullable ? "true" : "false")},");
+                    sb.AppendLine($"            Read = c => c.{name},");
+                    sb.AppendLine(
+                        field.IsNullable
+                            ? $"            Write = (c, v) => c.{name} = v,"
+                            : $"            Write = (c, v) => c.{name} = v is true,");
+                }
             }
 
-            var display = candidate.ToDisplayString(FullyQualified);
+            if (field.IsDifficultyOnly)
+                sb.AppendLine("            IsDifficultyOnly = true,");
 
-            if (SymbolEqualityComparer.Default.Equals(candidate, configSymbol))
-            {
-                if (!resolvers.ContainsKey(display))
-                    resolvers.Add(display, new ConfigResolverInfo(candidate, "value"));
-                continue;
-            }
+            if (field.IncludedResolverMethod is not null)
+                sb.AppendLine(
+                    $"            Included = ctx => " +
+                    $"FlagIncludedResolver.{field.IncludedResolverMethod}(ctx),");
+            else if (field.GeneratedIncludedPredicate is not null)
+                sb.AppendLine(
+                    "            Included = ctx => " +
+                    "global::CrossPlatformUI.Controls.FlagEnablement.Build(" +
+                    $"ctx, static c => c.{field.GeneratedIncludedPredicate}()),");
 
-            var configProperty = PublicInstanceProperty(candidate, "Config");
-
-            if (configProperty is not null &&
-                SymbolEqualityComparer.Default.Equals(
-                    configProperty.Type,
-                    configSymbol))
-            {
-                if (!resolvers.ContainsKey(display))
-                    resolvers.Add(
-                        display,
-                        new ConfigResolverInfo(candidate, "value.Config"));
-
-                continue;
-            }
-
-            var mainProperty = PublicInstanceProperty(candidate, "Main");
-
-            if (mainProperty?.Type is not INamedTypeSymbol mainType)
-                continue;
-
-            var mainConfig = PublicInstanceProperty(mainType, "Config");
-
-            if (mainConfig is not null &&
-                SymbolEqualityComparer.Default.Equals(
-                    mainConfig.Type,
-                    configSymbol))
-            {
-                if (!resolvers.ContainsKey(display))
-                    resolvers.Add(
-                        display,
-                        new ConfigResolverInfo(candidate, "value.Main.Config"));
-            }
+            sb.AppendLine("        },");
         }
 
-        return resolvers;
+        sb.AppendLine("    };");
+        sb.AppendLine();
+        sb.AppendLine(
+            "    public static global::CrossPlatformUI.Controls.FlagEntry? " +
+            "Get(ConfigFlag flag)");
+        sb.AppendLine(
+            "        => Entries.TryGetValue(flag, out var entry) ? entry : null;");
+        sb.AppendLine("}");
+        return sb.ToString();
     }
 
     /// <summary>
@@ -1902,19 +788,6 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
         }
     }
 
-    private static IPropertySymbol? PublicInstanceProperty(
-        INamedTypeSymbol type,
-        string name)
-    {
-        return type.GetMembers(name)
-            .OfType<IPropertySymbol>()
-            .FirstOrDefault(
-                p =>
-                    p.DeclaredAccessibility == Accessibility.Public &&
-                    !p.IsStatic &&
-                    p.GetMethod is not null);
-    }
-
     private static bool IsNullableBool(ITypeSymbol type)
     {
         return type is INamedTypeSymbol
@@ -1965,7 +838,7 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
     /// <summary>
     /// Recognizes a numeric config field: <c>int</c>/<c>int?</c> with both a
     /// <c>[Minimum]</c> and a <c>[Maximum]</c>. Carries the optional
-    /// <c>[UiNumericPair(label, partner)]</c> matching info when the field is one end
+    /// <c>[UiNumericPair(partner)]</c> matching info when the field is one end
     /// of a Min/Max pair.
     /// </summary>
     private static bool TryGetNumeric(
@@ -2004,11 +877,10 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
             if (!Matches(attribute.AttributeClass?.Name, NumericPairAttribute))
                 continue;
 
-            if (attribute.ConstructorArguments.Length == 2 &&
-                attribute.ConstructorArguments[0].Value is string label &&
-                attribute.ConstructorArguments[1].Value is string partner)
+            if (attribute.ConstructorArguments.Length == 1 &&
+                attribute.ConstructorArguments[0].Value is string partner)
             {
-                candidate.Pair = (label, partner);
+                candidate.Pair = partner;
             }
 
             break;
@@ -2018,79 +890,49 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
     }
 
     /// <summary>
-    /// Turns the collected numeric fields into generated controls. Pair endpoints
-    /// merge into a single control named after the "Min" field minus its trailing
-    /// "Min" (e.g. two fields <c>PalacesToCompleteMin</c>/<c>Max</c> become
-    /// <c>PalacesToComplete</c>); other pairs fall back to the "Max" field. Singles
-    /// are opt-in by caption resource, like ComboBoxes.
+    /// Turns the collected numeric fields into generated controls. Each field is its
+    /// own control (the two ends of a <c>[UiNumericPair]</c> are two boxes); a mutual
+    /// pair carries the partner and which end is the low one, so each box can
+    /// cross-limit the other.
     /// </summary>
     private static IEnumerable<ControlFieldInfo> ResolveNumericCandidates(
-        List<NumericCandidate> candidates,
-        HashSet<string> resourceNames)
+        List<NumericCandidate> candidates)
     {
         var byName = new Dictionary<string, NumericCandidate>(StringComparer.Ordinal);
         foreach (var candidate in candidates)
-            byName.Add(candidate.PropertyName, candidate);
-
-        var used = new HashSet<string>(StringComparer.Ordinal);
+        {
+            if (!byName.ContainsKey(candidate.PropertyName))
+                byName.Add(candidate.PropertyName, candidate);
+        }
 
         foreach (var candidate in candidates
                      .OrderBy(c => c.PropertyName, StringComparer.Ordinal))
         {
-            if (!used.Add(candidate.PropertyName))
-                continue;
+            string? partnerProperty = null;
+            var isMinEnd = false;
+            var isPair = false;
 
-            if (candidate.Pair is { } pair &&
-                byName.TryGetValue(
-                    Pascalize(pair.Partner),
-                    out var partner) &&
-                partner.Pair is { } partnerPair &&
-                Pascalize(partnerPair.Partner) == candidate.PropertyName)
+            if (candidate.Pair is { } partnerKey &&
+                byName.TryGetValue(Pascalize(partnerKey), out var partner) &&
+                partner.Pair is { } partnerBack &&
+                Pascalize(partnerBack) == candidate.PropertyName)
             {
-                used.Add(partner.PropertyName);
+                isPair = true;
+                partnerProperty = partner.PropertyName;
 
-                // The "Min"-suffixed member is the low end regardless of its label
-                // (labels are free-form: "Min"/"Max" in Palaces, "Start Min"/"Start
-                // Max" in Start).
-                var minEnd = candidate.PropertyName.EndsWith(
-                        "Min",
-                        StringComparison.Ordinal)
-                    ? candidate
-                    : partner;
-                var maxEnd = ReferenceEquals(minEnd, candidate) ? partner : candidate;
-
-                yield return new ControlFieldInfo
-                {
-                    PropertyName = PairControlName(minEnd, maxEnd),
-                    Kind = ControlKind.NumericPair,
-                    PairMembers = new List<NumericPairMemberInfo>
-                    {
-                        new()
-                        {
-                            PropertyName = minEnd.PropertyName,
-                            Label = minEnd.Pair!.Value.Label,
-                            Minimum = minEnd.Minimum,
-                            Maximum = minEnd.Maximum,
-                            IsNullable = minEnd.IsNullable,
-                        },
-                        new()
-                        {
-                            PropertyName = maxEnd.PropertyName,
-                            Label = maxEnd.Pair!.Value.Label,
-                            Minimum = maxEnd.Minimum,
-                            Maximum = maxEnd.Maximum,
-                            IsNullable = maxEnd.IsNullable,
-                        },
-                    },
-                };
-
-                continue;
+                // The "Min"-suffixed member is the low end. The role is decided by
+                // the name suffix alone - never by a display string - so the
+                // StartView pairs can hint their boxes "Start Min"/"Start Max"
+                // without affecting which end is which.
+                isMinEnd = candidate.PropertyName.EndsWith(
+                    "Min",
+                    StringComparison.Ordinal);
             }
 
-            // Singles are opt-in by caption, mirroring the ComboBox rule: until a
-            // Resources.<PropertyName> caption exists the view keeps its hand-written
-            // NumericUpDown.
-            if (!resourceNames.Contains(candidate.PropertyName))
+            // A [UiNumericPair] field whose partner is missing or not mutual cannot
+            // cross-limit; skip it rather than emit a box that reads a resource key
+            // that does not exist. A plain numeric is emitted as a single box.
+            if (candidate.Pair is not null && !isPair)
                 continue;
 
             yield return new ControlFieldInfo
@@ -2104,40 +946,19 @@ if (IncludedPredicateName(configSymbol, field.PropertyName)
                 NumericMinimum = candidate.Minimum,
                 NumericMaximum = candidate.Maximum,
                 IsNumericNullable = candidate.IsNullable,
+                PartnerPropertyName = partnerProperty,
+                IsMinEnd = isMinEnd,
+                CaptionResourceKey =
+                    isPair ? candidate.PropertyName + "Caption" : null,
+                SharedTooltipResourceKey = isPair
+                    ? (isMinEnd ? candidate.PropertyName : partnerProperty) + "ToolTip"
+                    : null,
             };
         }
     }
 
-    private static string PairControlName(
-        NumericCandidate minEnd,
-        NumericCandidate maxEnd)
-    {
-        if (minEnd.PropertyName.EndsWith("Min", StringComparison.Ordinal))
-            return minEnd.PropertyName[..^"Min".Length];
-
-        if (maxEnd.PropertyName.EndsWith("Max", StringComparison.Ordinal))
-            return maxEnd.PropertyName[..^"Max".Length];
-
-        return maxEnd.PropertyName;
-    }
-
     private static string Pascalize(string name)
         => char.ToUpperInvariant(name[0]) + name[1..];
-
-    /// <summary>
-    /// True when <c>Enums</c> exposes a public static <c>&lt;property&gt;List</c>,
-    /// which a generated ComboBox binds as its ItemsSource.
-    /// </summary>
-    private static bool HasEnumList(
-        INamedTypeSymbol enumsType,
-        string propertyName)
-    {
-        return enumsType.GetMembers(propertyName + "List")
-            .OfType<IPropertySymbol>()
-            .Any(p =>
-                p.IsStatic &&
-                p.DeclaredAccessibility == Accessibility.Public);
-    }
 
     /// <summary>
     /// True when any member's <c>[Description]</c> contains a ';', which
@@ -2193,7 +1014,6 @@ public sealed class ClassGenerationInfo
     public string ClassName { get; set; } = string.Empty;
     public string ConfigType { get; set; } = string.Empty;
     public List<ControlFieldInfo> ControlFields { get; set; } = new();
-    public Dictionary<string, ConfigResolverInfo> Resolvers { get; set; } = new(StringComparer.Ordinal);
     public List<IncludedResolverInfo> IncludedResolvers { get; set; } = new();
 }
 
@@ -2201,8 +1021,17 @@ public enum ControlKind
 {
     CheckBox,
     ComboBox,
-    Numeric,
-    NumericPair
+    Numeric
+}
+
+/// <summary>
+/// A generated control field together with the config type it reads, for the
+/// shared <c>FlagRegistry</c>.
+/// </summary>
+public sealed class FlagFieldInfo
+{
+    public string ConfigType { get; set; } = string.Empty;
+    public ControlFieldInfo Field { get; set; } = new();
 }
 
 public sealed class ControlFieldInfo
@@ -2225,40 +1054,36 @@ public sealed class ControlFieldInfo
         /// </summary>
         public string TooltipResourceName { get; set; } = string.Empty;
 
-    // Non-null only when this control actually auto-binds IsEnabled.
+    // Non-null when the control's IsEnabled is routed through a generated
+    // FlagIncludedResolver method (a hand-written FooEnabledObservable).
     public string? IncludedResolverMethod { get; set; }
+
+    // Non-null when the control's IsEnabled derives from a config predicate
+    // (fooIncluded()); the registry builds the observable with FlagEnablement.Build.
+    public string? GeneratedIncludedPredicate { get; set; }
 
     // The config field carries [DifficultyOnly]: apply the "DifficultyOnly" style
     // class while ShareSeedAcrossDifficulty is on, instead of every view repeating
     // Classes.DifficultyOnly="{Binding Config.ShareSeedAcrossDifficulty}".
     public bool IsDifficultyOnly { get; set; }
 
-    // Single numeric (ControlKind.Numeric): bounds from the config's [Minimum]/
-    // [Maximum], pushed into the generated NumericUpDown.
+    // Numeric (ControlKind.Numeric): bounds from the config's [Minimum]/
+    // [Maximum], served by the shared Z2NumericUpDown.
     public int? NumericMinimum { get; set; }
     public int? NumericMaximum { get; set; }
     public bool IsNumericNullable { get; set; }
 
-    // Min/Max pair (ControlKind.NumericPair): [0] is the Min box, [1] the Max box.
-    // PropertyName is the generated control's name (Min field minus its "Min"
-    // suffix) and the optional Resources.<PropertyName> caption/tooltip keys.
-    public List<NumericPairMemberInfo>? PairMembers { get; set; }
+    // A [UiNumericPair] end: the partner field this box cross-limits against,
+    // which end this is, and the optional lazy caption/shared-tooltip resource
+    // keys. All null/false for a lone numeric.
+    public string? PartnerPropertyName { get; set; }
+    public bool IsMinEnd { get; set; }
+    public string? CaptionResourceKey { get; set; }
+    public string? SharedTooltipResourceKey { get; set; }
 }
 
 /// <summary>
-/// One NumericUpDown within a generated Min/Max pair control.
-/// </summary>
-public sealed class NumericPairMemberInfo
-{
-    public string PropertyName { get; set; } = string.Empty;
-    public string Label { get; set; } = string.Empty;
-    public int Minimum { get; set; }
-    public int Maximum { get; set; }
-    public bool IsNullable { get; set; }
-}
-
-/// <summary>
-/// A collected int/int? config field awaiting pairing/emission.
+/// A collected int/int? config field awaiting emission.
 /// </summary>
 public sealed class NumericCandidate
 {
@@ -2266,7 +1091,8 @@ public sealed class NumericCandidate
     public bool IsNullable { get; set; }
     public int Minimum { get; set; }
     public int Maximum { get; set; }
-    public (string Label, string Partner)? Pair { get; set; }
+    /// <summary>The other end of the pair, as <c>nameof(otherField)</c>, or null for a lone numeric.</summary>
+    public string? Pair { get; set; }
     public bool IsDifficultyOnly { get; set; }
     public string? TooltipOverride { get; set; }
 }
@@ -2277,14 +1103,11 @@ public sealed class ConfigResolverInfo
         INamedTypeSymbol ownerType,
         string configExpression)
     {
-        OwnerType = ownerType;
         DataContextType = ownerType.ToDisplayString(FlagsControlsGenerator.FullyQualified);
         ConfigExpression = configExpression;
     }
 
-    /// <summary>The DataContext view model type, kept as a symbol for later inspection.</summary>
-    public INamedTypeSymbol OwnerType { get; }
-
+    /// <summary>The DataContext view model type's fully-qualified name.</summary>
     public string DataContextType { get; }
     public string ConfigExpression { get; }
 }

@@ -12,6 +12,7 @@ using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Disposables;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
 using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Flags;
 using CrossPlatformUI.Controls.Generated;
 using CrossPlatformUI.Presets;
 
@@ -35,14 +36,14 @@ public class PresetItem
 
 public sealed class PresetDiffRow : ReactiveObject
 {
-    public PresetDiffRow(string field, Control? control, string value)
+    public PresetDiffRow(ConfigFlag field, Control? control, string value)
     {
         Field = field;
         Control = control;
         this.value = value;
     }
 
-    public string Field { get; }
+    public ConfigFlag Field { get; }
 
     [JsonIgnore]
     public Control? Control { get; }
@@ -116,7 +117,7 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
     // build each field's control once and reuse it across rebuilds. Reuse is
     // safe: a field appears at most once per diff, rows are the only consumer,
     // and a detached control holds no config subscription.
-    private readonly Dictionary<string, Control> controlCache = new();
+    private readonly Dictionary<ConfigFlag, Control> controlCache = new();
 
     // Keep in sync with the Opacity DoubleTransition duration in PresetsView.axaml.
     private const int RemovalFadeMilliseconds = 250;
@@ -181,13 +182,13 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
             }
         }
 
-        var positionOf = new Dictionary<string, int>(d.Count);
+        var positionOf = new Dictionary<ConfigFlag, int>(d.Count);
         for (int i = 0; i < d.Count; i++)
         {
             positionOf[d[i].Field] = i;
         }
 
-        var rowsByField = new Dictionary<string, PresetDiffRow>();
+        var rowsByField = new Dictionary<ConfigFlag, PresetDiffRow>();
         foreach (var row in DiffRows)
         {
             rowsByField[row.Field] = row;
@@ -229,7 +230,7 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
         HasDiff = d.Count > 0 || DiffRows.Count > 0;
     }
 
-    private int InsertionIndex(Dictionary<string, int> positionOf, int position)
+    private int InsertionIndex(Dictionary<ConfigFlag, int> positionOf, int position)
     {
         for (int i = 0; i < DiffRows.Count; i++)
         {
@@ -279,14 +280,14 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
         DiffRows.Clear();
     }
 
-    private static string FormatRowValue(string arrow, Control? control, (string Field, object? OldValue, object? NewValue) t)
+    private static string FormatRowValue(string arrow, Control? control, (ConfigFlag Field, object? OldValue, object? NewValue) t)
     {
         return control is not null
             ? $"{arrow}    {FormatDiffValue(t.NewValue)}"
             : FormatDiffLine(t);
     }
 
-    private Control? GetControl(string field)
+    private Control? GetControl(ConfigFlag field)
     {
         if (controlCache.TryGetValue(field, out var cached))
         {
@@ -319,7 +320,7 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
         };
     }
 
-    private static string FormatDiffLine((string Field, object? OldValue, object? NewValue) t)
+    private static string FormatDiffLine((ConfigFlag Field, object? OldValue, object? NewValue) t)
     {
 #if false
         // useful to create new built-in presets

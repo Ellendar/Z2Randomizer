@@ -9,21 +9,20 @@ namespace Z2Randomizer.RandomizerCore;
 /// the attribute and reference each other as <see cref="Partner"/>.
 /// </summary>
 /// <remarks>
-/// The attribute is consumed by <c>CrossPlatformUI.SourceGenerator</c>; the generated
-/// control is named after the "Min" end's property minus its trailing "Min" suffix
-/// (e.g. <c>PalacesToComplete</c>). Label is the Material hint shown in each box.
+/// The attribute is consumed by <c>CrossPlatformUI.SourceGenerator</c>; each end is
+/// its own control (two boxes, not one). The Min/Max role is decided by the
+/// "Min"/"Max" name suffix, never by anything on this attribute. Display text - the
+/// box hint, the pair caption and the shared tooltip - lives in
+/// <c>Resources.resx</c> under each field's name, exactly as for a lone numeric.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class UiNumericPairAttribute : Attribute
 {
-    /// <param name="label">The Material hint text shown in this box ("Min"/"Max"/"Start Min").</param>
     /// <param name="partner">The other field of the pair (<c>nameof(otherField)</c>).</param>
-    public UiNumericPairAttribute(string label, string partner)
+    public UiNumericPairAttribute(string partner)
     {
-        Label = label;
         Partner = partner;
     }
 
-    public string Label { get; }
     public string Partner { get; }
 }

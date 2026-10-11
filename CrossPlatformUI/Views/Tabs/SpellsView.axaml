@@ -2,26 +2,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.Tabs.SpellsView"
-             x:DataType="vmt:SpellsViewModel">
+             x:DataType="vm:MainViewModel">
     <Grid ColumnDefinitions="*, *">
         <StackPanel Grid.Column="0">
-            <gen:ShuffleLifeRefillAmount />
-            <gen:ShuffleSpellLocations />
-            <gen:DisableMagicContainerRequirements />
-            <gen:RandomizeSpellSpellEnemy />
-            <gen:SwapUpAndDownStab />
-            <gen:FireOption />
+            <z:Z2CheckBox Flag="ShuffleLifeRefillAmount" />
+            <z:Z2CheckBox Flag="ShuffleSpellLocations" />
+            <z:Z2CheckBox Flag="DisableMagicContainerRequirements" />
+            <z:Z2CheckBox Flag="RandomizeSpellSpellEnemy" />
+            <z:Z2CheckBox Flag="SwapUpAndDownStab" />
+            <z:Z2ComboBox Flag="FireOption" />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <gen:JumpAlwaysOn />
-            <gen:DashAlwaysOn />
-            <gen:PermanentBeamSword />
-            <gen:MarioMode />
-            <gen:FluteWarpMode />
+            <z:Z2CheckBox Flag="JumpAlwaysOn" />
+            <z:Z2CheckBox Flag="DashAlwaysOn" />
+            <z:Z2CheckBox Flag="PermanentBeamSword" />
+            <z:Z2CheckBox Flag="MarioMode" />
+            <z:Z2ComboBox Flag="FluteWarpMode" />
         </StackPanel>
     </Grid>
 </UserControl>

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:DataType="vm:MainViewModel"
@@ -18,9 +19,9 @@
                     Margin="17 0 17 0"
                     Padding="14 8" CornerRadius="4">
                 <UniformGrid Rows="0" Columns="1" RowSpacing="8">
-                    <gen:ShuffleAttackExperience Classes="DisabledMeansChecked" />
-                    <gen:ShuffleMagicExperience Classes="DisabledMeansChecked" />
-                    <gen:ShuffleLifeExperience Classes="DisabledMeansChecked" />
+                    <z:Z2CheckBox Flag="ShuffleAttackExperience" Classes="DisabledMeansChecked" />
+                    <z:Z2CheckBox Flag="ShuffleMagicExperience" Classes="DisabledMeansChecked" />
+                    <z:Z2CheckBox Flag="ShuffleLifeExperience" Classes="DisabledMeansChecked" />
                 </UniformGrid>
             </Border>
 
@@ -28,18 +29,18 @@
                 <TextBlock>Level Cap</TextBlock>
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LevelCapToolTip}"/></ToolTip.Tip>
                 <Grid ColumnDefinitions="72,72,72" ColumnSpacing="8" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <gen:AttackLevelCap Grid.Column="0" />
-                    <gen:MagicLevelCap Grid.Column="1" />
-                    <gen:LifeLevelCap Grid.Column="2" />
+                    <z:Z2NumericUpDown Flag="AttackLevelCap" Grid.Column="0" />
+                    <z:Z2NumericUpDown Flag="MagicLevelCap" Grid.Column="1" />
+                    <z:Z2NumericUpDown Flag="LifeLevelCap" Grid.Column="2" />
                 </Grid>
             </StackPanel>
 
-            <gen:ScaleLevelRequirementsToCap />
+            <z:Z2CheckBox Flag="ScaleLevelRequirementsToCap" />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <gen:AttackEffectiveness />
-            <gen:MagicEffectiveness />
-            <gen:LifeEffectiveness />
+            <z:Z2ComboBox Flag="AttackEffectiveness" />
+            <z:Z2ComboBox Flag="MagicEffectiveness" />
+            <z:Z2ComboBox Flag="LifeEffectiveness" />
         </StackPanel>
     </Grid>
 </UserControl>

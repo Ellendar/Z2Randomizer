@@ -23,7 +23,7 @@ using Z2Randomizer.RandomizerCore;
 namespace CrossPlatformUI.ViewModels.Tabs;
 
 [RequiresUnreferencedCode("")]
-public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
+public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel, IFlagHost
 {
     private CancellationTokenSource backgroundUpdateTask = new ();
 
@@ -91,6 +91,10 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 
     [JsonIgnore]
     public MainViewModel Main { get; }
+    [JsonIgnore]
+    IObservable<RxVoid> IFlagHost.FlagsChanged => Main.FlagsChanged;
+    [JsonIgnore]
+    RandomizerConfiguration IFlagHost.Config => Main.Config;
 
     private LoadedCharacterSprite? sprite;
     [JsonIgnore]
