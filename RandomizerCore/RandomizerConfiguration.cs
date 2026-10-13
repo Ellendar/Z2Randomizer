@@ -1238,7 +1238,10 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.Global5050JarDrop = global5050JarDrop ?? GetIndeterminateFlagValue(r);
         properties.ReduceDripperVariance = reduceDripperVariance;
         properties.RemoveTbird = removeTBird;
-        properties.BossItem = randomizeBossItemDrop;
+        // give BossItem rolling vanilla its chance here
+        properties.BossItem = randomizeBossItemDrop
+            ? (r.Next(8) == 0 ? false : randomizeBossItemDrop)
+            : false;
 
         //if all 3 room options are hard false, the seed can't generate. The UI tries to prevent this, but as a safety
         //if we get to this point, use vanilla rooms
