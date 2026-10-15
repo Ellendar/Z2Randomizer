@@ -2948,7 +2948,7 @@ DrawHiddenJarBank5:
     {
         if (!biome.UsesVanillaMap())
         {
-            Put(0x8382, (byte)(hiddenPalaceLocation.Y + 2));
+            Put(0x8382, (byte)(hiddenPalaceLocation.YRaw - 2)); // the whistle spot, 2 tiles north of the palace
             Put(0x8388, (byte)hiddenPalaceLocation.Xpos);
         }
         int pos = hiddenPalaceLocation.YRaw;
