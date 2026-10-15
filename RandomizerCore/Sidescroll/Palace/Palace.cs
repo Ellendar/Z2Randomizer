@@ -1306,6 +1306,17 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 
         return gettableItems;
     }
+    // The collectables present in this palace's item rooms, independent of reachability
+    public List<Collectable> GetAllCollectables()
+    {
+        return [.. ItemRooms.Select(room => room.Collectable!.Value)];
+    }
+
+    public List<Collectable> GetShufflableCollectables()
+    {
+        return PalaceItemsAreShufflable ? GetAllCollectables() : [];
+    }
+
     public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false)
     {
         //Shufflable marking NYI for palaces (and probably not needed) so it's NOP for now

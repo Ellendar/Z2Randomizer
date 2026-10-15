@@ -277,11 +277,22 @@ public class Location
 
     public List<Collectable> GetAllCollectables()
     {
+        if (Palace != null)
+        {
+            // For palace locations, the collectables are always equal to the palaces' collectables
+            return Palace.GetAllCollectables();
+        }
+        // Towns (Saria) may be split into multiple locations
+        // Keeping previous logic for the rest
         return GetGettableItems(RequirementTypeExtensions.ALL);
     }
 
     public List<Collectable> GetShufflableCollectables()
     {
+        if (Palace != null)
+        {
+            return Palace.GetShufflableCollectables();
+        }
         return GetGettableItems(RequirementTypeExtensions.ALL, ForceEnterRight ? Direction.EAST : Direction.WEST, true);
     }
 
