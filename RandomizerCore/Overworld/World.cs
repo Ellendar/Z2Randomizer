@@ -295,6 +295,7 @@ public abstract class World
                     if (!location.Reachable)
                     {
                         AllReached = false;
+                        return;
                     }
                 }
             }
