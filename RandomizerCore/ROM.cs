@@ -1916,6 +1916,51 @@ FREE_UNTIL $e54f
 """);
     }
 
+    public void OptimizeOverworldByteDecode(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+.segment "PRG0"
+
+UpdateOverworldTilesHorizontalMove := $88e8
+UpdateOverworldTilesVerticalMove := $8bfe
+OverworldRowPointerFetch := $8c48
+
+.org $892d
+    jsr OverworldByteDecode
+
+.org $8c30
+    jsr OverworldByteDecode
+
+; decode the next RLE segment from the row data
+; like vanilla bank7_E001 without the bank swapping.
+; updates zp_02 (terrain) and zp_03 (new column).
+; can now be in PRG0 instead of PRG7
+.segment "PRG0","PRG7"
+.reloc
+OverworldByteDecode:
+    lda (zp_0e),y
+    and #$0f                      ; keep bits .... xxxx
+    sta zp_02
+    lda (zp_0e),y
+    lsr
+    lsr
+    lsr
+    lsr
+    sec
+    adc zp_03
+    sta zp_03                     ; column reached
+    rts
+
+.segment "PRG7"
+.org $e001
+FREE_UNTIL $e01b
+
+""");
+    }
+
     public void CollisionFixes(Assembler asm)
     {
         var a = asm.Module();

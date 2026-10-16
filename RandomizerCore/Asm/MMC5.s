@@ -773,16 +773,14 @@ UPDATE_REFS SwapPRG @ $C00B $C035 $C1C4 $C33F $C38B $CD5D $CF24
 UPDATE_REFS SwapToSavedPRG @ $C1DB $C24A $C250 $C4D6 $C63C $C645 $CB36 $CF2A $CF3D $CF50
 UPDATE_REFS SwapToSavedPRG @ $CFFD $D127 $D502 $DFD3 $DFDC $DFF0 $DFF9 $E01C $E025 $E071 $E1DE
 UPDATE_REFS SwapToPRG0 @ $C1CA $C1CE $C256 $C350 $C636 $C68B $C9EF $CCFA $D0FD $D121 $D508
-UPDATE_REFS SwapToPRG0 @ $DFD9 $DFE2 $DFF6 $DFFF $E017 $E022 $E02B $E077 $E1E4 $FF4A
+UPDATE_REFS SwapToPRG0 @ $DFD9 $DFE2 $DFF6 $DFFF $E022 $E02B $E077 $E1E4 $FF4A
 
 ; z2ft uses this location
-.if !ENABLE_Z2FT
+.if ENABLE_Z2FT
 
-UPDATE_REFS SwapToSavedPRG @ $E002
+UPDATE_REFS SwapToPRG0 @ $E017
 
 .endif
-
-
 ; Clear a ton of free space out of the fixed bank by banking ganon's laugh sfx
 ; its only used during a scene thats otherwise doing nothing special, so we can
 ; cheese it out using mmc5's ability to bank $e000.
