@@ -20,7 +20,6 @@ using CrossPlatformUI.Views;
 
 namespace CrossPlatformUI;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public sealed partial class App : Application // , IDisposable
 {
     public override void Initialize()

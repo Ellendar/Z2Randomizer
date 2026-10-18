@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 using Avalonia.Controls;
@@ -73,7 +72,6 @@ public sealed class PresetDiffRow : ReactiveObject
     }
 }
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public class PresetsViewModel : ReactiveObject, IActivatableViewModel
 {
     public ViewModelActivator Activator { get; }

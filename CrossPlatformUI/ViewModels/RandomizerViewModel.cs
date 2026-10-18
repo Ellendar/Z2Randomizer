@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -18,7 +17,6 @@ using CrossPlatformUI.ViewModels.Tabs;
 
 namespace CrossPlatformUI.ViewModels;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
     [JsonIgnore]

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +13,6 @@ using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.Desktop;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public static class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any

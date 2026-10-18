@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using ReactiveUI;
 using RUISG = ReactiveUI.SourceGenerators;
@@ -13,7 +12,6 @@ using CrossPlatformUI.ViewModels.Tabs;
 
 namespace CrossPlatformUI.ViewModels;
 
-[RequiresUnreferencedCode("")]
 public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel, IFlagHost
 {
     public string? OutputFilePath { get; set; }
@@ -45,10 +43,10 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
     public SpritePreviewViewModel SpritePreviewViewModel { get; }
 
     [RUISG.Reactive]
-    public partial CustomPixelPoint WindowPosition { get; set; }
+    public partial CustomPixelPoint WindowPosition { get; set; } = null!;
 
     [RUISG.Reactive]
-    public partial CustomSize WindowSize { get; set; }
+    public partial CustomSize WindowSize { get; set; } = null!;
 
     public MainViewModel()
     {

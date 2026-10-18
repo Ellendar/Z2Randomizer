@@ -5,12 +5,10 @@ using Desktop.Common;
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
 using Z2Randomizer.RandomizerCore;
-using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace Z2Randomizer.CommandLine;
 
-[RequiresUnreferencedCode("Newtonsoft.Json uses reflection")]
 public class Program
 {
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]

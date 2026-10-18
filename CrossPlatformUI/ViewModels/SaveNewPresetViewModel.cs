@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using DynamicData.Binding;
@@ -67,7 +66,6 @@ public partial class CustomPreset : ReactiveObject
     }
 }
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class SaveNewPresetViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
 

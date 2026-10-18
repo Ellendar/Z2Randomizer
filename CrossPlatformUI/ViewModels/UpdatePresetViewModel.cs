@@ -1,13 +1,10 @@
 using ReactiveUI;
-using System;
-using System.Diagnostics.CodeAnalysis;
 using Z2Randomizer.RandomizerCore;
 using RUISG = ReactiveUI.SourceGenerators;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
 
 namespace CrossPlatformUI.ViewModels;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class UpdatePresetViewModel : ReactiveObject
 {
     [RUISG.Reactive]

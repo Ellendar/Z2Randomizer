@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using CrossPlatformUI.Services;
 
 namespace CrossPlatformUI.ViewModels;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class RomFileViewModel : ViewModelBase, IRoutableViewModel
 {
     private byte[] romData = [];

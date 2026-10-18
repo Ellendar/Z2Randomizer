@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
@@ -13,7 +12,6 @@ using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class RandomizerView : ReactiveUserControl<RandomizerViewModel>
 {
     public RandomizerView()

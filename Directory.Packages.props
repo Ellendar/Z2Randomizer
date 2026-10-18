@@ -35,7 +35,6 @@
     <PackageVersion Include="DialogHost.Avalonia" Version="0.12.3" />
     <!-- Material Avalonia -->
     <PackageVersion Include="Material.Avalonia" Version="3.21.0" />
-    <PackageVersion Include="Material.Avalonia.DataGrid" Version="3.21.0" />
     <PackageVersion Include="Material.Icons.Avalonia" Version="3.0.2" />
     <!-- Skia -->
     <PackageVersion Include="SkiaSharp" Version="$(SkiaSharpVersion)" />

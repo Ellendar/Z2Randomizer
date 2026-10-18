@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -22,7 +21,6 @@ using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 
-[RequiresUnreferencedCode("")]
 public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel, IFlagHost
 {
     private CancellationTokenSource backgroundUpdateTask = new();

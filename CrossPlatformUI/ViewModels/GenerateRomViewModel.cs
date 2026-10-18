@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.IO;
 using System.Reflection;
@@ -19,15 +18,13 @@ using CrossPlatformUI.Services;
 
 namespace CrossPlatformUI.ViewModels;
 
-[RequiresUnreferencedCode("")]
 public partial class GenerateRomViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
-
 #pragma warning disable CS8618, CS9264
-
     [JsonConstructor]
     public GenerateRomViewModel() {}
 #pragma warning restore CS8618, CS9264
+
     public GenerateRomViewModel(MainViewModel main)
     {
         Main = main;
