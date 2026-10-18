@@ -30,20 +30,23 @@ bank7_Remove_All_Sprites = $d24c
 
 ; Remove sprite zero sliver tile. This frees up tile $c5 and one sprite.
 .segment "PRG0"
+
 .org $8cdd  ; old sprite 0 table followed by old SideviewInit
 FREE_UNTIL NewSideviewInit
+    lda #$f8
+    sta $0200
+.assert * = $8cec
 
-.segment "PRG5"
-.org $a7a8
-JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
-
-.segment "PRG7"
-.org $c1a2
-JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
-.org $c212
-JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
+;.segment "PRG5"
+;.org $a7a8
+;JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
 
 .segment "PRG7"
+;.org $c1a2
+;JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
+;.org $c212
+;JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
+
 ; Replace the code to wait for sprite 0 with code to set up the scanline IRQ
 .org $d4b2
     jsr SetupScanlineIRQ
