@@ -6,6 +6,7 @@ using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -95,6 +96,9 @@ public class Hyrule
 
     private static readonly Collectable[] minorItems = [Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG,
             Collectable.MEDIUM_BAG, Collectable.LARGE_BAG, Collectable.XL_BAG, Collectable.ONEUP, Collectable.KEY];
+    private static readonly Collectable[] minorItemsMinusKey = [Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG,
+            Collectable.MEDIUM_BAG, Collectable.LARGE_BAG, Collectable.XL_BAG, Collectable.ONEUP];
+
     private static readonly Collectable[] spellItems = [Collectable.TROPHY, Collectable.MEDICINE, Collectable.CHILD, Collectable.MIRROR, Collectable.WATER];
 
 
@@ -656,7 +660,7 @@ public class Hyrule
 
     private void ShuffleItems()
     {
-        List<Location> possibleItemLocations = ItemLocations().ToList();
+        ImmutableList<Location> possibleItemLocations = ItemLocations().ToImmutableList();
         List<Location> palaceLocations = AllLocations().Where(i => i.Palace != null).ToList();
 
         spellListOrder = [Collectable.SHIELD_SPELL,
@@ -1129,6 +1133,28 @@ public class Hyrule
         {
             PreventSpellItemChains();
         }
+
+        if (props.KeyLogic == KeyLogicOption.KEYS_PER_PALACE_SOLVABLE)
+        {
+            var nonPalaceLocs = possibleItemLocations.Where(loc => loc.Palace == null);
+            // don't want to roll this for every ReplaceCollectable call
+            Collectable replacementItem = minorItemsMinusKey.Sample(r);
+            foreach (var loc in nonPalaceLocs)
+            {
+                while (true)
+                {
+                    if (loc.ReplaceCollectable(Collectable.KEY, replacementItem))
+                    {
+                        // we did a key replacement, roll next replacement
+                        replacementItem = minorItemsMinusKey.Sample(r);
+                    }
+                    else
+                    {
+                        break; // nothing to replace - next!
+                    }
+                }
+            }
+        }
     }
 
     private void ReplaceWithUnshuffledMinorItem(TownMap townMap)
@@ -1137,7 +1163,7 @@ public class Hyrule
         townMap.CollectableIsShufflable = false;
     }
 
-    private void HandleStartingSpellItems(List<Location> possibleItemLocations)
+    private void HandleStartingSpellItems(IList<Location> possibleItemLocations)
     {
         if (props.StartWithSpellItems)
         {
