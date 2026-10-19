@@ -3258,7 +3258,8 @@ FixSoftlock:
     {
         a.Module().Code("""
 .segment "PRG7"
-.org $e8ad
+DrawRngForDrop := $e8ad
+.org DrawRngForDrop
     jsr StandardizeDrops
 .reloc
 StandardizeDrops:
@@ -3649,48 +3650,93 @@ IncKeysForCurrentPalace:
 .import FlagHudUpdate
 
 .segment "PRG0"
-.org $a150
-    jsr GetKeysForCurrentPalace
+PauseMenuLoadKeys := $a150
+.org PauseMenuLoadKeys
+    jsr PauseMenuLoadKeysHook  ; was lda Keys
+
+.reloc
+; In a palace (WorldNumber >= 3): returns A = key count.
+; Not in a palace:                draw spaces over the menu key count
+; Clobbers X
+PauseMenuLoadKeysHook:
+    lda WorldNumber
+    cmp #$03
+    bcc @NotInPalace
+    jmp GetKeysForCurrentPalace
+@NotInPalace:
+    lda #$f4
+    sta $787f  ; blank out key symbol
+    sta $7880  ; blank out x symbol
+    lda #$24   ; will add up to $f4 as well
+    rts
 
 .segment "PRG7"
 
-.org $d9df
+LockedDoorLoadKeys := $d9df
+.org LockedDoorLoadKeys
     jsr GetKeysForCurrentPalace
 
-.org $d9e4
+LockedDoorDecKeys := $d9e4
+.org LockedDoorDecKeys
     jsr DecKeysForCurrentPalace
 
-.org $e7b5
+KeyStabbedIncKeys := $e7b5
+.org KeyStabbedIncKeys
 jsr IncKeysForCurrentPalace
 
+DropTable := $e870  ; bank7_Table_for_Probability_for_Item_given_by_killed_enemy
+LoadDropTableY := $e8b9
+.org LoadDropTableY
+    jsr GetEnemyDrop
+
 .reloc
-; Sets A and Z from number of keys. Clobbers X.
+; In: Y = drop index (0-7 small pool / 8-15 large pool).
+; Out: A = drop item.
+; Outside of a palace a key drop ($88) becomes a small bag.
+; Clobbering Y is safe.
+GetEnemyDrop:
+    lda DropTable,y
+    cmp #$88                    ; SmallItem.KEY
+    bne @Done
+    ldy WorldNumber
+    cpy #$03
+    bcs @Done                   ; World 3, 4, 5 = palaces, where keys are ok
+    lda #$8a                    ; SmallItem.SMALL_BAG
+@Done:
+    rts
+
+.reloc
+; Sets A and Z from the current palace's key count.
+; X = PalaceNumber on return.
+; Callers must only reach this while in a palace (WorldNumber >= 3),
+; where PalaceNumber is a valid 1-7. (or you get garbage outputs)
 GetKeysForCurrentPalace:
     ldx PalaceNumber
     lda Palace1Keys-1,x
-    ;php
-    ;ldx EnemyIndex
-    ;plp
     rts
 .export GetKeysForCurrentPalace
 
 .reloc
 ; Input X must be PalaceNumber
 ; Reloads X = EnemyIndex after
+; We can only spend keys inside palaces so this should always be safe.
 DecKeysForCurrentPalace:
-    ;ldx PalaceNumber
     dec Palace1Keys-1,x
     ldx EnemyIndex
     jmp FlagHudUpdate
 
 .reloc
 ; IncKeysForCurrentPalace increments the current palace's key count.
-;   Returns: X = EnemyIndex, for the fall-through into bank7_remove_enemy_or_item
-;            (`sta zp_B6,x`).
-;            Flags are unspecified; that routine opens with `lda #$00`.
+; Does nothing outside a palace, to make sure a key picked up outside does not corrupt random memory.
 IncKeysForCurrentPalace:
+;.if EXTRA_SAFE_KEYS  ; in the future there may be 0 chance of finding keys outside of palaces
+    ldx WorldNumber
+    cpx #$03
+    bcc @Skip
+;.endif
     ldx PalaceNumber
     inc Palace1Keys-1,x
+@Skip:
     ldx EnemyIndex
     rts
 .export IncKeysForCurrentPalace
@@ -3699,7 +3745,7 @@ IncKeysForCurrentPalace:
     }
 
 
-    public void CustomHud(Assembler asm, bool enabled)
+    public void CustomHud(Assembler asm, bool enabled, bool keysPerPalace)
     {
         var a = asm.Module();
 
@@ -3782,6 +3828,7 @@ FlagHudUpdate:
         newHudCmd.Add(0xff);
 
         a.Assign("HUD_INCLUDES_KEYS", 1);
+        a.Assign("KEYS_PER_PALACE", keysPerPalace ? 1 : 0);
         a.Segment("PRG0");
         a.Reloc();
         a.Label("NewHudCmd");
@@ -3829,11 +3876,24 @@ UpdateNewHud:
     sta $0302 - (NewHudLength - LivesIndex),y
 
 .if HUD_INCLUDES_KEYS
+    .if KEYS_PER_PALACE                              ; per-palace keys: only show inside a palace
+        lda WorldNumber
+        cmp #$03
+        bcs @DrawKeys
+        lda #$f6                                     ; minus sign
+        sta $0302 - (NewHudLength - KeyIndex),y
+        clc
+        bcc @DrawCrystals+1
+    .endif
+@DrawKeys:
+    clc
     jsr GetKeysForCurrentPalace                  ; clobbers X
     adc #$d0                                     ; add offset for digit tile index
     sta $0302 - (NewHudLength - KeyIndex),y
 .endif
 
+@DrawCrystals:
+    clc                                          ; clear just in case keys overflow
     lda Crystals
     adc #$d0                                     ; add offset for digit tile index
     sta $0302 - (NewHudLength - CrystalIndex),y
@@ -3997,7 +4057,7 @@ FlagHudUpdate:
         rom.AllowForChangingElevatorYPosition(engine);
         rom.InstantText(engine);
         KeysPerPalace(engine, props.KeyLogic.UsesKeysPerPalace());
-        CustomHud(engine, props.UpdatedHud);
+        CustomHud(engine, props.UpdatedHud, props.KeyLogic.UsesKeysPerPalace());
         rom.ChangeLavaKillPosition(engine);
         rom.FixItemPickup(engine);
         rom.CollisionFixes(engine);
