@@ -987,7 +987,7 @@ public class CustomTexts
             items.Remove(Collectable.MIRROR);
             items.Remove(Collectable.WATER);
         }
-        if (!props.IncludeQuestItemsInShuffle)
+        if (!props.IncludeBagusNoteInShuffle)
         {
             items.Remove(Collectable.BAGUS_NOTE);
         }

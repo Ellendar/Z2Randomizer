@@ -453,6 +453,153 @@ public class ItemBucketTests
         Assert.IsTrue(okNoSpells, "No start spells: should still have enough space");
     }
 
+    // ─── Town Quest Locations Are Minor Items Tests ─────────────────────────
+    // Each affected town location keeps a pinned minor item that can't be overwritten, while its
+    // vanilla major item becomes excess and needs a minor item location of its own to land in.
+    // So every affected location costs one slot of overworld overflow room.
+
+    /// <summary>
+    /// Best case properties with the overworld overflow budget pinned to <paramref name="room"/>.
+    /// The PBag caves (worth +3) are turned off, and starting heart containers are used to tune
+    /// the container drag of -(MaxHearts - StartHearts - 4) to exactly +room.
+    /// </summary>
+    private static RandomizerProperties PropertiesWithOverworldRoom(int room)
+    {
+        RandomizerProperties props = BestCaseProperties();
+        props.PbagItemShuffle = false;
+        props.MaxHearts = 8;
+        props.MaxMagicContainers = 8;
+        props.StartHearts = room + 4;
+        props.StartMagicContainers = 4;
+        return props;
+    }
+
+    [TestMethod]
+    public void TownQuestLocationsAreMinorItems_CostsOneSlotPerEnabledCategory()
+    {
+        // Saria's table and Nabooru's fountain, so -2.
+        var quest = PropertiesWithOverworldRoom(2);
+        quest.TownQuestLocationsAreMinorItems = true;
+        quest.IncludeQuestItemsInShuffle = true;
+        Assert.IsTrue(quest.HasEnoughSpaceToAllocateItems(),
+            "Quest items cost 2 slots, so a budget of 2 should exactly fit");
+
+        // The Mido and Darunia trainers, also -2.
+        var stabs = PropertiesWithOverworldRoom(2);
+        stabs.TownQuestLocationsAreMinorItems = true;
+        stabs.IncludeSwordTechsInShuffle = true;
+        Assert.IsTrue(stabs.HasEnoughSpaceToAllocateItems(),
+            "Sword techniques cost 2 slots, so a budget of 2 should exactly fit");
+
+        // All four locations, so -4, which a budget of 2 can't cover.
+        var both = PropertiesWithOverworldRoom(2);
+        both.TownQuestLocationsAreMinorItems = true;
+        both.IncludeQuestItemsInShuffle = true;
+        both.IncludeSwordTechsInShuffle = true;
+        Assert.IsFalse(both.HasEnoughSpaceToAllocateItems(),
+            "All four locations cost 4 slots, so a budget of 2 should be short");
+
+        var bothWithRoom = PropertiesWithOverworldRoom(4);
+        bothWithRoom.TownQuestLocationsAreMinorItems = true;
+        bothWithRoom.IncludeQuestItemsInShuffle = true;
+        bothWithRoom.IncludeSwordTechsInShuffle = true;
+        Assert.IsTrue(bothWithRoom.HasEnoughSpaceToAllocateItems(),
+            "A budget of 4 should exactly cover all four locations");
+    }
+
+    [TestMethod]
+    public void TownQuestLocationsAreMinorItems_OnlyCostsEnabledCategories()
+    {
+        // The option can't displace an item that isn't in the pool, so leaving a category out of
+        // the shuffle must leave its locations alone.
+        var questOnlyEnabled = PropertiesWithOverworldRoom(2);
+        questOnlyEnabled.TownQuestLocationsAreMinorItems = true;
+        questOnlyEnabled.IncludeQuestItemsInShuffle = true;
+        Assert.IsTrue(questOnlyEnabled.HasEnoughSpaceToAllocateItems(),
+            "Stab locations shouldn't cost anything when stabs aren't shuffled");
+
+        var stabsOnlyEnabled = PropertiesWithOverworldRoom(2);
+        stabsOnlyEnabled.TownQuestLocationsAreMinorItems = true;
+        stabsOnlyEnabled.IncludeSwordTechsInShuffle = true;
+        Assert.IsTrue(stabsOnlyEnabled.HasEnoughSpaceToAllocateItems(),
+            "Quest locations shouldn't cost anything when quest items aren't shuffled");
+
+        // Neither category: there is nothing to displace, so the option is free.
+        var neither = PropertiesWithOverworldRoom(0);
+        neither.TownQuestLocationsAreMinorItems = true;
+        Assert.IsTrue(neither.HasEnoughSpaceToAllocateItems(),
+            "With neither quest items nor stabs shuffled the option must cost nothing");
+    }
+
+    [TestMethod]
+    public void TownQuestLocationsAreMinorItems_NeedsOverworldItemShuffle()
+    {
+        // The overworld shuffle requirement lives in the config's inclusion test, which is what
+        // gates the exported property that the item budget reads. So the option can't reach the
+        // budget at all when overworld items aren't shuffled.
+        var config = new RandomizerConfiguration
+        {
+            ShuffleOverworldItems = false,
+            IncludeQuestItemsInShuffle = true,
+            IncludeSwordTechsInShuffle = true,
+            TownQuestLocationsAreMinorItems = true,
+        };
+        Assert.IsFalse(config.townQuestLocationsAreMinorItemsIncluded(),
+            "The option can't be included when overworld items aren't shuffled");
+
+        config.ShuffleOverworldItems = true;
+        Assert.IsTrue(config.townQuestLocationsAreMinorItemsIncluded(),
+            "With overworld items shuffled the option is includable");
+    }
+
+    [TestMethod]
+    public void StartingWithAStab_OffsetsTheCostOfThatStab()
+    {
+        // Starting with DOWNSTAB means it is never placed in the world, so only UPSTAB has to
+        // overflow. A budget of 1 should fit one stab but not two.
+        var oneStab = PropertiesWithOverworldRoom(1);
+        oneStab.TownQuestLocationsAreMinorItems = true;
+        oneStab.IncludeSwordTechsInShuffle = true;
+        oneStab.StartWithDownstab = true;
+        Assert.IsTrue(oneStab.HasEnoughSpaceToAllocateItems(),
+            "Starting with downstab should leave room for the one remaining displaced stab");
+
+        var noStab = PropertiesWithOverworldRoom(1);
+        noStab.TownQuestLocationsAreMinorItems = true;
+        noStab.IncludeSwordTechsInShuffle = true;
+        Assert.IsFalse(noStab.HasEnoughSpaceToAllocateItems(),
+            "Without a starting stab, both stabs need to overflow and a budget of 1 is short");
+    }
+
+    [TestMethod]
+    public void TownQuestLocationsAreMinorItems_ConfigAndPropertiesAgree()
+    {
+        // Config-level: turning the option on must cost 4 overworld slots (2 per category).
+        var configOff = new RandomizerConfiguration
+        {
+            ShuffleOverworldItems = true,
+            ShufflePalaceItems = true,
+            IncludeQuestItemsInShuffle = true,
+            IncludeSwordTechsInShuffle = true,
+            TownQuestLocationsAreMinorItems = false,
+        };
+        var (overworldOff, palaceOff) = configOff.CountPossibleMinorItems();
+
+        var configOn = new RandomizerConfiguration
+        {
+            ShuffleOverworldItems = true,
+            ShufflePalaceItems = true,
+            IncludeQuestItemsInShuffle = true,
+            IncludeSwordTechsInShuffle = true,
+            TownQuestLocationsAreMinorItems = true,
+        };
+        var (overworldOn, palaceOn) = configOn.CountPossibleMinorItems();
+
+        Assert.AreEqual(4, overworldOff - overworldOn,
+            "Both categories should cost 4 overworld slots");
+        Assert.AreEqual(palaceOff, palaceOn, "The option must not touch the palace bucket");
+    }
+
     // ─── Cross-Method Consistency ──────────────────────────────────────────
     // When config is at best-case (all shuffled, all non-VANILLA, default containers),
     // the properties-level function should also report "enough space."
