@@ -18,6 +18,12 @@ public abstract class PalaceGenerator
 
     internal abstract Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt);
 
+    public virtual bool AllReachable(RandomizerProperties props, Palace palace)
+    {
+        return palace.AllReachable(dropsMayBypassBosses: props.DropsMayBypassBosses,
+                                   tBirdRequired: props.RequireTbird);
+    }
+
     protected static bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
     {
         if (palaceNumber < 7)

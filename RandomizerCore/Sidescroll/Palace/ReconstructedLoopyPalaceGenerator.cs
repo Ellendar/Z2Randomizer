@@ -36,8 +36,11 @@ public class ReconstructedLoopyPalaceGenerator(CancellationToken ct) : Reconstru
         }
     }
 
-    public override bool AllReachable(Palace palace)
+    public override bool AllReachable(RandomizerProperties props, Palace palace)
     {
-        return palace.AllReachable(allowBossEnterLeft: palace.Number == 7);
+        return palace.AllReachable(allowMiniBossEnterGoingLeft: true,
+                                   allowFinalBossEnterGoingLeft: palace.Number == 7,
+                                   dropsMayBypassBosses: props.DropsMayBypassBosses,
+                                   tBirdRequired: props.RequireTbird);
     }
 }

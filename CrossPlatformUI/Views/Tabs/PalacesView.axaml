@@ -41,7 +41,7 @@
                     <z:Z2NumericUpDown Flag="PalacesToCompleteMax" Grid.Column="1" />
                 </Grid>
             </StackPanel>
-                </Grid>
+        </Grid>
 
         <Grid Grid.Row="1" Margin="0 16 0 0" ColumnDefinitions="*, *, *">
             <StackPanel Grid.Column="0" Margin="0 0">
@@ -79,6 +79,7 @@
                 <z:Z2CheckBox Flag="TBirdRequired" Classes="DisabledMeansChecked" />
                 <z:Z2CheckBox Flag="AggressiveTbird" />
                 <z:Z2CheckBox Flag="RemoveTBird" />
+                <z:Z2CheckBox Flag="DropsMayBypassBosses" />
 
                 <Separator Margin="16 10 18 10"/>
                 <!-- misc -->
