@@ -220,9 +220,9 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         foreach (var attr in field.GetAttributes())
         {
             // Look for attributes with "property:" target
-            if (attr.AttributeClass == null) continue;
+            if (attr.AttributeClass == null) { continue; }
             var attrName = attr.AttributeClass.Name;
-            if (attrName.StartsWith("Reactive") || attrName.StartsWith("CustomFlagSerializer") || attrName.StartsWith("DifficultyOnly")) continue;
+            if (attrName.StartsWith("Reactive") || attrName.StartsWith("CustomFlagSerializer")) { continue; }
             // if (attrName.EndsWith("Attribute"))
             //     attrName = attrName[..^9];
 
@@ -432,9 +432,9 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
     private static void GenerateDiffMethod(StringBuilder sb, string className, List<SerializedFieldInfo> fields, string indent)
     {
         sb.AppendLine();
-        sb.AppendLine($"{indent}    public global::System.Collections.Generic.IReadOnlyList<(string Field, object? OldValue, object? NewValue)> Diff({className} other)");
+        sb.AppendLine($"{indent}    public global::System.Collections.Generic.IReadOnlyList<(global::Z2Randomizer.RandomizerCore.Flags.ConfigFlag Field, object? OldValue, object? NewValue)> Diff({className} other)");
         sb.AppendLine($"{indent}    {{");
-        sb.AppendLine($"{indent}        var diffs = new global::System.Collections.Generic.List<(string Field, object? OldValue, object? NewValue)>();");
+        sb.AppendLine($"{indent}        var diffs = new global::System.Collections.Generic.List<(global::Z2Randomizer.RandomizerCore.Flags.ConfigFlag Field, object? OldValue, object? NewValue)>();");
         sb.AppendLine();
 
         foreach (var field in fields)
@@ -442,7 +442,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             var propName = GetPropertyName(field.FieldName);
             sb.AppendLine($"{indent}        if (!Equals({propName}, other.{propName}))");
             sb.AppendLine($"{indent}        {{");
-            sb.AppendLine($"{indent}            diffs.Add((Field: \"{propName}\", OldValue: {propName}, NewValue: other.{propName}));");
+            sb.AppendLine($"{indent}            diffs.Add((Field: global::Z2Randomizer.RandomizerCore.Flags.ConfigFlag.{propName}, OldValue: {propName}, NewValue: other.{propName}));");
             sb.AppendLine($"{indent}        }}");
         }
 

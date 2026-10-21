@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Controls;
 using Avalonia.Media;
 using ReactiveUI;
+using RUISG = ReactiveUI.SourceGenerators;
 using ReactiveUI.Primitives;
 using ReactiveUI.Primitives.Disposables;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
@@ -18,7 +19,7 @@ using CrossPlatformUI.ViewModels.Tabs;
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
-public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
+public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
     [JsonIgnore]
     public IObservable<bool> CanGenerateObservable { get; private set; }
@@ -26,8 +27,11 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     [JsonIgnore]
     public IObservable<IBrush> FlagInputUnderlineObservable { get; }
 
-    private bool flagsValid = true;
-    private bool FlagsValid { get => flagsValid; set => this.RaiseAndSetIfChanged(ref flagsValid, value); }
+    [JsonIgnore]
+    public IObservable<IBrush> HeaderBackgroundObservable { get; }
+
+    [RUISG.Reactive]
+    public partial bool FlagsValid { get; set; } = true;
 
     private static bool IsFlagStringValid(string flags) => FlagPasteParser.IsValidFlagString(flags);
 
@@ -46,16 +50,17 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     }
 
     private string themeVariantName = "";
-    public string ThemeVariantName 
+    public string ThemeVariantName
     {
-        get
-        {
-            return themeVariantName;
-        }
+        get => themeVariantName;
         set
         {
-            ThemeHelper.SetTheme(value);
-            this.RaiseAndSetIfChanged(ref themeVariantName, value);
+            if (themeVariantName != value)
+            {
+                themeVariantName = value;
+                this.RaisePropertyChanged();
+                ThemeHelper.SetTheme(value);
+            }
         }
     }
     [JsonIgnore]
@@ -65,8 +70,8 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     }
 
     // Remembers the selected tab between app restarts.
-    private int currentTabIndex;
-    public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
+    [RUISG.Reactive]
+    public partial int CurrentTabIndex { get; set; }
 
     // This remembers the preset you had selected in the list between app restarts (not which preset you *loaded*)
     public string? SelectedPresetName { get; set; }
@@ -79,12 +84,6 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     {
         Main = main;
         HostScreen = Main;
-        BiomesViewModel = new(Main);
-        PalacesViewModel = new(Main);
-        SpellsViewModel = new(Main);
-        ItemsViewModel = new(Main);
-        HintsViewModel = new(Main, this);
-        CustomizeViewModel = new(Main);
         PresetViewModel = new(Main);
         Activator = new ViewModelActivator();
 
@@ -124,18 +123,25 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
             }
         });
 
-        var seedValidObservable = this.WhenAnyValue(x => x.Main.Config.Seed, seed => !string.IsNullOrWhiteSpace(seed));
+        var seedValidObservable = Main.WhenAnyValue(x => x.Config.Seed)
+            .Select(seed => !string.IsNullOrWhiteSpace(seed))
+            .DistinctUntilChanged();
 
-        CanGenerateObservable = this.WhenAnyValue(x => x.FlagsValid).CombineLatest(
+        CanGenerateObservable = this.WhenAnyValue(vm => vm.FlagsValid).CombineLatest(
             seedValidObservable,
             Main.RomFileViewModel.HasRomDataObservable,
-            Main.GenerateRomViewModel.WhenAnyValue(x => x.IsRunning),
+            Main.GenerateRomViewModel.WhenAnyValue(vm => vm.IsRunning),
             (flagsValid, seedValid, hasRom, isRunning) =>
                 flagsValid && seedValid && hasRom && !isRunning);
 
         FlagInputUnderlineObservable = this.WhenAnyValue(x => x.ThemeVariantName)
             .CombineLatest(this.WhenAnyValue(x => x.FlagsValid), (theme, valid) =>
                 ThemeHelper.GetFlagUnderlineBrush(theme, valid));
+
+        HeaderBackgroundObservable = this.WhenAnyValue(x => x.ThemeVariantName)
+            .CombineLatest(
+                Main.FlagsChanged.Select(_ => Main.Config.GenerateSpoiler).DistinctUntilChanged(),
+                (theme, alert) => ThemeHelper.GetFlagAlertBackgroundBrush(theme, alert));
 
         Generate = ReactiveCommand.Create(() =>
         {
@@ -179,10 +185,10 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
     {
         var loadedFlags = Main.Config.SerializeFlags(); // this serializes the configuration
         var defaultFlags = new RandomizerConfiguration().SerializeFlags();
-        // If the flags are entirely default, use the beginner preset
+        // If the flags are entirely default, use the vanilla preset
         if (loadedFlags == defaultFlags)
         {
-            Main.Config.DeserializeFlags(BeginnerPreset.Preset.SerializeFlags());
+            Main.Config.DeserializeFlags(VanillaPreset.Preset.SerializeFlags());
         }
 
         // flag updates from RandomizerConfiguration always overwrites our flag input
@@ -217,23 +223,18 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
             })
             .DisposeWith(disposables);
 
-        Main.Config.PropertyChanged += (sender, args) =>
-        {
-            switch (args.PropertyName)
-            {
-                case "Seed":
-                    this.RaisePropertyChanged(nameof(Seed));
-                    break;
-            }
-        };
+        SubscribeExtensions.Subscribe(
+            Main.Config.ObservableForProperty(x => x.Seed),
+            _ => this.RaisePropertyChanged(nameof(Seed)))
+            .DisposeWith(disposables);
 
         // ReactiveUI.Validation (latest 7.1.0) is not updated to ReactiveUI 24 and can't be used
         // this.ValidationRule(viewModel => viewModel.FlagsValid, this.WhenAnyValue(x => x.FlagsValid), "Invalid Flags");
 
-        AddValidationRules();
+        AddValidationRules(disposables);
     }
 
-    private void AddValidationRules()
+    private void AddValidationRules(MultipleDisposable disposables)
     {
         SubscribeExtensions.Subscribe(
             Main.Config.WhenAnyValue(
@@ -254,7 +255,8 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
                 Main.Config.DripperEnemyOption = DripperEnemyOption.ONLY_BOTS;
                 Main.Config.GeneratorsAlwaysMatch = false;
             }
-        });
+        })
+            .DisposeWith(disposables);
 
         // When PalaceItems and OverworldItems are off, then don't allow MixingOverworldAndPalaceItems
         SubscribeExtensions.Subscribe(
@@ -270,14 +272,16 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
             {
                 Main.Config.MixOverworldAndPalaceItems = false;
             }
-        });
+        })
+            .DisposeWith(disposables);
 
         // If shuffle overworld items is off, turn off pbag cave item shuffle too
         SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems), x =>
         {
             if (x.Value ?? true) return;
             Main.Config.IncludePBagCavesInItemShuffle = false;
-        });
+        })
+            .DisposeWith(disposables);
         
         // If Palaces can't swap continents 
         SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleEncounters), x =>
@@ -285,14 +289,16 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
             if (x.Value ?? true) return;
             Main.Config.IncludeLavaInEncounterShuffle = false;
             Main.Config.AllowUnsafePathEncounters = false;
-        });
+        })
+            .DisposeWith(disposables);
 
         // If shuffle palaces is off, then don't allow shuffling GP
         SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.PalacesCanSwapContinents), x =>
             {
                 if (x.Value ?? true) return;
                 Main.Config.ShuffleGP = false;
-            });
+            })
+            .DisposeWith(disposables);
 
         SubscribeExtensions.Subscribe(Main.ObservableForProperty(x => x.ShuffleAllExpState), x =>
         {
@@ -300,7 +306,24 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
             Main.Config.ShuffleAttackExperience = true;
             Main.Config.ShuffleMagicExperience = true;
             Main.Config.ShuffleLifeExperience = true;
-        });
+        })
+            .DisposeWith(disposables);
+
+        // At most one of the "no duplicate rooms" settings may be on:
+        // checking either clears the other (was view code-behind before).
+        SubscribeExtensions.Subscribe(Main.Config.WhenAnyValue(x => x.NoDuplicateRoomsByLayout), byLayout =>
+        {
+            if (byLayout)
+                Main.Config.NoDuplicateRoomsByEnemies = false;
+        })
+            .DisposeWith(disposables);
+
+        SubscribeExtensions.Subscribe(Main.Config.WhenAnyValue(x => x.NoDuplicateRoomsByEnemies), byEnemies =>
+        {
+            if (byEnemies)
+                Main.Config.NoDuplicateRoomsByLayout = false;
+        })
+            .DisposeWith(disposables);
     }
 
     [JsonIgnore]
@@ -308,13 +331,6 @@ public class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivata
 
     [JsonIgnore]
     public MainViewModel Main { get; }
-    [JsonIgnore]
-    public BiomesViewModel BiomesViewModel { get; }
-    public PalacesViewModel PalacesViewModel { get; }
-    public SpellsViewModel SpellsViewModel { get; }
-    public ItemsViewModel ItemsViewModel { get; }
-    public HintsViewModel HintsViewModel { get; }
-    public CustomizeViewModel CustomizeViewModel { get; }
     public PresetsViewModel PresetViewModel { get; }
     
     [JsonIgnore]

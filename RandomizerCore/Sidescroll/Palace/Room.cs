@@ -256,7 +256,7 @@ public class Room : IJsonOnDeserialized
         // Console.WriteLine($"whatever {label} here: ${tableAddr:X6}");
         a.Segment(PalaceGroup == PalaceGrouping.PalaceGp ? "PRG5" : "PRG4");
         a.RomOrg(tableAddr);
-        a.Word(a.Symbol(label));
+        a.Word(AsmModule.Symbol(label));
     }
 
     public int UpdateEnemies(AsmModule a, int enemyAddr)

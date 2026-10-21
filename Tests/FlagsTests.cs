@@ -357,10 +357,10 @@ public class FlagsTests
 
         // StartWithGlove (defined before AttackLevelCap) must come first.
         Assert.AreEqual(2, diffs.Count);
-        Assert.AreEqual("StartWithGlove", diffs[0].Field);
+        Assert.AreEqual(ConfigFlag.StartWithGlove, diffs[0].Field);
         Assert.AreEqual(true, diffs[0].OldValue);
         Assert.AreEqual(false, diffs[0].NewValue);
-        Assert.AreEqual("AttackLevelCap", diffs[1].Field);
+        Assert.AreEqual(ConfigFlag.AttackLevelCap, diffs[1].Field);
         Assert.AreEqual(4, diffs[1].OldValue);
         Assert.AreEqual(8, diffs[1].NewValue);
     }
@@ -377,7 +377,7 @@ public class FlagsTests
         var diffs = config.Diff(other);
 
         Assert.AreEqual(1, diffs.Count);
-        Assert.AreEqual("PalacesCanSwapContinents", diffs[0].Field);
+        Assert.AreEqual(ConfigFlag.PalacesCanSwapContinents, diffs[0].Field);
         Assert.IsNull(diffs[0].OldValue);
         Assert.AreEqual(false, diffs[0].NewValue);
     }

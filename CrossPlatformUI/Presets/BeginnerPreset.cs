@@ -3,7 +3,7 @@
 namespace CrossPlatformUI.Presets;
 
 /// <summary>
-/// Beginner and Default preset.
+/// Beginner preset.
 /// </summary>
 public static class BeginnerPreset
 {

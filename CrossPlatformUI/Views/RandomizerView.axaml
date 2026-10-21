@@ -88,37 +88,37 @@
                 <tabs:PresetsView DataContext="{Binding PresetViewModel}"/>
             </TabItem>
             <TabItem Header="Customize">
-                <tabs:CustomizeView DataContext="{Binding CustomizeViewModel}" />
+                <tabs:CustomizeView DataContext="{Binding Main}" />
             </TabItem>
             <TabItem Header="Start">
                 <tabs:StartView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Biomes">
-                <tabs:BiomesView DataContext="{Binding BiomesViewModel}"/>
+                <tabs:BiomesView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Overworld">
                 <tabs:OverworldView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Palaces">
-                <tabs:PalacesView DataContext="{Binding PalacesViewModel}"/>
+                <tabs:PalacesView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Levels">
                 <tabs:LevelsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Spells">
-                <tabs:SpellsView DataContext="{Binding SpellsViewModel}"/>
+                <tabs:SpellsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Enemies">
                 <tabs:EnemiesView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Items">
-                <tabs:ItemsView DataContext="{Binding ItemsViewModel}"/>
+                <tabs:ItemsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Drops">
                 <tabs:DropsView DataContext="{Binding Main}"/>
             </TabItem>
-            <TabItem Header="Hints" Background="{Binding HintsViewModel.HeaderBackgroundObservable^}">
-                <tabs:HintsView DataContext="{Binding HintsViewModel}"/>
+            <TabItem Header="Hints" Background="{Binding HeaderBackgroundObservable^}">
+                <tabs:HintsView DataContext="{Binding Main}"/>
             </TabItem>
         </TabControl>
     </Grid>

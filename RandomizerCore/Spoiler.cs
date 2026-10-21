@@ -11,6 +11,7 @@ public class Spoiler
 {
     private ROM rom;
     private byte[] itemPalette;
+    public static SKSamplingOptions sampleNearest = new(SKFilterMode.Nearest);
     public Dictionary<Terrain, SKBitmap> terrainTiles;
 
     public Spoiler(ROM rom)
@@ -119,9 +120,9 @@ public class Spoiler
             for (int x = offsetX; x < offsetX + width; x++)
             {
                 Terrain t = world.map[y, x];
-                var tile = terrainTiles[t];
+                SKBitmap tile = terrainTiles[t];
                 Debug.Assert(tile != null);
-                canvas.DrawBitmap(tile, (startDrawX - offsetX) * 16 + x * 16, startDrawY * 16 + y * 16);
+                canvas.DrawBitmap(tile, (startDrawX - offsetX) * 16 + x * 16, startDrawY * 16 + y * 16, sampleNearest);
             }
         }
 
@@ -237,7 +238,7 @@ public class Spoiler
             foreach (var p in part.Placement)
             {
                 SKBitmap drawTile = p.FlipH ? FlipTileHorizontally(tile) : tile;
-                canvas.DrawBitmap(drawTile, startX + p.X * 8, startY + p.Y * 8);
+                canvas.DrawBitmap(drawTile, startX + p.X * 8, startY + p.Y * 8, sampleNearest);
             }
         }
     }

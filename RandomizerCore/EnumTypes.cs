@@ -1041,51 +1041,55 @@ public record EnumDescription
 
 public static class Enums
 {
-    public static IEnumerable<EnumDescription> StartingTechList { get; } = ToDescriptions<StartingTechs>();
+    public static IEnumerable<EnumDescription> StartingTechniquesList { get; } = ToDescriptions<StartingTechs>();
     public static IEnumerable<EnumDescription> StartingLivesList { get; } = ToDescriptions<StartingLives>();
     public static IEnumerable<EnumDescription> AttackEffectivenessList { get; } = ToDescriptions<AttackEffectiveness>();
     public static IEnumerable<EnumDescription> MagicEffectivenessList { get; } = ToDescriptions<MagicEffectiveness>();
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
-    public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
-    public static IEnumerable<EnumDescription> HelpfulHintsOptionList { get; } = ToDescriptions<HelpfulHintOption>();
+    public static IEnumerable<EnumDescription> EnemyXPDropsList { get; } = ToDescriptions<XPEffectiveness>();
+    public static IEnumerable<EnumDescription> HelpfulHintsList { get; } = ToDescriptions<HelpfulHintOption>();
     public static IEnumerable<EnumDescription> DripperEnemyOptionList { get; } = ToDescriptions<DripperEnemyOption>();
-    public static IEnumerable<EnumDescription> EnemyLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>();
-    public static IEnumerable<EnumDescription> BossLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>(i => i != EnemyLifeOption.WIDE);
+    public static IEnumerable<EnumDescription> ShuffleEnemyHPList { get; } = ToDescriptions<EnemyLifeOption>();
+    public static IEnumerable<EnumDescription> ShuffleBossHPList { get; } = ToDescriptions<EnemyLifeOption>(i => i != EnemyLifeOption.WIDE);
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
     public static IEnumerable<EnumDescription> SwordImmunityOptionList { get; } = ToDescriptions<SwordImmunityOption>();
     public static IEnumerable<EnumDescription> FluteWarpModeList { get; } = ToDescriptions<FluteWarpMode>();
-    public static IEnumerable<EnumDescription> BossRoomMinDistanceOptions { get; } = ToDescriptions<BossRoomMinDistance>();
-    public static IEnumerable<EnumDescription> PalaceLengthOptionList { get; } = ToDescriptions<PalaceLengthOption>();
-    public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();
+    public static IEnumerable<EnumDescription> DarkLinkMinDistanceList { get; } = ToDescriptions<BossRoomMinDistance>();
+    public static IEnumerable<EnumDescription> NormalPalaceLengthList { get; } = ToDescriptions<PalaceLengthOption>();
+    public static IEnumerable<EnumDescription> GpLengthList { get; } = ToDescriptions<PalaceLengthOption>();
+    public static IEnumerable<EnumDescription> PalaceItemRoomCountList { get; } = ToDescriptions<PalaceItemRoomCount>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
         = ToDescriptions<PalaceStyle>(i => i.NormalPalaceStyle());
-    public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
+    public static IEnumerable<EnumDescription> GpStyleList { get; } 
         = ToDescriptions<PalaceStyle>(i => i.IsGpStyle());
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();
     public static IEnumerable<EnumDescription> PalaceDropStyleList { get; } = ToDescriptions<PalaceDropStyle>();
 
     public static IEnumerable<EnumDescription> WestBiomeList { get; } = ToDescriptions<Biome>(i => i.IsWestBiome());
     public static IEnumerable<EnumDescription> EastBiomeList { get; } = ToDescriptions<Biome>(i => i.IsEastBiome());
-    public static IEnumerable<EnumDescription> DMBiomeList { get; } = ToDescriptions<Biome>(i => i.IsDMBiome());
+    public static IEnumerable<EnumDescription> DmBiomeList { get; } = ToDescriptions<Biome>(i => i.IsDMBiome());
     public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
     public static IEnumerable<EnumDescription> WestClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsWestClimate());
     public static IEnumerable<EnumDescription> EastClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsEastClimate());
     public static IEnumerable<EnumDescription> DmClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsDmClimate());
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
     public static IEnumerable<EnumDescription> OverworldSizeList { get; } = ToDescriptions<OverworldSizeOption>();
+    public static IEnumerable<EnumDescription> WestSizeList { get; } = ToDescriptions<OverworldSizeOption>();
+    public static IEnumerable<EnumDescription> EastSizeList { get; } = ToDescriptions<OverworldSizeOption>();
     public static IEnumerable<EnumDescription> DmSizeList { get; } = ToDescriptions<DmSizeOption>();
     public static IEnumerable<EnumDescription> MazeSizeList { get; } = ToDescriptions<MazeSizeOption>();
     public static IEnumerable<EnumDescription> LessImportantLocationsOptionList { get; } = ToDescriptions<LessImportantLocationsOption>();
 
     public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions<EncounterRate>();
     public static IEnumerable<EnumDescription> CharacterColorList { get; } = ToDescriptions<NesColor>();
-    public static IEnumerable<EnumDescription> BeamSpritesList { get; } = ToDescriptions<BeamSprites>();
+    public static IEnumerable<EnumDescription> BeamSpriteList { get; } = ToDescriptions<BeamSprites>();
     public static IEnumerable<EnumDescription> BeepThresholdList { get; } = ToDescriptions<BeepThreshold>();
     public static IEnumerable<EnumDescription> BeepFrequencyList { get; } = ToDescriptions<BeepFrequency>();
-    public static IEnumerable<EnumDescription> MaxHeartsOptionList { get; } = ToDescriptions<MaxHeartsOption>();
+    public static IEnumerable<EnumDescription> MaxHeartContainersList { get; } = ToDescriptions<MaxHeartsOption>();
     public static IEnumerable<EnumDescription> IndeterminateOptionRateList { get; } = ToDescriptions<IndeterminateOptionRate>();
     public static IEnumerable<EnumDescription> RiverDevilBlockerOptionList { get; } = ToDescriptions<RiverDevilBlockerOption>();
-    public static IEnumerable<EnumDescription> StartingResourceLimitList { get; } = ToDescriptions<StartingResourceLimit>();
+    public static IEnumerable<EnumDescription> StartItemsLimitList { get; } = ToDescriptions<StartingResourceLimit>();
+    public static IEnumerable<EnumDescription> StartSpellsLimitList => StartItemsLimitList;
     
 
     public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : Enum

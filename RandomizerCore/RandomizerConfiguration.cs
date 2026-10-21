@@ -152,21 +152,25 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
+    [UiNumericPair(nameof(startingHeartContainersMax))]
     private int? startingHeartContainersMin = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
+    [UiNumericPair(nameof(startingHeartContainersMin))]
     private int? startingHeartContainersMax = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
+    [UiNumericPair(nameof(startingMagicContainersMax))]
     private int? startingMagicContainersMin = 4;
 
     [Reactive]
     [Minimum(1)]
     [Maximum(8)]
+    [UiNumericPair(nameof(startingMagicContainersMin))]
     private int? startingMagicContainersMax = 4;
 
     [Reactive]
@@ -258,9 +262,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private ContinentConnectionType continentConnectionType = ContinentConnectionType.NORMAL;
 
     [Reactive]
+    [TooltipResource("OverworldSizeToolTip")]
     private OverworldSizeOption westSize = OverworldSizeOption.LARGE;
 
     [Reactive]
+    [TooltipResource("OverworldSizeToolTip")]
     private OverworldSizeOption eastSize = OverworldSizeOption.LARGE;
 
     [Reactive]
@@ -282,12 +288,15 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private Biome mazeBiome = Biome.VANILLA;
 
     [Reactive]
+    [TooltipResource("ClimateToolTip")]
     private ClimateEnum westClimate = ClimateEnum.VANILLA_WEIGHTED;
 
     [Reactive]
+    [TooltipResource("ClimateToolTip")]
     private ClimateEnum eastClimate = ClimateEnum.VANILLA_WEIGHTED;
 
     [Reactive]
+    [TooltipResource("ClimateToolTip")]
     private ClimateEnum dmClimate = ClimateEnum.CLASSIC;
 
     [Reactive]
@@ -442,12 +451,14 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [Minimum(0)]
     [Maximum(6)]
+    [UiNumericPair(nameof(palacesToCompleteMax))]
     private int palacesToCompleteMin = 6;
 
     [Reactive]
     [Minimum(0)]
     [Maximum(6)]
     [ConditionallyIncludeInFlags]
+    [UiNumericPair(nameof(palacesToCompleteMin))]
     private int palacesToCompleteMax = 6;
     public bool palacesToCompleteMaxIncluded() => palacesToCompleteMin != 6;
 
@@ -529,7 +540,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool? swapUpAndDownStab = false;
 
     [Reactive]
+    // Add [ConditionallyIncludeInFlags] for next minor release.
     private FireOption fireOption = FireOption.NORMAL;
+    public bool fireOptionIncluded() => !marioMode;
 
     //Enemies
     [Reactive]
@@ -726,18 +739,22 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [IgnoreInFlags]
     private bool randomizeMusic = false;
+    public bool randomizeMusicIncluded() => !disableMusic;
 
     [Reactive]
     [IgnoreInFlags]
     private bool mixCustomAndOriginalMusic = false;
-    
+    public bool mixCustomAndOriginalMusicIncluded() => !disableMusic && randomizeMusic;
+
     [Reactive]
     [IgnoreInFlags]
     private bool includeDiverseMusic = false;
+    public bool includeDiverseMusicIncluded() => !disableMusic && randomizeMusic;
 
     [Reactive]
     [IgnoreInFlags]
     private bool disableUnsafeMusic = false;
+    public bool disableUnsafeMusicIncluded() => !disableMusic && randomizeMusic;
 
     [Reactive]
     [IgnoreInFlags]
@@ -778,18 +795,22 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
     [Reactive]
     [IgnoreInFlags]
+    [IgnoreInFlagControls]
     private NesColor tunic = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
+    [IgnoreInFlagControls]
     private NesColor skinTone = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
+    [IgnoreInFlagControls]
     private NesColor tunicOutline = NesColor.Default;
 
     [Reactive]
     [IgnoreInFlags]
+    [IgnoreInFlagControls]
     private NesColor shieldTunic = NesColor.Default;
 
     [Reactive]
