@@ -1,0 +1,8 @@
+# To add this file to your blame ignore:
+# git config --local blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Change files that had mixed line-endings
+b553986064065193f899e827a452233550757953
+
+# Fix basic formatting errors
+364df8546b69497d12abd26ae69ac5d8e2cbe9d6
