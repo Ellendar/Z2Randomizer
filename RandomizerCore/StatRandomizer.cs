@@ -121,7 +121,8 @@ public class StatRandomizer
     }
 
     [Conditional("DEBUG")]
-    public void AssertHasWritten(bool value = true) {
+    public void AssertHasWritten(bool value = true)
+    {
 #if DEBUG
         Debug.Assert(hasWritten == value);
 #endif
@@ -210,7 +211,8 @@ public class StatRandomizer
         rom.Put(RomMap.PALACE125_ENEMY_HP_TABLE, Palace125EnemyHpTable);
         rom.Put(RomMap.PALACE346_ENEMY_HP_TABLE, Palace346EnemyHpTable);
         rom.Put(RomMap.GP_ENEMY_HP_TABLE, GpEnemyHpTable);
-        for (int i = 0; i < RomMap.bossHpAddresses.Count; i++) {
+        for (int i = 0; i < RomMap.bossHpAddresses.Count; i++)
+        {
             rom.Put(RomMap.bossHpAddresses[i], BossHpTable[i]);
         }
     }
@@ -494,7 +496,7 @@ public class StatRandomizer
                 byte baseVal = (byte)(MagicEffectivenessTable[index] >> 1);
                 int min = (int)(baseVal * range.Low);
                 int max = (int)(baseVal * range.High);
-                        nextVal = (byte)r.Next(min, max);
+                nextVal = (byte)r.Next(min, max);
                 nextVal = Math.Min(nextVal, (byte)120);
 
                 if (level > 0)

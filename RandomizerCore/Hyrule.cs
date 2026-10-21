@@ -202,7 +202,7 @@ public class Hyrule
             config.CheckForFlagConflicts();
             props = config.Export(r, includeDifficulty: !shareSeedAcrossDifficulty);
             //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
-            if(config.GenerateSpoiler)
+            if (config.GenerateSpoiler)
             {
                 r.NextBytes(new byte[64]);
                 difficultyRng?.NextBytes(new byte[64]);
@@ -296,7 +296,7 @@ public class Hyrule
             if (props.DashAlwaysOn)
             {
                 ROMData.Put(0x13C3, [0x30, 0xD0]);
-                }
+            }
 
             if (props.PermanentBeam)
             {
@@ -470,18 +470,18 @@ public class Hyrule
                 z2Hash = CombineHashes(sharedHash, finalHash);
             }
             else
-                {
+            {
                 byte[] finalRngState = new byte[32];
                 r.NextBytes(finalRngState);
                 byte[] finalHash = CalculateHash(Flags, SeedHash, randoRomHash, finalRngState);
                 z2Hash = ConvertHash(finalHash);
                 SanitizeHashCharacters(z2Hash);
-                }
+            }
 
             if (Z2MarioModeEnabled && !IS_RANDOMIZED)
-                {
+            {
                 z2Hash = Util.ToGameText("VER. 2.0.0 ");
-                }
+            }
             ROMData.Put(0x17C2C, z2Hash);
             Hash = Util.FromGameText(z2Hash);
 
@@ -503,7 +503,7 @@ public class Hyrule
             }*/
             return new RandomizerResult(true, ROMData.rawdata, rom.debugfile, string.Join(Environment.NewLine, rom.messages.Select(x => x.ToString())));
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             logger.Error(e);
             Debug.WriteLine(e.StackTrace);
@@ -610,7 +610,7 @@ public class Hyrule
             Collectable replacementItem = minorItems.Sample(r);
             foreach (Location location in ItemLocations())
             {
-                if(location.ReplaceCollectable(item, replacementItem))
+                if (location.ReplaceCollectable(item, replacementItem))
                 {
                     return;
                 }
@@ -644,11 +644,11 @@ public class Hyrule
 
         spellListOrder = [Collectable.SHIELD_SPELL,
             props.MarioMode ? Collectable.TANOOKI : Collectable.JUMP_SPELL,
-            Collectable.LIFE_SPELL, 
+            Collectable.LIFE_SPELL,
             Collectable.FAIRY_SPELL,
-            props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL, 
+            props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL,
             Collectable.REFLECT_SPELL,
-            Collectable.SPELL_SPELL, 
+            Collectable.SPELL_SPELL,
             Collectable.THUNDER_SPELL];
 
         //Non-pbag, non-wizard, non-palace items are inherently in the global shuffle pool
@@ -685,7 +685,7 @@ public class Hyrule
         }
 
         bool canReplaceStartingSpellsWithMinorItems = !props.ShuffleSpellLocations;
-        if(props.IncludeSpellsInShuffle)
+        if (props.IncludeSpellsInShuffle)
         {
             shufflableItems.Add(Collectable.SHIELD_SPELL);
             shufflableItems.Add(props.MarioMode ? Collectable.TANOOKI : Collectable.JUMP_SPELL);
@@ -698,13 +698,13 @@ public class Hyrule
             globalShuffleLocations.Add([westHyrule.rauru, westHyrule.ruto, westHyrule.sariaNorth, westHyrule.mido,
                 eastHyrule.nabooru, eastHyrule.darunia, eastHyrule.newKasuto, eastHyrule.oldKasuto]);
         }
-        else if(props.ShuffleSpellLocations)
+        else if (props.ShuffleSpellLocations)
         {
             ShuffleSpells();
             //Mario's spell list is inherently always vanilla (until we either update mario to not break with a shuffled spell list)
             //or we add the option to choose vanilla spell order, in which case properties should always set that to true for mario
             //and this conditional should be that one
-            if(!props.MarioMode)
+            if (!props.MarioMode)
             {
                 spellListOrder = possibleItemLocations.Where(i => i.Town != null && i?.Town?.Type != TownType.BAGU)
                     .OrderBy(i => (int)i.Town!.Type!)
@@ -753,7 +753,7 @@ public class Hyrule
                 globalShuffleLocations.AddRange([westHyrule.mido, eastHyrule.darunia]);
             }
         }
-        else if(props.SwapUpAndDownStab)
+        else if (props.SwapUpAndDownStab)
         {
             SwapUpAndDownstab();
         }
@@ -767,7 +767,7 @@ public class Hyrule
         //Spell Item handling
 
         //Remove 
-        if(props.StartWithSpellItems)
+        if (props.StartWithSpellItems)
         {
             foreach (Collectable spellItem in spellItems)
             {
@@ -800,7 +800,7 @@ public class Hyrule
             Collectable.SPELL_SPELL,
             Collectable.THUNDER_SPELL];
 
-        foreach(Collectable item in possibleStartItems)
+        foreach (Collectable item in possibleStartItems)
         {
             if (props.StartsWithCollectable(item) && (canReplaceStartingSpellsWithMinorItems || !item.IsSpell()))
             {
@@ -1063,7 +1063,7 @@ public class Hyrule
             ];
 
             //Mario mode has different priority because the relative value of upgrades is very different
-            if(props.MarioMode)
+            if (props.MarioMode)
             {
                 importantItemsToDuplicate = [
                 Collectable.GLOVE,
@@ -1095,13 +1095,13 @@ public class Hyrule
                 List<Collectable> locationCollectables = minorItemLocation.GetAllCollectables();
                 List<int> collectableIndexes = Enumerable.Range(0, minorItemLocation.GetCollectableCount()).ToList();
                 collectableIndexes.FisherYatesShuffle(r);
-                foreach(int collectableIndex in collectableIndexes) 
-                    {
-                    if(locationCollectables[collectableIndex].IsMinorItem())
+                foreach (int collectableIndex in collectableIndexes)
+                {
+                    if (locationCollectables[collectableIndex].IsMinorItem())
                     {
                         locationCollectables[collectableIndex] = importantItemsToDuplicate[itemIndex];
                         minorItemLocation.SetCollectables(locationCollectables);
-                        if(!locationCollectables.Any(c => c.IsMinorItem()))
+                        if (!locationCollectables.Any(c => c.IsMinorItem()))
                         {
                             minorItemLocations.Remove(minorItemLocation);
                         }
@@ -1149,7 +1149,7 @@ public class Hyrule
                 if (props.StartsWithCollectable(wizardCollectable))
                 {
                     ItemGet[spellItems[i]] = true;
-                    Location? spellItemLocation = 
+                    Location? spellItemLocation =
                         possibleItemLocations.FirstOrDefault(location => location.GetAllCollectables().Contains(spellItems[i]));
                     spellItemLocation?.ReplaceCollectable(spellItems[i], minorItems.Sample(r));
                 }
@@ -1194,9 +1194,9 @@ public class Hyrule
                         break;
                     }
                 }
-                if(replaced)
+                if (replaced)
                 {
-                            break;
+                    break;
                 }
             }
         }
@@ -1217,7 +1217,7 @@ public class Hyrule
         itemsToShuffle.FisherYatesShuffle(r);
 
         int itemIndex = 0;
-        foreach(Location location in itemShuffleLocations)
+        foreach (Location location in itemShuffleLocations)
         {
             int collectableCount = location.GetCollectableCount(true);
             List<Collectable> newCollectables = itemsToShuffle.GetRange(itemIndex, collectableCount);
@@ -1244,11 +1244,11 @@ public class Hyrule
         //so do a first pass with distinct items so all item rooms are always separate sideviews
         int itemRoomIndex = 0;
         Collectable[] temporaryCollectables = Enum.GetValues<Collectable>().Where(i => !i.IsInternalUse() && !i.IsMinorItem()).ToArray();
-        foreach(Palace palace in palaces)
+        foreach (Palace palace in palaces)
         {
-            foreach(Room itemRoom in palace.ItemRooms)
+            foreach (Room itemRoom in palace.ItemRooms)
             {
-                while(((Collectable)itemRoomIndex).IsMinorItem())
+                while (((Collectable)itemRoomIndex).IsMinorItem())
                 {
                     itemRoomIndex++;
                 }
@@ -1376,7 +1376,7 @@ public class Hyrule
         int previousGettableItemsCount = 0;
         debug++;
 
-        int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count 
+        int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count
             + deathMountain.AllLocations.Count + mazeIsland.AllLocations.Count;
         //logger.Debug("Locations count: West-" + westHyrule.AllLocations.Count + " East-" + eastHyrule.AllLocations.Count +
         //   " DM-" + deathMountain.AllLocations.Count + " MI-" + mazeIsland.AllLocations.Count + " Total-" + totalLocationsCount);
@@ -1440,7 +1440,7 @@ public class Hyrule
             //+ " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
         }
 
-        foreach(Collectable item in ItemGet.Keys)
+        foreach (Collectable item in ItemGet.Keys)
         {
             if (ItemGet[item] == false && item.IsItemGetItem())
             {
@@ -1470,7 +1470,7 @@ public class Hyrule
             //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
-        if(accessibleHeartContainers > props.MaxHearts)
+        if (accessibleHeartContainers > props.MaxHearts)
         {
             throw new Exception("More hearts found than should exist in the seed.");
         }
@@ -1552,7 +1552,7 @@ public class Hyrule
 
         //upstab guy entrance is unchanged because you drop into it, but still change the exit to lead directly out
         ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 45 * 4, (16 << 2) + 3);
-        }
+    }
 
     /// <summary>
     /// 
@@ -1580,8 +1580,8 @@ public class Hyrule
             {
                 List<Collectable> gettableItems = location.GetGettableItems(requireables);
 
-                foreach(Collectable item in gettableItems)
-                    {
+                foreach (Collectable item in gettableItems)
+                {
                     ItemGet[item] = true;
                     gottenItems.Add(item);
 
@@ -1600,7 +1600,7 @@ public class Hyrule
         } while (!stalled);
 
         accessibleHeartContainers = props.StartHearts + heartContainerGetLocations.Count;
-        accessibleMagicContainers = props.StartMagicContainers + magicContainerGetLocations.Count;  
+        accessibleMagicContainers = props.StartMagicContainers + magicContainerGetLocations.Count;
         return gottenItems.Count;
     }
 
@@ -1608,12 +1608,12 @@ public class Hyrule
     {
         HashSet<RequirementType> requireables = [];
 
-        foreach(Collectable item in ItemGet.Keys)
+        foreach (Collectable item in ItemGet.Keys)
         {
             if (item.AsRequirement() != null && (ItemGet[item] || props.StartsWithCollectable(item)))
             {
                 RequirementType? reqirement = item.AsRequirement();
-                if(reqirement != null)
+                if (reqirement != null)
                 {
                     requireables.Add((RequirementType)reqirement);
                 }
@@ -1624,7 +1624,7 @@ public class Hyrule
         //(even though they aren't collectable)
         //Also mario implicitly has upstab as a requirementType because it means "can break blocks upward"
         //but not in itemget because he can still get the upstab upgrade, which lets him POW
-        if(props.MarioMode)
+        if (props.MarioMode)
         {
             requireables.Add(RequirementType.JUMP);
             requireables.Add(RequirementType.DASH);
@@ -1632,7 +1632,7 @@ public class Hyrule
         }
 
         requireables.AddRange(RequirementTypeExtensions.UpToXContainers(accessibleMagicContainers));
-       
+
         return requireables;
     }
 
@@ -1722,7 +1722,7 @@ public class Hyrule
                     type = props.EastBiome.UsesVanillaMap() || props.MazeBiome.UsesVanillaMap() ? 2 : PickRandomType();
                     SetTransportation(2, 3, type);
                 }
-                else if(props.ContinentConnections == ContinentConnectionType.ANYTHING_GOES)
+                else if (props.ContinentConnections == ContinentConnectionType.ANYTHING_GOES)
                 {
                     Location l1, l2;
                     List<int> doNotPick = new List<int>();
@@ -1881,7 +1881,7 @@ public class Hyrule
                 if (!westHyrule.AllReached)
                 {
                     while (!westHyrule.Terraform(props, ROMData))
-                    { 
+                    {
                         if (++totalWestGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
                         {
                             throw new Exception("Failed to generate West Continent");
@@ -1899,7 +1899,7 @@ public class Hyrule
                 if (!deathMountain.AllReached)
                 {
                     while (!deathMountain.Terraform(props, ROMData))
-                    { 
+                    {
                         if (++totalDeathMountainGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
                         {
                             throw new Exception("Failed to generate Death Mountain");
@@ -1917,7 +1917,7 @@ public class Hyrule
                 if (!eastHyrule.AllReached)
                 {
                     while (!eastHyrule.Terraform(props, ROMData))
-                    { 
+                    {
                         if (++totalEastGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
                         {
                             throw new Exception("Failed to generate East Continent");
@@ -2083,7 +2083,7 @@ public class Hyrule
 
     private bool AllContinentsAreConnected((Location, Location)[] connections)
     {
-        if(connections.Length != 4)
+        if (connections.Length != 4)
         {
             throw new ImpossibleException("Too many connections!");
         }
@@ -2094,12 +2094,12 @@ public class Hyrule
         }
         HashSet<Continent> continentsFound = [Continent.WEST];
         bool progress = true;
-        while(progress == true)
+        while (progress == true)
         {
             progress = false;
             foreach ((Location, Location) connection in connections)
             {
-                if(continentsFound.Contains(connection.Item1.Continent) && !continentsFound.Contains(connection.Item2.Continent))
+                if (continentsFound.Contains(connection.Item1.Continent) && !continentsFound.Contains(connection.Item2.Continent))
                 {
                     continentsFound.Add(connection.Item2.Continent);
                     progress = true;
@@ -2207,15 +2207,15 @@ public class Hyrule
     /// <exception cref="Exception"></exception>
     private void ShuffleSpells()
     {
-        foreach(Collectable collectable in ItemGet.Keys)
+        foreach (Collectable collectable in ItemGet.Keys)
         {
-            if(collectable.IsSpell())// || collectable == Collectable.UPSTAB || collectable == Collectable.DOWNSTAB)
+            if (collectable.IsSpell())// || collectable == Collectable.UPSTAB || collectable == Collectable.DOWNSTAB)
             {
                 ItemGet[collectable] = false;
             }
         }
 
-        List<Location> unallocatedTowns = new List<Location> { westHyrule.rauru, westHyrule.ruto, westHyrule.sariaNorth, westHyrule.mido, 
+        List<Location> unallocatedTowns = new List<Location> { westHyrule.rauru, westHyrule.ruto, westHyrule.sariaNorth, westHyrule.mido,
             eastHyrule.nabooru, eastHyrule.darunia, eastHyrule.newKasuto, eastHyrule.oldKasuto };
 
         var filteredToJustSpells = Enum.GetValues<Collectable>().Cast<Collectable>().Where(i => i.IsSpell());
@@ -2272,7 +2272,7 @@ public class Hyrule
         //neither of these starting item handlings really belong here, but this is good enough.
 
         //Instead of patching out the checks for the spell items, actually update the default save data so you start with them.
-        if(props.StartsWithCollectable(Collectable.TROPHY) || props.StartsWithCollectable(westHyrule.ruto.GetAllCollectables()[0]))
+        if (props.StartsWithCollectable(Collectable.TROPHY) || props.StartsWithCollectable(westHyrule.ruto.GetAllCollectables()[0]))
         {
             rom.Put(0x17b14, 0x10); //Trophy
         }
@@ -2292,7 +2292,7 @@ public class Hyrule
         {
             rom.Put(0x17b17, 0x01); //Water
         }
-        if (props.StartsWithCollectable(Collectable.CHILD) 
+        if (props.StartsWithCollectable(Collectable.CHILD)
             || props.StartsWithCollectable(eastHyrule.darunia.Town!.GetTownMap(VanillaTownMap.DARUNIA_WIZARD)!.Collectable))
         {
             rom.Put(0x17b18, 0x20); //Child
@@ -2381,7 +2381,7 @@ public class Hyrule
             var starSpriteTilePalette1 = starSpriteTile.ToArray();
             var starSpriteTilePalette2 = starSpriteTile.ToArray();
             starSpriteTilePalette1[3] = 0;
-            starSpriteTilePalette2[3+8] = 0;
+            starSpriteTilePalette2[3 + 8] = 0;
             rom.Put(ROM.ChrRomOffset + 0x0ea0, starSpriteTilePalette1);
             rom.Put(ROM.ChrRomOffset + 0x0ec0, starSpriteTilePalette2);
         }
@@ -2587,7 +2587,7 @@ public class Hyrule
             var idx = (int)loc.Palace!.Number! - 1;
             if (loc.Palace!.Number != 7)
             {
-                foreach(Room itemRoom in loc.Palace.ItemRooms)
+                foreach (Room itemRoom in loc.Palace.ItemRooms)
                 {
                     Debug.Assert(itemRoom.Collectable != null, $"Item room {itemRoom.Name} map {itemRoom.Map} in palace {loc.Palace.Number} is missing its item");
                     ROMData.UpdateItem((Collectable)itemRoom.Collectable, itemRoom);
@@ -2605,7 +2605,7 @@ public class Hyrule
         Collectable? collectable = (eastHyrule.newKasuto.Town!.GetTownMap(VanillaTownMap.SPELL_TOWER_INTERIOR)?.Collectable)
             ?? throw new Exception("Unable to find spell tower while setting collectables");
         ROMData.Put(RomMap.EAST_SPELL_TOWER_COLLECTABLE, ((Collectable)collectable).GetROMCollectableIndex());
-        collectable = eastHyrule.newKasuto.Town!.GetTownMap(VanillaTownMap.GRANNYS_BASEMENT)!.Collectable 
+        collectable = eastHyrule.newKasuto.Town!.GetTownMap(VanillaTownMap.GRANNYS_BASEMENT)!.Collectable
             ?? throw new Exception("Unable to find granny's basement while setting collectables");
         ROMData.Put(RomMap.EAST_NEW_KASUTO_BASEMENT_COLLECTABLE, ((Collectable)collectable).GetROMCollectableIndex());
 
@@ -2678,7 +2678,7 @@ public class Hyrule
         // Add marker for linked fire. Do this before old spell name shuffle so this gets shuffled in there too
         if (props.LinkedFireSpell != null)
         {
-            ROMData.Put(0x1c72, [..ROM.StringToZ2Bytes("FIRE"), 0xFC]);
+            ROMData.Put(0x1c72, [.. ROM.StringToZ2Bytes("FIRE"), 0xFC]);
         }
 
         // Use the vanilla spell order for the spells if the wizards aren't guaranteed to have a spell
@@ -2702,7 +2702,7 @@ public class Hyrule
                 .Where(l => l.Town?.GetWizard() != null && l != westHyrule.sariaSouth && l != westHyrule.bagu)
                 .Select(l => (Collectable)l.Town!.GetWizard()!.Collectable!).ToList();
             */
-            
+
             for (int i = 0; i < magFunction.Length; i++)
             {
                 magFunction[i] = ROMData.GetByte(functionBase + spellListOrder[i].VanillaSpellOrder());
@@ -2798,11 +2798,11 @@ public class Hyrule
                         Collectable collectable = (Collectable)item;
                         if (collectable.IsMinorItem())
                         {
-    #if UNSAFE_DEBUG
+#if UNSAFE_DEBUG
                             logger.Debug("Map: " + map);
                             logger.Debug("Item: " + item);
                             logger.Debug($"Address: {addr:X}");
-    #endif
+#endif
                             visited.Add(addr);
                             items.Add(item);
                         }
@@ -2898,9 +2898,9 @@ public class Hyrule
             //sb.AppendLine();
         }
 
-        for(int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
-            sb.AppendLine($"\nPalace {i+1}:\n");
+            sb.AppendLine($"\nPalace {i + 1}:\n");
             sb.AppendLine(palaces[i].GetLayoutDebug(props.PalaceStyles[i], false));
         }
 
@@ -2913,10 +2913,10 @@ public class Hyrule
         //Currently randomizedStats only exists if stats were randomized.
         //This should just be a characterStats object that holds the stats regardless of whether they
         //are randomized or not
-        if(randomizedStats != null)
+        if (randomizedStats != null)
         {
-        sb.AppendLine("\nSTATS:\n");
-        sb.AppendLine(randomizedStats.GenerateSpoiler());
+            sb.AppendLine("\nSTATS:\n");
+            sb.AppendLine(randomizedStats.GenerateSpoiler());
         }
 
         sb.AppendLine("\nDETAILS: ");
@@ -3049,23 +3049,23 @@ CustomFileSelectData:
         }
 
         if (!itemWasUnreachable)
-            {
+        {
             sb.AppendLine("One or more items were in ItemGet but in no location!");
             foreach (Collectable missingItem in ItemGet.Keys.Where(i => ItemGet[i] == false && !i.IsMinorItem()))
-                {
+            {
                 sb.AppendLine(missingItem.ToString());
                 itemWasMissing = true;
-                }
-            //Debug.WriteLine(GenerateSpoiler());
             }
+            //Debug.WriteLine(GenerateSpoiler());
+        }
 
-        if(!itemWasMissing)
+        if (!itemWasMissing)
         {
             sb.AppendLine("Missing Non-Item locations (this should have been caught by ValidateBasicRouting!");
             foreach (Location location in ItemLocations().Where(l => !l.Reachable))
             {
                 sb.AppendLine(location.Name);
-        }
+            }
         }
         sb.AppendLine();
 
@@ -3133,8 +3133,9 @@ CustomFileSelectData:
         a.Assign("ENABLE_Z2_MARIO", props.MarioMode ? 1 : 0);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
-    
-    private static void RestartWithPalaceUpA(Assembler a) {
+
+    private static void RestartWithPalaceUpA(Assembler a)
+    {
         a.Module().Code("""
 .include "z2r.inc"
 
@@ -3216,12 +3217,12 @@ FixSoftlock:
 +   rts
 """, "fix_softlock.s");
     }
-    
+
     public static void ExpandedPauseMenu(Assembler a)
     {
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
     }
-    
+
     public static void StandardizeDrops(Assembler a)
     {
         a.Module().Code("""
@@ -3431,7 +3432,8 @@ EndTileComparisons = $8601
         a.Word(Symbol("Towns_in_West_Hyrule"));
         a.Word(Symbol("Towns_in_East_Hyrule"));
 
-        for (var i = 0; i < hints.Count; i++) {
+        for (var i = 0; i < hints.Count; i++)
+        {
             var hint = hints[i];
             a.Reloc();
             a.Label($"HintText{i}");
@@ -3441,14 +3443,16 @@ EndTileComparisons = $8601
         a.Reloc();
         a.Label("Towns_in_West_Hyrule");
         // There are 52 texts in this first table
-        for (var i = 0; i < CustomTexts.WEST_TEXT_COUNT; i++) {
+        for (var i = 0; i < CustomTexts.WEST_TEXT_COUNT; i++)
+        {
             var hint = hints[i];
             a.Word(Symbol($"HintText{i}"));
         }
         // and the rest are in this table
         a.Reloc();
         a.Label("Towns_in_East_Hyrule");
-        for (var i = CustomTexts.WEST_TEXT_COUNT; i < hints.Count; i++) {
+        for (var i = CustomTexts.WEST_TEXT_COUNT; i < hints.Count; i++)
+        {
             var hint = hints[i];
             a.Word(Symbol($"HintText{i}"));
         }
@@ -3459,7 +3463,7 @@ EndTileComparisons = $8601
         if (texts.Count == 0)
         {
             return;
-    }
+        }
         var a = asm.Module();
         a.Assign("MOVING_DIALOG_COUNT", texts.Count);
         a.Segment("PRG3");
@@ -3781,13 +3785,13 @@ FlagHudUpdate:
         {
             // New Zelda II Mario credit screens which comes after the z2 credits but before the
             // rando credits
-            byte[] marioRole1 = [.. CmdText(7,  2, "Z2M PROGRAMER"), 0xff];
+            byte[] marioRole1 = [.. CmdText(7, 2, "Z2M PROGRAMER"), 0xff];
             byte[] marioName1 = [.. CmdText(11, 4, "JROWEBOY"), 0xff];
-            byte[] marioRole2 = [.. CmdText(7,  2, "Z2M SOUND COMPOSER"), 0xff];
+            byte[] marioRole2 = [.. CmdText(7, 2, "Z2M SOUND COMPOSER"), 0xff];
             byte[] marioName2 = [.. CmdText(11, 4, "HEYDON  "), 0xff];
-            byte[] marioRole3 = [.. CmdText(7,  2, "SPECIAL THANKS    "), 0xff];
+            byte[] marioRole3 = [.. CmdText(7, 2, "SPECIAL THANKS    "), 0xff];
             byte[] marioName3 = [.. CmdText(11, 4, "STUDSX"), .. CmdText(11, 6, "QUANTAM"), 0xff];
-            byte[] marioRole4 = [.. CmdText(7,  2, "SPECIAL THANKS"), 0xff];
+            byte[] marioRole4 = [.. CmdText(7, 2, "SPECIAL THANKS"), 0xff];
             byte[] marioName4 = [.. CmdText(11, 4, "YOU   "), .. CmdText(11, 6, "       "), 0xff];
             a.Assign("ENABLE_Z2_MARIO", 1);
 
@@ -3851,10 +3855,10 @@ FlagHudUpdate:
         string[] modules = ["boss.s", "integration.s", "map.s", "mario.s", "metasprite.s", "sfx.s", "CustomTitleScreen.s"];
         foreach (var mod in modules)
         {
-        var a = asm.Module();
+            var a = asm.Module();
             a.Assign("ENABLE_Z2_MARIO", 1);
             a.Code(Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.z2mario.{mod}"), mod);
-    }
+        }
         // Rename JUMP to TANOOKI
         var m = asm.Module();
         m.Segment("PRG0");
@@ -3978,7 +3982,7 @@ FlagHudUpdate:
             StandardizeDrops(engine);
         }
         FixSoftLock(engine);
-        
+
         RandomizeStartingValues(props, engine, r, rom);
         rom.FixStaleSaveSlotData(engine);
         rom.UseExtendedBanksForPalaceRooms(engine);
@@ -4042,7 +4046,7 @@ FlagHudUpdate:
                 // have the same expectations for the game, so this will "unpatch" the
                 // extra lag routine, so that it uses the lag reduction code.
                 rom.Put(0x1ffec, 0xb4, 0xf2);
-        }
+            }
         }
 
         UpdateMovingNpcDialog(engine, CustomTexts.BuildMovingNpcDialogPool(props));
@@ -4060,24 +4064,24 @@ FlagHudUpdate:
             (eastHyrule?.locationAtPalace6.Palace!.Number ?? 6),
             (eastHyrule?.locationAtGP.Palace!.Number ?? 7)
         ];
-        }
+    }
 
     private void AssignPalaceLocations()
-        {
+    {
         List<Location> palaceLocations = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3,
                 mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6];
         if (props.PalacesCanSwapContinent)
         {
             if (props.P7shuffle)
-        {
+            {
                 palaceLocations.Add(eastHyrule.locationAtGP);
                 palaceLocations.FisherYatesShuffle(r);
-        }
+            }
             else
-        {
+            {
                 palaceLocations.FisherYatesShuffle(r);
                 palaceLocations.Add(eastHyrule.locationAtGP);
-        }
+            }
         }
         else
         {

@@ -66,11 +66,11 @@ public class Program
             configuration = JsonSerializer.Deserialize(configurationString, SerializationContext.Default.RandomizerConfiguration);
         }
 
-        if (!Seed.HasValue) 
+        if (!Seed.HasValue)
         {
             var r = new System.Random();
             Seed = r.Next(1000000000);
-        } 
+        }
         configuration!.Seed = Seed.Value.ToString();
 
         if (string.IsNullOrEmpty(Rom))
@@ -135,7 +135,7 @@ public class Program
         var roomsJson = RandomizerCore.Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = configuration!.UseCustomRooms ? RandomizerCore.Util.ReadAllTextFromFile("CustomRooms.json") : null;
         var palaceRooms = new PalaceRooms(configuration!.UseCustomRooms ? customJson! : roomsJson, configuration!.UseCustomRooms);
-        var randomizer = new Hyrule(createAsm,palaceRooms);
+        var randomizer = new Hyrule(createAsm, palaceRooms);
         var rom = await randomizer.Randomize(vanillaRomData!, configuration, UpdateProgress, cts.Token);
 
         if (rom.success)
@@ -150,7 +150,7 @@ public class Program
                     ? filename[..filename.LastIndexOf(os_sep)]
                     : Directory.GetCurrentDirectory();
             }
-            string newFileName =  $"{outpath}/Z2_{Seed}_{Flags}.nes";
+            string newFileName = $"{outpath}/Z2_{Seed}_{Flags}.nes";
             await File.WriteAllBytesAsync(newFileName, rom.romdata!);
             logger.Info($"File {newFileName} has been created!");
             if (rom.debuginfo != null)
@@ -166,7 +166,7 @@ public class Program
             logger.Error(rom.messages!);
         }
     }
-    
+
     private async Task UpdateProgress(string str)
     {
         await Task.Run(() => logger.Info(str));
