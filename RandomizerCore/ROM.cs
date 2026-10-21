@@ -43,20 +43,20 @@ public class ROM
     private readonly int[] inCurtains = { 0x13F1D, 0x13F2D, 0x13F3D, 0x13F4D, 0x13F5D, 0x13F6D, 0x1402B };
 
     private readonly int[] brickSprites = {
-        ChrRomOffset + 0x9640, 
-        ChrRomOffset + 0xB640, 
-        ChrRomOffset + 0xD640, 
-        ChrRomOffset + 0x13640, 
-        ChrRomOffset + 0x15640, 
-        ChrRomOffset + 0x17640, 
+        ChrRomOffset + 0x9640,
+        ChrRomOffset + 0xB640,
+        ChrRomOffset + 0xD640,
+        ChrRomOffset + 0x13640,
+        ChrRomOffset + 0x15640,
+        ChrRomOffset + 0x17640,
         ChrRomOffset + 0x19640
     };
-    private readonly int[] inBrickSprites = { 
-        ChrRomOffset + 0x9680, 
-        ChrRomOffset + 0xB680, 
-        ChrRomOffset + 0xD680, 
-        ChrRomOffset + 0x13680, 
-        ChrRomOffset + 0x15680, 
+    private readonly int[] inBrickSprites = {
+        ChrRomOffset + 0x9680,
+        ChrRomOffset + 0xB680,
+        ChrRomOffset + 0xD680,
+        ChrRomOffset + 0x13680,
+        ChrRomOffset + 0x15680,
         ChrRomOffset + 0x17680,
         ChrRomOffset + 0x19680
     };
@@ -178,7 +178,6 @@ public class ROM
         return rawdata[index];
     }
 
-    
     //This used to be [start, end), but that's both awkward and not idiomatic, so I replaced it
     //with a more conventional start + lengh implementation
     public byte[] GetBytes(int start, int length)
@@ -522,7 +521,7 @@ Line3:
 """;
 
 
-        var playerName = marioMode ? 
+        var playerName = marioMode ?
 """
 Line4:
 ; MARIO(TM)
@@ -557,7 +556,7 @@ Line7:
 .byte $23, $29, 15 ; Write 15 bytes to $2329
 .byte $5d, $5e, $5e, $5e, $5f, $5e, $60, $5e, $61, $62, $63, $64, $65, $66, $67
 """;
-        
+
         asm.Module().Code($"""
 .macpack common
 .segment "PRG5"
@@ -651,10 +650,10 @@ SAVE PRINCESS ZELDA...
             a.Segment("PRG5");
             foreach (var (line, i) in titleText.Split('\n').Select((item, index) => (item, index)))
             {
-                var blankLine = Enumerable.Repeat((byte)0xf4,29).ToArray();
+                var blankLine = Enumerable.Repeat((byte)0xf4, 29).ToArray();
                 StringToZ2Bytes(line.Trim()).CopyTo(blankLine, 0);
                 blankLine[28] = 0xfd;
-                a.Org((ushort) (0xA932 + i * 29));
+                a.Org((ushort)(0xA932 + i * 29));
                 a.Byt(blankLine);
             }
         }
@@ -665,24 +664,25 @@ SAVE PRINCESS ZELDA...
         IpsPatcher.Patch(rawdata, patch, expandRom);
     }
 
-    private readonly int[] fireLocs = { 
-        ChrRomOffset + 0x00840, 
-        ChrRomOffset + 0x02840, 
-        ChrRomOffset + 0x04840, 
-        ChrRomOffset + 0x06840, 
-        ChrRomOffset + 0x08840, 
-        ChrRomOffset + 0x0a840, 
-        ChrRomOffset + 0x0c840, 
-        ChrRomOffset + 0x0e840, 
-        ChrRomOffset + 0x16840, 
-        ChrRomOffset + 0x12840, 
-        ChrRomOffset + 0x14840, 
-        ChrRomOffset + 0x18840 
+    private readonly int[] fireLocs = {
+        ChrRomOffset + 0x00840,
+        ChrRomOffset + 0x02840,
+        ChrRomOffset + 0x04840,
+        ChrRomOffset + 0x06840,
+        ChrRomOffset + 0x08840,
+        ChrRomOffset + 0x0a840,
+        ChrRomOffset + 0x0c840,
+        ChrRomOffset + 0x0e840,
+        ChrRomOffset + 0x16840,
+        ChrRomOffset + 0x12840,
+        ChrRomOffset + 0x14840,
+        ChrRomOffset + 0x18840
     };
 
     public void UpdateSprite(CharacterSprite charSprite, bool sanitize, bool changeItems)
     {
-        if (charSprite.Patch != null) {
+        if (charSprite.Patch != null)
+        {
             if (sanitize)
             {
                 SpritePatcher.PatchSpriteSanitized(rawdata, charSprite.Patch, true, changeItems);
@@ -746,14 +746,14 @@ SAVE PRINCESS ZELDA...
         {
             outlineColorInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
         }
-        if(shieldColor == NesColor.Random)
+        if (shieldColor == NesColor.Random)
         {
             shieldColorInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
         }
 
-        if(tunicColor != NesColor.Default && tunicColorInt != null)
-        { 
-            foreach(int l in LinkTunicPaletteAddr)
+        if (tunicColor != NesColor.Default && tunicColorInt != null)
+        {
+            foreach (int l in LinkTunicPaletteAddr)
             {
                 Put(l, (byte)tunicColorInt);
             }
@@ -767,12 +767,12 @@ SAVE PRINCESS ZELDA...
         }
         if (outlineColor != NesColor.Default && outlineColorInt != null)
         {
-            foreach(int l in LinkOutlinePaletteAddr)
+            foreach (int l in LinkOutlinePaletteAddr)
             {
                 Put(l, (byte)outlineColorInt);
             }
         }
-        if(shieldColor != NesColor.Default && shieldColorInt != null)
+        if (shieldColor != NesColor.Default && shieldColorInt != null)
         {
             Put(LinkShieldPaletteAddr, (byte)shieldColorInt);
         }
@@ -850,11 +850,11 @@ SAVE PRINCESS ZELDA...
 
         Put(0x8660, 0x51);
         Put(0x924D, 0x00);
-        
+
         //Hack fix for palace 6
         Put(0x8664, 0xE6);
         //put(0x935E, 0x02);
-       
+
         //Fix for extra battle scene
         Put(0x8645, 0x00);
 
@@ -1293,7 +1293,7 @@ CheckController1ForUpAMagic:
         byte[] x_arr = new byte[enemy_count];
         byte[] y_lo_arr = new byte[enemy_count];
         byte[] y_hi_arr = new byte[enemy_count];
-        ushort recoilTableXAddr = (ushort) (0xbfff - enemy_count * 3);
+        ushort recoilTableXAddr = (ushort)(0xbfff - enemy_count * 3);
         a.Set("RecoilTableX", recoilTableXAddr);
         a.Set("RecoilTableYLo", recoilTableXAddr + enemy_count);
         a.Set("RecoilTableYHi", recoilTableXAddr + enemy_count * 2);
@@ -2337,14 +2337,16 @@ DrawHiddenJarBank5:
 
     public static string Z2BytesToString(byte[] data)
     {
-        return new string(data.Select(letter => {
+        return new string(data.Select(letter =>
+        {
             return ReverseCharMap.TryGetValue(letter, out var chr) ? chr : ' ';
         }).ToArray());
     }
 
     public static byte[] StringToZ2Bytes(string text)
     {
-        return text.Select(letter => {
+        return text.Select(letter =>
+        {
             return CharMap.TryGetValue(letter, out var byt) ? byt : (byte)0xfc;
         }).ToArray();
     }
@@ -2489,17 +2491,17 @@ DrawHiddenJarBank5:
             var roomDoorConnectionsRomAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x8817 + currentMapNum * 4);
             var roomDoorConnections = GetBytes(roomDoorConnectionsRomAddr, 4);
 
-            for(int connectionNumber = 0; connectionNumber < 4; connectionNumber++)
+            for (int connectionNumber = 0; connectionNumber < 4; connectionNumber++)
             {
                 byte internalMapNumber = (byte)((roomDoorConnections[connectionNumber] & 0xFC) >> 2);
-                if(!DOOR_CONNECTION_BLACKLIST.Contains(internalMapNumber) && !townMaps.Any(i => i.Map == internalMapNumber))
+                if (!DOOR_CONNECTION_BLACKLIST.Contains(internalMapNumber) && !townMaps.Any(i => i.Map == internalMapNumber))
                 {
                     townMaps.Add(LoadTownMap(internalMapNumber, true));
                 }
             }
         }
 
-        foreach(TownMap townMap in townMaps)
+        foreach (TownMap townMap in townMaps)
         {
             var romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(3, 0x871B + townMap.Map * 4);
             var connectionsRaw = GetBytes(romAddr, 4);
@@ -2907,7 +2909,7 @@ SetInitialEncounterTimer := $8879
             int byte3 = GetByte(sideviewRomPtr + offset++);
 
             if (((Collectable)byte3).IsMinorItem()) continue;
-                Put(sideviewRomPtr + offset - 1, item.GetROMCollectableIndex());
+            Put(sideviewRomPtr + offset - 1, item.GetROMCollectableIndex());
             return;
         } while (offset < sideviewLength);
         logger.Warn($"Could not write Collectable {item} to Item room {room.GetDebuggerDisplay()} in palace {room.PalaceNumber}");

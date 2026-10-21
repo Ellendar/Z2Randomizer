@@ -86,14 +86,14 @@ Seed: {config.Seed}
             var randomizer = new Hyrule(createAsm!, palaceRooms);
             Dispatcher.UIThread.Post(GenerateSeed, DispatcherPriority.Background);
             return;
-            
+
             async void GenerateSeed()
             {
                 try
                 {
                     var romdata = host.RomFileViewModel.RomData!.ToArray();
                     var output = await Task.Run(async () => await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token));
-                    if(!tokenSource.IsCancellationRequested && output.success)
+                    if (!tokenSource.IsCancellationRequested && output.success)
                     {
                         var flags = config.SerializeFlags();
                         var version = Assembly.GetEntryAssembly()!.GetName().Version!;
@@ -151,7 +151,8 @@ Seed: {config.Seed}
                         }
                         ProgressHeading = "Generation Complete";
                         ProgressBody = $"Hash: {randomizer.Hash}\n\nFile: {filename}";
-                    } else if (!output.success)
+                    }
+                    else if (!output.success)
                     {
                         throw new Exception(output.messages);
                     }
@@ -236,5 +237,4 @@ Seed: {config.Seed}
     public string UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
     [JsonIgnore]
     public ViewModelActivator Activator { get; }
-    
 }

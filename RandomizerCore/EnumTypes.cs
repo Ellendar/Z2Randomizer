@@ -336,7 +336,7 @@ public static class PalaceStyleExtensions
             PalaceStyle.RANDOM => false,
             _ => true
         };
-}
+    }
     public static bool IsGpStyle(this PalaceStyle style)
     {
         return style switch
@@ -1060,7 +1060,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> PalaceItemRoomCountList { get; } = ToDescriptions<PalaceItemRoomCount>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
         = ToDescriptions<PalaceStyle>(i => i.NormalPalaceStyle());
-    public static IEnumerable<EnumDescription> GpStyleList { get; } 
+    public static IEnumerable<EnumDescription> GpStyleList { get; }
         = ToDescriptions<PalaceStyle>(i => i.IsGpStyle());
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();
     public static IEnumerable<EnumDescription> PalaceDropStyleList { get; } = ToDescriptions<PalaceDropStyle>();
@@ -1090,14 +1090,14 @@ public static class Enums
     public static IEnumerable<EnumDescription> RiverDevilBlockerOptionList { get; } = ToDescriptions<RiverDevilBlockerOption>();
     public static IEnumerable<EnumDescription> StartItemsLimitList { get; } = ToDescriptions<StartingResourceLimit>();
     public static IEnumerable<EnumDescription> StartSpellsLimitList => StartItemsLimitList;
-    
+
 
     public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : Enum
     {
         if (!typeof(T).IsEnum)
             throw new ArgumentException($"{nameof(T)} must be an enum type");
 
-        if(filterExpression == null)
+        if (filterExpression == null)
         {
             return Enum.GetValues(typeof(T)).Cast<Enum>().Select(i => i.ToDescription());
         }

@@ -51,7 +51,7 @@ public partial class RomFileViewModel : ViewModelBase, IRoutableViewModel
         OpenFileCommand = ReactiveCommand.CreateFromTask(OpenFileInternal);
         HostScreen = Main;
     }
-    
+
 
     private async Task OpenFileInternal(CancellationToken token)
     {
@@ -97,7 +97,7 @@ public partial class RomFileViewModel : ViewModelBase, IRoutableViewModel
             Message = "File exceeded 1MB limit. Please provide an unmodified Zelda 2 ROM (US release) with or without header.";
         }
     }
-    
+
     [JsonIgnore]
     public ReactiveCommand<RxVoid, RxVoid> OpenFileCommand { get; }
     [JsonIgnore]

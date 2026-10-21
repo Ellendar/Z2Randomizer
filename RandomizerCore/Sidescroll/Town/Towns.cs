@@ -12,7 +12,7 @@ public class Towns
     {
         Town town;
         TownMap map;
-        switch(townType)
+        switch (townType)
         {
             case TownType.RAURU:
                 town = rom.LoadTown(1, 2);

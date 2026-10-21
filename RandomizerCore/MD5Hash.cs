@@ -3,7 +3,8 @@ using System.Linq;
 
 namespace Z2Randomizer.RandomizerCore;
 
-public static class MD5Hash {
+public static class MD5Hash
+{
     public static byte[] ComputeHash(byte[] input)
     {
         uint num = 1732584193u;
@@ -142,7 +143,7 @@ public static class MD5Hash {
         BitConverter.GetBytes(num4).CopyTo(hashBytes, 12);
         return hashBytes;
     }
-    
+
     public static string ComputeHashString(byte[] input) => string.Join("", ComputeHash(input).Select(o => o.ToString("x2")));
 
     private static readonly int[] S = new int[64]

@@ -16,7 +16,7 @@ public class FileDialogService(TopLevel? target) : IFileDialogService
 
         return files.Count >= 1 ? files[0] : null;
     }
-    
+
     public async Task<IStorageFolder?> OpenFolderAsync()
     {
         var files = await target!.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()

@@ -16,7 +16,7 @@ public class Enemies
     public const int OverworldEnemyPtr = 0xA08E;
 
     public const int MAXIMUM_ENEMY_BYTES = 0x400;
-	public const int MAXIMUM_ENEMY_BYTES_GP = 681;
+    public const int MAXIMUM_ENEMY_BYTES_GP = 681;
 
     public static readonly EnemiesWest[] WestSmallEnemies = [
         EnemiesWest.MYU,

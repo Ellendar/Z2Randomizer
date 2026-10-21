@@ -15,7 +15,7 @@ public class DesktopFileService : IFileSystemService
         if (OperatingSystem.IsWindows())
         {
             OSBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        } 
+        }
         else if (OperatingSystem.IsMacOS() && Environment.GetEnvironmentVariable("HOME") is not null)
         {
             OSBasePath = Path.Combine(Environment.GetEnvironmentVariable("HOME")!,

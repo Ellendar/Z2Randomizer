@@ -21,7 +21,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 public class SideviewEditable<T> where T : struct, Enum
 {
     private byte[] Header;
-    public List<SideviewMapCommand<T>> Commands { get; set; } 
+    public List<SideviewMapCommand<T>> Commands { get; set; }
 
     /// <summary>
     /// Create a SideViewEditable from an array of bytes for a side view.
@@ -29,12 +29,13 @@ public class SideviewEditable<T> where T : struct, Enum
     /// <param name="bytes"><see cref="Room.SideView"/> goes here.</param>
     public SideviewEditable(byte[] bytes)
     {
-        if(bytes.Length < 4) { throw new ArgumentException("Sideview data has no header."); }
+        if (bytes.Length < 4) { throw new ArgumentException("Sideview data has no header."); }
         Header = bytes[0..4];
         if (bytes.Length != Length) { throw new ArgumentException("Sideview data has bad length in header."); }
         var bgMap = BackgroundMap;
         // (bg maps in the overworld are never solid)
-        if (bgMap != 0 && this is SideviewEditable<PalaceObject>) {
+        if (bgMap != 0 && this is SideviewEditable<PalaceObject>)
+        {
             byte[] bgMapBytes = [];
             switch (bgMap)
             {
@@ -64,7 +65,7 @@ public class SideviewEditable<T> where T : struct, Enum
                     throw new NotImplementedException();
             }
             byte[] xSkip = [0xE0, 0]; // insert after bgmap to set x cursor back to 0
-            bytes = [(byte)(bytes[0] + bgMapBytes[0] - 2), ..bgMapBytes[1..], ..xSkip, ..bytes[4..]];
+            bytes = [(byte)(bytes[0] + bgMapBytes[0] - 2), .. bgMapBytes[1..], .. xSkip, .. bytes[4..]];
             Header = bytes[0..4];
             if (bytes.Length != Length) { throw new ArgumentException("Sideview background map has bad length in header."); }
             BackgroundMap = 0;
@@ -111,7 +112,8 @@ public class SideviewEditable<T> where T : struct, Enum
         set { Header[1] = (byte)((Header[1] & 0b01111111) | (((value) << 7) & 0b10000000)); }
     }
 
-    public byte PageCount {
+    public byte PageCount
+    {
         get => (byte)(((Header[1] & 0b01100000) >> 5) + 1);
         set { Header[1] = (byte)((Header[1] & 0b10011111) | (((value - 1) << 5) & 0b01100000)); }
     }
@@ -241,7 +243,7 @@ public class SideviewEditable<T> where T : struct, Enum
             i++;
         }
         byte[] bytes = [
-            .. Header, 
+            .. Header,
             .. Commands.SelectMany(o => o.Bytes)
         ];
         bytes[0] = (byte)bytes.Length;
@@ -355,7 +357,7 @@ public class SideviewEditable<T> where T : struct, Enum
 
     public SideviewEditable<O> ConvertTo<O>() where O : struct, Enum
     {
-        SideviewEditable<O> converted = new([4, ..Header[1..4]]);
+        SideviewEditable<O> converted = new([4, .. Header[1..4]]);
         foreach (var cmd in Commands)
         {
             var iId = cmd.Id.ToString();
@@ -364,13 +366,16 @@ public class SideviewEditable<T> where T : struct, Enum
             {
                 converted.Add(new SideviewMapCommand<O>(cmd.Bytes, cmd.AbsX));
             }
-            else if (cmd.IsNewFloor()) {
+            else if (cmd.IsNewFloor())
+            {
                 converted.Add(new SideviewMapCommand<O>(cmd.Bytes, cmd.AbsX));
             }
-            else if (cmd.IsXSkip()) {
+            else if (cmd.IsXSkip())
+            {
                 continue;
             }
-            else if (cmd.IsLava()) {
+            else if (cmd.IsLava())
+            {
                 converted.Add(SideviewMapCommand<O>.CreateLava(cmd.AbsX, cmd.Param));
             }
             else if (cmd.IsElevator())

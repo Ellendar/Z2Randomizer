@@ -7,6 +7,6 @@ public class DesktopCheckUpdateService : ICheckUpdateService
 {
     public Task CheckUpdate()
     {
-        return Task.Run(() => WinSparkle.win_sparkle_check_update_with_ui()); 
+        return Task.Run(() => WinSparkle.win_sparkle_check_update_with_ui());
     }
 }

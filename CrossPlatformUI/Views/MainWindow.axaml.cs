@@ -15,9 +15,10 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
     {
         InitializeComponent();
         // Prevent the previewer's DataContext from being set when the application is run.
-        this.WhenActivated((MultipleDisposable disposables) => {
+        this.WhenActivated((MultipleDisposable disposables) =>
+        {
             var context = DataContext as MainViewModel;
-            ClientSize = new Size(context!.WindowSize.Width,context.WindowSize.Height);
+            ClientSize = new Size(context!.WindowSize.Width, context.WindowSize.Height);
             PositionChanged += (_, args) =>
             {
                 context.WindowPosition = new CustomPixelPoint
@@ -37,7 +38,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
         });
         // AvaloniaXamlLoader.Load(this);
         // var prevSize = ClientSize;
-        
+
         // newPosition = new(WindowX, WindowY);
         // Resized += (sender, args) =>
         // {
@@ -51,6 +52,6 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
     {
         base.OnOpened(e);
         var context = DataContext as MainViewModel;
-        ClientSize = new Size(context!.WindowSize.Width,context.WindowSize.Height);
+        ClientSize = new Size(context!.WindowSize.Width, context.WindowSize.Height);
     }
 }

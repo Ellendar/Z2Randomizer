@@ -7,25 +7,25 @@ namespace Z2Randomizer.RandomizerCore;
 
 public enum RequirementType
 {
-    JUMP, 
-    FAIRY, 
-    UPSTAB, 
-    DOWNSTAB, 
-    KEY, 
-    DASH, 
-    GLOVE, 
-    REFLECT, 
+    JUMP,
+    FAIRY,
+    UPSTAB,
+    DOWNSTAB,
+    KEY,
+    DASH,
+    GLOVE,
+    REFLECT,
     SPELL,
     ONE_CONTAINER,
     TWO_CONTAINERS,
     THREE_CONTAINERS,
     FOUR_CONTAINERS,
-    FIVE_CONTAINERS, 
-    SIX_CONTAINERS, 
-    SEVEN_CONTAINERS, 
-    EIGHT_CONTAINERS, 
-    TROPHY, 
-    MEDICINE, 
+    FIVE_CONTAINERS,
+    SIX_CONTAINERS,
+    SEVEN_CONTAINERS,
+    EIGHT_CONTAINERS,
+    TROPHY,
+    MEDICINE,
     CHILD,
     MIRROR,
     WATER,
@@ -40,7 +40,7 @@ public enum RequirementType
 
 public static class RequirementTypeExtensions
 {
-    public static readonly ReadOnlySet<RequirementType> ALL = [..Enum.GetValues<RequirementType>()];
+    public static readonly ReadOnlySet<RequirementType> ALL = [.. Enum.GetValues<RequirementType>()];
     /// Mirror of Collectable.AsRequirement()
     public static Collectable? AsCollectable(this RequirementType requirementType)
     {
@@ -73,7 +73,7 @@ public static class RequirementTypeExtensions
     public static RequirementType[] UpToXContainers(int x)
     {
         List<RequirementType> requirements = [];
-        if(x >= 1)
+        if (x >= 1)
         {
             requirements.Add(RequirementType.ONE_CONTAINER);
         }

@@ -294,7 +294,7 @@ public class RandomizerProperties
 
     public void SetStartingCollectable(Collectable collectable, bool starts = true)
     {
-        if(collectable == Collectable.SHIELD_SPELL)
+        if (collectable == Collectable.SHIELD_SPELL)
         {
             StartShield = starts;
         }

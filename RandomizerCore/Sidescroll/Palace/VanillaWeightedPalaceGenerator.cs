@@ -98,7 +98,7 @@ public class VanillaWeightedPalaceGenerator : RandomWalkCoordinatePalaceGenerato
 
     public static Dictionary<Coord, int> MeasureDeadendPaths(Palace palace, Dictionary<Coord, RoomExitType> palaceShape)
     {
-        List<Coord> importantCoords = [palace.Entrance!.coords, palace.BossRoom!.coords, ..palace.ItemRooms.Select(room => room.coords)];
+        List<Coord> importantCoords = [palace.Entrance!.coords, palace.BossRoom!.coords, .. palace.ItemRooms.Select(room => room.coords)];
         SortedSet<Coord> allCoords = [.. palaceShape.Keys.Order()];
 
         /// a map of coord -> distance  for each importantCoord

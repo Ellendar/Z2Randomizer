@@ -36,7 +36,7 @@ public class FlagsTests
     public void TestNullableBoolEncodeCycle()
     {
         bool? nullBool = null;
-        FlagBuilder flagBuilder= new FlagBuilder();
+        FlagBuilder flagBuilder = new FlagBuilder();
         flagBuilder.Append(nullBool);
         String flags = flagBuilder.ToString();
         FlagReader flagReader = new FlagReader(flags);
@@ -131,7 +131,7 @@ public class FlagsTests
         RandomizerConfiguration config = new();
         RandomizerConfiguration config2 = new(config.SerializeFlags());
         var failures = new List<string>();
-        foreach(PropertyInfo property in typeof(RandomizerConfiguration).GetProperties())
+        foreach (PropertyInfo property in typeof(RandomizerConfiguration).GetProperties())
         {
             if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
             {
@@ -399,7 +399,7 @@ public class FlagsTests
 
         Assert.AreEqual(originalFlags, config.SerializeFlags());
     }
-  
+
     [TestMethod]
     public void DiffReturnsNothingForIdenticalConfigs()
     {

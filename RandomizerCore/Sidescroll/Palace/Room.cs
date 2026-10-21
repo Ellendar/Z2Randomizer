@@ -816,7 +816,7 @@ public class Room : IJsonOnDeserialized
         return true;
     }
 
-    public Room Mirror<S,E>() where S : struct, Enum where E : Enum
+    public Room Mirror<S, E>() where S : struct, Enum where E : Enum
     {
         Room mirror = new(this);
 
@@ -874,7 +874,7 @@ public class Room : IJsonOnDeserialized
     }
     public void SetEffectiveRequirements(Requirements requirements, bool isMario)
     {
-        if(isMario)
+        if (isMario)
         {
             MarioRequirements = requirements;
         }

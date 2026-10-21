@@ -19,7 +19,7 @@ public class HintsTests
         CustomTexts.WIZARD_SPELL_TEXTS_BY_COLLECTABLE.Values.SelectMany(i => i).ToList().ForEach(hints.Add);
         CustomTexts.WIZARD_SPELL_TEXTS_BY_TOWN.Values.SelectMany(i => i).ToList().ForEach(hints.Add);
 
-        foreach(string hint in hints)
+        foreach (string hint in hints)
         {
             Assert.IsTrue(Regex.IsMatch(hint.ToUpper(), @"^[-A-Z0-9 /,.!?*\n$]+$"), "Hint contains an invalid character: " + hint);
             string[] parts = hint.Split('$');

@@ -171,7 +171,8 @@ public class OverworldEnemyShuffler
                 if (floorY != 0)
                 {
                     var y = floorY - j;
-                    if (y == 2) {
+                    if (y == 2)
+                    {
                         // Geldarm could only be positioned 1 tile above
                         // or below the floor - pick another enemy instead.
                         return false;

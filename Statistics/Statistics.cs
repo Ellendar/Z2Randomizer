@@ -63,12 +63,12 @@ class Statistics
                 logger.Info("Finished seed# " + i + " in: " + result.GenerationTime + "ms");
                 //dbContext.SaveChanges();
             }
-            
+
             dbContext.SaveChanges();
         }
-        catch(Exception e) { logger.Error(e); }
+        catch (Exception e) { logger.Error(e); }
     }
-    
+
     private static async Task UpdateProgress(string str)
     {
         await Task.Run(() => logger.Trace(str));

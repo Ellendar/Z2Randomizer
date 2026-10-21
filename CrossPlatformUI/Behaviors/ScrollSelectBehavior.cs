@@ -13,7 +13,7 @@ public class ScrollSelectBehavior : Behavior<Control>
 {
     // Accumulated delta for smooth / throttled scrolling
     private double _scrollAccumulator = 0;
-    
+
     /// <summary>
     /// Whether to use natural scrolling (like macOS). Defaults to true on macOS.
     /// </summary>
@@ -93,7 +93,7 @@ public class ScrollSelectBehavior : Behavior<Control>
 
         if (combo.IsDropDownOpen)
             return false;
-        
+
         var items = itemsEnum.Cast<object>().ToList();
         if (items.Count == 0)
             return false;

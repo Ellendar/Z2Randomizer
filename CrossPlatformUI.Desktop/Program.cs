@@ -26,7 +26,7 @@ public static class Program
         BuildAvaloniaApp()
             .AfterSetup(_ =>
             {
-                App.ServiceContainer ??= new ();
+                App.ServiceContainer ??= new();
                 App.ServiceContainer.AddSingleton<Hyrule.NewAssemblerFn>((opts, debug) => new DesktopJsEngine(opts, debug));
                 App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService!);
                 App.FileSystemService = new DesktopFileService();

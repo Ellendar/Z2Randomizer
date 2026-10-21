@@ -88,7 +88,7 @@ class RomMap
     public const int EXPERIENCE_TO_LEVEL_TEXT_TABLE = 0x1e42;
 
     public const int NORTH_SOUTH_SEPARATOR_WEST = 0x1cb42;
-    public const int NORTH_SOUTH_SEPARATOR_DM   = 0x1cb43;
+    public const int NORTH_SOUTH_SEPARATOR_DM = 0x1cb43;
     public const int NORTH_SOUTH_SEPARATOR_EAST = 0x1cb44;
 
     public static readonly List<int> bossHpAddresses = [

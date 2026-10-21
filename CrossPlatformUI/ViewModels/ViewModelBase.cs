@@ -8,7 +8,8 @@ namespace CrossPlatformUI.ViewModels;
 
 public class ViewModelBase : ReactiveObject { }
 
-public static class Extension {
+public static class Extension
+{
     public static void ValueOrException<TParent, TBacking>(this TParent parent, ref TBacking backing,
         Func<TBacking> newValue, string? message = null, [CallerMemberName] string? field = "")
         where TParent : IReactiveObject

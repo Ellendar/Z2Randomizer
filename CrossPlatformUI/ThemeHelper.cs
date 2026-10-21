@@ -19,7 +19,8 @@ public class ThemeHelper
     private static IBrush DarkInvalidFlagUnderline = SolidColorBrush.Parse("#b10600");
     private static IBrush LightInvalidFlagUnderline = SolidColorBrush.Parse("#b30000");
 
-    static ThemeHelper() {
+    static ThemeHelper()
+    {
         DarkMaterialTheme = Theme.Create(Theme.Dark, Color.Parse("#ffbc33"), Color.Parse("#969696"));
         DarkMaterialTheme.Paper = Color.Parse("#1a1a1a");
 

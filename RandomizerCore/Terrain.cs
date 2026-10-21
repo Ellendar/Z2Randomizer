@@ -56,7 +56,7 @@ static class TerrainExtensions
     public static byte RomValue(this Terrain terrain)
     {
         return terrain switch
-        { 
+        {
             Terrain.PREPLACED_WATER => 12,
             Terrain.PREPLACED_WATER_WALKABLE => 13,
             Terrain.NONE => 15,

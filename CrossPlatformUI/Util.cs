@@ -19,7 +19,7 @@ public class EnumDescriptionConverter : IValueConverter
         }
         return targetType.ToDefault();
     }
-    
+
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is EnumDescription enumDescription)

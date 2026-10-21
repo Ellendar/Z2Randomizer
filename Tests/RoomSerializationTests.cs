@@ -105,11 +105,11 @@ public class RoomSerializationTests
     {
         public bool Equals(byte[]? x, byte[]? y)
         {
-            if(x == null)
+            if (x == null)
             {
                 return y == null;
             }
-            if(y == null)
+            if (y == null)
             {
                 return false;
             }
@@ -141,7 +141,7 @@ public class RoomSerializationTests
         }
     }
 
-    [TestMethod] 
+    [TestMethod]
     public void RoomsContainsNoDuplcateRooms()
     {
         //TODO: REIMPLEMENT THIS

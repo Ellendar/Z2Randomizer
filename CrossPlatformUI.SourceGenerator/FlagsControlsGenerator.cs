@@ -145,7 +145,7 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
             .FirstOrDefault(a => a.Name == CoreAssemblyName);
 
         if (configAssembly is null)
-        { 
+        {
             yield break;
         }
 
@@ -1047,12 +1047,12 @@ public sealed class ControlFieldInfo
     // Whether the enum's members produce a non-null Info column.
     public bool HasInfo { get; set; }
 
-        /// <summary>
-        /// The resx key the control reads its tooltip from, either the
-        /// <c>&lt;PropertyName&gt;ToolTip</c> convention or the value of an explicit
-        /// <c>[TooltipResource(...)]</c> on the config's backing field.
-        /// </summary>
-        public string TooltipResourceName { get; set; } = string.Empty;
+    /// <summary>
+    /// The resx key the control reads its tooltip from, either the
+    /// <c>&lt;PropertyName&gt;ToolTip</c> convention or the value of an explicit
+    /// <c>[TooltipResource(...)]</c> on the config's backing field.
+    /// </summary>
+    public string TooltipResourceName { get; set; } = string.Empty;
 
     // Non-null when the control's IsEnabled is routed through a generated
     // FlagIncludedResolver method (a hand-written FooEnabledObservable).

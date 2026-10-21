@@ -90,7 +90,7 @@ public class Location
     //which causes a bunch of bugs. That said, tracking 100 references and reworking it everywhere is beyond what I want to mess with
     //so for now i'm going to keep this crap design but I am mad about it.
     public bool CanShuffle { get; set; }
-	
+
     /// <summary>
     /// Page you enter this location from, 0 means left. 1/2/3 will enter from the right on areas that have
     /// that many pages total or midscren on other areas.
@@ -190,7 +190,7 @@ public class Location
     public byte[] GetLocationBytes()
     {
         byte[] bytes = new byte[4];
-        if(AccessRequirements.HasHardRequirement(RequirementType.HAMMER) || AccessRequirements.HasHardRequirement(RequirementType.FLUTE))
+        if (AccessRequirements.HasHardRequirement(RequirementType.HAMMER) || AccessRequirements.HasHardRequirement(RequirementType.FLUTE))
         {
             bytes[0] = 0;
         }
@@ -300,14 +300,14 @@ public class Location
         {
             return Palace.GetGettableItems(requireables, shufflableItemsOnly);
         }
-        if(shufflableItemsOnly && !CollectablesAreShufflable)
+        if (shufflableItemsOnly && !CollectablesAreShufflable)
         {
             return [];
         }
         return AccessRequirements.AreSatisfiedBy(requireables) ? NonPalaceTownCollectables : [];
     }
 
-    public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false) 
+    public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false)
     {
         Debug.Assert(Town == null || Palace == null);
         if (Town != null)
@@ -345,14 +345,14 @@ public class Location
         }
         else if (NonPalaceTownCollectables.Contains(toReplace))
         {
-            List<int> replacementIndexCandidates = 
+            List<int> replacementIndexCandidates =
                 Enumerable.Range(0, NonPalaceTownCollectables.Count)
                 .Where(i => NonPalaceTownCollectables[i] == toReplace).ToList();
             if (replacementIndexCandidates.Count == 0)
             {
                 return false;
             }
-            if(r != null)
+            if (r != null)
             {
                 replacementIndexCandidates.FisherYatesShuffle(r);
             }

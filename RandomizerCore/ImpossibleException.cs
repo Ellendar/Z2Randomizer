@@ -6,7 +6,6 @@ public class ImpossibleException : Exception
 {
     public ImpossibleException() : base()
     {
-        
     }
 
     public ImpossibleException(string message) : base(message)

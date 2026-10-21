@@ -235,7 +235,7 @@ public abstract class World
         }
 
         // Add locations with more than one entrance to the maps
-        foreach (var (lid, entrs) 
+        foreach (var (lid, entrs)
             in locsEntrances.Where(kv => kv.Value.Count > 1))
         {
             var allEntrs = entrs.Select(i => GetLocation(lid + i)).ToList();
@@ -288,8 +288,8 @@ public abstract class World
             foreach (Location location in AllLocations)
             {
                 //TODO: Doing this off terrain type is a very bad idea for stuff like vanilla shuffle no actual terrain.
-                if (location.TerrainType == Terrain.PALACE 
-                    || location.TerrainType == Terrain.TOWN 
+                if (location.TerrainType == Terrain.PALACE
+                    || location.TerrainType == Terrain.TOWN
                     || location.GetAllCollectables().Any(i => !i.IsInternalUse()))
                 {
                     if (!location.Reachable)
@@ -359,7 +359,7 @@ public abstract class World
         return AllLocations.FirstOrDefault(i => i.Pos == pos);
     }
 
-    protected Location? GetLocationByCoordsY30Offset((int, int)coords)
+    protected Location? GetLocationByCoordsY30Offset((int, int) coords)
     {
         return AllLocations.FirstOrDefault(i => i.CoordsY30Offset.Equals(coords));
     }
@@ -378,7 +378,7 @@ public abstract class World
     {
         int placementAttempt = 0;
         // make sure we can't shuffle hidden palace
-        if(hiddenPalaceLocation is { CanShuffle: true })
+        if (hiddenPalaceLocation is { CanShuffle: true })
         {
             throw new ImpossibleException("In PlaceLocations we should not be able to shuffle the hidden palace location");
         }
@@ -683,7 +683,7 @@ public abstract class World
     /// <param name="placeLongBridge">If true, one of the bridges is the bridge from vanilla west connecting DM to the SE desert with encounters at both ends</param>
     /// <param name="placeDaruniaDesert">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
-    protected bool ConnectIslands(int maxBridges, bool placeSaria, Terrain riverTerrain, bool riverDevil, 
+    protected bool ConnectIslands(int maxBridges, bool placeSaria, Terrain riverTerrain, bool riverDevil,
         bool rockBlock, bool placeLongBridge, bool placeDaruniaDesert,
         bool canWalkOnWater, Biome biome, int deadZoneMinX = 999, int deadZoneMaxX = -1, int deadZoneMinY = 999, int deadZoneMaxY = -1)
     {
@@ -696,7 +696,7 @@ public abstract class World
             => (x < deadZoneMinX || x > deadZoneMaxX) && (y < deadZoneMinY || y > deadZoneMaxY);
 
         //Any of the bridge locations that are being placed need to be reset so their vanilla locations aren't avoided.
-        if(placeSaria)
+        if (placeSaria)
         {
             foreach (Location location in AllLocations.Where(i => i.Town?.Type == TownType.SARIA))
             {
@@ -704,7 +704,7 @@ public abstract class World
                 location.Y = 0;
             }
         }
-        if(placeDaruniaDesert)
+        if (placeDaruniaDesert)
         {
             int addr1 = LocationID.EAST_TRAP_DESERT1.GetRomOffset(),
                 addr2 = LocationID.EAST_TRAP_DESERT2.GetRomOffset();
@@ -749,14 +749,14 @@ public abstract class World
         //precompute next to water tiles since there are likely more fails than successes and randomly iterating the same
         //bad tiles over and over is wasteful
         List<(IntVector2 Pos, Direction)> nextToWaterTiles = [];
-        for (int y = 1; y < MapRows - 1; y++) 
+        for (int y = 1; y < MapRows - 1; y++)
         {
             for (int x = 1; x < MapColumns - 1; x++)
             {
                 List<Direction> waterDirections = NextToWaterDirections(x, y, crossingTerrains);
                 if (IsDeadZoneSafe(deadZoneMinX, deadZoneMaxX, deadZoneMinY, deadZoneMaxY, y, x))
                 {
-                    foreach(Direction direction in waterDirections)
+                    foreach (Direction direction in waterDirections)
                     {
                         nextToWaterTiles.Add((new IntVector2(x, y), direction));
                     }
@@ -803,7 +803,7 @@ public abstract class World
                     break;
                 }
                 //if advancing goes off the edge of the map, give up
-                if(!WithinMapBounds(pos + forward))
+                if (!WithinMapBounds(pos + forward))
                 {
                     length = 100;
                     break;
@@ -1136,7 +1136,7 @@ public abstract class World
                                 {
                                     if (
                                         riverTerrain.IsWater()
-                                        || riverTerrain == Terrain.MOUNTAIN 
+                                        || riverTerrain == Terrain.MOUNTAIN
                                         || (riverTerrain != Terrain.WALKABLEWATER && curr != length / 2 + 1))
                                     {
                                         map[pos] = Terrain.BRIDGE;
@@ -1632,7 +1632,7 @@ public abstract class World
                     var t = map[y + i, x];
                     if (t != Terrain.NONE && biome != Biome.MOUNTAINOUS && biome != Biome.CALDERA)
                     {
-                        logger.LogDebug("DrawOcean could not add water west"); 
+                        logger.LogDebug("DrawOcean could not add water west");
                         return false;
                     }
                     map[y + i, x] = oceanTerrain;
@@ -1690,7 +1690,7 @@ public abstract class World
         }
         return true;
     }
-  
+
     protected void UpdateReachable(IReadOnlySet<RequirementType> requireables)
     {
 
@@ -2133,9 +2133,9 @@ public abstract class World
     public void DebugVisitation()
     {
         StringBuilder sb = new();
-        for(int y = 0; y < MapRows; y++) 
-        { 
-            for(int x = 0; x < MapColumns; x++)
+        for (int y = 0; y < MapRows; y++)
+        {
+            for (int x = 0; x < MapColumns; x++)
             {
                 sb.Append(visitation[y, x] ? 'x' : ' ');
             }
@@ -2718,11 +2718,11 @@ public abstract class World
         {
             for (int x = 0; x < MapColumns; x++)
             {
-                if(globs[y,x] < 10)
+                if (globs[y, x] < 10)
                 {
                     debug.Append(globs[y, x]);
                 }
-                else if(globs[y, x] < 36)
+                else if (globs[y, x] < 36)
                 {
                     debug.Append((char)(globs[y, x] + 55));
                 }
@@ -2812,11 +2812,11 @@ public abstract class World
 
     public bool ValidateCaves()
     {
-        for(int y = 0; y < MapRows; y++)
+        for (int y = 0; y < MapRows; y++)
         {
-            for(int x = 0; x < MapColumns; x++)
+            for (int x = 0; x < MapColumns; x++)
             {
-                if (map[y,x] == Terrain.CAVE)
+                if (map[y, x] == Terrain.CAVE)
                 {
                     //If all 4 sides of a cave are unwalkable terrain, you can never leave the cave
                     //and you softlock since you can't turn around
@@ -2882,9 +2882,9 @@ public abstract class World
 
     public bool HasCollidingLocations()
     {
-        foreach(Location location in AllLocations)
+        foreach (Location location in AllLocations)
         {
-            if(AllLocations.Any(i => location != i && location.CoordsY30Offset == i.CoordsY30Offset))
+            if (AllLocations.Any(i => location != i && location.CoordsY30Offset == i.CoordsY30Offset))
             {
                 return true;
             }

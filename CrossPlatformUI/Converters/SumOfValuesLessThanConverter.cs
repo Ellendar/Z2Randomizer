@@ -14,7 +14,7 @@ public class SumOfValuesLessThanConverter : IMultiValueConverter
 
     public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if(values.Any(i => i is UnsetValueType))
+        if (values.Any(i => i is UnsetValueType))
         {
             return BindingOperations.DoNothing;
         }
@@ -22,15 +22,15 @@ public class SumOfValuesLessThanConverter : IMultiValueConverter
         {
             return BindingOperations.DoNothing;
         }
- 
+
         int sum = 0;
         foreach (object? value in values)
         {
-            if(!int.TryParse(value!.ToString(), out int intVal))
+            if (!int.TryParse(value!.ToString(), out int intVal))
             {
                 return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);
             }
-            
+
             sum += intVal!;
         }
         if (!int.TryParse(parameter!.ToString(), out int paramVal))

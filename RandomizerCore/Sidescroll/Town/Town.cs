@@ -26,7 +26,7 @@ public class Town
         TownMaps = townMaps;
         foreach (TownMap townMap in townMaps.OrderBy(i => i.Map).Where(i => !i.IsInternalLocation || (i.Map == 57 && Type == TownType.DARUNIA)))
         {
-            if(connections.TryGetValue(townMap.Map, out var connectionsRaw))
+            if (connections.TryGetValue(townMap.Map, out var connectionsRaw))
             {
                 byte connectionMap = (byte)((connectionsRaw[0] & 0xFC) >> 2);
                 townMap.Left = townMaps.FirstOrDefault(i => i.Map == connectionMap);
@@ -84,22 +84,22 @@ public class Town
                 {
                     mapsToCheck.Add(currentMap.Door3);
                 }
-                if (entranceDirection == Direction.WEST 
+                if (entranceDirection == Direction.WEST
                     //This is a hacky fix for the darunia upstab guy intermediary room, which is the only vanilla room
                     //after shortenWizards that connects to another internal room. Normal internal rooms specifically need
                     //to not consider their connections because there's often multiple rooms in the same map,
                     //but this specific one does so it's special cased here. This will need to be fixed for custom towns.
                     && (!currentMap.IsInternalLocation || (currentMap.Map == 57 && Type == TownType.DARUNIA))
-                    && currentMap.Right != null 
-                    && !checkedMaps.Contains(currentMap.Right) 
+                    && currentMap.Right != null
+                    && !checkedMaps.Contains(currentMap.Right)
                     && !mapsToCheck.Contains(currentMap.Right))
                 {
                     mapsToCheck.Add(currentMap.Right);
                 }
-                if (entranceDirection == Direction.EAST 
+                if (entranceDirection == Direction.EAST
                     && !currentMap.IsInternalLocation
-                    && currentMap.Left != null 
-                    && !checkedMaps.Contains(currentMap.Left) 
+                    && currentMap.Left != null
+                    && !checkedMaps.Contains(currentMap.Left)
                     && !mapsToCheck.Contains(currentMap.Left))
                 {
                     mapsToCheck.Add(currentMap.Left);
@@ -126,13 +126,13 @@ public class Town
         //for some reason set as a connection. Don't do that.
         List<TownMap> coveredMaps = [];
         TownMap currentMap = leftMap;
-        while(coveredMaps.Count < 63)
+        while (coveredMaps.Count < 63)
         {
-            if(coveredMaps.Contains(currentMap))
+            if (coveredMaps.Contains(currentMap))
             {
                 throw new Exception($"Loop detected in town connection routing. Check your town connections for town {Name}.");
             }
-            if(!currentMap.AccessRequirements.AreSatisfiedBy(requireables))
+            if (!currentMap.AccessRequirements.AreSatisfiedBy(requireables))
             {
                 return false;
             }
@@ -140,7 +140,7 @@ public class Town
             {
                 return true;
             }
-            if (currentMap.Right == null) 
+            if (currentMap.Right == null)
             {
                 return false;
             }
@@ -155,7 +155,7 @@ public class Town
         List<TownMap> collectableMaps = TownMaps.Where(i => i.Collectable != null && (!collectableOnly || i.CollectableIsShufflable)).ToList();
         Debug.Assert(collectables.Count() == collectableMaps.Count);
         int i = 0;
-        foreach(Collectable collectable in collectables)
+        foreach (Collectable collectable in collectables)
         {
             collectableMaps[i++].Collectable = collectable;
         }
@@ -180,7 +180,7 @@ public class Town
 
     public TownMap? GetWizard()
     {
-        if(Type == null) return null;
+        if (Type == null) return null;
 
         VanillaTownMap map = Type switch
         {

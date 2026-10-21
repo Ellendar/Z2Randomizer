@@ -32,7 +32,7 @@ public sealed class WestHyrule : World
     private Location bridge1;
     private Location bridge2;
     public Location pbagCave;
-	
+
     private Location jumpCave;
     private Location fairyCave;
 
@@ -242,7 +242,7 @@ public sealed class WestHyrule : World
             unimportantLocs.Add(GetLocation(LocationID.WEST_BAGU_WOODS5));
             unimportantLocs.Add(GetLocation(LocationID.WEST_MINOR_ROAD));
             unimportantLocs.Add(GetLocation(LocationID.WEST_MINOR_DESERT));
-            if(props.HelpfulHints == HelpfulHintOption.NONE)
+            if (props.HelpfulHints == HelpfulHintOption.NONE)
             {
                 unimportantLocs.Add(GetLocation(LocationID.WEST_KINGS_TOMB));
             }
@@ -319,10 +319,10 @@ public sealed class WestHyrule : World
             { (0x62, 0x39), "island" }
         };
         lostWoods = [
-            GetLocation(LocationID.WEST_BAGU_WOODS2), 
-            GetLocation(LocationID.WEST_BAGU_WOODS3), 
-            GetLocation(LocationID.WEST_BAGU_WOODS4), 
-            GetLocation(LocationID.WEST_BAGU_WOODS5), 
+            GetLocation(LocationID.WEST_BAGU_WOODS2),
+            GetLocation(LocationID.WEST_BAGU_WOODS3),
+            GetLocation(LocationID.WEST_BAGU_WOODS4),
+            GetLocation(LocationID.WEST_BAGU_WOODS5),
             GetLocation(LocationID.WEST_BAGU_WOODS1)
         ];
         //SetVanillaCollectables(props.ReplaceFireWithDash);
@@ -382,10 +382,10 @@ public sealed class WestHyrule : World
 
             int bytesWritten = 2000;
 
-            if(props.BagusWoods)
+            if (props.BagusWoods)
             {
                 bagu.CanShuffle = false;
-                foreach(Location location in lostWoods)
+                foreach (Location location in lostWoods)
                 {
                     location.CanShuffle = false;
                     unimportantLocs.Remove(location);
@@ -410,7 +410,7 @@ public sealed class WestHyrule : World
                 }
 
                 //Biome specifics
-                switch(biome)
+                switch (biome)
                 {
                     case Biome.ISLANDS:
                         riverTerrain = preplacedWater;
@@ -470,9 +470,9 @@ public sealed class WestHyrule : World
                         sariaNorth.CanShuffle = false;
                         walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
                         //Islands specifically seeds preplaced water instead of normally expandable water to make wetlands less insane
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, 
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,
                             Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, preplacedWater };
-                        
+
                         break;
 
                     case Biome.CANYON:
@@ -486,8 +486,8 @@ public sealed class WestHyrule : World
                             bridge2.CanShuffle = false;
                             bridge2.YRaw = 0;
                         }
-                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN];
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
+                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN];
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
 
                         DrawCanyon(riverTerrain);
                         walkableTerrains.Remove(Terrain.MOUNTAIN);
@@ -664,7 +664,7 @@ public sealed class WestHyrule : World
                 if (biome == Biome.CALDERA)
                 {
                     bool f = ConnectIslands(1, true, preplacedWater, false, false, false, false, props.CanWalkOnWaterWithBoots, biome,
-                        calderaCenterX - CALDERA_DEAD_ZONE_X, calderaCenterX + CALDERA_DEAD_ZONE_X, 
+                        calderaCenterX - CALDERA_DEAD_ZONE_X, calderaCenterX + CALDERA_DEAD_ZONE_X,
                         calderaCenterY - CALDERA_DEAD_ZONE_Y, calderaCenterY + CALDERA_DEAD_ZONE_Y);
                     if (!f)
                     {
@@ -784,12 +784,12 @@ public sealed class WestHyrule : World
         int y = RNG.Next(6, MapRows - 7);
         int x = RNG.Next(6, MapColumns - 7);
         int tries = 0;
-        while((map[y, x] != Terrain.NONE || GetLocationByCoordsNoOffset((y, x)) != null) && tries < 1000)
+        while ((map[y, x] != Terrain.NONE || GetLocationByCoordsNoOffset((y, x)) != null) && tries < 1000)
         {
             y = RNG.Next(6, MapRows - 7);
             x = RNG.Next(6, MapColumns - 7);
         }
-        if(tries >= 1000)
+        if (tries >= 1000)
         {
             return false;
         }
@@ -800,11 +800,11 @@ public sealed class WestHyrule : World
 
         int placed = 0;
         tries = 0;
-        while(placed < 5 && tries < 3000)
+        while (placed < 5 && tries < 3000)
         {
             int newx = RNG.Next(x - 3, x + 4);
             int newy = RNG.Next(y - 3, y + 4);
-            while((map[newy, newx] != Terrain.NONE || GetLocationByCoordsNoOffset((newy, newx)) != null) && tries < 100)
+            while ((map[newy, newx] != Terrain.NONE || GetLocationByCoordsNoOffset((newy, newx)) != null) && tries < 100)
             {
                 newx = RNG.Next(x - 3, x + 4);
                 newy = RNG.Next(y - 3, y + 4);
@@ -816,11 +816,11 @@ public sealed class WestHyrule : World
             lostWoods[placed].CanShuffle = false;
             placed++;
         }
-        if(tries >= 3000 && placed < 3)
+        if (tries >= 3000 && placed < 3)
         {
             return false;
         }
-        for(int i = placed; i < lostWoods.Count; i++)
+        for (int i = placed; i < lostWoods.Count; i++)
         {
             lostWoods[placed].YRaw = 0;
         }
@@ -885,30 +885,29 @@ public sealed class WestHyrule : World
             deltax = 0;
             deltay = 1;
         }
-        for(int i = 0; i < 10; i++)
+        for (int i = 0; i < 10; i++)
         {
             int lake = RNG.Next(7, 11);
-            if(i == 0 || i == 9)
+            if (i == 0 || i == 9)
             {
                 lake = RNG.Next(3, 6);
             }
             if (isHorizontal)
             {
-                for(int j = 0; j < lake / 2; j++)
+                for (int j = 0; j < lake / 2; j++)
                 {
                     map[starty + j, startx] = water;
-                    if(i == 0)
+                    if (i == 0)
                     {
                         map[starty + j, startx - 1] = Terrain.FOREST;
                     }
-                    if(i == 9)
+                    if (i == 9)
                     {
                         map[starty + j, startx + 1] = Terrain.FOREST;
                     }
-                    
                 }
                 int top = starty + lake / 2;
-                while(map[top, startx - 1] == Terrain.MOUNTAIN)
+                while (map[top, startx - 1] == Terrain.MOUNTAIN)
                 {
                     map[top, startx - 1] = Terrain.FOREST;
                     top--;
@@ -931,7 +930,6 @@ public sealed class WestHyrule : World
                     {
                         map[starty - j, startx + 1] = Terrain.FOREST;
                     }
-                    
                 }
                 top = starty - (lake - (lake / 2));
                 while (map[top, startx - 1] == Terrain.MOUNTAIN)
@@ -956,7 +954,7 @@ public sealed class WestHyrule : World
                 if (i == 9)
                 {
                     map[starty + lake / 2, startx + 1] = Terrain.FOREST;
-                    map[starty - (lake - (lake / 2) ), startx + 1] = Terrain.FOREST;
+                    map[starty - (lake - (lake / 2)), startx + 1] = Terrain.FOREST;
                 }
 
             }
@@ -999,7 +997,7 @@ public sealed class WestHyrule : World
                         map[starty + 1, startx - j] = Terrain.FOREST;
                     }
                 }
-                 top = startx - (lake - (lake / 2));
+                top = startx - (lake - (lake / 2));
                 while (map[starty - 1, top] == Terrain.MOUNTAIN && i != 0)
                 {
                     map[starty - 1, top] = Terrain.FOREST;
@@ -1063,7 +1061,7 @@ public sealed class WestHyrule : World
         if (isHorizontal)
         {
             bool f = HorizontalCave(caveOrientation, calderaCenterX, calderaCenterY, cave1l, cave1r);
-            if(!f)
+            if (!f)
             {
                 return false;
             }
@@ -1106,11 +1104,11 @@ public sealed class WestHyrule : World
                 map[cave2r.Y + 1, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
                 map[cave2r.Y - 1, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
             }
-            
-            if(caveCount == 1)
+
+            if (caveCount == 1)
             {
                 int delta = -1;
-                if(caveOrientation == 0) //palace goes right
+                if (caveOrientation == 0) //palace goes right
                 {
                     delta = 1;
                 }
@@ -1130,7 +1128,7 @@ public sealed class WestHyrule : World
             {
                 int palaceType = RNG.Next(2);
                 int delta = -1;
-                if(palaceType == 0)
+                if (palaceType == 0)
                 {
                     delta = 1;
                 }

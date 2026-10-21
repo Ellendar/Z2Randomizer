@@ -144,7 +144,7 @@ public class Palaces
             //For now stomp-only barba is in logic. Maybe we change that later.
 
             //Mario Tbird requires hammer (in addition to thunder)
-            if(palaces[6].TbirdRoom != null)
+            if (palaces[6].TbirdRoom != null)
             {
                 palaces[6].TbirdRoom?.SetEffectiveRequirements(
                     palaces[6].TbirdRoom!.GetEffectiveRequirements(true).WithHardRequirement(RequirementType.HAMMER), true);

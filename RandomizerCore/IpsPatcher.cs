@@ -22,8 +22,8 @@ internal class IpsPatcher
         int ipsOffs = PatchSig.Count;
         while (!EofSig.SequenceEqual(new ArraySegment<byte>(ipsData, ipsOffs, EofSig.Count)))
         {
-            int tgtOffs = ((int)ipsData[ipsOffs] << 16) 
-                | ((int)ipsData[ipsOffs + 1] << 8) 
+            int tgtOffs = ((int)ipsData[ipsOffs] << 16)
+                | ((int)ipsData[ipsOffs + 1] << 8)
                 | ipsData[ipsOffs + 2];
             ipsOffs += 3;
 

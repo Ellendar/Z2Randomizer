@@ -131,7 +131,7 @@ public class Utils
             .ToList();
 
         List<(RoomExitType, int)> counts = [];
-        foreach(RoomExitType key in categorizedRooms.Keys)
+        foreach (RoomExitType key in categorizedRooms.Keys)
         {
             counts.Add((key, categorizedRooms[key].Count));
         }

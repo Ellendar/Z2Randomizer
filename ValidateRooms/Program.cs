@@ -52,9 +52,10 @@ void ValidateRoomsForFile(string filename)
 
         if (room.Connections.Length != 4) { sb.AppendLine($"{room.Name}: Room Connections data error."); }
 
-        if (string.IsNullOrEmpty(room.Name)) {
+        if (string.IsNullOrEmpty(room.Name))
+        {
             sb.AppendLine($"Room with sideview data={Convert.ToHexString(room.SideView)} is missing a name.");
-        };
+        }
     }
 
     // REGULAR PALACE ROOMS
@@ -224,7 +225,7 @@ void CheckHeaders<T>(Room room, SideviewEditable<T> sv) where T : struct, Enum
     if (sv.BackgroundMap != 0) { Warning(room, "BackgroundMapInCustomRoom", "Using a background map in custom rooms"); }
 }
 
-void CheckPageOverflow<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : struct, Enum where U : Enum
+void CheckPageOverflow<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : struct, Enum where U : Enum
 {
     foreach (var cmd in sv.Commands)
     {
@@ -254,9 +255,9 @@ void CheckPageOverflow<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U
     }
 }
 
-void CheckDoorsAndItems<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : struct, Enum where U : Enum
+void CheckDoorsAndItems<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : struct, Enum where U : Enum
 {
-    var lockedDoorCmds = sv.FindAll(o =>  o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LOCKED_DOOR);
+    var lockedDoorCmds = sv.FindAll(o => o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LOCKED_DOOR);
     var itemCmds = sv.Commands.Where(o => o.HasExtra());
 
     var lockedDoorEnemies = ee.Enemies.Where(o => (int)(object)o.Id == (int)EnemiesShared.LOCKED_DOOR);
@@ -288,7 +289,7 @@ void CheckDoorsAndItems<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<
 
         if (itemsOnPage.Count > 1)
         {
-            Warning(room, "MultipleItemsOnPage", $"Has multiple items on page { page + 1}: { string.Join(", ", itemsOnPage)}");
+            Warning(room, "MultipleItemsOnPage", $"Has multiple items on page {page + 1}: {string.Join(", ", itemsOnPage)}");
         }
     }
 }
@@ -502,7 +503,8 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
         if (IsDownElevator(elevator))
         {
             // if you go above param 2 for down elevators you will respawn below the elevator
-            if (elevator.Param > 2) {
+            if (elevator.Param > 2)
+            {
                 Warning(room, "ElevatorParam", $"Down elevator has param > 2.\n{FixedElevatorHexString(sv, elevator, 2)}");
             }
         }
@@ -744,7 +746,7 @@ void MirrorConnections(String hex)
 }
 
 
-void ConvertRoom<I,O>(String hex) where I : struct, Enum where O : struct, Enum
+void ConvertRoom<I, O>(String hex) where I : struct, Enum where O : struct, Enum
 {
     byte[] bytes = Convert.FromHexString(hex);
     var sv = new SideviewEditable<I>(bytes);

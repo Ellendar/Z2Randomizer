@@ -29,11 +29,11 @@ public class Util
         {
             char c = rawTextChars[i];
             if (c >= '0' && c <= '9')
-            { 
+            {
                 output.Add((byte)(c + 0xA0));
             }
             else if (c >= 'A' && c <= 'Z')
-            { 
+            {
                 output.Add((byte)(c + 0x99));
             }
             else
@@ -135,7 +135,7 @@ public class Util
 
     private static string FilePathFromAssemblyLocation(string fileName)
     {
-        string executingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) 
+        string executingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
             ?? throw new ImpossibleException("Invalid executing assembly directory");
 
         return Path.Combine(executingDirectory, fileName);
@@ -148,11 +148,11 @@ public class Util
     {
         public bool Equals(byte[]? x, byte[]? y)
         {
-            if(x == null)
+            if (x == null)
             {
                 return y == null;
             }
-            if(y == null)
+            if (y == null)
             {
                 return false;
             }
@@ -208,7 +208,7 @@ public class Util
     /// <exception cref="Exception"></exception>
     public static PalaceGrouping GetPalaceGroupingByMemoryAddress(int address)
     {
-        if(address >= 67371 && address <= 67619)
+        if (address >= 67371 && address <= 67619)
         {
             return PalaceGrouping.Palace125;
         }
@@ -230,7 +230,7 @@ public static class AssemblyExtensions
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
         using var stream = assembly.GetManifestResourceStream(name);
-        if(stream == null)
+        if (stream == null)
         {
             throw new Exception("Unable to read ManifestResourceStream: " + name);
         }
@@ -248,7 +248,7 @@ public static class AssemblyExtensions
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
         using var stream = assembly.GetManifestResourceStream(name);
-        if(stream == null)
+        if (stream == null)
         {
             throw new Exception("Unable to read binary resource: " + name);
         }

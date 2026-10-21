@@ -302,7 +302,8 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [ConditionallyIncludeInFlags]
     private bool legacyVanillaShuffledLocations = false;
-    public bool legacyVanillaShuffledLocationsIncluded() {
+    public bool legacyVanillaShuffledLocationsIncluded()
+    {
         foreach (var biome in (List<Biome>)[westBiome, eastBiome, dmBiome, mazeBiome])
         {
             switch (biome)
@@ -921,7 +922,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         return flags.ReadInt(extent) + minimum;
     }
 
-    public static T DeserializeEnum<T>(FlagReader flags, string name) where T: Enum
+    public static T DeserializeEnum<T>(FlagReader flags, string name) where T : Enum
     {
         var extent = GetEnumCount<T>();
         var index = flags.ReadInt(extent);
@@ -950,7 +951,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         flags.Append(value, extent);
     }
 
-    public static void SerializeEnum<T>(FlagBuilder flags, string name, T? val) where T: Enum
+    public static void SerializeEnum<T>(FlagBuilder flags, string name, T? val) where T : Enum
     {
         var index = GetEnumIndex<T>(val);
         var extent = GetEnumCount<T>();
@@ -981,7 +982,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, startSpellsLimit, shuffleStartingSpells, properties, r);
 
             List<PalaceStyle> allowedPalaceStyles;
-            if(GpStyle.IsMetastyle())
+            if (GpStyle.IsMetastyle())
             {
                 Debug.Assert(GpStyle == PalaceStyle.RANDOM);
                 allowedPalaceStyles = [.. Enums.GetShufflableList<PalaceStyle>().Where(i => i.IsGpStyle())];
@@ -1144,7 +1145,8 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.BoulderBlockConnections = allowConnectionCavesToBeBlocked;
         if (westBiome == Biome.RANDOM || westBiome == Biome.RANDOM_NO_VANILLA || westBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = westBiome switch {
+            int shuffleLimit = westBiome switch
+            {
                 Biome.RANDOM => 7,
                 Biome.RANDOM_NO_VANILLA => 6,
                 Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
@@ -1162,18 +1164,20 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
                 _ => throw new Exception("Invalid Biome")
             };
         }
-        else if(westBiome == Biome.CANYON)
+        else if (westBiome == Biome.CANYON)
         {
             properties.WestBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
         }
-        else {
+        else
+        {
             properties.WestBiome = westBiome;
         }
         if (eastBiome == Biome.RANDOM || eastBiome == Biome.RANDOM_NO_VANILLA || eastBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = eastBiome switch { 
-                Biome.RANDOM => 7, 
-                Biome.RANDOM_NO_VANILLA => 6, 
+            int shuffleLimit = eastBiome switch
+            {
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 6,
                 Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
                 _ => throw new ImpossibleException()
             };
@@ -1199,7 +1203,8 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         }
         if (dmBiome == Biome.RANDOM || dmBiome == Biome.RANDOM_NO_VANILLA || dmBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = dmBiome switch {
+            int shuffleLimit = dmBiome switch
+            {
                 Biome.RANDOM => 7,
                 Biome.RANDOM_NO_VANILLA => 6,
                 Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
@@ -1289,7 +1294,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         {
             properties.LessImportantLocationsOption = LessImportantLocationsOption;
         }
-        if(riverDevilBlockerOption == RiverDevilBlockerOption.RANDOM)
+        if (riverDevilBlockerOption == RiverDevilBlockerOption.RANDOM)
         {
             properties.RiverDevilBlockerOption = r.Next(3) switch
             {
@@ -1317,11 +1322,12 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         //if all 3 room options are hard false, the seed can't generate. The UI tries to prevent this, but as a safety
         //if we get to this point, use vanilla rooms
-        if(!((includeVanillaRooms ?? true) || (includev4_0Rooms ?? true) || (includev5_0Rooms ?? true)))
+        if (!((includeVanillaRooms ?? true) || (includev4_0Rooms ?? true) || (includev5_0Rooms ?? true)))
         {
             properties.AllowVanillaRooms = true;
         }
-        while (!(properties.AllowVanillaRooms || properties.AllowV4Rooms || properties.AllowV5_0Rooms)) {
+        while (!(properties.AllowVanillaRooms || properties.AllowV4Rooms || properties.AllowV5_0Rooms))
+        {
             properties.AllowVanillaRooms = includeVanillaRooms ?? GetIndeterminateFlagValue(r);
             properties.AllowV4Rooms = includev4_0Rooms ?? GetIndeterminateFlagValue(r);
             properties.AllowV5_0Rooms = includev5_0Rooms ?? GetIndeterminateFlagValue(r);
@@ -1427,7 +1433,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         //Also see fields set in AssignItemPoolProps()
         properties.RandomizeSmallItems = shuffleSmallItems;
         properties.ExtraKeys = palacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
-        properties.NewKasutoBasementRequirement = randomizeNewKasutoJarRequirements ? r.Next(5,8) : 7;
+        properties.NewKasutoBasementRequirement = randomizeNewKasutoJarRequirements ? r.Next(5, 8) : 7;
         properties.AllowImportantItemDuplicates = allowImportantItemDuplicates;
         properties.ShufflePbagXp = shufflePBagAmounts ?? GetIndeterminateFlagValue(r);
         properties.IncludeBagusNoteInShuffle = IncludeBagusNoteInShuffle ?? GetIndeterminateFlagValue(r);
@@ -1555,7 +1561,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             properties.IncludeLavaInEncounterShuffle = false;
         }
 
-        if(properties.IncludeSwordTechsInShuffle)
+        if (properties.IncludeSwordTechsInShuffle)
         {
             properties.SwapUpAndDownStab = false;
         }
@@ -1614,7 +1620,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         }
 
         //If spells are in the shuffle pool, shuffle spells means nothing, so disable it
-        if(properties.IncludeSpellsInShuffle)
+        if (properties.IncludeSpellsInShuffle)
         {
             properties.ShuffleSpellLocations = false;
         }
@@ -1624,8 +1630,8 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         {
             properties.SwapUpAndDownStab = false;
         }
-    
-        if(rerollPalaceItemRoomCounts)
+
+        if (rerollPalaceItemRoomCounts)
         {
             do
             {
@@ -1860,7 +1866,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         };
     }
 
-    private void ShuffleStartingCollectables(Collectable[] possibleCollectables, StartingResourceLimit limit, bool shuffleRandom, 
+    private void ShuffleStartingCollectables(Collectable[] possibleCollectables, StartingResourceLimit limit, bool shuffleRandom,
         RandomizerProperties properties, Random r)
     {
         int itemLimit = limit.AsInt();
@@ -2053,7 +2059,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         int startItemsOverflow = Math.Min(0, palaceStartMinorItemCount + overworldStartMinorItemCount - (shuffleStartingItems ? startItemsLimit.AsInt() : 0));
         // overflow distribution between overworld items and palace items could be improved here (but needed for when the pools are not mixed)
-        overworldMinorItemCount += Math.Max(0, overworldStartMinorItemCount - startItemsOverflow); 
+        overworldMinorItemCount += Math.Max(0, overworldStartMinorItemCount - startItemsOverflow);
         palaceMinorItemCount += Math.Max(0, palaceStartMinorItemCount - startItemsOverflow);
 
         if (includeSpellsInShuffle ?? true)

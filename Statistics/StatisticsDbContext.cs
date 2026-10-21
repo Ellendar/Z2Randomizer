@@ -14,8 +14,8 @@ internal class StatisticsDbContext : DbContext
 
     private string dbPath;
 
-    [UnconditionalSuppressMessage("Trimming", 
-        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", 
+    [UnconditionalSuppressMessage("Trimming",
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
         Justification = "Statistics Doesn't ship with the trimmed package")]
     public StatisticsDbContext(string dbPath) : base()
     {

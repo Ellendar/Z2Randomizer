@@ -161,7 +161,7 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
             Room? unmirrored = rooms.NormalRooms.SingleOrDefault(room => room.Name == mirrorRoom.Name);
             //Stubs don't have a mirror in the pool, but their mirror is itself.
             //
-            if(unmirrored == null && mirrorRoom.IsStub) 
+            if (unmirrored == null && mirrorRoom.IsStub)
             {
                 unmirrored = mirrorRoom;
             }

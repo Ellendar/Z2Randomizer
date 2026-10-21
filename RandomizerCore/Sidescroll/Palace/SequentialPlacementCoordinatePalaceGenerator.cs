@@ -127,7 +127,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
 
         //var openCoordsIter = openCoords.ToArray();
         List<Coord> orderedOpenCoords = openCoords.ToList().OrderBy(c => c.X).ThenBy(c => c.Y).ToList();
-        foreach(Coord openCoord in orderedOpenCoords)
+        foreach (Coord openCoord in orderedOpenCoords)
         {
             var (x, y) = openCoord;
             Room? left = roomsByCoordinate.GetValueOrDefault(new Coord(x - 1, y));
@@ -187,8 +187,8 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
                 //In sufficiently large palaces, you can run out of horizontal dead ends very easily on more limited palace room sets
                 //so in very large palaces, some dead ends can be duplicated to fill stubs since they are less confusing than
                 //duplicate passthroughs / junctions. limit 1 refill per generation attempt per room type
-                if(newRoom == null 
-                    && ALLOWED_REFILL_TYPES.Contains(exitType) 
+                if (newRoom == null
+                    && ALLOWED_REFILL_TYPES.Contains(exitType)
                     && roomCount >= REFILL_SIZE_THRESHOLD
                     && !refilledTypes.Contains(exitType))
                 {

@@ -934,8 +934,8 @@ sealed class DeathMountain : World
             {
                 return false;
             }
-            
         }
+
         return true;
     }
 
@@ -968,7 +968,7 @@ sealed class DeathMountain : World
 
     protected override List<Location> GetPathingStarts()
     {
-        return 
+        return
             connectionsDM.Keys.Where(i => i.Reachable)
             .Union(GetContinentConnections().Where(i => i.Reachable))
             .ToList();
@@ -985,7 +985,7 @@ sealed class DeathMountain : World
 
         bool[,] visitedCoordinates = new bool[MapRows, MapColumns];
         List<(int, int)> pendingCoordinates = new();
-        foreach(Location location in GetContinentConnections())
+        foreach (Location location in GetContinentConnections())
         {
             pendingCoordinates.Add((location.Y, location.Xpos));
         }
@@ -996,7 +996,7 @@ sealed class DeathMountain : World
             y = coordinate.Item1;
             x = coordinate.Item2;
             pendingCoordinates.Remove(coordinate);
-            if(visitedCoordinates[y, x])
+            if (visitedCoordinates[y, x])
             {
                 continue;
             }
@@ -1008,14 +1008,14 @@ sealed class DeathMountain : World
                 //it's reachable
                 unreachedLocations.Remove(here);
                 //if it's a connection cave, add the exit(s) to the pending locations
-                if(connectionsDM.ContainsKey(here))
+                if (connectionsDM.ContainsKey(here))
                 {
                     connectionsDM[here].ForEach(i => pendingCoordinates.Add((i.Y, i.Xpos)));
                 }
             }
 
             //for each adjacent direction, if it's not off the map, and it's potentially walkable terrain, crawl it
-            if(x > 0 && map[y, x - 1].IsWalkable())
+            if (x > 0 && map[y, x - 1].IsWalkable())
             {
                 pendingCoordinates.Add((y, x - 1));
             }

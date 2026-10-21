@@ -384,7 +384,7 @@ public sealed class EastHyrule : World
                     }
                 }
             }
-			
+
             //in vanilla shuffle, post location shuffling, the locations have moved, but the hidden palace spot doesn't
             //so reset the reference
             hiddenKasutoLocation = GetLocationByCoordsY30Offset((81, 61))!;
@@ -405,7 +405,7 @@ public sealed class EastHyrule : World
             }
             else
             {
-                if(props.ShuffleHidden)
+                if (props.ShuffleHidden)
                 {
                     map[72, 45] = hiddenPalaceLocation.TerrainType;
                 }
@@ -748,7 +748,7 @@ public sealed class EastHyrule : World
 
                 }
 
-                if(props.RiverDevilBlockerOption == RiverDevilBlockerOption.SIEGE)
+                if (props.RiverDevilBlockerOption == RiverDevilBlockerOption.SIEGE)
                 {
                     //Iterate the towns in a random order
                     Location[] towns = [nabooru, darunia, newKasuto, oldKasuto];
@@ -775,7 +775,7 @@ public sealed class EastHyrule : World
                             break;
                         }
                     }
-                    if(!placed)
+                    if (!placed)
                     {
                         logger.Trace("No valid candidate towns for river devil siege.");
                         return false;
@@ -1286,7 +1286,7 @@ public sealed class EastHyrule : World
 
     private bool RandomizeHiddenPalace(ROM rom, bool shuffleHidden, bool hiddenKasuto)
     {
-        if(hiddenKasuto && hiddenKasutoLocation is null)
+        if (hiddenKasuto && hiddenKasutoLocation is null)
         {
             throw new ImpossibleException("If hidden Kasuto is on, RandomizeHiddenKasuto must be run before RadomizeHiddenPalace");
         }
@@ -1391,10 +1391,10 @@ public sealed class EastHyrule : World
         BlockCaves(connectionsCanBeBlocked, riverDevilBlocks, rockBlock, []);
     }
 
-    private void BlockCaves(bool connectionsCanBeBlocked, bool riverDevilBlocks, bool rockBlock, 
+    private void BlockCaves(bool connectionsCanBeBlocked, bool riverDevilBlocks, bool rockBlock,
         IEnumerable<Location?> disallowedLocations)
     {
-        if(!riverDevilBlocks && !rockBlock) { return; }
+        if (!riverDevilBlocks && !rockBlock) { return; }
 
         bool riverDevilPlaced = !riverDevilBlocks;
         bool rockPlaced = !rockBlock;
@@ -1427,10 +1427,10 @@ public sealed class EastHyrule : World
 
             var dir = ValidBlockingCavePosition(cave.Pos);
             if (dir != null)
-                {
+            {
                 PlaceCaveBlocker(cave, dir.Value, blockerTerrain);
                 if (!riverDevilPlaced)
-                    {
+                {
                     riverDevilPlaced = true;
                     riverDevilPlacedLocation = cave;
                 }
@@ -1745,7 +1745,7 @@ public sealed class EastHyrule : World
             //vodcave2
         ];
 
-        if(hiddenPalace)
+        if (hiddenPalace)
         {
             if (hiddenPalaceLocation is null)
             {
@@ -1754,7 +1754,7 @@ public sealed class EastHyrule : World
             requiredLocations.Add(hiddenPalaceLocation);
         }
 
-        if(hiddenKasuto)
+        if (hiddenKasuto)
         {
             if (hiddenKasutoLocation is null)
             {
@@ -1787,13 +1787,13 @@ public sealed class EastHyrule : World
         sb.AppendLine("\tWater Tile: " + waterTile.GetAllCollectables()[0].EnglishText());
         sb.AppendLine("\tDesert tile: " + desertTile.GetAllCollectables()[0].EnglishText());
 
-        if(hiddenPalaceLocation is not null)
+        if (hiddenPalaceLocation is not null)
         {
             var palaceDescription = hiddenPalaceLocation.Palace is null ? "" : " (" + hiddenPalaceLocation.Palace!.Number + ")";
             sb.AppendLine("\tThree-Eyed Rock: " + hiddenPalaceLocation.ID.GetDescription() + palaceDescription);
         }
 
-        if(hiddenKasutoLocation is not null)
+        if (hiddenKasutoLocation is not null)
         {
             var palaceDescription = hiddenKasutoLocation.Palace is null ? "" : " (" + hiddenKasutoLocation.Palace!.Number + ")";
             sb.AppendLine("\tHidden Kasuto Tile: " + hiddenKasutoLocation.ID.GetDescription() + palaceDescription);

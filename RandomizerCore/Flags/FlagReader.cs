@@ -99,7 +99,8 @@ public class FlagReader
         var end = index + count;
         var bitRange = bits[index..end];
         int ret = 0;
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++)
+        {
             ret |= (bitRange[i] ? 1 : 0) << (count - i - 1);
         }
         index += count;

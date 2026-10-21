@@ -25,7 +25,7 @@ namespace CrossPlatformUI.ViewModels.Tabs;
 [RequiresUnreferencedCode("")]
 public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel, IFlagHost
 {
-    private CancellationTokenSource backgroundUpdateTask = new ();
+    private CancellationTokenSource backgroundUpdateTask = new();
 
     public string? SpriteName
     {
@@ -254,7 +254,7 @@ public class LoadedCharacterSprite : ReactiveObject
         {
             fixed (byte* b = data)
             {
-                var bmp = new Bitmap(PixelFormat.Rgba8888, AlphaFormat.Premul, (nint)b, new PixelSize(16, 32), Vector.One, 16*4);
+                var bmp = new Bitmap(PixelFormat.Rgba8888, AlphaFormat.Premul, (nint)b, new PixelSize(16, 32), Vector.One, 16 * 4);
                 Preview = bmp.CreateScaledBitmap(new PixelSize(16, 32), BitmapInterpolationMode.None);
             }
         }
@@ -272,10 +272,10 @@ public class LoadedCharacterSprite : ReactiveObject
 
     private Bitmap? preview;
     public Bitmap? Preview { get => preview; set => this.RaiseAndSetIfChanged(ref preview, value); }
-    
+
     private string? credit;
     public string? Credit { get => credit; set => this.RaiseAndSetIfChanged(ref credit, value); }
-    
+
     private string? name;
     public string? Name { get => name; set => this.RaiseAndSetIfChanged(ref name, value); }
 

@@ -13,7 +13,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt)
     {
         VanillaRoomPool roomPool = (VanillaRoomPool)rooms;
-        if(roomPool.BossRooms.Count != 1
+        if (roomPool.BossRooms.Count != 1
             || (palaceNumber == 7 && roomPool.TbirdRooms.Count != 1))
         {
             throw new Exception("Invalid vanilla palace room pool");
@@ -60,7 +60,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
         bool removeTbird = (palaceNumber == 7 && props.RemoveTbird);
         palace.CreateTree(removeTbird);
 
-        if(palaceNumber != 7 && props.PalaceItemRoomCounts[palaceNumber - 1] == 0)
+        if (palaceNumber != 7 && props.PalaceItemRoomCounts[palaceNumber - 1] == 0)
         {
             //Replace item room with an appropriately shaped stub
             RoomExitType itemRoomExitType = roomPool.ItemRoom!.CategorizeExits();
@@ -69,7 +69,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
             palace.ItemRooms.Clear();
         }
 
-        if(palaceNumber != 7 && props.PalaceItemRoomCounts[palaceNumber - 1] > 1)
+        if (palaceNumber != 7 && props.PalaceItemRoomCounts[palaceNumber - 1] > 1)
         {
             //Find all left/right dead ends that aren't special
             List<Room> normalDeadEnds = palace.AllRooms.Where(i =>
@@ -83,7 +83,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
             //pick N-1 of them 
             IEnumerable<Room> roomsToItemRoomify = normalDeadEnds.Sample(r, props.PalaceItemRoomCounts[palaceNumber - 1] - 1);
             //replace them with randomly selected vanilla item rooms of the same shape
-            foreach(Room room in roomsToItemRoomify)
+            foreach (Room room in roomsToItemRoomify)
             {
                 Room itemRoom = new(roomPool.ItemRoomsByExitType[room.CategorizeExits()].Sample(r)
                     ?? throw new Exception("There are no available item rooms for vanilla item room replacement"));

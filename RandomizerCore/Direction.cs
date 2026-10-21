@@ -2,7 +2,8 @@
 
 namespace Z2Randomizer.RandomizerCore;
 
-public enum Direction { 
+public enum Direction
+{
     NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, HORIZONTAL_PASSTHROUGH = 4, VERTICAL_PASSTHROUGH = 5, NONE = 6
 }
 

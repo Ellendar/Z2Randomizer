@@ -35,7 +35,7 @@ public class Spoiler
             }
 
             SKBitmap tileBitmap;
-            switch(t)
+            switch (t)
             {
                 case Terrain.CAVE:
                 case Terrain.DESERT:
@@ -213,7 +213,7 @@ public class Spoiler
             for (int x = 0; x < srcWidth; x++)
             {
                 int destX = x + offsetX;
-                if (destX < 0 || destX >= destWidth) {  continue; }
+                if (destX < 0 || destX >= destWidth) { continue; }
 
                 int destIndex = (destY * destWidth + destX) * colorDepthBytes;
                 int srcIndex = (y * srcWidth + x) * colorDepthBytes;

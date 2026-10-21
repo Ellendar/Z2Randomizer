@@ -34,7 +34,7 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public RomFileViewModel RomFileViewModel { get; set; }
-    
+
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public RandomizerViewModel RandomizerViewModel { get; set; }
 
@@ -99,10 +99,10 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
     }
 
     // Window/Desktop specific data
-    
+
     private const int DefaultWidth = 900;
     private const int DefaultHeight = 750;
-    
+
     private CustomPixelPoint windowPosition = new()
     {
         X = 0,
@@ -121,16 +121,16 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
     [JsonIgnore]
     [RUISG.Reactive]
     public partial bool ShuffleAllExpState { get; set; }
-    
+
     // The Router associated with this Screen.
     // Required by the IScreen interface.
     [JsonIgnore]
-    public RoutingState Router { get; } = new ();
+    public RoutingState Router { get; } = new();
 
     // The command that navigates a user to first view model.
     [JsonIgnore]
     public ReactiveCommand<RxVoid, IRoutableViewModel> GenerateRom { get; }
-    
+
     [JsonIgnore]
     public GenerateRomViewModel GenerateRomViewModel { get; }
 
@@ -161,7 +161,7 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
     [JsonIgnore]
     public string UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
     [JsonIgnore]
-    public ViewModelActivator Activator { get; } = new ();
+    public ViewModelActivator Activator { get; } = new();
 }
 
 

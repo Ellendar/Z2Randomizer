@@ -19,19 +19,19 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
     {
         if (OperatingSystem.IsWindows())
         {
-            
+
         }
         else if (OperatingSystem.IsMacOS())
         {
-            
+
         }
     }
-    
+
     private readonly JsonSerializerSettings serializerSettings = new()
     {
         TypeNameHandling = TypeNameHandling.All
     };
-    
+
     public object? LoadState()
     {
         var data = File.ReadAllText(App.SETTINGS_FILENAME);
@@ -65,9 +65,10 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
         try
         {
             File.Delete(App.SETTINGS_FILENAME);
-        } catch (IOException) {}
+        }
+        catch (IOException) { }
     }
-    
+
     public Task<IEnumerable<string>> ListLocalFiles(string path)
     {
         return Task.FromResult(Directory.GetFiles(path).AsEnumerable());

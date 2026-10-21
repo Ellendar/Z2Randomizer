@@ -274,8 +274,8 @@ internal class MusicRandomizer
     {
         List<FtSong> ftSongs = new();
         LoadLibrariesSongs(
-            _jsonLibPaths, 
-            d => _imptr.LoadFtJsonLibrarySongs(d, opts), 
+            _jsonLibPaths,
+            d => _imptr.LoadFtJsonLibrarySongs(d, opts),
             includeDiverse,
             ftSongs);
         LoadLibrariesSongs(
@@ -294,7 +294,7 @@ internal class MusicRandomizer
     }
 
     void LoadLibrariesSongs(
-        IEnumerable<string> libPaths, 
+        IEnumerable<string> libPaths,
         Func<string, IEnumerable<FtSong>> loader,
         bool includeDiverse,
         List<FtSong> songs)

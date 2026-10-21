@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
+
 internal class ChaosPalaceGenerator : PalaceGenerator
 {
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();

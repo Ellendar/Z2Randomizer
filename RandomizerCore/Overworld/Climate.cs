@@ -7,22 +7,22 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 public class Climate
 {
     public ClimateEnum? Type { get; }
-    private const float EXCESSIVELY_LARGE = 1000f; 
+    private const float EXCESSIVELY_LARGE = 1000f;
     public float[] DistanceCoefficients { get; }
     public string Name { get; init; }
     public int SeedTerrainCount { get; set; }
     private IWeightedSampler<Terrain> weightedSampler;
 
-    public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, IWeightedSampler<Terrain> terrainWeights, 
+    public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, IWeightedSampler<Terrain> terrainWeights,
         int seedTerrainCount, ClimateEnum? type = null)
     {
         Name = name;
         Type = type;
         // Precompute distance coefficients into a inverse list
         DistanceCoefficients = new float[Enum.GetValues<Terrain>().Length];
-        for(int i = 0; i < DistanceCoefficients.Length; i++)
+        for (int i = 0; i < DistanceCoefficients.Length; i++)
         {
-            if(distanceCoefficients.TryGetValue((Terrain)i, out float coefficient))
+            if (distanceCoefficients.TryGetValue((Terrain)i, out float coefficient))
             {
                 DistanceCoefficients[i] = coefficient;
             }
@@ -106,7 +106,7 @@ public class Climate
         float coefficientSum = 0f;
         foreach (Terrain terrain in walkableTerrains)
         {
-            if(terrain != Terrain.ROAD)
+            if (terrain != Terrain.ROAD)
             {
                 coefficientSum += DistanceCoefficients[(int)terrain];
             }

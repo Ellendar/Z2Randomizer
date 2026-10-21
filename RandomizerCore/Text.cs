@@ -116,7 +116,7 @@ public class Text : IEquatable<Text>
         {
             hint = $"{((TownType)location.Town.Type!).HintName()}$has the$%%";
         }
-        if(hint == null)
+        if (hint == null)
         {
             if (location.Continent == Continent.EAST)
             {
@@ -130,7 +130,7 @@ public class Text : IEquatable<Text>
             {
                 hint = "death$mountain$holds the$%%";
             }
-            else if(location.Continent == Continent.MAZE)
+            else if (location.Continent == Continent.MAZE)
             {
                 hint = "in a maze$lies the$%%";
             }

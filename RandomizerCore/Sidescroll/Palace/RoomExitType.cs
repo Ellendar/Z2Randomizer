@@ -87,7 +87,7 @@ public static class RoomExitTypeExtensions
 
     public static RoomExitType AddDown(this RoomExitType exitType, bool overwriteDrop = false)
     {
-        if(exitType.ContainsDrop())
+        if (exitType.ContainsDrop())
         {
             if (overwriteDrop)
             {
@@ -118,7 +118,7 @@ public static class RoomExitTypeExtensions
 
     public static RoomExitType ConvertToDrop(this RoomExitType exitType)
     {
-        if(!exitType.ContainsDown())
+        if (!exitType.ContainsDown())
         {
             throw new Exception("Cannot convert non-down room to drop");
         }

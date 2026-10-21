@@ -5,7 +5,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public class VanillaShufflePalaceGenerator() : VanillaPalaceGenerator()
 {
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt) 
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt)
     {
         Palace palace = await base.GeneratePalace(props, rooms, r, roomCount, palaceNumber, attempt);
 
@@ -14,7 +14,7 @@ public class VanillaShufflePalaceGenerator() : VanillaPalaceGenerator()
 
         int tries = 0;
         while (
-            !palace.AllReachable(dropsMayBypassBosses: props.DropsMayBypassBosses, tBirdRequired: props.RequireTbird) 
+            !palace.AllReachable(dropsMayBypassBosses: props.DropsMayBypassBosses, tBirdRequired: props.RequireTbird)
             || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
             || (palaceNumber == 7 && !palace.IsBossRoomAtLeastMinDistance(props.DarkLinkMinDistance))
             || palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], props.PalaceDropStyle, r)
@@ -22,7 +22,7 @@ public class VanillaShufflePalaceGenerator() : VanillaPalaceGenerator()
         {
             palace.ResetRooms();
             palace.ShuffleRooms(r);
-            if(++tries > ROOM_SHUFFLE_ATTEMPT_LIMIT)
+            if (++tries > ROOM_SHUFFLE_ATTEMPT_LIMIT)
             {
                 palace.IsValid = false;
                 return palace;

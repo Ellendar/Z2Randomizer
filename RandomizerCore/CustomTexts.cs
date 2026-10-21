@@ -155,7 +155,7 @@ public class CustomTexts
         { Collectable.THUNDER_SPELL, 96 },
     };
 
-    private static readonly int[][] hintIndexes = [rauruHints, rutoHints, sariaHints, midoHints, 
+    private static readonly int[][] hintIndexes = [rauruHints, rutoHints, sariaHints, midoHints,
         nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint, kingsTomb];
 
     public static readonly string[] GENERIC_WIZARD_TEXTS =
@@ -461,7 +461,7 @@ public class CustomTexts
     //the vanilla text can be misleading, so put in a more obvious replacement.
     public static string NON_COMMUNITY_STARTED_WITH_TEXT = "YOU STARTED$WITH$%%";
 
-    public static readonly string[] STARTED_WITH_ITEM_TEXTS = 
+    public static readonly string[] STARTED_WITH_ITEM_TEXTS =
     [
         "check your$tracker$for$%%",
         "%%$is on$the menu",
@@ -595,7 +595,7 @@ public class CustomTexts
         Random hashRNG)
     {
         DebugValidateTexts();
-      
+
         //Change the "vanilla" spell texts to mario specific texts
         if (props.MarioMode)
         {
@@ -665,7 +665,7 @@ public class CustomTexts
                 texts[upstabClosedDoorTextIndex] = hint;
                 if (props.SwapUpAndDownStab)
                 {
-                    (texts[upstabClosedDoorTextIndex], texts[downstabClosedDoorTextIndex]) 
+                    (texts[upstabClosedDoorTextIndex], texts[downstabClosedDoorTextIndex])
                         = (texts[downstabClosedDoorTextIndex], texts[upstabClosedDoorTextIndex]);
                 }
             }
@@ -755,7 +755,7 @@ public class CustomTexts
     {
         foreach (Location location in locations.Where(i => i.Town?.GetWizard() != null))
         {
-            if(location?.Town?.Type != null && TOWN_SIGN_INDEXES.TryGetValue((TownType)location?.Town?.Type!, out int index))
+            if (location?.Town?.Type != null && TOWN_SIGN_INDEXES.TryGetValue((TownType)location?.Town?.Type!, out int index))
             {
                 texts[index] = GenerateTownSignHint((Collectable)location.Town.GetWizard()!.Collectable!, linkedFire);
             }
@@ -764,7 +764,7 @@ public class CustomTexts
     private static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
     {
         string text = spell.EnglishText();
-        if(spell == Collectable.FIRE_SPELL && linkedFire)
+        if (spell == Collectable.FIRE_SPELL && linkedFire)
         {
             text = "FIRE!$SPELL";
         }
@@ -812,15 +812,15 @@ public class CustomTexts
             default:
                 throw new Exception("Unrecognized CollectableTextType while generating hint");
         }
-    } 
+    }
 
     private static Text? GenerateBaguText(Collectable baguItem, Random r, bool useCommunityText, bool includeQuestItemsInShuffle)
     {
-        if(includeQuestItemsInShuffle)
+        if (includeQuestItemsInShuffle)
         {
             return GenerateNonSpellTownsfolkText(baguItem, r, useCommunityText);
         }
-        else if(useCommunityText)
+        else if (useCommunityText)
         {
             return new Text(BAGU_TEXTS.Sample(r)!);
         }
@@ -834,10 +834,11 @@ public class CustomTexts
             {
                 return GenerateNonSpellTownsfolkText(mirrorItem, r, true);
             }
-            else {
+            else
+            {
                 string rawText;
                 rawText = "I FOUND A$%$UNDER THE$TABLE.";
-                    return new Text(rawText.Replace("%", mirrorItem.SingleLineText()));
+                return new Text(rawText.Replace("%", mirrorItem.SingleLineText()));
             }
         }
         return null;
@@ -866,7 +867,7 @@ public class CustomTexts
             MOVING_NPC_TEXTS
         ];
         var maybeMarioAdded = marioMode ?
-            allTexts.Select(list => (string[])[..MARIO_KNOW_NOTHING_TEXTS, ..list]).ToArray()
+            allTexts.Select(list => (string[])[.. MARIO_KNOW_NOTHING_TEXTS, .. list]).ToArray()
             : allTexts;
         ShuffleBag<string> marioOnlyTexts = new(MARIO_KNOW_NOTHING_TEXTS, r);
         ShuffleBag<string> kidKnowNothingTexts = new(maybeMarioAdded[0], r);
@@ -905,7 +906,7 @@ public class CustomTexts
         ];
 
         Text defaultKnowNothing = new();
-        
+
         // if we are doing mario mode, we could have helpful hints off but still want mario flavor text
         // for the moving NPCs, so skip stationary onces
         if (helpfulHintOption != HelpfulHintOption.NONE)
@@ -958,7 +959,7 @@ public class CustomTexts
         }
     }
 
-    private static List<int> GenerateHelpfulHints(List<Text> hints, IEnumerable<Location> locations, Random r, 
+    private static List<int> GenerateHelpfulHints(List<Text> hints, IEnumerable<Location> locations, Random r,
         RandomizerProperties props)
     {
         List<int> placedIndex = [];
@@ -999,7 +1000,7 @@ public class CustomTexts
         }
 
         int hintsCount = HELPFUL_HINTS_COUNT;
-        if(OLD_KASUTO_HINT_IS_ALWAYS_GOOD)
+        if (OLD_KASUTO_HINT_IS_ALWAYS_GOOD)
         {
             hintsCount++;
         }
@@ -1017,7 +1018,7 @@ public class CustomTexts
         {
             Collectable[] criticalSpells = [Collectable.THUNDER_SPELL, Collectable.FAIRY_SPELL, Collectable.REFLECT_SPELL];
             criticalSpells = criticalSpells.Where(i => hintCollectables.Contains(i)).ToArray();
-            if(criticalSpells.Length > 0)
+            if (criticalSpells.Length > 0)
             {
                 var collectableSpell = criticalSpells.Sample(r);
                 hintCollectables.Remove(collectableSpell);
@@ -1035,7 +1036,7 @@ public class CustomTexts
         hintCollectables.FisherYatesShuffle(r);
 
         bool requiredOldKasutoHintPlaced = !OLD_KASUTO_HINT_IS_ALWAYS_GOOD;
-        foreach(Collectable hintCollectable in hintCollectables)
+        foreach (Collectable hintCollectable in hintCollectables)
         {
             List<Location> possibleHintLocations = locations.Where(i => i.GetAllCollectables().Contains(hintCollectable)).ToList();
 
@@ -1044,7 +1045,7 @@ public class CustomTexts
             do
             {
                 //This fails if we ever have more than 1 item location in old kasuto, but that is unlikely
-                if(!hintCollectable.IsMinorItem() && !requiredOldKasutoHintPlaced)
+                if (!hintCollectable.IsMinorItem() && !requiredOldKasutoHintPlaced)
                 {
                     town = 7;
                     requiredOldKasutoHintPlaced = true;
@@ -1095,12 +1096,12 @@ public class CustomTexts
 
     private static void GenerateSpellHints(IEnumerable<Location> locations, List<Text> hints, RandomizerProperties props)
     {
-        if(props.SpellItemHints && !props.StartWithSpellItems)
+        if (props.SpellItemHints && !props.StartWithSpellItems)
         {
             Location itemLocation;
 
             itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.TROPHY))!;
-            if(itemLocation != null)
+            if (itemLocation != null)
             {
                 Text trophyHint = Text.GenerateHelpfulHint(itemLocation, Collectable.TROPHY, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE, HELPFUL_HINTS_TREAT_BAGU_AS_TOWN);
                 hints[trophySpellHintIndex] = trophyHint;
@@ -1111,7 +1112,7 @@ public class CustomTexts
             {
                 Text medHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MEDICINE, props.HelpfulHints == HelpfulHintOption.TOWNS_SEPARATE, HELPFUL_HINTS_TREAT_BAGU_AS_TOWN);
                 hints[medicineSpellHintIndex] = medHint;
-            }   
+            }
 
             itemLocation = locations.FirstOrDefault(i => i.GetAllCollectables().Contains(Collectable.CHILD))!;
             if (itemLocation != null)
@@ -1139,7 +1140,7 @@ public class CustomTexts
         }
     }
 
-    private static void GenerateTownsfolkTexts(List<Text> texts, IEnumerable<Location> itemLocs, Random r, 
+    private static void GenerateTownsfolkTexts(List<Text> texts, IEnumerable<Location> itemLocs, Random r,
         bool useCommunityText, bool includeQuestItemsInShuffle)
     {
         List<Text> vanillaTexts = new(texts);
@@ -1152,7 +1153,7 @@ public class CustomTexts
         foreach (Town town in townsfolkCollectableTowns)
         {
             TownType type = town.Type ?? throw new Exception("Town missing type while generating hints");
-            foreach(TownMap map in town.TownMaps.Where(m => m.CollectableTextType != null))
+            foreach (TownMap map in town.TownMaps.Where(m => m.CollectableTextType != null))
             {
                 Text text;
                 int tries = 0;
@@ -1160,7 +1161,7 @@ public class CustomTexts
                 {
                     text = GenerateTownsfolkText(vanillaTexts, r, type, map, useCommunityText, includeQuestItemsInShuffle);
                 } while (useCommunityText && usedTexts.Contains(text) && tries++ < TOWNSFOLK_TEXT_ATTEMPT_LIMIT);
-                if(tries > TOWNSFOLK_TEXT_ATTEMPT_LIMIT)
+                if (tries > TOWNSFOLK_TEXT_ATTEMPT_LIMIT)
                 {
                     logger.Warn("Exceeded townsfolk text generation attempt limit. Using error text");
                     text = new(ERROR_TEXT);
@@ -1177,7 +1178,7 @@ public class CustomTexts
     {
         string collectableWizardText;
 
-        if(useCommunityText)
+        if (useCommunityText)
         {
             collectableWizardText = COMMUNITY_NONSPELL_GET_TEXT[r.Next(COMMUNITY_NONSPELL_GET_TEXT.Length)];
         }

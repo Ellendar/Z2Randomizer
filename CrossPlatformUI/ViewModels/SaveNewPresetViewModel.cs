@@ -82,7 +82,8 @@ public partial class SaveNewPresetViewModel : ReactiveObject, IRoutableViewModel
         HostScreen = Main;
         PresetName = string.Empty;
         Activator = new();
-        SavePreset = ReactiveCommand.Create(() => {
+        SavePreset = ReactiveCommand.Create(() =>
+        {
             Main.SaveNewPresetDialogOpen = false;
             // Setting the preset config through the flags creates a deep clone instead of a reference
             var preset = new CustomPreset(PresetName, new RandomizerConfiguration(Main.Config.SerializeFlags()));
@@ -102,7 +103,7 @@ public partial class SaveNewPresetViewModel : ReactiveObject, IRoutableViewModel
             .StartWith(SavedPresets.Count > 0)
             .ToProperty(this, x => x.HasSavedPresets, out hasSavedPresets);
     }
-    
+
     [RUISG.Reactive]
     public partial ObservableCollection<CustomPreset> SavedPresets { get; set; } = new();
 
@@ -114,7 +115,7 @@ public partial class SaveNewPresetViewModel : ReactiveObject, IRoutableViewModel
     [JsonIgnore]
     [RUISG.Reactive]
     public partial string PresetName { get; set; } = "";
-    
+
     [JsonIgnore]
     private MainViewModel Main { get; }
     [JsonIgnore]

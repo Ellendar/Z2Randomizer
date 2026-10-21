@@ -27,7 +27,7 @@ public class StartingLivesSerializer : IFlagSerializer
 
     public int Serialize(object? lives)
     {
-        if(lives == null)
+        if (lives == null)
         {
             return 7;
         }

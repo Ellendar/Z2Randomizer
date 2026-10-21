@@ -315,7 +315,7 @@ public static class ForestObjectExtensions
 
     public static SideviewMapCommand<O>[] ConvertTo<O>(SideviewMapCommand<ForestObject> command) where O : struct, Enum
     {
-        throw new NotImplementedException();    
+        throw new NotImplementedException();
     }
 }
 

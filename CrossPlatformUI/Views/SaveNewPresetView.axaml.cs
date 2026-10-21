@@ -19,7 +19,7 @@ public partial class SaveNewPresetView : ReactiveUserControl<SaveNewPresetViewMo
             TextBox? host = this.FindControl<TextBox>("PresetNameTextBox");
             host!.Focus();
         });
-        
+
         AvaloniaXamlLoader.Load(this);
     }
 }

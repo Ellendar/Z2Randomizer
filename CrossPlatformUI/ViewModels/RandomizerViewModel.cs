@@ -91,7 +91,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
         {
             Main.Config.Seed = new System.Random().Next(0, 999999999).ToString();
         });
-        
+
         LoadRom = ReactiveCommand.CreateFromObservable(
             () => Main.Router.Navigate.Execute(Main.RomFileViewModel)
         );
@@ -104,7 +104,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
         CheckForUpdates = ReactiveCommand.CreateFromTask(async () =>
         {
             var checkUpdateService = App.Current?.Services?.GetService<ICheckUpdateService>();
-            if(checkUpdateService == null)
+            if (checkUpdateService == null)
             {
                 throw new Exception("Unable to load update service");
             }
@@ -113,7 +113,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
 
         ToggleTheme = ReactiveCommand.Create(() =>
         {
-            if(ThemeHelper.IsDark(ThemeVariantName))
+            if (ThemeHelper.IsDark(ThemeVariantName))
             {
                 ThemeVariantName = "Light";
             }
@@ -268,7 +268,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             ),
             _ =>
         {
-            if(!(Main.Config.ShufflePalaceItems ?? true) || !(Main.Config.ShufflePalaceItems ?? true))
+            if (!(Main.Config.ShufflePalaceItems ?? true) || !(Main.Config.ShufflePalaceItems ?? true))
             {
                 Main.Config.MixOverworldAndPalaceItems = false;
             }
@@ -282,7 +282,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             Main.Config.IncludePBagCavesInItemShuffle = false;
         })
             .DisposeWith(disposables);
-        
+
         // If Palaces can't swap continents 
         SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleEncounters), x =>
         {
@@ -332,7 +332,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
     [JsonIgnore]
     public MainViewModel Main { get; }
     public PresetsViewModel PresetViewModel { get; }
-    
+
     [JsonIgnore]
     public ReactiveCommand<RxVoid, RxVoid> RerollSeed { get; }
     [JsonIgnore]

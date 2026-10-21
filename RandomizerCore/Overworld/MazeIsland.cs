@@ -407,7 +407,7 @@ sealed class MazeIsland : World
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES);
         foreach (var lid in LocationIDUtils.Enumerate(Continent.MAZE))
         {
-            if(!terrains.Keys.Contains(lid))
+            if (!terrains.Keys.Contains(lid))
             {
                 rom.Put(lid, 0, 0x00);
             }

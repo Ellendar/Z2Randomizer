@@ -132,7 +132,8 @@ internal class SpritePatcher
         // NOTE: this isn't written in stone, if anything
         // more should be allowed, let us know.
 
-        if (ROM.VanillaChrRomOffs <= addr) {
+        if (ROM.VanillaChrRomOffs <= addr)
+        {
             if (!changeItems)
             {
                 if (ChrItemAddresses.Contains(addr))

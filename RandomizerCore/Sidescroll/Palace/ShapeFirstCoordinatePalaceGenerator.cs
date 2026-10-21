@@ -21,7 +21,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
 
         Dictionary<Coord, RoomExitType> palaceShape;
         palaceShape = await GetPalaceShape(props, palace, roomPool, r, roomCount);
-        if(palaceShape.Count == 0)
+        if (palaceShape.Count == 0)
         {
             palace.IsValid = false;
             return palace;
@@ -267,7 +267,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
                     left.Right = room;
                 }
             }
-            foreach(Room down in downRooms)
+            foreach (Room down in downRooms)
             {
                 if (down != null && room.FitsWithDown(down) > 0)
                 {
@@ -278,7 +278,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
                     }
                 }
             }
-            foreach(Room up in upRooms)
+            foreach (Room up in upRooms)
             {
                 if (up != null && room.FitsWithUp(up) > 0)
                 {
@@ -289,7 +289,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
                     up.Down = room;
                 }
             }
-            foreach(Room right in rightRooms)
+            foreach (Room right in rightRooms)
             {
                 if (right != null && room.FitsWithRight(right) > 0)
                 {

@@ -106,11 +106,13 @@ public class Enemy<T> where T : Enum
     /// </summary>
     public int Y
     {
-        get {
+        get
+        {
             int rawY = (Bytes[0] & 0xF0) >> 4;
             return rawY == 0 ? 1 : rawY + 2;
         }
-        set {
+        set
+        {
             int rawY = value < 3 ? 0 : value - 2;
             Bytes[0] = (byte)(rawY << 4 | Bytes[0] & 0x0F);
         }
@@ -124,7 +126,8 @@ public class Enemy<T> where T : Enum
     public int X
     {
         get => (Bytes[1] & 0b11000000) >> 2 | Bytes[0] & 0x0F;
-        set {
+        set
+        {
             Bytes[1] = (byte)((value & 0b110000) << 2 | Bytes[1] & 0b00111111);
             Bytes[0] = (byte)(Bytes[0] & 0xF0 | value & 0x0F);
         }

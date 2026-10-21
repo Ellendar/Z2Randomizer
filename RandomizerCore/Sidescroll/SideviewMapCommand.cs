@@ -122,7 +122,8 @@ public class SideviewMapCommand<T> where T : struct, Enum
     /// <summary>
     /// Access the relative x position of the map command, the second 4 bits.
     /// </summary>
-    public int RelX {
+    public int RelX
+    {
         get => Bytes[0] & 0x0F;
         set { Bytes[0] = (byte)((Bytes[0] & 0xF0) | (value & 0x0F)); }
     }

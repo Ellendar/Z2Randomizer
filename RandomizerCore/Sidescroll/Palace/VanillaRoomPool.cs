@@ -26,7 +26,7 @@ internal class VanillaRoomPool : RoomPool
         NormalRooms.AddRange(palaceRooms.VanillaPalaceRoomsByPalaceNumber(palaceNumber));
 
         ItemRoomsByExitType = new();
-        ItemRoomsByExitType[RoomExitType.DEADEND_EXIT_RIGHT] 
+        ItemRoomsByExitType[RoomExitType.DEADEND_EXIT_RIGHT]
             = [palaceRooms.VanillaItemRoom(1), palaceRooms.VanillaItemRoom(2), palaceRooms.VanillaItemRoom(5)];
         ItemRoomsByExitType[RoomExitType.DEADEND_EXIT_LEFT]
             = [palaceRooms.VanillaItemRoom(3), palaceRooms.VanillaItemRoom(4), palaceRooms.VanillaItemRoom(6)];

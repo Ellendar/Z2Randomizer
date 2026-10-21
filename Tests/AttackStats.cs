@@ -22,7 +22,7 @@ public class AttackStats
 
         Random RNG = new Random();
 
-        for(int monteCarloIteration = 1; monteCarloIteration <= LIMIT; monteCarloIteration++)
+        for (int monteCarloIteration = 1; monteCarloIteration <= LIMIT; monteCarloIteration++)
         {
             for (int i = 0; i < 8; i++)
             {
