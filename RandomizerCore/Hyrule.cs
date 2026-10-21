@@ -2342,6 +2342,13 @@ public class Hyrule
             rom.Put(ROM.ChrRomOffset + 0x0ea0, starSpriteTilePalette1);
             rom.Put(ROM.ChrRomOffset + 0x0ec0, starSpriteTilePalette2);
         }
+        else
+        {
+            if (props.FluteWarpMode != FluteWarpMode.NONE)
+            {
+                rom.Put(ROM.ChrRomOffset + 0x11b40, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.whirlwind.chr"));
+            }
+        }
 
         if (props.ShuffleLifeRefill)
         {
@@ -3949,7 +3956,7 @@ FlagHudUpdate:
 
         if (props.FluteWarpMode != FluteWarpMode.NONE)
         {
-            ROM.FluteTwisterWarp(engine, props.FluteWarpMode, GetPalaceOrder());
+            ROM.FluteTwisterWarp(engine, props.FluteWarpMode, GetPalaceOrder(), props.MarioMode);
         }
 
         if (props.UpARestartsAtPalaces)

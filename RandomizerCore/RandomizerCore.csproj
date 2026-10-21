@@ -27,6 +27,7 @@
     <None Remove="Asm\Graphics\Mario_Upstab_Varcal.chr" />
     <None Remove="Asm\Graphics\randomizer_text.chr" />
     <None Remove="Asm\Graphics\Tanooki.chr" />
+    <None Remove="Asm\Graphics\whirlwind.chr" />
     <None Remove="Asm\Recoil.s" />
     <None Remove="Asm\StatTracking.s" />
     <None Remove="Asm\z2ft.s" />
@@ -72,6 +73,7 @@
     <EmbeddedResource Include="Asm\Graphics\Mario_Upstab_Varcal.chr" />
     <EmbeddedResource Include="Asm\Graphics\randomizer_text.chr" />
     <EmbeddedResource Include="Asm\Graphics\Tanooki.chr" />
+    <EmbeddedResource Include="Asm\Graphics\whirlwind.chr" />
     <EmbeddedResource Include="Asm\z2mario\fireball_explosion.chr" />
     <EmbeddedResource Include="Asm\ram.inc" />
     <EmbeddedResource Include="Asm\z2r.inc" />

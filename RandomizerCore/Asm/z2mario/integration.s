@@ -251,8 +251,7 @@ BankPatchLinkDrawRoutine:
   +
   jsr SwapToPRG0
   jsr $EC02 ; let the double return go back to here
-  jsr SwapToSavedPRG
-  rts
+  jmp SwapToSavedPRG
 @Exit:
   ; double return to skip the OG drawing code
   pla
@@ -984,8 +983,7 @@ PatchLinkHitDispatch:
     ; otherwise a surviving enemy recoils mario like a melee sword hit would.
     lda #1
     sta $0B
-    jsr $E726
-    rts
+    jmp $E726
 @notStar:
   lda StatueTimer
   ora StatueChangeTimer
@@ -1127,8 +1125,7 @@ PatchLinkMain:
   stx $14
   lda $de   ; check if we can move
   beq @notfrozen
-    jsr ProcFireball_Bubble    ;process fireballs and air bubbles
-    rts
+    jmp ProcFireball_Bubble    ;process fireballs and air bubbles
 @notfrozen:
   ; Do some checks that happen every frame
   lda $0752 ; link is stuck in the mud

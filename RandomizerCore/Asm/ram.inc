@@ -276,7 +276,6 @@ zp_dd = $dd
 zp_de = $de
 zp_df = $df                              ; Enemy type temporary storage
 
-; $e0-$ef are music and sound variables
 Z2NoiseSoundQueue := $ed
 Z2Square2SoundQueue := $ee
 Z2Square1SoundQueue := $ef
@@ -370,6 +369,8 @@ RNG := $051b
 MapNumber := $0561
 OverworldFacingDirection := $0562         ; Link's facing direction: $01=right, $02=left, $04=down, $08=up
 OverworldFacingTerrain := $0563           ; terrain type Link is currently facing
+FlutePlayingLatch := $0567
+FlutePlaying := $0568
 TownNumber := $056b
 PalaceNumber := $056c                     ; [Z2R] Current post-shuffle palace number (1-7); [Z2] Palace index in continent (0-2)
 OverworldDemonYVelocity := $056d          ; overworld demon Y velocity, indexed by slot X (signed: $01=down, $FF=up)

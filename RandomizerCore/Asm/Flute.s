@@ -2,7 +2,7 @@
 
 TWISTER_ENEMY_ID = $04
 TWISTER_TILE = $b5   ; tile IDs for frame 0; frame 1 uses TWISTER_TILE+2
-TWISTER_PAL  = $02   ; OAM palette attribute (bits 0-1)
+TWISTER_PAL  = $02   ; OAM palette attribute (bits 0-1) for Mario Mode
 
 ; Exactly one of the following is defined by ROM.FluteTwisterWarp() to select the mode:
 ;   FLUTE_WARP_CLEARED_PALACES - warp to palaces whose crystal has been placed
@@ -35,10 +35,10 @@ PowersOfTwo:
 
 .segment "PRG0", "PRG7"
 
-ProcessNextOverworldEnemy = $842F
-UpdateOverworldSpritePosition = $8397
-AreaLoadTrigger = $85eb
-OverworldPostLoad = $C72F
+UpdateOverworldSpritePosition := $8397
+ProcessNextOverworldEnemy := $842f
+AreaLoadTrigger := $85eb
+OverworldPostLoad := $c72f
 
 ; Patches the place where the enemy graphics data is loaded
 ; so we can draw a custom tornado
@@ -101,6 +101,7 @@ TwisterDrawCheck:
 @twister:
   ; type 4: write twister tile and palette
   ; Y = slot*16 (OAM base), set before this hook
+.if MARIO_MODE
   lda FrameCounter
   and #$10
   lsr
@@ -112,6 +113,40 @@ TwisterDrawCheck:
   lda #TWISTER_PAL
   sta $0282, y
   sta $0286, y
+
+.else ; Zelda 1 style whirlwind
+  lda FrameCounter
+  and #$01
+  bne @flip
+@noflip:
+  lda FrameCounter
+  and #$02
+  sta R7
+  asl
+  adc #TWISTER_TILE
+  sta $0281, y  ; left
+  adc #2
+  sta $0285, y  ; right = base+2
+  lda R7
+  lsr           ; 0 or 1
+  ora #$02      ; palette 2 or 3
+  bne @setattr
+@flip:
+  lda FrameCounter
+  and #$02
+  sta R7
+  asl
+  adc #TWISTER_TILE
+  sta $0285, y  ; right = base
+  adc #2
+  sta $0281, y  ; left = base+2
+  lda R7
+  lsr           ; 0 or 1
+  ora #$42      ; H-flip + palette 2 or 3
+@setattr:
+  sta $0282, y
+  sta $0286, y
+.endif
   pla
   pla
   jmp UpdateOverworldSpritePosition
@@ -179,8 +214,6 @@ TwisterWarp:
   ; already in the right continent so we don't need to switch continents
   beq @same_region
     ; Different continent so we need to reload the continent
-    ldx RegionNumber
-    stx PreviousRegion
     sta RegionNumber
     ; the new game mode will load the WorldNumber
     lda #$00
@@ -204,20 +237,15 @@ TwisterWarp:
   pla
   jmp AreaLoadTrigger
 
-; Put the twister spawning into a macro so it can be copied between bank 1 and 2
-.macro TwisterSpawnBody
-  ; Refuse to spawn a second twister if one is already active.
-  ldx #$07
-@active_check:
-  lda OverworldEnemy0Type, x
-  cmp #$04
-  ; already have a twister so skip processing it
-  bne @skip_active
-    jmp @exit
-@skip_active:
-  dex
-  bpl @active_check
+.segment "PRG0"
 
+OverworldCheckBButton := $8512
+.org $8524
+  jmp FluteDestinationStep
+
+.reloc
+FluteDestinationStep:
+  sta FlutePlaying ; cmd overwritten by hook
   ; Check the player direction to decide which way to walk the destination list.
   ; Direction: OverworldFacingDirection bits
   ; next     $01=right $08=up
@@ -272,7 +300,7 @@ TwisterWarp:
   dex
   bpl @next_dst
     ; nothing visited yet, so leave
-    jmp @exit
+    bmi @exit
 @found_dst:
 .ifdef FLUTE_WARP_VISITED_TOWNS
   ; town code is used directly as the slot
@@ -282,39 +310,8 @@ TwisterWarp:
   lda R6
   sta TwisterCurrentPalaceSlot
 .endif
-
-@spawn:
-  ; Find a free encounter slot
-  ldx #$07
-@free_slot:
-  lda OverworldEnemy0Type, x
-  beq @init_slot
-  dex
-  bpl @free_slot
-  inx ; set x = 0 and just overwrite slot 0 if all else fails
-@init_slot:
-  lda #TWISTER_ENEMY_ID
-  sta OverworldEnemy0Type, x
-  lda #$40
-  sta OverworldDemonTimer, x
-  lda OverworldScrollY
-  clc
-  ; center-screen height where the player is
-  adc #$6c
-  sta OverworldEnemyYPosition, x
-  ; spawn it at the left edge of the screen
-  lda ScrollPosShadow
-  sta OverworldEnemyXPosition, x
-  ; horizontally move at 2px right a frame
-  lda #$02
-  sta OverworldDemonXVelocity, x
-  lda #$00
-  sta OverworldDemonYVelocity, x
 @exit:
-  ; And also check if its time to do spider/3 eye rock encounter
-  lda OverworldFacingTerrain
   rts
-.endmacro
 
 
 .if .defined(FLUTE_WARP_CLEARED_PALACES) .or .defined(FLUTE_WARP_VISITED_PALACES)
@@ -379,8 +376,7 @@ FluteMarkVisited:
 .endif
 .endif
 
-
-.segment "PRG1"
+.segment "PRG1" & "PRG2"
 
 ; Skip east continent check
 .org $8368
@@ -388,28 +384,64 @@ FluteMarkVisited:
 FREE_UNTIL $836f
 
 .org $8387
-  jsr TwisterSpawnPRG1
+  jsr TwisterSpawn
 
 .reloc
-.proc TwisterSpawnPRG1
-  TwisterSpawnBody
-.endproc
+.proc TwisterSpawn
+  ; Refuse to spawn a second twister if one is already active.
+  ldx #$07
+@active_check:
+  lda OverworldEnemy0Type, x
+  cmp #$04
+  ; already have a twister so skip processing it
+  bne @skip_active
+    jmp @exit
+@skip_active:
+  dex
+  bpl @active_check
 
+; exit if we have no location to warp to
+  lda TwisterCurrentPalaceSlot
+.if .defined(FLUTE_WARP_CLEARED_PALACES) .or .defined(FLUTE_WARP_VISITED_PALACES)
+  beq @exit ; skip 0, not a palace number
+.else ; FLUTE_WARP_VISITED_TOWNS
+  tay
+  lda FluteWarpFlags
+  and PowersOfTwo,y
+  beq @exit
+.endif
 
-.segment "PRG2"
-
-; Skip east continent check
-.org $8368
-  jmp $836f
-FREE_UNTIL $836f
-
-; Same hook at the same address.
-.org $8387
-  jsr TwisterSpawnPRG2
-
-.reloc
-.proc TwisterSpawnPRG2
-  TwisterSpawnBody
+@spawn:
+  ; Find a free encounter slot
+  ldx #$07
+@free_slot:
+  lda OverworldEnemy0Type, x
+  beq @init_slot
+  dex
+  bpl @free_slot
+  inx ; set x = 0 and just overwrite slot 0 if all else fails
+@init_slot:
+  lda #TWISTER_ENEMY_ID
+  sta OverworldEnemy0Type, x
+  lda #$40
+  sta OverworldDemonTimer, x
+  lda OverworldScrollY
+  clc
+  ; center-screen height where the player is
+  adc #$6c
+  sta OverworldEnemyYPosition, x
+  ; spawn it at the left edge of the screen
+  lda ScrollPosShadow
+  sta OverworldEnemyXPosition, x
+  ; horizontally move at 2px right a frame
+  lda #$02
+  sta OverworldDemonXVelocity, x
+  lda #$00
+  sta OverworldDemonYVelocity, x
+@exit:
+  ; And also check if its time to do spider/3 eye rock encounter
+  lda OverworldFacingTerrain
+  rts
 .endproc
 
 ; patch the flute SFX to play the warp whistle tune
