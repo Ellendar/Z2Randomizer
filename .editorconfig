@@ -1,0 +1,45 @@
+root = true
+
+[*]
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.cs]
+end_of_line = crlf
+
+[*.{asm,inc,s}]
+end_of_line = lf
+
+[*.{xaml,axaml}]
+end_of_line = lf
+
+[*.resx]
+indent_style = tab
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+[*.{props}]
+indent_size = 2
+
+[*.{csproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
+indent_size = 2
+
+[*.json]
+end_of_line = lf
+indent_size = 2
+
+[*.{yaml,yml}]
+end_of_line = lf
+indent_size = 2
+
+[*.md]
+end_of_line = lf
+trim_trailing_whitespace = false
+
+[*.{cmd,bat}]
+end_of_line = crlf
+
+[*.sh]
+end_of_line = lf
