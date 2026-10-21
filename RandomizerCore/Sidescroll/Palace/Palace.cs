@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Z2Randomizer.RandomizerCore.Enemy;
-using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 using static Z2Randomizer.RandomizerCore.Util;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
@@ -272,6 +271,19 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                                                dropsMayBypassFinalBosses: dropsMayBypassBosses && Number < 7,
                                                tBirdRequired: tBirdRequired);
         return AllRooms.All(i => reachableRooms.Contains(i));
+    }
+
+    public bool AllReachable(
+        RandomizerProperties props,
+        bool allowBacktracking = false,
+        bool allowMiniBossEnterGoingLeft = false,
+        bool allowFinalBossEnterGoingLeft = false)
+    {
+        return AllReachable(allowBacktracking: allowBacktracking,
+                            allowMiniBossEnterGoingLeft: allowMiniBossEnterGoingLeft,
+                            allowFinalBossEnterGoingLeft: allowFinalBossEnterGoingLeft,
+                            dropsMayBypassBosses: props.DropsMayBypassBosses,
+                            tBirdRequired: props.RequireTbird);
     }
 
     /// <summary>
