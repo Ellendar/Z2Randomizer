@@ -107,6 +107,9 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
         Main = main;
         HostScreen = Main;
         PresetViewModel = new(Main);
+        SearchViewModel = new(Main);
+        SearchViewModel.SearchStarted += (_, _) => OpenSearch();
+        SearchViewModel.SearchEnded += OnSearchEnded;
         Activator = new ViewModelActivator();
 
         RerollSeed = ReactiveCommand.Create(() =>
@@ -269,6 +272,50 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
         AddValidationRules(disposables);
     }
 
+    /// <summary>
+    /// Opens the search results, remembering the tab the user came from.
+    /// </summary>
+    internal void OpenSearch()
+    {
+        if (SearchTabIndex < 0)
+        {
+            return;
+        }
+
+        if (CurrentTabIndex == SearchTabIndex)
+        {
+            return;
+        }
+
+        tabIndexBeforeSearch = CurrentTabIndex;
+        CurrentTabIndex = SearchTabIndex;
+    }
+
+    /// <summary>
+    /// The search box was emptied, so the tabs take over again.
+    /// </summary>
+    private void OnSearchEnded(object? sender, EventArgs e)
+    {
+        if (SearchTabIndex < 0)
+        {
+            return;
+        }
+
+        // The user moved on to another tab while searching; leave them there.
+        if (CurrentTabIndex != SearchTabIndex)
+        {
+            tabIndexBeforeSearch = -1;
+            return;
+        }
+
+        if (tabIndexBeforeSearch >= 0)
+        {
+            CurrentTabIndex = tabIndexBeforeSearch;
+        }
+
+        tabIndexBeforeSearch = -1;
+    }
+
     private void AddValidationRules(MultipleDisposable disposables)
     {
         SubscribeExtensions.Subscribe(
@@ -367,6 +414,46 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
     [JsonIgnore]
     public MainViewModel Main { get; }
     public PresetsViewModel PresetViewModel { get; }
+
+    /// <summary>
+    /// Searches the flag controls by caption and shows the matches.
+    /// </summary>
+    [JsonIgnore]
+    public SearchViewModel SearchViewModel { get; }
+
+    private int searchTabIndex = -1;
+
+    /// <summary>
+    /// Where the "Search" tab sits in the view's tab strip. The view reports it
+    /// (the tabs are declared in XAML), so reordering them cannot desynchronize
+    /// this.
+    /// </summary>
+    [JsonIgnore]
+    public int SearchTabIndex
+    {
+        get => searchTabIndex;
+        set
+        {
+            if (searchTabIndex == value)
+            {
+                return;
+            }
+
+            searchTabIndex = value;
+
+            // A session that ended on the Search tab has no search to show, so
+            // the app does not come back to it.
+            if (value >= 0 &&
+                !SearchViewModel.HasQuery &&
+                CurrentTabIndex == value)
+            {
+                CurrentTabIndex = 0;
+            }
+        }
+    }
+
+    /// <summary>The tab the user was on before the search took over.</summary>
+    private int tabIndexBeforeSearch = -1;
 
     [JsonIgnore]
     public ReactiveCommand<RxVoid, RxVoid> RerollSeed { get; }

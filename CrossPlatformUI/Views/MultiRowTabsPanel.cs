@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 
@@ -11,9 +12,27 @@ namespace CrossPlatformUI.Views;
 /// </summary>
 public class MultiRowTabsPanel : Panel
 {
+    private const int TrailingColumnSpan = 2;
+    private const double TrailingGap = 12;
+    private const double MinimumTrailingSpace = 160;
+
     /// <summary>How many tab items occupy the first row. Defaults to 2.</summary>
     public static readonly StyledProperty<int> FirstRowCountProperty =
         AvaloniaProperty.Register<MultiRowTabsPanel, int>(nameof(FirstRowCount), 2);
+
+    public static readonly StyledProperty<Control?> FirstRowContentProperty =
+        AvaloniaProperty.Register<MultiRowTabsPanel, Control?>(nameof(FirstRowContent));
+
+    private double firstRowHeight;
+    private double secondRowHeight;
+    private bool trailingOnOwnRow;
+    private readonly List<Control> visibleTabs = new();
+
+    static MultiRowTabsPanel()
+    {
+        AffectsMeasure<MultiRowTabsPanel>(FirstRowCountProperty, FirstRowContentProperty);
+        AffectsParentMeasure<MultiRowTabsPanel>(IsVisibleProperty);
+    }
 
     public int FirstRowCount
     {
@@ -21,19 +40,55 @@ public class MultiRowTabsPanel : Panel
         set => SetValue(FirstRowCountProperty, value);
     }
 
+    public Control? FirstRowContent
+    {
+        get => GetValue(FirstRowContentProperty);
+        set => SetValue(FirstRowContentProperty, value);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property != FirstRowContentProperty) return;
+
+        // The ItemsPresenter uses Children for its tab indices.
+        if (change.OldValue is Control oldContent)
+        {
+            VisualChildren.Remove(oldContent);
+            LogicalChildren.Remove(oldContent);
+        }
+        if (change.NewValue is Control newContent)
+        {
+            LogicalChildren.Add(newContent);
+            VisualChildren.Add(newContent);
+        }
+    }
+
     protected override Size MeasureOverride(Size availableSize)
     {
         var constraint = new Size(double.PositiveInfinity, availableSize.Height);
-        double firstRowHeight = 0, secondRowHeight = 0;
-        double firstRowWidth = 0, secondRowWidth = 0;
-        for (int i = 0; i < Children.Count; i++)
+        visibleTabs.Clear();
+        foreach (var child in Children)
         {
-            Children[i].Measure(constraint);
-            var desired = Children[i].DesiredSize;
-            if (i < FirstRowCount)
+            if (child.IsVisible)
+                visibleTabs.Add(child);
+        }
+        int firstRowCount = Math.Clamp(FirstRowCount, 0, visibleTabs.Count);
+        int secondRowCount = visibleTabs.Count - firstRowCount;
+        double columnWidth = secondRowCount > 0 && double.IsFinite(availableSize.Width)
+            ? availableSize.Width / secondRowCount
+            : 0;
+        firstRowHeight = secondRowHeight = 0;
+        double firstRowWidth = 0, secondRowWidth = 0, extraRowHeight = 0;
+        for (int i = 0; i < visibleTabs.Count; i++)
+        {
+            var tab = visibleTabs[i];
+            tab.Measure(constraint);
+            var desired = tab.DesiredSize;
+            if (i < firstRowCount)
             {
                 firstRowHeight = Math.Max(firstRowHeight, desired.Height);
-                firstRowWidth += desired.Width;
+                firstRowWidth += Math.Max(columnWidth, desired.Width);
             }
             else
             {
@@ -41,45 +96,57 @@ public class MultiRowTabsPanel : Panel
                 secondRowWidth += desired.Width;
             }
         }
-        var height = (Children.Count > FirstRowCount ? firstRowHeight + secondRowHeight : firstRowHeight);
-        return new Size(Math.Max(firstRowWidth, secondRowWidth), height);
+        if (FirstRowContent is { IsVisible: true } trailing)
+        {
+            double remainingWidth = availableSize.Width - firstRowWidth - TrailingGap;
+            double trailingWidth = columnWidth * Math.Min(TrailingColumnSpan, secondRowCount);
+            trailingOnOwnRow = trailingWidth <= 0 || remainingWidth < MinimumTrailingSpace || trailingWidth > remainingWidth;
+            trailing.Measure(new Size(trailingOnOwnRow ? availableSize.Width : trailingWidth, availableSize.Height));
+            if (trailingOnOwnRow)
+            {
+                extraRowHeight = trailing.DesiredSize.Height;
+                firstRowWidth = Math.Max(firstRowWidth, trailing.DesiredSize.Width);
+            }
+            else
+            {
+                firstRowHeight = Math.Max(firstRowHeight, trailing.DesiredSize.Height);
+                firstRowWidth = availableSize.Width;
+            }
+        }
+        return new Size(Math.Max(firstRowWidth, secondRowWidth), firstRowHeight + secondRowHeight + extraRowHeight);
     }
 
     protected override Size ArrangeOverride(Size finalSize)
     {
-        double firstRowHeight = 0;
-        for (int i = 0; i < Math.Min(FirstRowCount, Children.Count); i++)
-        {
-            firstRowHeight = Math.Max(firstRowHeight, Children[i].DesiredSize.Height);
-        }
-
-        double secondRowHeight = 0;
-        for (int i = FirstRowCount; i < Children.Count; i++)
-        {
-            secondRowHeight = Math.Max(secondRowHeight, Children[i].DesiredSize.Height);
-        }
-
-        int secondRowCount = Children.Count - FirstRowCount;
-
-        // Match the second-row columns where possible and give long first-row headers room.
-        double columnWidth = secondRowCount > 0 ? finalSize.Width / secondRowCount : finalSize.Width;
+        int firstRowCount = Math.Clamp(FirstRowCount, 0, visibleTabs.Count);
+        int secondRowCount = visibleTabs.Count - firstRowCount;
+        double columnWidth = secondRowCount > 0 ? finalSize.Width / secondRowCount : 0;
+        var trailing = FirstRowContent is { IsVisible: true } content ? content : null;
+        double tabTop = trailingOnOwnRow ? trailing?.DesiredSize.Height ?? 0 : 0;
 
         double firstRowX = 0;
-        for (int i = 0; i < Math.Min(FirstRowCount, secondRowCount); i++)
+        for (int i = 0; i < firstRowCount; i++)
         {
-            var child = Children[i];
+            var child = visibleTabs[i];
             double width = Math.Max(columnWidth, child.DesiredSize.Width);
-            child.Arrange(new Rect(firstRowX, 0, width, firstRowHeight));
+            child.Arrange(new Rect(firstRowX, tabTop, width, firstRowHeight));
             firstRowX += width;
         }
 
-        if (secondRowCount > 0)
+        for (int j = 0; j < secondRowCount; j++)
         {
-            for (int j = 0; j < secondRowCount; j++)
-            {
-                var child = Children[FirstRowCount + j];
-                child.Arrange(new Rect(new Point(j * columnWidth, firstRowHeight), new Size(columnWidth, secondRowHeight)));
-            }
+            var child = visibleTabs[firstRowCount + j];
+            child.Arrange(new Rect(j * columnWidth, tabTop + firstRowHeight, columnWidth, secondRowHeight));
+        }
+
+        if (trailing is not null)
+        {
+            double width = trailingOnOwnRow
+                ? finalSize.Width
+                : columnWidth * Math.Min(TrailingColumnSpan, secondRowCount);
+            double height = trailing.DesiredSize.Height;
+            double y = trailingOnOwnRow ? 0 : (firstRowHeight - height) / 2;
+            trailing.Arrange(new Rect(finalSize.Width - width, y, width, height));
         }
 
         return finalSize;

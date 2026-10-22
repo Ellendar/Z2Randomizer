@@ -74,10 +74,30 @@
                 </Menu>
             </StackPanel>
         </Grid>
-        <TabControl Grid.Row="1" Margin="5" SelectedIndex="{Binding CurrentTabIndex}">
+        <TabControl Grid.Row="1" Name="Tabs" Margin="5" SelectedIndex="{Binding CurrentTabIndex}">
             <TabControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <views:MultiRowTabsPanel FirstRowCount="3"/>
+                    <views:MultiRowTabsPanel FirstRowCount="3">
+                        <views:MultiRowTabsPanel.FirstRowContent>
+                            <TextBox Name="SearchInputTextBox" x:DataType="vm:RandomizerViewModel" UseFloatingPlaceholder="False"
+                                     PlaceholderText="Search settings" AutomationProperties.Name="Search options"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                     GotFocus="OnSearchInputFocused"
+                                     Height="56" HorizontalAlignment="Stretch" Text="{Binding SearchViewModel.Query}">
+                                <TextBox.InnerLeftContent>
+                                    <avalonia:MaterialIcon Kind="Magnify" Width="20" Height="20" Margin="0,0,4,0" />
+                                </TextBox.InnerLeftContent>
+                                <TextBox.InnerRightContent>
+                                    <Button ToolTip.Tip="Clear the search" AutomationProperties.Name="Clear the search"
+                                            Classes="Flat" Padding="0" Width="32" Height="32"
+                                            Content="{avalonia:MaterialIconExt Kind=Close, IconSize=20}"
+                                            IsVisible="{Binding SearchViewModel.HasQuery}"
+                                            Command="{Binding SearchViewModel.Clear}" />
+                                </TextBox.InnerRightContent>
+                            </TextBox>
+                        </views:MultiRowTabsPanel.FirstRowContent>
+                    </views:MultiRowTabsPanel>
                 </ItemsPanelTemplate>
             </TabControl.ItemsPanel>
             <Interaction.Behaviors>
@@ -121,6 +141,10 @@
             </TabItem>
             <TabItem Header="Patches">
                 <tabs:PatchesView DataContext="{Binding Main}"/>
+            </TabItem>
+            <!-- Hidden search tab required for search to work -->
+            <TabItem Header="Search" IsVisible="False">
+                <tabs:SearchView DataContext="{Binding SearchViewModel}"/>
             </TabItem>
         </TabControl>
     </Grid>

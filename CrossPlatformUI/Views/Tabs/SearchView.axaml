@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             xmlns:views="clr-namespace:CrossPlatformUI.Views"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+             x:Class="CrossPlatformUI.Views.Tabs.SearchView"
+             x:DataType="vmt:SearchViewModel">
+    <Grid RowDefinitions="Auto,*" Margin="4">
+        <TextBlock Grid.Row="0" Text="{Binding StatusText}" Margin="4 4 4 8" TextWrapping="Wrap"/>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding Results}">
+                <!--
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <views:FlexColumnsPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                -->
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vmt:SearchResultRow">
+                        <ContentControl Content="{Binding Control}"
+                                        MinWidth="310"
+                                        MaxWidth="310"
+                                        HorizontalAlignment="Left"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
