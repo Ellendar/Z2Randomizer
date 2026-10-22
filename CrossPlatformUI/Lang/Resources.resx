@@ -430,11 +430,20 @@ The &quot;Shuffle all Experience&quot; box just checks all 3 shuffle EXP boxes.<
 	<data name="AttackLevelCap" xml:space="preserve">
 <value>Attack</value>
 	</data>
+	<data name="AttackLevelCapCaption" xml:space="preserve">
+<value>Level Cap</value>
+	</data>
 	<data name="MagicLevelCap" xml:space="preserve">
 <value>Magic</value>
 	</data>
+	<data name="MagicLevelCapCaption" xml:space="preserve">
+<value>Level Cap</value>
+	</data>
 	<data name="LifeLevelCap" xml:space="preserve">
 <value>Life</value>
+	</data>
+	<data name="LifeLevelCapCaption" xml:space="preserve">
+<value>Level Cap</value>
 	</data>
 	<data name="LevelCapToolTip" xml:space="preserve">
 <value>Sets a maximum level for the specified attribute. Any levels gained beyond this cap will
@@ -1154,11 +1163,20 @@ randomly selected between these values (inclusive).
 	<data name="StartingAttackLevel" xml:space="preserve">
 <value>Attack</value>
 	</data>
+	<data name="StartingAttackLevelCaption" xml:space="preserve">
+<value>Starting Level</value>
+	</data>
 	<data name="StartingMagicLevel" xml:space="preserve">
 <value>Magic</value>
 	</data>
+	<data name="StartingMagicLevelCaption" xml:space="preserve">
+<value>Starting Level</value>
+	</data>
 	<data name="StartingLifeLevel" xml:space="preserve">
 <value>Life</value>
+	</data>
+	<data name="StartingLifeLevelCaption" xml:space="preserve">
+<value>Starting Level</value>
 	</data>
 	<data name="StartItemsLimit" xml:space="preserve">
 <value>Starting Item Limit</value>

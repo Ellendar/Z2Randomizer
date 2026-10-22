@@ -63,8 +63,7 @@ internal sealed class FlagEntry
 
     /// <summary>
     /// The caption shown above a numeric box when it is rendered on its own (the
-    /// preset diff), or null to show none. Only a Min/Max pair end has one, so the
-    /// two ends read clearly away from their tab's heading.
+    /// preset diff), or null to show none.
     /// </summary>
     public Func<string?>? Caption { get; init; }
 

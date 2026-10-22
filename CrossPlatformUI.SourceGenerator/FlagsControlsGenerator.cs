@@ -218,6 +218,7 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
                 HasInfo = isEnum &&
                     property.Type is INamedTypeSymbol enumSymbol &&
                     EnumHasInfo(enumSymbol),
+                CaptionResourceKey = property.Name + "Caption",
                 TooltipResourceName =
                     TooltipResourceOverride(property) ??
                     property.Name + "ToolTip",
@@ -468,11 +469,9 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
 
             if (field.Kind == ControlKind.Numeric)
             {
-                // A numeric gets the diff composite (optional caption + one box) so
-                // a Min/Max end shown on its own still carries its caption.
                 sb.AppendLine(
                     "                return global::CrossPlatformUI.Controls" +
-                    $".NumericDiffControl.Build(ConfigFlag.{field.PropertyName});");
+                    $".Z2NumericPanel.Build(ConfigFlag.{field.PropertyName});");
                 continue;
             }
 
@@ -574,6 +573,10 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
                     sb.AppendLine(
                         $"            Label = () => " +
                         $"global::{ResourcesNamespace}.Resources.{name},");
+                    sb.AppendLine(
+                        "            Caption = () => " +
+                        $"global::{ResourcesNamespace}.Resources.ResourceManager" +
+                        $".GetString(\"{field.CaptionResourceKey}\"),");
                     sb.AppendLine(
                         "            ToolTip = () => " +
                         $"global::{ResourcesNamespace}.Resources" +
@@ -948,11 +951,8 @@ public sealed class FlagsControlsGenerator : IIncrementalGenerator
                 IsNumericNullable = candidate.IsNullable,
                 PartnerPropertyName = partnerProperty,
                 IsMinEnd = isMinEnd,
-                CaptionResourceKey =
-                    isPair ? candidate.PropertyName + "Caption" : null,
-                SharedTooltipResourceKey = isPair
-                    ? (isMinEnd ? candidate.PropertyName : partnerProperty) + "ToolTip"
-                    : null,
+                CaptionResourceKey = candidate.PropertyName + "Caption",
+                SharedTooltipResourceKey = (isMinEnd ? candidate.PropertyName : partnerProperty) + "ToolTip",
             };
         }
     }
