@@ -1,55 +1,59 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
+             xmlns:v="clr-namespace:CrossPlatformUI.Views"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
-             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              xmlns:z="clr-namespace:CrossPlatformUI.Controls"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
-             x:DataType="vm:MainViewModel"
-             x:Class="CrossPlatformUI.Views.Tabs.DropsView">
-    <Grid ColumnDefinitions="*, *, *">
-        <StackPanel Grid.Column="0">
-            <z:Z2CheckBox Flag="ShuffleItemDropFrequency" />
-            <z:Z2CheckBox Flag="RandomizeDrops" />
-            <z:Z2CheckBox Flag="StandardizeDrops" />
-        </StackPanel>
-        <StackPanel Grid.Column="1">
-            <TextBlock Margin="17 8">Small Enemy Pool</TextBlock>
-            <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1"
-                    Margin="17 0 17 0"
-                    Padding="14 8" CornerRadius="4">
-                <UniformGrid Rows="0" Columns="1" RowSpacing="8">
-                    <z:Z2CheckBox Flag="SmallEnemiesCanDropBlueJar" />
-                    <z:Z2CheckBox Flag="SmallEnemiesCanDropRedJar" />
-                    <z:Z2CheckBox Flag="SmallEnemiesCanDropSmallBag" />
-                    <z:Z2CheckBox Flag="SmallEnemiesCanDropMediumBag" />
-                    <z:Z2CheckBox Flag="SmallEnemiesCanDropLargeBag" />
-                    <z:Z2CheckBox Flag="SmallEnemiesCanDropXLBag" />
-                    <z:Z2CheckBox Flag="SmallEnemiesCanDrop1up" />
-                    <z:Z2CheckBox Flag="SmallEnemiesCanDropKey" />
-                </UniformGrid>
-            </Border>
-        </StackPanel>
-        <StackPanel Grid.Column="2">
-            <TextBlock Margin="17 8">Large Enemy Pool</TextBlock>
-            <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1"
-                    Margin="17 0 17 0"
-                    Padding="14 8" CornerRadius="4">
-                <UniformGrid Rows="0" Columns="1" RowSpacing="8">
-                    <z:Z2CheckBox Flag="LargeEnemiesCanDropBlueJar" />
-                    <z:Z2CheckBox Flag="LargeEnemiesCanDropRedJar" />
-                    <z:Z2CheckBox Flag="LargeEnemiesCanDropSmallBag" />
-                    <z:Z2CheckBox Flag="LargeEnemiesCanDropMediumBag" />
-                    <z:Z2CheckBox Flag="LargeEnemiesCanDropLargeBag" />
-                    <z:Z2CheckBox Flag="LargeEnemiesCanDropXLBag" />
-                    <z:Z2CheckBox Flag="LargeEnemiesCanDrop1up" />
-                    <z:Z2CheckBox Flag="LargeEnemiesCanDropKey" />
-                </UniformGrid>
-            </Border>
-        </StackPanel>
-    </Grid>
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             Design.Width="{x:Static ui:MainWindowSize.TabPreviewWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.TabPreviewHeight}"
+             x:Class="CrossPlatformUI.Views.Tabs.DropsView"
+             x:DataType="vm:MainViewModel">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <v:FlexColumnsPanel Margin="4 16">
+            <StackPanel Margin="0">
+                <TextBlock Text="Small Enemy Pool" Classes="SectionHeader" />
+                <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1"
+                        Margin="17 4 17 4"
+                        Padding="14 8" CornerRadius="4">
+                    <UniformGrid Rows="0" Columns="1" RowSpacing="8">
+                        <z:Z2CheckBox Flag="SmallEnemiesCanDropBlueJar" />
+                        <z:Z2CheckBox Flag="SmallEnemiesCanDropRedJar" />
+                        <z:Z2CheckBox Flag="SmallEnemiesCanDropSmallBag" />
+                        <z:Z2CheckBox Flag="SmallEnemiesCanDropMediumBag" />
+                        <z:Z2CheckBox Flag="SmallEnemiesCanDropLargeBag" />
+                        <z:Z2CheckBox Flag="SmallEnemiesCanDropXLBag" />
+                        <z:Z2CheckBox Flag="SmallEnemiesCanDrop1up" />
+                        <z:Z2CheckBox Flag="SmallEnemiesCanDropKey" />
+                    </UniformGrid>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Large Enemy Pool" Classes="SectionHeader" />
+                <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1"
+                        Margin="17 4 17 4"
+                        Padding="14 8" CornerRadius="4">
+                    <UniformGrid Rows="0" Columns="1" RowSpacing="8">
+                        <z:Z2CheckBox Flag="LargeEnemiesCanDropBlueJar" />
+                        <z:Z2CheckBox Flag="LargeEnemiesCanDropRedJar" />
+                        <z:Z2CheckBox Flag="LargeEnemiesCanDropSmallBag" />
+                        <z:Z2CheckBox Flag="LargeEnemiesCanDropMediumBag" />
+                        <z:Z2CheckBox Flag="LargeEnemiesCanDropLargeBag" />
+                        <z:Z2CheckBox Flag="LargeEnemiesCanDropXLBag" />
+                        <z:Z2CheckBox Flag="LargeEnemiesCanDrop1up" />
+                        <z:Z2CheckBox Flag="LargeEnemiesCanDropKey" />
+                    </UniformGrid>
+                </Border>
+            </StackPanel>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Drop Settings" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="ShuffleItemDropFrequency" />
+                <z:Z2CheckBox Flag="RandomizeDrops" />
+                <z:Z2CheckBox Flag="StandardizeDrops" />
+            </StackPanel>
+        </v:FlexColumnsPanel>
+    </ScrollViewer>
 </UserControl>

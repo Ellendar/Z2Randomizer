@@ -1,33 +1,33 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:v="clr-namespace:CrossPlatformUI.Views"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
-             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              xmlns:z="clr-namespace:CrossPlatformUI.Controls"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             Design.Width="{x:Static ui:MainWindowSize.TabPreviewWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.TabPreviewHeight}"
              x:Class="CrossPlatformUI.Views.Tabs.HintsView"
              x:DataType="vm:MainViewModel">
-    <Grid ColumnDefinitions="*, *">
-        <StackPanel Grid.Column="0">
-            <HyperlinkButton
-                Margin="43 0"
-                HorizontalAlignment="Left"
-                Content="[Wiki: Hints]"
-                NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Hints"
-                FontSize="12"
-                Foreground="#4557c4"
-                Cursor="Hand"
-            />
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <v:FlexColumnsPanel Margin="4 16">
+            <StackPanel Margin="0">
+                <DockPanel Margin="0,0,0,-11" >
+                    <HyperlinkButton Classes="WikiLink" DockPanel.Dock="Right" Margin="8,12,18,0"
+                                     Content="[Wiki: Hints]"
+                                     NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Hints" />
+                    <TextBlock Text="In-Game Hints" Classes="SectionHeader" VerticalAlignment="Top" />
+                </DockPanel>
+                <z:Z2ComboBox Flag="HelpfulHints" />
+                <z:Z2CheckBox Flag="EnableSpellItemHints" />
+                <z:Z2CheckBox Flag="EnableTownNameHints" />
+            </StackPanel>
 
-            <z:Z2ComboBox Flag="HelpfulHints" />
-            <z:Z2CheckBox Flag="EnableSpellItemHints" />
-            <z:Z2CheckBox Flag="EnableTownNameHints" />
-        </StackPanel>
-        <StackPanel Grid.Column="1">
-            <z:Z2CheckBox Flag="GenerateSpoiler" />
-            <z:Z2CheckBox Flag="RevealWalkthroughWalls" />
-            <z:Z2CheckBox Flag="RevealHiddenJars" />
-        </StackPanel>
-    </Grid>
+            <StackPanel Margin="0">
+                <TextBlock Text="Spoiler Files" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="GenerateSpoiler" />
+            </StackPanel>
+        </v:FlexColumnsPanel>
+    </ScrollViewer>
 </UserControl>

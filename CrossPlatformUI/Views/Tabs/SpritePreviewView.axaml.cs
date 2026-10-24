@@ -6,7 +6,7 @@ using CrossPlatformUI.ViewModels.Tabs;
 
 namespace CrossPlatformUI.Views.Tabs;
 
-public partial class SpritePreviewView : ReactiveUserControl<SpritePreviewViewModel>
+public partial class SpritePreviewView : ReactiveUserControl<SpriteCustomizationViewModel>
 {
     public SpritePreviewView()
     {

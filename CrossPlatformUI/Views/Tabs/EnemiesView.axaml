@@ -1,35 +1,40 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:v="clr-namespace:CrossPlatformUI.Views"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
-             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              xmlns:z="clr-namespace:CrossPlatformUI.Controls"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
-             x:DataType="vm:MainViewModel"
-             x:Class="CrossPlatformUI.Views.Tabs.EnemiesView">
-    <Grid ColumnDefinitions="*, *, *">
-        <StackPanel Grid.Column="0">
-            <z:Z2CheckBox Flag="ShuffleOverworldEnemies" />
-            <z:Z2CheckBox Flag="ShufflePalaceEnemies" />
-            <z:Z2CheckBox Flag="MixLargeAndSmallEnemies" />
-            <z:Z2CheckBox Flag="GeneratorsAlwaysMatch" />
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             Design.Width="{x:Static ui:MainWindowSize.TabPreviewWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.TabPreviewHeight}"
+             x:Class="CrossPlatformUI.Views.Tabs.EnemiesView"
+             x:DataType="vm:MainViewModel">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <v:FlexColumnsPanel Margin="4 16">
+            <StackPanel Margin="0">
+                <TextBlock Text="Enemy Shuffling" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="ShuffleOverworldEnemies" />
+                <z:Z2CheckBox Flag="ShufflePalaceEnemies" />
+                <z:Z2CheckBox Flag="MixLargeAndSmallEnemies" />
+                <z:Z2CheckBox Flag="GeneratorsAlwaysMatch" />
+            </StackPanel>
+
+            <z:Z2CheckBox Flag="RandomizeSpellSpellEnemy" />
             <z:Z2ComboBox Flag="DripperEnemyOption" />
-        </StackPanel>
 
-        <StackPanel Grid.Column="1">
-            <z:Z2ComboBox Flag="ShuffleEnemyHP" />
-            <z:Z2ComboBox Flag="ShuffleBossHP" />
+            <StackPanel Margin="0">
+                <TextBlock Text="Enemy Attributes" Classes="SectionHeader" Margin="0,12,0,-7" />
+                <z:Z2ComboBox Flag="ShuffleEnemyHP" />
+                <z:Z2ComboBox Flag="ShuffleBossHP" />
+                <z:Z2ComboBox Flag="SwordImmunityOption" />
+            </StackPanel>
 
-            <z:Z2CheckBox Flag="ShuffleXPStealers" />
-            <z:Z2CheckBox Flag="ShuffleXPStolenAmount" />
-            <z:Z2ComboBox Flag="SwordImmunityOption" />
-        </StackPanel>
-
-        <StackPanel Grid.Column="2">
-            <z:Z2ComboBox Flag="EnemyXPDrops" />
-
-            <z:Z2CheckBox Flag="RandomizeKnockback" />
-        </StackPanel>
-    </Grid>
+            <StackPanel Margin="0">
+                <TextBlock Text="Experience Stealing" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="ShuffleXPStealers" />
+                <z:Z2CheckBox Flag="ShuffleXPStolenAmount" />
+            </StackPanel>
+        </v:FlexColumnsPanel>
+    </ScrollViewer>
 </UserControl>

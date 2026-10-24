@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:CrossPlatformUI.Views"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
+             Design.Width="{x:Static ui:MainWindowSize.TabPreviewWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.TabPreviewHeight}"
+             x:Class="CrossPlatformUI.Views.Tabs.PlayerOptionsView"
+             x:DataType="vm:MainViewModel">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <v:FlexColumnsPanel Margin="4 16">
+            <TextBlock Text="Accessibility" Classes="SectionHeader" />
+            <z:Z2CheckBox Flag="RemoveFlashing" />
+            <z:Z2CheckBox Flag="DarkenThunderbird" />
+            <z:Z2CheckBox Flag="DisableHUDLag" />
+
+            <TextBlock Text="Quality of Life" Classes="SectionHeader" />
+            <z:Z2CheckBox Flag="FastSpellCasting" />
+            <z:Z2CheckBox Flag="UpAOnController1" />
+            <z:Z2CheckBox Flag="UpdatedHud" />
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Low-Health Beep" Classes="SectionHeader" Margin="0,12,0,-7" />
+                <z:Z2ComboBox Flag="BeepThreshold" />
+                <z:Z2ComboBox Flag="BeepFrequency" />
+            </StackPanel>
+
+            <TextBlock Text="Game Text" Classes="SectionHeader" />
+            <z:Z2CheckBox Flag="UseCommunityText" />
+
+            <TextBlock Text="Output" Classes="SectionHeader" />
+            <TextBox Margin="17,0,0,0"
+                     UseFloatingPlaceholder="True"
+                     PlaceholderText="%g-%s-%h-%f.nes"
+                     assists:TextFieldAssist.Label="Filename"
+                     Text="{Binding Config.OutputFilenameTemplate, Mode=TwoWay}">
+                <ToolTip.Tip><TextBlock Text="%f = flags, %s = seed, %h = hash, %d = date/time, %v = version, %g = game (Z2, Z2M)" /></ToolTip.Tip>
+            </TextBox>
+        </v:FlexColumnsPanel>
+    </ScrollViewer>
+</UserControl>

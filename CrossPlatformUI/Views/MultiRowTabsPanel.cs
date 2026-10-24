@@ -1,7 +1,6 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Layout;
 
 namespace CrossPlatformUI.Views;
 
@@ -62,12 +61,16 @@ public class MultiRowTabsPanel : Panel
 
         int secondRowCount = Children.Count - FirstRowCount;
 
-        // Rows share the same column widths, so they stay aligned
+        // Match the second-row columns where possible and give long first-row headers room.
         double columnWidth = secondRowCount > 0 ? finalSize.Width / secondRowCount : finalSize.Width;
 
+        double firstRowX = 0;
         for (int i = 0; i < Math.Min(FirstRowCount, secondRowCount); i++)
         {
-            Children[i].Arrange(new Rect(new Point(i * columnWidth, 0), new Size(columnWidth, firstRowHeight)));
+            var child = Children[i];
+            double width = Math.Max(columnWidth, child.DesiredSize.Width);
+            child.Arrange(new Rect(firstRowX, 0, width, firstRowHeight));
+            firstRowX += width;
         }
 
         if (secondRowCount > 0)

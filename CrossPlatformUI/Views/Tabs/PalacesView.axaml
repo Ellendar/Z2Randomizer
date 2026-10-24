@@ -1,105 +1,85 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:v="clr-namespace:CrossPlatformUI.Views"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
-             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              xmlns:core="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Design.Width="{x:Static ui:MainWindowSize.TabPreviewWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.TabPreviewHeight}"
              x:Class="CrossPlatformUI.Views.Tabs.PalacesView"
              x:DataType="vm:MainViewModel">
-    <Grid RowDefinitions="*, *">
-        <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *, *" RowDefinitions="*, *, *">
-            <HyperlinkButton
-                Margin="16 -4 16 0"
-                HorizontalAlignment="Right"
-                Content="[Wiki: Palace Styles]"
-                NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Palace-Styles"
-                FontSize="12"
-                Foreground="#4557c4"
-                Cursor="Hand"
-            />
-            <!-- Row 0 -->
-            <z:Z2ComboBox Flag="NormalPalaceStyle" Grid.Column="0" Grid.Row="0" VerticalAlignment="Top" />
-            <z:Z2ComboBox Flag="NormalPalaceLength" Grid.Column="1" Grid.Row="0" VerticalAlignment="Top" />
-            <z:Z2ComboBox Flag="BossRoomsExitType" Grid.Column="2" Grid.Row="0" VerticalAlignment="Top" />
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <v:FlexColumnsPanel Margin="4 16">
+            <StackPanel Margin="0">
+                <DockPanel Margin="0,0,0,-11">
+                    <HyperlinkButton Classes="WikiLink" DockPanel.Dock="Right" Margin="8,12,18,0"
+                                     Content="[Wiki: Palace Styles]"
+                                     NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Palace-Styles" />
+                    <TextBlock Text="Palace Styles" Classes="SectionHeader" VerticalAlignment="Top" />
+                </DockPanel>
+                <z:Z2ComboBox Flag="NormalPalaceStyle" />
+                <z:Z2ComboBox Flag="GpStyle" />
+                <z:Z2CheckBox Flag="RandomStylesAllowVanilla" />
+            </StackPanel>
 
-            <!-- Row 1 -->
-            <z:Z2ComboBox Flag="GpStyle" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" />
-            <z:Z2ComboBox Flag="GpLength" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" />
-            <z:Z2ComboBox Flag="DarkLinkMinDistance" Grid.Column="2" Grid.Row="1" VerticalAlignment="Top" />
+            <StackPanel Margin="0">
+                <TextBlock Text="Room Pool" Classes="SectionHeader" Margin="0,12,0,-7" />
+                <z:Z2ComboBox Flag="RoomPoolOption" />
 
-            <!-- Row 2 -->
-            <z:Z2ComboBox Flag="PalaceItemRoomCount" Grid.Column="0" Grid.Row="2" VerticalAlignment="Top" />
-            <z:Z2ComboBox Flag="PalaceDropStyle" Grid.Column="1" Grid.Row="2" VerticalAlignment="Top" />
+                <StackPanel Margin="0"
+                            IsVisible="{Binding Config.RoomPoolOption, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static core:RoomPoolOption.CUSTOM}}">
+                    <TextBlock Margin="48 8 0 0" Text="{Binding RandomizerViewModel.CustomRoomPoolText}" TextWrapping="Wrap" />
+                    <TextBlock Margin="48 0 0 8" Text="{Binding RandomizerViewModel.PalaceRoomsText}" TextWrapping="Wrap" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Margin="0"
+                        IsVisible="{Binding Config.RoomPoolOption, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static core:RoomPoolOption.USE_CHECKBOXES}}">
+                <z:Z2CheckBox Flag="IncludeVanillaRooms" Classes="DisabledMeansChecked" />
+                <z:Z2CheckBox Flag="Includev4_0Rooms" />
+                <z:Z2CheckBox Flag="Includev5_0Rooms" />
+                <z:Z2CheckBox Flag="RemoveLongDeadEnds" />
+                <z:Z2CheckBox Flag="IncludeExpertRooms" />
+            </StackPanel>
+            <StackPanel Margin="0">
+                <z:Z2CheckBox Flag="NoDuplicateRoomsByLayout" />
+                <z:Z2CheckBox Flag="NoDuplicateRoomsByEnemies" />
+            </StackPanel>
+            <z:Z2CheckBox Flag="BlockingRoomsInAnyPalace" />
 
-            <StackPanel Grid.Column="2" Grid.Row="2" Margin="15 8 15 0">
-                <TextBlock Text="{x:Static lang:Resources.PalacesToCompleteMinCaption}" TextWrapping="Wrap" />
-                <Grid ColumnDefinitions="72,72" ColumnSpacing="8" Margin="0 4 0 0">
+            <TextBlock Text="Regular Palaces" Classes="SectionHeader" Margin="0,12,0,-7" />
+            <z:Z2ComboBox Flag="NormalPalaceLength" />
+            <z:Z2ComboBox Flag="KeyLogic" />
+            <z:Z2ComboBox Flag="PalaceItemRoomCount" />
+            <z:Z2ComboBox Flag="BossRoomsExitType" />
+
+            <StackPanel Margin="0">
+                <TextBlock Text="{x:Static lang:Resources.PalacesToCompleteMinCaption}" Classes="SectionCaption" />
+                <Grid ColumnDefinitions="72,72" ColumnSpacing="8" Margin="17 8 17 4">
                     <z:Z2NumericUpDown Flag="PalacesToCompleteMin" Grid.Column="0" />
                     <z:Z2NumericUpDown Flag="PalacesToCompleteMax" Grid.Column="1" />
                 </Grid>
             </StackPanel>
-        </Grid>
 
-        <Grid Grid.Row="1" Margin="0 16 0 0" ColumnDefinitions="*, *, *">
-            <StackPanel Grid.Column="0" Margin="0 0">
-                <!-- general behavior -->
-                <z:Z2CheckBox Flag="RandomStylesAllowVanilla" />
-
-                <z:Z2CheckBox Flag="NoDuplicateRoomsByLayout" />
-                <z:Z2CheckBox Flag="NoDuplicateRoomsByEnemies" />
-                <Separator Margin="16 10 18 10"/>
-
-                <!-- QoL -->
-                <z:Z2CheckBox Flag="RestartAtPalacesOnGameOver" />
-                <z:Z2CheckBox Flag="Global5050JarDrop" />
-                <z:Z2CheckBox Flag="ReduceDripperVariance" />
-            </StackPanel>
-
-            <StackPanel Grid.Column="1" Margin="0 0">
-                <!-- room pool -->
-                <z:Z2ComboBox Flag="RoomPoolOption" />
-
-                <StackPanel Margin="0 0"
-                            IsVisible="{Binding Config.RoomPoolOption, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static core:RoomPoolOption.CUSTOM}}">
-                    <TextBlock Margin="32 8 0 8" Text="{Binding RandomizerViewModel.CustomRoomPoolText}"/>
-                    <TextBlock Margin="32 8 0 8" Text="{Binding RandomizerViewModel.PalaceRoomsText}"/>
-                </StackPanel>
-
-                <StackPanel Margin="0 0"
-                            IsVisible="{Binding Config.RoomPoolOption, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static core:RoomPoolOption.USE_CHECKBOXES}}">
-                    <z:Z2CheckBox Flag="IncludeVanillaRooms" Classes="DisabledMeansChecked" />
-                    <z:Z2CheckBox Flag="Includev4_0Rooms" />
-                    <z:Z2CheckBox Flag="Includev5_0Rooms" />
-                    <!-- <z:Z2CheckBox Flag="UseCustomRooms" />-->
-
-                    <!-- room pool tuning -->
-                    <z:Z2CheckBox Flag="RemoveLongDeadEnds" />
-                    <z:Z2CheckBox Flag="IncludeExpertRooms" />
-                </StackPanel>
-
-                <Separator Margin="16 10 18 10"/>
-
-                <z:Z2ComboBox Flag="KeyLogic" />
-                <z:Z2CheckBox Flag="BlockingRoomsInAnyPalace" />
-            </StackPanel>
-
-            <StackPanel Grid.Column="2" Margin="0 0">
-                <!-- boss-related -->
-                <z:Z2CheckBox Flag="RandomizeBossItemDrop" />
-                <z:Z2CheckBox Flag="HardBosses" />
+            <TextBlock Text="Great Palace" Classes="SectionHeader" Margin="0,12,0,-7" />
+            <z:Z2ComboBox Flag="GpLength" />
+            <z:Z2ComboBox Flag="DarkLinkMinDistance" />
+            <StackPanel Margin="0">
                 <z:Z2CheckBox Flag="TBirdRequired" Classes="DisabledMeansChecked" />
-                <z:Z2CheckBox Flag="AggressiveTbird" />
                 <z:Z2CheckBox Flag="RemoveTBird" />
-                <z:Z2CheckBox Flag="DropsMayBypassBosses" />
-
-                <Separator Margin="16 10 18 10"/>
-                <!-- misc -->
-                <z:Z2CheckBox Flag="ChangePalacePallettes" />
             </StackPanel>
-        </Grid>
-    </Grid>
+
+            <TextBlock Text="Palace Drops" Classes="SectionHeader" Margin="0,12,0,-7" />
+            <StackPanel Margin="0">
+                <z:Z2ComboBox Flag="PalaceDropStyle" />
+                <z:Z2CheckBox Flag="DropsMayBypassBosses" />
+            </StackPanel>
+
+            <TextBlock Text="Misc." Classes="SectionHeader" />
+            <z:Z2CheckBox Flag="RandomizeBossItemDrop" />
+            <z:Z2CheckBox Flag="ChangePalacePallettes" />
+        </v:FlexColumnsPanel>
+    </ScrollViewer>
 </UserControl>

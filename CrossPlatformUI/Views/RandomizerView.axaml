@@ -1,7 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
@@ -11,7 +9,8 @@
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:views="clr-namespace:CrossPlatformUI.Views"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Design.Width="{x:Static ui:MainWindowSize.DefaultWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.DefaultHeight}"
              Name="RandomizerViewControl"
              x:DataType="vm:RandomizerViewModel"
              x:Class="CrossPlatformUI.Views.RandomizerView">
@@ -78,7 +77,7 @@
         <TabControl Grid.Row="1" Margin="5" SelectedIndex="{Binding CurrentTabIndex}">
             <TabControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <views:MultiRowTabsPanel FirstRowCount="2"/>
+                    <views:MultiRowTabsPanel FirstRowCount="3"/>
                 </ItemsPanelTemplate>
             </TabControl.ItemsPanel>
             <Interaction.Behaviors>
@@ -86,6 +85,9 @@
             </Interaction.Behaviors>
             <TabItem Header="Presets">
                 <tabs:PresetsView DataContext="{Binding PresetViewModel}"/>
+            </TabItem>
+            <TabItem Header="Player Options">
+                <tabs:PlayerOptionsView DataContext="{Binding Main}" />
             </TabItem>
             <TabItem Header="Customize">
                 <tabs:CustomizeView DataContext="{Binding Main}" />
@@ -105,9 +107,6 @@
             <TabItem Header="Levels">
                 <tabs:LevelsView DataContext="{Binding Main}"/>
             </TabItem>
-            <TabItem Header="Spells">
-                <tabs:SpellsView DataContext="{Binding Main}"/>
-            </TabItem>
             <TabItem Header="Enemies">
                 <tabs:EnemiesView DataContext="{Binding Main}"/>
             </TabItem>
@@ -119,6 +118,9 @@
             </TabItem>
             <TabItem Header="Hints" Background="{Binding HeaderBackgroundObservable^}">
                 <tabs:HintsView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Patches">
+                <tabs:PatchesView DataContext="{Binding Main}"/>
             </TabItem>
         </TabControl>
     </Grid>

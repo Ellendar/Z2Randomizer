@@ -1,37 +1,53 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:v="clr-namespace:CrossPlatformUI.Views"
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              xmlns:z="clr-namespace:CrossPlatformUI.Controls"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             Design.Width="{x:Static ui:MainWindowSize.TabPreviewWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.TabPreviewHeight}"
              x:Class="CrossPlatformUI.Views.Tabs.ItemsView"
              x:DataType="vm:MainViewModel">
-    <Grid ColumnDefinitions="*, *">
-        <StackPanel Grid.Column="0">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <v:FlexColumnsPanel Margin="4 16">
+            <TextBlock Text="Palace &amp; Overworld Items" Classes="SectionHeader" />
             <z:Z2CheckBox Flag="ShufflePalaceItems" />
             <z:Z2CheckBox Flag="ShuffleOverworldItems" />
             <z:Z2CheckBox Flag="MixOverworldAndPalaceItems" />
             <z:Z2CheckBox Flag="IncludePBagCavesInItemShuffle" />
-            <z:Z2CheckBox Flag="IncludeSpellsInShuffle" />
-            <z:Z2CheckBox Flag="IncludeSwordTechsInShuffle" />
-            <z:Z2CheckBox Flag="IncludeQuestItemsInShuffle" />
-            <z:Z2CheckBox Flag="TownQuestLocationsAreMinorItems" />
-            <z:Z2CheckBox Flag="IncludeBagusNoteInShuffle" />
-            <z:Z2CheckBox Flag="PreventSpellItemChains" />
-        </StackPanel>
-        <StackPanel Grid.Column="1">
-            <z:Z2CheckBox Flag="ShuffleSmallItems" />
-            <z:Z2CheckBox Flag="RemoveSpellItems" />
-            <z:Z2CheckBox Flag="ShufflePBagAmounts" />
-            <z:Z2CheckBox Flag="PalacesContainExtraKeys" />
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Towns" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="IncludeSpellsInShuffle" />
+                <z:Z2CheckBox Flag="ShuffleSpellLocations" />
+            </StackPanel>
+            <z:Z2CheckBox Flag="DisableMagicContainerRequirements" />
             <z:Z2CheckBox Flag="RandomizeNewKasutoJarRequirements" />
+            <StackPanel Margin="0">
+                <z:Z2CheckBox Flag="IncludeSwordTechsInShuffle" />
+                <z:Z2CheckBox Flag="SwapUpAndDownStab" />
+                <z:Z2CheckBox Flag="IncludeQuestItemsInShuffle" />
+                <z:Z2CheckBox Flag="TownQuestLocationsAreMinorItems" />
+            </StackPanel>
+            <z:Z2CheckBox Flag="IncludeBagusNoteInShuffle" />
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Misc" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="PreventSpellItemChains" />
+            </StackPanel>
             <z:Z2CheckBox Flag="AllowImportantItemDuplicates" />
-        </StackPanel>
-    </Grid>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Small Items" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="ShuffleSmallItems" />
+                <z:Z2CheckBox Flag="PalacesContainExtraKeys" />
+            </StackPanel>
+        </v:FlexColumnsPanel>
+    </ScrollViewer>
 </UserControl>

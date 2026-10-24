@@ -663,11 +663,13 @@ public class CustomTexts
                     hint = Text.GenerateHelpfulHint(upstabLoc!, Collectable.UPSTAB, props.IncludeSpellsInShuffle, HELPFUL_HINTS_TREAT_BAGU_AS_TOWN);
                 }
                 texts[upstabClosedDoorTextIndex] = hint;
+                /*
                 if (props.SwapUpAndDownStab)
                 {
                     (texts[upstabClosedDoorTextIndex], texts[downstabClosedDoorTextIndex])
                         = (texts[downstabClosedDoorTextIndex], texts[upstabClosedDoorTextIndex]);
                 }
+                */
             }
 
             if (props.HelpfulHints != HelpfulHintOption.NONE || props.MarioMode)

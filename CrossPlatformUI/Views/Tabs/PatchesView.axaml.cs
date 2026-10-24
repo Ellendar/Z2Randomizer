@@ -1,14 +1,14 @@
 using Avalonia.Markup.Xaml;
-using CrossPlatformUI.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
 using ReactiveUI.Primitives.Disposables;
+using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views.Tabs;
 
-public partial class SpellsView : ReactiveUserControl<MainViewModel>
+public partial class PatchesView : ReactiveUserControl<MainViewModel>
 {
-    public SpellsView()
+    public PatchesView()
     {
         this.WhenActivated((MultipleDisposable disposables) => { });
         AvaloniaXamlLoader.Load(this);

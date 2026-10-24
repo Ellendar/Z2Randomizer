@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:CrossPlatformUI.Views"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             Design.Width="{x:Static ui:MainWindowSize.TabPreviewWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.TabPreviewHeight}"
+             x:Class="CrossPlatformUI.Views.Tabs.PatchesView"
+             x:DataType="vm:MainViewModel">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <v:FlexColumnsPanel Margin="4 16">
+            <TextBlock Text="Quality of Life" Classes="SectionHeader" />
+            <z:Z2CheckBox Flag="RestartAtPalacesOnGameOver" />
+            <z:Z2CheckBox Flag="Global5050JarDrop" />
+            <z:Z2CheckBox Flag="ReduceDripperVariance" />
+            <StackPanel Margin="0">
+                <z:Z2CheckBox Flag="RevealWalkthroughWalls" />
+                <z:Z2CheckBox Flag="RevealHiddenJars" />
+            </StackPanel>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Utility" Classes="SectionHeader" Margin="0,12,0,-7" />
+                <z:Z2ComboBox Flag="FireOption" />
+                <z:Z2ComboBox Flag="FluteWarpMode" />
+            </StackPanel>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Enemy Hacks" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="HardBosses" />
+                <z:Z2CheckBox Flag="AggressiveTbird" />
+            </StackPanel>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Fun" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="JumpAlwaysOn" />
+                <z:Z2CheckBox Flag="DashAlwaysOn" />
+            </StackPanel>
+            <z:Z2CheckBox Flag="PermanentBeamSword" />
+            <z:Z2CheckBox Flag="RandomizeKnockback" />
+            <z:Z2CheckBox Flag="MarioMode" />
+        </v:FlexColumnsPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1504,7 +1504,7 @@ This is a wildly different gameplay experience, so be warned when setting this f
 		<value>Remove Long Dead End Rooms</value>
 	</data>
 	<data name="RemoveSpellItems" xml:space="preserve">
-		<value>Start With Spell Items</value>
+		<value>Start With Quest Items</value>
 	</data>
 	<data name="RemoveTBird" xml:space="preserve">
 		<value>Remove Thunderbird</value>
@@ -1576,10 +1576,10 @@ This is a wildly different gameplay experience, so be warned when setting this f
 		<value>Shuffle Small Items</value>
 	</data>
 	<data name="ShuffleSpellLocations" xml:space="preserve">
-		<value>Shuffle Spell Locations</value>
+		<value>Shuffle Spells Within Towns</value>
 	</data>
 	<data name="ShuffleSpritePalettes" xml:space="preserve">
-		<value>Shuffle Sprite Palettes</value>
+		<value>Shuffle Enemy/NPC Palettes</value>
 	</data>
 	<data name="ShuffleStartingItems" xml:space="preserve">
 		<value>Shuffle Starting Items</value>
@@ -1757,7 +1757,7 @@ This is a wildly different gameplay experience, so be warned when setting this f
 on Controller 1</value>
 	</data>
 	<data name="UpdatedHud" xml:space="preserve">
-		<value>Use Updated HUD</value>
+		<value>Updated HUD</value>
 	</data>
 	<data name="UseCommunityText" xml:space="preserve">
 		<value>Use Community Text</value>

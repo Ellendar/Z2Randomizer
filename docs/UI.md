@@ -17,7 +17,7 @@
 | --- | --- |
 | `CrossPlatformUI/` | Shared Avalonia views and view models (contents listed below the table). |
 | `CrossPlatformUI.Desktop/` | Avalonia desktop host. |
-| `CrossPlatformUI.Browser/` | WebAssembly host. |
+| `CrossPlatformUI.Browser/` | WebAssembly host. See the [browser build guide](BROWSER.md). |
 | `Desktop.Common/` | `DesktopJsEngine.cs` (ClearScript V8) and `DesktopFileService.cs`. |
 | `CrossPlatformUI.SourceGenerator/` | Roslyn incremental generator. `FlagsControlsGenerator.cs` emits only the `FlagRegistry` metadata table, the `RandomizerConfigResolver` cast, a small `FlagIncludedResolver` (for hand-written enablement rules), and `FlagControlFactory`. |
 | `CoreSourceGenerator/` | The main source generator used by `RandomizerCore`. `FlagsSerializeGenerator.cs` (reactive properties and flag-string serialization, including `Diff`) and `ConfigFlagGenerator.cs` (emits the `ConfigFlag` enum). |
@@ -131,7 +131,7 @@ both `OnDataContextChanged` and `OnAttachedToVisualTree`, and unbinds on detach.
 | DataContext | How it gets there |
 | --- | --- |
 | `MainViewModel` | Implements `IFlagHost` directly. |
-| `SpritePreviewViewModel` (inside `CustomizeView`) | Forwards to its `Main` through explicit interface members, so it adds no public surface. |
+| `SpriteCustomizationViewModel` (inside `CustomizeView`) | Forwards to its `Main` through explicit interface members, so it adds no public surface. |
 | Views with no state of their own (`Biomes`, `Hints`, `Items`, `Palaces`, `Spells`, `Customize`, `Drops`, `Enemies`, `Levels`, `Overworld`, `Start`) | Bind `DataContext` straight to `Main` and have no view model. |
 | `PresetsViewModel` | Creates its controls in code and sets each control's `DataContext` explicitly. It does not implement the interface. |
 
@@ -156,7 +156,7 @@ Its inputs are exactly the values `RandomizerConfiguration.Diff` reports in
 control:
 
 - The "shuffle all experience" grouping in `LevelsView`.
-- The `Character Sprite` combo in `SpritePreviewView`: preview UI state with a
+- The `Character Sprite` combo in `CustomizeView`: preview UI state with a
   custom item template, not a flag.
 
 ### 4.2 Checkboxes (`Z2CheckBox`)
