@@ -197,7 +197,10 @@ public class Hyrule
             World.ResetStats();
             Z2MarioModeEnabled = config.MarioMode;
 
-            SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed!)).AsSpan()[..4]);
+            string seedString = config.Seed!
+                + (Assembly.GetEntryAssembly()?.GetName()?.Version)
+                ?? throw new Exception("Invalid entry assembly version information");
+            SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(seedString)).AsSpan()[..4]);
             r = new Random(SeedHash);
             bool shareSeedAcrossDifficulty = config.ShareSeedAcrossDifficulty;
             Random? difficultyRng = shareSeedAcrossDifficulty ? CreateDifficultyRng(config.Seed) : null;
