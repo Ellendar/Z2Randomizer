@@ -1445,11 +1445,12 @@ public sealed class EastHyrule : World
     private void DrawMountains(bool useRiverDevil)
     {
         bool placedSpider = !useRiverDevil;
+        int maxMountainVariance = (int)Math.Ceiling((decimal)MapRows / 75) * 10; 
 
-        /*readonly*/ int mountStartY1 = RNG.Next(MapColumns / 3 - 10, MapColumns / 3 + 10);
-        /*readonly*/ int mountEndY1 = RNG.Next(MapColumns / 3 - 10, MapColumns / 3 + 10);
-        /*readonly*/ int endMountMargin1 = RNG.Next(2, 8);
-        /*readonly*/ int endMountEndRight1 = MapColumns - endMountMargin1;
+        /*readonly*/ int mountStartY1 = RNG.Next(MapRows / 3 - maxMountainVariance, MapRows / 3 + maxMountainVariance);
+        /*readonly*/ int mountEndY1 = RNG.Next(MapRows / 3 - maxMountainVariance, MapRows / 3 + maxMountainVariance);
+        /*readonly*/ int endMountMargin1 = RNG.Next(2, 8 * MapColumns / 75);
+        int endMountEndRight1 = MapColumns - endMountMargin1;
         int x = 0;
         int y = mountStartY1;
         int roadEncounters = 0;
@@ -1530,12 +1531,12 @@ public sealed class EastHyrule : World
             }
         }
 
-        /*readonly*/ int mountStartY2 = RNG.Next(MapColumns * 2 / 3 - 10, MapColumns * 2 / 3 + 10);
+        /*readonly*/ int mountStartY2 = RNG.Next(MapRows * 2 / 3 - maxMountainVariance, MapRows * 2 / 3 + maxMountainVariance);
         map[mountStartY2, 0] = Terrain.MOUNTAIN;
 
-        /*readonly*/ int mountEndY2 = RNG.Next(MapColumns * 2 / 3 - 10, MapColumns * 2 / 3 + 10);
-        /*readonly*/ int endMountMargin2 = RNG.Next(2, 8);
-        /*readonly*/ int endMountEndRight2 = MapColumns - endMountMargin2;
+        /*readonly*/ int mountEndY2 = RNG.Next(MapRows * 2 / 3 - maxMountainVariance, MapRows * 2 / 3 + maxMountainVariance);
+        /*readonly*/ int endMountMargin2 = RNG.Next(2, 8 * MapColumns / 75);
+        int endMountEndRight2 = MapColumns - endMountMargin2;
 
         x = 0;
         y = mountStartY2;
