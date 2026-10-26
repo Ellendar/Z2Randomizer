@@ -1267,9 +1267,9 @@ public sealed class WestHyrule : World
 
     private void DrawMountains()
     {
-        /*readonly*/ int mountStartY = RNG.Next(22, 42);
-        /*readonly*/ int mountEndY = RNG.Next(22, 42);
-        /*readonly*/ int mountMargin = RNG.Next(2, 8);
+        /*readonly*/ int mountStartY = RNG.Next((int)(MapRows * .30), (int)(MapRows * .56));
+        /*readonly*/ int mountEndY = RNG.Next((int)(MapRows * .30), (int)(MapRows * .56));
+        /*readonly*/ int mountMargin = RNG.Next(2, 8 * MapColumns / 75);
         /*readonly*/ int mountEndRight = MapColumns - mountMargin;
         map[mountStartY, 0] = Terrain.MOUNTAIN;
         bool placedRoad = false;
