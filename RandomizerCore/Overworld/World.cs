@@ -647,30 +647,42 @@ public abstract class World
                 {
                     if (location.CanShuffle)
                     {
-                        int tries = 0;
-                        int x, y;
-                        do
-                        {
-                            x = RNG.Next(MapColumns);
-                            y = RNG.Next(MapRows);
-                            tries++;
-                        } while ((map[y, x] != location.TerrainType || GetLocationByCoordsNoOffset((y, x)) != null) && tries < 2000);
-
-                        if (tries < 2000)
-                        {
-                            location.Xpos = x;
-                            location.Y = y;
-                        }
-                        else
-                        {
-                            location.Xpos = 0;
-                            location.YRaw = 0;
-                        }
+                        location.Pos = FindNewPosForUnimportantLoc(location);
                         location.CanShuffle = false;
                     }
                 }
                 break;
         }
+    }
+
+    private IntVector2 FindNewPosForUnimportantLoc(Location location)
+    {
+        for (int tries = 0; tries < 2000; tries++)
+        {
+            var p = IntVector2.Random(RNG, MapColumns, MapRows);
+            if (map[p] != location.TerrainType)
+            {
+                continue;
+            }
+            if (LocationsAtOrOrthogonalTo(p).Any(
+                loc => loc != location
+                    && (loc.Pos == p || !TerrainAllowedAdjacent(loc))))
+            {
+                continue;
+            }
+            return p;
+        }
+
+        return IntVector2.NOT_ON_MAP;
+
+        static bool TerrainAllowedAdjacent(Location loc) => loc.TerrainType switch
+        {
+            Terrain.BRIDGE => false,
+            Terrain.CAVE => false,
+            Terrain.ROCK => false,
+            Terrain.RIVER_DEVIL => false,
+            _ => true,
+        };
     }
 
     /// <summary>
