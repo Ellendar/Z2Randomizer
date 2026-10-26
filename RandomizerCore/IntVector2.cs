@@ -7,6 +7,8 @@ public readonly struct IntVector2 : IEquatable<IntVector2>
 {
     public static readonly IntVector2 ZERO = new(0, 0);
     public static readonly IntVector2 ORIGIN = new(0, 0);
+    /// Removed Overworld locations should have RawY = 0, which translates to Y = -30.
+    public static readonly IntVector2 NOT_ON_MAP = new(0, -30);
     public static readonly IntVector2 NORTH = new(0, -1);
     public static readonly IntVector2 EAST = new(1, 0);
     public static readonly IntVector2 SOUTH = new(0, 1);
