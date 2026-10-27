@@ -471,9 +471,11 @@ P346RebonackInitRoutine := $af91
     lda #$00
     sta EnemySizeCodesRamCopy+REBO_UNHORSED   ; reset "size code" in case another Rebo has previously been killed in the palace
     sta $0504,x                     ; clear timer (like vanilla)
-    lda #$ac                        ; rebo vanilla X start position
+    lda #$ac                        ; rebo vanilla Y start position
     sta EnemyYPositionLo,x
-    inc EnemyXPositionHi,x          ; push Rebo one page right (off-screen if coming from the left)
+    inc EnemyXPositionHi,x          ; push Rebo one page right
+    lda #$20                        ; rebo vanilla X start position
+    sta EnemyXPositionLo,x
 @Done:
     rts
 FREE_UNTIL $afb3                    ; $afb3 is used in a couple of places as the closest RTS - must keep
