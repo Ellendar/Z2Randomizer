@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
@@ -19,6 +16,19 @@ public abstract class PalaceGenerator
     protected static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
 
     internal abstract Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt);
+
+    public virtual bool AddKeysForKeyLogic(RandomizerProperties props, Palace palace, bool createKeys, Random r)
+    {
+        if (props.RequiresSmallKeyValidation(palace.Number))
+        {
+            bool solvable = palace.SolveKeyLogic(RequirementTypeExtensions.ALL, !props.BossItem, 0, createKeys, r);
+            if (!solvable)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public virtual bool AllReachable(RandomizerProperties props, Palace palace)
     {

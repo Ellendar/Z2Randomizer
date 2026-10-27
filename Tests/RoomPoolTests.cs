@@ -503,6 +503,82 @@ public class RoomPoolTests
         targetPool.NormalRooms.Should().Contain(r => r.Name == "Room2");
     }
 
+    // Expose the real shape-filling path without generating a random layout or ROM.
+    private sealed class RefillPlacementGenerator : TowerCoordinatePalaceGenerator
+    {
+        public Task<bool> FillForTest(RandomizerProperties props, Palace palace, RoomPool source, RoomPool working)
+        {
+            Dictionary<Coord, RoomExitType> shape = new()
+            {
+                [new Coord(1, 0)] = RoomExitType.HORIZONTAL_PASSTHROUGH,
+                [new Coord(2, 0)] = RoomExitType.HORIZONTAL_PASSTHROUGH,
+                [new Coord(3, 0)] = RoomExitType.HORIZONTAL_PASSTHROUGH,
+            };
+            return FillShape(props, palace, source, working, new Random(0), shape, []);
+        }
+    }
+
+    [TestMethod]
+    [DataRow(false, false)]
+    [DataRow(false, true)]
+    [DataRow(true, false)]
+    [DataRow(true, true)]
+    public async Task RefilledTemplatesProduceIndependentPlacedRooms(bool transmute, bool preventBySideview)
+    {
+        var template = CreateMockRoom("Repeated", RoomGroup.VANILLA, palaceNumber: 1,
+            hasLeftExit: true, hasRightExit: true);
+        if (transmute)
+        {
+            template.SideView = [0x07, 0x60, 0x00, 0x08, 0x82, 0x0F, (byte)Collectable.BLUE_JAR];
+        }
+        else
+        {
+            template.ItemPresenceBits = [0];
+        }
+        var source = new RoomPool(CreateMockPalaceRooms([template]), 1, CreateMockProps());
+        var working = new RoomPool(source);
+        var props = CreateMockProps();
+        props.NoDuplicateRooms = !preventBySideview;
+        props.NoDuplicateRoomsBySideview = preventBySideview;
+        var palace = new Palace(1, false) { Entrance = new Room(source.Entrances[0]) };
+        var originalSideView = template.SideView.ToArray();
+        var originalBits = template.ItemPresenceBits.ToArray();
+        var originalEnemies = template.Enemies.ToArray();
+
+        // Only one passthrough template exists. Duplicate prevention removes it
+        // after each placement, so placing three requires two actual refills.
+        Assert.IsTrue(await new RefillPlacementGenerator().FillForTest(props, palace, source, working));
+        Assert.AreEqual(3, palace.AllRooms.Count);
+        Assert.AreEqual(0, working.NormalRooms.Count);
+        for (int i = 0; i < palace.AllRooms.Count; i++)
+        {
+            var placed = palace.AllRooms[i];
+            Assert.AreEqual(template.Name, placed.Name);
+            Assert.AreNotSame(template, placed);
+            Assert.AreNotSame(template.SideView, placed.SideView);
+            Assert.AreNotSame(template.ItemPresenceBits, placed.ItemPresenceBits);
+            Assert.AreNotSame(template.Enemies, placed.Enemies);
+            for (int j = 0; j < i; j++)
+            {
+                Assert.AreNotSame(palace.AllRooms[j], placed);
+                Assert.AreNotSame(palace.AllRooms[j].SideView, placed.SideView);
+                Assert.AreNotSame(palace.AllRooms[j].ItemPresenceBits, placed.ItemPresenceBits);
+                Assert.AreNotSame(palace.AllRooms[j].Enemies, placed.Enemies);
+            }
+        }
+
+        var edited = palace.AllRooms[0];
+        Assert.IsTrue(transmute ? edited.TryTransmuteMinorItemToKey(new Random(0)) : edited.TryAddKeyOnFloor());
+        edited.SetItemBit(0, !edited.GetItemBit(0));
+        edited.Enemies[0] = 0;
+        foreach (var untouched in palace.AllRooms.Skip(1).Append(template))
+        {
+            CollectionAssert.AreEqual(originalSideView, untouched.SideView);
+            CollectionAssert.AreEqual(originalBits, untouched.ItemPresenceBits);
+            CollectionAssert.AreEqual(originalEnemies, untouched.Enemies);
+        }
+    }
+
     #endregion
 
     #region ItemRoomsByDirection

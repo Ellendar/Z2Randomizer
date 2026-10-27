@@ -59,6 +59,7 @@ public class PalaceTests
 
     private static RandomizerProperties ReachabilityProps(bool dropsMayBypassBosses = false, bool tBirdRequired = false) => new()
     {
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         DropsMayBypassBosses = dropsMayBypassBosses,
         RequireTbird = tBirdRequired,
     };

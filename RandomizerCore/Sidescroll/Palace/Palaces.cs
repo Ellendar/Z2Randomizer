@@ -99,6 +99,10 @@ public class Palaces
             do
             {
                 palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace, attempts++);
+                if (palace.IsValid)
+                {
+                    palace.IsValid = palaceGenerator.AddKeysForKeyLogic(props, palace, true, r);
+                }
             } while (!palace.IsValid);
             palace.BossRoom!.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
             PalaceGenerator.DebugCheckDuplicates(props, palace);

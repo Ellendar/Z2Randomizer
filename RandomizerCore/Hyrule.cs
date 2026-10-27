@@ -1615,7 +1615,7 @@ public class Hyrule
             gottenItems = [];
             foreach (Location location in reachableLocations)
             {
-                IReadOnlyList<Collectable> gettableItems = GettableItems.GetGettableItemsAt(location, requireables);
+                IReadOnlyList<Collectable> gettableItems = GettableItems.GetGettableItemsAt(props, location, requireables);
 
                 foreach (Collectable item in gettableItems)
                 {
@@ -4302,13 +4302,17 @@ FlagHudUpdate:
             case KeyLogicOption.KEYS_PER_PALACE_SOLVABLE:
                 foreach (var loc in palaceLocations)
                 {
-                    loc.AccessRequirements = Requirements.NONE;
-                }
-                if (!props.BlockersAnywhere)
-                {
-                    // with vanilla palace blockers, Magic Key is in-logic for P6
-                    var p6 = palaceLocations.Single(loc => loc.Palace!.Number == 6);
-                    p6.AccessRequirements = new([RequirementType.MAGIC_KEY]);
+                    var palace = loc.Palace!;
+                    if (props.RequiresSmallKeyValidation(palace.Number))
+                    {
+                        loc.AccessRequirements = Requirements.NONE;
+                    }
+                    else if (palace.Number == 6)
+                    {
+                        // with vanilla palace blockers, Magic Key is in-logic for P6
+                        var p6 = palaceLocations.Single(loc => loc.Palace!.Number == 6);
+                        p6.AccessRequirements = new([RequirementType.MAGIC_KEY]);
+                    }
                 }
                 break;
             case KeyLogicOption.FAIRY_OR_MAGICKEY:

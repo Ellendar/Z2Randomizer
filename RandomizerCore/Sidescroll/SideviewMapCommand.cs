@@ -192,6 +192,11 @@ public class SideviewMapCommand<T> where T : struct, Enum
         return Bytes[1] == 0x0F && Y < 13 && HasExtra() && Extra == item;
     }
 
+    public bool IsMinorItem()
+    {
+        return Bytes[1] == 0x0F && Y < 13 && HasExtra() && Extra.IsMinorItem();
+    }
+
     public bool IsLockedDoor()
     {
         return Y < 13 && Bytes[1] == PalaceObjectShared.LOCKED_DOOR;

@@ -292,4 +292,15 @@ public class Enemy<T> where T : Enum
                 throw new NotImplementedException();
         }
     }
+
+    public bool IsStrikeForJarLike()
+    {
+        return Id switch
+        {
+            EnemiesPalace125.STRIKE_FOR_RED_JAR => true,
+            EnemiesPalace346.STRIKE_FOR_RED_JAR_OR_IRON_KNUCKLE => true,
+            EnemiesGreatPalace.STRIKE_FOR_RED_JAR_OR_FOKKA => true,
+            _ => false,
+        };
+    }
 }

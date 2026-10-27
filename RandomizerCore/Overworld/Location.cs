@@ -326,7 +326,8 @@ public class Location
         }
         if (Palace != null)
         {
-            return Palace.GetGettableItems(requireables, shufflableItemsOnly, props);
+            ArgumentNullException.ThrowIfNull(props, "Location.GetGettableItems for palace location must pass props");
+            return Palace.GetGettableItems(props, requireables, shufflableItemsOnly);
         }
         if (shufflableItemsOnly && !CollectablesAreShufflable)
         {

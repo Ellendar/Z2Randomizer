@@ -103,6 +103,7 @@ public sealed class GettableItemSet
     /// room requirements.
     /// </remarks>
     public IReadOnlyList<Collectable> GetGettableItemsAt(
+        RandomizerProperties props,
         Location location,
         IReadOnlySet<RequirementType> requireables)
     {
@@ -123,7 +124,7 @@ public sealed class GettableItemSet
             return cached.GettableItems;
         }
 
-        List<Collectable> gettableItemsAtPalace = palace.GetGettableItems(requireables, false);
+        List<Collectable> gettableItemsAtPalace = palace.GetGettableItems(props, requireables, false);
         palaceCache[palace] = new(
             gettableItemsAtPalace.Count == palace.ItemRooms.Count,
             requireables.ToFrozenSet(),

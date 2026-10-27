@@ -122,6 +122,16 @@ public class RandomizerProperties
     public bool BossItem { get; set; }
     public KeyLogicOption KeyLogic { get; set; }
     public bool BlockersAnywhere { get; set; }
+
+    /// <summary>
+    /// P1-P5 need self-contained small keys. P6 does too with BlockersAnywhere on
+    /// or Magic Key is removed. GP is not covered by key logic.
+    /// </summary>
+    public bool RequiresSmallKeyValidation(int palaceNumber) =>
+        KeyLogic == KeyLogicOption.KEYS_PER_PALACE_SOLVABLE
+        && palaceNumber < 7
+        && (palaceNumber < 6 || BlockersAnywhere);
+
     //Always false for now; reserved as a future logic setting.
     public bool LockedDoorsBlockFairy { get; set; } = false;
     public bool RemoveLongDeadEnds { get; set; }

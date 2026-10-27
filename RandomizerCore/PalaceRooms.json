@@ -738,10 +738,8 @@
     "name": "Vanilla P2 M32",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-      "JUMP",
-      "FAIRY"
-    ],
+    "requirements": ["JUMP", "FAIRY"],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "29600708F017D800F01340517052A053900F0BD40BF013A221F21FA02FE200F01FA02FE300F01FA02F"
   },
   {
@@ -872,6 +870,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [{"target": "KEY", "requires": [["GLOVE", "DOWNSTAB"]]}],
+    "tags": ["NoKeyTransform"],
     "duplicateGroup": "P3 Items Buried In Breakable Block Hallway",
     "sideviewData": "2E600010809DA03D37008773A02311C6839FA03F3600A00F088A9BA03BA40F0B31008773A07311C6839DA03D3600"
   },
@@ -1067,6 +1066,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "duplicateGroup": "P3 First Room Platforms On Pillars",
     "sideviewData": "29600F10D20E05F1B071F0508405D100743583C2453553C5753583C2453553C5320F0B733583C2D90E"
   },
@@ -1093,16 +1093,11 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
-      [
-        "GLOVE",
-        "DOWNSTAB"
-      ],
-      [
-        "GLOVE",
-        "UPSTAB"
-      ]
+      ["GLOVE", "DOWNSTAB"],
+      ["GLOVE", "UPSTAB"]
     ],
-	"marioRequirements": [["HAMMER", "GLOVE"]],
+    "marioRequirements": [["HAMMER", "GLOVE"]],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "35600310D600822F91915F2A8022617190918231822AD5093191509160919091522E832F359160919091D70C8427A30F0BD10B9073"
   },
   {
@@ -1180,8 +1175,8 @@
     "name": "Vanilla P4 M19",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "2D600E10D60BA226D708D10BA026D708A00F0BD10BA027D808D10BA026D708D10BA026D90EA32182F1F050D20F"
   },
   {
@@ -1207,7 +1202,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [{"target": "KEY", "requires": [["GLOVE", "DOWNSTAB"]]}],
-    "tags": ["LongDeadEnd"],
+    "tags": ["LongDeadEnd", "NoKeyTransform"],
     "duplicateGroup": "P3 Dig Stairs In Breakable Blocks For Key",
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
   },
@@ -1393,6 +1388,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "duplicateGroup": "P3 First Room Platforms On Pillars",
     "sideviewData": "29600F10D20E05F1B071F0508405D100743583C2453553C5753583C2453553C5320F0B733583C2D90E"
   },
@@ -1849,6 +1845,7 @@
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "duplicateGroup": "P1 First T Junction",
     "sideviewData": "29600E08D208D60BD408D40E8205D208D40BD40827C86177A12582F1F050500F0C25C8D60CD608D60E"
   },
@@ -1901,7 +1898,7 @@
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [],
-    "tags": ["LongDeadEnd"],
+    "tags": ["LongDeadEnd", "NoKeyTransform"],
     "duplicateGroup": "P5 3-way With Waste-of-time P-bag",
     "sideviewData": "38600F08D2087095640F0CD20E7071D208D60E7075D60880B281B281719073D80E80B2A32304F1F050A223D7086001762782C2640F08D20E"
   },
@@ -1928,7 +1925,7 @@
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [{"target": "KEY", "requires": ["JUMP"]}],
-    "tags": ["LongDeadEnd"],
+    "tags": ["LongDeadEnd", "NoKeyTransform"],
     "duplicateGroup": "P5 3-way With Waste-of-time P-bag",
     "sideviewData": "38600F08D2087095640F0CD20E7071D208D60E7075D60880B281B281719073D80E80B2A32304F1F050A223D7086001762782C2640F08D20E"
   },
@@ -2006,6 +2003,7 @@
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "duplicateGroup": "P1 Bubble Room",
     "sideviewData": "21600E08D20870357A357A35620F0A78357A33D40E810508F1F050B0719609D10F"
   },
@@ -2294,7 +2292,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [],
-    "tags": ["Expert","NotSGL"],
+    "tags": ["Expert", "NotSGL", "NoKeyTransform"],
     "sideviewData": "25600E10D20983759075D90ED60983759075D90EA22905F1F050D7087027600F0B7837D80F"
   },
   {
@@ -2320,7 +2318,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [],
-    "tags": ["LongDeadEnd","NotSGL"],
+    "tags": ["LongDeadEnd", "NoKeyTransform", "NotSGL"],
     "duplicateGroup": "P3 Dig Stairs In Breakable Blocks For Key",
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
   },
@@ -2399,6 +2397,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "duplicateGroup": "P6 Drop-through With P-bag",
     "sideviewData": "17600F10D200A10F0CD98072C3B6F992537BC3D500D80F",
     "mirrorSideviewData": "17600F10DF00DB8074C3B4F994537BC3D300A80F0CD20F"
@@ -2488,6 +2487,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "duplicateGroup": "P3 3Tile Breakable Block Jumps and Iron Knuckles",
     "sideviewData": "3360801088B2813F57B5513FA60F0B21B280B2213A8036D7835130D186D287207183F1F050D2806028A021DC82D185120930C2"
   },
@@ -2514,6 +2514,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "duplicateGroup": "P6 Drop-through With P-bag",
     "sideviewData": "17600F10D200A10F0CD98072C3B6F992537BC3D500D80F",
     "mirrorSideviewData": "17600F10DF00DB8074C3B4F994537BC3D300A80F0CD20F"
@@ -2651,11 +2652,9 @@
     "name": "Vanilla P6 M47",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-      "GLOVE"
-    ],
-	"marioRequirements": [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
-    "tags": ["LongDeadEnd"],
+    "requirements": ["GLOVE"],
+    "marioRequirements": [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
+    "tags": ["LongDeadEnd", "NoKeyTransform"],
     "suppressWarning": ["DropZoneNoRespawnPoint"],
     "sideviewData": "1B600010E10018B91BB9D180DA0010B780709070DC02820F0CD20F"
   },
@@ -2821,8 +2820,8 @@
     "name": "Vanilla P6 M54",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "15600710E100D600B0F37151D307E3003C0F12D20F"
   },
   {
@@ -2848,7 +2847,7 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [],
-    "tags": ["LongDeadEnd"],
+    "tags": ["LongDeadEnd", "NoKeyTransform"],
     "duplicateGroup": "P3 Dig Stairs In Breakable Blocks For Key",
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
   },
@@ -5446,7 +5445,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
-    "tags": ["Easy"],
+    "tags": ["Easy", "NoKeyTransform"],
     "sideviewData": "19600E08DE00702B610F0D7B34D50EA625F25000F1D900DD0F"
   },
   {
@@ -5885,8 +5884,8 @@
     "name": "dmInPalaces M9",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "22600608DA00707190736A216421510F11632166216421410F0C632198737271D206"
   },
   {
@@ -7482,7 +7481,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
-    "tags": ["NotSGL"],
+    "tags": ["NotSGL", "NoKeyTransform"],
     "sideviewData": "2F600E10D20983239073F41F9152D4089026D7099152F31081239073D70EF65000F1B071D7087027610F0C7737D80E"
   },
   {
@@ -11703,7 +11702,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
-    "tags": ["NotSGL"],
+    "tags": ["NotSGL", "NoKeyTransform"],
     "sideviewData": "33600010809DA03D37008773A02312C6D180819FA03F3600A00F0DD700D60EF25000F1B071D4008373A07311C6839DA03D3600"
   },
   {
@@ -11805,8 +11804,8 @@
     "name": "benthicKing M39",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "25600E10DC00743583C24535320F0D51C5753583C2453553C5753583C2F45000F1B071D20F"
   },
   {
@@ -12106,6 +12105,7 @@
       }
     ],
     "marioRequirements" : [["GLOVE", "HAMMER"]],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "2D600310D901722F80914D2E900F0B51718071742E8491F650509180F1422F122F7191722FA22F5291D90B5074"
   },
   {
@@ -12141,7 +12141,7 @@
       }
     ],
     "marioRequirements" : [["GLOVE", "HAMMER"]],
-    "tags": ["NoMirror"],
+    "tags": ["NoMirror", "NoKeyTransform"],
     "sideviewData": "39600308107CDD054271D201402E722D84F1827868B161918091112C20714029732D310F0B26923092509281B1D20DA02FF75000D901D9D10F"
   },
   {
@@ -14123,6 +14123,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "38600F10D101920F1162C3D270F019A0598230D3805455B040A1B2B1FC5434A1325455A4B2F119A059B040D5008230D30161C3920F11D30F"
   },
   {
@@ -14636,6 +14637,7 @@
       "FAIRY",
       "JUMP"
     ],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "3D600008697380309030A0303102317F5021110980C26600150950C5347F6100A30F0C6300150950C53479610017095021607380C2320181309030A030"
   },
   {
@@ -15451,6 +15453,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "sideviewData": "1D600108F01F8A09F61FDC00915561533151F11F200F0BD401FC1F8509"
   },
   {
@@ -15586,6 +15589,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [{"target": "KEY", "requires": ["OUT_OF_LOGIC"]}],
+    "tags": ["NoKeyTransform"],
     "suppressWarning": ["EnemyTooCloseToEntrance", "MultipleItemsOnPage"],
     "sideviewData": "24608008D087D480F0126030712F322DA00F0DA20F087B2F312F7F2F312F7F243126D787"
   },
@@ -16853,6 +16857,7 @@
       }
     ],
     "marioRequirements" : [["GLOVE", "HAMMER"]],
+    "tags": ["NoKeyTransform"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B2B067D195A4610C533DE",
@@ -16887,6 +16892,7 @@
         ]
       }
     ],
+    "tags": ["NoKeyTransform"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "090B8D03CD69525F83",
@@ -17049,6 +17055,7 @@
         ]
       }
     ],
+    "tags": ["NoKeyTransform"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0901467B5D0E867E9D",
@@ -17074,6 +17081,7 @@
     "hasDrop": false,
     "elevatorScreen": 2,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "097E0E77DE26D91DC5",
@@ -17293,7 +17301,7 @@
     "hasDrop": false,
     "elevatorScreen": 3,
     "requirements": [],
-    "tags": ["LongDeadEnd"],
+    "tags": ["Expert", "LongDeadEnd"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B3D8A368E79467A9F70CE",
@@ -17462,7 +17470,8 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": ["FAIRY", "GLOVE"],
-	"marioRequirements" : [],
+    "marioRequirements" : [],
+    "tags": ["NoKeyTransform"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0B0A070F5A02CE7E9E8391",
@@ -17830,6 +17839,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0D15DE1D1A00C70F071A9F129D",
@@ -17855,6 +17865,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0722462F467C19",
@@ -18270,7 +18281,8 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": ["JUMP", "FAIRY"],
-	"marioRequirements": ["FAIRY"],
+    "marioRequirements": ["FAIRY"],
+    "tags": ["NoKeyTransform"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "097E8B0D0B72D12A85",
@@ -18322,6 +18334,7 @@
     "hasDrop": false,
     "elevatorScreen": 0,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "071D6317A37286",
@@ -19073,6 +19086,7 @@
     "hasDrop": false,
     "elevatorScreen": 3,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B7D1D1963719D7E9D12E3",
@@ -20898,6 +20912,7 @@
     "hasDrop": false,
     "elevatorScreen": 1,
     "requirements": [],
+    "tags": ["NoKeyTransform"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "077818878470D8",
@@ -21863,7 +21878,7 @@
     "requirements": ["JUMP","FAIRY"],
     "suppressWarning": [],
     "group": "NONE",
-    "tags": ["SGL"],
+    "tags": ["SGL", "NoKeyTransform"],
     "hasBoss": false,
     "hasDrop": false,
     "hasItem": false,
@@ -21944,7 +21959,7 @@
     "requirements": [],
     "suppressWarning": [],
     "group": "NONE",
-    "tags": ["SGL"],
+    "tags": ["SGL", "NoKeyTransform"],
     "hasBoss": false,
     "hasDrop": false,
     "hasItem": false,
@@ -21971,7 +21986,7 @@
     "requirements": [["GLOVE","DOWNSTAB"],["GLOVE","UPSTAB"]],
     "suppressWarning": [],
     "group": "NONE",
-    "tags": ["SGL"],
+    "tags": ["SGL", "NoKeyTransform"],
     "hasBoss": false,
     "hasDrop": false,
     "hasItem": false,
@@ -22189,7 +22204,7 @@
     "requirements": [],
     "suppressWarning": [],
     "group": "NONE",
-    "tags": ["SGL"],
+    "tags": ["SGL", "NoKeyTransform"],
     "hasBoss": false,
     "hasDrop": false,
     "hasItem": false,
@@ -22433,7 +22448,7 @@
     "requirements": [],
     "suppressWarning": [],
     "group": "NONE",
-    "tags": ["SGL"],
+    "tags": ["SGL", "NoKeyTransform"],
     "duplicateGroup": "",
     "hasBoss": false,
     "hasDrop": false,
@@ -22573,7 +22588,7 @@
     "requirements": [],
     "suppressWarning": [],
     "group": "NONE",
-    "tags": ["SGL"],
+    "tags": ["SGL", "NoKeyTransform"],
     "duplicateGroup": "",
     "hasBoss": false,
     "hasDrop": false,
@@ -22685,7 +22700,7 @@
     "requirements": [],
     "suppressWarning": [],
     "group": "NONE",
-    "tags": ["SGL"],
+    "tags": ["SGL", "NoKeyTransform"],
     "duplicateGroup": "benthicKing M4",
     "hasBoss": false,
     "hasDrop": false,
