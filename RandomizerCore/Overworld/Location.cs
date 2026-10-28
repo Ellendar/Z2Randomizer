@@ -313,12 +313,12 @@ public class Location
         return GetGettableItems(RequirementTypeExtensions.ALL, ForceEnterRight ? Direction.EAST : Direction.WEST, true);
     }
 
-    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> requireables)
+    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> requireables, RandomizerProperties? props = null)
     {
-        return GetGettableItems(requireables, ForceEnterRight ? Direction.EAST : Direction.WEST);
+        return GetGettableItems(requireables, ForceEnterRight ? Direction.EAST : Direction.WEST, false, props);
     }
 
-    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> requireables, Direction entranceDirection, bool shufflableItemsOnly = false)
+    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> requireables, Direction entranceDirection, bool shufflableItemsOnly = false, RandomizerProperties? props = null)
     {
         if (Town != null)
         {
@@ -326,7 +326,7 @@ public class Location
         }
         if (Palace != null)
         {
-            return Palace.GetGettableItems(requireables, shufflableItemsOnly);
+            return Palace.GetGettableItems(requireables, shufflableItemsOnly, props);
         }
         if (shufflableItemsOnly && !CollectablesAreShufflable)
         {

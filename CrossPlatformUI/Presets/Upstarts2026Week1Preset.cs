@@ -45,6 +45,7 @@ Starting items and spells: Candle, Life, Fairy, Downstab
         RemoveLongDeadEnds = true,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
         ReduceDripperVariance = true,

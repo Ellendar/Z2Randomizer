@@ -43,6 +43,7 @@ Tournament preset for the final week of the Upstarts Tournament of 2025.
         ChangePalacePallettes = true,
         PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         NoDuplicateRoomsByEnemies = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
 

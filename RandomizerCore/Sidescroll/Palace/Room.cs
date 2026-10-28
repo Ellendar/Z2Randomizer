@@ -458,11 +458,18 @@ public class Room : IJsonOnDeserialized
 
     public bool HasTag(string tag) => Tags != null && Tags.Contains(tag);
 
-    public int Keys(bool bossesDropKeys)
+    public int Keys(IReadOnlyCollection<RequirementType> requireables, bool bossesDropKeys)
     {
-        // TODO: probably add this to rooms file for optimization
+        // probably add this to rooms file for optimization?
         SideviewEditable<PalaceObject> sv = new(SideView);
-        int keys = sv.Commands.Count(cmd => cmd.IsItem(RandomizerCore.Collectable.KEY));
+        int keys = sv.Commands
+            .Count(cmd => cmd.IsItem(RandomizerCore.Collectable.KEY) &&
+                          ItemBit(cmd.Page));
+
+        if (!LinkRequirements.KeyIsAccessible(requireables))
+        {
+            keys = 0;
+        }
 
         if (bossesDropKeys && HasBoss)
         {
@@ -474,9 +481,10 @@ public class Room : IJsonOnDeserialized
 
     public int LockedDoors()
     {
-        // TODO: probably add this to rooms file for optimization
         SideviewEditable<PalaceObject> sv = new(SideView);
-        int doors = sv.Commands.Count(cmd => cmd.IsLockedDoor());
+        int doors = sv.Commands
+            .Count(cmd => cmd.IsLockedDoor() &&
+                          GetItemBit(cmd.Page));
 
         return doors;
     }
@@ -888,6 +896,12 @@ public class Room : IJsonOnDeserialized
         )];
 
         return mirror;
+    }
+
+    public bool ItemBit(int page)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(page, 3);
+        return (ItemPresenceBits[0] & (0b1000 >> page)) != 0;
     }
 
     public Requirements GetEffectiveRequirements(bool isMario)

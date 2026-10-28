@@ -49,6 +49,7 @@ Tournament preset for the swiss part of the Standard Tournament of 2026.
         ChangePalacePallettes = true,
         PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         NoDuplicateRoomsByLayout = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
         PalaceItemRoomCount = PalaceItemRoomCount.RANDOM_INCLUDE_ZERO,

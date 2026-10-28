@@ -66,8 +66,9 @@
                 <!-- <z:Z2CheckBox Flag="UseCustomRooms" />-->
                 <Separator Margin="16 10 18 10"/>
 
-                <!-- room pool tuning -->
+                <z:Z2ComboBox Flag="KeyLogic" />
                 <z:Z2CheckBox Flag="BlockingRoomsInAnyPalace" />
+                <!-- room pool tuning -->
                 <z:Z2CheckBox Flag="RemoveLongDeadEnds" />
                 <z:Z2CheckBox Flag="IncludeExpertRooms" />
             </StackPanel>

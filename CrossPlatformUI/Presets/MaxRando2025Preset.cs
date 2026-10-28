@@ -58,6 +58,7 @@ Very high variance in difficulty. You may start with anything from 1 Heart Conta
         PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         BossRoomsExitType = BossRoomsExitType.PALACE,
         NoDuplicateRoomsByEnemies = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
 

@@ -47,6 +47,7 @@ A challenging preset focused on combat, with low XP gains and slightly lower tha
         ChangePalacePallettes = true,
         PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         NoDuplicateRoomsByEnemies = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
         AggressiveTbird = true,

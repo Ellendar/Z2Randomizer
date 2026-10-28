@@ -275,7 +275,7 @@ public static class CollectableExtensions
             Collectable.FAIRY_SPELL => RequirementType.FAIRY,
             Collectable.UPSTAB => RequirementType.UPSTAB,
             Collectable.DOWNSTAB => RequirementType.DOWNSTAB,
-            Collectable.MAGIC_KEY => RequirementType.KEY,
+            Collectable.MAGIC_KEY => RequirementType.MAGIC_KEY,
             Collectable.DASH_SPELL => RequirementType.DASH,
             Collectable.GLOVE => RequirementType.GLOVE,
             Collectable.REFLECT_SPELL => RequirementType.REFLECT,

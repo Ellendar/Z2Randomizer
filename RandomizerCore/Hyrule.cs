@@ -262,12 +262,12 @@ public class Hyrule
 
                 if (props.RandomizeSmallItems || props.ExtraKeys)
                 {
-                    palaces[0].RandomizeSmallItems(r, props.ExtraKeys);
-                    palaces[1].RandomizeSmallItems(r, props.ExtraKeys);
-                    palaces[2].RandomizeSmallItems(r, props.ExtraKeys);
-                    palaces[3].RandomizeSmallItems(r, props.ExtraKeys);
-                    palaces[4].RandomizeSmallItems(r, props.ExtraKeys);
-                    palaces[5].RandomizeSmallItems(r, props.ExtraKeys);
+                    RandomizeSmallPalaceItems(1);
+                    RandomizeSmallPalaceItems(2);
+                    RandomizeSmallPalaceItems(3);
+                    RandomizeSmallPalaceItems(4);
+                    RandomizeSmallPalaceItems(5);
+                    RandomizeSmallPalaceItems(6);
                     //Small items in GP shouldn't be randomized. This is intentional to keep
                     //the randomization in line with the original "shuffle" behavior
                     //palaces[6].RandomizeSmallItems(RNG, props.ExtraKeys);
@@ -505,6 +505,11 @@ public class Hyrule
             logger.Error(e);
             Debug.WriteLine(e.StackTrace);
             throw;
+        }
+
+        void RandomizeSmallPalaceItems(int palaceNumber)
+        {
+            palaces[palaceNumber - 1].RandomizeSmallItems(r, props.ExtraKeys, props.KeyLogic == KeyLogicOption.KEYS_PER_PALACE_SOLVABLE);
         }
     }
 
@@ -1636,6 +1641,13 @@ public class Hyrule
         }
 
         requireables.AddRange(RequirementTypeExtensions.UpToXContainers(accessibleMagicContainers));
+
+        // Now there are KEY requirements in palace rooms, and that responsibility is handled by
+        // AccessRequirements in the old mode - we just add KEY here
+        if (props.KeyLogic == KeyLogicOption.FAIRY_OR_MAGICKEY)
+        {
+            requireables.Add(RequirementType.KEY);
+        }
 
         return requireables;
     }
@@ -3617,12 +3629,18 @@ DecreaseKeysUpdateHud:
     dec Keys
     jmp FlagHudUpdate
 
+.reloc
+GetKeysForCurrentPalace:
+    lda Keys
+    rts
+.export GetKeysForCurrentPalace
+
 IncKeysForCurrentPalace:
     inc Keys
     rts
 .export IncKeysForCurrentPalace
 
-""");
+""", "keys_per_palace_disabled.s");
             return;
         }
 
@@ -3677,7 +3695,7 @@ IncKeysForCurrentPalace:
     rts
 .export IncKeysForCurrentPalace
 
-""");
+""", "keys_per_palace.s");
     }
 
 
@@ -3978,7 +3996,7 @@ FlagHudUpdate:
         rom.AllowForChangingDoorYPosition(engine);
         rom.AllowForChangingElevatorYPosition(engine);
         rom.InstantText(engine);
-        KeysPerPalace(engine, true);
+        KeysPerPalace(engine, props.KeyLogic.UsesKeysPerPalace());
         CustomHud(engine, props.UpdatedHud);
         rom.ChangeLavaKillPosition(engine);
         rom.FixItemPickup(engine);
@@ -4179,11 +4197,11 @@ FlagHudUpdate:
                 palaceLocations.Add(eastHyrule.locationAtGP);
                 palaceLocations.FisherYatesShuffle(r);
             }
-            else
+                else
             {
                 palaceLocations.FisherYatesShuffle(r);
                 palaceLocations.Add(eastHyrule.locationAtGP);
-            }
+           }
         }
         else
         {
@@ -4193,7 +4211,24 @@ FlagHudUpdate:
         {
             palaceLocations[i].Palace = palaces[i];
         }
-        palaceLocations.ForEach(i => i.AccessRequirements = Requirements.DEFAULT_PALACE_REQUIREMENTS);
+        switch (props.KeyLogic)
+        {
+            case KeyLogicOption.KEYS_PER_PALACE_SOLVABLE:
+                foreach (var loc in palaceLocations)
+                {
+                    loc.AccessRequirements = Requirements.NONE;
+                }
+                if (!props.BlockersAnywhere)
+                {
+                    // with vanilla palace blockers, Magic Key is in-logic for P6
+                    var p6 = palaceLocations.Single(loc => loc.Palace!.Number == 6);
+                    p6.AccessRequirements = new([RequirementType.MAGIC_KEY]);
+                }
+                break;
+            case KeyLogicOption.FAIRY_OR_MAGICKEY:
+                palaceLocations.ForEach(loc => loc.AccessRequirements = Requirements.DEFAULT_PALACE_REQUIREMENTS);
+                break;
+        }
     }
 
     private World GetWorld(Location location)

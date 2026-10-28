@@ -930,6 +930,19 @@ variants of a room (same layout with different enemy sets, Fairy/No Fairy, etc.)
 considered duplicates of each other. Has no effect on vanilla palaces. Does not completely
 prevent duplicates for Random Walk generated palaces.</value>
 	</data>
+	<data name="KeyLogicToolTip" xml:space="preserve">
+<value>Controls how the randomizer expects you to get past locked palace doors.
+
+Keys Per Palace
+  Small keys can only be spent in the palace where you found them. The generator
+  makes sure palaces 1–5 have enough reachable keys to open every locked door.
+  Blocking Rooms in Any Palace determines the logic for Palace 6:
+    Enabled it is handled the same as Palace 1-5. Disabled Magic Key is required in logic.
+
+Fairy or Magic Key
+  Small keys can be used in any palace. For progression, the randomizer counts
+  palace items and bosses as reachable only after you have Fairy or Magic Key.</value>
+	</data>
 	<data name="BlockingRoomsInAnyPalaceToolTip" xml:space="preserve">
 <value>Allows rooms that cannot be passed without a specific item or spell to appear in any palace.
 Otherwise, the allowed requirements for rooms in palaces are based on the items and spells
@@ -1255,6 +1268,9 @@ This is a wildly different gameplay experience, so be warned when setting this f
 	</data>
 	<data name="AllowUnsafePathEncounters" xml:space="preserve">
 		<value>Allow Unsafe Path Encounters</value>
+	</data>
+	<data name="KeyLogic" xml:space="preserve">
+		<value>Key Logic</value>
 	</data>
 	<data name="BlockingRoomsInAnyPalace" xml:space="preserve">
 		<value>Blocking Rooms in Any Palace</value>

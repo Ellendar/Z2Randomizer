@@ -120,7 +120,10 @@ public class RandomizerProperties
     public bool ReduceDripperVariance { get; set; }
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
+    public KeyLogicOption KeyLogic { get; set; }
     public bool BlockersAnywhere { get; set; }
+    //Always false for now; reserved as a future logic setting.
+    public bool LockedDoorsBlockFairy { get; set; } = false;
     public bool RemoveLongDeadEnds { get; set; }
     public bool IncludeExpertRooms { get; set; }
     [NotMapped]

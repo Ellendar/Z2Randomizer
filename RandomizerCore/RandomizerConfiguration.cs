@@ -397,6 +397,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
     [Reactive]
     [ConditionallyIncludeInFlags]
+    private KeyLogicOption keyLogic = KeyLogicOption.KEYS_PER_PALACE_SOLVABLE;
+    public bool keyLogicIncluded() => palaceStylesAreNotAllVanilla();
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool blockingRoomsInAnyPalace = false;
     public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanilla();
 
@@ -1256,6 +1261,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             properties.AllowV5_0Rooms = includev5_0Rooms ?? GetIndeterminateFlagValue(r);
         }
 
+        properties.KeyLogic = keyLogicIncluded() ? keyLogic : KeyLogicOption.FAIRY_OR_MAGICKEY;
         properties.BlockersAnywhere = blockingRoomsInAnyPalaceIncluded() && blockingRoomsInAnyPalace;
         properties.RemoveLongDeadEnds = removeLongDeadEndsIncluded() && removeLongDeadEnds;
         properties.IncludeExpertRooms = includeExpertRoomsIncluded() && includeExpertRooms;

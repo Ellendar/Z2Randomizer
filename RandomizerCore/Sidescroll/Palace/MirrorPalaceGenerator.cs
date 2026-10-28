@@ -190,4 +190,12 @@ public class MirrorPalaceGenerator : RandomWalkCoordinatePalaceGenerator
             return base.SelectRoomForCoord(palace, rooms, roomPool, palaceShape, roomCoords, dropZone, nonLinkedCandidates);
         }
     }
+
+    public override bool AllReachable(RandomizerProperties props, Palace palace)
+    {
+        return palace.AllReachable(
+            props,
+            allowMiniBossEnterGoingLeft: true,
+            allowFinalBossEnterGoingLeft: false);
+    }
 }

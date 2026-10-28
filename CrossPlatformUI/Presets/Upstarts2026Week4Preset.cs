@@ -52,6 +52,7 @@ Starting items and spells: Candle, Downstab
         RemoveLongDeadEnds = true,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
         NoDuplicateRoomsByLayout = true,

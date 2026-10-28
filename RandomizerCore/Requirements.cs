@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 namespace Z2Randomizer.RandomizerCore;
@@ -32,7 +31,7 @@ public record ComplexRequirement(
 public class Requirements
 {
     public static readonly Requirements NONE = new();
-    public static readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new([RequirementType.FAIRY, RequirementType.KEY]);
+    public static readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new([RequirementType.FAIRY, RequirementType.MAGIC_KEY]);
 
     private static readonly Dictionary<RequirementType, RequirementType[]> ImplicitRequirements = new()
     {
@@ -108,6 +107,14 @@ public class Requirements
         return ComplexRequirements.Any(complexRequirement =>
             complexRequirement.IndividualRequirements.Contains(requirement)
             || complexRequirement.CompositeRequirements.Any(inner => inner.Contains(requirement)));
+    }
+
+    public bool KeyIsAccessible(
+        IReadOnlyCollection<RequirementType> requireables,
+        Direction? enterFrom = null,
+        Direction? exitTo = null)
+    {
+        return AreSatisfiedBy(requireables, RequirementTarget.KEY, enterFrom, exitTo);
     }
 
     /// Returns whether the requirements that apply when exiting the room in the given direction

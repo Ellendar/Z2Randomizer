@@ -408,6 +408,28 @@ public enum BossRoomsExitType
     RANDOM_PER_PALACE
 }
 
+[DefaultValue(KEYS_PER_PALACE_SOLVABLE)]
+public enum KeyLogicOption
+{
+    [Description("Keys Per Palace")]
+    KEYS_PER_PALACE_SOLVABLE,
+    [Description("Fairy or Magic Key")]
+    FAIRY_OR_MAGICKEY,
+}
+
+static class KeyLogicOptionExtensions
+{
+    public static bool UsesKeysPerPalace(this KeyLogicOption keyLogic)
+    {
+        return keyLogic switch
+        {
+            KeyLogicOption.KEYS_PER_PALACE_SOLVABLE => true,
+            KeyLogicOption.FAIRY_OR_MAGICKEY => false,
+            _ => throw new NotImplementedException(),
+        };
+    }
+}
+
 [DefaultValue(VANILLA)]
 public enum Biome
 {
@@ -1134,6 +1156,7 @@ public static class Enums
         = ToDescriptions<PalaceStyle>(i => i.IsGpStyle());
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();
     public static IEnumerable<EnumDescription> PalaceDropStyleList { get; } = ToDescriptions<PalaceDropStyle>();
+    public static IEnumerable<EnumDescription> KeyLogicList { get; } = ToDescriptions<KeyLogicOption>();
 
     public static IEnumerable<EnumDescription> WestBiomeList { get; } = ToDescriptions<Biome>(i => i.IsWestBiome());
     public static IEnumerable<EnumDescription> EastBiomeList { get; } = ToDescriptions<Biome>(i => i.IsEastBiome());

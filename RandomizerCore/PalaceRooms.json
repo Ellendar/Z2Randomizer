@@ -544,7 +544,16 @@
     "name": "Vanilla P2 M22",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
+    ],
     "duplicateGroup": "P1 Fairy Room",
     "sideviewData": "32600E08D20BD209D208D409D20BD20E8405D20BD209D20829C8D20BD10EA12502F1F050D50BD10821C8DA09D20BD20ED20F"
   },
@@ -862,7 +871,7 @@
     "name": "Vanilla P3 M4",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": [["GLOVE", "DOWNSTAB"]]}],
     "duplicateGroup": "P3 Items Buried In Breakable Block Hallway",
     "sideviewData": "2E600010809DA03D37008773A02311C6839FA03F3600A00F088A9BA03BA40F0B31008773A07311C6839DA03D3600"
   },
@@ -914,7 +923,16 @@
     "name": "P3 Inverse T With Jar And Door On Same Page",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["EAST"]},
+          {"from": ["EAST"]}
+        ]
+      }
+    ],
     "duplicateGroup": "P3 Inverse T With Jar And Door On Same Page",
     "sideviewData": "18600010DD0EDC006A02D10E03F1B071F0508405D1006001"
   },
@@ -1021,7 +1039,7 @@
     "name": "P3 Dig Stairs In Breakable Blocks For Key",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": [["GLOVE", "DOWNSTAB"]]}],
     "tags": ["LongDeadEnd"],
     "duplicateGroup": "P3 Dig Stairs In Breakable Blocks For Key",
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
@@ -1136,7 +1154,7 @@
     "name": "Vanilla P4 M17",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": [["JUMP", "GLOVE", "UPSTAB"]]}],
     "duplicateGroup": "P3 T Glove And Jump For Key",
     "sideviewData": "21600E10D8085C0970C3DF0EA22582F1F0508505D108702576357625640F08D20E"
   },
@@ -1188,7 +1206,7 @@
     "name": "Vanilla P4 M16",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": [["GLOVE", "DOWNSTAB"]]}],
     "tags": ["LongDeadEnd"],
     "duplicateGroup": "P3 Dig Stairs In Breakable Blocks For Key",
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
@@ -1400,7 +1418,16 @@
     "name": "Vanilla P4 M33",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["EAST"]},
+          {"from": ["EAST"]}
+        ]
+      }
+    ],
     "duplicateGroup": "P3 Inverse T With Jar And Door On Same Page",
     "sideviewData": "18600010DD0EDC006A02D10E03F1B071F0508405D1006001"
   },
@@ -1505,7 +1532,7 @@
     "name": "Vanilla P4 M32",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": [["GLOVE", "DOWNSTAB"]]}],
     "tags": ["LongDeadEnd"],
     "duplicateGroup": "P3 Dig Stairs In Breakable Blocks For Key",
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
@@ -1716,7 +1743,7 @@
     "name": "Vanilla P5 M43",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": ["JUMP"]}],
     "duplicateGroup": "P2 Falling Block Room",
     "sideviewData": "14600E48DA80AE0F0AE2003071200F08E300D20E"
   },
@@ -1900,7 +1927,7 @@
     "name": "Vanilla P5 M54",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": ["JUMP"]}],
     "tags": ["LongDeadEnd"],
     "duplicateGroup": "P5 3-way With Waste-of-time P-bag",
     "sideviewData": "38600F08D2087095640F0CD20E7071D208D60E7075D60880B281B281719073D80E80B2A32304F1F050A223D7086001762782C2640F08D20E"
@@ -1927,7 +1954,7 @@
     "linkedRoomName": "Segmented deadend/key room right side",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": ["OUT_OF_LOGIC"]}],
     "tags": ["LongDeadEnd"],
     "sideviewData": "13600808E2008AC26009D60FD6089071800F08"
   },
@@ -2425,7 +2452,16 @@
     "name": "Vanilla P6 M48",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["EAST"]},
+          {"from": ["EAST"]}
+        ]
+      }
+    ],
     "duplicateGroup": "P4 Drop-through With Right Exit",
     "sideviewData": "16600F10E100D080B2FB62559354D70BDA0E8105D30B"
   },
@@ -2749,7 +2785,16 @@
     "name": "Vanilla P6 M60",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["EAST"]},
+          {"from": ["EAST"]}
+        ]
+      }
+    ],
     "duplicateGroup": "P3 Inverse T With Jar And Door On Same Page",
     "sideviewData": "18600010DD0EDC006A02D10E03F1B071F0508405D1006001"
   },
@@ -2855,7 +2900,11 @@
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
-      "FAIRY"
+      {
+        "target": "EXIT",
+        "requires": ["FAIRY"],
+        "routes": [{"to": ["EAST"]}]
+      }
     ],
     "sideviewData": "18600F10E100D280B0FBDC07102E1F2FD105D203D2001B22"
   },
@@ -5472,8 +5521,7 @@
     "name": "roomJamGTM 7",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [{"target": "KEY", "requires": [["GLOVE", "DOWNSTAB"]]}],
     "sideviewData": "23600E08D200649F429F370F08679B4297AC27D10EF25000F1B071D400639C4298DE0E"
   },
   {
@@ -5498,8 +5546,7 @@
     "name": "roomJamGTM 8",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [{"target": "KEY", "requires": [["GLOVE", "DOWNSTAB"]]}],
     "sideviewData": "21600E08D400959A729F529F9998759F529FA20F089298549D7699919AE300DC0E"
   },
   {
@@ -6939,8 +6986,7 @@
     "name": "winterSolstice M4",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [{"target": "KEY", "requires": [["GLOVE", "DOWNSTAB"]]}],
     "sideviewData": "2E600F10D103D300F01FA05E527B840F0D7AB19072D307F05070F1D500509E70919093A10F08699D7A999891D203"
   },
   {
@@ -6966,9 +7012,16 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
-      "GLOVE"
+      {
+        "target": "EXIT",
+        "requires": [["JUMP", "GLOVE"]],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
     ],
-	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
+    "marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "33600E108AB2D101D400F0136451A02C71506177F25080F1520F08F711A271F211A221F211A221F211A227D803D205D2064075"
   },
   {
@@ -7020,9 +7073,16 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
-      "GLOVE"
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
     ],
-	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
+    "marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "16600010DD0E80B2DC00DB0EF35000F1B071D5006001"
   },
   {
@@ -9815,7 +9875,7 @@
     "name": "winterSolsticeGP M10",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": ["KEY", "FAIRY"],
+    "requirements": ["KEY"],
     "sideviewData": "40600F08D20EF5500006B0900106B0908205D10ED200109FD202D200F011D204D200F0187088189FD103D200F01192924100F211D204D200F01D708D1497DA05"
   },
   {
@@ -10493,7 +10553,7 @@
     "name": "triforceOfCourage M17",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": [["JUMP", "GLOVE", "UPSTAB"]]}],
     "duplicateGroup": "triforceOfCourage M17",
     "sideviewData": "21600ED0D80896739C73D90EA22582F1F0508505D108702576357625640F08D20E"
   },
@@ -11692,8 +11752,7 @@
     "name": "benthicKing M13",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [{"target": "KEY", "requires": [["JUMP", "GLOVE", "UPSTAB"], ["GLOVE", "DOWNSTAB"]]}],
     "sideviewData": "37600310D600822E91919B91512DF25060F1627180238431822AD3093191509160919091522E852F339160919091D70C8622710F08D20F"
   },
   {
@@ -12034,9 +12093,17 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
-      "GLOVE"
+      "GLOVE",
+      {
+        "target": "EXIT",
+        "requires": ["FAIRY"],
+        "routes": [
+          {"from": ["SOUTH"], "to": ["EAST"]},
+          {"from": ["EAST"], "to": ["SOUTH"]}
+        ]
+      }
     ],
-	"marioRequirements" : [["GLOVE", "HAMMER"]],
+    "marioRequirements" : [["GLOVE", "HAMMER"]],
     "sideviewData": "2D600310D901722F80914D2E900F0B51718071742E8491F650509180F1422F122F7191722FA22F5291D90B5074"
   },
   {
@@ -12062,9 +12129,16 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
-      "GLOVE"
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"to": ["EAST"]},
+          {"from": ["EAST"]}
+        ]
+      }
     ],
-	"marioRequirements" : [["GLOVE", "HAMMER"]],
+    "marioRequirements" : [["GLOVE", "HAMMER"]],
     "tags": ["NoMirror"],
     "sideviewData": "39600308107CDD054271D201402E722D84F1827868B161918091112C20714029732D310F0B26923092509281B1D20DA02FF75000D901D9D10F"
   },
@@ -12091,6 +12165,14 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
     ],
     "suppressWarning": ["MultipleItemsOnPage"],
     "sideviewData": "20600E10D0804900460046004600D66B6202D16E8105F25000F1B071D56B6001"
@@ -12118,6 +12200,14 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["EAST"]},
+          {"from": ["EAST"]}
+        ]
+      }
     ],
     "sideviewData": "2660080845004400957B7274D70AD50CD40D72C3D3806021120012006121D20D72C3D30E8205"
   },
@@ -13920,7 +14010,8 @@
     "palaceNumber": null,
     "requirements": [
       "GLOVE",
-      "FAIRY"
+      "FAIRY",
+      {"target": "KEY", "requires": [["JUMP", "GLOVE"], ["GLOVE", "UPSTAB"]]}
     ],
     "sideviewData": "31200E08D4085100210F083031213180319090513261304300430043005232613021318031313190905200D20EE300DE0E"
   },
@@ -14344,8 +14435,17 @@
     "name": "z2oot forest temple elevator room",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": ["GLOVE"],
-	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"to": ["SOUTH"]},
+          {"from": ["SOUTH"]}
+        ]
+      }
+    ],
+    "marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "sideviewData": "2C600320107D307DDF02D101D100E20002729071742380B2F150607190F182B202729171DA01D102D103D104"
   },
   {
@@ -14611,8 +14711,7 @@
     "name": "aaron jam 4_4 P1_M3",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [{"target": "KEY", "requires": ["JUMP"]}],
     "sideviewData": "19600F08F31FE100F31FE200DD08F01652947096420F08DD0E"
   },
   {
@@ -15078,7 +15177,16 @@
     "name": "aaron jam 4_4 P2_M22",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
+    ],
     "duplicateGroup": "aaron jam 4_4 P1_M7",
     "sideviewData": "3A600E08D20B51C5D109D208D409D20BD20E8405D20B7001D209D208208ADB0B7002D10EA125F25000F1D50BD108208AF711D409D20BD20ED20F"
   },
@@ -15104,7 +15212,7 @@
     "name": "aaron jam 4_4 P2_M23",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": ["JUMP"]}],
     "suppressWarning": ["EnemyTooCloseToEntrance"],
     "sideviewData": "21600F08D00ED200400F085021949F729F9E935694979F729D7E9390955921D20E"
   },
@@ -15475,7 +15583,7 @@
     "name": "Winding reward room",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": ["OUT_OF_LOGIC"]}],
     "suppressWarning": ["EnemyTooCloseToEntrance", "MultipleItemsOnPage"],
     "sideviewData": "24608008D087D480F0126030712F322DA00F0DA20F087B2F312F7F2F312F7F243126D787"
   },
@@ -16707,7 +16815,7 @@
     "connections": "B3FFFFFF",
     "hasDrop": false,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": ["GLOVE"]}],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "055F17181F",
@@ -16732,8 +16840,17 @@
     "connections": "E8D7A0BC",
     "hasDrop": false,
     "elevatorScreen": 2,
-    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
-	"marioRequirements" : [["GLOVE", "HAMMER"]],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
+    ],
+    "marioRequirements" : [["GLOVE", "HAMMER"]],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B2B067D195A4610C533DE",
@@ -16758,7 +16875,16 @@
     "connections": "BBFFFFC0",
     "hasDrop": false,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
+    ],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "090B8D03CD69525F83",
@@ -16834,7 +16960,7 @@
     "connections": "C7FFFFCC",
     "hasDrop": false,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": ["GLOVE"]}],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "091E067F0C6B8E01CB",
@@ -16911,7 +17037,16 @@
     "connections": "D300BAFC",
     "hasDrop": false,
     "elevatorScreen": 3,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
+    ],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0901467B5D0E867E9D",
@@ -17011,7 +17146,16 @@
     "connections": "E3FBFFE8",
     "hasDrop": false,
     "elevatorScreen": 2,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
+    ],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0B791D7D5D038D0C8D74DD",
@@ -17112,7 +17256,15 @@
     "connections": "FFFFFFF8",
     "hasDrop": false,
     "elevatorScreen": -1,
-    "requirements": ["GLOVE"],
+    "requirements": ["GLOVE",
+      {
+        "target": "ITEM",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"from": ["EAST"]}
+        ]
+      }
+    ],
     "suppressWarning": ["EnemyTooCloseToEntrance"],
     "isDropZone": true,
     "hasItem": true,
@@ -17164,8 +17316,16 @@
     "connections": "FFB1FF98",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": ["GLOVE"],
-	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"to": ["SOUTH"]}
+        ]
+      }
+    ],
+    "marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0D89D086107B4008C7118F1E0F",
@@ -17215,7 +17375,7 @@
     "connections": "E800FFA0",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": [],
+   "requirements": [{"target": "EXIT", "requires": ["KEY"], "routes": [{"to": ["SOUTH"]}]}],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "07755D799D2A9E",
@@ -17240,7 +17400,16 @@
     "connections": "9FB5FFA4",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
+    ],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "097D1A184D004E23D1",
@@ -17316,8 +17485,17 @@
     "connections": "ABFF02B0",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": ["GLOVE"],
-	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
+    ],
+    "marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "tags": ["Expert"],
     "isDropZone": true,
     "hasItem": false,
@@ -17419,7 +17597,16 @@
     "connections": "EC00AABC",
     "hasDrop": true,
     "elevatorScreen": 3,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"from": ["WEST"], "to": ["NORTH", "EAST"]},
+          {"from": ["NORTH", "EAST"], "to": ["WEST", "SOUTH"]}
+        ]
+      }
+    ],
     "tags": ["NoMirror"],
     "isDropZone": false,
     "hasItem": false,
@@ -17445,8 +17632,17 @@
     "connections": "BB01FFFC",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": ["GLOVE"],
-	"marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["GLOVE"],
+        "routes": [
+          {"to": ["WEST"]},
+          {"from": ["WEST"]}
+        ]
+      }
+    ],
+    "marioRequirements" : [["GLOVE", "HAMMER"], ["GLOVE", "TANOOKI"]],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0B5C073E4E77D95CC04705",
@@ -17471,7 +17667,16 @@
     "connections": "FCDDFFC4",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["EAST"]},
+          {"from": ["EAST"]}
+        ]
+      }
+    ],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0576DA0D43",
@@ -17977,7 +18182,16 @@
     "connections": "FC89FF7C",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [
+      {
+        "target": "EXIT",
+        "requires": ["KEY"],
+        "routes": [
+          {"to": ["EAST"]},
+          {"from": ["EAST"]}
+        ]
+      }
+    ],
     "duplicateGroup": "aaron jam 4_4 P4_M21",
     "isDropZone": true,
     "hasItem": false,
@@ -18156,7 +18370,7 @@
     "connections": "00FFFF00",
     "hasDrop": false,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [{"target": "KEY", "requires": ["JUMP"]}],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B0B483A993B19254682D1",

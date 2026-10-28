@@ -34,6 +34,20 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         Collectable.ONEUP
     ];
 
+    private static readonly TableWeightedRandom<Collectable> SmallItemWeights = new([
+        (Collectable.KEY, 7),
+        (Collectable.BLUE_JAR, 2),
+        (Collectable.RED_JAR, 2),
+        (Collectable.SMALL_BAG, 2),
+        (Collectable.MEDIUM_BAG, 3),
+        (Collectable.LARGE_BAG, 2),
+        (Collectable.XL_BAG, 1),
+        (Collectable.ONEUP, 1),
+    ]);
+
+    private static readonly TableWeightedRandom<Collectable> SmallItemWeightsNoKey =
+        (TableWeightedRandom<Collectable>)SmallItemWeights.Subtract(Collectable.KEY)!;
+
     public List<Room> AllRooms { get; private set; } = [];
 
     public Room? Entrance { get; set; }
@@ -107,12 +121,13 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
     private static bool DropsMayBypass(Room bossRoom, bool dropsMayBypassMiniBosses, bool dropsMayBypassFinalBosses, bool tBirdRequired)
         => IsMiniBoss(bossRoom, tBirdRequired) ? dropsMayBypassMiniBosses : dropsMayBypassFinalBosses;
 
-    public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false,
-                                               bool allowMiniBossEnterGoingLeft = false,
-                                               bool allowFinalBossEnterGoingLeft = false,
-                                               bool dropsMayBypassMiniBosses = false,
-                                               bool dropsMayBypassFinalBosses = false,
-                                               bool tBirdRequired = false)
+    public IEnumerable<Room> GetReachableRooms(
+        bool allowBacktracking = false,
+        bool allowMiniBossEnterGoingLeft = false,
+        bool allowFinalBossEnterGoingLeft = false,
+        bool dropsMayBypassMiniBosses = false,
+        bool dropsMayBypassFinalBosses = false,
+        bool tBirdRequired = false)
     {
         if (Entrance == null)
         {
@@ -235,13 +250,13 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         }
 
         // Fail quickly if there are not enough keys to open every locked door.
-        int keysTotal = AllRooms.Sum(room => room.Keys(bossesDropKeys));
+        int keysTotal = AllRooms.Sum(room => room.Keys(initialRequireables, bossesDropKeys));
         if (keysTotal + startingKeys < doorsTotal)
         {
             return false;
         }
 
-        HashSet<RequirementType> requireables = [.. initialRequireables.Where(req => req != RequirementType.KEY)];
+        HashSet<RequirementType> requireables = [.. initialRequireables.Where(req => req != RequirementType.KEY && req != RequirementType.MAGIC_KEY)];
         HashSet<RequirementType> requireablesIncludingKey = new(requireables) { RequirementType.KEY };
 
         // Compute the currently unlocked area
@@ -253,55 +268,83 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                 AccessibleRooms = new HashSet<Room>(ReferenceEqualityComparer.Instance),
                 UnopenedDoors = [],
             };
-            Queue<(Direction, Room)> pendingRooms = new();
 
-            void AddRoom(Direction enterFrom, Room room)
+            var pending = new Queue<(Direction EnterFrom, Room Room)>();
+            var visitedLockedDoorEntries = new Dictionary<Room, HashSet<Direction>>(ReferenceEqualityComparer.Instance);
+            var visitedTraversableEntries = new HashSet<(Direction EnterFrom, Room Room)>(new RoomTupleComparer<Direction>());
+
+            bool MarkLockedDoorEntryVisited(Room room, Direction enterFrom)
             {
+                if (!visitedLockedDoorEntries.TryGetValue(room, out var directions))
+                {
+                    directions = [];
+                    visitedLockedDoorEntries.Add(room, directions);
+                }
+                return directions.Add(enterFrom);
+            }
+
+            void EnqueuePossibleDirections(Direction enterFrom, Room room, bool doorOpened)
+            {
+                foreach (var (nextEnterFrom, nextRoom) in room.PossibleDirections(
+                             doorOpened ? requireablesIncludingKey : requireables,
+                             enterFrom))
+                {
+                    pending.Enqueue((nextEnterFrom, nextRoom));
+                }
+            }
+
+            pending.Enqueue((Direction.WEST, entrance));
+
+            while (pending.Count > 0)
+            {
+                var (enterFrom, room) = pending.Dequeue();
+
                 if (doorRooms.Contains(room))
                 {
                     if (openedDoors.Contains(room))
                     {
-                        // The locked door has been paid for, so this room is traversable.
-                        if (area.AccessibleRooms.Add(room))
+                        // The locked door has been paid for, so this room is traversable
+                        var key = (enterFrom, room);
+                        if (visitedTraversableEntries.Add(key))
                         {
-                            pendingRooms.Enqueue((enterFrom, room));
+                            area.AccessibleRooms.Add(room);
+                            EnqueuePossibleDirections(enterFrom, room, doorOpened: true);
                         }
-                        return;
+
+                        continue;
+                    }
+
+                    if (!MarkLockedDoorEntryVisited(room, enterFrom))
+                    {
+                        continue; // pair has already been explored
                     }
 
                     // A locked-door room may not block all of its exits: when its complex
                     // requirements contain a KEY requirement in some capacity, exits that do not
-                    // require a key can be used without spending one.
+                    // require a key can be taken without spending one.
                     foreach (var (nextEnterFrom, nextRoom) in room.FreeExitsInLockedDoorRoom(enterFrom))
                     {
-                        AddRoom(nextEnterFrom, nextRoom);
+                        pending.Enqueue((nextEnterFrom, nextRoom));
                     }
 
                     if (area.UnopenedDoors.All(door => door.Room != room))
                     {
                         area.UnopenedDoors.Add((enterFrom, room));
                     }
-                    return;
-                }
-                if (area.AccessibleRooms.Add(room))
-                {
-                    pendingRooms.Enqueue((enterFrom, room));
-                }
-            }
 
-            AddRoom(Direction.WEST, entrance);
-            while (pendingRooms.Count > 0)
-            {
-                var (enterFrom, room) = pendingRooms.Dequeue();
-                bool doorOpened = doorRooms.Contains(room) && openedDoors.Contains(room);
-                foreach (var (nextEnterFrom, nextRoom) in room.PossibleDirections(doorOpened ? requireablesIncludingKey : requireables, enterFrom))
+                    continue;
+                }
+
+                var traversableKey = (enterFrom, room);
+                if (visitedTraversableEntries.Add(traversableKey))
                 {
-                    AddRoom(nextEnterFrom, nextRoom);
+                    area.AccessibleRooms.Add(room);
+                    EnqueuePossibleDirections(enterFrom, room, doorOpened: false);
                 }
             }
 
             area.KeysOnHand = startingKeys
-                + area.AccessibleRooms.Sum(room => room.Keys(bossesDropKeys))
+                + area.AccessibleRooms.Sum(room => room.Keys(requireables, bossesDropKeys))
                 - openedDoors.Sum(room => room.LockedDoors());
 
             return area;
@@ -424,11 +467,36 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false; // Boss room not found?
     }
 
-    public bool AllReachable(bool allowBacktracking = false,
-                             bool allowMiniBossEnterGoingLeft = false,
-                             bool allowFinalBossEnterGoingLeft = false,
-                             bool dropsMayBypassBosses = false,
-                             bool tBirdRequired = false)
+    public bool AllReachable(
+        RandomizerProperties props,
+        bool allowBacktracking = false,
+        bool allowMiniBossEnterGoingLeft = false,
+        bool allowFinalBossEnterGoingLeft = false)
+    {
+        if (!AllRoomsReachable(
+            allowBacktracking: allowBacktracking,
+            allowMiniBossEnterGoingLeft: allowMiniBossEnterGoingLeft,
+            allowFinalBossEnterGoingLeft: allowFinalBossEnterGoingLeft,
+            dropsMayBypassBosses: props.DropsMayBypassBosses,
+            tBirdRequired: props.RequireTbird))
+        {
+            return false;
+        }
+        if (props.KeyLogic == KeyLogicOption.KEYS_PER_PALACE_SOLVABLE &&
+            Number < 7 &&
+            (Number < 6 || props.BlockersAnywhere))
+        {
+            return HasSolvableKeyLogic(RequirementTypeExtensions.ALL, !props.BossItem, 0);
+        }
+        return true;
+    }
+
+    private bool AllRoomsReachable(
+        bool allowBacktracking = false,
+        bool allowMiniBossEnterGoingLeft = false,
+        bool allowFinalBossEnterGoingLeft = false,
+        bool dropsMayBypassBosses = false,
+        bool tBirdRequired = false)
     {
         var reachableRooms = GetReachableRooms(allowBacktracking: allowBacktracking,
                                                allowMiniBossEnterGoingLeft: allowMiniBossEnterGoingLeft,
@@ -437,19 +505,6 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                                                dropsMayBypassFinalBosses: dropsMayBypassBosses && Number < 7,
                                                tBirdRequired: tBirdRequired);
         return AllRooms.All(i => reachableRooms.Contains(i));
-    }
-
-    public bool AllReachable(
-        RandomizerProperties props,
-        bool allowBacktracking = false,
-        bool allowMiniBossEnterGoingLeft = false,
-        bool allowFinalBossEnterGoingLeft = false)
-    {
-        return AllReachable(allowBacktracking: allowBacktracking,
-                            allowMiniBossEnterGoingLeft: allowMiniBossEnterGoingLeft,
-                            allowFinalBossEnterGoingLeft: allowFinalBossEnterGoingLeft,
-                            dropsMayBypassBosses: props.DropsMayBypassBosses,
-                            tBirdRequired: props.RequireTbird);
     }
 
     /// <summary>
@@ -1150,7 +1205,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         logger.Debug("Target: " + roomCount + " Rooms: " + rooms);
     }
 
-    public void RandomizeSmallItems(Random r, bool extraKeys)
+    public void RandomizeSmallItems(Random r, bool extraKeys, bool excludeKeys)
     {
         foreach (Room room in AllRooms)
         {
@@ -1165,65 +1220,23 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                     if (secondByte == 15 && ypos < 13)
                     {
                         int thirdByte = room.SideView[sideviewIndex++];
-                        if (!SHUFFLABLE_SMALL_ITEMS.Contains((Collectable)thirdByte))
+                        var original = (Collectable)thirdByte;
+                        if (!SHUFFLABLE_SMALL_ITEMS.Contains(original) ||
+                            excludeKeys && original == Collectable.KEY)
                         {
                             continue;
                         }
-                        double d = r.NextDouble();
-                        if (room.PalaceNumber == 7)
+                        Collectable newItem;
+                        if (extraKeys)
                         {
-                            if (d <= 1)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.ONEUP;
-                            }
+                            newItem = Collectable.KEY;
                         }
                         else
                         {
-                            if (extraKeys)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.KEY;
-                            }
-                            //35 Key
-                            //10 BlueJar
-                            //10 RedJar
-                            //10 Small bag
-                            //15 Medium Bag
-                            //10 Large Bag
-                            //5 XL bag
-                            //5 1Up
-                            else if (d <= .35)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.KEY;
-                            }
-                            else if (d <= .45)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.BLUE_JAR;
-                            }
-                            else if (d <= .55)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.RED_JAR;
-                            }
-                            else if (d <= .65)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.SMALL_BAG;
-                            }
-                            else if (d <= .80)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.MEDIUM_BAG;
-                            }
-                            else if (d <= .90)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.LARGE_BAG;
-                            }
-                            else if (d <= .95)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.XL_BAG;
-                            }
-                            else
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.ONEUP;
-                            }
+                            var weights = excludeKeys ? SmallItemWeightsNoKey : SmallItemWeights;
+                            newItem = weights.Next(r);
                         }
+                        room.SideView[sideviewIndex - 1] = (byte)newItem;
                     }
                 }
             }
@@ -1411,6 +1424,19 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             return [];
         }
         HashSet<RequirementType> requireables = [.. initialRequireables];
+        if (props != null && props.KeyLogic == KeyLogicOption.KEYS_PER_PALACE_SOLVABLE
+            && Number < 7 && (Number < 6 || props.BlockersAnywhere))
+        {
+            if (HasSolvableKeyLogic(initialRequireables, !props!.BossItem, 0))
+            {
+                // HasSolvableKeyLogic has already proved this palace is key-solvable
+                requireables.Add(RequirementType.KEY);
+            }
+            else
+            {
+                return [];
+            }
+        }
         var entrance = AllRooms.First(i => i.IsEntrance);
         Queue<(Direction, Room)> pendingRooms = new([(Direction.WEST, entrance)]);
         HashSet<(Direction, Room)> coveredRooms = new(new RoomTupleComparer<Direction>());
