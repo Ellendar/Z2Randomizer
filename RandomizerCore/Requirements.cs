@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,18 +17,37 @@ public enum RequirementTarget
 }
 
 public record RequirementRoute(
+    /// Entry directions. Null or empty matches all entry directions.
     Direction[]? From,
+    /// Exit directions. Null or empty matches all exit directions.
     Direction[]? To
 );
 
 public record ComplexRequirement(
     RequirementTarget Target,
+    /// Individual requirements (OR clause) - any one is sufficient
     RequirementType[] IndividualRequirements,
+    /// Composite requirements (OR of AND clauses) - each inner array must all be satisfied, 
+    /// and any inner array being satisfied is enough
     RequirementType[][] CompositeRequirements,
+    /// Optional traversal routes. If null or empty, applies to all traversals.
+    /// If present, only applies when both enterFrom and exitTo match one of the routes.
+    /// Null enterFrom or exitTo matches everything.
     RequirementRoute[]? Routes = null
 );
 
-public class Requirements
+/// Requirements in Disjunctive Normal Form (DNF): a disjunction (OR) of conjunctions (AND).
+///
+/// The three fields are OR'd together - any one being satisfied causes the whole requirement to pass:
+/// - IndividualRequirements: a single OR clause (any one requirement suffices)
+/// - CompositeRequirements: multiple OR clauses, each being an AND (all requirements in a clause must be satisfied)
+/// - ComplexRequirements: additional DNF structures with target/route filters
+///
+/// Example satisfaction semantics:
+/// - IndividualRequirements=[JUMP, FAIRY]: satisfied if JUMP OR FAIRY is available
+/// - CompositeRequirements=[[JUMP, FAIRY], [GLOVE]]: satisfied if (JUMP AND FAIRY) OR GLOVE is available
+/// - ComplexRequirements with target=KEY: only checked when querying RequirementTarget.KEY
+public class Requirements : IDeterministicHash
 {
     public static readonly Requirements NONE = new();
     public static readonly Requirements DEFAULT_PALACE_REQUIREMENTS = new([RequirementType.FAIRY, RequirementType.MAGIC_KEY]);
@@ -50,8 +69,17 @@ public class Requirements
         { RequirementType.SPELL, 3 },
     };
 
+    /// List of OR requirements. Any one requirement in this array is sufficient.
+    /// Example: [JUMP, FAIRY] means JUMP OR FAIRY
     public RequirementType[] IndividualRequirements { get; private set; }
+    /// OR list of AND clauses. Each inner array is an AND clause (all requirements must be satisfied).
+    /// The outer array is an OR of these clauses (any one clause being satisfied is enough).
+    /// Example: [[JUMP], [FAIRY, GLOVE]] means (JUMP) OR (FAIRY AND GLOVE)
     public RequirementType[][] CompositeRequirements { get; private set; }
+    /// More complex requirements in Disjunctive Normal Form, with optional route filtering.
+    /// Each `ComplexRequirement` may contain individual requirements and composite requirements,
+    /// and only applies when its target matches and (if specified) its routes match the traversal.
+    /// For routes, null or empty `From` or `To` arrays match any direction.
     public ComplexRequirement[] ComplexRequirements { get; private set; }
 
     public Requirements()
@@ -117,6 +145,123 @@ public class Requirements
         return AreSatisfiedBy(requireables, RequirementTarget.KEY, enterFrom, exitTo);
     }
 
+    /// <summary>
+    /// Combines two requirement sets using logical AND, after resolving
+    /// complex requirements for the specified target and traversal context.
+    /// </summary>
+    /// <remarks>
+    /// Each individual requirement represents a single alternative. Each composite
+    /// requirement represents an AND-clause, with the clauses themselves forming
+    /// alternatives (OR).
+    ///
+    /// The combination computes the Cartesian product of the alternatives from
+    /// both inputs, merging each pair into a single AND-clause. Redundant
+    /// supersets are removed afterward.
+    ///
+    /// An empty requirement set represents no restriction and is the identity
+    /// for this operation.
+    /// </remarks>
+    public static Requirements Combine(
+        Requirements req1,
+        Requirements req2,
+        RequirementTarget target = RequirementTarget.ANY,
+        Direction? enterFrom = null,
+        Direction? exitTo = null)
+    {
+        ArgumentNullException.ThrowIfNull(req1);
+        ArgumentNullException.ThrowIfNull(req2);
+
+        var flattened1 = req1.FlattenComplex(target, enterFrom, exitTo);
+        var flattened2 = req2.FlattenComplex(target, enterFrom, exitTo);
+
+        // An empty requirement set imposes no restriction.
+        if (flattened1.IsEmpty())
+        {
+            return flattened2;
+        }
+
+        if (flattened2.IsEmpty())
+        {
+            return flattened1;
+        }
+
+        var clauses1 = JoinIndividualAndComposite(flattened1);
+        var clauses2 = JoinIndividualAndComposite(flattened2);
+
+        List<RequirementType[]> combinedClauses = [];
+
+        // AND distributes over OR:
+        // (A OR B) AND (C OR D)
+        // = (A AND C) OR (A AND D) OR (B AND C) OR (B AND D).
+        foreach (var clause1 in clauses1)
+        {
+            foreach (var clause2 in clauses2)
+            {
+                combinedClauses.Add([.. clause1.Concat(clause2).Distinct()]);
+            }
+        }
+
+        var simplified = RemoveRedundantComposites(combinedClauses);
+
+        /* we could do this if we really wanted, but individual only exists for convenience and it's no longer convenient here.
+        var individual = simplified
+            .Where(clause => clause.Length == 1)
+            .Select(clause => clause[0])
+            .Distinct()
+            .ToArray();
+
+        var composite = simplified
+            .Where(clause => clause.Length > 1)
+            .ToArray();
+
+        return new Requirements(individual, composite);
+        */
+
+        return new Requirements([], simplified);
+    }
+
+    /// Remove redundant composite requirements.
+    /// If we have [JUMP] and [JUMP, FAIRY], the larger clause is redundant because satisfying
+    // [JUMP] automatically satisfies [JUMP, FAIRY]. We keep only the smaller clause.
+    private static RequirementType[][] RemoveRedundantComposites(List<RequirementType[]> composites)
+    {
+        if (composites.Count <= 1)
+        {
+            return composites.ToArray();
+        }
+
+        // Sort by size (smallest first) for efficient redundancy check
+        var sorted = composites.OrderBy(c => c.Length).ToArray();
+
+        var result = new List<RequirementType[]>();
+
+        for (int i = 0; i < sorted.Length; i++)
+        {
+            var current = sorted[i];
+            bool isRedundant = false;
+
+            // Check if this composite is a superset of any already-added composite
+            // If so, it's redundant (the smaller one already covers its requirements)
+            foreach (var alreadyAdded in result)
+            {
+                // If 'alreadyAdded' is a subset of 'current', then 'current' is redundant
+                // because 'alreadyAdded' being satisfied means 'current' is also satisfied
+                if (alreadyAdded.All(r => current.Contains(r)))
+                {
+                    isRedundant = true;
+                    break;
+                }
+            }
+
+            if (!isRedundant)
+            {
+                result.Add(current);
+            }
+        }
+
+        return result.ToArray();
+    }
+
     /// Returns whether the requirements that apply when exiting the room in the given direction
     /// require a small key (RequirementType.KEY) in some capacity.
     ///
@@ -132,11 +277,7 @@ public class Requirements
         }
         foreach (ComplexRequirement complexRequirement in ComplexRequirements)
         {
-            if (complexRequirement.Target is not RequirementTarget.ANY && complexRequirement.Target != RequirementTarget.EXIT)
-            {
-                continue;
-            }
-            if (!ComplexRequirementRouteMatches(complexRequirement, enterFrom, exitTo))
+            if (!ComplexRequirementMatches(complexRequirement, RequirementTarget.EXIT, enterFrom, exitTo))
             {
                 continue;
             }
@@ -149,11 +290,18 @@ public class Requirements
         return false;
     }
 
+    public static bool ComplexRequirementTargetMatches(ComplexRequirement complexRequirement, RequirementTarget target)
+    {
+        return target is RequirementTarget.ANY
+            || complexRequirement.Target is RequirementTarget.ANY
+            || target == complexRequirement.Target;
+    }
+
     /// Returns whether any route of a complex requirement matches the given (enterFrom, exitTo)
     /// pair. A route matches when its From array is empty or contains the direction entered from,
     /// and its To array is empty or contains the direction exited to. A complex requirement with
     /// no routes applies to every traversal.
-    private static bool ComplexRequirementRouteMatches(ComplexRequirement complexRequirement, Direction? enterFrom, Direction? exitTo)
+    public static bool ComplexRequirementRouteMatches(ComplexRequirement complexRequirement, Direction? enterFrom, Direction? exitTo)
     {
         RequirementRoute[]? routes = complexRequirement.Routes;
         if (routes is null || routes.Length == 0)
@@ -173,6 +321,15 @@ public class Requirements
             }
         }
         return false;
+    }
+
+    /// A complex requirement only applies when both its target matches the query
+    /// and one of its routes matches the traversal. Otherwise, they are treated
+    /// as if they did not exist.
+    public static bool ComplexRequirementMatches(ComplexRequirement req, RequirementTarget target, Direction? enterFrom, Direction? exitTo)
+    {
+        return ComplexRequirementTargetMatches(req, target)
+            && ComplexRequirementRouteMatches(req, enterFrom, exitTo);
     }
 
     public string Serialize()
@@ -235,22 +392,13 @@ public class Requirements
             return true;
         }
 
-        // A complex requirement only applies when both its target matches the query
-        // and one of its routes matches the traversal. Otherwise, they are treated
-        // as if they did not exist.
         bool hasApplicableComplexRequirement = false;
         foreach (var complexRequirement in ComplexRequirements)
         {
-            if (target is not RequirementTarget.ANY && target != complexRequirement.Target)
+            if (!ComplexRequirementMatches(complexRequirement, target, enterFrom, exitTo))
             {
                 continue;
             }
-            if (!ComplexRequirementRouteMatches(complexRequirement, enterFrom, exitTo))
-            {
-                continue;
-            }
-            hasApplicableComplexRequirement = true;
-
             if (IndividualRequirementMatch(complexRequirement.IndividualRequirements))
             {
                 return true;
@@ -259,6 +407,8 @@ public class Requirements
             {
                 return true;
             }
+
+            hasApplicableComplexRequirement = true;
         }
 
         return IndividualRequirements.Length == 0 
@@ -482,6 +632,58 @@ public class Requirements
     public bool IsEmpty()
     {
         return IndividualRequirements.Length == 0 && CompositeRequirements.Length == 0 && ComplexRequirements.Length == 0;
+    }
+
+    // Convert each representation into DNF clauses.
+    // Every individual requirement is a one-item alternative.
+    public static RequirementType[][] JoinIndividualAndComposite(Requirements requirements)
+    {
+        if (!requirements.IndividualRequirements.Any())
+        {
+            return requirements.CompositeRequirements;
+        }
+        return [
+            .. requirements.IndividualRequirements.Select(r => new[] { r }),
+            .. requirements.CompositeRequirements,
+        ];
+    }
+
+    /// Flatten ComplexRequirements into Individual and Composite requirements, given the current context.
+    /// ComplexRequirements with routes only apply when traversing in specific directions.
+    /// ComplexRequirements with non-ANY targets only apply for specific operations (KEY, EXIT, ITEM).
+    ///
+    /// Returns a new Requirements object. The current Requirements are untouched.
+    public Requirements FlattenComplex(RequirementTarget target = RequirementTarget.ANY, Direction? enterFrom = null, Direction? exitTo = null)
+    {
+        if (ComplexRequirements.Length == 0)
+        {
+            return this;
+        }
+
+        // Collect all individual and composite requirements from ComplexRequirements that apply
+        var combinedIndividual = new HashSet<RequirementType>(IndividualRequirements);
+        var combinedComposite = new List<RequirementType[]>(CompositeRequirements);
+
+        foreach (var complex in ComplexRequirements)
+        {
+            if (!ComplexRequirementMatches(complex, target, enterFrom, exitTo))
+            {
+                continue;
+            }
+
+            foreach (var req in complex.IndividualRequirements)
+            {
+                combinedIndividual.Add(req);
+            }
+
+            foreach (var composite in complex.CompositeRequirements)
+            {
+                combinedComposite.Add(composite);
+            }
+        }
+
+        var simplifiedComposite = RemoveRedundantComposites(combinedComposite);
+        return new Requirements([.. combinedIndividual], [.. simplifiedComposite]);
     }
 }
 
