@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NLog;
+using Z2Randomizer.RandomizerCore.Diagnostics;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
@@ -98,11 +99,13 @@ public class Palaces
             int attempts = 0;
             do
             {
+                Diag.Retry("palace.generate", attempts + 1, $"event=begin palace={currentPalace} style={palaceStyle} size={palaceSize}");
                 palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace, attempts++);
                 if (palace.IsValid)
                 {
                     palace.IsValid = palaceGenerator.AddKeysForKeyLogic(props, palace, true, r);
                 }
+                Diag.Retry("palace.generate", attempts, $"event=end palace={currentPalace} valid={palace.IsValid} rooms={palace.AllRooms.Count}");
             } while (!palace.IsValid);
             palace.BossRoom!.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
             PalaceGenerator.DebugCheckDuplicates(props, palace);
@@ -333,6 +336,7 @@ public class Palaces
         if (palaces.Where(i => i.Number != 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length)) > 0x400
             || palaces.Where(i => i.Number == 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length)) > 0x2A9)
         {
+            Diag.Trace("palace.validation", $"failed check=enemy-data regular={palaces.Where(i => i.Number != 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length))}/1024 gp={palaces.Where(i => i.Number == 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length))}/681");
             return false;
         }
 
@@ -345,12 +349,27 @@ public class Palaces
                     || palace.ItemRooms.Any(i => i == null))
                 || palace.BossRoom == null)
             {
+                Diag.Trace("palace.validation", $"failed check=rooms palace={palace.Number} itemRooms={palace.ItemRooms.Count} expected={(palace.Number < 7 ? props.PalaceItemRoomCounts[palace.Number - 1] : 0)} boss={palace.BossRoom != null}");
                 return false;
             }
         }
-        return CanGetGlove(props, palaces)
-            && CanGetRaft(props, raftIsRequired, palaces[1], palaces[2])
-            && AtLeastOnePalaceCanHaveGlove(props, palaces);
+        if (!CanGetGlove(props, palaces))
+        {
+            Diag.Trace("palace.validation", "failed check=can-get-glove");
+            return false;
+        }
+        if (!CanGetRaft(props, raftIsRequired, palaces[1], palaces[2]))
+        {
+            Diag.Trace("palace.validation", $"failed check=can-get-raft raftRequired={raftIsRequired}");
+            return false;
+        }
+        if (!AtLeastOnePalaceCanHaveGlove(props, palaces))
+        {
+            Diag.Trace("palace.validation", "failed check=glove-candidate");
+            return false;
+        }
+        Diag.Trace("palace.validation", "event=success");
+        return true;
     }
     private static bool AtLeastOnePalaceCanHaveGlove(RandomizerProperties props, List<Palace> palaces)
     {

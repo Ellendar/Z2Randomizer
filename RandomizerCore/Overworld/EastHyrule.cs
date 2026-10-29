@@ -619,7 +619,6 @@ public sealed class EastHyrule : World
                         return false;
                     }
                 }
-                //Debug.WriteLine(GetMapDebug());
 
                 Direction raftDirection = Direction.WEST;
                 if (props.ContinentConnections != ContinentConnectionType.NORMAL && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
@@ -701,7 +700,6 @@ public sealed class EastHyrule : World
                 {
                     return false;
                 }
-                //Debug.WriteLine(GetMapDebug());
                 randomTerrainFilter.Remove(Terrain.LAVA);
                 if (raft != null)
                 {

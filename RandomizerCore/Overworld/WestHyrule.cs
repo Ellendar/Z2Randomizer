@@ -635,8 +635,6 @@ public sealed class WestHyrule : World
                     failedOnPlaceLocations++;
                     return false;
                 }
-
-                //Debug.WriteLine(GetMapDebug());
                 if (!GrowTerrain(climate))
                 {
                     return false;
@@ -679,16 +677,13 @@ public sealed class WestHyrule : World
                 }
 
                 BlockCaves(props.BoulderBlockConnections, Terrain.ROCK);
-                //Debug.WriteLine(GetMapDebug());
                 PlaceHiddenLocations(props.LessImportantLocationsOption);
 
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
-                    //Debug.WriteLine(GetMapDebug());
                     bool f = ConnectIslands(100, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
-                        //Debug.WriteLine(GetMapDebug());
                         failedOnConnectIslands++;
                         return false;
                     }

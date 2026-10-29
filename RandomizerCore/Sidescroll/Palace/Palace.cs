@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Z2Randomizer.RandomizerCore.Diagnostics;
 using Z2Randomizer.RandomizerCore.Enemy;
 using static Z2Randomizer.RandomizerCore.Util;
 
@@ -917,9 +918,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             ROMData.Put(room.ConnectionStartAddress + 2, upByte);
             ROMData.Put(room.ConnectionStartAddress + 3, rightByte);
 
-            //Debug.WriteLine("Wrote Map " + room.Map + "(" + room.PalaceGroup + ") " +
-            //   room.PalaceNumber + " at address " + room.ConnectionStartAddress + " : "
-            //    + Util.ByteArrayToHexString([leftByte, downByte, upByte, rightByte]));
+
         }
     }
 
@@ -1327,7 +1326,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         && i != room);
                     if (duplicateRoom != null)
                     {
-                        Debug.WriteLine("Room# " + room.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.NewEnemies) + ") " +
+                        Diag.Trace("palace.enemies", "Room# " + room.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.NewEnemies) + ") " +
                             " is a duplicate of Room# " + duplicateRoom.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(duplicateRoom.SideView) + "/" + Util.ByteArrayToHexString(duplicateRoom.Enemies) + ")");
                         room.NewEnemies = PalaceEnemyShuffler.Shuffle(room, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
                     }
@@ -1354,10 +1353,15 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                 HashSet<RequirementType> palaceRequireables = [.. requireables, palaceItemRequirement.Value];
                 requireables = palaceRequireables;
             }
-            else return false;
+            else
+            {
+                Diag.Trace("palace.validation", $"palace={Number} failed check=item-unreachable item={palaceItem}");
+                return false;
+            }
         }
 
         IEnumerable<Room> unclearableRooms = AllRooms.Where(i => !i.GetEffectiveRequirements(isMario).AreSatisfiedBy(requireables, RequirementTarget.EXIT));
+        Diag.Trace("palace.validation.rooms", $"palace={Number} item={palaceItem} unclearable=[{string.Join(",", unclearableRooms.Select(room => room.Map))}]");
         return !unclearableRooms.Any();
     }
 
@@ -1431,11 +1435,9 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             //if the exploration list runs out, we couldn't find the exit, so the drop is isolated.
             if (!found)
             {
-                //Debug.WriteLine(GetLayoutDebug());
                 return true;
             }
         }
-        //Debug.WriteLine(GetLayoutDebug());
         return false;
     }
 
@@ -1455,6 +1457,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             }
             if (ItemRooms.Contains(room) && room.LinkRequirements.AreSatisfiedBy(requireables, RequirementTarget.ITEM, enterFrom: enterFrom))
             {
+                Diag.Trace("palace.validation.bfs", $"palace={Number} event=item-room map={room.Map} covered={coveredRooms.Count} requireables=[{string.Join(",", requireables.Order())}]");
                 return true;
             }
             coveredRooms.Add(t);
@@ -1467,13 +1470,27 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             }
         }
 
+        Diag.Trace("palace.validation.bfs", $"palace={Number} failed check=item-room covered={coveredRooms.Select(state => state.Item2).Distinct(ReferenceEqualityComparer.Instance).Count()}/{AllRooms.Count} states={coveredRooms.Count} itemRooms=[{string.Join(",", ItemRooms.Select(room => room.Map))}] requireables=[{string.Join(",", requireables.Order())}]");
         return false;
     }
 
+#if Z2R_DIAGNOSTICS
+    private long itemBfsCalls;
+    private long itemBfsDequeues;
+#endif
+
     public List<Collectable> GetGettableItems(RandomizerProperties props, IReadOnlyCollection<RequirementType> initialRequireables, bool shufflableItemsOnly)
     {
+#if Z2R_DIAGNOSTICS
+        long call = ++itemBfsCalls;
+        long dequeues = 0;
+        Diag.Retry("palace.bfs", call, $"event=begin palace={Number} shufflableOnly={shufflableItemsOnly} requireables=[{string.Join(",", initialRequireables.Order())}]");
+#endif
         if (shufflableItemsOnly && !PalaceItemsAreShufflable)
         {
+#if Z2R_DIAGNOSTICS
+            Diag.Retry("palace.bfs", call, $"event=skip palace={Number} reason=fixed-items");
+#endif
             return [];
         }
         HashSet<RequirementType> requireables = [.. initialRequireables];
@@ -1509,6 +1526,12 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             previousGettableItems = gettableItems;
             while (pendingRooms.Count > 0)
             {
+#if Z2R_DIAGNOSTICS
+                dequeues++;
+                itemBfsDequeues++;
+                if ((Diag.IsSample(call) || dequeues >= 1000) && Diag.IsSample(dequeues))
+                    Diag.Trace("palace.bfs.loop", $"palace={Number} call={call} dequeues={dequeues} pending={pendingRooms.Count} covered={coveredRooms.Count}");
+#endif
                 var t = pendingRooms.Dequeue();
                 (Direction enterFrom, Room room) = t;
                 if (coveredRooms.Contains(t))
@@ -1543,8 +1566,15 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             }
         } while (gettableItems.Count != previousGettableItems.Count);
 
+#if Z2R_DIAGNOSTICS
+        if (Diag.IsSample(call))
+            Diag.Trace("palace.bfs", $"event=end palace={Number} call={call} dequeues={dequeues} totalDequeues={itemBfsDequeues} "
+                + $"covered={coveredRooms.Select(state => state.Item2).Distinct(ReferenceEqualityComparer.Instance).Count()}/{AllRooms.Count} states={coveredRooms.Count} items=[{string.Join(",", gettableItemList)}] "
+                + $"itemRooms=[{string.Join(",", ItemRooms.Select(room => $"{room.Map}:{room.Collectable}:{reachedItemRooms.Contains(room)}"))}]");
+#endif
         return gettableItemList;
     }
+
     // The collectables present in this palace's item rooms, independent of reachability
     public List<Collectable> GetAllCollectables()
     {

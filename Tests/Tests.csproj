@@ -11,6 +11,7 @@
     <RootNamespace>Z2Randomizer.Tests</RootNamespace>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <LangVersion>default</LangVersion>
+    <DefineConstants Condition="'$(Z2RTrace)' == 'true'">Z2R_DIAGNOSTICS;$(DefineConstants)</DefineConstants>
     <Configurations>Debug;Release;Unsafe Debug</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">

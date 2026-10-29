@@ -14,6 +14,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Z2Randomizer.RandomizerCore.Diagnostics;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
@@ -102,10 +103,8 @@ public class Hyrule
     private static readonly Collectable[] spellItems = [Collectable.TROPHY, Collectable.MEDICINE, Collectable.CHILD, Collectable.MIRROR, Collectable.WATER];
 
 
-    //DEBUG/STATS
-#pragma warning disable CS0414 // Field is assigned but its value is never used
-    private static int DEBUG_THRESHOLD = 200;
-#pragma warning restore CS0414 // Field is assigned but its value is never used
+    // Statistics consumed by Statistics/Result.cs. Reachability failures are also
+    // reported by the compile-time-gated diagnostics inside IsEverythingReachable.
     public DateTime startTime = DateTime.Now;
     // public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime firstProcessOverworldTimestamp;
@@ -118,19 +117,10 @@ public class Hyrule
     public int totalDeathMountainGenerationAttempts = 0;
     public int isEverythingReachableFailures = 0;
 
-    public int itemGetReachableFailures = 0;
-    public int spellGetReachableFailures = 0;
-    public int heartContainerReachableFailures = 0;
-    public int magicContainerReachableFailures = 0;
-    public int logicallyRequiredLocationsReachableFailures = 0;
-
     public int timeSpentBuildingWest = 0;
     public int timeSpentBuildingEast = 0;
     public int timeSpentBuildingDM = 0;
     public int timeSpentBuildingMI = 0;
-
-    public int debug = 0;
-    public int totalReachableCheck = 0;
 
     public ROM ROMData { get; set; }
     public RandomizerCore.Random r { get; set; }
@@ -204,6 +194,14 @@ public class Hyrule
             bool shareSeedAcrossDifficulty = config.ShareSeedAcrossDifficulty;
             Random? difficultyRng = shareSeedAcrossDifficulty ? CreateDifficultyRng(config.Seed) : null;
 
+#if Z2R_DIAGNOSTICS
+            using var diagnostics = new Diag.Generation(r, difficultyRng);
+            lastReachabilityFailure = null;
+            consecutiveReachabilityFailures = 0;
+            reachabilityCalls = itemUpdateCalls = 0;
+            Diag.Trace("seed", $"event=begin seed={config.Seed} flags={config.SerializeFlags()}");
+            diagnostics.Stage("config");
+#endif
             config.CheckForFlagConflicts();
             props = config.Export(r, includeDifficulty: !shareSeedAcrossDifficulty);
             //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
@@ -226,6 +224,9 @@ public class Hyrule
             logger.Info($"Started generation for flags: {Flags} sharedseedflags: {sharedSeedFlags} seed: {config.Seed} seedhash: {SeedHash}");
             //character = new Character(props);
 
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("palaces");
+#endif
             palaces = [];
             GettableItems = new GettableItemSet.Builder()
                 .Excluding(
@@ -244,11 +245,21 @@ public class Hyrule
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
             HashSet<int> freeBanks = [];
-            if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
+            if (ct.IsCancellationRequested)
+            {
+                Diag.Trace("seed", "event=cancelled");
+                return new RandomizerResult(false);
+            }
             UpdateProgress(progress, ProgressEnum.GENERATING_PALACES);
 
+#if Z2R_DIAGNOSTICS
+            long palaceAttempts = 0;
+#endif
             while (palaces.Count != 7 || passedValidation == false)
             {
+#if Z2R_DIAGNOSTICS
+                Diag.Retry("palace.retry", ++palaceAttempts, $"event=begin count={palaces.Count} packed={passedValidation}");
+#endif
                 freeBanks = new(ROM.FreeRomBanks);
                 var palaceGenerator = new Palaces();
                 palaces = await palaceGenerator.CreatePalaces(r, props, palaceRooms, raftIsRequired, ct);
@@ -280,9 +291,13 @@ public class Hyrule
                 AsmModule sideviewModule = new();
                 passedValidation = await FillPalaceRooms(sideviewModule);
 
+                Diag.Trace("palace", $"event=packed count={palaces.Count} valid={passedValidation}");
                 assembler.Add(sideviewModule);
             }
 
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("drops");
+#endif
             ROMData.WriteKasutoJarAmount(props.NewKasutoBasementRequirement);
             ROMData.DoHackyFixes();
             ROMData.AdjustGpProjectileDamage();
@@ -307,12 +322,22 @@ public class Hyrule
 
             ShortenWizards();
 
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("overworld");
+#endif
             firstProcessOverworldTimestamp = DateTime.Now;
             await ProcessOverworld(progress, ct);
 
-            if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
+            if (ct.IsCancellationRequested)
+            {
+                Diag.Trace("seed", "event=cancelled");
+                return new RandomizerResult(false);
+            }
             UpdateProgress(progress, ProgressEnum.SHUFFLING_ENEMIES);
 
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("overworld-enemies");
+#endif
             if (props.ShuffleOverworldEnemies)
             {
                 // move a PRG1 background map to make space for more enemy data
@@ -350,9 +375,16 @@ public class Hyrule
                 ROMData.Put(0x17b19, 0x08); // give New Kasuto Basement access at start
             }
 
-            if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
+            if (ct.IsCancellationRequested)
+            {
+                Diag.Trace("seed", "event=cancelled");
+                return new RandomizerResult(false);
+            }
             UpdateProgress(progress, ProgressEnum.GENERATING_HINTS);
 
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("hints-stats");
+#endif
             List<Text> texts = CustomTexts.GenerateTexts(ItemLocations(), ROMData.GetGameText(), props, r);
             randomizedStats = new(ROMData, props);
             randomizedStats.Randomize(r, skipDifficultyOnly: shareSeedAcrossDifficulty);
@@ -360,6 +392,9 @@ public class Hyrule
             // Apply difficulty after shared randomization, then let ApplyAsmPatches see full
             // props. A second ApplyAsm pass would re-claim PRG4/PRG5 free space (js65 sees it
             // as fully free) and clobber first-pass code like the palace elevator routines.
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("difficulty");
+#endif
             byte[]? sharedRngState = null;
             if (shareSeedAcrossDifficulty)
             {
@@ -371,6 +406,9 @@ public class Hyrule
                 randomizedStats.RandomizeDifficultyOnly(difficultyRng!);
             }
 
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("customization");
+#endif
             randomizedStats.Write(ROMData);
 
             // ideally this should be calculated later, but custom music changes asm patches
@@ -394,17 +432,27 @@ public class Hyrule
             }
 
             UpdateProgress(progress, ProgressEnum.APPLYING_PATCHES);
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("patches");
+#endif
             ApplyAsmPatches(props, assembler, r, texts, ROMData, randomizedStats, startLocation!);
 
             UpdateProgress(progress, ProgressEnum.LINKING_ASSEMBLY);
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("link");
+#endif
             var rom = await ROMData.ApplyAsm(assembler);
             if (!rom.success)
             {
+                Diag.Block("seed", $"event=failed reason=link messages={string.Join(";", rom.messages)}");
                 return new RandomizerResult(false, null, null, string.Join(Environment.NewLine, rom.messages.Select(x => x.ToString())));
             }
             UpdateProgress(progress, ProgressEnum.FINISHING_UP);
             ROMData = new ROM(rom.romdata);
 
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("music");
+#endif
             if (randomizeMusic)
             {
                 string musicDir = "Music";
@@ -430,6 +478,7 @@ public class Hyrule
                 int triesLeft = 8;
                 while (!success)
                 {
+                    Diag.Trace("music.retry", $"attempt={9 - triesLeft}/8");
                     try
                     {
                         MusicRandomizer musicRnd = new(
@@ -456,8 +505,14 @@ public class Hyrule
                         logger.Debug(e, $"Song packing failed. {triesLeft} tries left.");
                     }
                 }
+#if Z2R_DIAGNOSTICS
+                Diag.Trace("rng", $"stage=music stream=music draws={musicRng.DrawCount} state={musicRng.GetState()}");
+#endif
             }
 
+#if Z2R_DIAGNOSTICS
+            diagnostics.Stage("finalize");
+#endif
             UpdateRom();
 
             byte[] z2Hash;
@@ -485,29 +540,14 @@ public class Hyrule
             }
             ROMData.Put(0x17C2C, z2Hash);
             Hash = Util.FromGameText(z2Hash);
+            Diag.Trace("seed", $"event=success seed={config.Seed} hash={Hash}");
 
-            /*
-            if (UNSAFE_DEBUG)
-            {
-                PrintDebugSpoiler(LogLevel.Error);
-                //DEBUG
-                StringBuilder sb = new();
-                foreach (Palace palace in palaces)
-                {
-                    sb.AppendLine("Palace: " + palace.Number);
-                    foreach (Room room in palace.AllRooms.OrderBy(i => i.Map))
-                    {
-                        sb.AppendLine(room.DebugString());
-                    }
-                    File.WriteAllText("rooms.log", sb.ToString());
-                }
-            }*/
             return new RandomizerResult(true, ROMData.rawdata, rom.mlbfile, string.Join(Environment.NewLine, rom.messages.Select(x => x.ToString())));
         }
         catch (Exception e)
         {
             logger.Error(e);
-            Debug.WriteLine(e.StackTrace);
+            Diag.Block("seed", $"event=exception {e}");
             throw;
         }
 
@@ -1249,8 +1289,8 @@ public class Hyrule
 
         if (itemsToShuffle.Count != possibleItemPlacements)
         {
-            itemShuffleLocations.ForEach(i => Debug.WriteLine($"{i.Name} - {i.GetShufflableCollectables().Count}"));
-            itemsToShuffle.ForEach(i => Debug.WriteLine($"{i}"));
+            Diag.Block("items", string.Join("\n", itemShuffleLocations.Select(i => $"location={i.Name} slots={i.GetShufflableCollectables().Count}")));
+            Diag.Trace("items", $"placements={possibleItemPlacements} items=[{string.Join(",", itemsToShuffle)}]");
             throw new Exception("Item locations must match number of items");
         }
 
@@ -1403,9 +1443,14 @@ public class Hyrule
         return true;
     }
 
+#if Z2R_DIAGNOSTICS
+    private string? lastReachabilityFailure;
+    private long consecutiveReachabilityFailures;
+    private long reachabilityCalls, itemUpdateCalls;
+#endif
+
     private bool IsEverythingReachable()
     {
-        totalReachableCheck++;
         int dm = 0;
         int mi = 0;
         int wh = 0;
@@ -1414,14 +1459,20 @@ public class Hyrule
         int previousReachableLocationsCount = 0;
         int gettableItemsCount = 1;
         int previousGettableItemsCount = 0;
-        debug++;
 
         int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count
             + deathMountain.AllLocations.Count + mazeIsland.AllLocations.Count;
-        //logger.Debug("Locations count: West-" + westHyrule.AllLocations.Count + " East-" + eastHyrule.AllLocations.Count +
-        //   " DM-" + deathMountain.AllLocations.Count + " MI-" + mazeIsland.AllLocations.Count + " Total-" + totalLocationsCount);
+#if Z2R_DIAGNOSTICS
+        long reachCall = ++reachabilityCalls;
+        long reachPasses = 0;
+#endif
         while (reachableLocationsCount != previousReachableLocationsCount || gettableItemsCount != previousGettableItemsCount)
         {
+#if Z2R_DIAGNOSTICS
+            reachPasses++;
+            if (Diag.IsSample(reachCall) || reachPasses >= 1000)
+                Diag.Retry("reach.loop", reachPasses, $"reachable={reachableLocationsCount} previous={previousReachableLocationsCount} items={gettableItemsCount} previousItems={previousGettableItemsCount}");
+#endif
             previousReachableLocationsCount = reachableLocationsCount;
             previousGettableItemsCount = gettableItemsCount;
             gettableItemsCount = UpdateGettableItems(props);
@@ -1475,36 +1526,24 @@ public class Hyrule
             dm = deathMountain.AllLocations.Count(i => i.Reachable);
             mi = mazeIsland.AllLocations.Count(i => i.Reachable);
             reachableLocationsCount = wh + eh + dm + mi;
-
-            //logger.Debug("Starting reachable main loop(" + loopCount++ + ". prevCount:" + prevCount + " count:" + count
-            //+ " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
         }
 
         if (GettableItems.TrackedItems.Any(item => !GettableItems[item]))
         {
-                itemGetReachableFailures++;
-//#if UNSAFE_DEBUG
-                if (reachableLocationsCount >= DEBUG_THRESHOLD)
-                {
-                    Debug.WriteLine("Failed on collectables");
-                    //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
-                    //Debug.WriteLine(GenerateSpoiler());
-                    //Debug.WriteLine(westHyrule.GetMapDebug());
-                    return false;
-                }
-//#endif
-                return false;
+            isEverythingReachableFailures++;
+            EmitReachabilityFailure("items", reachableLocationsCount, wh, eh, dm, mi);
+            return false;
         }
         if (accessibleMagicContainers != props.MaxMagicContainers)
         {
-            magicContainerReachableFailures++;
-            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+            isEverythingReachableFailures++;
+            EmitReachabilityFailure("magic", reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
         if (accessibleHeartContainers < props.MaxHearts)
         {
-            heartContainerReachableFailures++;
-            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+            isEverythingReachableFailures++;
+            EmitReachabilityFailure("hearts", reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
         if (accessibleHeartContainers > props.MaxHearts)
@@ -1512,39 +1551,86 @@ public class Hyrule
             throw new Exception("More hearts found than should exist in the seed.");
         }
 
-        bool retval =
+        bool requiredLocationsReachable =
             CanGet(westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
             && CanGet(eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
             && CanGet(deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
             && CanGet(mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto));
-        if (retval == false)
+        if (!requiredLocationsReachable)
         {
-            logicallyRequiredLocationsReachableFailures++;
-#if UNSAFE_DEBUG
-            List<Location> missingLocations =
-            [
-                .. westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
-                .. eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
-                .. mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
-            ];
-
-            List<Location> nonDmLocations = new(missingLocations);
-            missingLocations.AddRange(deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable));
-
-            Debug.WriteLine("Unreachable locations:");
-            Debug.WriteLine(string.Join("\n", missingLocations.Select(i => i.GetDebuggerDisplay())));
-
+            isEverythingReachableFailures++;
+            EmitReachabilityFailure("locations", reachableLocationsCount, wh, eh, dm, mi);
             return false;
-#endif
         }
 
-#if UNSAFE_DEBUG
-        if (retval)
-        {
-            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
-        }
+#if Z2R_DIAGNOSTICS
+        lastReachabilityFailure = null;
+        consecutiveReachabilityFailures = 0;
 #endif
-        return retval;
+        Diag.Trace("reach", $"event=success reachable={reachableLocationsCount}/{totalLocationsCount}");
+        return true;
+    }
+
+    /// <summary>
+    /// Emits why <see cref="IsEverythingReachable"/> failed as a failure reason plus
+    /// the routing snapshot that used to sit behind a reachability threshold.
+    /// Compiled out (call site and all LINQ arguments removed) unless
+    /// <c>Z2R_DIAGNOSTICS</c> is defined.
+    /// </summary>
+    [Conditional("Z2R_DIAGNOSTICS")]
+    private void EmitReachabilityFailure(string failureClass, int reachableLocations, int wh, int eh, int dm, int mi)
+    {
+#if Z2R_DIAGNOSTICS
+        if (lastReachabilityFailure != failureClass)
+        {
+            lastReachabilityFailure = failureClass;
+            consecutiveReachabilityFailures = 0;
+        }
+        if (!Diag.IsSample(++consecutiveReachabilityFailures)) return;
+        Diag.Trace("reach", $"failed class={failureClass} consecutive={consecutiveReachabilityFailures} attempt={isEverythingReachableFailures} "
+            + $"reachable={reachableLocations} "
+            + $"wh={wh}/{westHyrule.AllLocations.Count} "
+            + $"eh={eh}/{eastHyrule.AllLocations.Count} "
+            + $"dm={dm}/{deathMountain.AllLocations.Count} "
+            + $"mi={mi}/{mazeIsland.AllLocations.Count} "
+            + $"hearts={accessibleHeartContainers}/{props.MaxHearts} magic={accessibleMagicContainers}/{props.MaxMagicContainers}");
+
+        foreach (Collectable item in GettableItems.TrackedItems.Where(i => !GettableItems[i] && !i.IsMinorItem()))
+        {
+            Diag.Trace("reach", $"ungotten {item}");
+        }
+
+        foreach (Location location in ItemLocations()
+            .Where(l => l.GetAllCollectables().Any(i => !i.IsMinorItem() && !GettableItems[i])))
+        {
+            string palace = location.Palace is null ? string.Empty : $"({location.Palace.Number})";
+            Diag.Trace("reach", $"held-by {location.Name}{palace} "
+                + $"[{string.Join(", ", location.GetAllCollectables().Where(i => !i.IsMinorItem() && !GettableItems[i]))}]");
+        }
+
+        foreach (Location location in ItemLocations().Where(l => !l.Reachable))
+        {
+            Diag.Trace("reach", $"unreachable-item-location {location.Name}");
+        }
+        if (failureClass == "locations") EmitUnreachableRequiredLocations();
+#endif
+    }
+
+    [Conditional("Z2R_DIAGNOSTICS")]
+    private void EmitUnreachableRequiredLocations()
+    {
+        IEnumerable<Location> requiredLocations =
+        [
+            .. westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto),
+            .. eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto),
+            .. mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto),
+            .. deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto),
+        ];
+
+        foreach (Location location in requiredLocations.Where(l => !l.Reachable))
+        {
+            Diag.Trace("reach", $"unreachable-required {location.GetDebuggerDisplay()}");
+        }
     }
 
     private bool CanGet(IEnumerable<Location> locations)
@@ -1607,8 +1693,17 @@ public class Hyrule
         bool stalled = false;
         //No more delayed evaluation because too many locations could give you containers or require containers.
         //Just iterate until we find as many items as possible
+#if Z2R_DIAGNOSTICS
+        long itemCall = ++itemUpdateCalls;
+        long itemPasses = 0;
+#endif
         do
         {
+#if Z2R_DIAGNOSTICS
+            itemPasses++;
+            if (Diag.IsSample(itemCall) || itemPasses >= 1000)
+                Diag.Retry("items.loop", itemPasses, $"event=begin previousItems={lastIterationGottenItems.Count}");
+#endif
             accessibleHeartContainers = props.StartHearts + heartContainerGetLocations.Count;
             accessibleMagicContainers = props.StartMagicContainers + magicContainerGetLocations.Count;
             requireables = GetRequireables(props);
@@ -1694,11 +1789,13 @@ public class Hyrule
         do //while (!EverythingReachable()) ;
         {
             totalReachabilityOverworldAttempts++;
+            Diag.Retry("overworld.retry", totalReachabilityOverworldAttempts, "event=begin loop=outer");
 
             //Generate a pathable set of continents
             do // } while (!AllContinentsHaveConnection(worlds));
             {
                 totalContinentConnectionOverworldAttempts++;
+                Diag.Retry("overworld.connections", totalContinentConnectionOverworldAttempts, $"event=begin outer={totalReachabilityOverworldAttempts}");
                 worlds = new List<World>();
                 westHyrule = new WestHyrule(props, r, ROMData);
                 deathMountain = new DeathMountain(props, r, ROMData);
@@ -1786,6 +1883,9 @@ public class Hyrule
                     }
 
                     int raftw1 = r.Next(worlds.Count);
+#if Z2R_DIAGNOSTICS
+                    long raftw1Attempts = 0;
+#endif
 
                     if (props.WestBiome.UsesVanillaMap())
                     {
@@ -1795,11 +1895,17 @@ public class Hyrule
                     {
                         while (doNotPick.Contains(raftw1))
                         {
+#if Z2R_DIAGNOSTICS
+                            Diag.Retry("overworld.connector", ++raftw1Attempts, $"connector=raftw1 current={raftw1} excluded=[{string.Join(",", doNotPick)}]");
+#endif
                             raftw1 = r.Next(worlds.Count);
                         }
                     }
 
                     int raftw2 = r.Next(worlds.Count);
+#if Z2R_DIAGNOSTICS
+                    long raftw2Attempts = 0;
+#endif
                     if (props.EastBiome.UsesVanillaMap())
                     {
                         raftw2 = 2;
@@ -1808,6 +1914,9 @@ public class Hyrule
                     {
                         do
                         {
+#if Z2R_DIAGNOSTICS
+                            Diag.Retry("overworld.connector", ++raftw2Attempts, $"connector=raftw2 current={raftw2} other={raftw1} excluded=[{string.Join(",", doNotPick)}]");
+#endif
                             raftw2 = r.Next(worlds.Count);
                         } while (raftw1 == raftw2 || doNotPick.Contains(raftw2));
                     }
@@ -1817,6 +1926,9 @@ public class Hyrule
                     connections[0] = (l1, l2);
 
                     int bridgew1 = r.Next(worlds.Count);
+#if Z2R_DIAGNOSTICS
+                    long bridgew1Attempts = 0;
+#endif
                     if (props.EastBiome.UsesVanillaMap())
                     {
                         bridgew1 = 2;
@@ -1825,10 +1937,16 @@ public class Hyrule
                     {
                         while (doNotPick.Contains(bridgew1))
                         {
+#if Z2R_DIAGNOSTICS
+                            Diag.Retry("overworld.connector", ++bridgew1Attempts, $"connector=bridgew1 current={bridgew1} excluded=[{string.Join(",", doNotPick)}]");
+#endif
                             bridgew1 = r.Next(worlds.Count);
                         }
                     }
                     int bridgew2 = r.Next(worlds.Count);
+#if Z2R_DIAGNOSTICS
+                    long bridgew2Attempts = 0;
+#endif
                     if (props.MazeBiome.UsesVanillaMap())
                     {
                         bridgew2 = 3;
@@ -1837,6 +1955,9 @@ public class Hyrule
                     {
                         do
                         {
+#if Z2R_DIAGNOSTICS
+                            Diag.Retry("overworld.connector", ++bridgew2Attempts, $"connector=bridgew2 current={bridgew2} other={bridgew1} excluded=[{string.Join(",", doNotPick)}]");
+#endif
                             bridgew2 = r.Next(worlds.Count);
                         } while (bridgew1 == bridgew2 || doNotPick.Contains(bridgew2));
                     }
@@ -1846,6 +1967,9 @@ public class Hyrule
                     connections[1] = (l1, l2);
 
                     int c1w1 = r.Next(worlds.Count);
+#if Z2R_DIAGNOSTICS
+                    long c1w1Attempts = 0;
+#endif
                     if (props.WestBiome.UsesVanillaMap())
                     {
                         c1w1 = 0;
@@ -1854,10 +1978,16 @@ public class Hyrule
                     {
                         while (doNotPick.Contains(c1w1))
                         {
+#if Z2R_DIAGNOSTICS
+                            Diag.Retry("overworld.connector", ++c1w1Attempts, $"connector=c1w1 current={c1w1} excluded=[{string.Join(",", doNotPick)}]");
+#endif
                             c1w1 = r.Next(worlds.Count);
                         }
                     }
                     int c1w2 = r.Next(worlds.Count);
+#if Z2R_DIAGNOSTICS
+                    long c1w2Attempts = 0;
+#endif
                     if (props.DmBiome.UsesVanillaMap())
                     {
                         c1w2 = 1;
@@ -1866,6 +1996,9 @@ public class Hyrule
                     {
                         do
                         {
+#if Z2R_DIAGNOSTICS
+                            Diag.Retry("overworld.connector", ++c1w2Attempts, $"connector=c1w2 current={c1w2} other={c1w1} excluded=[{string.Join(",", doNotPick)}]");
+#endif
                             c1w2 = r.Next(worlds.Count);
                         } while (c1w1 == c1w2 || doNotPick.Contains(c1w2));
                     }
@@ -1875,6 +2008,9 @@ public class Hyrule
                     connections[2] = (l1, l2);
 
                     int c2w1 = r.Next(worlds.Count);
+#if Z2R_DIAGNOSTICS
+                    long c2w1Attempts = 0;
+#endif
                     if (props.WestBiome.UsesVanillaMap())
                     {
                         c2w1 = 0;
@@ -1883,10 +2019,16 @@ public class Hyrule
                     {
                         while (doNotPick.Contains(c2w1))
                         {
+#if Z2R_DIAGNOSTICS
+                            Diag.Retry("overworld.connector", ++c2w1Attempts, $"connector=c2w1 current={c2w1} excluded=[{string.Join(",", doNotPick)}]");
+#endif
                             c2w1 = r.Next(worlds.Count);
                         }
                     }
                     int c2w2 = r.Next(worlds.Count);
+#if Z2R_DIAGNOSTICS
+                    long c2w2Attempts = 0;
+#endif
                     if (props.DmBiome.UsesVanillaMap())
                     {
                         c2w2 = 1;
@@ -1895,6 +2037,9 @@ public class Hyrule
                     {
                         do
                         {
+#if Z2R_DIAGNOSTICS
+                            Diag.Retry("overworld.connector", ++c2w2Attempts, $"connector=c2w2 current={c2w2} other={c2w1} excluded=[{string.Join(",", doNotPick)}]");
+#endif
                             c2w2 = r.Next(worlds.Count);
                         } while (c2w1 == c2w2 || doNotPick.Contains(c2w2));
                     }
@@ -1920,81 +2065,116 @@ public class Hyrule
             do //while (wtries < 10 && !EverythingReachable());
             {
                 //GENERATE WEST
-                if (ct.IsCancellationRequested) { return; }
+                if (ct.IsCancellationRequested) 
+                {
+                    Diag.Trace("seed", "event=cancelled");
+                    return;
+                }
                 UpdateProgress(progress, ProgressEnum.GENERATING_WEST_HYRULE);
                 nonContinentGenerationAttempts++;
+                Diag.Retry("overworld.terrain", nonContinentGenerationAttempts,
+                    $"outer={totalReachabilityOverworldAttempts} limit={NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT} "
+                    + $"west={westHyrule.AllReached} east={eastHyrule.AllReached} dm={deathMountain.AllReached} maze={mazeIsland.AllReached}");
                 timestamp = DateTime.Now;
                 if (!westHyrule.AllReached)
                 {
+                    Diag.Trace("terrain", $"event=begin world=westHyrule attempts={totalWestGenerationAttempts}");
                     while (!westHyrule.Terraform(props, ROMData))
                     {
+                        Diag.Retry("terrain.retry", totalWestGenerationAttempts + 1, $"world=westHyrule limit={TERRAIN_GENERATION_ATTEMPT_LIMIT}");
                         if (++totalWestGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
                         {
                             throw new Exception("Failed to generate West Continent");
                         }
                     }
                     totalWestGenerationAttempts++;
+                    Diag.Trace("terrain", $"event=end world=westHyrule attempts={totalWestGenerationAttempts}");
                 }
                 westHyrule.ResetVisitabilityState();
                 timeSpentBuildingWest += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE DM
-                if (ct.IsCancellationRequested) { return; }
+                if (ct.IsCancellationRequested)
+                {
+                    Diag.Trace("seed", "event=cancelled");
+                    return;
+                }
                 UpdateProgress(progress, ProgressEnum.GENERATING_DEATH_MOUNTAIN);
                 timestamp = DateTime.Now;
                 if (!deathMountain.AllReached)
                 {
+                    Diag.Trace("terrain", $"event=begin world=deathMountain attempts={totalDeathMountainGenerationAttempts}");
                     while (!deathMountain.Terraform(props, ROMData))
                     {
+                        Diag.Retry("terrain.retry", totalDeathMountainGenerationAttempts + 1, $"world=deathMountain limit={TERRAIN_GENERATION_ATTEMPT_LIMIT}");
                         if (++totalDeathMountainGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
                         {
                             throw new Exception("Failed to generate Death Mountain");
                         }
                     }
                     totalDeathMountainGenerationAttempts++;
+                    Diag.Trace("terrain", $"event=end world=deathMountain attempts={totalDeathMountainGenerationAttempts}");
                 }
                 deathMountain.ResetVisitabilityState();
                 timeSpentBuildingDM += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE EAST
-                if (ct.IsCancellationRequested) { return; }
+                if (ct.IsCancellationRequested)
+                {
+                    Diag.Trace("seed", "event=cancelled");
+                    return;
+                }
                 UpdateProgress(progress, ProgressEnum.GENERATING_EAST_HYRULE);
                 timestamp = DateTime.Now;
                 if (!eastHyrule.AllReached)
                 {
+                    Diag.Trace("terrain", $"event=begin world=eastHyrule attempts={totalEastGenerationAttempts}");
                     while (!eastHyrule.Terraform(props, ROMData))
                     {
+                        Diag.Retry("terrain.retry", totalEastGenerationAttempts + 1, $"world=eastHyrule limit={TERRAIN_GENERATION_ATTEMPT_LIMIT}");
                         if (++totalEastGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
                         {
                             throw new Exception("Failed to generate East Continent");
                         }
                     }
                     totalEastGenerationAttempts++;
+                    Diag.Trace("terrain", $"event=end world=eastHyrule attempts={totalEastGenerationAttempts}");
                 }
                 eastHyrule.ResetVisitabilityState();
                 timeSpentBuildingEast += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE MAZE ISLAND
-                if (ct.IsCancellationRequested) { return; }
+                if (ct.IsCancellationRequested)
+                {
+                    Diag.Trace("seed", "event=cancelled");
+                    return;
+                }
                 UpdateProgress(progress, ProgressEnum.GENERATING_MAZE_ISLAND);
                 timestamp = DateTime.Now;
                 if (!mazeIsland.AllReached)
                 {
+                    Diag.Trace("terrain", $"event=begin world=mazeIsland attempts={totalMazeIslandGenerationAttempts}");
                     while (!mazeIsland.Terraform(props, ROMData))
                     {
+                        Diag.Retry("terrain.retry", totalMazeIslandGenerationAttempts + 1, $"world=mazeIsland limit={TERRAIN_GENERATION_ATTEMPT_LIMIT}");
                         if (++totalMazeIslandGenerationAttempts == TERRAIN_GENERATION_ATTEMPT_LIMIT)
                         {
                             throw new Exception("Failed to generate Maze Island");
                         }
                     }
                     totalMazeIslandGenerationAttempts++;
+                    Diag.Trace("terrain", $"event=end world=mazeIsland attempts={totalMazeIslandGenerationAttempts}");
                 }
                 mazeIsland.ResetVisitabilityState();
                 timeSpentBuildingMI += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 worlds.Where(i => i.biome == Biome.VANILLA_SHUFFLE).ToList().ForEach(i => i.DisableDisallowedPassthroughs());
 
-                if (ct.IsCancellationRequested) { return; }
+                if (ct.IsCancellationRequested)
+                {
+                    Diag.Trace("seed", "event=cancelled");
+                    return;
+                }
                 UpdateProgress(progress, ProgressEnum.SHUFFLING_ITEMS_AND_SPELLS);
 
                 //Then perform non-terrain shuffles looking for one that works.
@@ -2024,7 +2204,6 @@ public class Hyrule
                     worlds.ForEach(i => i.ResetCollectables(props));
 
                     ShuffleItems();
-                    //Debug.WriteLine(GenerateSpoiler());
 
                     westHyrule.UpdateAllReached();
                     eastHyrule.UpdateAllReached();
@@ -2033,6 +2212,8 @@ public class Hyrule
                     deathMountain.UpdateAllReached();
 
                     nonTerrainShuffleAttempt++;
+                    Diag.Retry("overworld.items", nonTerrainShuffleAttempt,
+                        $"outer={totalReachabilityOverworldAttempts} terrain={nonContinentGenerationAttempts} limit={NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT}");
                 } while (nonTerrainShuffleAttempt < NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT && !IsEverythingReachable());
 
                 if (nonTerrainShuffleAttempt != NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT)
@@ -2880,62 +3061,6 @@ public class Hyrule
         }
     }
 
-    public void PrintDebugSpoiler(LogLevel logLevel)
-    {
-        //I didn't want to port this and we mostly use spoiler log for this now anyway so maybe this just dies.
-        throw new NotImplementedException();
-        /*
-        logger.Log(logLevel, "ITEMS:");
-        List<string> magicContainerLocations = [];
-        List<string> heartContainerLocations = [];
-
-        StringBuilder sb = new();
-
-        foreach (Collectable item in Enum.GetValues(typeof(Collectable)))
-        {
-            if (item.IsItemGetItem() && ItemGet.ContainsKey(item))
-            {
-                Location? location = AllLocationsForReal().Where(i => i.Collectables.Contains(item)).FirstOrDefault();
-                sb.AppendLine(item.ToString() + "(" + ItemGet[item] + ") : " + location?.Name);
-            }
-        }
-        foreach(Location location in AllLocationsForReal())
-        {
-            for(int i = 0; i < location.Collectables.Count; i++)
-            {
-                if (location.Collectables[i] == Collectable.HEART_CONTAINER)
-                {
-                    string locationName = location.Name;
-                    if(location.Collectables.Count > 1)
-                    {
-                        locationName += $"[{i}]";
-                    }
-                    heartContainerLocations.Add(locationName);
-                }
-                if (location.Collectables[i] == Collectable.MAGIC_CONTAINER)
-                {
-                    string locationName = location.Name;
-                    if (location.Collectables.Count > 1)
-                    {
-                        locationName += $"[{i}]";
-                    }
-                    magicContainerLocations.Add(locationName);
-                }
-            }
-
-        }
-        foreach (string locationName in heartContainerLocations)
-        {
-            sb.AppendLine(locationName);
-        }
-        foreach (string locationName in magicContainerLocations)
-        {
-            sb.AppendLine(locationName);
-        }
-        logger.Log(logLevel, sb.ToString());
-        */
-    }
-
     public string GenerateSpoiler()
     {
         StringBuilder sb = new StringBuilder();
@@ -3081,55 +3206,6 @@ CustomFileSelectData:
         return possibleItemLocations;
     }
 
-    /*
-    public void PrintRoutingDebug(int count, int wh, int eh, int dm, int mi)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("Number: " + debug);
-        sb.AppendLine("Reached: " + count);
-        sb.AppendLine("wh: " + wh + " / " + westHyrule.AllLocations.Count);
-        sb.AppendLine("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
-        sb.AppendLine("dm: " + dm + " / " + deathMountain.AllLocations.Count);
-        sb.AppendLine("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
-        sb.AppendLine();
-
-        sb.AppendLine("Missing Items:");
-        //Where(i => !i.ItemGet && !i.Collectable.IsInternalUse()
-        bool itemWasUnreachable = false, itemWasMissing = false;
-        foreach (Location location in ItemLocations().Where(l => l.GetAllCollectables().Any(i => !i.IsMinorItem() && !ItemGet[i])))
-        {
-            string name = location.Name + (location.Palace == null ? String.Empty : $"({location?.Palace?.Number})");
-            sb.AppendLine($"{name} / [{String.Join(", ", location!.GetAllCollectables()
-                .Where(i => !i.IsMinorItem() && !ItemGet[i])
-                .Select(i => Enum.GetName(i)))}]");
-            itemWasUnreachable = true;
-        }
-
-        if (!itemWasUnreachable)
-        {
-            sb.AppendLine("One or more items were in ItemGet but in no location!");
-            foreach (Collectable missingItem in ItemGet.Keys.Where(i => ItemGet[i] == false && !i.IsMinorItem()))
-            {
-                sb.AppendLine(missingItem.ToString());
-                itemWasMissing = true;
-            }
-            //Debug.WriteLine(GenerateSpoiler());
-        }
-
-        if (!itemWasMissing)
-        {
-            sb.AppendLine("Missing Non-Item locations (this should have been caught by ValidateBasicRouting!");
-            foreach (Location location in ItemLocations().Where(l => !l.Reachable))
-            {
-                sb.AppendLine(location.Name);
-            }
-        }
-        sb.AppendLine();
-
-
-        logger.Error(sb.ToString());
-    }
-    */
 
     private bool IsRaftAlwaysRequired(RandomizerProperties props)
     {

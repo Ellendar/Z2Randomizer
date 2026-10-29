@@ -353,7 +353,6 @@ sealed class DeathMountain : World
 
                     randomTerrainFilter.Remove(Terrain.SWAMP);
                     DrawCanyon(riverT);
-                    //Debug.WriteLine(GetMapDebug());
                     walkableTerrains.Remove(Terrain.MOUNTAIN);
 
                     randomTerrainFilter.Remove(Terrain.SWAMP);
@@ -499,13 +498,11 @@ sealed class DeathMountain : World
                     dmOpennessFactor *= 2;
                 }
                 growthClimate.ApplyDeathMountainSafety(randomTerrainFilter, dmOpennessFactor);
-                //Debug.WriteLine(GetMapDebug());
                 if (!GrowTerrain(growthClimate))
                 {
                     logger.LogDebug("GrowTerrain failed");
                     return false;
                 }
-                //Debug.WriteLine(GetMapDebug());
                 if (biome == Biome.CALDERA)
                 {
                     bool f = MakeCaldera(props.CanWalkOnWaterWithBoots);

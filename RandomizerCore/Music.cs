@@ -1,3 +1,4 @@
+using Z2Randomizer.RandomizerCore.Diagnostics;
 ﻿#nullable enable
 
 using FtRandoLib.Importer;
@@ -254,9 +255,7 @@ internal class MusicRandomizer
 
     void WriteLogLine(string? line)
     {
-#if DEBUG
-        Console.WriteLine(line);
-#endif
+        Diag.Block("music", line ?? string.Empty);
         _spoilerSb.AppendLine(line);
     }
 
