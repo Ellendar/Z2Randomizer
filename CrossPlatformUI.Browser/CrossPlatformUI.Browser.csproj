@@ -5,6 +5,8 @@
         <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
         <WasmMainJSPath>wwwroot\main.js</WasmMainJSPath>
         <WasmRuntimeAssetsLocation>./_framework</WasmRuntimeAssetsLocation>
+        <!-- Link native dependencies even when managed AOT compilation is disabled. -->
+        <WasmBuildNative>true</WasmBuildNative>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <InvariantGlobalization>true</InvariantGlobalization>
 
