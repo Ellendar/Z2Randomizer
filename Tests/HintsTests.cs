@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Z2Randomizer.RandomizerCore;
 
-namespace Tests;
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class HintsTests

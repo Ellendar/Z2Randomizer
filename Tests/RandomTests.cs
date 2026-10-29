@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Random = Z2Randomizer.RandomizerCore.Random;
 
-namespace Tests;
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class RandomTests

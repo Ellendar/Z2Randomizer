@@ -75,14 +75,15 @@ public class DiagnosticsTests
         palace.Entrance = entrance;
         palace.AllRooms.AddRange([entrance, item]);
         palace.ItemRooms.Add(item);
+        var props = new RandomizerProperties { KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY };
         using var output = new StringWriter();
         TextWriter original = Console.Error;
         try
         {
             Console.SetError(output);
             palace.CanReachAnItemRoom(new HashSet<RequirementType>()).Should().BeFalse();
-            palace.GetGettableItems(new HashSet<RequirementType>(), false).Should().BeEmpty();
-            palace.GetGettableItems(new HashSet<RequirementType> { RequirementType.GLOVE }, false)
+            palace.GetGettableItems(props, new HashSet<RequirementType>(), false).Should().BeEmpty();
+            palace.GetGettableItems(props, new HashSet<RequirementType> { RequirementType.GLOVE }, false)
                 .Should().Equal(Collectable.RAFT);
         }
         finally { Console.SetError(original); }
@@ -102,7 +103,7 @@ public class DiagnosticsTests
         const BindingFlags instance = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
         typeof(Random).GetProperty("DrawCount", instance).Should().Match<PropertyInfo?>(p => (p != null) == Enabled);
         typeof(Palace).GetField("itemBfsCalls", instance).Should().Match<FieldInfo?>(f => (f != null) == Enabled);
-        typeof(Hyrule).GetField("consecutiveReachabilityFailures", instance).Should().Match<FieldInfo?>(f => (f != null) == Enabled);
+        typeof(ReachabilitySimulation).GetField("consecutiveReachabilityFailures", instance).Should().Match<FieldInfo?>(f => (f != null) == Enabled);
         typeof(Diag).GetNestedType("Generation", BindingFlags.NonPublic).Should().Match<Type?>(t => (t != null) == Enabled);
     }
 

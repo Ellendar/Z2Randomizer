@@ -111,6 +111,9 @@ public readonly struct IntVector2 : IEquatable<IntVector2>
     public double Distance(IntVector2 other)
         => Math.Sqrt(DistanceSquared(other));
 
+    internal bool IsWithinBounds(int width, int height, int margin = 0)
+        => X >= margin && X < width - margin && Y >= margin && Y < height - margin;
+
     public int ManhattanDistance(IntVector2 other)
         => Math.Abs(X - other.X) + Math.Abs(Y - other.Y);
 

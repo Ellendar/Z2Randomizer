@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using Z2Randomizer.RandomizerCore.Enemy;
@@ -15,40 +15,24 @@ sealed class MazeIsland : World
     public static readonly int[] OverworldSmallEnemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x16];
     public static readonly int[] OverworldLargeEnemies = [0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
 
-    private readonly SortedDictionary<LocationID, Terrain> terrains = new()
-    {
-        { LocationID.MI_TRAP1, Terrain.ROAD },
-        { LocationID.MI_TRAP2, Terrain.ROAD },
-        { LocationID.MI_MAGIC_CONTAINER_DROP, Terrain.ROAD },
-        { LocationID.MI_CONNECTOR_BRIDGE, Terrain.BRIDGE },
-        { LocationID.MI_PALACE4, Terrain.PALACE },
-        { LocationID.MI_CHILD_DROP, Terrain.ROAD },
-        { LocationID.MI_TRAP3, Terrain.ROAD },
-        { LocationID.MI_TRAP4, Terrain.ROAD },
-        { LocationID.MI_TRAP5, Terrain.ROAD },
-        { LocationID.MI_TRAP6, Terrain.ROAD },
-        { LocationID.MI_TRAP7, Terrain.ROAD },
-    };
 
     public Location childDrop;
     public Location magicContainerDrop;
     public Location locationAtPalace4;
 
-    private const int MAP_ADDR = 0xba00;
 
-
-    public MazeIsland(RandomizerProperties props, Random r, ROM rom) : base(r)
+    public MazeIsland(RandomizerProperties props, Random r, ROM rom) : base(r, RomMap.MI_MAP_OFFSET)
     {
         List<Location> trapLocations = [
-            .. rom.LoadLocations(LocationID.MI_TRAP1, 2, terrains),
-            .. rom.LoadLocations(LocationID.MI_TRAP3, 5, terrains),
+            .. rom.LoadLocations(LocationID.MI_TRAP1, 2),
+            .. rom.LoadLocations(LocationID.MI_TRAP3, 5),
         ];
 
         List<Location> locations =
         [
-            .. rom.LoadLocations(LocationID.MI_MAGIC_CONTAINER_DROP, 1, terrains),
-            .. rom.LoadLocations(LocationID.MI_PALACE4, 1, terrains),
-            .. rom.LoadLocations(LocationID.MI_CHILD_DROP, 1, terrains),
+            .. rom.LoadLocations(LocationID.MI_MAGIC_CONTAINER_DROP, 1),
+            .. rom.LoadLocations(LocationID.MI_PALACE4, 1),
+            .. rom.LoadLocations(LocationID.MI_CHILD_DROP, 1),
             .. trapLocations,
         ];
         locations.ForEach(AddLocation);
@@ -77,7 +61,7 @@ sealed class MazeIsland : World
         locationAtPalace4 = GetLocation(LocationID.MI_PALACE4);
 
         continentId = Continent.MAZE;
-        baseAddr = RomMap.ContinentLocationBases[continentId];
+        baseAddr = RomMap.MI_LOCATIONS_BASE;
         VANILLA_MAP_ADDR = 0xa65c;
 
         biome = props.MazeBiome;
@@ -109,352 +93,319 @@ sealed class MazeIsland : World
                 trapLocations.Remove(removeLoc);
             }
         }
-        //SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
     {
+        using var candidate = BeginTerrainCandidate(rom);
+        EncodedWorldMap? encodedMap;
         if (biome.UsesVanillaMap())
         {
-            Debug.Assert(MapRows == 75);
-            Debug.Assert(MapColumns == 64);
-            map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
-            if (biome == Biome.VANILLA_SHUFFLE)
-            {
-                ShuffleLocations(AllLocations);
-                if (!props.LegacyVanillaShuffledLocations)
-                {
-                    foreach (Location location in AllLocations)
-                    {
-                        map[location.Y, location.Xpos] = location.TerrainType;
-                        location.IsPassthrough = true;
-                    }
-                }
-            }
+            LoadAndShuffleVanillaMap(rom, props.LegacyVanillaShuffledLocations);
+            encodedMap = EncodeTerrainMap();
         }
-        else
+        else // Generate biome terrain
         {
-            int bytesWritten = 2000;
-            foreach (Location location in AllLocations)
+            if (!TryGenerateMazeMap(out encodedMap))
             {
-                location.CanShuffle = true;
-                location.IsPassthrough = location.WasPassthrough;
-                location.ResetCoords(biome.UsesVanillaMap());
-            }
-            while (bytesWritten > MAP_SIZE_BYTES)
-            {
-                map = new OverworldMap(MapRows, 64);
-                bool[,] visited = new bool[MapRows, MapColumns];
-                List<Location> placedLocations = new();
-
-                // create walkable water border
-                for (int x = 0; x < MapColumns; x++)
-                {
-                    IntVector2 top = new(x, 0);
-                    map[top] = Terrain.WALKABLEWATER;
-                    visited[top.Y, top.X] = true;
-                    IntVector2 bottom = new(x, MapRows - 1);
-                    map[bottom] = Terrain.WALKABLEWATER;
-                    visited[bottom.Y, bottom.X] = true;
-                }
-                for (int y = 0; y < MapRows; y++)
-                {
-                    IntVector2 left = new(0, y);
-                    map[left] = Terrain.WALKABLEWATER;
-                    visited[left.Y, left.X] = true;
-                    IntVector2 right = new(MapColumns - 1, y);
-                    map[right] = Terrain.WALKABLEWATER;
-                    visited[right.Y, left.X] = true;
-                }
-
-                // fill non-walkable water to the right of the island water border
-                for (int y = 0; y < MapRows; y++)
-                {
-                    for (int x = MapColumns; x < 64; x++)
-                    {
-                        map[y, x] = Terrain.WATER;
-                    }
-                }
-
-                // fill every other row with mountain
-                for (int y = 1; y < MapRows - 1; y += 2)
-                {
-                    for (int x = 1; x < MapColumns - 1; x++)
-                    {
-                        map[y, x] = Terrain.MOUNTAIN;
-                    }
-                }
-
-                // fill every other column with mountain
-                for (int x = 1; x < MapColumns; x += 2)
-                {
-                    for (int y = 1; y < MapRows - 1; y++)
-                    {
-                        map[y, x] = Terrain.MOUNTAIN;
-                    }
-                }
-
-                for (int y = 1; y < MapRows; y++)
-                {
-                    for (int x = 1; x < MapColumns; x++)
-                    {
-                        if (map[y, x] != Terrain.MOUNTAIN && map[y, x] != Terrain.WATER && map[y, x] != Terrain.WALKABLEWATER)
-                        {
-                            map[y, x] = Terrain.ROAD;
-                            visited[y, x] = false;
-                        }
-                        else
-                        {
-                            visited[y, x] = true;
-                        }
-                    }
-                }
-
-                //choose starting Y position
-                int starty = RNG.Next(2, MapRows - 1);
-                if (starty % 2 == 1)
-                {
-                    starty--;
-                }
-
-                //generate maze
-                IntVector2 current = new(2, starty);
-                Stack<IntVector2> stack = new();
-                bool canPlaceCave = true;
-                while (MoreToVisit(visited))
-                {
-                    var neighbors = GetPositionsTwoTilesAway(current, visited, RNG).ToArray();
-                    RNG.Shuffle(neighbors);
-                    if (neighbors.Length > 0)
-                    {
-                        canPlaceCave = true;
-                        var next = neighbors[RNG.Next(neighbors.Length)];
-                        stack.Push(next);
-                        var delta = (next - current) / 2; // neighbors are all 2 tiles away
-                        map[current + delta] = Terrain.ROAD;
-                        current = next;
-                        visited[current.Y, current.X] = true;
-                    }
-                    else if (stack.Count > 0)
-                    {
-                        if (cave1 != null && cave1.CanShuffle && GetLocationAt(current) == null)
-                        {
-                            map[current] = Terrain.CAVE;
-                            cave1.Pos = current;
-                            cave1.CanShuffle = false;
-                            canPlaceCave = false;
-                            SealDeadEnd(current, RNG);
-                            placedLocations.Add(cave1);
-                        }
-                        else if (cave2 != null && cave2.CanShuffle && GetLocationAt(current) == null && canPlaceCave)
-                        {
-                            map[current] = Terrain.CAVE;
-                            cave2.Pos = current;
-                            cave2.CanShuffle = false;
-                            SealDeadEnd(current, RNG);
-                            placedLocations.Add(cave2);
-                        }
-                        current = stack.Pop();
-                    }
-                }
-
-                //place palace 4
-                bool canPlace = false;
-                IntVector2 palace4Pos;
-                do
-                {
-                    palace4Pos = IntVector2.Random(RNG, 3, MapColumns - 4, 3, MapRows - 4);
-                    if (palace4Pos.X % 2 == 0) { palace4Pos += IntVector2.EAST; }
-                    if (palace4Pos.Y % 2 == 0) { palace4Pos += IntVector2.SOUTH; }
-                    canPlace = true;
-                    if (LocationsIn3x3Area(palace4Pos).Any())
-                    {
-                        canPlace = false;
-                    }
-                } while (!canPlace);
-                locationAtPalace4.Pos = palace4Pos;
-                map[palace4Pos] = Terrain.PALACE;
-                foreach (var dir in IntVector2.DIRECTIONS)
-                {
-                    map[palace4Pos + dir] = Terrain.ROAD;
-                }
-                placedLocations.Add(locationAtPalace4);
-
-                //draw a river
-                bool openWest, openEast;
-                do
-                {
-                    openWest = RNG.Next(2) == 1;
-                    openEast = RNG.Next(2) == 1;
-                } while (!openWest && !openEast);
-
-                int riverEndX = MapColumns - 2;
-                int riverPivotX, riverStartY, riverEndY;
-                do
-                {
-                    riverStartY = RNG.Next((MapRows - 5) / 2) * 2 + 3;
-                } while (riverStartY == starty || Math.Abs(palace4Pos.Y - riverStartY) < 2);
-
-                do
-                {
-                    riverEndY = RNG.Next((MapRows - 5) / 2) * 2 + 3;
-                } while (Math.Abs(riverStartY - riverEndY) < 2 || Math.Abs(palace4Pos.Y - riverEndY) < 2);
-
-                do
-                {
-                    riverPivotX = RNG.Next(1, riverEndX / 2) * 2 + 1; //3,5,7,9,11,13,15,17,19
-                } while (Math.Abs(palace4Pos.X - riverPivotX) < 2);
-
-                Debug.Assert(riverEndX % 2 == 1); // even number loops forever
-                Debug.Assert(riverEndY % 2 == 1);
-                DrawRiver(riverStartY, 1, riverEndY, riverEndX, riverPivotX, openWest, openEast);
-
-                //Pick raft & bridge edges
-                Direction raftDirEnum = (Direction)RNG.Next(4);
-                Direction bridgeDirEnum;
-                do
-                {
-                    bridgeDirEnum = (Direction)RNG.Next(4);
-                } while (bridgeDirEnum == raftDirEnum);
-
-                //Place raft
-                if (raft != null)
-                {
-                    IntVector2 raftDirVec = raftDirEnum.ToIntVector2();
-                    IntVector2 raftPos, nextToRaft;
-                    do
-                    {
-                        raftPos = raftDirEnum switch
-                        {
-                            Direction.NORTH => new IntVector2(RNG.Next(2, MapColumns - 2), 1),
-                            Direction.SOUTH => new IntVector2(RNG.Next(2, MapColumns - 2), MapRows - 2),
-                            Direction.WEST => new IntVector2(1, RNG.Next(2, MapRows - 2)),
-                            Direction.EAST => new IntVector2(MapColumns - 2, RNG.Next(2, MapRows - 2)),
-                            _ => throw new ArgumentException("Invalid direction: " + raftDirEnum)
-                        };
-                        nextToRaft = raftPos - raftDirVec;
-                    } while (map[raftPos] is not Terrain.MOUNTAIN || map[nextToRaft] is not Terrain.ROAD);
-
-                    map[raftPos] = Terrain.BRIDGE;
-                    raft.Pos = raftPos;
-                }
-
-                //Place bridge
-                if (bridge != null)
-                {
-                    IntVector2 bridgeDirVec = bridgeDirEnum.ToIntVector2();
-                    IntVector2 bridgePos, nextToBridge;
-
-                    do
-                    {
-                        bridgePos = bridgeDirEnum switch
-                        {
-                            Direction.NORTH => new IntVector2(RNG.Next(2, MapColumns - 2), 1),
-                            Direction.SOUTH => new IntVector2(RNG.Next(2, MapColumns - 2), MapRows - 2),
-                            Direction.WEST => new IntVector2(1, RNG.Next(2, MapRows - 2)),
-                            Direction.EAST => new IntVector2(MapColumns - 2, RNG.Next(2, MapRows - 2)),
-                            _ => throw new ArgumentException("Invalid direction: " + bridgeDirEnum)
-                        };
-                        nextToBridge = bridgePos - bridgeDirVec;
-                    } while (map[bridgePos] is not Terrain.MOUNTAIN || map[nextToBridge] is not Terrain.ROAD);
-
-                    IntVector2 waterByBridge = bridgePos + bridgeDirVec;
-                    map[bridgePos] = Terrain.BRIDGE;
-                    bridge.Pos = bridgePos;
-                    map[waterByBridge] = Terrain.BRIDGE;
-                }
-
-                foreach (Location location in AllLocations)
-                {
-                    if (location.TerrainType == Terrain.ROAD)
-                    {
-                        if ((location != magicContainerDrop && location != childDrop))
-                        {
-                            while (true)
-                            {
-                                var pos = IntVector2.Random(RNG, 2, MapColumns - 2, 2, MapRows - 2);
-                                if (ValidTrapTilePosition(pos) != null)
-                                {
-                                    location.Pos = pos;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            while (true)
-                            {
-                                var pos = IntVector2.Random(RNG, 2, MapColumns - 2, 2, MapRows - 2);
-                                if (ValidMazeDropPosition(pos))
-                                {
-                                    location.Pos = pos;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (!ValidateCaves())
-                {
-                    return false;
-                }
-
-                //check bytes and adjust
-                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES);
-            }
-        }
-        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES);
-        foreach (var lid in LocationIDUtils.Enumerate(Continent.MAZE))
-        {
-            if (!terrains.Keys.Contains(lid))
-            {
-                rom.Put(lid, 0, 0x00);
+                return false;
             }
         }
 
-        visitation = new bool[MapRows, MapColumns];
-        for (int i = 0; i < MapRows; i++)
+        if (!TryStageEncodedTerrainMap(encodedMap)) return false;
+        ClearUnusedLocationYBytes(Continent.MAZE, TerrainWrites.Put);
+        InitializeVisitation();
+
+        candidate.Commit();
+        return true;
+    }
+
+    private protected override void RepaintVanillaShuffleTiles()
+        => RepaintLocationTiles(markPassthrough: true);
+
+    /// <summary>Resets placement and builds one maze whose encoding fits the ROM budget.</summary>
+    private bool TryGenerateMazeMap([NotNullWhen(true)] out EncodedWorldMap? encodedMap)
+    {
+        encodedMap = null;
+        PrepareTerraformLocations();
+        // Tracks maze carving progress; it remains local to this attempt.
+        bool[,] relaxed = new bool[MapRows, MapColumns];
+        InitializeMazeMap(relaxed);
+
+        //choose starting Y position
+        IntVector2 mazeStart = new(2, RNG.Next(2, MapRows - 1));
+        if (mazeStart.Y % 2 == 1)
         {
-            for (int j = 0; j < MapColumns; j++)
+            mazeStart += IntVector2.NORTH;
+        }
+
+        //generate maze
+        IntVector2 current = mazeStart;
+        Stack<IntVector2> stack = new();
+        while (MoreToVisit(relaxed))
+        {
+            var neighbors = GetPositionsTwoTilesAway(current, relaxed).ToArray();
+            RNG.Shuffle(neighbors);
+            if (neighbors.Length > 0)
             {
-                visitation[i, j] = false;
+                var next = neighbors[RNG.Next(neighbors.Length)];
+                stack.Push(next);
+                var delta = (next - current) / 2; // neighbors are all 2 tiles away
+                map[current + delta] = Terrain.ROAD;
+                current = next;
+                relaxed[current.Y, current.X] = true;
             }
+            else if (stack.Count > 0)
+            {
+                current = stack.Pop();
+            }
+        }
+
+        if (!TryPlaceMazePalace(out var palacePosition)) return false;
+        if (!TryDrawMazeRiver(mazeStart, palacePosition)) return false;
+        if (!TryPlaceMazeConnectors()) return false;
+        if (!TryPlaceMazeEncounters()) return false;
+        if (!TryRepairAndValidateCaveExits()) return false;
+
+        // Current supported sizes always fit; reject safely if future dimensions exceed the budget.
+        var candidate = EncodeTerrainMap();
+        if (candidate.Length > MapRomCapacity)
+        {
+            return false;
+        }
+
+        encodedMap = candidate;
+        return true;
+    }
+
+    /// <summary>
+    /// Builds the uncarved island grid and initializes carving progress.
+    /// The playable border is walkable water. The encoder adds deep water beyond it.
+    /// </summary>
+    private void InitializeMazeMap(bool[,] relaxed)
+    {
+        map = new OverworldMap(MapRows, MapColumns);
+        // create walkable water border
+        for (int x = 0; x < MapColumns; x++)
+        {
+            IntVector2 top = new(x, 0);
+            map[top] = Terrain.WALKABLEWATER;
+            relaxed[top.Y, top.X] = true;
+            IntVector2 bottom = new(x, MapRows - 1);
+            map[bottom] = Terrain.WALKABLEWATER;
+            relaxed[bottom.Y, bottom.X] = true;
+        }
+        for (int y = 0; y < MapRows; y++)
+        {
+            IntVector2 left = new(0, y);
+            map[left] = Terrain.WALKABLEWATER;
+            relaxed[left.Y, left.X] = true;
+            IntVector2 right = new(MapColumns - 1, y);
+            map[right] = Terrain.WALKABLEWATER;
+            relaxed[right.Y, right.X] = true;
+        }
+
+        // fill every other row with mountain
+        for (int y = 1; y < MapRows - 1; y += 2)
+        {
+            for (int x = 1; x < MapColumns - 1; x++)
+            {
+                map[y, x] = Terrain.MOUNTAIN;
+            }
+        }
+
+        // fill every other column with mountain
+        for (int x = 1; x < MapColumns; x += 2)
+        {
+            for (int y = 1; y < MapRows - 1; y++)
+            {
+                map[y, x] = Terrain.MOUNTAIN;
+            }
+        }
+
+        for (int y = 1; y < MapRows; y++)
+        {
+            for (int x = 1; x < MapColumns; x++)
+            {
+                IntVector2 position = new(x, y);
+                Terrain terrain = map[position];
+                if (terrain != Terrain.MOUNTAIN && terrain != Terrain.WATER && terrain != Terrain.WALKABLEWATER)
+                {
+                    map[position] = Terrain.ROAD;
+                    relaxed[position.Y, position.X] = false;
+                }
+                else
+                {
+                    relaxed[position.Y, position.X] = true;
+                }
+            }
+        }
+    }
+
+    /// <summary>Places Palace 4 away from existing locations and opens its eight neighboring tiles.</summary>
+    private bool TryPlaceMazePalace(out IntVector2 palacePosition)
+    {
+        List<IntVector2> candidates = [];
+        for (int y = 3; y < MapRows - 4; y++)
+            for (int x = 3; x < MapColumns - 4; x++)
+            {
+                // Preserve the weights from rounding each sampled even coordinate upward.
+                // Several raw coordinate pairs can therefore represent the same odd center.
+                var position = new IntVector2(x % 2 == 0 ? x + 1 : x, y % 2 == 0 ? y + 1 : y);
+                if (!LocationsIn3x3Area(position).Any()) candidates.Add(position);
+            }
+        palacePosition = default;
+        if (candidates.Count == 0) return false;
+        palacePosition = candidates[RNG.Next(candidates.Count)];
+        locationAtPalace4.Pos = palacePosition;
+        map[palacePosition] = Terrain.PALACE;
+        foreach (var direction in IntVector2.DIRECTIONS) map[palacePosition + direction] = Terrain.ROAD;
+        return true;
+    }
+
+    /// <summary>Selects a complete river plan avoiding the carving start row and palace opening before painting.</summary>
+    private bool TryDrawMazeRiver(IntVector2 mazeStart, IntVector2 palacePosition)
+    {
+        List<int> startRows = [];
+        List<int> endRows = [];
+        for (int sample = 0; sample < (MapRows - 5) / 2; sample++)
+        {
+            int row = sample * 2 + 3;
+            if (Math.Abs(palacePosition.Y - row) < 2) continue;
+            endRows.Add(row);
+            if (row != mazeStart.Y) startRows.Add(row);
+        }
+        List<int> pivotColumns = [];
+        for (int sample = 1; sample < (MapColumns - 2) / 2; sample++)
+        {
+            int column = sample * 2 + 1;
+            if (Math.Abs(palacePosition.X - column) >= 2) pivotColumns.Add(column);
+        }
+        // Every allowed start belongs to endRows, so each has endRows.Count - 1 partners.
+        if (startRows.Count == 0 || endRows.Count < 2 || pivotColumns.Count == 0) return false;
+        int startY = startRows[RNG.Next(startRows.Count)];
+        endRows.Remove(startY);
+        var start = new IntVector2(1, startY);
+        var end = new IntVector2(MapColumns - 2, endRows[RNG.Next(endRows.Count)]);
+        int pivot = pivotColumns[RNG.Next(pivotColumns.Count)];
+        // The three equally likely opening combinations exclude closing both ends.
+        int openings = RNG.Next(1, 4);
+        DrawRiver(start, end, pivot, (openings & 1) != 0, (openings & 2) != 0);
+        return true;
+    }
+
+    /// <summary>Places caves in finished-maze dead ends, then paints present raft/bridge landings on distinct edges.</summary>
+    private bool TryPlaceMazeConnectors()
+    {
+        if (!TryPlaceMazeCaves()) return false;
+        List<Direction> availableEdges = [Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST];
+        if (raft != null)
+        {
+            var direction = availableEdges[RNG.Next(availableEdges.Count)];
+            if (!TryChooseConnectorPosition(direction, out var position)) return false;
+            raft.Pos = position;
+            map[position] = Terrain.BRIDGE;
+            availableEdges.Remove(direction);
+        }
+        if (bridge != null)
+        {
+            var direction = availableEdges[RNG.Next(availableEdges.Count)];
+            if (!TryChooseConnectorPosition(direction, out var position)) return false;
+            bridge.Pos = position;
+            map[position] = Terrain.BRIDGE;
+            map[position + direction.ToIntVector2()] = Terrain.BRIDGE;
         }
         return true;
     }
 
-    private void SealDeadEnd(IntVector2 pos, Random r)
+    /// <summary>Plans all loaded caves on unused ROAD dead ends, each with exactly one ROAD approach.</summary>
+    private bool TryPlaceMazeCaves()
     {
-        var cardinalOrder = IntVector2.CARDINALS.ToArray();
-        r.Shuffle(cardinalOrder);
-        bool foundRoad = false;
-        foreach (IntVector2 dir in cardinalOrder)
-        {
-            IntVector2 neighbor = pos + dir;
+        if (cave1 == null && cave2 == null) return true;
+        List<IntVector2> available = [];
+        // Carved maze cells occupy even coordinates; odd cells are the connecting passages.
+        for (int y = 2; y < MapRows - 2; y += 2)
+            for (int x = 2; x < MapColumns - 2; x += 2)
+            {
+                var position = new IntVector2(x, y);
+                if (map[position] != Terrain.ROAD || LocationsIn3x3Area(position).Any()) continue;
+                var neighbors = IntVector2.CARDINALS.Select(d => map[position + d]).ToArray();
+                if (neighbors.Count(t => t == Terrain.ROAD) == 1
+                    && neighbors.All(t => t is Terrain.ROAD or Terrain.MOUNTAIN)) available.Add(position);
+            }
 
-            if (map[neighbor] != Terrain.ROAD)
-            {
-                continue;
-            }
-            if (foundRoad)
-            {
-                map[neighbor] = Terrain.MOUNTAIN;
-            }
-            else
-            {
-                foundRoad = true;
-            }
+        List<(Location Location, IntVector2 Position)> planned = [];
+        foreach (var cave in new[] { cave1, cave2 })
+        {
+            if (cave == null) continue;
+            if (available.Count == 0) return false;
+            var position = available[RNG.Next(available.Count)];
+            planned.Add((cave, position));
+            available.RemoveAll(p => Math.Abs(p.X - position.X) <= 1 && Math.Abs(p.Y - position.Y) <= 1);
         }
+        foreach (var (cave, position) in planned)
+        {
+            cave.Pos = position;
+            cave.CanShuffle = false;
+            map[position] = Terrain.CAVE;
+        }
+        return true;
     }
 
-    private bool MoreToVisit(bool[,] v)
+    /// <summary>Chooses a mountain landing on the requested edge with an existing ROAD approach inward.</summary>
+    private bool TryChooseConnectorPosition(Direction direction, out IntVector2 position)
     {
-        for (int y = 0; y < v.GetLength(0); y++)
+        var outward = direction.ToIntVector2();
+        int span = direction.IsHorizontal() ? MapRows : MapColumns;
+        List<IntVector2> candidates = [];
+        for (int offset = 2; offset < span - 2; offset++)
         {
-            for (int x = 1; x < v.GetLength(1) - 1; x++)
+            var candidate = direction switch
             {
-                if (v[y, x] == false)
+                Direction.NORTH => new IntVector2(offset, 1),
+                Direction.SOUTH => new IntVector2(offset, MapRows - 2),
+                Direction.WEST => new IntVector2(1, offset),
+                Direction.EAST => new IntVector2(MapColumns - 2, offset),
+                _ => throw new ArgumentException("Invalid direction: " + direction)
+            };
+            if (map[candidate] == Terrain.MOUNTAIN && map[candidate - outward] == Terrain.ROAD)
+                candidates.Add(candidate);
+        }
+        position = default;
+        if (candidates.Count == 0) return false;
+        position = candidates[RNG.Next(candidates.Count)];
+        return true;
+    }
+
+    /// <summary>Places ROAD records in their existing order, rejecting an empty drop/trap pool without moving that record.</summary>
+    private bool TryPlaceMazeEncounters()
+    {
+        foreach (Location location in AllLocations)
+        {
+            if (location.TerrainType != Terrain.ROAD) continue;
+            bool isDrop = location == magicContainerDrop || location == childDrop;
+            List<IntVector2> candidates = [];
+            for (int y = 2; y < MapRows - 2; y++)
+                for (int x = 2; x < MapColumns - 2; x++)
+                {
+                    var position = new IntVector2(x, y);
+                    bool valid = isDrop ? ValidMazeDropPosition(position) : ValidTrapTilePosition(position) != null;
+                    if (valid) candidates.Add(position);
+                }
+            if (candidates.Count == 0) return false;
+            location.Pos = candidates[RNG.Next(candidates.Count)];
+        }
+        return true;
+    }
+
+    /// <summary>Checks maze-carving progress, independently of gameplay visitation.</summary>
+    private bool MoreToVisit(bool[,] relaxed)
+    {
+        for (int y = 0; y < relaxed.GetLength(0); y++)
+        {
+            for (int x = 1; x < relaxed.GetLength(1) - 1; x++)
+            {
+                if (relaxed[y, x] == false)
                 {
                     return true;
                 }
@@ -463,7 +414,7 @@ sealed class MazeIsland : World
         return false;
     }
 
-    private List<IntVector2> GetPositionsTwoTilesAway(IntVector2 current, bool[,] visited, Random r)
+    private List<IntVector2> GetPositionsTwoTilesAway(IntVector2 current, bool[,] relaxed)
     {
         List<IntVector2> neighbors = [];
 
@@ -474,7 +425,7 @@ sealed class MazeIsland : World
             {
                 continue;
             }
-            if (!visited[candidate.Y, candidate.X])
+            if (!relaxed[candidate.Y, candidate.X])
             {
                 neighbors.Add(candidate);
             }
@@ -483,12 +434,10 @@ sealed class MazeIsland : World
         return neighbors;
     }
 
-    private void DrawRiver(int fromY, int fromX, int toY, int toX, int xPivot, bool openWest, bool openEast)
+    private void DrawRiver(IntVector2 startPos, IntVector2 endPos, int xPivot, bool openWest, bool openEast)
     {
         Terrain terrain = Terrain.WALKABLEWATER;
-        IntVector2 startPos = new(fromX, fromY);
         IntVector2 pos = startPos;
-        IntVector2 endPos = new(toX, toY);
 
         IntVector2 horizontalStep = endPos.X > pos.X ? IntVector2.EAST : IntVector2.WEST;
         IntVector2 verticalStep = endPos.Y > pos.Y ? IntVector2.SOUTH : IntVector2.NORTH;
@@ -543,73 +492,50 @@ sealed class MazeIsland : World
 
     public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
     {
+        VisitStart(); // in case we support Maze Island start later
+        ExpandMazeVisitation(requireables.Contains(RequirementType.BOOTS));
+        MarkReachableMazeLocations(requireables);
+    }
+
+    /// <summary>Expands existing entrance/tile visitation in row order until no further tiles are reached.</summary>
+    private void ExpandMazeVisitation(bool hasBoots)
+    {
         bool changed = true;
         while (changed)
         {
             changed = false;
-            for (int i = 0; i < MapRows; i++)
+            for (int y = 0; y < MapRows; y++)
             {
-                for (int j = 0; j < MapColumns; j++)
+                for (int x = 0; x < MapColumns; x++)
                 {
-                    Terrain terrain = map[i, j];
-                    if (!visitation[i, j]
-                    && (
-                        (terrain == Terrain.WALKABLEWATER && requireables.Contains(RequirementType.BOOTS))
-                        || terrain == Terrain.ROAD || map[i, j] == Terrain.PALACE
-                        || terrain == Terrain.BRIDGE
-                        || terrain == Terrain.CAVE
-                        )
-                    )
-                    {
-                        if (i - 1 >= 0)
-                        {
-                            if (visitation[i - 1, j])
-                            {
-                                visitation[i, j] = true;
-                                changed = true;
-                                continue;
-                            }
-
-                        }
-
-                        if (i + 1 < MapRows)
-                        {
-                            if (visitation[i + 1, j])
-                            {
-                                visitation[i, j] = true;
-                                changed = true;
-                                continue;
-                            }
-                        }
-
-                        if (j - 1 >= 0)
-                        {
-                            if (visitation[i, j - 1])
-                            {
-                                visitation[i, j] = true;
-                                changed = true;
-                                continue;
-                            }
-                        }
-
-                        if (j + 1 < MapColumns)
-                        {
-                            if (visitation[i, j + 1])
-                            {
-                                visitation[i, j] = true;
-                                changed = true;
-                                continue;
-                            }
-                        }
-                    }
+                    if (visitation[y, x]) continue;
+                    Terrain terrain = map[y, x];
+                    bool passable = terrain is Terrain.ROAD or Terrain.PALACE or Terrain.BRIDGE or Terrain.CAVE
+                        || (terrain == Terrain.WALKABLEWATER && hasBoots);
+                    if (!passable || !HasVisitedMazeNeighbor(new(x, y))) continue;
+                    visitation[y, x] = true;
+                    changed = true;
                 }
             }
         }
+    }
 
-        //DebugVisitation();
+    private bool HasVisitedMazeNeighbor(IntVector2 position)
+    {
+        foreach (var direction in IntVector2.CARDINALS)
+        {
+            var neighbor = position + direction;
+            if (WithinMapBounds(neighbor) && visitation[neighbor.Y, neighbor.X]) return true;
+        }
+        return false;
+    }
+
+    /// <summary>Requirements gate location marking, not the terrain beyond a location; reached flags accumulate.</summary>
+    private void MarkReachableMazeLocations(IReadOnlySet<RequirementType> requireables)
+    {
         foreach (Location location in AllLocations)
         {
-            if (visitation[location.Y, location.Xpos] && location.AccessRequirements.AreSatisfiedBy(requireables))
+            if (location.IsEnabled() && visitation[location.Y, location.Xpos] && location.AccessRequirements.AreSatisfiedBy(requireables))
             {
                 location.Reachable = true;
             }
@@ -634,36 +560,18 @@ sealed class MazeIsland : World
             magicContainerDrop,
             locationAtPalace4
         };
-
-        foreach (Location key in connections.Keys)
-        {
-            if (requiredLocations.TryGetValue(key, out Location? value))
-            {
-                requiredLocations.Add(key);
-            }
-        }
+        requiredLocations.UnionWith(GetContinentConnections());
         return requiredLocations.Where(i => i != null);
     }
-
-    /*
-    protected override void SetVanillaCollectables(bool useDash)
-    {
-        locationAtPalace4.VanillaCollectable = Collectable.BOOTS;
-        childDrop.VanillaCollectable = Collectable.CHILD;
-        magicContainerDrop.VanillaCollectable = Collectable.MAGIC_CONTAINER;
-    }
-    */
 
     public override string GenerateSpoiler()
     {
         StringBuilder sb = new();
         sb.AppendLine("MAZE ISLAND: ");
-        sb.AppendLine("\tMagic Container Drop: " + magicContainerDrop.GetAllCollectables()[0].EnglishText());
-        sb.AppendLine("\tChild Drop: " + childDrop.GetAllCollectables()[0].EnglishText());
+        AppendOverworldItemSpoilerLine(sb, magicContainerDrop);
+        AppendOverworldItemSpoilerLine(sb, childDrop);
 
-        sb.Append("\tPalace 4 (" + locationAtPalace4.Palace!.Number + "): ");
-        List<Collectable> palaceCollectables = locationAtPalace4.GetAllCollectables();
-        sb.AppendLine(palaceCollectables.Count == 0 ? "No Items" : string.Join(", ", palaceCollectables.Select(c => c.EnglishText())));
+        AppendPalaceSpoilerLine(sb, locationAtPalace4);
 
         sb.AppendLine();
         return sb.ToString();
@@ -671,18 +579,7 @@ sealed class MazeIsland : World
 
     public override void DisableDisallowedPassthroughs()
     {
-        foreach (Location location in Locations[Terrain.CAVE])
-        {
-            location.IsPassthrough = false;
-        }
-        foreach (Location location in Locations[Terrain.TOWN])
-        {
-            location.IsPassthrough = false;
-        }
-        foreach (Location location in Locations[Terrain.PALACE])
-        {
-            location.IsPassthrough = false;
-        }
+        base.DisableDisallowedPassthroughs();
         if (bridge != null)
         {
             bridge.IsPassthrough = false;
@@ -693,12 +590,9 @@ sealed class MazeIsland : World
 
     public override void ResetCollectables(RandomizerProperties props)
     {
-        childDrop.SetCollectables([Collectable.CHILD]);
-        childDrop.CollectablesAreShufflable = props.ShuffleOverworldItems;
-        magicContainerDrop.SetCollectables([Collectable.MAGIC_CONTAINER]);
-        magicContainerDrop.CollectablesAreShufflable = props.ShuffleOverworldItems;
+        ResetOverworldCollectable(childDrop, Collectable.CHILD, props.ShuffleOverworldItems);
+        ResetOverworldCollectable(magicContainerDrop, Collectable.MAGIC_CONTAINER, props.ShuffleOverworldItems);
 
-        locationAtPalace4.SetCollectables(locationAtPalace4.Palace!
-            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace4.Palace!.Number - 1]));
+        ResetPalaceCollectables(locationAtPalace4, props);
     }
 }

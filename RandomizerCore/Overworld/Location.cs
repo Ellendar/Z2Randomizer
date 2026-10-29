@@ -1,11 +1,10 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
+using NLog;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
-using DynamicData;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -19,7 +18,9 @@ public class Location
     private List<Collectable> NonPalaceTownCollectables { get; set; }
     public bool CollectablesAreShufflable { get; set; }
     public bool AppearsOnMap { get; set; }
-    public bool Reachable { get; set; }
+    /// <summary>Suppresses the normal entrance in ROM until revealed; the model retains the revealed coordinates.</summary>
+    public bool IsHidden { get => TerrainState.Hidden; set => TerrainState.Hidden = value; }
+    public bool Reachable { get => TerrainState.Reachable; set => TerrainState.Reachable = value; }
 
     public Town? Town { get; set; }
     public Palace? Palace { get; set; }
@@ -28,7 +29,7 @@ public class Location
     public Continent? VanillaContinent { get; set; }
     public Continent? ConnectedContinent { get; set; }
 
-    public Terrain TerrainType { get; set; }
+    public Terrain TerrainType { get => TerrainState.Terrain; set => TerrainState.Terrain = value; }
 
     //public byte[] LocationBytes { get; set; }
 
@@ -36,20 +37,36 @@ public class Location
 
     public int Map { get; set; }
 
-    private IntVector2 pos = IntVector2.ZERO;
+    private LocationTerrainState committedTerrain = new();
+    private LocationTerrainState? candidateTerrain;
+    private LocationTerrainState TerrainState => candidateTerrain ?? committedTerrain;
+
+    internal void BeginTerrainCandidate()
+    {
+        if (candidateTerrain is not null) throw new InvalidOperationException("Location already has a terrain candidate.");
+        candidateTerrain = committedTerrain with { };
+    }
+
+    internal void RestartTerrainCandidate() => candidateTerrain = committedTerrain with { };
+
+    internal void EndTerrainCandidate(bool accept)
+    {
+        if (accept) committedTerrain = candidateTerrain!;
+        candidateTerrain = null;
+    }
 
     /// int vector position starting at Y=0 for the top row
     public IntVector2 Pos
     {
-        get => pos;
-        set { pos = value; }
+        get => TerrainState.Position;
+        set { TerrainState.Position = value; }
     }
 
     /// Y position starting at Y=0 for the top row
     public int Y
     {
-        get => pos.Y;
-        set { Pos = new(pos.X, value); }
+        get => TerrainState.Position.Y;
+        set { Pos = new(TerrainState.Position.X, value); }
     }
     /// Y position starting at Y=30 for the top row
     public int YRaw
@@ -60,8 +77,8 @@ public class Location
 
     public int Xpos
     {
-        get => pos.X;
-        set { Pos = new(value, pos.Y); }
+        get => TerrainState.Position.X;
+        set { Pos = new(value, TerrainState.Position.Y); }
     }
 
     /// Y,X position with Y starting at 30 for the top row
@@ -83,13 +100,31 @@ public class Location
 
     //List of requirements to access this location. Required before the other requirements are evaluated,
     //and to pass through the location on the map, even if the collectable is not gettable.
-    public Requirements AccessRequirements;
+    public Requirements AccessRequirements { get => TerrainState.Requirements; set => TerrainState.Requirements = value; }
 
-    //This does 2 things and should only do 1. It both tracks whether the location is a location that should be possible to shuffle,
-    //and tracks whether this location has actually been shuffled already. This persistence doesn't always get reset properly,
-    //which causes a bunch of bugs. That said, tracking 100 references and reworking it everywhere is beyond what I want to mess with
-    //so for now i'm going to keep this crap design but I am mad about it.
-    public bool CanShuffle { get; set; }
+    internal LocationPlacementState? PlacementState { get; set; }
+
+    /// <summary>
+    /// Legacy availability flag. Generated West/East/DM attempts adapt it to separate
+    /// eligibility/progress state; vanilla shuffling and gameplay retain a plain flag.
+    /// </summary>
+    public bool CanShuffle
+    {
+        get => PlacementState?.CanPlace ?? TerrainState.CanShuffle;
+        set
+        {
+            if (PlacementState is { } state) state.SetAvailable(value);
+            else TerrainState.CanShuffle = value;
+        }
+    }
+
+    internal void ReserveForTerrainGeneration() => PlacementState!.Reserve();
+
+    internal void EndPlacementAttempt()
+    {
+        TerrainState.CanShuffle = CanShuffle;
+        PlacementState = null;
+    }
 
     /// <summary>
     /// Page you enter this location from, 0 means left. 1/2/3 will enter from the right on areas that have
@@ -98,11 +133,11 @@ public class Location
     public int MapPageRaw { get; set; }
     public int MapPage { get => MapPageRaw >> 6; set => MapPageRaw = value << 6; }
 
-    public bool IsExternalWorld { get; set; } //0:0
-    public int EntranceNumber { get; set; } //1:0-1
+    public bool IsExternalWorld { get => TerrainState.ExternalWorld; set => TerrainState.ExternalWorld = value; } //0:0
+    public int EntranceNumber { get => TerrainState.EntranceNumber; set => TerrainState.EntranceNumber = value; } //1:0-1
     public bool IsFallInHole { get; set; }//3:0
     internal bool WasPassthrough { get; }
-    public bool IsPassthrough { get; set; }//3:1
+    public bool IsPassthrough { get => TerrainState.Passthrough; set => TerrainState.Passthrough = value; }//3:1
     public bool ForceEnterRight { get; set; }//3:2
 
     public string Name { get; set; }
@@ -165,7 +200,7 @@ public class Location
             Town.Type = ID.GetTown();
         }
 
-        if (Name.StartsWith("Unknown") && Xpos != 0 && YRaw != 0)
+        if (Name.StartsWith("Unknown") && Xpos != 0 && IsEnabled())
         {
             logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Y + ", " + Xpos + ") Map: " + Map);
         }
@@ -175,22 +210,36 @@ public class Location
         }
     }
 
-    public Location(Location clone) : this(clone.ID, clone.YRaw, clone.Xpos, clone.Map, clone.Continent)
+    public Location(Location clone)
     {
-        IsExternalWorld = clone.IsExternalWorld;
-        EntranceNumber = clone.EntranceNumber;
-        Xpos = clone.Xpos;
+        ArgumentNullException.ThrowIfNull(clone);
+        ID = clone.ID;
+        NonPalaceTownCollectables = [.. clone.NonPalaceTownCollectables];
+        CollectablesAreShufflable = clone.CollectablesAreShufflable;
+        AppearsOnMap = clone.AppearsOnMap;
+        Town = clone.Town;
+        Palace = clone.Palace;
+        Continent = clone.Continent;
+        VanillaContinent = clone.VanillaContinent;
+        ConnectedContinent = clone.ConnectedContinent;
+        MemAddress = clone.MemAddress;
+        Map = clone.Map;
+        VanillaCoords = clone.VanillaCoords;
         MapPageRaw = clone.MapPageRaw;
         IsFallInHole = clone.IsFallInHole;
-        IsPassthrough = clone.IsPassthrough;
+        WasPassthrough = clone.WasPassthrough;
         ForceEnterRight = clone.ForceEnterRight;
-        TerrainType = clone.TerrainType;
+        Name = clone.Name;
+        committedTerrain = clone.TerrainState with { CanShuffle = clone.CanShuffle };
     }
 
     public byte[] GetLocationBytes()
     {
         byte[] bytes = new byte[4];
-        if (AccessRequirements.HasHardRequirement(RequirementType.HAMMER) || AccessRequirements.HasHardRequirement(RequirementType.FLUTE))
+        // Hidden locations are written with raw Y zero in the ROM. Logic keeps
+        // their actual revealed coordinates. The hidden-location ASM and tables
+        // supply the Y coordinate when the game reveals the entrance.
+        if (IsHidden)
         {
             bytes[0] = 0;
         }
@@ -214,9 +263,20 @@ public class Location
             + '[' + string.Join(", ", GetAllCollectables().Select(i => i.ToString())) + ']';
     }
 
+    /// <summary>
+    /// Restores vanilla coordinates, or moves the location off-map (raw Y zero)
+    /// for generated placement. Does not change placement availability or other state.
+    /// </summary>
     public void ResetCoords(bool isVanilla)
     {
-        (Y, Xpos) = isVanilla ? VanillaCoords : (0, 0);
+        if (isVanilla)
+        {
+            (Y, Xpos) = VanillaCoords;
+        }
+        else
+        {
+            Pos = IntVector2.NOT_ON_MAP;
+        }
     }
 
     /// The TownNumber as used in game code
@@ -281,15 +341,24 @@ public class Location
     }
 
     /// <summary>
-    /// Zero out some bytes for this Location, which makes it an unused location in-game.
+    /// Marks the location off-map and unavailable for shuffling, retaining its entrance metadata.
+    /// The inactive marker is YRaw == 0.
     /// </summary>
-    public void Clear()
+    public void Disable()
     {
-        IsExternalWorld = false;
         YRaw = 0;
         Xpos = 0;
-        EntranceNumber = 0;
         CanShuffle = false;
+        PlacementState?.Disable();
+    }
+
+    /// <summary>
+    /// Tests the model's YRaw == 0 disabled marker, independently of ROM encoding.
+    /// Does not establish placement, map bounds or reachability.
+    /// </summary>
+    public bool IsEnabled()
+    {
+        return YRaw != 0;
     }
 
     public List<Collectable> GetAllCollectables()

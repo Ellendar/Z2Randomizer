@@ -255,7 +255,7 @@ public enum LocationID
     MI_TRAP7,                                    // 61: (50, 42)
 }
 
-public static class LocationIDUtils
+public static partial class LocationIDUtils
 {
     public const int NumLocationIndices = 0x3f;
     public const int MaxLocationIndex = NumLocationIndices - 1;

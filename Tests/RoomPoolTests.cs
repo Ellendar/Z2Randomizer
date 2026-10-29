@@ -3,7 +3,7 @@ using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 using Random = Z2Randomizer.RandomizerCore.Random;
 
-namespace Tests;
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class RoomPoolTests

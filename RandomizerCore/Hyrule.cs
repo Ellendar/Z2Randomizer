@@ -1,8 +1,3 @@
-using DynamicData;
-using FtRandoLib.Importer;
-using js65;
-using NLog;
-using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -14,12 +9,16 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using DynamicData;
+using NLog;
+using js65;
+using static js65.AsmModule;
+using FtRandoLib.Importer;
 using Z2Randomizer.RandomizerCore.Diagnostics;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
-using static js65.AsmModule;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -236,7 +235,6 @@ public class Hyrule
                 .Build();
 
             reachableAreas = new HashSet<string>();
-            //areasByLocation = new SortedDictionary<string, List<Location>>();
 
             ROM.ValidateVanillaRom(ref vanillaRomData);
             // Make a copy of the vanilla data to prevent seed bleed
@@ -2181,26 +2179,7 @@ public class Hyrule
                 nonTerrainShuffleAttempt = 0;
                 do
                 {
-                    foreach (Location location in westHyrule.AllLocations)
-                    {
-                        location.Reachable = false;
-                    }
-
-                    foreach (Location location in eastHyrule.AllLocations)
-                    {
-                        location.Reachable = false;
-                    }
-
-                    foreach (Location location in mazeIsland.AllLocations)
-                    {
-                        location.Reachable = false;
-                    }
-                    foreach (Location location in deathMountain.AllLocations)
-                    {
-                        location.Reachable = false;
-                    }
-
-                    worlds.ForEach(i => i.ResetVisitabilityState());
+                    worlds.ForEach(i => i.ResetVisitabilityState()); // Sets all locations as unreachable
                     worlds.ForEach(i => i.ResetCollectables(props));
 
                     ShuffleItems();
@@ -4146,6 +4125,7 @@ FlagHudUpdate:
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
         rom.ChangeMapperToMMC5(engine, GetPalaceOrder(), props.DisableHUDLag, randomizeMusic, props.MarioMode); // will make output vary with customize tab options
+        rom.ApplyHiddenLocationPatches(engine, eastHyrule.HiddenLocations, eastHyrule.biome, !props.LegacyVanillaShuffledLocations);
         // the second flag determines if we should add the "randomizer" text, but we don't have a "vanilla" option
         // right now, so this is just always off, except when i manually make an update
         rom.AddRandomizerToTitle(engine, props.MarioMode, IS_RANDOMIZED);

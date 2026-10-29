@@ -2668,15 +2668,13 @@ DrawHiddenJarBank5:
         return map;
     }
 
-    public List<Location> LoadLocations(LocationID baseLid, int count, SortedDictionary<LocationID, Terrain> Terrains)
+    public List<Location> LoadLocations(LocationID baseLid, int count)
     {
-        var (continent, locNum) = baseLid.GetIndices();
-        int startAddr = baseLid.GetRomOffset();
         List<Location> locations = [];
         for (int i = 0; i < count; i++)
         {
             LocationID lid = baseLid + i;
-            Terrain terrain = Terrains[lid];
+            Terrain terrain = lid.GetDefaultTerrain();
             var location = LoadLocation(lid, terrain);
             locations.Add(location);
         }
@@ -2790,10 +2788,33 @@ DrawHiddenJarBank5:
         }
     }
 
-    static readonly Dictionary<Terrain, byte[]> hiddenPalaceTiles = new()
+
+    /// <summary>Writes the Flute and Hammer reveal code/tables from the generated East map's hidden locations.</summary>
+    internal void ApplyHiddenLocationPatches(Assembler assembler, IReadOnlyList<HiddenLocation> hiddenLocations,
+        Biome biome, bool vanillaShuffleUsesActualTerrain)
     {
-        // corresponds to ROM locations [0x1df7d, 0x1df82, 0x1df7e, 0x1df83]
-        // and no i don't know why they're in that order
+        if (hiddenLocations.Any(l => l is null || !Enum.IsDefined(l.Trigger)))
+            throw new ArgumentException("Each hidden location must have a Flute or Hammer trigger.", nameof(hiddenLocations));
+        if (hiddenLocations.Select(l => l.Trigger).Distinct().Count() != hiddenLocations.Count)
+            throw new ArgumentException("Only one hidden location per trigger is supported.", nameof(hiddenLocations));
+        foreach (var location in hiddenLocations)
+        {
+            switch (location.Trigger)
+            {
+                case HiddenLocationTrigger.Flute:
+                    UpdateHiddenPalaceSpot(assembler, biome, location, vanillaShuffleUsesActualTerrain, biome.UsesVanillaMap() ? null : location.UnrevealedTerrain);
+                    break;
+                case HiddenLocationTrigger.Hammer:
+                    UpdateKasuto(assembler, biome, location, location.RevealedTerrain, vanillaShuffleUsesActualTerrain);
+                    break;
+            }
+        }
+    }
+
+    // Keep the historical tile order. Palace PPU macros use [0,2] / [1,3];
+    // Kasuto's four immediate loads use [0,1] / [2,3].
+    private static readonly Dictionary<Terrain, byte[]> hiddenLocationTiles = new()
+    {
         [Terrain.PALACE]        = [0x60, 0x61, 0x62, 0x63],
         [Terrain.SWAMP]         = [0x6F, 0x6F, 0x6F, 0x6F],
         [Terrain.LAVA]          = [0x6E, 0x6E, 0x6E, 0x6E],
@@ -2807,149 +2828,131 @@ DrawHiddenJarBank5:
         [Terrain.TOWN]          = [0x5C, 0x5D, 0x5E, 0x5F],
     };
 
-    //This was refactored out of EastHyrule. The signature/timing/structure needs work.
-    public void UpdateHiddenPalaceSpot(Biome biome, Location hiddenPalaceLocation, bool vanillaShuffleUsesActualTerrain)
+    private static void UpdateHiddenPalaceSpot(Assembler assembler, Biome biome, HiddenLocation location,
+        bool vanillaShuffleUsesActualTerrain, Terrain? surroundingTerrain)
     {
+        var a = assembler.Module();
+        a.Assign("PalaceX", (byte)location.Location.Xpos);
+        a.Assign("PalaceY", (byte)location.Location.YRaw);
+        a.Assign("PalaceAreaByte", location.AreaByte);
+        a.Assign("PalaceIndex", (byte)location.LocationIndex);
+        int ppuAddress = 0x2000 + 2 * (32 * (location.Location.YRaw % 15) + location.Location.Xpos % 16)
+            + 2048 * (location.Location.YRaw % 30 / 15);
+        a.Assign("PalacePpuAddress", ppuAddress);
+
         if (!biome.UsesVanillaMap())
         {
-            Put(0x8382, (byte)(hiddenPalaceLocation.YRaw - 2)); // the whistle spot, 2 tiles north of the palace
-            Put(0x8388, (byte)hiddenPalaceLocation.Xpos);
-        }
-        int pos = hiddenPalaceLocation.YRaw;
+            a.Code("""
+.segment "PRG2"
+.org $8371 ; Check_for_Hidden_Palace_spot: whistle spot, two tiles north
+    cmp #(PalaceY - 2)
+.org $8377
+    cmp #PalaceX
 
-        Put(0x1df78, (byte)(pos + (hiddenPalaceLocation.IsExternalWorld ? 0x80 : 0)));
-        Put(0x1df84, 0xff);
-        Put(0x1ccc0, (byte)pos);
-        int connection = hiddenPalaceLocation.MemAddress - 0x862F;
-        Put(0x1df76, (byte)connection);
+""", "hidden_palace_whistle.s");
+        }
+
+        if (surroundingTerrain is { } terrain)
+        {
+            a.Assign("PalaceSurroundingTerrain", (byte)terrain);
+            a.Code("""
+
+.segment "PRG7"
+
+.org $df60 ; terrain that the flute transforms into the revealed entrance
+    .byte PalaceSurroundingTerrain
+    ; byte for revealed tile should be set here? (investigate later)
+    ; not sure why it's not - maybe the PPU bytes in hiddenLocationTile make it unnecessary
+
+""", "hidden_palace_surrounding.s");
+        }
+
+        a.Code("""
+.segment "PRG7"
+OverworldTileTransformTable := $df5e
+
+.org $ccaf ; fallback Y when returning from the hidden palace
+    lda #PalaceY
+
+.org $df66 ; reveal location index table, palace slot
+    .byte PalaceIndex
+.org $df68 ; revealed Area Byte 0; also read by Flute.s
+    .byte PalaceAreaByte
+.org $df6a ; first PPU row address, high byte first
+    .byte .hibyte(PalacePpuAddress), .lobyte(PalacePpuAddress)
+.org $df6f ; second PPU row address
+    .byte .hibyte(PalacePpuAddress + $20), .lobyte(PalacePpuAddress + $20)
+.org $df74 ; end the macro after the two reveal rows
+    .byte $FF
+""", "hidden_palace_location.s");
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
-            Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
-            if (hiddenPalaceTiles.TryGetValue(hiddenPalaceLocation.TerrainType, out var tiles))
+            a.Assign("PalaceTerrain", (byte)location.RevealedTerrain);
+            a.Code("""
+.segment "PRG7"
+.org $df64 ; transform-result terrain table, palace slot
+    .byte PalaceTerrain
+""", "hidden_palace_terrain.s");
+            if (hiddenLocationTiles.TryGetValue(location.RevealedTerrain, out var tiles))
             {
-                Put(0x1df7d, tiles[0]);
-                Put(0x1df82, tiles[1]);
-                Put(0x1df7e, tiles[2]);
-                Put(0x1df83, tiles[3]);
+                for (int i = 0; i < tiles.Length; i++) a.Assign($"PalaceTile{i}", tiles[i]);
+                a.Code("""
+.segment "PRG7"
+.org $df6d ; top reveal row
+    .byte PalaceTile0, PalaceTile2
+.org $df72 ; bottom reveal row
+    .byte PalaceTile1, PalaceTile3
+""", "hidden_palace_tiles.s");
             }
         }
-
-        int ppu_addr1 = 0x2000 + 2 * (32 * (hiddenPalaceLocation.YRaw % 15) + (hiddenPalaceLocation.Xpos % 16)) + 2048 * (hiddenPalaceLocation.YRaw % 30 / 15);
-        int ppu_addr2 = ppu_addr1 + 32;
-        int ppu1low = ppu_addr1 & 0x00ff;
-        int ppu1high = (ppu_addr1 >> 8) & 0xff;
-        int ppu2low = ppu_addr2 & 0x00ff;
-        int ppu2high = (ppu_addr2 >> 8) & 0xff;
-        Put(0x1df7a, (byte)ppu1high);
-        Put(0x1df7b, (byte)ppu1low);
-        Put(0x1df7f, (byte)ppu2high);
-        Put(0x1df80, (byte)ppu2low);
-
     }
 
-    public void UpdateKasuto(Location hiddenKasutoLocation, Biome biome,
-        int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
+    private static void UpdateKasuto(Assembler assembler, Biome biome, HiddenLocation location,
+        Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
     {
-        Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + (hiddenKasutoLocation.IsExternalWorld ? 0x80 : 0)));
-        Put(0x1dfac, (byte)(hiddenKasutoLocation.Y));
-        Put(0x1dfb2, (byte)(hiddenKasutoLocation.Xpos + 1));
-        Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + (hiddenKasutoLocation.EntranceNumber << 6)));
-        Put(0x1ccdb, (byte)hiddenKasutoLocation.YRaw);
-        int connection = hiddenKasutoLocation.MemAddress - baseAddr;
-        Put(0x1df77, (byte)connection);
+        var a = assembler.Module();
+        a.Assign("KasutoX", (byte)location.Location.Xpos);
+        a.Assign("KasutoY", (byte)location.Location.YRaw);
+        a.Assign("KasutoAreaByte", location.AreaByte);
+        a.Assign("KasutoIndex", (byte)location.LocationIndex);
+        a.Assign("KasutoEntryX", (byte)(location.Location.Xpos + (location.Location.EntranceNumber << 6)));
+        a.Code("""
+.segment "PRG7"
+.org $ccc3 ; identify the hidden town's packed entrance X when returning outside
+    lda #KasutoEntryX
+.org $ccca ; restore its Y coordinate
+    lda #KasutoY
+.org $df67 ; reveal location index table, town slot
+    .byte KasutoIndex
+.org $df69 ; revealed Area Byte 0; also read by Flute.s
+    .byte KasutoAreaByte
+.org $df9B ; hammer reveal checks zero-based Y and the following X tile
+    cmp #(KasutoY - 30)
+.org $dfa1
+    cmp #(KasutoX + 1)
+""", "hidden_kasuto_location.s");
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
-            //Terrain t = terrains[hiddenKasutoLocation.MemAddress];
-            Put(0x1df75, (byte)hiddenKasutoTerrain);
-            if (hiddenKasutoTerrain == Terrain.PALACE)
+            a.Assign("KasutoTerrain", (byte)hiddenKasutoTerrain);
+            a.Code("""
+.segment "PRG7"
+.org $df65 ; transform-result terrain table, town slot
+    .byte KasutoTerrain
+""", "hidden_kasuto_terrain.s");
+            if (hiddenLocationTiles.TryGetValue(hiddenKasutoTerrain, out var tiles))
             {
-                Put(0x1dfb6, 0x60);
-                Put(0x1dfbb, 0x61);
-
-                Put(0x1dfc0, 0x62);
-
-                Put(0x1dfc5, 0x63);
-            }
-            else if (hiddenKasutoTerrain == Terrain.SWAMP)
-            {
-                Put(0x1dfb6, 0x6F);
-                Put(0x1dfbb, 0x6F);
-
-                Put(0x1dfc0, 0x6F);
-
-                Put(0x1dfc5, 0x6F);
-            }
-            else if (hiddenKasutoTerrain == Terrain.LAVA || hiddenKasutoTerrain == Terrain.WALKABLEWATER)
-            {
-                Put(0x1dfb6, 0x6E);
-                Put(0x1dfbb, 0x6E);
-
-                Put(0x1dfc0, 0x6E);
-
-                Put(0x1dfc5, 0x6E);
-            }
-            else if (hiddenKasutoTerrain == Terrain.FOREST)
-            {
-                Put(0x1dfb6, 0x68);
-                Put(0x1dfbb, 0x69);
-
-                Put(0x1dfc0, 0x6A);
-
-                Put(0x1dfc5, 0x6B);
-            }
-            else if (hiddenKasutoTerrain == Terrain.GRAVE)
-            {
-                Put(0x1dfb6, 0x70);
-                Put(0x1dfbb, 0x71);
-
-                Put(0x1dfc0, 0x7F);
-
-                Put(0x1dfc5, 0x7F);
-            }
-            else if (hiddenKasutoTerrain == Terrain.ROAD)
-            {
-                Put(0x1dfb6, 0xFE);
-                Put(0x1dfbb, 0xFE);
-
-                Put(0x1dfc0, 0xFE);
-
-                Put(0x1dfc5, 0xFE);
-            }
-            else if (hiddenKasutoTerrain == Terrain.BRIDGE)
-            {
-                Put(0x1dfb6, 0x5A);
-                Put(0x1dfbb, 0x5B);
-
-                Put(0x1dfc0, 0x5A);
-
-                Put(0x1dfc5, 0x5B);
-            }
-            else if (hiddenKasutoTerrain == Terrain.CAVE)
-            {
-                Put(0x1dfb6, 0x72);
-                Put(0x1dfbb, 0x73);
-
-                Put(0x1dfc0, 0x72);
-
-                Put(0x1dfc5, 0x73);
-            }
-            else if (hiddenKasutoTerrain == Terrain.DESERT)
-            {
-                Put(0x1dfb6, 0x6C);
-                Put(0x1dfbb, 0x6C);
-
-                Put(0x1dfc0, 0x6C);
-
-                Put(0x1dfc5, 0x6C);
-            }
-            else if (hiddenKasutoTerrain == Terrain.TOWN)
-            {
-                Put(0x1dfb6, 0x5C);
-                Put(0x1dfbb, 0x5D);
-
-                Put(0x1dfc0, 0x5E);
-
-                Put(0x1dfc5, 0x5F);
+                for (int i = 0; i < tiles.Length; i++) a.Assign($"KasutoTile{i}", tiles[i]);
+                a.Code("""
+.segment "PRG7"
+.org $dfa5 ; tile loads into the two PPU reveal rows
+    lda #KasutoTile0
+.org $dfaa
+    lda #KasutoTile1
+.org $dfaf
+    lda #KasutoTile2
+.org $dfb4
+    lda #KasutoTile3
+""", "hidden_kasuto_tiles.s");
             }
         }
     }

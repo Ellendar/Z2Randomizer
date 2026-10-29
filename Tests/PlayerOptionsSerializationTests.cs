@@ -2,8 +2,8 @@
 using Z2Randomizer.CommandLine.Models;
 using Z2Randomizer.RandomizerCore;
 
-namespace Tests
-{
+namespace Z2Randomizer.Tests;
+
     [TestClass]
     public class PlayerOptionsSerializationTests
     {
@@ -90,4 +90,3 @@ namespace Tests
             }
         }
     }
-}
