@@ -78,7 +78,7 @@ public class Hyrule
     private int accessibleMagicContainers;
     private int accessibleHeartContainers;
 
-    public Dictionary<Collectable, bool> ItemGet { get; set; }
+    public GettableItemSet GettableItems { get; private set; }
     private List<Collectable> spellListOrder { get; set; }
 
     public WestHyrule westHyrule;
@@ -223,16 +223,12 @@ public class Hyrule
             //character = new Character(props);
 
             palaces = [];
-            ItemGet = [];
-            foreach (Collectable item in Enum.GetValues(typeof(Collectable)))
-            {
-                if (item.IsItemGetItem())
-                {
-                    ItemGet.Add(item, false);
-                }
-            }
-            ItemGet.Remove(props.ReplaceFireWithDash ? Collectable.FIRE_SPELL : Collectable.DASH_SPELL);
-            ItemGet.Remove(props.MarioMode ? Collectable.JUMP_SPELL : Collectable.TANOOKI);
+            GettableItems = new GettableItemSet.Builder()
+                .Excluding(
+                    props.ReplaceFireWithDash ? Collectable.FIRE_SPELL : Collectable.DASH_SPELL,
+                    props.MarioMode ? Collectable.JUMP_SPELL : Collectable.TANOOKI)
+                .StartingWith(Enum.GetValues<Collectable>().Where(collectable => props.StartsWithCollectable(collectable)))
+                .Build();
 
             reachableAreas = new HashSet<string>();
             //areasByLocation = new SortedDictionary<string, List<Location>>();
@@ -774,10 +770,7 @@ public class Hyrule
             SwapUpAndDownstab();
         }
 
-        foreach (Collectable collectable in ItemGet.Keys)
-        {
-            ItemGet[collectable] = props.StartsWithCollectable(collectable);
-        }
+        GettableItems.Reset();
 
 
         //Spell Item handling
@@ -1147,7 +1140,7 @@ public class Hyrule
             {
                 Location? defaultLocation = possibleItemLocations.FirstOrDefault(i => i.GetAllCollectables().Contains(spellItem));
                 defaultLocation?.ReplaceCollectable(spellItem, minorItems.Sample(r));
-                ItemGet[spellItem] = true;
+                GettableItems[spellItem] = true;
             }
         }
         else
@@ -1164,7 +1157,7 @@ public class Hyrule
                 Collectable wizardCollectable = (Collectable)spellItemTowns[i].Town!.GetWizard()!.Collectable!;
                 if (props.StartsWithCollectable(wizardCollectable))
                 {
-                    ItemGet[spellItems[i]] = true;
+                    GettableItems[spellItems[i]] = true;
                     Location? spellItemLocation =
                         possibleItemLocations.FirstOrDefault(location => location.GetAllCollectables().Contains(spellItems[i]));
                     spellItemLocation?.ReplaceCollectable(spellItems[i], minorItems.Sample(r));
@@ -1379,7 +1372,7 @@ public class Hyrule
         return true;
     }
 
-    private bool IsEverythingReachable(Dictionary<Collectable, bool> itemGet)
+    private bool IsEverythingReachable()
     {
         totalReachableCheck++;
         int dm = 0;
@@ -1400,7 +1393,7 @@ public class Hyrule
         {
             previousReachableLocationsCount = reachableLocationsCount;
             previousGettableItemsCount = gettableItemsCount;
-            gettableItemsCount = UpdateItemGets(props);
+            gettableItemsCount = UpdateGettableItems(props);
             IReadOnlySet<RequirementType> requireables = GetRequireables(props);
             westHyrule.UpdateVisit(requireables);
             deathMountain.UpdateVisit(requireables);
@@ -1409,7 +1402,7 @@ public class Hyrule
 
             foreach (World world in worlds)
             {
-                if (world.raft != null && world.raft.Reachable && itemGet[Collectable.RAFT])
+                if (world.raft != null && world.raft.Reachable && GettableItems[Collectable.RAFT])
                 {
                     worlds.ForEach(i => i.VisitRaft());
                 }
@@ -1429,7 +1422,7 @@ public class Hyrule
                     worlds.ForEach(i => i.VisitCave2());
                 }
             }
-            gettableItemsCount = UpdateItemGets(props);
+            gettableItemsCount = UpdateGettableItems(props);
 
             //This 2nd pass is weird and may not need to exist, eventually I should run some stats on whether it helps or not
             requireables = GetRequireables(props);
@@ -1438,7 +1431,7 @@ public class Hyrule
             eastHyrule.UpdateVisit(requireables);
             mazeIsland.UpdateVisit(requireables);
 
-            gettableItemsCount = UpdateItemGets(props);
+            gettableItemsCount = UpdateGettableItems(props);
 
             reachableLocationsCount = 0;
             dm = 0;
@@ -1456,23 +1449,20 @@ public class Hyrule
             //+ " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
         }
 
-        foreach (Collectable item in ItemGet.Keys)
+        if (GettableItems.TrackedItems.Any(item => !GettableItems[item]))
         {
-            if (ItemGet[item] == false && item.IsItemGetItem())
-            {
                 itemGetReachableFailures++;
 //#if UNSAFE_DEBUG
                 if (reachableLocationsCount >= DEBUG_THRESHOLD)
                 {
                     Debug.WriteLine("Failed on collectables");
-                    PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+                    //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
                     //Debug.WriteLine(GenerateSpoiler());
                     //Debug.WriteLine(westHyrule.GetMapDebug());
                     return false;
                 }
 //#endif
                 return false;
-            }
         }
         if (accessibleMagicContainers != props.MaxMagicContainers)
         {
@@ -1571,17 +1561,17 @@ public class Hyrule
     }
 
     /// <summary>
-    /// 
+    /// Marks every item reachable at currently reachable locations, repeating
+    /// until no new items become available.
     /// </summary>
-    /// <returns>Whether any items were marked accessable</returns>
-    private int UpdateItemGets(RandomizerProperties props)
+    /// <returns>The number of items obtained on the final pass.</returns>
+    private int UpdateGettableItems(RandomizerProperties props)
     {
         IReadOnlySet<RequirementType> requireables;
         accessibleMagicContainers = props.StartMagicContainers;
         accessibleHeartContainers = props.StartHearts;
-        Location newKasuto = eastHyrule.newKasuto;
         List<Collectable> gottenItems = [], lastIterationGottenItems = [];
-        List<Location> locations = ItemLocations().ToList();
+        List<Location> reachableLocations = ItemLocations().Where(i => i.Reachable).ToList();
         List<Location> heartContainerGetLocations = [], magicContainerGetLocations = [];
         bool stalled = false;
         //No more delayed evaluation because too many locations could give you containers or require containers.
@@ -1592,13 +1582,13 @@ public class Hyrule
             accessibleMagicContainers = props.StartMagicContainers + magicContainerGetLocations.Count;
             requireables = GetRequireables(props);
             gottenItems = [];
-            foreach (Location location in ItemLocations().Where(i => i.Reachable))
+            foreach (Location location in reachableLocations)
             {
-                List<Collectable> gettableItems = location.GetGettableItems(requireables);
+                IReadOnlyList<Collectable> gettableItems = GettableItems.GetGettableItemsAt(location, requireables);
 
                 foreach (Collectable item in gettableItems)
                 {
-                    ItemGet[item] = true;
+                    GettableItems[item] = true;
                     gottenItems.Add(item);
 
                     if (item == Collectable.HEART_CONTAINER && !heartContainerGetLocations.Contains(location))
@@ -1624,15 +1614,13 @@ public class Hyrule
     {
         HashSet<RequirementType> requireables = [];
 
-        foreach (Collectable item in ItemGet.Keys)
+        foreach (Collectable item in GettableItems.TrackedItems)
         {
-            if (item.AsRequirement() != null && (ItemGet[item] || props.StartsWithCollectable(item)))
+            RequirementType? requirement = item.AsRequirement();
+            if (requirement != null
+                && (GettableItems[item] || props.StartsWithCollectable(item)))
             {
-                RequirementType? reqirement = item.AsRequirement();
-                if (reqirement != null)
-                {
-                    requireables.Add((RequirementType)reqirement);
-                }
+                requireables.Add(requirement.Value);
             }
         }
 
@@ -2007,14 +1995,14 @@ public class Hyrule
                     deathMountain.UpdateAllReached();
 
                     nonTerrainShuffleAttempt++;
-                } while (nonTerrainShuffleAttempt < NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT && !IsEverythingReachable(ItemGet));
+                } while (nonTerrainShuffleAttempt < NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT && !IsEverythingReachable());
 
                 if (nonTerrainShuffleAttempt != NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT)
                 {
                     break;
                 }
             } while (nonContinentGenerationAttempts < NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT);
-        } while (!IsEverythingReachable(ItemGet));
+        } while (!IsEverythingReachable());
     }
 
     private async void UpdateProgress(Func<string, Task> progress, ProgressEnum v)
@@ -2246,14 +2234,6 @@ public class Hyrule
     /// <exception cref="Exception"></exception>
     private void ShuffleSpells()
     {
-        foreach (Collectable collectable in ItemGet.Keys)
-        {
-            if (collectable.IsSpell())// || collectable == Collectable.UPSTAB || collectable == Collectable.DOWNSTAB)
-            {
-                ItemGet[collectable] = false;
-            }
-        }
-
         List<Location> unallocatedTowns = new List<Location> { westHyrule.rauru, westHyrule.ruto, westHyrule.sariaNorth, westHyrule.mido,
             eastHyrule.nabooru, eastHyrule.darunia, eastHyrule.newKasuto, eastHyrule.oldKasuto };
 
@@ -3063,7 +3043,7 @@ CustomFileSelectData:
         return possibleItemLocations;
     }
 
-
+    /*
     public void PrintRoutingDebug(int count, int wh, int eh, int dm, int mi)
     {
         StringBuilder sb = new StringBuilder();
@@ -3111,6 +3091,7 @@ CustomFileSelectData:
 
         logger.Error(sb.ToString());
     }
+    */
 
     private bool IsRaftAlwaysRequired(RandomizerProperties props)
     {
