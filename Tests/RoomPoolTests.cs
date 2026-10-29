@@ -39,7 +39,7 @@ public class RoomPoolTests
             DuplicateGroup = duplicateGroup,
             SideView = [0x04, 0x60, 0x00, 0x08],
             Enemies = [0x01],
-            ItemGetBits = [0x0F],
+            ItemPresenceBits = [0x0F],
             Connections = connections,
             Map = map
         };

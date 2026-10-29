@@ -88,7 +88,7 @@ public class PalaceTests
             coords = new(x, y),
             SideView = [0x04, 0x60, 0x00, 0x08],
             Enemies = [0x01],
-            ItemGetBits = [0x0F],
+            ItemPresenceBits = [0x0F],
             Connections = BuildConnections(hasLeftExit, hasRightExit, hasUpExit, hasDownExit),
         };
         room.OnDeserialized();

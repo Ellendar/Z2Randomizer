@@ -1285,9 +1285,9 @@ public class Hyrule
 
         var palaceItemBits = new Dictionary<PalaceGrouping, byte[]>
         {
-            [PalaceGrouping.Palace125] = ROMData.GetBytes(Room.Group1ItemGetStartAddress, 0x20),
-            [PalaceGrouping.Palace346] = ROMData.GetBytes(Room.Group2ItemGetStartAddress, 0x20),
-            [PalaceGrouping.PalaceGp] = ROMData.GetBytes(Room.Group3ItemGetStartAddress, 0x20),
+            [PalaceGrouping.Palace125] = ROMData.GetBytes(Room.Group1ItemPresenceBitsStartAddress, 0x20),
+            [PalaceGrouping.Palace346] = ROMData.GetBytes(Room.Group2ItemPresenceBitsStartAddress, 0x20),
+            [PalaceGrouping.PalaceGp] = ROMData.GetBytes(Room.Group3ItemPresenceBitsStartAddress, 0x20),
         };
 
         int enemyAddr = Enemies.NormalPalaceEnemyAddr;
@@ -1302,7 +1302,7 @@ public class Hyrule
             foreach (var room in sideviews[sv])
             {
                 room.WriteSideViewPtr(sideviewModule, name);
-                room.UpdateItemGetBits(palaceItemBits);
+                room.PutItemPresenceBitsIntoFinalTable(palaceItemBits);
                 enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr);
                 room.UpdateConnectionStartAddress();
             }
@@ -1322,7 +1322,7 @@ public class Hyrule
             foreach (var room in sideviewsgp[sv])
             {
                 room.WriteSideViewPtr(sideviewModule, name);
-                room.UpdateItemGetBits(palaceItemBits);
+                room.PutItemPresenceBitsIntoFinalTable(palaceItemBits);
                 enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr);
                 room.UpdateConnectionStartAddress();
             }

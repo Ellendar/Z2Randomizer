@@ -54,16 +54,16 @@ public class Room : IJsonOnDeserialized
 
     public Coord coords;
 
-    public const int Group1ItemGetStartAddress = 0x17ba5;
-    public const int Group2ItemGetStartAddress = 0x17bc5;
-    public const int Group3ItemGetStartAddress = 0x17be5;
+    public const int Group1ItemPresenceBitsStartAddress = 0x17ba5;
+    public const int Group2ItemPresenceBitsStartAddress = 0x17bc5;
+    public const int Group3ItemPresenceBitsStartAddress = 0x17be5;
     private const int connectors1 = 0x1072b;
     private const int connectors2 = 0x12208;
     private const int connectors3 = 0x1472b;
 
     [JsonPropertyName("bitmask")]
     [JsonConverter(typeof(HexStringConverter))]
-    public byte[] ItemGetBits { get; set; }
+    public byte[] ItemPresenceBits { get; set; }
 
     public byte Map { get; set; }
 
@@ -187,7 +187,7 @@ public class Room : IJsonOnDeserialized
         NewEnemies = new byte[Enemies.Length];
         SideView = room.SideView.ToArray();
         MirrorSideView = room.MirrorSideView?.ToArray();
-        ItemGetBits = room.ItemGetBits.ToArray();
+        ItemPresenceBits = room.ItemPresenceBits.ToArray();
         HasItem = room.HasItem;
         HasBoss = room.HasBoss;
         IsBossRoom = room.IsBossRoom;
@@ -317,20 +317,20 @@ public class Room : IJsonOnDeserialized
         return NewEnemies.Length;
     }
 
-    public void UpdateItemGetBits(Dictionary<PalaceGrouping, byte[]> palaceItemBits)
+    public void PutItemPresenceBitsIntoFinalTable(Dictionary<PalaceGrouping, byte[]> palaceItemBits)
     {
-        PalaceGrouping palaceGroup = PalaceGroup ?? throw new Exception("Unable to assign ItemGetBits on a room with no palace group");
+        PalaceGrouping palaceGroup = PalaceGroup ?? throw new Exception("Unable to assign ItemPresenceBits on a room with no palace group");
 
         var old = palaceItemBits[palaceGroup][Map / 2];
         if (Map % 2 == 0)
         {
             old = (byte)(old & 0x0F);
-            old = (byte)((ItemGetBits[0] << 4) | old);
+            old = (byte)((ItemPresenceBits[0] << 4) | old);
         }
         else
         {
             old = (byte)(old & 0xF0);
-            old = (byte)((ItemGetBits[0]) | old);
+            old = (byte)((ItemPresenceBits[0]) | old);
         }
         palaceItemBits[palaceGroup][Map / 2] = old;
     }
@@ -858,11 +858,11 @@ public class Room : IJsonOnDeserialized
         ];
         mirror.SetConnections(mirroredConnections);
 
-        mirror.ItemGetBits = [(byte)(
-             ((ItemGetBits[0] & 0b0001) != 0 ? 0b1000 : 0) |
-             ((ItemGetBits[0] & 0b0010) != 0 ? 0b0100 : 0) |
-             ((ItemGetBits[0] & 0b0100) != 0 ? 0b0010 : 0) |
-             ((ItemGetBits[0] & 0b1000) != 0 ? 0b0001 : 0)
+        mirror.ItemPresenceBits = [(byte)(
+             ((ItemPresenceBits[0] & 0b0001) != 0 ? 0b1000 : 0) |
+             ((ItemPresenceBits[0] & 0b0010) != 0 ? 0b0100 : 0) |
+             ((ItemPresenceBits[0] & 0b0100) != 0 ? 0b0010 : 0) |
+             ((ItemPresenceBits[0] & 0b1000) != 0 ? 0b0001 : 0)
         )];
 
         return mirror;
