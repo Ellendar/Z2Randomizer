@@ -179,6 +179,10 @@ public class RoomPool
         {
             allowedBlockers.Remove(RequirementType.DASH);
         }
+        if (props.KeyLogic is KeyLogicOption.KEYS_PER_PALACE_SOLVABLE && palaceNumber == 7)
+        {
+            allowedBlockers.Remove(RequirementType.KEY);
+        }
         RemoveRooms(room => !room.GetEffectiveRequirements(props.MarioMode).AreSatisfiedBy(allowedBlockers));
     }
 
