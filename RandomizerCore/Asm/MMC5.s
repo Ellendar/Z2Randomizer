@@ -219,6 +219,8 @@ HandleLagFrame:
 ;        bne @loop
     jsr SetupScanlineIRQ
 @HandleAudio:
+
+.if ENABLE_Z2FT
     lda PendingAudioCall
     beq @RunAudio
         ; Audio is currently running on the main thread; signal it to re-run after
@@ -230,6 +232,16 @@ HandleLagFrame:
     bit LagFrameVar
     bvc @TitleScreenSoSkip
     jmp UpdateSound
+
+.else  ; Vanilla Z2 audio
+    ; Skip processing audio during a real lag frame since thats what
+    ; vanilla accomplishes with a hard disabled NMI
+    lda SoftDisableNmi
+    bne @skip
+        jsr UpdateSound
+@skip:
+    rts
+.endif
 
 .segment "PRG7"
 .reloc
