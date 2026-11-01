@@ -1765,4 +1765,12 @@ on Controller 1</value>
 	<data name="UseCustomRooms" xml:space="preserve">
 		<value>Use Custom Rooms File</value>
 	</data>
+	<data name="RemoveMagicKey" xml:space="preserve">
+		<value>Remove Magic Key</value>
+	</data>
+	<data name="RemoveMagicKeyToolTip" xml:space="preserve">
+		<value>Play without Magic Key so you have to rely on keys (or Fairy) to open all doors.
+The Magic Key is removed and the seed is guaranteed to be beatable without it.
+    Removing both Fairy and Magic Key requires Keys Per Palace Solvable key logic and disables Blockers Anywhere.</value>
+	</data>
 </root>

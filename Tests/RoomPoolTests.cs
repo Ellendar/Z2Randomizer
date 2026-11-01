@@ -63,7 +63,8 @@ public class RoomPoolTests
             BlockersAnywhere = blockersAnywhere,
             ReplaceFireWithDash = replaceFireWithDash,
             NoDuplicateRooms = false,
-            NoDuplicateRoomsBySideview = false
+            NoDuplicateRoomsBySideview = false,
+            RemoveItems = removeItems ?? []
         };
     }
 

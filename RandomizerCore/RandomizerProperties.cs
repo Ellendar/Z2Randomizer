@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -130,8 +131,7 @@ public class RandomizerProperties
     public bool RequiresSmallKeyValidation(int palaceNumber) =>
         KeyLogic == KeyLogicOption.KEYS_PER_PALACE_SOLVABLE
         && palaceNumber < 7
-        && (palaceNumber < 6 || BlockersAnywhere);
-
+        && (palaceNumber < 6 || BlockersAnywhere || RemoveItems.Contains(Collectable.MAGIC_KEY));
     //Always false for now; reserved as a future logic setting.
     public bool LockedDoorsBlockFairy { get; set; } = false;
     public bool RemoveLongDeadEnds { get; set; }
@@ -205,6 +205,8 @@ public class RandomizerProperties
     public bool PbagItemShuffle { get; set; }
     public bool StartWithSpellItems { get; set; }
     public bool ShufflePbagXp { get; set; }
+
+    public HashSet<Collectable> RemoveItems { get; set; } = [];
 
     //Drops
     public bool ShuffleItemDropFrequency { get; set; }
@@ -420,7 +422,7 @@ public class RandomizerProperties
         }
         if (ShuffleOverworldItems && EastBiome.InItemShuffle())
         {
-            overworldMinorItemCount += StartKey ? 1 : 0;
+            overworldMinorItemCount += StartKey || RemoveItems.Contains(Collectable.MAGIC_KEY) ? 1 : 0;
         }
 
         if (IncludeSpellsInShuffle)

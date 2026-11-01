@@ -296,6 +296,14 @@ public class RoomPool
     {
         var palaceBlockers = !props.BlockersAnywhere ? Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1] : Palaces.ALL_PALACE_ALLOWED_BLOCKERS;
         HashSet<RequirementType> allowedBlockers = [.. palaceBlockers];
+        foreach (Collectable removed in props.RemoveItems)
+        {
+            if (removed.AsRequirement() is RequirementType requirement)
+            {
+                Debug.Assert(requirement is not RequirementType.KEY); // Magic Key should be its own RequirementType
+                allowedBlockers.Remove(requirement);
+            }
+        }
         if (!props.ReplaceFireWithDash)
         {
             allowedBlockers.Remove(RequirementType.DASH);

@@ -232,6 +232,7 @@ public class Hyrule
                 .Excluding(
                     props.ReplaceFireWithDash ? Collectable.FIRE_SPELL : Collectable.DASH_SPELL,
                     props.MarioMode ? Collectable.JUMP_SPELL : Collectable.TANOOKI)
+                .Excluding(props.RemoveItems)
                 .StartingWith(Enum.GetValues<Collectable>().Where(collectable => props.StartsWithCollectable(collectable)))
                 .Build();
 
@@ -966,6 +967,16 @@ public class Hyrule
         //Placing unmixed vanilla locations could have replaced unwanted spell items, so recheck them
         HandleStartingSpellItems(ItemLocations().ToList());
 
+        if (props.RemoveItems.Count > 0)
+        {
+            foreach (Location location in possibleItemLocations)
+            {
+                foreach (Collectable collectable in location.GetAllCollectables().Where(props.RemoveItems.Contains).ToList())
+                {
+                    location.ReplaceCollectable(collectable, minorItems.Sample(r));
+                }
+            }
+        }
 
         int heartContainersInItemPool = props.MaxHearts - props.StartHearts;
         int magicContainersInItemPool = props.MaxMagicContainers - props.StartMagicContainers;
@@ -1138,7 +1149,7 @@ public class Hyrule
                 ];
             }
 
-            importantItemsToDuplicate = importantItemsToDuplicate.Where(shufflableItems.Contains).ToList();
+            importantItemsToDuplicate = importantItemsToDuplicate.Where(c => shufflableItems.Contains(c) && !props.RemoveItems.Contains(c)).ToList();
 
             var minorItemLocations = duplicateItemPlacementCandidates.Where(i => i.GetShufflableCollectables().Any(c => c.IsMinorItem())).ToList();
             int replaceableMinorItemCount = duplicateItemPlacementCandidates.Sum(l => l.GetShufflableCollectables().Count(c => c.IsMinorItem()));

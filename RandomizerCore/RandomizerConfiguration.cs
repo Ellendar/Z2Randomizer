@@ -404,6 +404,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     public bool keyLogicIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
+    private bool removeMagicKey = false;
+
+    [Reactive]
     [ConditionallyIncludeInFlags]
     private bool blockingRoomsInAnyPalace = false;
     public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanilla();
@@ -987,6 +990,8 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             //ROM Info
             Seed = seed
         };
+
+        if (removeMagicKey) { properties.RemoveItems.Add(Collectable.MAGIC_KEY); }
 
         ExportBiomes(properties, r);
 
@@ -1927,7 +1932,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             {
                 break;
             }
-            if (StartsWithCollectable(collectable))
+            if (StartsWithCollectable(collectable) && !properties.RemoveItems.Contains(collectable))
             {
                 startingItems.Add(collectable);
             }
@@ -1941,7 +1946,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
                 {
                     break;
                 }
-                if (!StartsWithCollectable(collectable))
+                if (!StartsWithCollectable(collectable) && !properties.RemoveItems.Contains(collectable))
                 {
                     if (r.Next(4) == 0)
                     {
@@ -2099,7 +2104,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         }
         if (shuffleOverworldItems != false && eastBiome.InItemShuffle())
         {
-            overworldStartMinorItemCount += shuffleStartingItems || startWithMagicKey ? 1 : 0;
+            overworldStartMinorItemCount += shuffleStartingItems || startWithMagicKey || removeMagicKey ? 1 : 0;
         }
 
         int startItemsOverflow = Math.Min(0, palaceStartMinorItemCount + overworldStartMinorItemCount - (shuffleStartingItems ? startItemsLimit.AsInt() : 0));

@@ -48,6 +48,11 @@
                 <z:Z2CheckBox Flag="ShuffleSmallItems" />
                 <z:Z2CheckBox Flag="PalacesContainExtraKeys" />
             </StackPanel>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Remove Items" Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="RemoveMagicKey" />
+            </StackPanel>
         </v:FlexColumnsPanel>
     </ScrollViewer>
 </UserControl>
