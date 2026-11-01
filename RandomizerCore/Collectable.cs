@@ -327,6 +327,7 @@ public static class CollectableExtensions
         return collectable switch
         {
             Collectable.DO_NOT_USE or Collectable.DO_NOT_USE_ANTIFAIRY => throw new Exception($"Collectable {collectable} cannot be placed"),
+            Collectable.DASH_SPELL => (byte)Collectable.FIRE_SPELL,
             Collectable.TANOOKI => (byte)Collectable.JUMP_SPELL,
             _ => (byte)collectable
         };

@@ -2997,19 +2997,19 @@ CustomFileSelectData:
     public IEnumerable<(string, int)> GetFullShuffleLocationCollectables()
     {
         return [
-            ("SHIELD_SPELL_ITEMLOC", (int)westHyrule.rauru.Town!.GetWizard()!.Collectable!),
-            ("JUMP_SPELL_ITEMLOC", (int)westHyrule.ruto.Town!.GetWizard()!.Collectable!),
-            ("LIFE_SPELL_ITEMLOC", (int)westHyrule.sariaNorth.Town!.GetWizard()!.Collectable!),
-            ("FAIRY_SPELL_ITEMLOC", (int)westHyrule.mido.Town!.GetWizard()!.Collectable!),
-            ("FIRE_SPELL_ITEMLOC", (int)eastHyrule.nabooru.Town!.GetWizard()!.Collectable!),
-            ("REFLECT_SPELL_ITEMLOC", (int)eastHyrule.darunia.Town!.GetWizard()!.Collectable!),
-            ("SPELL_SPELL_ITEMLOC", (int)eastHyrule.newKasuto.Town!.GetWizard()!.Collectable!),
-            ("THUNDER_SPELL_ITEMLOC", (int)eastHyrule.oldKasuto.Town!.GetWizard()!.Collectable!),
-            ("MIRROR_ITEMLOC", (int)westHyrule.sariaNorth.Town!.GetTownMap(VanillaTownMap.SARIA_TABLE)!.Collectable!),
-            ("BAGUS_NOTE_ITEMLOC", (int)westHyrule.bagu.Town!.GetTownMap(VanillaTownMap.BAGU_INDOORS)!.Collectable!),
-            ("WATER_ITEMLOC", (int)eastHyrule.nabooru.Town!.GetTownMap(VanillaTownMap.NABOORU_MID)!.Collectable!),
-            ("DOWNSTAB_ITEMLOC", (int)westHyrule.mido.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER)!.Collectable!),
-            ("UPSTAB_ITEMLOC", (int)eastHyrule.darunia.Town.GetTownMap(VanillaTownMap.DARUNIA_TRAINER)!.Collectable!),
+            ("SHIELD_SPELL_ITEMLOC", westHyrule.rauru.Town!.GetWizard()!.Collectable!.Value.GetROMCollectableIndex()),
+            ("JUMP_SPELL_ITEMLOC", westHyrule.ruto.Town!.GetWizard()!.Collectable!.Value.GetROMCollectableIndex()),
+            ("LIFE_SPELL_ITEMLOC", westHyrule.sariaNorth.Town!.GetWizard()!.Collectable!.Value.GetROMCollectableIndex()),
+            ("FAIRY_SPELL_ITEMLOC", westHyrule.mido.Town!.GetWizard()!.Collectable!.Value.GetROMCollectableIndex()),
+            ("FIRE_SPELL_ITEMLOC", eastHyrule.nabooru.Town!.GetWizard()!.Collectable!.Value.GetROMCollectableIndex()),
+            ("REFLECT_SPELL_ITEMLOC", eastHyrule.darunia.Town!.GetWizard()!.Collectable!.Value.GetROMCollectableIndex()),
+            ("SPELL_SPELL_ITEMLOC", eastHyrule.newKasuto.Town!.GetWizard()!.Collectable!.Value.GetROMCollectableIndex()),
+            ("THUNDER_SPELL_ITEMLOC", eastHyrule.oldKasuto.Town!.GetWizard()!.Collectable!.Value.GetROMCollectableIndex()),
+            ("MIRROR_ITEMLOC", westHyrule.sariaNorth.Town!.GetTownMap(VanillaTownMap.SARIA_TABLE)!.Collectable!.Value.GetROMCollectableIndex()),
+            ("BAGUS_NOTE_ITEMLOC", westHyrule.bagu.Town!.GetTownMap(VanillaTownMap.BAGU_INDOORS)!.Collectable!.Value.GetROMCollectableIndex()),
+            ("WATER_ITEMLOC", eastHyrule.nabooru.Town!.GetTownMap(VanillaTownMap.NABOORU_MID)!.Collectable!.Value.GetROMCollectableIndex()),
+            ("DOWNSTAB_ITEMLOC", westHyrule.mido.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER)!.Collectable!.Value.GetROMCollectableIndex()),
+            ("UPSTAB_ITEMLOC", eastHyrule.darunia.Town.GetTownMap(VanillaTownMap.DARUNIA_TRAINER)!.Collectable!.Value.GetROMCollectableIndex()),
         ];
     }
 
@@ -3126,7 +3126,6 @@ CustomFileSelectData:
             a.Label("ShuffledSpellList");
             a.Byt(spellBytes);
         }
-        a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
         a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", 1); // always on now, so starting spells can be replaced by minor items
         a.Set("SHUFFLED_SPELL_LIST", props.ShuffleSpellLocations ? 1 : 0);
