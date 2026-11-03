@@ -16,13 +16,14 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 */
 public enum LocationID
 {
-    [Description("Starting Palace")]
+    // WEST CONTINENT
+    [Description("North Palace")]
     WEST_NORTH_PALACE = 0,                       //  0: (23, 52)
     [Description("Trophy Cave")]
     WEST_CAVE_TROPHY,                            //  1: (29, 32)
-    [Description("West PBag Forest Tile")]
+    [Description("Pbag Forest Tile")]
     WEST_MINOR_FOREST_AT_START,                  //  2: (37, 42)
-    [Description("West Magic Container Cave")]
+    [Description("Magic Container Cave")]
     WEST_CAVE_MAGIC_CONTAINER,                   //  3: (16, 60)
     [Description("Minor Forest Tile (Saria)")]
     WEST_MINOR_FOREST_BY_SARIA,                  //  4: (20, 86)
@@ -30,9 +31,9 @@ public enum LocationID
     WEST_GRASS,                                  //  5: (62, 64)
     [Description("Lost Woods (1)")]
     WEST_BAGU_WOODS1,                            //  6: (21, 77)
-    [Description("West Road Trap Tile")]
+    [Description("Road Trap Tile")]
     WEST_TRAP_ROAD,                              //  7: (61, 57)
-    [Description("West Minor Swamp Tile (1)")]
+    [Description("Minor Swamp Tile (1)")]
     WEST_MINOR_SWAMP1,                           //  8: ( 8, 71)
     [Description("Minor Grave Tile")]
     WEST_MINOR_GRAVE1,                           //  9: (48, 92)
@@ -44,11 +45,11 @@ public enum LocationID
     WEST_CAVE_JUMP_NORTH,                        // 12: ( 1, 58)
     [Description("Jump Cave South")]
     WEST_CAVE_JUMP_SOUTH,                        // 13: ( 3, 62)
-    [Description("West PBag Cave")]
+    [Description("Pillar Pbag Cave")]
     WEST_CAVE_PBAG,                              // 14: (38, 62)
     [Description("Medicine Cave")]
     WEST_CAVE_MEDICINE,                          // 15: ( 9, 69)
-    [Description("West Heart Container Cave")]
+    [Description("Heart Container Cave")]
     WEST_CAVE_HEART_CONTAINER,                   // 16: (54, 62)
     [Description("Fairy Cave Drop")]
     WEST_FAIRY_CAVE_DROP,                        // 17: (50, 96)
@@ -64,7 +65,7 @@ public enum LocationID
     WEST_BRIDGE_AFTER_DM_EAST,                   // 22: (34, 97)
     [Description("Forest Tile (Jump Cave)")]
     WEST_MINOR_FOREST_BY_JUMP_CAVE,              // 23: ( 7, 64)
-    [Description("West Minor Swamp Tile (2)")]
+    [Description("Minor Swamp Tile (2)")]
     WEST_MINOR_SWAMP2,                           // 24: (17, 67)
     [Description("Minor Forest Tile (Saria East)")]
     WEST_MINOR_FOREST_EAST_OF_SARIA,             // 25: (33, 87)
@@ -78,13 +79,15 @@ public enum LocationID
     WEST_BAGU_WOODS5,                            // 29: (23, 77)
     [Description("Minor Road Tile")]
     WEST_MINOR_ROAD,                             // 30: (37, 68)
-    [Description("West Minor Desert Tile")]
+    [Description("Minor Desert Tile")]
     WEST_MINOR_DESERT = 32,                      // 32: (38,102)
+    [Description("West Continent Connector Bridge")]
+    WEST_CONTINENT_CONNECTOR_BRIDGE = 40,        // 40: not in vanilla
     [Description("West Raft Tile")]
-    WEST_RAFT_TO_EAST = 41,                      // 41: (61, 77)
-    [Description("Death Mountain Entrance")]
+    WEST_RAFT_TO_EAST,                           // 41: (61, 77)
+    [Description("West Continent Connector Cave 1")]
     WEST_DM_ENTRANCE,                            // 42: (10, 95)
-    [Description("Death Mountain Exit")]
+    [Description("West Continent Connector Cave 2")]
     WEST_DM_EXIT,                                // 43: (21, 96)
     [Description("Kings Tomb")]
     WEST_KINGS_TOMB,                             // 44: (50, 88)
@@ -100,13 +103,14 @@ public enum LocationID
     WEST_BAGU_HOUSE,                             // 50: (21, 76)
     [Description("Mido")]
     WEST_TOWN_MIDO,                              // 51: (60, 75)
-    [Description("Palace 1")]
+    [Description("Parapa Palace")]
     WEST_PALACE1,                                // 52: (62, 32)
-    [Description("Palace 2")]
+    [Description("Midoro Palace")]
     WEST_PALACE2,                                // 53: (11, 64)
-    [Description("Palace 3")]
+    [Description("Island Palace")]
     WEST_PALACE3,                                // 54: (57, 98)
 
+    // DEATH MOUNTAIN
     DM_CAVE1A = 0x40 + 0,                        //  0: ( 0, 42)
     DM_CAVE1B,                                   //  1: ( 4, 41)
     DM_CAVE2A,                                   //  2: ( 9, 40)
@@ -135,6 +139,7 @@ public enum LocationID
     DM_CAVE13B,                                  // 25: (18, 63)
     DM_CAVE14A,                                  // 26: (22, 63)
     DM_CAVE14B,                                  // 27: (24, 60)
+
     [Description("Hammer Cave")]
     DM_HAMMER_CAVE,                              // 28: (10, 64)
     DM_CAVE4WAY1A,                               // 29: (11, 54)
@@ -145,13 +150,19 @@ public enum LocationID
     DM_CAVE4WAY2B,                               // 34: (10, 51)
     DM_CAVE4WAY2C,                               // 35: (18, 40)
     DM_CAVE4WAY2D,                               // 36: (18, 44)
-    [Description("Death Mountain Connector 1")]
+
+    [Description("DM Continent Connector Bridge")]
+    DM_CONNECTOR_BRIDGE = 0x40 + 40,             // 40: not in vanilla
+    [Description("DM Raft Tile")]
+    DM_RAFT_TILE,                                // 41: not in vanilla
+    [Description("DM Continent Connector Cave 1")]
     DM_CONTINENT_CONNECTOR1 = 0x40 + 42,         // 42: ( 7, 37)
-    [Description("Death Mountain Connector 2")]
-    DM_CONTINENT_CONNECTOR2,                     // 43: (23, 37)
+    [Description("DM Continent Connector Cave 2")]
+    DM_CONTINENT_CONNECTOR2 = 0x40 + 43,         // 43: (23, 37)
     [Description("Spectacle Rock")]
     DM_SPEC_ROCK = 0x40 + 56,                    // 56: ( 8, 64)
 
+    // EAST CONTINENT
     [Description("Forest Tile (Nabooru)")]
     EAST_MINOR_FOREST_BY_NABOORU = 0x80 + 0,     //  0: (10, 58)
     [Description("Forest Tile (Near Palace 6)")]
@@ -162,7 +173,7 @@ public enum LocationID
     EAST_TRAP_ROAD2,                             //  3: (17, 81)
     [Description("Road Trap Tile (3)")]
     EAST_TRAP_ROAD3,                             //  4: (19, 84)
-    [Description("Road Trap (VOD)")]
+    [Description("Road Trap (VoD)")]
     EAST_TRAP_ROAD_TO_VOD,                       //  5: (24, 96)
     [Description("Bridge (Palace 6)")]
     EAST_BRIDGE_TO_P6,                           //  6: (35, 93)
@@ -174,25 +185,25 @@ public enum LocationID
     EAST_TRAP_DESERT2,                           //  9: (10, 38)
     [Description("Water Tile")]
     EAST_WATER,                                  // 10: (63, 56)
-    [Description("Nabooru Passthru South")]
+    [Description("Nabooru Passthrough South")]
     EAST_CAVE_NABOORU_PASSTHROUGH_SOUTH,         // 11: (24, 52)
-    [Description("Nabooru Passthru North")]
+    [Description("Nabooru Passthrough North")]
     EAST_CAVE_NABOORU_PASSTHROUGH_NORTH,         // 12: (27, 48)
     [Description("Sunken Pbag Cave")]
     EAST_CAVE_PBAG1,                             // 13: (25, 71)
     [Description("Risen Pbag Cave")]
     EAST_CAVE_PBAG2,                             // 14: (31, 78)
-    [Description("New Kasuto Passthru West")]
+    [Description("New Kasuto Passthrough West")]
     EAST_CAVE_NEW_KASUTO_PASSTHROUGH_WEST,       // 15: (49, 78)
-    [Description("New Kasuto Passthru East")]
+    [Description("New Kasuto Passthrough East")]
     EAST_CAVE_NEW_KASUTO_PASSTHROUGH_EAST,       // 16: (57, 78)
-    [Description("VOD Passthrough 2 Start")]
+    [Description("VoD Passthrough 2 Start")]
     EAST_CAVE_VOD_PASSTHROUGH2_START,            // 17: ( 2, 75)
-    [Description("VOD Passthrough 2 End")]
+    [Description("VoD Passthrough 2 End")]
     EAST_CAVE_VOD_PASSTHROUGH2_END,              // 18: ( 4, 75)
-    [Description("VOD Passthrough 1 End")]
+    [Description("VoD Passthrough 1 End")]
     EAST_CAVE_VOD_PASSTHROUGH1_END,              // 19: ( 6, 77)
-    [Description("VOD Passthrough 1 Start")]
+    [Description("VoD Passthrough 1 Start")]
     EAST_CAVE_VOD_PASSTHROUGH1_START,            // 20: (10, 77)
     [Description("East Swamp 1UP")]
     EAST_MINOR_SWAMP,                            // 21: (26, 81)
@@ -218,10 +229,14 @@ public enum LocationID
     EAST_TRAP_LAVA2,                             // 31: ( 8, 86)
     [Description("Lava Trap Tile (1)")]
     EAST_TRAP_LAVA3,                             // 32: ( 8, 99)
-    [Description("Bridge to Maze Island")]
+    [Description("East Continent Connector Bridge")]
     EAST_BRIDGE_TO_MI = 0x80 + 40,               // 40: (52, 40)
     [Description("East Raft Tile")]
     EAST_RAFT_TO_WEST,                           // 41: ( 7, 52)
+    [Description("East Continent Connector Cave 1")]
+    EAST_CONTINENT_CONNECTOR_CAVE1,              // 42: not in vanilla
+    [Description("East Continent Connector Cave 2")]
+    EAST_CONTINENT_CONNECTOR_CAVE2,              // 43: not in vanilla
     [Description("Nabooru")]
     EAST_TOWN_NABOORU = 0x80 + 45,               // 45: (23, 60)
     [Description("Darunia")]
@@ -230,23 +245,30 @@ public enum LocationID
     EAST_TOWN_NEW_KASUTO = 0x80 + 49,            // 49: (61,  0)
     [Description("Old Kasuto")]
     EAST_TOWN_OLD_KASUTO = 0x80 + 51,            // 51: (34, 99)
-    [Description("Palace 5")]
+    [Description("Ocean Palace")]
     EAST_PALACE5,                                // 52: (62, 60)
-    [Description("Palace 6")]
+    [Description("Three Eye Rock Palace")]
     EAST_PALACE6,                                // 53: (45,  0)
-    [Description("Great Palace")]
+    [Description("VoD Palace")]
     EAST_GREAT_PALACE,                           // 54: ( 4, 73)
 
+    // MAZE ISLAND
     // DM and MI tables are actually identical but duplicated in banks 1 and 2
     MI_TRAP1 = 0xc0 + 37,                        // 37: (45, 62)
     MI_TRAP2,                                    // 38: (48, 68)
-    [Description("Maze Island Magic Container Cave")]
+    [Description("Magic Container Drop")]
     MI_MAGIC_CONTAINER_DROP,                     // 39: (41, 58)
-    [Description("Maze Island Bridge")]
+    [Description("MI Continent Connector Bridge")]
     MI_CONNECTOR_BRIDGE,                         // 40: (40, 67)
-    [Description("Palace 4")]
+    [Description("MI Raft Tile")]
+    MI_RAFT_TILE,                                // 41: not in vanilla
+    [Description("MI Continent Connector Cave 1")]
+    MI_CONTINENT_CONNECTOR_CAVE1,                // 42: not in vanilla
+    [Description("MI Continent Connector Cave 2")]
+    MI_CONTINENT_CONNECTOR_CAVE2,                // 43: not in vanilla
+    [Description("Maze Island Palace")]
     MI_PALACE4 = 0xc0 + 52,                      // 52: (60, 58)
-    [Description("Maze Island Child Cave")]
+    [Description("Child Drop")]
     MI_CHILD_DROP = 0xc0 + 55,                   // 55: (57, 60)
     MI_TRAP3 = 0xc0 + 57,                        // 57: (48, 58)
     MI_TRAP4,                                    // 58: (51, 49)
