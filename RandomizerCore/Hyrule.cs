@@ -76,8 +76,7 @@ public class Hyrule
     //Continent connectors
     protected (Location, Location)[] connections = new (Location, Location)[4];
 
-    private int accessibleMagicContainers;
-    private int accessibleHeartContainers;
+    private readonly ReachabilitySimulation reachability;
 
     public GettableItemSet GettableItems { get; private set; }
     private List<Collectable> spellListOrder { get; set; }
@@ -179,6 +178,7 @@ public class Hyrule
     {
         NewAssembler = createAsm;
         palaceRooms = rooms;
+        reachability = new(ItemLocations);
     }
     public async Task<RandomizerResult> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Func<string, Task> progress, CancellationToken ct)
     {
@@ -195,9 +195,7 @@ public class Hyrule
 
 #if Z2R_DIAGNOSTICS
             using var diagnostics = new Diag.Generation(r, difficultyRng);
-            lastReachabilityFailure = null;
-            consecutiveReachabilityFailures = 0;
-            reachabilityCalls = itemUpdateCalls = 0;
+            reachability.ResetDiagnostics();
             Diag.Trace("seed", $"event=begin seed={config.Seed} flags={config.SerializeFlags()}");
             diagnostics.Stage("config");
 #endif
@@ -1441,200 +1439,8 @@ public class Hyrule
         return true;
     }
 
-#if Z2R_DIAGNOSTICS
-    private string? lastReachabilityFailure;
-    private long consecutiveReachabilityFailures;
-    private long reachabilityCalls, itemUpdateCalls;
-#endif
-
     private bool IsEverythingReachable()
-    {
-        int dm = 0;
-        int mi = 0;
-        int wh = 0;
-        int eh = 0;
-        int reachableLocationsCount = 1;
-        int previousReachableLocationsCount = 0;
-        int gettableItemsCount = 1;
-        int previousGettableItemsCount = 0;
-
-        int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count
-            + deathMountain.AllLocations.Count + mazeIsland.AllLocations.Count;
-#if Z2R_DIAGNOSTICS
-        long reachCall = ++reachabilityCalls;
-        long reachPasses = 0;
-#endif
-        while (reachableLocationsCount != previousReachableLocationsCount || gettableItemsCount != previousGettableItemsCount)
-        {
-#if Z2R_DIAGNOSTICS
-            reachPasses++;
-            if (Diag.IsSample(reachCall) || reachPasses >= 1000)
-                Diag.Retry("reach.loop", reachPasses, $"reachable={reachableLocationsCount} previous={previousReachableLocationsCount} items={gettableItemsCount} previousItems={previousGettableItemsCount}");
-#endif
-            previousReachableLocationsCount = reachableLocationsCount;
-            previousGettableItemsCount = gettableItemsCount;
-            gettableItemsCount = UpdateGettableItems(props);
-            IReadOnlySet<RequirementType> requireables = GetRequireables(props);
-            westHyrule.UpdateVisit(requireables);
-            deathMountain.UpdateVisit(requireables);
-            eastHyrule.UpdateVisit(requireables);
-            mazeIsland.UpdateVisit(requireables);
-
-            foreach (World world in worlds)
-            {
-                if (world.raft != null && world.raft.Reachable && GettableItems[Collectable.RAFT])
-                {
-                    worlds.ForEach(i => i.VisitRaft());
-                }
-
-                if (world.bridge != null && world.bridge.Reachable)
-                {
-                    worlds.ForEach(i => i.VisitBridge());
-                }
-
-                if (world.cave1 != null && world.cave1.Reachable)
-                {
-                    worlds.ForEach(i => i.VisitCave1());
-                }
-
-                if (world.cave2 != null && world.cave2.Reachable)
-                {
-                    worlds.ForEach(i => i.VisitCave2());
-                }
-            }
-            gettableItemsCount = UpdateGettableItems(props);
-
-            //This 2nd pass is weird and may not need to exist, eventually I should run some stats on whether it helps or not
-            requireables = GetRequireables(props);
-            westHyrule.UpdateVisit(requireables);
-            deathMountain.UpdateVisit(requireables);
-            eastHyrule.UpdateVisit(requireables);
-            mazeIsland.UpdateVisit(requireables);
-
-            gettableItemsCount = UpdateGettableItems(props);
-
-            reachableLocationsCount = 0;
-            dm = 0;
-            mi = 0;
-            wh = 0;
-            eh = 0;
-
-            wh = westHyrule.AllLocations.Count(i => i.Reachable);
-            eh = eastHyrule.AllLocations.Count(i => i.Reachable);
-            dm = deathMountain.AllLocations.Count(i => i.Reachable);
-            mi = mazeIsland.AllLocations.Count(i => i.Reachable);
-            reachableLocationsCount = wh + eh + dm + mi;
-        }
-
-        if (GettableItems.TrackedItems.Any(item => !GettableItems[item]))
-        {
-            isEverythingReachableFailures++;
-            EmitReachabilityFailure("items", reachableLocationsCount, wh, eh, dm, mi);
-            return false;
-        }
-        if (accessibleMagicContainers != props.MaxMagicContainers)
-        {
-            isEverythingReachableFailures++;
-            EmitReachabilityFailure("magic", reachableLocationsCount, wh, eh, dm, mi);
-            return false;
-        }
-        if (accessibleHeartContainers < props.MaxHearts)
-        {
-            isEverythingReachableFailures++;
-            EmitReachabilityFailure("hearts", reachableLocationsCount, wh, eh, dm, mi);
-            return false;
-        }
-        if (accessibleHeartContainers > props.MaxHearts)
-        {
-            throw new Exception("More hearts found than should exist in the seed.");
-        }
-
-        bool requiredLocationsReachable =
-            CanGet(westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
-            && CanGet(eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
-            && CanGet(deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
-            && CanGet(mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto));
-        if (!requiredLocationsReachable)
-        {
-            isEverythingReachableFailures++;
-            EmitReachabilityFailure("locations", reachableLocationsCount, wh, eh, dm, mi);
-            return false;
-        }
-
-#if Z2R_DIAGNOSTICS
-        lastReachabilityFailure = null;
-        consecutiveReachabilityFailures = 0;
-#endif
-        Diag.Trace("reach", $"event=success reachable={reachableLocationsCount}/{totalLocationsCount}");
-        return true;
-    }
-
-    /// <summary>
-    /// Emits why <see cref="IsEverythingReachable"/> failed as a failure reason plus
-    /// the routing snapshot that used to sit behind a reachability threshold.
-    /// Compiled out (call site and all LINQ arguments removed) unless
-    /// <c>Z2R_DIAGNOSTICS</c> is defined.
-    /// </summary>
-    [Conditional("Z2R_DIAGNOSTICS")]
-    private void EmitReachabilityFailure(string failureClass, int reachableLocations, int wh, int eh, int dm, int mi)
-    {
-#if Z2R_DIAGNOSTICS
-        if (lastReachabilityFailure != failureClass)
-        {
-            lastReachabilityFailure = failureClass;
-            consecutiveReachabilityFailures = 0;
-        }
-        if (!Diag.IsSample(++consecutiveReachabilityFailures)) return;
-        Diag.Trace("reach", $"failed class={failureClass} consecutive={consecutiveReachabilityFailures} attempt={isEverythingReachableFailures} "
-            + $"reachable={reachableLocations} "
-            + $"wh={wh}/{westHyrule.AllLocations.Count} "
-            + $"eh={eh}/{eastHyrule.AllLocations.Count} "
-            + $"dm={dm}/{deathMountain.AllLocations.Count} "
-            + $"mi={mi}/{mazeIsland.AllLocations.Count} "
-            + $"hearts={accessibleHeartContainers}/{props.MaxHearts} magic={accessibleMagicContainers}/{props.MaxMagicContainers}");
-
-        foreach (Collectable item in GettableItems.TrackedItems.Where(i => !GettableItems[i] && !i.IsMinorItem()))
-        {
-            Diag.Trace("reach", $"ungotten {item}");
-        }
-
-        foreach (Location location in ItemLocations()
-            .Where(l => l.GetAllCollectables().Any(i => !i.IsMinorItem() && !GettableItems[i])))
-        {
-            string palace = location.Palace is null ? string.Empty : $"({location.Palace.Number})";
-            Diag.Trace("reach", $"held-by {location.Name}{palace} "
-                + $"[{string.Join(", ", location.GetAllCollectables().Where(i => !i.IsMinorItem() && !GettableItems[i]))}]");
-        }
-
-        foreach (Location location in ItemLocations().Where(l => !l.Reachable))
-        {
-            Diag.Trace("reach", $"unreachable-item-location {location.Name}");
-        }
-        if (failureClass == "locations") EmitUnreachableRequiredLocations();
-#endif
-    }
-
-    [Conditional("Z2R_DIAGNOSTICS")]
-    private void EmitUnreachableRequiredLocations()
-    {
-        IEnumerable<Location> requiredLocations =
-        [
-            .. westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto),
-            .. eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto),
-            .. mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto),
-            .. deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto),
-        ];
-
-        foreach (Location location in requiredLocations.Where(l => !l.Reachable))
-        {
-            Diag.Trace("reach", $"unreachable-required {location.GetDebuggerDisplay()}");
-        }
-    }
-
-    private bool CanGet(IEnumerable<Location> locations)
-    {
-        return locations.All(i => i.Reachable);
-    }
+        => reachability.IsEverythingReachable(worlds, props, GettableItems, ref isEverythingReachableFailures);
 
     private void ShortenWizards()
     {
@@ -1675,101 +1481,8 @@ public class Hyrule
         ROMData.Put(RomMap.TOWN_NORMAL_CONNECTIONS_TABLE + 45 * 4, (16 << 2) + 3);
     }
 
-    /// <summary>
-    /// Marks every item reachable at currently reachable locations, repeating
-    /// until no new items become available.
-    /// </summary>
-    /// <returns>The number of items obtained on the final pass.</returns>
-    private int UpdateGettableItems(RandomizerProperties props)
-    {
-        IReadOnlySet<RequirementType> requireables;
-        accessibleMagicContainers = props.StartMagicContainers;
-        accessibleHeartContainers = props.StartHearts;
-        List<Collectable> gottenItems = [], lastIterationGottenItems = [];
-        List<Location> reachableLocations = ItemLocations().Where(i => i.Reachable).ToList();
-        List<Location> heartContainerGetLocations = [], magicContainerGetLocations = [];
-        bool stalled = false;
-        //No more delayed evaluation because too many locations could give you containers or require containers.
-        //Just iterate until we find as many items as possible
-#if Z2R_DIAGNOSTICS
-        long itemCall = ++itemUpdateCalls;
-        long itemPasses = 0;
-#endif
-        do
-        {
-#if Z2R_DIAGNOSTICS
-            itemPasses++;
-            if (Diag.IsSample(itemCall) || itemPasses >= 1000)
-                Diag.Retry("items.loop", itemPasses, $"event=begin previousItems={lastIterationGottenItems.Count}");
-#endif
-            accessibleHeartContainers = props.StartHearts + heartContainerGetLocations.Count;
-            accessibleMagicContainers = props.StartMagicContainers + magicContainerGetLocations.Count;
-            requireables = GetRequireables(props);
-            gottenItems = [];
-            foreach (Location location in reachableLocations)
-            {
-                IReadOnlyList<Collectable> gettableItems = GettableItems.GetGettableItemsAt(props, location, requireables);
-
-                foreach (Collectable item in gettableItems)
-                {
-                    GettableItems[item] = true;
-                    gottenItems.Add(item);
-
-                    if (item == Collectable.HEART_CONTAINER && !heartContainerGetLocations.Contains(location))
-                    {
-                        heartContainerGetLocations.Add(location);
-                    }
-                    if (item == Collectable.MAGIC_CONTAINER && !magicContainerGetLocations.Contains(location))
-                    {
-                        magicContainerGetLocations.Add(location);
-                    }
-                }
-            }
-            stalled = lastIterationGottenItems.SequenceEqual(gottenItems);
-            lastIterationGottenItems = new(gottenItems);
-        } while (!stalled);
-
-        accessibleHeartContainers = props.StartHearts + heartContainerGetLocations.Count;
-        accessibleMagicContainers = props.StartMagicContainers + magicContainerGetLocations.Count;
-        return gottenItems.Count;
-    }
-
     public IReadOnlySet<RequirementType> GetRequireables(RandomizerProperties props)
-    {
-        HashSet<RequirementType> requireables = [];
-
-        foreach (Collectable item in GettableItems.TrackedItems)
-        {
-            RequirementType? requirement = item.AsRequirement();
-            if (requirement != null
-                && (GettableItems[item] || props.StartsWithCollectable(item)))
-            {
-                requireables.Add(requirement.Value);
-            }
-        }
-
-        //Mario always runs fast and jumps high, so assume he always has access to jump and dash
-        //(even though they aren't collectable)
-        //Also mario implicitly has upstab as a requirementType because it means "can break blocks upward"
-        //but not in itemget because he can still get the upstab upgrade, which lets him POW
-        if (props.MarioMode)
-        {
-            requireables.Add(RequirementType.JUMP);
-            requireables.Add(RequirementType.DASH);
-            requireables.Add(RequirementType.UPSTAB);
-        }
-
-        requireables.AddRange(RequirementTypeExtensions.UpToXContainers(accessibleMagicContainers));
-
-        // Now there are KEY requirements in palace rooms, and that responsibility is handled by
-        // AccessRequirements in the old mode - we just add KEY here
-        if (props.KeyLogic == KeyLogicOption.FAIRY_OR_MAGICKEY)
-        {
-            requireables.Add(RequirementType.KEY);
-        }
-
-        return requireables;
-    }
+        => reachability.GetRequireables(props, GettableItems);
 
     private async Task ProcessOverworld(Func<string, Task> progress, CancellationToken ct)
     {
@@ -1799,6 +1512,7 @@ public class Hyrule
                 deathMountain = new DeathMountain(props, r, ROMData);
                 eastHyrule = new EastHyrule(props, r, ROMData);
                 mazeIsland = new MazeIsland(props, r, ROMData);
+                // Reachability visits and indexes these worlds in Continent order.
                 worlds.Add(westHyrule);
                 worlds.Add(deathMountain);
                 worlds.Add(eastHyrule);
