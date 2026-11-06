@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using NLog;
+using Z2Randomizer.RandomizerCore.Diagnostics;
 using Z2Randomizer.RandomizerCore.Flags;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 // ReSharper disable InconsistentNaming
@@ -984,7 +985,10 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         ExportBiomes(properties, r);
 
         //Properties that can affect available minor item replacements
-        do // while (!properties.HasEnoughSpaceToAllocateItems())
+#if Z2R_DIAGNOSTICS
+        long initialAllocationFailures = 0;
+#endif
+        while (true)
         {
             //Start Configuration
             ShuffleStartingCollectables(includeDifficulty ? POSSIBLE_STARTING_ITEMS : POSSIBLE_SHARED_STARTING_ITEMS,
@@ -1088,7 +1092,13 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
             //Not settable yet
             properties.MaxMagicContainers = 8;
-        } while (!properties.HasEnoughSpaceToAllocateItems());
+
+            if (properties.HasEnoughSpaceToAllocateItems())
+                break;
+#if Z2R_DIAGNOSTICS
+            TraceItemAllocationRetry(++initialAllocationFailures, "initial-roll", properties);
+#endif
+        }
 
         //Handle Fire
         Collectable RollLinkedFireSpell()
@@ -1562,15 +1572,35 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         if (rerollPalaceItemRoomCounts)
         {
-            do
+#if Z2R_DIAGNOSTICS
+            long palaceRoomRerollFailures = 0;
+#endif
+            while (true)
             {
                 AssignPalaceItemCounts(properties, r);
+                if (properties.HasEnoughSpaceToAllocateItems()) break;
+#if Z2R_DIAGNOSTICS
+                TraceItemAllocationRetry(++palaceRoomRerollFailures, "palace-room-reroll", properties);
+#endif
             }
-            while (!properties.HasEnoughSpaceToAllocateItems());
         }
 
         return properties;
     }
+
+#if Z2R_DIAGNOSTICS
+    private static void TraceItemAllocationRetry(long attempt, string phase, RandomizerProperties properties)
+    {
+        if (!Diag.IsSample(attempt)) return;
+
+        Diag.Trace("config.item-allocation", $"attempt={attempt} phase={phase} reason=insufficient-item-space "
+            + $"hearts={properties.StartHearts}/{properties.MaxHearts} "
+            + $"magic={properties.StartMagicContainers}/{properties.MaxMagicContainers} "
+            + $"mixItems={properties.MixOverworldPalaceItems} shuffleOverworld={properties.ShuffleOverworldItems} "
+            + $"shufflePalaces={properties.ShufflePalaceItems} pbagCaves={properties.PbagItemShuffle} "
+            + $"palaceItemRooms=[{string.Join(",", properties.PalaceItemRoomCounts)}]");
+    }
+#endif
 
     private void ExportBiomes(RandomizerProperties properties, Random r)
     {

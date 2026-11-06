@@ -1608,7 +1608,8 @@ public class Hyrule
                         while (doNotPick.Contains(raftw1))
                         {
 #if Z2R_DIAGNOSTICS
-                            Diag.Retry("overworld.connector", ++raftw1Attempts, $"connector=raftw1 current={raftw1} excluded=[{string.Join(",", doNotPick)}]");
+                            if (Diag.IsSample(++raftw1Attempts))
+                                Diag.Trace("overworld.connector", $"attempt={raftw1Attempts} connector=raftw1 current={raftw1} excluded=[{string.Join(",", doNotPick)}]");
 #endif
                             raftw1 = r.Next(worlds.Count);
                         }
@@ -1627,7 +1628,8 @@ public class Hyrule
                         do
                         {
 #if Z2R_DIAGNOSTICS
-                            Diag.Retry("overworld.connector", ++raftw2Attempts, $"connector=raftw2 current={raftw2} other={raftw1} excluded=[{string.Join(",", doNotPick)}]");
+                            if (Diag.IsSample(++raftw2Attempts))
+                                Diag.Trace("overworld.connector", $"attempt={raftw2Attempts} connector=raftw2 current={raftw2} other={raftw1} excluded=[{string.Join(",", doNotPick)}]");
 #endif
                             raftw2 = r.Next(worlds.Count);
                         } while (raftw1 == raftw2 || doNotPick.Contains(raftw2));
@@ -1650,7 +1652,8 @@ public class Hyrule
                         while (doNotPick.Contains(bridgew1))
                         {
 #if Z2R_DIAGNOSTICS
-                            Diag.Retry("overworld.connector", ++bridgew1Attempts, $"connector=bridgew1 current={bridgew1} excluded=[{string.Join(",", doNotPick)}]");
+                            if (Diag.IsSample(++bridgew1Attempts))
+                                Diag.Trace("overworld.connector", $"attempt={bridgew1Attempts} connector=bridgew1 current={bridgew1} excluded=[{string.Join(",", doNotPick)}]");
 #endif
                             bridgew1 = r.Next(worlds.Count);
                         }
@@ -1668,7 +1671,8 @@ public class Hyrule
                         do
                         {
 #if Z2R_DIAGNOSTICS
-                            Diag.Retry("overworld.connector", ++bridgew2Attempts, $"connector=bridgew2 current={bridgew2} other={bridgew1} excluded=[{string.Join(",", doNotPick)}]");
+                            if (Diag.IsSample(++bridgew2Attempts))
+                                Diag.Trace("overworld.connector", $"attempt={bridgew2Attempts} connector=bridgew2 current={bridgew2} other={bridgew1} excluded=[{string.Join(",", doNotPick)}]");
 #endif
                             bridgew2 = r.Next(worlds.Count);
                         } while (bridgew1 == bridgew2 || doNotPick.Contains(bridgew2));
@@ -1691,7 +1695,8 @@ public class Hyrule
                         while (doNotPick.Contains(c1w1))
                         {
 #if Z2R_DIAGNOSTICS
-                            Diag.Retry("overworld.connector", ++c1w1Attempts, $"connector=c1w1 current={c1w1} excluded=[{string.Join(",", doNotPick)}]");
+                            if (Diag.IsSample(++c1w1Attempts))
+                                Diag.Trace("overworld.connector", $"attempt={c1w1Attempts} connector=c1w1 current={c1w1} excluded=[{string.Join(",", doNotPick)}]");
 #endif
                             c1w1 = r.Next(worlds.Count);
                         }
@@ -1709,7 +1714,8 @@ public class Hyrule
                         do
                         {
 #if Z2R_DIAGNOSTICS
-                            Diag.Retry("overworld.connector", ++c1w2Attempts, $"connector=c1w2 current={c1w2} other={c1w1} excluded=[{string.Join(",", doNotPick)}]");
+                            if (Diag.IsSample(++c1w2Attempts))
+                                Diag.Trace("overworld.connector", $"attempt={c1w2Attempts} connector=c1w2 current={c1w2} other={c1w1} excluded=[{string.Join(",", doNotPick)}]");
 #endif
                             c1w2 = r.Next(worlds.Count);
                         } while (c1w1 == c1w2 || doNotPick.Contains(c1w2));
@@ -1732,7 +1738,8 @@ public class Hyrule
                         while (doNotPick.Contains(c2w1))
                         {
 #if Z2R_DIAGNOSTICS
-                            Diag.Retry("overworld.connector", ++c2w1Attempts, $"connector=c2w1 current={c2w1} excluded=[{string.Join(",", doNotPick)}]");
+                            if (Diag.IsSample(++c2w1Attempts))
+                                Diag.Trace("overworld.connector", $"attempt={c2w1Attempts} connector=c2w1 current={c2w1} excluded=[{string.Join(",", doNotPick)}]");
 #endif
                             c2w1 = r.Next(worlds.Count);
                         }
@@ -1750,7 +1757,8 @@ public class Hyrule
                         do
                         {
 #if Z2R_DIAGNOSTICS
-                            Diag.Retry("overworld.connector", ++c2w2Attempts, $"connector=c2w2 current={c2w2} other={c2w1} excluded=[{string.Join(",", doNotPick)}]");
+                            if (Diag.IsSample(++c2w2Attempts))
+                                Diag.Trace("overworld.connector", $"attempt={c2w2Attempts} connector=c2w2 current={c2w2} other={c2w1} excluded=[{string.Join(",", doNotPick)}]");
 #endif
                             c2w2 = r.Next(worlds.Count);
                         } while (c2w1 == c2w2 || doNotPick.Contains(c2w2));

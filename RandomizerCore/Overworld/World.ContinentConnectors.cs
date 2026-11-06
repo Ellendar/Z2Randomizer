@@ -138,6 +138,7 @@ public abstract partial class World
                 if (kind == ConnectorKind.Raft) failedOnRaftPlacement++;
                 else failedOnBridgePlacement++;
                 logger.LogDebug($"No viable {kind} approach on the {edge} edge");
+                TraceTerrainRejection("connector-reservation", $"kind={kind} edge={edge}");
                 return false;
             }
             planned.Add(reservation);
@@ -179,6 +180,7 @@ public abstract partial class World
             {
                 failedOnConnectorConflict++;
                 logger.LogDebug($"Reserved {reservation.Kind} approach was overwritten");
+                TraceTerrainRejection("connector-conflict", $"kind={reservation.Kind} edge={reservation.Edge}");
                 return false;
             }
         }

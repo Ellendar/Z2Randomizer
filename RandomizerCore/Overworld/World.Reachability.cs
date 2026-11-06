@@ -14,8 +14,12 @@ public abstract partial class World
     /// <summary>Checks that the continent connectors can reach the standard required locations with all capabilities available.</summary>
     /// <remarks>Requires at least one loaded continent connector.</remarks>
     public bool ValidateBasicRouting()
-        => BasicWorldRouting.CanReachRequiredLocations(map, MapRows, MapColumns,
+    {
+        bool reachable = BasicWorldRouting.CanReachRequiredLocations(map, MapRows, MapColumns,
             GetContinentConnections(), RequiredLocations(false, false), GetLocalConnectionExits);
+        if (!reachable) TraceTerrainRejection("basic-routing");
+        return reachable;
+    }
 
     //Should the visibility calculation table even be persistent? Why is this not just in scope of the calculation itself?
     /// <summary>Clears tile/location reachability and re-enables shuffling, retaining layout, start, and AllReached.</summary>

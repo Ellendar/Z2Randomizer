@@ -51,8 +51,6 @@ internal sealed class ReachabilitySimulation(Func<IEnumerable<Location>> itemLoc
         int gettableItemsCount = 1;
         int previousGettableItemsCount = 0;
 
-        int totalLocationsCount = west.AllLocations.Count + east.AllLocations.Count
-            + mountain.AllLocations.Count + maze.AllLocations.Count;
 #if Z2R_DIAGNOSTICS
         long reachCall = ++reachabilityCalls;
         long reachPasses = 0;
@@ -152,7 +150,8 @@ internal sealed class ReachabilitySimulation(Func<IEnumerable<Location>> itemLoc
         lastReachabilityFailure = null;
         consecutiveReachabilityFailures = 0;
 #endif
-        Diag.Trace("reach", $"event=success reachable={reachableLocationsCount}/{totalLocationsCount}");
+        Diag.Trace("reach", $"event=success reachable={reachableLocationsCount}/"
+            + $"{west.AllLocations.Count + east.AllLocations.Count + mountain.AllLocations.Count + maze.AllLocations.Count}");
         return true;
     }
 

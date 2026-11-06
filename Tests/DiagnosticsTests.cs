@@ -98,6 +98,40 @@ public class DiagnosticsTests
     }
 
     [TestMethod]
+    public void OversizedTerrain_ReportsSampledRejectionsAndLeavesRomUntouched()
+    {
+        var world = new WorldCharacterizationTests.TestWorld(1, 64, Terrain.GRASS, mapRomCapacity: 3);
+        var encoded = world.EncodeMap();
+        var rom = new ROM(new byte[16]);
+        using var candidate = world.BeginTerrainCandidate(rom);
+        using var output = new StringWriter();
+        TextWriter original = Console.Error;
+        try
+        {
+            Console.SetError(output);
+            for (int i = 0; i < 5; i++)
+            {
+                world.StageEncodedMap(encoded).Should().BeFalse();
+            }
+            candidate.Commit();
+        }
+        finally { Console.SetError(original); }
+
+        rom.rawdata.Should().OnlyContain(value => value == 0);
+        var lines = output.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        if (Enabled)
+        {
+            lines.Should().HaveCount(3);
+            foreach (var (line, count) in lines.Zip(new[] { 1, 2, 4 }))
+            {
+                line.Should().StartWith("[Z2R:terrain.reject] world=");
+                line.Should().EndWith($"reason=map-too-large count={count} bytes=4 capacity=3");
+            }
+        }
+        else lines.Should().BeEmpty();
+    }
+
+    [TestMethod]
     public void InstrumentationStorage_OnlyExistsInTraceBuilds()
     {
         const BindingFlags instance = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;

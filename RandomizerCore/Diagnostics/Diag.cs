@@ -5,19 +5,14 @@ using System.Globalization;
 namespace Z2Randomizer.RandomizerCore.Diagnostics;
 
 /// <summary>
-/// Compile-time-gated diagnostics sink for generator tracing.
-///
-/// Event entry points are <see cref="ConditionalAttribute"/> on <c>Z2R_DIAGNOSTICS</c>,
-/// so when the symbol is undefined the compiler removes both the call site and
-/// its argument evaluation: zero IL, zero runtime cost, no level checks.
-/// Enable it with <c>dotnet build -p:Z2RTrace=true</c>.
-///
-/// Output goes to stderr, one prefixed line per event:
-/// <c>[Z2R:&lt;tag&gt;] message</c>. Tags are stable tokens so output can be
-/// filtered (e.g. <c>findstr "Z2R:reach"</c>) without parsing the message text.
-/// Keep tags short and event-scoped: <c>reach</c>, <c>overworld</c>, <c>palace</c>,
-/// <c>rng</c>, <c>timing</c>.
+/// Compile-time generator tracing. Build the CLI with <c>-p:Z2RTrace=true</c>.
+/// Events go to stderr, for example <c>[Z2R:timing] stage=overworld event=begin</c>.
+/// See Diagnostics/README.md for the stuck-seed workflow and tag reference.
 /// </summary>
+/// <remarks>
+/// Conditional calls and their arguments compile out unless <c>Z2R_DIAGNOSTICS</c>
+/// is defined. Guard diagnostic-only counters and scopes with the same symbol.
+/// </remarks>
 internal static class Diag
 {
     /// <summary>Emits one tagged event line.</summary>

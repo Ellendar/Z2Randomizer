@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using NLog;
+using Z2Randomizer.RandomizerCore.Diagnostics;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
@@ -506,14 +507,23 @@ public abstract partial class World
     /// <param name="options">Map encoding options such as hidden tile positions.</param>
     private protected bool TryStageTerrainMap(MapEncodingOptions options = default)
     {
-        if (continentConnectorReservations.Count > 0 && !continentConnectorsFinalized) return false;
+        if (continentConnectorReservations.Count > 0 && !continentConnectorsFinalized)
+        {
+            TraceTerrainRejection("connector-not-finalized");
+            return false;
+        }
         if (!ContinentConnectorReservationsIntact()) return false;
         return TryStageEncodedTerrainMap(EncodeTerrainMap(options));
     }
 
     /// <summary>Queues an existing encoding and filler if they fit the world's ROM map region.</summary>
     private protected bool TryStageEncodedTerrainMap(EncodedWorldMap encodedMap)
-        => encodedMap.TryStage(TerrainWrites, MapRomOffset, MapRomCapacity);
+    {
+        if (encodedMap.TryStage(TerrainWrites, MapRomOffset, MapRomCapacity)) return true;
+
+        TraceTerrainRejection("map-too-large", $"bytes={encodedMap.Length} capacity={MapRomCapacity}");
+        return false;
+    }
 
     /// <summary>Zeros the raw Y byte for each ROM location slot without default terrain, making them not enterable in game.</summary>
     /// <remarks>Many of these slots have no Location object. Any loaded connectors in these slots
@@ -598,13 +608,32 @@ public abstract partial class World
     private protected bool TryGenerateTerrainWithinBudget(RandomizerProperties props, BiomeTerrainProfile profile,
         GenerateTerrainAttempt generateAttempt)
     {
-        int encodedSize;
-        do
+        while (generateAttempt(props, profile, out int encodedSize))
         {
-            if (!generateAttempt(props, profile, out encodedSize)) return false;
-        } while (encodedSize > MapRomCapacity);
+            if (encodedSize <= MapRomCapacity) return true;
 
-        return true;
+            TraceTerrainRejection("encoding-retry", $"bytes={encodedSize} capacity={MapRomCapacity}");
+        }
+
+        return false;
+    }
+
+#if Z2R_DIAGNOSTICS
+    private Dictionary<string, long>? terrainRejections;
+#endif
+
+    [Conditional("Z2R_DIAGNOSTICS")]
+    private protected void TraceTerrainRejection(string reason, string detail = "")
+    {
+#if Z2R_DIAGNOSTICS
+        terrainRejections ??= new();
+        long count = terrainRejections.GetValueOrDefault(reason) + 1;
+        terrainRejections[reason] = count;
+        if (Diag.IsSample(count))
+        {
+            Diag.Trace("terrain.reject", $"world={continentId} biome={biome} reason={reason} count={count} {detail}".TrimEnd());
+        }
+#endif
     }
 
     /// <summary>
@@ -1064,6 +1093,7 @@ public abstract partial class World
         if (failure is null) return true;
 
         logger.LogDebug($"Cave exit validation failed: {failure}");
+        TraceTerrainRejection("cave-exit", $"failure={failure}");
         return false;
     }
 

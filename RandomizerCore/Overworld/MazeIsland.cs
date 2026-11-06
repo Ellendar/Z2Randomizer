@@ -163,7 +163,11 @@ sealed class MazeIsland : World
 
         if (!TryPlaceMazePalace(out var palacePosition)) return false;
         if (!TryDrawMazeRiver(mazeStart, palacePosition)) return false;
-        if (!TryPlaceMazeConnectors()) return false;
+        if (!TryPlaceMazeConnectors())
+        {
+            TraceTerrainRejection("connector-placement");
+            return false;
+        }
         if (!TryPlaceMazeEncounters()) return false;
         if (!TryRepairAndValidateCaveExits()) return false;
 
@@ -171,6 +175,7 @@ sealed class MazeIsland : World
         var candidate = EncodeTerrainMap();
         if (candidate.Length > MapRomCapacity)
         {
+            TraceTerrainRejection("map-too-large", $"bytes={candidate.Length} capacity={MapRomCapacity}");
             return false;
         }
 

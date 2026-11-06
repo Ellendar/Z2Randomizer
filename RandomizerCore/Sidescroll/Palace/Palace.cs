@@ -1484,7 +1484,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
 #if Z2R_DIAGNOSTICS
         long call = ++itemBfsCalls;
         long dequeues = 0;
-        Diag.Retry("palace.bfs", call, $"event=begin palace={Number} shufflableOnly={shufflableItemsOnly} requireables=[{string.Join(",", initialRequireables.Order())}]");
+        if (Diag.IsSample(call))
+            Diag.Trace("palace.bfs", $"attempt={call} event=begin palace={Number} shufflableOnly={shufflableItemsOnly} requireables=[{string.Join(",", initialRequireables.Order())}]");
 #endif
         if (shufflableItemsOnly && !PalaceItemsAreShufflable)
         {

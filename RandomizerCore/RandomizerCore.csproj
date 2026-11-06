@@ -12,7 +12,7 @@
     <LangVersion>default</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <DefineConstants Condition="'$(Configuration)' == 'Unsafe Debug'">UNSAFE_DEBUG;$(DefineConstants)</DefineConstants>
-    <!-- Compile-time generator tracing; see RandomizerCore/Diagnostics/Diag.cs. -->
+    <!-- Compile-time generator tracing. See Diagnostics/README.md. -->
     <DefineConstants Condition="'$(Z2RTrace)' == 'true'">Z2R_DIAGNOSTICS;$(DefineConstants)</DefineConstants>
     <PublishTrimmed>true</PublishTrimmed>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
