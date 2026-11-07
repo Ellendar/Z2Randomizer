@@ -1,3 +1,5 @@
+using System;
+
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public static class RoomPoolConfigs
@@ -43,6 +45,40 @@ public static class RoomPoolConfigs
             new RoomOverride { Name = "Up elevator block columns right turn", Enemies = "073F843E44028E" },
         ],
     };
+
+    internal static RoomPoolSpec Get(RoomPoolOption roomPoolOption)
+    {
+        return roomPoolOption switch
+        {
+            RoomPoolOption.VANILLA => Vanilla,
+            RoomPoolOption.V5_0_NO_EXPERT => Upstarts,
+            RoomPoolOption.V5_0 => V5_0,
+            RoomPoolOption.V4_0 => V4_0,
+            RoomPoolOption.SGL2026 => SGL2026,
+            _ => throw new ArgumentOutOfRangeException(nameof(roomPoolOption), roomPoolOption, "Expected a built-in room pool."),
+        };
+    }
+
+    internal static int PotentialRoomPools(RoomPoolOption roomPoolOption)
+    {
+        switch (roomPoolOption)
+        {
+            case RoomPoolOption.VANILLA:
+                return 1;
+            case RoomPoolOption.V5_0_NO_EXPERT:
+            case RoomPoolOption.V5_0:
+                return 3;
+            case RoomPoolOption.V4_0:
+                return 2;
+            case RoomPoolOption.SGL2026:
+                return 2;
+            case RoomPoolOption.CUSTOM:
+                // just leave it up to the user
+                return 3;
+            default:
+                throw new NotImplementedException();
+        }
+    }
 
     /*
     public static RoomPoolSpec All = new()

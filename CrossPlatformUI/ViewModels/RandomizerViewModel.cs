@@ -31,7 +31,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
     [RUISG.Reactive]
     public partial bool FlagsValid { get; set; } = true;
 
-    private string customRoomPoolText = "Use predefined room pool";
+    private string customRoomPoolText = "";
     [JsonIgnore]
     public string CustomRoomPoolText
     {
@@ -201,7 +201,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
         PalaceRoomsText = $"Palace rooms hash: {palaceRooms.Hash}";
 
         var spec = await roomLoaderService!.GetRoomPoolSpec();
-        CustomRoomPoolText = spec != null ? $"Use {spec.Name} ({spec.Hash})" : "No Custom Room Pool Found";
+        CustomRoomPoolText = spec != null ? $"{spec.Name} (Hash: {spec.Hash})" : "No Custom Room Pool Found";
     }
 
     public static async Task<string?> SelectSaveFolder()

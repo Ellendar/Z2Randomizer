@@ -6,6 +6,7 @@
              xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              xmlns:z="clr-namespace:CrossPlatformUI.Controls"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             xmlns:core="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.PalacesView"
              x:DataType="vm:MainViewModel">
@@ -60,22 +61,30 @@
 
             <StackPanel Grid.Column="1" Margin="0 0">
                 <!-- room pool -->
-                <z:Z2CheckBox Flag="CustomRoomPool"
-                              CaptionOverride="{Binding RandomizerViewModel.CustomRoomPoolText}" />
+                <z:Z2ComboBox Flag="RoomPoolOption" />
 
-                <!-- <TextBlock Margin="48 8 0 8" Text="{Binding RandomizerViewModel.PalaceRoomsText}"/> -->
+                <StackPanel Margin="0 0"
+                            IsVisible="{Binding Config.RoomPoolOption, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static core:RoomPoolOption.CUSTOM}}">
+                    <TextBlock Margin="32 8 0 8" Text="{Binding RandomizerViewModel.CustomRoomPoolText}"/>
+                    <TextBlock Margin="32 8 0 8" Text="{Binding RandomizerViewModel.PalaceRoomsText}"/>
+                </StackPanel>
 
-                <z:Z2CheckBox Flag="IncludeVanillaRooms" Classes="DisabledMeansChecked" />
-                <z:Z2CheckBox Flag="Includev4_0Rooms" />
-                <z:Z2CheckBox Flag="Includev5_0Rooms" />
-                <!-- <z:Z2CheckBox Flag="UseCustomRooms" />-->
+                <StackPanel Margin="0 0"
+                            IsVisible="{Binding Config.RoomPoolOption, Converter={x:Static ObjectConverters.Equal}, ConverterParameter={x:Static core:RoomPoolOption.USE_CHECKBOXES}}">
+                    <z:Z2CheckBox Flag="IncludeVanillaRooms" Classes="DisabledMeansChecked" />
+                    <z:Z2CheckBox Flag="Includev4_0Rooms" />
+                    <z:Z2CheckBox Flag="Includev5_0Rooms" />
+                    <!-- <z:Z2CheckBox Flag="UseCustomRooms" />-->
+
+                    <!-- room pool tuning -->
+                    <z:Z2CheckBox Flag="RemoveLongDeadEnds" />
+                    <z:Z2CheckBox Flag="IncludeExpertRooms" />
+                </StackPanel>
+
                 <Separator Margin="16 10 18 10"/>
 
                 <z:Z2ComboBox Flag="KeyLogic" />
                 <z:Z2CheckBox Flag="BlockingRoomsInAnyPalace" />
-                <!-- room pool tuning -->
-                <z:Z2CheckBox Flag="RemoveLongDeadEnds" />
-                <z:Z2CheckBox Flag="IncludeExpertRooms" />
             </StackPanel>
 
             <StackPanel Grid.Column="2" Margin="0 0">

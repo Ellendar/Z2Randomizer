@@ -95,6 +95,20 @@ public class RoomPoolTests
     }
 
     #region Test Spec Presets
+    [TestMethod]
+    [DataRow(RoomPoolOption.VANILLA, 1)]
+    [DataRow(RoomPoolOption.V5_0_NO_EXPERT, 3)]
+    [DataRow(RoomPoolOption.V5_0, 3)]
+    [DataRow(RoomPoolOption.V4_0, 2)]
+    [DataRow(RoomPoolOption.SGL2026, 2)]
+    public void BuiltInRoomPoolSurvivesFlagRoundTrip(RoomPoolOption option, int groupCount)
+    {
+        var config = new RandomizerConfiguration { NormalPalaceStyle = PalaceStyle.RECONSTRUCTED, RoomPoolOption = option };
+        var decoded = new RandomizerConfiguration(config.SerializeFlags());
+
+        Assert.AreEqual(option, decoded.RoomPoolOption);
+        Assert.AreEqual(groupCount, RoomPoolConfigs.PotentialRoomPools(decoded.RoomPoolOption));
+    }
 
     [TestMethod]
     public void Test_Presets()

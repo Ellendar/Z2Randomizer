@@ -873,14 +873,20 @@ requires it.</value>
 will be removed and bypassed. For generated styles, one additional normal room will appear
 instead.</value>
 	</data>
-    <data name="CustomRoomPool" xml:space="preserve">
-<value>Use Custom Room Pool</value>
+    <data name="RoomPoolOption" xml:space="preserve">
+<value>Room Pool</value>
 	</data>
-	<data name="CustomRoomPoolToolTip" xml:space="preserve">
-<value>If selected, a customized selection of rooms will be used that overrides the
-room pool options below.
+	<data name="RoomPoolOptionToolTip" xml:space="preserve">
+<value>Chooses which rooms can appear in generated palaces. Vanilla and Shuffled palace
+styles always use vanilla rooms.
 
-(The pool is defined in the file CustomRoomPool.yaml)</value>
+  • Vanilla — Original Zelda II rooms only.
+  • Upstarts — Vanilla, v4.0, and v5.0 rooms, excluding Expert-tagged rooms.
+  • Vanilla, v4.0 &amp; v5.0 — All three room sets, including Expert rooms.
+  • Vanilla &amp; v4.0 — Original rooms and the v4.0 community rooms.
+  • SGL 2026 — The tournament room pool, including its room edits.
+  • Other — Choose room sets and filters using the checkboxes below.
+  • Custom — Load room selections and overrides from CustomRoomPool.yaml.</value>
 	</data>
 	<data name="UseCustomRoomsToolTip" xml:space="preserve">
 <value>If selected, rooms will be based on the file CustomRooms.json instead of PalaceRooms.json

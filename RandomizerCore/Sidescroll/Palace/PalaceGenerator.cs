@@ -39,7 +39,7 @@ public abstract class PalaceGenerator
 
     protected static bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
     {
-        if (props.CustomRoomPool)
+        if (RoomPoolConfigs.PotentialRoomPools(props.RoomPoolOption) >= 2)
         {
             return true;
         }

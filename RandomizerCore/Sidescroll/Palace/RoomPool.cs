@@ -108,7 +108,7 @@ public class RoomPool
 
             if (!string.IsNullOrEmpty(roomOverride.Sideview))
             {
-                room.Sideview = Convert.FromHexString(roomOverride.Sideview);
+                room.SideView = Convert.FromHexString(roomOverride.Sideview);
             }
 
             if (!string.IsNullOrEmpty(roomOverride.Enemies))

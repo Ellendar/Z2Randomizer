@@ -86,7 +86,7 @@ Seed: {config.Seed}
             try
             {
                 palaceRooms = await roomLoaderService!.GetPalaceRooms();
-                roomPoolSpec = await roomLoaderService!.GetRoomPoolSpec();
+                roomPoolSpec = config.RoomPoolOption == RoomPoolOption.CUSTOM ? await roomLoaderService.GetRoomPoolSpec() : null;
             }
             catch(UserFacingException userError)
             {

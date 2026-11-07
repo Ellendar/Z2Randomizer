@@ -134,8 +134,18 @@ public class Program
         var roomsJson = RandomizerCore.Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = configuration!.UseCustomRooms ? RandomizerCore.Util.ReadAllTextFromFile("CustomRooms.json") : null;
         var palaceRooms = new PalaceRooms(configuration!.UseCustomRooms ? customJson! : roomsJson, configuration!.UseCustomRooms);
-        var roomPoolYaml = RandomizerCore.Util.ReadAllTextFromFile("CustomRoomPool.yaml");
-        RoomPoolSpec? roomPoolSpec = RoomPoolSpecDeserializer.FromString(roomPoolYaml);
+        const string customRoomPoolFile = "CustomRoomPool.yaml";
+        RoomPoolSpec? roomPoolSpec;
+        if (configuration.RoomPoolOption == RoomPoolOption.CUSTOM)
+        {
+            if (!RandomizerCore.Util.FileExists(customRoomPoolFile)) { throw new Exception("CustomRoomPool.yaml missing."); }
+            roomPoolSpec = (RoomPoolSpec?)RoomPoolSpecDeserializer.FromString(RandomizerCore.Util.ReadAllTextFromFile(customRoomPoolFile));
+        }
+        else
+        {
+            roomPoolSpec = null;
+        }
+
         var randomizer = new Hyrule(createAsm, palaceRooms, roomPoolSpec);
         var rom = await randomizer.Randomize(vanillaRomData!, configuration, UpdateProgress, cts.Token);
 

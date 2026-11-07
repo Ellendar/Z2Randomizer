@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using NLog;
 using Z2Randomizer.RandomizerCore.Diagnostics;
 using Z2Randomizer.RandomizerCore.Flags;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantDefaultMemberInitializer
@@ -359,17 +360,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         return false;
     }
 
-    private bool roomSelectionEnabled()
-    {
-        if (customRoomPool)
-        {
-            return false;
-        }
-        return palaceStylesAreNotAllVanillaOrShuffled();
-    }
-
     [Reactive]
-    private bool customRoomPool = true;
+    private RoomPoolOption roomPoolOption = RoomPoolOption.VANILLA;
+
+    private bool roomSelectionEnabled()
+        => roomPoolOption is RoomPoolOption.USE_CHECKBOXES && palaceStylesAreNotAllVanillaOrShuffled();
 
     private bool palaceStylesAnyMetastyleSelected()
     {
@@ -1277,7 +1272,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             properties.AllowV4Rooms = includev4_0Rooms ?? GetIndeterminateFlagValue(r);
             properties.AllowV5_0Rooms = includev5_0Rooms ?? GetIndeterminateFlagValue(r);
         }
-        properties.CustomRoomPool = customRoomPool;
+        properties.RoomPoolOption = roomPoolOption;
         properties.KeyLogic = keyLogicIncluded() ? keyLogic : KeyLogicOption.FAIRY_OR_MAGICKEY;
         properties.BlockersAnywhere = blockingRoomsInAnyPalaceIncluded() && blockingRoomsInAnyPalace;
         properties.RemoveLongDeadEnds = removeLongDeadEndsIncluded() && removeLongDeadEnds;
@@ -1833,13 +1828,21 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             }
         }
 
-        if (!customRoomPool && (noDuplicateRoomsByLayout || noDuplicateRoomsByEnemies))
+        if (noDuplicateRoomsByLayoutIncluded() && (noDuplicateRoomsByLayout || noDuplicateRoomsByEnemies))
         {
             // if current palace generation logic changes, this should be updated
             int potentialRoomPools = 0;
-            if (includeVanillaRooms != false) { potentialRoomPools++; }
-            if (includev4_0Rooms != false) { potentialRoomPools++; }
-            if (includev5_0Rooms != false) { potentialRoomPools++; }
+            switch (roomPoolOption)
+            {
+                case RoomPoolOption.USE_CHECKBOXES:
+                    if (includeVanillaRooms != false) { potentialRoomPools++; }
+                    if (includev4_0Rooms != false) { potentialRoomPools++; }
+                    if (includev5_0Rooms != false) { potentialRoomPools++; }
+                    break;
+                default:
+                    potentialRoomPools = RoomPoolConfigs.PotentialRoomPools(roomPoolOption);
+                    break;
+            }
             if (potentialRoomPools < 2)
             {
                 throw new UserFacingException("Incompatible Palace Flags", "Not enough palace rooms in the pool.\n\nUnder the Palaces tab, include more room groups or disable No Duplicate Rooms.");

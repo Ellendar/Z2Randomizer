@@ -296,6 +296,24 @@ public enum FluteWarpMode
     VISITED_TOWNS,
 }
 
+public enum RoomPoolOption
+{
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Upstarts")]
+    V5_0_NO_EXPERT,
+    [Description("Vanilla, v4.0 & v5.0")]
+    V5_0,
+    [Description("Vanilla & v4.0")]
+    V4_0,
+    [Description("SGL 2026")]
+    SGL2026,
+    [Description("Other")]
+    USE_CHECKBOXES,
+    [Description("Custom")]
+    CUSTOM,
+}
+
 [DefaultValue(VANILLA)]
 public enum PalaceStyle
 {
@@ -1150,6 +1168,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> NormalPalaceLengthList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> GpLengthList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountList { get; } = ToDescriptions<PalaceItemRoomCount>();
+    public static IEnumerable<EnumDescription> RoomPoolOptionList { get; } = ToDescriptions<RoomPoolOption>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
         = ToDescriptions<PalaceStyle>(i => i.NormalPalaceStyle());
     public static IEnumerable<EnumDescription> GpStyleList { get; }

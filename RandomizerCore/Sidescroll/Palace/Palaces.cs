@@ -93,17 +93,21 @@ public class Palaces
             }
             else
             {
-                if (props.CustomRoomPool)
+                switch (props.RoomPoolOption)
                 {
-                    if (roomPoolConfig == null)
-                    {
-                        throw new UserFacingException("Custom Room Pool Issue", "Property enabled but CustomRoomPool.yaml file is not provided.");
-                    }
-                    roomPool = new(palaceRooms, currentPalace, props, roomPoolConfig);
-                }
-                else
-                {
-                    roomPool = new(palaceRooms, currentPalace, props);
+                    case RoomPoolOption.CUSTOM:
+                        if (roomPoolConfig == null)
+                        {
+                            throw new UserFacingException("Custom Room Pool Issue", "Property enabled but CustomRoomPool.yaml file is not provided.");
+                        }
+                        roomPool = new(palaceRooms, currentPalace, props, roomPoolConfig);
+                        break;
+                    case RoomPoolOption.USE_CHECKBOXES:
+                        roomPool = new(palaceRooms, currentPalace, props);
+                        break;
+                    default:
+                        roomPool = new(palaceRooms, currentPalace, props, RoomPoolConfigs.Get(props.RoomPoolOption));
+                        break;
                 }
             }
             Palace palace;
