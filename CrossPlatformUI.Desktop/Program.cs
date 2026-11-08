@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia;
 using Avalonia.Controls;
@@ -8,6 +9,7 @@ using ReactiveUI.Avalonia;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
 using CrossPlatformUI.Services;
+using CrossPlatformUI.ViewModels;
 using Desktop.Common;
 using Z2Randomizer.RandomizerCore;
 
@@ -28,6 +30,15 @@ public static class Program
                 App.ServiceContainer.AddSingleton<Hyrule.NewAssemblerFn>((opts, debug) => new DesktopJsEngine(opts, debug));
                 App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService!);
                 App.FileSystemService = new DesktopFileService();
+                App.ServiceContainer.AddSingleton<RomLoadedHandler>((main, file) =>
+                {
+                    if (string.IsNullOrEmpty(main.OutputFilePath))
+                    {
+                        main.OutputFilePath = new Uri(file.Path, ".").LocalPath;
+                    }
+
+                    return Task.CompletedTask;
+                });
                 // App.ServiceContainer.AddSingleton<IPersistenceService>(x => new LocalFilePersistenceService());
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {

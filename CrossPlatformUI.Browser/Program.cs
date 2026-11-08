@@ -11,6 +11,10 @@ using Avalonia;
 using Avalonia.Browser;
 using ReactiveUI.Avalonia;
 using CrossPlatformUI.Services;
+using CrossPlatformUI.ViewModels;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 using js65;
 using Z2Randomizer.RandomizerCore;
 
@@ -41,6 +45,15 @@ internal sealed partial class Program
         AppContext.SetSwitch("System.Runtime.InteropServices.EnableDebugLogging", true);
 #endif
 
+        // Use the browser console for NLog errors because the desktop config writes to a local log file.
+        var logging = new LoggingConfiguration();
+        logging.AddRule(LogLevel.Error, LogLevel.Fatal, new ConsoleTarget("browser")
+        {
+            Error = true,
+            Layout = "${level}|${logger}| ${message} ${exception:format=tostring}"
+        });
+        LogManager.Configuration = logging;
+
         return BuildAvaloniaApp()
             .WithInterFont()
             .AfterSetup(_ =>
@@ -50,6 +63,7 @@ internal sealed partial class Program
                 App.ServiceContainer.AddSingleton<Hyrule.NewAssemblerFn>(MakeBrowserAssembler);
                 App.FileSystemService = new BrowserFileService();
                 App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService);
+                App.ServiceContainer.AddSingleton<RomLoadedHandler>((_, _) => App.PersistState()); // save after ROM has been loaded
 
                 SetTitle(App.Title);
             })
