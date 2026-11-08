@@ -463,6 +463,8 @@ public enum Biome
     CANYON,
     [Description("Dry Canyon"), DefaultWeight(1)]
     DRY_CANYON,
+    [Description("Coastal Islands"), DefaultWeight(2)]
+    COASTAL_ISLANDS,
     [Description("Mountainous"), DefaultWeight(2)]
     MOUNTAINOUS,
     [Description("Volcano"), DefaultWeight(2)]
@@ -491,6 +493,7 @@ static class BiomeExtensions
             Biome.ISLANDS => 220,
             Biome.CANYON => 300,
             Biome.DRY_CANYON => 300,
+            Biome.COASTAL_ISLANDS => 250,
             Biome.MOUNTAINOUS => 250,
             Biome.CALDERA => 300,
             Biome.VOLCANO => 300,
@@ -523,6 +526,7 @@ static class BiomeExtensions
             Biome.VANILLALIKE => true,
             Biome.ISLANDS => true,
             Biome.CANYON => true,
+            Biome.COASTAL_ISLANDS => true,
             Biome.CALDERA => true,
             Biome.MOUNTAINOUS => true,
             Biome.RANDOM => true,
@@ -542,6 +546,7 @@ static class BiomeExtensions
             Biome.VANILLALIKE => true,
             Biome.ISLANDS => true,
             Biome.CANYON => true,
+            Biome.COASTAL_ISLANDS => true,
             Biome.VOLCANO => true,
             Biome.MOUNTAINOUS => true,
             Biome.RANDOM => true,
@@ -561,6 +566,7 @@ static class BiomeExtensions
             Biome.VANILLALIKE => true,
             Biome.ISLANDS => true,
             Biome.CANYON => true,
+            Biome.COASTAL_ISLANDS => true,
             Biome.CALDERA => true,
             Biome.MOUNTAINOUS => true,
             Biome.RANDOM => true,

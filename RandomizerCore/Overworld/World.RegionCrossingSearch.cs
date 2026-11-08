@@ -23,6 +23,7 @@ public abstract partial class World
         private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
         {
             { Biome.ISLANDS, 10 },
+            { Biome.COASTAL_ISLANDS, 15 },
             { Biome.VOLCANO, 10 },
             { Biome.DRY_CANYON, 10 },
             { Biome.VANILLALIKE, 10 },
@@ -34,6 +35,7 @@ public abstract partial class World
         private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_ATTEMPTS = new()
         {
             { Biome.ISLANDS, 4000 },
+            { Biome.COASTAL_ISLANDS, 4000 },
             { Biome.VOLCANO, 3000 },
             { Biome.DRY_CANYON, 2000 },
             { Biome.VANILLALIKE, 2000 },

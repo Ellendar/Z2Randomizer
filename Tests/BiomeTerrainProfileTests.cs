@@ -72,6 +72,35 @@ public class BiomeTerrainProfileTests
     }
 
     [TestMethod]
+    [DataRow(Continent.WEST)]
+    [DataRow(Continent.EAST)]
+    [DataRow(Continent.DM)]
+    public void CoastalProfiles_UseCanyonLandAndPreplacedIslandWater(Continent continent)
+    {
+        var profile = Profile(continent, Biome.COASTAL_ISLANDS);
+
+        profile.RiverTerrain.Should().Be(profile.PreplacedWater);
+        profile.StripeTerrain.Should().Be(profile.PreplacedWater);
+        profile.CanyonBankTerrains.Should().Contain(Terrain.MOUNTAIN);
+        profile.InitialPlacementTerrains.Should().NotContain(Terrain.MOUNTAIN).And.NotContain(Terrain.SWAMP);
+        profile.EasternSeaStartColumn.Should().BeNull();
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void CoastalProfiles_SeedWaterLikeIslands(bool goodBoots)
+    {
+        var west = Profile(Continent.WEST, Biome.COASTAL_ISLANDS, goodBoots);
+        var east = Profile(Continent.EAST, Biome.COASTAL_ISLANDS, goodBoots);
+        var water = goodBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
+        var preplaced = goodBoots ? Terrain.PREPLACED_WATER_WALKABLE : Terrain.PREPLACED_WATER;
+
+        west.SeedTerrains.Should().Contain(preplaced).And.NotContain(water);
+        east.SeedTerrains.Should().Contain(water).And.NotContain(preplaced);
+    }
+
+    [TestMethod]
     [DataRow(Continent.WEST, Biome.CALDERA)]
     [DataRow(Continent.DM, Biome.CALDERA)]
     [DataRow(Continent.EAST, Biome.VOLCANO)]

@@ -35,10 +35,17 @@ internal sealed record ContinentConnectorOrientationPolicy(IReadOnlyList<Directi
             case Biome.CALDERA:
             case Biome.VOLCANO:
                 return horizontal ? [Direction.WEST, Direction.EAST] : [Direction.NORTH, Direction.SOUTH];
+            case Biome.COASTAL_ISLANDS when continent != Continent.DM:
+                return connections switch
+                {
+                    ContinentConnectionType.NORMAL => horizontal ? [Direction.SOUTH] : [Direction.EAST],
+                    _ => ALL_EDGES,
+                };
             case Biome.VANILLA:
             case Biome.VANILLA_SHUFFLE:
             case Biome.VANILLALIKE:
             case Biome.ISLANDS:
+            case Biome.COASTAL_ISLANDS:
             case Biome.MOUNTAINOUS:
                 return connections switch
                 {

@@ -89,42 +89,6 @@ public class FlagsTests
         Assert.AreEqual(StartingResourceLimit.FOUR, RandomizerConfiguration.DeserializeEnum<StartingResourceLimit>(flagReader, "Test3"));
     }
 
-    /* We no longer have any custom flag encodes
-    [TestMethod]
-    public void TestCustomEncodeCycle()
-    {
-        var climate = Climates.Chaos;
-        var serializer = RandomizerConfiguration.GetSerializer<ClimateFlagSerializer>();
-        FlagBuilder flagBuilder = new FlagBuilder();
-        flagBuilder.Append(serializer.Serialize(climate), serializer.GetLimit());
-        String flags = flagBuilder.ToString();
-        FlagReader flagReader = new FlagReader(flags);
-        Assert.AreEqual(climate, serializer.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
-    }*/
-
-    /* Nullable int flags are no longer allowed (use Enums).
-    [TestMethod]
-    public void TestNullableIntEncodeCycle()
-    {
-        int? nullInt = null;
-        var limit = 8;
-        var minimum = 1;
-        FlagBuilder flagBuilder = new FlagBuilder();
-        flagBuilder.Append(nullInt, limit, minimum);
-        String flags = flagBuilder.ToString();
-        FlagReader flagReader = new FlagReader(flags);
-        Assert.AreEqual(nullInt, flagReader.ReadNullableInt(limit, minimum));
-
-        flagBuilder.Append((int?)8, limit, minimum);
-        flagBuilder.Append((int?)3,  limit, minimum);
-        flags = flagBuilder.ToString();
-        flagReader = new FlagReader(flags);
-        Assert.AreEqual(nullInt, flagReader.ReadNullableInt(limit, minimum));
-        Assert.AreEqual((int?)8, flagReader.ReadNullableInt(limit, minimum));
-        Assert.AreEqual((int?)3, flagReader.ReadNullableInt(limit, minimum));
-    }
-    */
-
     [TestMethod]
     public void TestBlankEncodeCycle()
     {

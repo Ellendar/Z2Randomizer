@@ -297,6 +297,9 @@ public sealed class WestHyrule : World
                 }
                 DrawCanyon(riverTerrain, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
                 break;
+            case Biome.COASTAL_ISLANDS:
+                DrawCoastalIslands(riverTerrain, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
+                break;
             case Biome.CALDERA:
                 DrawCenterMountain(profile.IsHorizontal);
                 locationAtPalace3.ReserveForTerrainGeneration();
@@ -426,6 +429,7 @@ public sealed class WestHyrule : World
                 maximumCrossings = 100;
                 break;
             case Biome.ISLANDS:
+            case Biome.COASTAL_ISLANDS:
                 maximumCrossings = 25;
                 break;
             case Biome.MOUNTAINOUS:

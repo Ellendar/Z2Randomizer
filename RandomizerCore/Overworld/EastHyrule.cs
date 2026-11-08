@@ -406,6 +406,10 @@ public sealed partial class EastHyrule : World
                 DrawCanyon(profile.RiverTerrain, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
                 locationAtGP.ReserveForTerrainGeneration();
                 return MakeValleyOfDeath();
+            case Biome.COASTAL_ISLANDS:
+                DrawCoastalIslands(profile.RiverTerrain, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
+                locationAtGP.ReserveForTerrainGeneration();
+                return MakeValleyOfDeath();
             case Biome.VOLCANO:
                 DrawCenterMountain(profile.IsHorizontal);
                 return MakeValleyOfDeath();
@@ -505,6 +509,7 @@ public sealed partial class EastHyrule : World
                 });
                 return;
             case Biome.ISLANDS:
+            case Biome.COASTAL_ISLANDS:
                 maximumCrossings = 100;
                 break;
             case Biome.MOUNTAINOUS:
@@ -657,7 +662,7 @@ public sealed partial class EastHyrule : World
     /// <remarks>Failure can leave partial edits. The enclosing candidate owns rollback; callers retain their biome-specific rejection policy.</remarks>
     public bool MakeValleyOfDeath()
     {
-        bool usesMountainOpening = biome is Biome.CANYON or Biome.DRY_CANYON or Biome.VOLCANO;
+        bool usesMountainOpening = biome is Biome.CANYON or Biome.DRY_CANYON or Biome.COASTAL_ISLANDS or Biome.VOLCANO;
         List<Location> traps =
         [
             GetLocation(LocationID.EAST_TRAP_LAVA1),

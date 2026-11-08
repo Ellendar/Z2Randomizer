@@ -154,22 +154,29 @@ internal static class TerrainLayout
     /// <summary>Paints a meandering canyon and climate-sampled banks, overwriting existing cells where geometry is drawn.</summary>
     internal static void DrawCanyon(OverworldMap map, int rows, int columns, Terrain riverTerrain,
         Climate climate, IEnumerable<Terrain> bankTerrains, bool horizontal, Random rng)
+        => DrawCanyon(map, rows, columns, riverTerrain, climate, bankTerrains, horizontal, rng, islandStarts: null);
+
+    private static void DrawCanyon(OverworldMap map, int rows, int columns, Terrain riverTerrain,
+        Climate climate, IEnumerable<Terrain> bankTerrains, bool horizontal, Random rng, int[]? islandStarts)
     {
         IntVector2 forward = horizontal ? IntVector2.EAST : IntVector2.SOUTH;
         IntVector2 side = horizontal ? IntVector2.SOUTH : IntVector2.EAST;
         int length = horizontal ? columns : rows;
         int width = horizontal ? rows : columns;
+        bool coastal = islandStarts is not null;
         int margin = Math.Min(width / 2 - 1, 15);
+        int minimumRiverOffset = coastal ? width / 4 : margin;
+        int maximumRiverOffset = coastal ? width * 3 / 5 : width - margin - 1;
+        int oceanBandWidth = Math.Clamp(width / 12, 2, 5);
         int leftBankSteps = rng.Next(0, 5);
-        int rightBankSteps = rng.Next(0, 5);
+        int rightBankSteps = coastal ? 0 : rng.Next(0, 5);
         Terrain leftBankTerrain = climate.GetRandomTerrain(rng, bankTerrains);
-        Terrain rightBankTerrain = climate.GetRandomTerrain(rng, bankTerrains);
-        int riverOffset = rng.Next(margin, width - margin);
+        Terrain rightBankTerrain = coastal ? Terrain.NONE : climate.GetRandomTerrain(rng, bankTerrains);
+        int riverOffset = rng.Next(minimumRiverOffset, maximumRiverOffset + 1);
 
         for (int step = 0; step < length; step++)
         {
             leftBankSteps++;
-            rightBankSteps++;
             IntVector2 basePos = step * forward;
             map[basePos + riverOffset * side] = riverTerrain;
             map[basePos + (riverOffset + 1) * side] = riverTerrain;
@@ -177,32 +184,41 @@ internal static class TerrainLayout
             // Retain the different horizontal/vertical wandering ranges.
             int shift = rng.Next(-3, horizontal ? 3 : 4);
             int leftMountainDistance = rng.Next(14, 17);
+            if (coastal) leftMountainDistance = Math.Min(leftMountainDistance, width / 4);
             if (riverOffset - leftMountainDistance > 0)
             {
-                map[basePos + (riverOffset - leftMountainDistance + 3) * side] = leftBankTerrain;
+                // Keep a 3x3 placement area open on the narrow coastal bank.
+                int seedDistanceFromCliff = coastal && width < 44 ? 1 : 3;
+                map[basePos + (riverOffset - leftMountainDistance + seedDistanceFromCliff) * side] = leftBankTerrain;
             }
             if (leftBankSteps % 5 == 0)
             {
                 leftBankTerrain = climate.GetRandomTerrain(rng, bankTerrains);
             }
-            for (int i = riverOffset - leftMountainDistance; i >= 0; i--)
+            int leftMountainEdge = riverOffset - leftMountainDistance;
+            if (coastal) leftMountainEdge = Math.Max(0, leftMountainEdge);
+            for (int i = leftMountainEdge; i >= 0; i--)
             {
                 map[basePos + i * side] = Terrain.MOUNTAIN;
             }
-            int rightMountainDistance = rng.Next(14, 17);
-            if (riverOffset + rightMountainDistance < width)
+            if (!coastal)
             {
-                map[basePos + (riverOffset + rightMountainDistance - 3) * side] = rightBankTerrain;
+                rightBankSteps++;
+                int rightMountainDistance = rng.Next(14, 17);
+                if (riverOffset + rightMountainDistance < width)
+                {
+                    map[basePos + (riverOffset + rightMountainDistance - 3) * side] = rightBankTerrain;
+                }
+                if (rightBankSteps % 5 == 0)
+                {
+                    rightBankTerrain = climate.GetRandomTerrain(rng, bankTerrains);
+                }
+                for (int i = riverOffset + 1 + rightMountainDistance; i < width; i++)
+                {
+                    map[basePos + i * side] = Terrain.MOUNTAIN;
+                }
             }
-            if (rightBankSteps % 5 == 0)
-            {
-                rightBankTerrain = climate.GetRandomTerrain(rng, bankTerrains);
-            }
-            for (int i = riverOffset + 1 + rightMountainDistance; i < width; i++)
-            {
-                map[basePos + i * side] = Terrain.MOUNTAIN;
-            }
-            while (riverOffset + shift + 1 > width - margin || riverOffset + shift < margin)
+            while (riverOffset + shift > maximumRiverOffset || riverOffset + shift < minimumRiverOffset)
             {
                 shift = rng.Next(-1, 2);
             }
@@ -211,6 +227,56 @@ internal static class TerrainLayout
             for (int s = previousOffset; shift > 0 ? s < riverOffset : s > riverOffset; s += Math.Sign(shift))
             {
                 map[basePos + s * side] = riverTerrain;
+            }
+
+            if (islandStarts is not null)
+            {
+                // The outer water tile follows the actual river step, not the prepainted border.
+                int lastRiverTile = Math.Max(previousOffset + 1, riverOffset - 1);
+                int islandStart = lastRiverTile + 1 + oceanBandWidth;
+                islandStarts[step] = islandStart;
+                for (int i = lastRiverTile + 1; i < islandStart; i++)
+                {
+                    map[basePos + i * side] = riverTerrain;
+                }
+            }
+        }
+    }
+
+    /// <summary>Seeds a mountain-backed coast, an open channel and water stripes for offshore islands.</summary>
+    internal static void DrawCoastalIslands(OverworldMap map, int rows, int columns, Terrain water,
+        Climate climate, IEnumerable<Terrain> bankTerrains, bool horizontal, Random rng)
+    {
+        PaintBorder(map, rows, columns, water);
+        IntVector2 forward = horizontal ? IntVector2.EAST : IntVector2.SOUTH;
+        IntVector2 seaward = horizontal ? IntVector2.SOUTH : IntVector2.EAST;
+        int length = horizontal ? columns : rows;
+        int width = horizontal ? rows : columns;
+
+        // Canyon drawing supplies the first offshore tile for each step. Unseeded
+        // mainland tiles remain available to place towns, caves and palaces.
+        var islandStarts = new int[length];
+        DrawCanyon(map, rows, columns, water, climate, bankTerrains, horizontal, rng, islandStarts);
+
+        int crossStripes = length >= 44 ? 3 : 2;
+        for (int stripe = 1; stripe <= crossStripes; stripe++)
+        {
+            int step = stripe * length / (crossStripes + 1) + rng.Next(-2, 3);
+            for (int offshore = islandStarts[step]; offshore < width - 1; offshore++)
+            {
+                map[step * forward + offshore * seaward] = water;
+            }
+        }
+
+        int furthestCoast = 0;
+        foreach (int islandStart in islandStarts) furthestCoast = Math.Max(furthestCoast, islandStart);
+        // Keep room for a 3x3 location on either side of the offshore divider.
+        if (furthestCoast + 3 < width - 4)
+        {
+            int offshoreStripe = rng.Next(furthestCoast + 3, width - 4);
+            for (int step = 1; step < length - 1; step++)
+            {
+                map[step * forward + offshoreStripe * seaward] = water;
             }
         }
     }

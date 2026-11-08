@@ -420,6 +420,24 @@ public class ContinentConnectorTests
     }
 
     [TestMethod]
+    [DataRow(Continent.WEST)]
+    [DataRow(Continent.EAST)]
+    public void CoastalNormalTravelUsesTheSeaFacingEdge(Continent continent)
+    {
+        ContinentConnectorOrientationPolicy.Resolve(continent, Biome.COASTAL_ISLANDS, true, ContinentConnectionType.NORMAL)
+            .RaftEdges.Should().Equal(Direction.SOUTH);
+        ContinentConnectorOrientationPolicy.Resolve(continent, Biome.COASTAL_ISLANDS, false, ContinentConnectionType.NORMAL)
+            .RaftEdges.Should().Equal(Direction.EAST);
+
+        foreach (var connections in new[] { ContinentConnectionType.TRANSPORTATION_SHUFFLE, ContinentConnectionType.ANYTHING_GOES })
+            ContinentConnectorOrientationPolicy.Resolve(continent, Biome.COASTAL_ISLANDS, true, connections)
+                .RaftEdges.Should().BeEquivalentTo(DirectionExtensions.CARDINAL_DIRECTIONS);
+
+        ContinentConnectorOrientationPolicy.Resolve(Continent.DM, Biome.COASTAL_ISLANDS, false, ContinentConnectionType.NORMAL)
+            .RaftEdges.Should().BeEquivalentTo(DirectionExtensions.CARDINAL_DIRECTIONS);
+    }
+
+    [TestMethod]
     [DataRow(Biome.CANYON, false)]
     [DataRow(Biome.CANYON, true)]
     [DataRow(Biome.DRY_CANYON, false)]

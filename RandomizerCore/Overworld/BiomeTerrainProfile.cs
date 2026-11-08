@@ -27,6 +27,8 @@ internal sealed class BiomeTerrainProfile
     {
         // local shorthands
         bool canyon = biome is Biome.CANYON or Biome.DRY_CANYON;
+        bool coastal = biome == Biome.COASTAL_ISLANDS;
+        bool seaBiome = biome == Biome.ISLANDS || coastal;
         bool dm = continent == Continent.DM;
         bool east = continent == Continent.EAST;
 
@@ -34,7 +36,7 @@ internal sealed class BiomeTerrainProfile
         IsHorizontal = isHorizontal;
         Water = goodBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
         PreplacedWater = goodBoots ? Terrain.PREPLACED_WATER_WALKABLE : Terrain.PREPLACED_WATER;
-        RiverTerrain = biome == Biome.ISLANDS || canyon ? PreplacedWater : Terrain.MOUNTAIN;
+        RiverTerrain = seaBiome || canyon ? PreplacedWater : Terrain.MOUNTAIN;
         if (!dm && biome == Biome.DRY_CANYON) RiverTerrain = Terrain.DESERT;
 
         Terrain[] placement = continent switch
@@ -43,7 +45,8 @@ internal sealed class BiomeTerrainProfile
             Continent.WEST => biome switch
             {
                 Biome.CANYON or
-                Biome.DRY_CANYON
+                Biome.DRY_CANYON or
+                Biome.COASTAL_ISLANDS
                     => [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE],
 
                 Biome.VANILLA or
@@ -59,7 +62,8 @@ internal sealed class BiomeTerrainProfile
             Continent.EAST => biome switch
             {
                 Biome.CANYON or
-                Biome.DRY_CANYON
+                Biome.DRY_CANYON or
+                Biome.COASTAL_ISLANDS
                     => [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE],
 
                 Biome.ISLANDS or
@@ -78,15 +82,15 @@ internal sealed class BiomeTerrainProfile
         };
         // West islands seed preplaced water; ordinary expandable water otherwise
         // makes the wetlands climate overwhelm the intended island borders.
-        Terrain seedWater = continent == Continent.WEST && biome == Biome.ISLANDS ? PreplacedWater : Water;
+        Terrain seedWater = continent == Continent.WEST && seaBiome ? PreplacedWater : Water;
         InitialPlacementTerrains = Array.AsReadOnly(placement);
         SeedTerrains = Array.AsReadOnly([.. placement, Terrain.MOUNTAIN, seedWater]);
         CanyonBankTerrains = Array.AsReadOnly<Terrain>(dm
             ? [Terrain.GRASS, Terrain.GRAVE, Terrain.FOREST, Terrain.DESERT, Terrain.MOUNTAIN]
             : [.. placement, Terrain.MOUNTAIN]);
         // Classic DM's land occupies the first 29 columns; the rest is seeded sea.
-        EasternSeaStartColumn = dm && !canyon && biome is not (Biome.CALDERA or Biome.ISLANDS) ? 29 : null;
-        StripeTerrain = biome == Biome.ISLANDS ? PreplacedWater : Terrain.MOUNTAIN;
+        EasternSeaStartColumn = dm && !canyon && !seaBiome && biome != Biome.CALDERA ? 29 : null;
+        StripeTerrain = seaBiome ? PreplacedWater : Terrain.MOUNTAIN;
         NearEdgeMargin = east && biome == Biome.ISLANDS ? 1 : 10;
         FarEdgeMargin = east && biome == Biome.ISLANDS ? 1 : 11;
     }
@@ -116,6 +120,7 @@ internal sealed class BiomeTerrainProfile
             case Biome.ISLANDS:
             case Biome.CANYON:
             case Biome.DRY_CANYON:
+            case Biome.COASTAL_ISLANDS:
             case Biome.MOUNTAINOUS:
                 break;
             // These are continent-specific.

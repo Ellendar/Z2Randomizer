@@ -19,7 +19,7 @@ internal static class TerrainGrowth
         float openness = biome switch
         {
             Biome.CALDERA or Biome.CANYON => (float)(rng.NextDouble() * .75 + 1),
-            Biome.ISLANDS => (float)(rng.NextDouble() * .5 + 1),
+            Biome.ISLANDS or Biome.COASTAL_ISLANDS => (float)(rng.NextDouble() * .5 + 1),
             _ => 1f
         };
         if (result.Type == ClimateEnum.SCRUBLAND) openness *= 2;

@@ -231,7 +231,8 @@ sealed class DeathMountain : World
 
         if (!TryPlaceSpectacleRock()) return false;
 
-        if (biome == Biome.CANYON || biome == Biome.DRY_CANYON || biome == Biome.ISLANDS)
+        if (biome == Biome.CANYON || biome == Biome.DRY_CANYON
+            || biome == Biome.ISLANDS || biome == Biome.COASTAL_ISLANDS)
         {
             _ = PlaceRegionCrossings(new RegionCrossingOptions
             {
@@ -273,6 +274,11 @@ sealed class DeathMountain : World
             walkableTerrains = profile.CanyonBankTerrains.Where(t => t != Terrain.MOUNTAIN).ToList();
             DrawCanyon(riverT, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
 
+        }
+        else if (biome == Biome.COASTAL_ISLANDS)
+        {
+            walkableTerrains = profile.CanyonBankTerrains.Where(t => t != Terrain.MOUNTAIN).ToList();
+            DrawCoastalIslands(riverT, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
         }
         else if (biome == Biome.CALDERA)
         {
@@ -397,7 +403,7 @@ sealed class DeathMountain : World
         }
 
         map[location.Pos] = Terrain.NONE;
-        var (minimumSpacing, maximumSpacingExclusive) = biome == Biome.ISLANDS ? (5, 12) : (3, 10);
+        var (minimumSpacing, maximumSpacingExclusive) = biome is Biome.ISLANDS or Biome.COASTAL_ISLANDS ? (5, 12) : (3, 10);
         var primary = SaneCavePlacement.Find(map, MapRows, MapColumns, RNG, minimumSpacing, maximumSpacingExclusive, null);
         if (primary is not { } primaryPair) return false;
 

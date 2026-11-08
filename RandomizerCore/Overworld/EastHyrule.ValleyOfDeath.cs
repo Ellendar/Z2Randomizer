@@ -51,7 +51,7 @@ public sealed partial class EastHyrule
             this.world = world;
             this.palacePosition = palacePosition;
             this.traps = traps;
-            bool isCanyon = world.biome is Biome.CANYON or Biome.DRY_CANYON;
+            bool isCanyon = world.biome is Biome.CANYON or Biome.DRY_CANYON or Biome.COASTAL_ISLANDS;
             usesMountainOpening = isCanyon || world.biome == Biome.VOLCANO;
             horizontalPath = world.isHorizontal ^ isCanyon;
             routeLength = usesMountainOpening ? 20 : world.RNG.Next(5, 16);

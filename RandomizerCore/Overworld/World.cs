@@ -365,7 +365,7 @@ public abstract partial class World
     {
         var (minimumSpacing, maximumSpacing) = biome switch
         {
-            Biome.ISLANDS or Biome.MOUNTAINOUS => (10, 20),
+            Biome.ISLANDS or Biome.COASTAL_ISLANDS or Biome.MOUNTAINOUS => (10, 20),
             Biome.VOLCANO or Biome.CALDERA => (5, 20),
             Biome.VANILLA or Biome.VANILLA_SHUFFLE or Biome.VANILLALIKE or Biome.CANYON or Biome.DRY_CANYON => (6, 18),
             _ => throw new ArgumentOutOfRangeException(nameof(biome)),
@@ -707,6 +707,10 @@ public abstract partial class World
     /// <summary>Seeds canyon banks using explicit climate and allowed bank terrain, including mountain.</summary>
     protected void DrawCanyon(Terrain riverT, Climate climate, IEnumerable<Terrain> bankTerrains, bool horizontal)
         => TerrainLayout.DrawCanyon(map, MapRows, MapColumns, riverT, climate, bankTerrains, horizontal, RNG);
+
+    /// <summary>Seeds a canyon land half, then clears the seaward half for island stripes and growth.</summary>
+    protected void DrawCoastalIslands(Terrain riverT, Climate climate, IEnumerable<Terrain> bankTerrains, bool horizontal)
+        => TerrainLayout.DrawCoastalIslands(map, MapRows, MapColumns, riverT, climate, bankTerrains, horizontal, RNG);
 
     protected void DrawCenterMountain(bool horizontal)
         => TerrainLayout.DrawCentralMountain(map, MapRows, MapColumns, horizontal);

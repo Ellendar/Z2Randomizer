@@ -134,6 +134,7 @@ public abstract partial class World
             Biome.VANILLA or
             Biome.VANILLA_SHUFFLE or
             Biome.ISLANDS or
+            Biome.COASTAL_ISLANDS or
             Biome.CANYON or
             Biome.DRY_CANYON or
             Biome.VOLCANO or
