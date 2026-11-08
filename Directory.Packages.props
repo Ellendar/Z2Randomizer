@@ -4,17 +4,17 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <RoslynVersion>5.9.0</RoslynVersion>
     <ClearScriptVersion>7.5.1.1</ClearScriptVersion>
-    <Js65Version>2.3.1</Js65Version>
-    <AvaloniaVersion>12.1.4</AvaloniaVersion>
-    <SkiaSharpVersion>4.153.1</SkiaSharpVersion>
+    <Js65Version>2.3.2</Js65Version>
+    <AvaloniaVersion>12.1.6</AvaloniaVersion>
+    <SkiaSharpVersion>4.156.0</SkiaSharpVersion>
   </PropertyGroup>
   <ItemGroup>
     <!-- Core -->
-    <PackageVersion Include="Microsoft.JSInterop" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.JSInterop" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="$(RoslynVersion)" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(RoslynVersion)" />
-    <PackageVersion Include="PolySharp" Version="1.16.0" />
+    <PackageVersion Include="PolySharp" Version="1.17.0" />
     <!-- ClearScript -->
     <PackageVersion Include="Microsoft.ClearScript" Version="$(ClearScriptVersion)" />
     <PackageVersion Include="Microsoft.ClearScript.Core" Version="$(ClearScriptVersion)" />
@@ -50,7 +50,7 @@
     <PackageVersion Include="Aigamo.ResXGenerator" Version="4.4.0" />
     <PackageVersion Include="NLog" Version="6.2.2" />
     <PackageVersion Include="SD.Tools.Algorithmia" Version="1.4.0" />
-    <PackageVersion Include="Xaml.Behaviors.Interactions" Version="12.0.7" />
+    <PackageVersion Include="Xaml.Behaviors.Interactions" Version="12.1.5" />
     <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="5.1.0" />
     <!-- FtRandoLib -->
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
@@ -62,9 +62,9 @@
     <PackageVersion Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageVersion Include="System.Data.SQLite" Version="2.0.4" />
     <!-- Test -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="4.5.1" />
-    <PackageVersion Include="MSTest.TestFramework" Version="4.5.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="4.5.3" />
+    <PackageVersion Include="MSTest.TestFramework" Version="4.5.3" />
     <PackageVersion Include="FluentAssertions" Version="8.11.0" />
     <PackageVersion Include="coverlet.collector" Version="10.1.0" />
   </ItemGroup>
