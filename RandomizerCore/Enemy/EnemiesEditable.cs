@@ -63,6 +63,25 @@ public class EnemiesEditable<T> where T : Enum
     public void Mirror(int pages)
     {
         int width = pages * 16;
+
+        foreach (var enemy in Enemies)
+        {
+            switch (enemy)
+            {
+                case Enemy<EnemiesPalace125>:
+                case Enemy<EnemiesPalace346>:
+                    if (enemy.IdByte == EnemiesRegularPalaceShared.ENERGY_BALL_SHOOTER_DOWN_LEFT)
+                    {
+                        enemy.IdByte = EnemiesRegularPalaceShared.ENERGY_BALL_SHOOTER_DOWN_RIGHT;
+                    }
+                    else if (enemy.IdByte == EnemiesRegularPalaceShared.ENERGY_BALL_SHOOTER_DOWN_RIGHT)
+                    {
+                        enemy.IdByte = EnemiesRegularPalaceShared.ENERGY_BALL_SHOOTER_DOWN_LEFT;
+                    }
+                    break;
+            }
+        }
+
         foreach (var enemy in Enemies)
         {
             enemy.X = width - enemy.X - 1;
