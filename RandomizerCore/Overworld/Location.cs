@@ -170,7 +170,7 @@ public class Location
     Byte 3 (offset BD bytes from Byte 0)
 
     ...x xxxx - World number
-    ..x. .... - Forced enter from the right edge of screen
+    ..x. .... - Forced enter from the right edge, or use the stored page when also a passthrough
     .x.. .... - Pass through
     x... .... - Fall in hole
     */
@@ -249,7 +249,8 @@ public class Location
         }
         bytes[1] = (byte)((EntranceNumber << 6) + Xpos);
         bytes[2] = (byte)(MapPageRaw + Map);
-        bytes[3] = (byte)((IsFallInHole ? 128 : 0) + (IsPassthrough ? 64 : 0) + (ForceEnterRight ? 32 : 0) + GetWorld());
+        bool useStoredEntryPage = IsPassthrough && ID is LocationID.WEST_BRIDGE_AFTER_DM_WEST or LocationID.WEST_BRIDGE_AFTER_DM_EAST;
+        bytes[3] = (byte)((IsFallInHole ? 128 : 0) + (IsPassthrough ? 64 : 0) + (ForceEnterRight || useStoredEntryPage ? 32 : 0) + GetWorld());
         return bytes;
     }
 

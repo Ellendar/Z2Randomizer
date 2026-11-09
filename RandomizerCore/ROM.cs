@@ -2312,6 +2312,47 @@ DetermineFacing:
 """, "FixSideviewEntryFacing.s");
     }
 
+    public void FixPassthroughAreaEntryPage(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+; The side a passthrough Location is entered from is based on the direction
+; Link was facing in the overworld. That is wrong for a passthrough whose
+; area only has an overworld exit at one end: entering it from the
+; other direction (or perpendicular to it, e.g. walking on water with the
+; Boots) enters Link into the far end of the room, so walking back out the
+; way he came in leads to the other room instead of the overworld.
+
+.include "z2r.inc"
+
+FinishOverworldEntry := $cbf2
+ContinueForcedRightEntry := $cbfd
+
+.segment "PRG7"
+
+; Vanilla branches here when location byte 3 has the forced-right bit set.
+.org $cbf8  ; lda #$01, sta EntryFacing (5 bytes)
+    jmp UseStoredPassthroughEntryPage
+    FREE_UNTIL ContinueForcedRightEntry
+
+.reloc
+UseStoredPassthroughEntryPage:
+    lda LocationByte3TableRamCopy,y
+    and #$40                           ; passthrough mask
+    bne @KeepStoredPage
+
+    lda #$01
+    sta EntryFacing
+    jmp ContinueForcedRightEntry
+
+@KeepStoredPage:
+    ; With both bits set, retain the page and facing loaded from location byte 2.
+    ; This mode is for edge pages 0 and 3, so the interior-page setup stays bypassed.
+    jmp FinishOverworldEntry
+
+""", "FixPassthroughAreaEntryPage.s");
+    }
+
     public void BuffCarrock(Assembler a)
     {
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");

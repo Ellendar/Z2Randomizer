@@ -3882,6 +3882,7 @@ FlagHudUpdate:
         rom.FixItemPickup(engine, props.FastItemPickup);
         rom.CollisionFixes(engine);
         rom.FixSideviewEntryFacing(engine);
+        rom.FixPassthroughAreaEntryPage(engine);
         if (!randomizeMusic) // custom music already optimizes the overworld similarly
         {
             rom.OptimizeOverworldByteDecode(engine);
