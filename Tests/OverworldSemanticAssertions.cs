@@ -118,6 +118,31 @@ internal static class OverworldSemanticAssertions
         Require(false, "bridge-shore", location.ID);
     }
 
+    internal static void OutwardConnectorCave(World world, Location? cave)
+    {
+        if (cave is null) return;
+        bool FacesEdge(IntVector2 outward)
+        {
+            var approach = cave.Pos - outward;
+            if (!Inside(world, approach) || !world.map[approach].IsWalkable(true) || world.map[approach].IsWater()) return false;
+            var side = outward.Perpendicular();
+            if (new[] { cave.Pos - side, cave.Pos + side }.Any(p => !Inside(world, p) || world.map[p] != Terrain.MOUNTAIN))
+                return false;
+            var behind = cave.Pos + outward;
+            if (!Inside(world, behind) || world.map[behind] != Terrain.MOUNTAIN) return false;
+            int distance = 0;
+            for (var p = behind; Inside(world, p); p += outward)
+            {
+                if (world.map[p] != Terrain.MOUNTAIN && !world.map[p].IsWater()) return false;
+                distance++;
+            }
+            return distance <= 8;
+        }
+
+        Require(cave.IsEnabled() && Inside(world, cave.Pos) && world.map[cave.Pos] == Terrain.CAVE
+            && IntVector2.CARDINALS.Any(FacesEdge), "connector-cave-outward", cave.ID);
+    }
+
     internal static void HiddenColumns(Location? palace, Location? kasuto, bool bothEnabled)
     {
         if (bothEnabled) Require(palace != null && kasuto != null && palace.Xpos != kasuto.Xpos, "hidden-columns");

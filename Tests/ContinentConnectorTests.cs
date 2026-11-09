@@ -100,6 +100,24 @@ public class ContinentConnectorTests
     }
 
     [TestMethod]
+    [DataRow(ContinentConnectionType.NORMAL, false)]
+    [DataRow(ContinentConnectionType.TRANSPORTATION_SHUFFLE, true)]
+    [DataRow(ContinentConnectionType.ANYTHING_GOES, true)]
+    public void NoRoomForAnOutwardFacingCaveRejectsOnlyNormalConnections(ContinentConnectionType connections, bool succeeds)
+    {
+        var world = new TestWorld(9, 9, Terrain.MOUNTAIN);
+        var cave = new Location(LocationIDUtils.FromIndex(Continent.WEST, Location.CONNECTOR_CAVE1_ID), 0, 0, 0, Continent.WEST);
+        world.cave1 = cave;
+
+        world.PlaceEdgeConnectorCaves(connections).Should().Be(succeeds);
+
+        cave.Pos.Should().Be(IntVector2.NOT_ON_MAP);
+        for (int y = 0; y < 9; y++)
+        for (int x = 0; x < 9; x++)
+            world.map[y, x].Should().Be(Terrain.MOUNTAIN);
+    }
+
+    [TestMethod]
     [DataRow(0)]
     [DataRow(1)]
     [DataRow(2)]

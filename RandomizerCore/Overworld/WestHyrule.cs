@@ -349,6 +349,10 @@ public sealed class WestHyrule : World
 
         PlaceRandomTerrain(profile.Climate, profile.SeedTerrains);
 
+        if (!TryPlaceEdgeConnectorCaves(props))
+        {
+            return false;
+        }
         bool b = PlaceLocations(riverTerrain, props.SaneCaves);
         if (!b)
         {
@@ -382,6 +386,11 @@ public sealed class WestHyrule : World
             {
                 location.Disable();
             }
+        }
+
+        if (!ValidateEdgeConnectorCaves(props))
+        {
+            return false;
         }
 
         //check bytes and adjust

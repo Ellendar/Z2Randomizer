@@ -196,6 +196,10 @@ sealed class DeathMountain : World
 
         var (raftDirection, bridgeDirection) = PrepareConnectorShores(props, profile);
 
+        if (!TryPlaceEdgeConnectorCaves(props))
+        {
+            return false;
+        }
         if (!TryPlaceGeneratedLocations(props))
         {
             return false;
@@ -243,7 +247,14 @@ sealed class DeathMountain : World
             });
         }
 
-        if (!TryRepairAndValidateCaveExits()) return false;
+        if (!TryRepairAndValidateCaveExits())
+        {
+            return false;
+        }
+        if (!ValidateEdgeConnectorCaves(props))
+        {
+            return false;
+        }
 
         //check bytes and adjust
         encodedSize = EncodeTerrainMap().Length;

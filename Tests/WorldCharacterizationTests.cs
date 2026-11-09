@@ -640,6 +640,8 @@ public class WorldCharacterizationTests
         internal EncodedWorldMap EncodeMap(MapEncodingOptions options = default) => EncodeTerrainMap(options);
 
         internal bool StageEncodedMap(EncodedWorldMap encodedMap) => TryStageEncodedTerrainMap(encodedMap);
+        internal bool PlaceEdgeConnectorCaves(ContinentConnectionType connections)
+            => TryPlaceEdgeConnectorCaves(new RandomizerProperties { ContinentConnections = connections });
 
         protected override List<Location> GetPathingStarts() => AllLocations.Where(location => location.Reachable).ToList();
         public override bool Terraform(RandomizerProperties props, ROM rom) => throw new NotSupportedException();

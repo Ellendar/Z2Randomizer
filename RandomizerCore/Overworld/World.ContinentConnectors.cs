@@ -74,6 +74,122 @@ public abstract partial class World
         }
     }
 
+    private const int MAX_CONNECTOR_CAVE_EDGE_DISTANCE = 8;
+
+    /// <summary>Places NORMAL connector caves before ordinary locations can fill the shore.</summary>
+    private protected bool TryPlaceEdgeConnectorCaves(RandomizerProperties props)
+    {
+        if (props.ContinentConnections != ContinentConnectionType.NORMAL)
+        {
+            return true;
+        }
+
+        foreach (var cave in new[] { cave1, cave2 })
+        {
+            if (cave is null) { continue; }
+
+            List<(IntVector2 Position, IntVector2 Outward)> candidates = [];
+            foreach (Direction edge in DirectionExtensions.CARDINAL_DIRECTIONS)
+            {
+                var outward = edge.ToIntVector2();
+                int edgeLength = edge.IsHorizontal() ? MapRows : MapColumns;
+                for (int offset = 2; offset < edgeLength - 2; offset++)
+                {
+                    var boundary = edge switch
+                    {
+                        Direction.WEST => new IntVector2(0, offset),
+                        Direction.EAST => new IntVector2(MapColumns - 1, offset),
+                        Direction.NORTH => new IntVector2(offset, 0),
+                        Direction.SOUTH => new IntVector2(offset, MapRows - 1),
+                        _ => throw new ArgumentOutOfRangeException(nameof(edge))
+                    };
+                    for (int depth = 2; depth <= MAX_CONNECTOR_CAVE_EDGE_DISTANCE; depth++)
+                    {
+                        var position = boundary - depth * outward;
+                        if (!map.AllTerrainIn3x3Equals(position, Terrain.NONE)) { continue; }
+                        if (!HasClearConnectorCaveEdge(position, outward, allowUnseeded: true)) { continue; }
+                        candidates.Add((position, outward));
+                    }
+                }
+            }
+
+            if (candidates.Count == 0)
+            {
+                TraceTerrainRejection("connector-cave-edge-placement", $"location={cave.ID}");
+                return false;
+            }
+
+            var (landing, direction) = candidates.Sample(RNG);
+            Terrain approach = continentId == Continent.DM && biome == Biome.VANILLALIKE
+                ? Terrain.ROAD : climate.GetRandomTerrain(RNG, walkableTerrains);
+            PlaceCave(landing, direction, approach);
+            // Keep growth from filling the still-unseeded cells behind the entrance with land.
+            for (var tile = landing + direction; map.Contains(tile); tile += direction)
+            {
+                if (map[tile] == Terrain.NONE)
+                {
+                    map[tile] = Terrain.MOUNTAIN;
+                }
+            }
+            cave.Pos = landing;
+            cave.CanShuffle = false;
+        }
+
+        return true;
+    }
+
+    /// <summary>Checks the final entrance and its outward path after growth, blockers and crossings.</summary>
+    private protected bool ValidateEdgeConnectorCaves(RandomizerProperties props)
+    {
+        if (props.ContinentConnections != ContinentConnectionType.NORMAL) return true;
+
+        foreach (var cave in new[] { cave1, cave2 })
+        {
+            if (cave is null) continue;
+            if (!map.Contains(cave.Pos) || map[cave.Pos] != Terrain.CAVE
+                || !IntVector2.CARDINALS.Any(direction => FacesEdge(cave.Pos, direction)))
+            {
+                TraceTerrainRejection("connector-cave-edge-validation", $"location={cave.ID}");
+                return false;
+            }
+        }
+
+        return true;
+
+        bool FacesEdge(IntVector2 position, IntVector2 outward)
+        {
+            if (!position.IsWithinBounds(MapColumns, MapRows, 1))
+            {
+                return false;
+            }
+
+            var approach = map[position - outward];
+            var side = outward.Perpendicular();
+            return approach.IsWalkable(true) && !approach.IsWater()
+                && map[position - side] == Terrain.MOUNTAIN && map[position + side] == Terrain.MOUNTAIN
+                && map[position + outward] == Terrain.MOUNTAIN
+                && HasClearConnectorCaveEdge(position, outward, allowUnseeded: false);
+        }
+    }
+
+    private bool HasClearConnectorCaveEdge(IntVector2 position, IntVector2 outward, bool allowUnseeded)
+    {
+        int distance = 0;
+        for (var tile = position + outward; map.Contains(tile); tile += outward)
+        {
+            if (++distance > MAX_CONNECTOR_CAVE_EDGE_DISTANCE)
+            {
+                return false;
+            }
+            var terrain = map[tile];
+            if (terrain != Terrain.MOUNTAIN && !terrain.IsWater() && !(allowUnseeded && terrain == Terrain.NONE))
+            {
+                return false;
+            }
+        }
+        return distance > 0;
+    }
+
     private static Terrain ConnectorTerrain(ConnectorKind kind)
     {
         bool isCave = kind is ConnectorKind.Cave1 or ConnectorKind.Cave2;
