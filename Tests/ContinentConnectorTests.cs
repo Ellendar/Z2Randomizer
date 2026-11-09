@@ -67,6 +67,39 @@ public class ContinentConnectorTests
     }
 
     [TestMethod]
+    [DataRow(Direction.NORTH)]
+    [DataRow(Direction.EAST)]
+    [DataRow(Direction.SOUTH)]
+    [DataRow(Direction.WEST)]
+    public void RaftLandingKeepsWaterBesideTheDockWithoutMovingItInland(Direction edge)
+    {
+        var map = new OverworldMap(9, 9, Terrain.WATER);
+        var inward = -edge.ToIntVector2();
+        var side = inward.Perpendicular();
+        var landing = EdgeCenter(edge, 9) + inward;
+        for (int depth = 1; depth <= 2; depth++)
+        for (int lateral = -1; lateral <= 1; lateral++)
+            map[landing + depth * inward + lateral * side] = Terrain.GRASS;
+        map[landing - side] = map[landing + side] = Terrain.GRASS;
+
+        var reservation = ContinentConnectorReservation.Plan(new Random(42), map, Biome.VANILLALIKE,
+            World.ConnectorKind.Raft, edge, [Terrain.GRASS], [], []);
+        reservation.Should().NotBeNull();
+        reservation!.Seed(map, Terrain.PREPLACED_WATER, Terrain.GRASS);
+        var raft = Connector(true);
+        reservation.Finalize(map, raft);
+
+        raft.Pos.Should().Be(landing);
+        map[landing].Should().Be(Terrain.BRIDGE);
+        map[landing + inward].Should().Be(Terrain.GRASS);
+        map[landing - side].Should().Be(Terrain.PREPLACED_WATER);
+        map[landing + side].Should().Be(Terrain.PREPLACED_WATER);
+        reservation.Contains(landing - side).Should().BeTrue();
+        reservation.Contains(landing + side).Should().BeTrue();
+        reservation.IsIntact(map, true).Should().BeTrue();
+    }
+
+    [TestMethod]
     [DataRow(0)]
     [DataRow(1)]
     [DataRow(2)]
@@ -252,7 +285,7 @@ public class ContinentConnectorTests
         route.Should().NotBeNull();
         route!.Seed(map, Terrain.PREPLACED_WATER, Terrain.GRASS);
         map[2, 0].Should().Be(Terrain.PREPLACED_WATER);
-        map[1, 0].Should().Be(Terrain.MOUNTAIN);
+        new[] { map[1, 0], map[3, 0] }.Should().BeEquivalentTo([Terrain.MOUNTAIN, Terrain.PREPLACED_WATER]);
         var blocked = new OverworldMap(5, 9, Terrain.NONE);
         for (int y = 0; y < 5; y++) blocked[y, 0] = blocked[y, 1] = Terrain.MOUNTAIN;
         ContinentConnectorReservation.Plan(new Random(42), blocked, biome, World.ConnectorKind.Bridge, Direction.WEST,
@@ -321,6 +354,7 @@ public class ContinentConnectorTests
 
         // Leave the top-right corner mountainous and open a single inlet on the east.
         world.map[7, 13] = world.map[7, 14] = Terrain.WALKABLEWATER;
+        if (!raft) world.map[8, 13] = world.map[8, 14] = Terrain.WALKABLEWATER;
         for (int y = 6; y <= 8; y++)
             world.map[y, 11] = world.map[y, 12] = Terrain.GRASS;
         var profile = BiomeTerrainProfile.Resolve(Continent.WEST, world.biome, true,
@@ -340,6 +374,8 @@ public class ContinentConnectorTests
         var (tiles, _) = OverworldSemanticAssertions.Decode(rom.rawdata, world.MapRows);
         tiles[0, 14].Should().Be((byte)Terrain.MOUNTAIN, "the logical corner stays unchanged");
         tiles[7, 14].Should().Be((byte)(raft ? Terrain.WALKABLEWATER : Terrain.BRIDGE));
+        tiles[6, 13].Should().Be((byte)Terrain.MOUNTAIN);
+        tiles[8, 13].Should().Be((byte)(raft ? Terrain.MOUNTAIN : Terrain.WALKABLEWATER));
         for (int x = world.MapColumns; x < 64; x++)
             tiles[7, x].Should().Be((byte)Terrain.WATER, "the connector needs water beyond the logical east edge");
     }
@@ -365,6 +401,43 @@ public class ContinentConnectorTests
         }
         rom.rawdata.Should().OnlyContain(b => b == 0xCC);
         world.raft.Pos.Should().Be(IntVector2.NOT_ON_MAP);
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void BridgeNeedsOneContinuousWaterSideFromTheEdgeToItsLanding(bool bothSidesBlocked)
+    {
+        var map = new OverworldMap(5, 9, Terrain.GRASS);
+        for (int x = 0; x < 3; x++) map[2, x] = Terrain.WATER;
+        map[1, 0] = Terrain.ROAD;
+        if (bothSidesBlocked) map[3, 2] = Terrain.ROAD;
+
+        var reservation = ContinentConnectorReservation.Plan(new Random(42), map, Biome.VANILLALIKE,
+            World.ConnectorKind.Bridge, Direction.WEST, [Terrain.GRASS, Terrain.ROAD], [], []);
+
+        if (bothSidesBlocked)
+        {
+            reservation.Should().BeNull("water must stay on the same side throughout the span");
+            return;
+        }
+
+        reservation.Should().NotBeNull();
+        reservation!.Seed(map, Terrain.PREPLACED_WATER, Terrain.GRASS);
+        var bridge = Connector(false);
+        reservation.Finalize(map, bridge);
+
+        bridge.Pos.Should().Be(new IntVector2(2, 2));
+        for (int x = 0; x < 3; x++)
+        {
+            map[2, x].Should().Be(Terrain.BRIDGE);
+            map[3, x].Should().Be(Terrain.PREPLACED_WATER);
+        }
+        map[1, 0].Should().Be(Terrain.ROAD);
+        map[2, 3].Should().Be(Terrain.GRASS);
+        reservation.IsIntact(map, true).Should().BeTrue();
+        map[3, 1] = Terrain.GRASS;
+        reservation.IsIntact(map, true).Should().BeFalse("the water strip is part of the reserved footprint");
     }
 
     [TestMethod]

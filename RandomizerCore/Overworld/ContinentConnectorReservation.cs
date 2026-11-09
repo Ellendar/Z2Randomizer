@@ -6,27 +6,31 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 
 /// <summary>
 /// A raft/bridge route chosen before growth: water from an edge to the landing,
-/// followed by a two-deep, three-wide land approach. It never cuts through an
-/// existing feature. Seeded cells keep ordinary placement and growth out.
+/// followed by a two-deep, three-wide land approach. Where space allows, water
+/// beside the raft landing keeps the dock flush with the shore. A bridge needs
+/// a continuous strip of water alongside its entire span.
 /// </summary>
 internal sealed class ContinentConnectorReservation
 {
     internal World.ConnectorKind Kind { get; }
     internal Direction Edge { get; }
     internal IntVector2 Landing { get; }
-    private readonly IntVector2[] waterRoute;
+    private readonly IntVector2[] route;
+    private readonly IntVector2[] waterBesideConnector;
     private readonly IntVector2[] approach;
 
-    private ContinentConnectorReservation(World.ConnectorKind kind, Direction edge, IntVector2[] waterRoute, IntVector2[] approach)
+    private ContinentConnectorReservation(World.ConnectorKind kind, Direction edge, IntVector2 landing,
+        IntVector2[] route, IntVector2[] waterBesideConnector, IntVector2[] approach)
     {
         Kind = kind;
         Edge = edge;
-        this.waterRoute = waterRoute;
+        Landing = landing;
+        this.route = route;
+        this.waterBesideConnector = waterBesideConnector;
         this.approach = approach;
-        Landing = waterRoute[^1];
     }
 
-    internal bool Contains(IntVector2 position) => waterRoute.Contains(position) || approach.Contains(position);
+    internal bool Contains(IntVector2 position) => route.Contains(position) || waterBesideConnector.Contains(position) || approach.Contains(position);
 
     /// <summary>
     /// Enumerates shores in a stable order, then samples one viable route. A bridge
@@ -72,6 +76,8 @@ internal sealed class ContinentConnectorReservation
             && !IntVector2.CARDINALS.Any(d => occupiedPositions.Contains(p + d))
             && !reservations.Any(r => r.Contains(p));
         bool Land(IntVector2 p) => map[p] == Terrain.NONE || landTerrains.Contains(map[p]) && IsApproachTerrain(map[p]);
+        bool CanOpenCoast(IntVector2 position) => map[position].IsWater()
+            || Land(position) && map[position] is not (Terrain.ROAD or Terrain.LAVA);
 
         // Keep the apron away from corners, including the far edge on narrow maps.
         for (int offset = 2; offset < span - 2; offset++)
@@ -109,7 +115,35 @@ internal sealed class ContinentConnectorReservation
                          from lateral in Enumerable.Range(-1, 3)
                          select shore + depth * inward + lateral * side).ToArray();
             if (!route.All(Free) || !apron.All(p => Inside(p) && Free(p) && Land(p))) continue;
-            var candidate = new ContinentConnectorReservation(kind, edge, route.ToArray(), apron);
+            var landing = route[^1];
+            IntVector2[] waterBesideConnector;
+            if (kind == World.ConnectorKind.Raft)
+            {
+                // Open the coast beside the dock where there is room.
+                IntVector2[] flanks = [landing - side, landing + side];
+                waterBesideConnector = flanks.Where(p => Free(p) && CanOpenCoast(p)).ToArray();
+            }
+            else
+            {
+                IntVector2[]? bestStrip = null;
+                int fewestTilesToPaint = int.MaxValue;
+                foreach (var lateral in new[] { -side, side })
+                {
+                    var strip = route.Select(p => p + lateral).ToArray();
+                    if (!strip.All(Free)) { continue; }
+                    // The first tile is on the perimeter and can use the same mountain exception as the route.
+                    if (!CanOpenCoast(strip[0]) && !(openMountainBorder && map[strip[0]] == Terrain.MOUNTAIN)) { continue; }
+                    if (!strip.Skip(1).All(CanOpenCoast)) { continue; }
+
+                    int tilesToPaint = strip.Count(p => !map[p].IsWater());
+                    if (tilesToPaint >= fewestTilesToPaint) { continue; }
+                    bestStrip = strip;
+                    fewestTilesToPaint = tilesToPaint;
+                }
+                if (bestStrip is null) { continue; }
+                waterBesideConnector = bestStrip;
+            }
+            var candidate = new ContinentConnectorReservation(kind, edge, landing, route.ToArray(), waterBesideConnector, apron);
             candidates.Add(candidate);
             if (candidate.ExistingApproachTerrain(map) is not null) anchoredCandidates.Add(candidate);
         }
@@ -125,19 +159,19 @@ internal sealed class ContinentConnectorReservation
     {
         if (!water.IsWater()) throw new ArgumentException("A connector needs water.", nameof(water));
         if (!IsApproachTerrain(land)) throw new ArgumentException("A connector needs ungated land.", nameof(land));
-        foreach (var pos in waterRoute) if (!map[pos].IsWater()) map[pos] = water;
+        foreach (var pos in route.Concat(waterBesideConnector)) if (!map[pos].IsWater()) map[pos] = water;
         foreach (var pos in approach) if (map[pos] == Terrain.NONE) map[pos] = land;
     }
 
     internal bool IsIntact(OverworldMap map, bool finalized)
     {
         if (!approach.All(p => IsApproachTerrain(map[p]))) return false;
-        foreach (var pos in waterRoute)
+        foreach (var pos in route)
         {
             bool bridgeTile = finalized && (Kind == World.ConnectorKind.Bridge || pos == Landing);
             if (bridgeTile ? map[pos] != Terrain.BRIDGE : !map[pos].IsWater()) return false;
         }
-        return true;
+        return waterBesideConnector.All(p => map[p].IsWater());
     }
 
     internal void Finalize(OverworldMap map, Location location)
