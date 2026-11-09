@@ -31,6 +31,8 @@ internal sealed record RegionCrossingOptions
     public bool RiverDevilBlocker { get; init; }
     public bool RockBlocker { get; init; }
     public RegionCrossingDeadZone? DeadZone { get; init; }
+
+    internal bool ShapesMountainPassages => Biome == Biome.MOUNTAINOUS && CrossingTerrain == Terrain.MOUNTAIN;
 }
 
 /// <summary>

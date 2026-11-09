@@ -53,7 +53,7 @@ public class SimpleCrossingTests
         var result = world.PlaceCrossings(Options(Biome.MOUNTAINOUS, Terrain.MOUNTAIN, boots: true, maximum: 2));
 
         result.PlacedCrossings.Should().Be(2);
-        Count(world, Terrain.FOREST).Should().Be(before + 10);
+        Count(world, Terrain.FOREST).Should().BeInRange(before + 18, before + 20);
         new[] { first, second }.Should().OnlyContain(l => !l.CanShuffle && world.map[l.Pos] == Terrain.FOREST);
         first.Pos.Should().NotBe(second.Pos);
     }

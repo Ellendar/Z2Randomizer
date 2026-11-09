@@ -35,22 +35,34 @@ public abstract partial class World
             var candidate = search.Sample();
             if (search.TryMeasure(candidate, feature == CrossingFeatures.Saria, out var span))
             {
-                search.RecordConnection(span);
+                if (feature == CrossingFeatures.None && !simpleCrossing.TryPaint(span, RNG))
+                {
+                    search.Discard(candidate);
+                    continue;
+                }
 
                 if (feature == CrossingFeatures.None)
                 {
-                    simpleCrossing.Paint(span);
+                    search.RecordConnection(span);
                     placedCrossings++;
                 }
                 else if (feature == CrossingFeatures.Saria)
                 {
+                    search.RecordConnection(span);
                     PlaceSariaCrossing(span, crossingTerrains);
                     placedFeatures |= feature;
                     placedCrossings++;
                 }
                 else
                 {
-                    var placement = PlaceEncounterCrossing(span, crossingTerrains, feature);
+                    var placement = PlaceEncounterCrossing(span, crossingTerrains, feature, options.ShapesMountainPassages);
+                    if (placement == EncounterCrossingPlacement.TooNarrow)
+                    {
+                        search.Discard(candidate);
+                        continue;
+                    }
+
+                    search.RecordConnection(span);
                     switch (placement)
                     {
                         case EncounterCrossingPlacement.EntranceBlocked:
@@ -149,7 +161,7 @@ public abstract partial class World
         public IntVector2 Side => Forward.Perpendicular();
     }
 
-    private enum EncounterCrossingPlacement { Placed, Unavailable, EntranceBlocked }
+    private enum EncounterCrossingPlacement { Placed, Unavailable, EntranceBlocked, TooNarrow }
 
     private void PlaceSariaCrossing(RegionCrossingSpan span, Terrain[] crossingTerrains)
     {
@@ -178,7 +190,7 @@ public abstract partial class World
 
     /// <summary>Paints the long bridge or Darunia path together with its encounter records.</summary>
     /// <remarks>Checks the far entrance before painting. Darunia requires both encounter records to be available.</remarks>
-    private EncounterCrossingPlacement PlaceEncounterCrossing(RegionCrossingSpan span, Terrain[] crossingTerrains, CrossingFeatures feature)
+    private EncounterCrossingPlacement PlaceEncounterCrossing(RegionCrossingSpan span, Terrain[] crossingTerrains, CrossingFeatures feature, bool shapeMountainPassages)
     {
         var (first, second, terrain) = GetEncounterCrossingLayout(feature);
         if (first is null || second is null)
@@ -202,6 +214,18 @@ public abstract partial class World
             farPosition -= span.Forward;
         }
 
+        MountainLane[] mountainLanes = [];
+        if (shapeMountainPassages && !isLongBridge)
+        {
+            int farTile = (span.End - farPosition).ManhattanLength - 1;
+            mountainLanes = PlanDaruniaMountainLanes(span, farPosition, farTile);
+            int encounterSpanLength = span.Length - farTile;
+            if (encounterSpanLength >= MinimumLengthRequiringWidePassage && mountainLanes.Length == 0)
+            {
+                return EncounterCrossingPlacement.TooNarrow;
+            }
+        }
+
         if (!walkableTerrains.Contains(map[firstTileFromFarBank])) map[firstTileFromFarBank] = terrain;
 
         // The long bridge can advance its far encounter by one more tile.
@@ -216,6 +240,14 @@ public abstract partial class World
         for (var position = farPosition; position != span.Start; position -= span.Forward)
         {
             map[position] = terrain;
+        }
+
+        foreach (var lane in mountainLanes)
+        {
+            for (int tileIndex = lane.FirstTile; tileIndex <= lane.LastTile; tileIndex++)
+            {
+                map[MountainCrossingTile(span, tileIndex) + lane.Side] = terrain;
+            }
         }
 
         // Darunia restores water at the near bank. The long bridge restores any crossing terrain there.
