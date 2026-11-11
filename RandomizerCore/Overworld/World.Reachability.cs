@@ -11,12 +11,14 @@ public abstract partial class World
     protected bool[,] visitation;
     public bool AllReached { get; set; }
 
-    /// <summary>Checks that the continent connectors can reach the standard required locations with all capabilities available.</summary>
+    /// <summary>Checks that the continent connectors can reach the standard required locations, assuming all capabilities.</summary>
     /// <remarks>Requires at least one loaded continent connector.</remarks>
-    public bool ValidateBasicRouting()
+    public virtual bool ValidateBasicRouting()
+        => ValidateBasicRouting(GetContinentConnections(), RequiredLocations(false, false));
+
+    private protected bool ValidateBasicRouting(IReadOnlyList<Location> roots, IEnumerable<Location> targets, bool assumeBoots = true)
     {
-        bool reachable = BasicWorldRouting.CanReachRequiredLocations(map, MapRows, MapColumns,
-            GetContinentConnections(), RequiredLocations(false, false), GetLocalConnectionExits);
+        bool reachable = BasicWorldRouting.CanReachRequiredLocations(map, MapRows, MapColumns, roots, targets, GetLocalConnectionExits, assumeBoots);
         if (!reachable) TraceTerrainRejection("basic-routing");
         return reachable;
     }

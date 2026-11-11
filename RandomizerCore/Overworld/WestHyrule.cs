@@ -481,6 +481,19 @@ public sealed class WestHyrule : World
         return true;
     }
 
+    public override bool ValidateBasicRouting()
+    {
+        if (biome == Biome.ISLANDS || biome == Biome.COASTAL_ISLANDS)
+        {
+            var start = startLocation ?? throw new InvalidOperationException("West Islands needs a starting location before terrain validation.");
+            var targets = RequiredLocations(false, false).Union(GetContinentConnections());
+            // in addition to not allowing boots, we only route from the start location, not all continent connectors
+            return ValidateBasicRouting([start], targets, assumeBoots: false);
+        }
+
+        return base.ValidateBasicRouting();
+    }
+
     /// <summary>Checks routing before cave repairs, stages terrain and separator, then resets visitation.</summary>
     private bool TryValidateAndStageMap()
     {
