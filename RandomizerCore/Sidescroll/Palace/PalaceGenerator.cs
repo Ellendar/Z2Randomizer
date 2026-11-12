@@ -9,6 +9,8 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public abstract class PalaceGenerator
 {
+    private readonly float? MINI_BOSS_CHANCE = null;
+
     protected const int ROOM_SHUFFLE_ATTEMPT_LIMIT = 100;
     protected const int DROP_PLACEMENT_FAILURE_LIMIT = 100;
     protected const int ROOM_PLACEMENT_FAILURE_LIMIT = 100;
@@ -23,6 +25,8 @@ public abstract class PalaceGenerator
         return palace.AllReachable(dropsMayBypassBosses: props.DropsMayBypassBosses,
                                    tBirdRequired: props.RequireTbird);
     }
+
+    protected virtual float? GetMiniBossChance() => MINI_BOSS_CHANCE;
 
     protected static bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
     {

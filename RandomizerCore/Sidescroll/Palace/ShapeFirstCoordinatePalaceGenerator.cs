@@ -153,6 +153,7 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         List<Room> roomCandidates = GetNormalRoomsForExitType(roomPool, roomCoords, roomExitType);
 
         Room? newRoom = null;
+        bool? preferMiniBoss = GetMiniBossChance() is float chance ? r.NextDouble() < chance : null;
 
         bool refillAllowed = duplicateProtection;
         while (true)
@@ -171,6 +172,10 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
             }
 
             roomCandidates.FisherYatesShuffle(r);
+            if (preferMiniBoss is bool preferBoss)
+            {
+                roomCandidates = roomCandidates.OrderByDescending(room => room.HasBoss == preferBoss).ToList(); // true gets sorted first
+            }
 
             newRoom = SelectRoomForCoord(palace, rooms, roomPool, palaceShape, roomCoords, dropZone, roomCandidates);
             if (newRoom != null)
