@@ -24,31 +24,33 @@ public partial class CustomPreset : ReactiveObject
     // to avoid changing presets unexpectedly.
     [JsonPropertyName("Config")]
     public JsonElement? RawConfig { get; set; }
+
+    internal JsonElement? UnreadableRecord { get; init; }
+
     [JsonIgnore]
     public RandomizerConfiguration Config
     {
-        get
-        {
-            if (config == null)
-            {
-                if (RawConfig.HasValue)
-                {
-                    // Deserialize with safe options to handle modified Enums affecting presets
-                    var parsed = JsonSerializer.Deserialize<RandomizerConfiguration>(RawConfig.Value, SerializationContext.CreateSafeOptions());
-                    if (parsed != null)
-                    {
-                        config = parsed;
-                        return config;
-                    }
-                }
-                config = new RandomizerConfiguration();
-            }
-            return config;
-        }
+        get => config ??= ReadConfig() ?? new RandomizerConfiguration();
         set
         {
             RawConfig = JsonSerializer.SerializeToElement(value, SerializationContext.Default.RandomizerConfiguration);
             this.RaiseAndSetIfChanged(ref config, value);
+        }
+    }
+
+    private RandomizerConfiguration? ReadConfig()
+    {
+        if (RawConfig is not { ValueKind: JsonValueKind.Object } json)
+            return null;
+
+        try
+        {
+            return json.Deserialize(SerializationContext.PresetReadTypeInfo);
+        }
+        catch (JsonException)
+        {
+            // Keep the original JSON so saving settings does not overwrite this preset.
+            return null;
         }
     }
 

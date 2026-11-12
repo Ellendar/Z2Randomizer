@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -703,23 +702,14 @@ public enum MazeSizeOption
 }
 public static class OverworldSizeExtensions
 {
-    public static OverworldSizeMetaAttribute GetMeta(this OverworldSizeOption size)
-    {
-        var member = typeof(OverworldSizeOption).GetMember(size.ToString()).FirstOrDefault();
-        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
-    }
+    public static OverworldSizeMetaAttribute GetMeta(this OverworldSizeOption size) =>
+        EnumMetadata.GetOverworldSize(typeof(OverworldSizeOption), size.ToString()) ?? new OverworldSizeMetaAttribute();
 
-    public static OverworldSizeMetaAttribute GetMeta(this DmSizeOption size)
-    {
-        var member = typeof(DmSizeOption).GetMember(size.ToString()).FirstOrDefault();
-        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
-    }
+    public static OverworldSizeMetaAttribute GetMeta(this DmSizeOption size) =>
+        EnumMetadata.GetOverworldSize(typeof(DmSizeOption), size.ToString()) ?? new OverworldSizeMetaAttribute();
 
-    public static OverworldSizeMetaAttribute GetMeta(this MazeSizeOption size)
-    {
-        var member = typeof(MazeSizeOption).GetMember(size.ToString()).FirstOrDefault();
-        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
-    }
+    public static OverworldSizeMetaAttribute GetMeta(this MazeSizeOption size) =>
+        EnumMetadata.GetOverworldSize(typeof(MazeSizeOption), size.ToString()) ?? new OverworldSizeMetaAttribute();
 }
 
 [DefaultValue(NO_LIMIT)]
@@ -954,11 +944,8 @@ public enum BeamSprites
 
 public static class BeamSpriteExtensions
 {
-    public static BeamSpriteMetaAttribute GetMeta(this BeamSprites sprite)
-    {
-        var member = typeof(BeamSprites).GetMember(sprite.ToString()).FirstOrDefault();
-        return member?.GetCustomAttribute<BeamSpriteMetaAttribute>() ?? new BeamSpriteMetaAttribute();
-    }
+    public static BeamSpriteMetaAttribute GetMeta(this BeamSprites sprite) =>
+        EnumMetadata.GetBeamSprite(typeof(BeamSprites), sprite.ToString()) ?? new BeamSpriteMetaAttribute();
 }
 
 [DefaultValue(Normal)]
@@ -1068,12 +1055,8 @@ public class StringValueAttribute(string v) : Attribute
 {
     public string Value => v;
 
-    public static string? GetStringValue(Enum value)
-    {
-        var type = value.GetType();
-        var fi = type.GetRuntimeField(value.ToString());
-        return (fi?.GetCustomAttributes(typeof(StringValueAttribute), false).FirstOrDefault() as StringValueAttribute)?.Value;
-    }
+    public static string? GetStringValue(Enum value) =>
+        EnumMetadata.GetStringValue(value.GetType(), value.ToString());
 }
 
 public class MetastyleAttribute : Attribute
@@ -1192,43 +1175,29 @@ public static class Enums
     public static IEnumerable<EnumDescription> StartSpellsLimitList => StartItemsLimitList;
 
 
-    public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : Enum
+    public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : struct, Enum
     {
-        if (!typeof(T).IsEnum)
-            throw new ArgumentException($"{nameof(T)} must be an enum type");
-
-        if (filterExpression == null)
+        IEnumerable<T> values = Enum.GetValues<T>();
+        if (filterExpression != null)
         {
-            return Enum.GetValues(typeof(T)).Cast<Enum>().Select(i => i.ToDescription());
+            values = values.Where(filterExpression);
         }
-        return Enum.GetValues(typeof(T)).Cast<T>().Where(filterExpression).Select(i => i.ToDescription());
+        return values.Select(value => value.ToDescription());
     }
 
-    public static object ToDefault(this Type enumType)
-    {
-        var attributes = enumType.GetCustomAttributes(typeof(DefaultValueAttribute), false);
-        if (attributes.Length == 0)
-        {
-            throw new ArgumentException("Generic Type 'T' must have DefaultValueAttribute.");
-        }
-        return Enum.ToObject(enumType, (attributes[0] as DefaultValueAttribute)?.Value!);
-    }
+    public static object ToDefault(this Type enumType) =>
+        EnumMetadata.GetDefault(enumType) ??
+        throw new ArgumentException("Generic Type 'T' must have DefaultValueAttribute.");
 
     public static EnumDescription ToDescription(this Enum self)
     {
-        string description;
         string? info = null;
-
         Type type = self.GetType();
-        string name = Enum.GetName(type, self)!;
-        var field = type.GetField(name);
+        string? name = Enum.GetName(type, self);
+        ArgumentNullException.ThrowIfNull(name);
 
-        var attributes = field?.GetCustomAttributes(typeof(DescriptionAttribute), false);
-        if (attributes?.Length is > 0)
-        {
-            description = (attributes[0] as DescriptionAttribute)?.Description!;
-        }
-        else
+        string? description = EnumMetadata.GetDescription(type, name);
+        if (description == null)
         {
             var ti = CultureInfo.CurrentCulture.TextInfo;
             description = ti.ToTitleCase(ti.ToLower(name.Replace("_", " ")));
@@ -1243,25 +1212,11 @@ public static class Enums
         return new EnumDescription() { Value = self, Description = description, Info = info };
     }
 
-    public static bool IsMetastyle(this Enum self)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return false; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return false; }
-        return fieldInfo.IsDefined(typeof(MetastyleAttribute), inherit: false);
-    }
+    public static bool IsMetastyle<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.IsMetastyle(typeof(T), Enum.GetName(value));
 
-    private static int GetWeight(this Enum self, int fallback=1)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return fallback; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return fallback; }
-        return fieldInfo.GetCustomAttribute<DefaultWeightAttribute>(inherit: false)?.Weight ?? fallback;
-    }
+    private static int GetWeight<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.GetWeight(typeof(T), Enum.GetName(value)) ?? 1;
 
     /// <summary>
     /// Get a list of enum values of a type, not including Metastyles,
@@ -1276,48 +1231,17 @@ public static class Enums
             .ToList();
     }
 
-    public static FixedBytesAttribute? GetFixedBytes(this Enum self)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return null; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return null; }
-        return fieldInfo.GetCustomAttribute<FixedBytesAttribute>(inherit: false);
-    }
+    public static FixedBytesAttribute? GetFixedBytes<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.GetFixedBytes(typeof(T), Enum.GetName(value));
 
-    public static RandomRangeDoubleAttribute? GetRandomRangeDouble(this Enum self)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return null; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return null; }
-        return fieldInfo.GetCustomAttribute<RandomRangeDoubleAttribute>(inherit: false);
-    }
+    public static RandomRangeDoubleAttribute? GetRandomRangeDouble<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.GetRandomRangeDouble(typeof(T), Enum.GetName(value));
 
-    public static RandomRangeIntAttribute? GetRandomRangeInt(this Enum self)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return null; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return null; }
-        return fieldInfo.GetCustomAttribute<RandomRangeIntAttribute>(inherit: false);
-    }
+    public static RandomRangeIntAttribute? GetRandomRangeInt<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.GetRandomRangeInt(typeof(T), Enum.GetName(value));
 
-    public static string? GetStringValue(Enum value)
-    {
-        string? output = null;
-        Type type = value.GetType();
-        var fi = type.GetField(value.ToString());
-        if (fi?.GetCustomAttributes(typeof(StringValueAttribute),
-                false) is StringValueAttribute[] { Length: > 0 } attrs)
-        {
-            output = attrs[0].Value;
-        }
-        return output;
-    }
+    public static string? GetStringValue(Enum value) =>
+        EnumMetadata.GetStringValue(value.GetType(), value.ToString());
 
     public static T? Parse<T>(string input) where T : struct
     {

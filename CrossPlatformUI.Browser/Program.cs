@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices.JavaScript;
@@ -22,7 +21,6 @@ using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.Browser;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 internal sealed partial class Program
 {
     [JSImport("globalThis.window.SetTitle")]

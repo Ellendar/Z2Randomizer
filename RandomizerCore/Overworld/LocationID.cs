@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.ComponentModel;
-using System.Reflection;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
@@ -475,8 +474,7 @@ public static class LocationIDDescriptions
             .Distinct()
             .ToDictionary(
                 lid => lid,
-                lid => typeof(LocationID).GetField(lid.ToString())!
-                           .GetCustomAttribute<DescriptionAttribute>()?.Description
+                lid => EnumMetadata.GetDescription(typeof(LocationID), lid.ToString())
                        ?? lid.ToString());
 
     public static string GetDescription(this LocationID lid) => cache[lid];

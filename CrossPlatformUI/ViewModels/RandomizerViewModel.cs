@@ -262,7 +262,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             .DisposeWith(disposables);
 
         SubscribeExtensions.Subscribe(
-            Main.Config.ObservableForProperty(x => x.Seed),
+            Main.Config.WhenAnyValue(x => x.Seed).Select(_ => RxVoid.Default),
             _ => this.RaisePropertyChanged(nameof(Seed)))
             .DisposeWith(disposables);
 
@@ -358,33 +358,40 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             .DisposeWith(disposables);
 
         // If shuffle overworld items is off, turn off pbag cave item shuffle too
-        SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems), x =>
+        SubscribeExtensions.Subscribe(
+            Main.Config.WhenAnyValue(x => x.ShuffleOverworldItems).Select(value => value == false),
+            disabled =>
         {
-            if (x.Value ?? true) return;
+            if (!disabled) return;
             Main.Config.IncludePBagCavesInItemShuffle = false;
         })
             .DisposeWith(disposables);
 
-        // If Palaces can't swap continents 
-        SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleEncounters), x =>
+        SubscribeExtensions.Subscribe(
+            Main.Config.WhenAnyValue(x => x.ShuffleEncounters).Select(value => value == false),
+            disabled =>
         {
-            if (x.Value ?? true) return;
+            if (!disabled) return;
             Main.Config.IncludeLavaInEncounterShuffle = false;
             Main.Config.AllowUnsafePathEncounters = false;
         })
             .DisposeWith(disposables);
 
         // If shuffle palaces is off, then don't allow shuffling GP
-        SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.PalacesCanSwapContinents), x =>
+        SubscribeExtensions.Subscribe(
+            Main.Config.WhenAnyValue(x => x.PalacesCanSwapContinents).Select(value => value == false),
+            disabled =>
             {
-                if (x.Value ?? true) return;
+                if (!disabled)
+                    return;
                 Main.Config.ShuffleGP = false;
             })
             .DisposeWith(disposables);
 
-        SubscribeExtensions.Subscribe(Main.ObservableForProperty(x => x.ShuffleAllExpState), x =>
+        SubscribeExtensions.Subscribe(Main.WhenAnyValue(x => x.ShuffleAllExpState), x =>
         {
-            if (!x.Value) return;
+            if (!x)
+                return;
             Main.Config.ShuffleAttackExperience = true;
             Main.Config.ShuffleMagicExperience = true;
             Main.Config.ShuffleLifeExperience = true;
