@@ -263,7 +263,7 @@ public class Room : IJsonOnDeserialized, IDeterministicHash
         a.Word(AsmModule.Symbol(label));
     }
 
-    public int UpdateEnemies(AsmModule a, int enemyAddr)
+    public int UpdateEnemies(AsmModule a, int enemyAddr, bool hardCarock)
     {
         //If we're using vanilla enemies, just clone them to newenemies so the logic can be the same for shuffled vs not
         if (NewEnemies[0] == 0)
@@ -286,9 +286,16 @@ public class Room : IJsonOnDeserialized, IDeterministicHash
             for (var i = 2; i < NewEnemies.Length; i += 2)
             {
                 // Replace any "Rebo Unhorsed" enemies, as that's a generator in P125
-                if ((NewEnemies[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
+                int enemyId = (NewEnemies[i] & 0x3F);
+                if (enemyId == 0x0A && !HasBoss && !HasItem)
                 {
                     NewEnemies[i] = (byte)(0x0F + (NewEnemies[i] & 0xC0));
+                }
+
+                if (hardCarock && enemyId == (int)EnemiesPalace346.CAROCK)
+                {
+                    // move Hard Carock 1 tile to the right
+                    NewEnemies[i - 1] = 0x6C;
                 }
             }
         }

@@ -1393,7 +1393,7 @@ public class Hyrule
             {
                 room.WriteSideViewPtr(sideviewModule, name);
                 room.PutItemPresenceBitsIntoFinalTable(palaceItemBits);
-                enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr);
+                enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr, props.HardBosses);
                 room.UpdateConnectionStartAddress();
             }
         }
@@ -1413,7 +1413,7 @@ public class Hyrule
             {
                 room.WriteSideViewPtr(sideviewModule, name);
                 room.PutItemPresenceBitsIntoFinalTable(palaceItemBits);
-                enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr);
+                enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr, props.HardBosses);
                 room.UpdateConnectionStartAddress();
             }
         }
