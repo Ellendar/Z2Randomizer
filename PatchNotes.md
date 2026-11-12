@@ -1,5 +1,76 @@
 # Z2Randomizer Changelog
 
+## Key Logic build
+
+### New Key Logic
+
+- Added Keys Per Palace as a Key Logic setting. This means small keys
+  can only be spent in the palace where you find them.
+  - It comes with changed logic where the palace must be solvable with
+    the keys found. Fairy/Magic Key are no longer in logic.
+  - Palaces 1–5 have enough reachable small keys to open every locked
+    door.
+  - Palace 6 follows the same rule if Blocking Rooms in Any Palace is
+    enabled. Otherwise Magic Key is required in logic like in vanilla.
+  - Great Palace has to be solvable without small keys. Rooms with
+    locked doors can still appear if the room has another solution.
+
+(The previous logic is still available as the Fairy or Magic Key option.)
+
+### Enter Boss Rooms Going Left
+
+- Some palace layouts now let you enter a boss room and fight the boss
+  while going left. For the final palace boss this is only possible
+  for Loopy and if the palace continues beyond the boss. You still
+  have to defeat the palace boss to place the crystal.
+- For mini-bosses (and not main palace bosses), this is also possible in
+  Chaos and Tower palaces.
+- A new Drops May Bypass Bosses option lets a palace drop take you
+  behind a boss for all palace styles, including Thunderbird when he's
+  optional.
+
+### Overworld
+
+- Added Coastal Islands, a biome first requested in 2023. Water
+  separates a narrow, mountain-backed mainland from a chain of
+  offshore islands. Locations can appear on both sides of the channel.
+- Change passages in Mountainous biomes to be slightly wider to allow
+  for encounter dodging.
+- Added Random (Unique) option for palaces and biomes - Random but not
+  the same as the other palaces/biomes (GP and Maze Island excluded).
+- Continent connector caves will now be placed towards the edges of
+  the map when continent connector setting is set to Normal.
+- West Hyrule's Islands & Coastal Islands biomes now generate a layout that
+  does not require Boots. This should help make early Boots less common.
+
+### Changes
+
+- Palace rooms now have more detailed requirements, so being blocked
+  from one exit in a room no longer means the other exits from that
+  room are blocked in-logic.
+- Add player option for Horizontal Boss HP Bars in GP. This increases
+  visibility when fighting Thunderbird by moving the health bars away
+  as this removes some of the flickering caused by the NES sprites per
+  scanline limit.
+- Move Hard Carock's start position 1 tile to the right.
+- Prevent minor locations from being placed in cave entrances.
+- Adjust Mirror Palace parameters to make them less linear.
+- Added the SGL 2026 tournament preset and its room pool, along with
+  some of the settings. (Except there is no setting for a fixed 6
+  container requirement for the New Kasuto basement.)
+
+### Bug Fixes
+
+- Improved accuracy of boss healthbars.
+- Fixed Mario Mode Tanooki giving the wrong spell in full shuffle.
+- Fixed a softlock when Rebonack dies off-screen and the item does not appear.
+- Fixed repeated phantom damage when being hit by Rebonack on the last
+  frame before he leaves the screen.
+- Fixed phantom collisions with enemies falling into pits.
+- Fixed entering bridges from the wrong direction when walking on water with boots.
+
+---
+
 ## Version 5.2.4 - September 26, 2026
 
 - Fixed an issue where elevators in mirrored rooms were sometimes incorrect.
