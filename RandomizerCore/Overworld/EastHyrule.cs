@@ -397,7 +397,7 @@ public sealed partial class EastHyrule : World
         {
             case Biome.ISLANDS:
             case Biome.MOUNTAINOUS:
-                FillMapBorder(profile.StripeTerrain);
+                FillMapBorder(profile.MapBorder);
                 _ = MakeValleyOfDeath(); // allowed to fail
                 DrawTerrainStripes(profile.StripeTerrain, profile.NearEdgeMargin, profile.FarEdgeMargin);
                 return true;
@@ -407,7 +407,7 @@ public sealed partial class EastHyrule : World
                 locationAtGP.ReserveForTerrainGeneration();
                 return MakeValleyOfDeath();
             case Biome.COASTAL_ISLANDS:
-                DrawCoastalIslands(profile.RiverTerrain, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
+                DrawCoastalIslands(profile);
                 locationAtGP.ReserveForTerrainGeneration();
                 return MakeValleyOfDeath();
             case Biome.VOLCANO:

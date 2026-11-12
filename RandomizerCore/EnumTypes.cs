@@ -483,24 +483,6 @@ public enum Biome
 
 static class BiomeExtensions
 {
-    public static int SeedTerrainLimit(this Biome biome)
-    {
-        return biome switch
-        {
-            Biome.VANILLA => 300,
-            Biome.VANILLA_SHUFFLE => 300,
-            Biome.VANILLALIKE => 300,
-            Biome.ISLANDS => 220,
-            Biome.CANYON => 300,
-            Biome.DRY_CANYON => 300,
-            Biome.COASTAL_ISLANDS => 250,
-            Biome.MOUNTAINOUS => 250,
-            Biome.CALDERA => 300,
-            Biome.VOLCANO => 300,
-            _ => throw new Exception("Unrecognized Biome in SeedTerrainLimit")
-        };
-    }
-
     public static bool UsesVanillaMap(this Biome biome)
     {
         return biome switch

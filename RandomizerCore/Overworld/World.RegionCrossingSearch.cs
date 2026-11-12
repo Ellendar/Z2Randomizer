@@ -20,30 +20,6 @@ public abstract partial class World
     {
         private const int MINIMUM_BRIDGE_LENGTH = 2;
 
-        private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
-        {
-            { Biome.ISLANDS, 10 },
-            { Biome.COASTAL_ISLANDS, 15 },
-            { Biome.VOLCANO, 10 },
-            { Biome.DRY_CANYON, 10 },
-            { Biome.VANILLALIKE, 10 },
-            { Biome.CALDERA, 10 },
-            { Biome.CANYON, 10 },
-            { Biome.MOUNTAINOUS, 15 }
-        };
-
-        private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_ATTEMPTS = new()
-        {
-            { Biome.ISLANDS, 4000 },
-            { Biome.COASTAL_ISLANDS, 4000 },
-            { Biome.VOLCANO, 3000 },
-            { Biome.DRY_CANYON, 2000 },
-            { Biome.VANILLALIKE, 2000 },
-            { Biome.CALDERA, 3000 },
-            { Biome.CANYON, 2000 },
-            { Biome.MOUNTAINOUS, 4000 }
-        };
-
         private readonly World world;
         private readonly RegionCrossingOptions options;
         private readonly int maximumLength;
@@ -61,17 +37,16 @@ public abstract partial class World
         {
             this.world = world;
             this.options = options;
-            var biome = options.Biome;
             var riverTerrain = options.CrossingTerrain;
             bool canWalkOnWater = options.CanWalkOnWaterWithBoots;
-            maximumLength = MAXIMUM_BRIDGE_LENGTH[biome];
+            var (baseMaximumLength, baseMaximumAttempts) = options.Biome.GetRegionCrossingLimits();
+            maximumLength = baseMaximumLength;
             // Preserve the extra length allowance for Great Lakes or Boots that cannot cross water.
             if (!canWalkOnWater || world.climate.Name == Climates.Create(world.continentId, ClimateEnum.GREAT_LAKES).Name)
             {
                 maximumLength = (int)(maximumLength * 1.5);
             }
-            MaximumAttempts = MAXIMUM_BRIDGE_ATTEMPTS[biome];
-            MaximumAttempts *= canWalkOnWater ? 1 : 2;
+            MaximumAttempts = canWalkOnWater ? baseMaximumAttempts : baseMaximumAttempts * 2;
             regionLabels = LabelLandRegions();
 
             crossingTerrains = riverTerrain.IsWater()

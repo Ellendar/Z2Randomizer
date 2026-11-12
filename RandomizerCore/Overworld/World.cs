@@ -363,15 +363,9 @@ public abstract partial class World
 
     protected bool PlaceSaneCave(Location location, Terrain crossingTerrain)
     {
-        var (minimumSpacing, maximumSpacing) = biome switch
-        {
-            Biome.ISLANDS or Biome.COASTAL_ISLANDS or Biome.MOUNTAINOUS => (10, 20),
-            Biome.VOLCANO or Biome.CALDERA => (5, 20),
-            Biome.VANILLA or Biome.VANILLA_SHUFFLE or Biome.VANILLALIKE or Biome.CANYON or Biome.DRY_CANYON => (6, 18),
-            _ => throw new ArgumentOutOfRangeException(nameof(biome)),
-        };
+        var (minimumSpacing, maximumSpacingExclusive) = biome.GetSaneCaveSpacing();
         Terrain? requiredCrossing = biome == Biome.VOLCANO ? null : crossingTerrain;
-        var placement = SaneCavePlacement.Find(map, MapRows, MapColumns, RNG, minimumSpacing, maximumSpacing, requiredCrossing);
+        var placement = SaneCavePlacement.Find(map, MapRows, MapColumns, RNG, minimumSpacing, maximumSpacingExclusive, requiredCrossing);
         if (placement is not { } pair)
         {
             logger.LogDebug($"No compatible cave pair across {requiredCrossing} for {location.ID}");
@@ -674,8 +668,7 @@ public abstract partial class World
 
     protected bool DrawOcean(Direction direction, Terrain oceanTerrain)
     {
-        var result = TerrainLayout.DrawOcean(map, MapRows, MapColumns, direction, oceanTerrain,
-            biome is Biome.MOUNTAINOUS or Biome.CALDERA, RNG);
+        var result = TerrainLayout.DrawOcean(map, MapRows, MapColumns, direction, oceanTerrain, biome.CanOpenMountainShore(), RNG);
         if (result == OceanPaintResult.Blocked)
         {
             logger.LogDebug($"Ocean painting blocked on the {direction} edge");
@@ -710,7 +703,11 @@ public abstract partial class World
 
     /// <summary>Seeds a canyon land half, then clears the seaward half for island stripes and growth.</summary>
     protected void DrawCoastalIslands(Terrain riverT, Climate climate, IEnumerable<Terrain> bankTerrains, bool horizontal)
-        => TerrainLayout.DrawCoastalIslands(map, MapRows, MapColumns, riverT, climate, bankTerrains, horizontal, RNG);
+        => TerrainLayout.DrawCoastalIslands(map, MapRows, MapColumns, riverT, riverT, riverT, climate, bankTerrains, horizontal, RNG);
+
+    private protected void DrawCoastalIslands(BiomeTerrainProfile profile)
+        => TerrainLayout.DrawCoastalIslands(map, MapRows, MapColumns, profile.RiverTerrain, profile.MapBorder, profile.StripeTerrain,
+            profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal, RNG);
 
     protected void DrawCenterMountain(bool horizontal)
         => TerrainLayout.DrawCentralMountain(map, MapRows, MapColumns, horizontal);

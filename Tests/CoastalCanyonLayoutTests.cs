@@ -12,6 +12,34 @@ public class CoastalCanyonLayoutTests
         [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN];
 
     [TestMethod]
+    public void CoastalLayoutUsesSeparateBorderChannelAndStripeTerrains()
+    {
+        const int rows = 75;
+        const int columns = 64;
+        var map = new OverworldMap(rows, columns, Terrain.NONE);
+        var climate = Climates.Create(Continent.WEST, ClimateEnum.CLASSIC);
+        const Terrain border = Terrain.ROAD;
+        const Terrain river = Terrain.PREPLACED_WATER;
+        const Terrain stripe = Terrain.PREPLACED_WATER_WALKABLE;
+
+        TerrainLayout.DrawCoastalIslands(map, rows, columns, river, border, stripe,
+            climate, BankTerrains, horizontal: false, new Random(7));
+
+        int crossStripes = 0;
+        for (int row = 1; row < rows - 1; row++)
+        {
+            map[row, columns - 1].Should().Be(border);
+            if (map[row, columns - 2] == stripe)
+            {
+                crossStripes++;
+                int channelStart = Enumerable.Range(1, columns - 2).First(column => map[row, column] == river);
+                Enumerable.Range(channelStart, 4).Should().OnlyContain(column => map[row, column] == river);
+            }
+        }
+        crossStripes.Should().Be(3);
+    }
+
+    [TestMethod]
     [DataRow(64, 75, false, Terrain.PREPLACED_WATER)]
     [DataRow(64, 75, true, Terrain.PREPLACED_WATER_WALKABLE)]
     [DataRow(26, 26, false, Terrain.PREPLACED_WATER_WALKABLE)]
@@ -22,7 +50,7 @@ public class CoastalCanyonLayoutTests
         var map = new OverworldMap(rows, columns, Terrain.NONE);
         var climate = Climates.Create(Continent.WEST, ClimateEnum.CLASSIC);
 
-        TerrainLayout.DrawCoastalIslands(map, rows, columns, water, climate, BankTerrains, horizontal, new Random(7));
+        TerrainLayout.DrawCoastalIslands(map, rows, columns, water, water, water, climate, BankTerrains, horizontal, new Random(7));
 
         IntVector2 forward = horizontal ? IntVector2.EAST : IntVector2.SOUTH;
         IntVector2 seaward = horizontal ? IntVector2.SOUTH : IntVector2.EAST;

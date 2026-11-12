@@ -16,12 +16,8 @@ internal static class TerrainGrowth
         Biome biome, Random rng)
     {
         var result = source.Clone();
-        float openness = biome switch
-        {
-            Biome.CALDERA or Biome.CANYON => (float)(rng.NextDouble() * .75 + 1),
-            Biome.ISLANDS or Biome.COASTAL_ISLANDS => (float)(rng.NextDouble() * .5 + 1),
-            _ => 1f
-        };
+        double opennessRange = biome.GetDeathMountainOpennessRange();
+        float openness = opennessRange > 0 ? (float)(rng.NextDouble() * opennessRange + 1) : 1f;
         if (result.Type == ClimateEnum.SCRUBLAND) openness *= 2;
         result.ApplyDeathMountainSafety(growthTerrains, openness);
         return result;

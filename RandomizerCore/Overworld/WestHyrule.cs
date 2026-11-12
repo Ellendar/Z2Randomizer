@@ -285,7 +285,7 @@ public sealed class WestHyrule : World
         {
             case Biome.ISLANDS:
             case Biome.MOUNTAINOUS:
-                FillMapBorder(profile.StripeTerrain);
+                FillMapBorder(profile.MapBorder);
                 DrawTerrainStripes(profile.StripeTerrain, profile.NearEdgeMargin, profile.FarEdgeMargin);
                 break;
             case Biome.CANYON:
@@ -298,7 +298,7 @@ public sealed class WestHyrule : World
                 DrawCanyon(riverTerrain, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
                 break;
             case Biome.COASTAL_ISLANDS:
-                DrawCoastalIslands(riverTerrain, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
+                DrawCoastalIslands(profile);
                 break;
             case Biome.CALDERA:
                 DrawCenterMountain(profile.IsHorizontal);

@@ -243,11 +243,12 @@ internal static class TerrainLayout
         }
     }
 
-    /// <summary>Seeds a mountain-backed coast, an open channel and water stripes for offshore islands.</summary>
-    internal static void DrawCoastalIslands(OverworldMap map, int rows, int columns, Terrain water,
+    /// <summary>Seeds the map border, mountain-backed coast, channel and offshore stripes.</summary>
+    internal static void DrawCoastalIslands(OverworldMap map, int rows, int columns,
+        Terrain riverTerrain, Terrain borderTerrain, Terrain stripeTerrain,
         Climate climate, IEnumerable<Terrain> bankTerrains, bool horizontal, Random rng)
     {
-        PaintBorder(map, rows, columns, water);
+        PaintBorder(map, rows, columns, borderTerrain);
         IntVector2 forward = horizontal ? IntVector2.EAST : IntVector2.SOUTH;
         IntVector2 seaward = horizontal ? IntVector2.SOUTH : IntVector2.EAST;
         int length = horizontal ? columns : rows;
@@ -256,7 +257,7 @@ internal static class TerrainLayout
         // Canyon drawing supplies the first offshore tile for each step. Unseeded
         // mainland tiles remain available to place towns, caves and palaces.
         var islandStarts = new int[length];
-        DrawCanyon(map, rows, columns, water, climate, bankTerrains, horizontal, rng, islandStarts);
+        DrawCanyon(map, rows, columns, riverTerrain, climate, bankTerrains, horizontal, rng, islandStarts);
 
         int crossStripes = length >= 44 ? 3 : 2;
         for (int stripe = 1; stripe <= crossStripes; stripe++)
@@ -264,7 +265,7 @@ internal static class TerrainLayout
             int step = stripe * length / (crossStripes + 1) + rng.Next(-2, 3);
             for (int offshore = islandStarts[step]; offshore < width - 1; offshore++)
             {
-                map[step * forward + offshore * seaward] = water;
+                map[step * forward + offshore * seaward] = stripeTerrain;
             }
         }
 
@@ -276,7 +277,7 @@ internal static class TerrainLayout
             int offshoreStripe = rng.Next(furthestCoast + 3, width - 4);
             for (int step = 1; step < length - 1; step++)
             {
-                map[step * forward + offshoreStripe * seaward] = water;
+                map[step * forward + offshoreStripe * seaward] = stripeTerrain;
             }
         }
     }

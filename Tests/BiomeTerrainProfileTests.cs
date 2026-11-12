@@ -42,6 +42,7 @@ public class BiomeTerrainProfileTests
         {
             profile.Water.Should().Be(water);
             profile.PreplacedWater.Should().Be(preplaced);
+            profile.MapBorder.Should().Be(preplaced);
             profile.StripeTerrain.Should().Be(preplaced);
         }
         east.InitialPlacementTerrains.Should().Contain(Terrain.LAVA);
@@ -80,6 +81,7 @@ public class BiomeTerrainProfileTests
         var profile = Profile(continent, Biome.COASTAL_ISLANDS);
 
         profile.RiverTerrain.Should().Be(profile.PreplacedWater);
+        profile.MapBorder.Should().Be(profile.PreplacedWater);
         profile.StripeTerrain.Should().Be(profile.PreplacedWater);
         profile.CanyonBankTerrains.Should().Contain(Terrain.MOUNTAIN);
         profile.InitialPlacementTerrains.Should().NotContain(Terrain.MOUNTAIN).And.NotContain(Terrain.SWAMP);

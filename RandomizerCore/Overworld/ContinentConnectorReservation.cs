@@ -55,7 +55,7 @@ internal sealed class ContinentConnectorReservation
         IReadOnlyCollection<Terrain> landTerrains, IEnumerable<IntVector2> occupied,
         IReadOnlyCollection<ContinentConnectorReservation> reservations)
     {
-        bool openMountainBorder = biome is Biome.MOUNTAINOUS or Biome.CALDERA;
+        bool openMountainBorder = biome.CanOpenMountainShore();
         switch (kind)
         {
             case World.ConnectorKind.Raft:

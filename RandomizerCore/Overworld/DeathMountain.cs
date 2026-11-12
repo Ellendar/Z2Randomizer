@@ -276,9 +276,9 @@ sealed class DeathMountain : World
 
         if (biome == Biome.ISLANDS)
         {
-            FillMapBorder(profile.StripeTerrain);
+            FillMapBorder(profile.MapBorder);
 
-            TerrainLayout.DrawIslandStripes(map, MapRows, MapColumns, profile.PreplacedWater, RNG);
+            TerrainLayout.DrawIslandStripes(map, MapRows, MapColumns, profile.StripeTerrain, RNG);
         }
         else if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
         {
@@ -289,7 +289,7 @@ sealed class DeathMountain : World
         else if (biome == Biome.COASTAL_ISLANDS)
         {
             walkableTerrains = profile.CanyonBankTerrains.Where(t => t != Terrain.MOUNTAIN).ToList();
-            DrawCoastalIslands(riverT, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
+            DrawCoastalIslands(profile);
         }
         else if (biome == Biome.CALDERA)
         {
@@ -297,9 +297,7 @@ sealed class DeathMountain : World
         }
         else if (biome == Biome.MOUNTAINOUS)
         {
-            FillMapBorder(profile.StripeTerrain);
-
-
+            FillMapBorder(profile.MapBorder);
             DrawTerrainStripes(profile.StripeTerrain, profile.NearEdgeMargin, profile.FarEdgeMargin);
         }
 
@@ -414,7 +412,7 @@ sealed class DeathMountain : World
         }
 
         map[location.Pos] = Terrain.NONE;
-        var (minimumSpacing, maximumSpacingExclusive) = biome is Biome.ISLANDS or Biome.COASTAL_ISLANDS ? (5, 12) : (3, 10);
+        var (minimumSpacing, maximumSpacingExclusive) = biome.GetDeathMountainCaveSpacing();
         var primary = SaneCavePlacement.Find(map, MapRows, MapColumns, RNG, minimumSpacing, maximumSpacingExclusive, null);
         if (primary is not { } primaryPair) return false;
 
