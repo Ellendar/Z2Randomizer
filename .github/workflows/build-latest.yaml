@@ -24,7 +24,7 @@ jobs:
       matrix:
         platform: [
           { os: windows-latest, arch: x64 },
-          { os: macos-latest, arch: arm64 },
+          #{ os: macos-latest, arch: arm64 },
           { os: ubuntu-latest, arch: x64 },
         ]
         dotnet-version: [ '10.0.x' ]
