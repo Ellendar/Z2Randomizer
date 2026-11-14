@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Text;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll.Town;
@@ -30,9 +29,7 @@ internal enum Usage
     Boss,
     LastBoss,
     Credits,
-    GameComplete,
     House,
-    PalaceClear,
 }
 
 /*internal  class LoggerAdapter : Logger
@@ -105,9 +102,7 @@ internal class Z2Importer : Importer
         new(7, "House", [Usage.House]),
         new(9, "Palace", [Usage.Palace]),
         new(0xb, "Boss", [Usage.Boss]),
-        new(0xc, "Palace Clear", [Usage.PalaceClear]),
         new(0xd, "Great Palace", [Usage.GreatPalace]),
-        new(0xf, "Game Complete", [Usage.GameComplete]),
         new(0x10, "Credits", [Usage.Credits]),
         new(0x12, "Last Boss", [Usage.LastBoss]),
     };
@@ -209,9 +204,7 @@ internal class MusicRandomizer
             { Usage.Boss, 1 },
             { Usage.LastBoss, 1 },
             { Usage.Credits, 1 },
-            { Usage.GameComplete, 1 },
             { Usage.House, 1 },
-            { Usage.PalaceClear, 1 },
         };
         var selUsesSongs = _imptr.SelectUsesSongs<Usage>(
             usesSongs, numUsageSongs, _shuffler);
@@ -335,10 +328,8 @@ internal class MusicRandomizer
             { Usage.Overworld, 1 },
             { Usage.House, 7 },
             { Usage.Boss, 0xb },
-            { Usage.PalaceClear, 0xc },
             { Usage.LastBoss, 0x12 },
             { Usage.Credits, 0x10 },
-            { Usage.GameComplete, 0xf },
         };
 
         SongMap songMap = new();
