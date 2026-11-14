@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
 public abstract class PalaceGenerator
 {
+    private readonly float? MINI_BOSS_CHANCE = null;
+
     protected const int ROOM_SHUFFLE_ATTEMPT_LIMIT = 100;
     protected const int DROP_PLACEMENT_FAILURE_LIMIT = 100;
     protected const int ROOM_PLACEMENT_FAILURE_LIMIT = 100;
@@ -18,14 +17,32 @@ public abstract class PalaceGenerator
 
     internal abstract Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber, int attempt);
 
+    public virtual bool AddKeysForKeyLogic(RandomizerProperties props, Palace palace, bool createKeys, Random r)
+    {
+        if (props.RequiresSmallKeyValidation(palace.Number))
+        {
+            bool solvable = palace.SolveKeyLogic(RequirementTypeExtensions.ALL, !props.BossItem, 0, createKeys, r);
+            if (!solvable)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public virtual bool AllReachable(RandomizerProperties props, Palace palace)
     {
-        return palace.AllReachable(dropsMayBypassBosses: props.DropsMayBypassBosses,
-                                   tBirdRequired: props.RequireTbird);
+        return palace.AllReachable(props);
     }
+
+    protected virtual float? GetMiniBossChance() => MINI_BOSS_CHANCE;
 
     protected static bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
     {
+        if (RoomPoolConfigs.PotentialRoomPools(props.RoomPoolOption) >= 2)
+        {
+            return true;
+        }
         if (palaceNumber < 7)
         {
             //Short normal palace should always be safe regardless of which palace set is being used
@@ -92,7 +109,7 @@ public abstract class PalaceGenerator
                 if (room.HasItem) { continue; }
                 if (room.LinkedRoom != null) { continue; }
                 var sideviewBytes = room.SideView;
-                //Debug.Assert(!usedRoomVariants.Contains(sideviewBytes));
+                Debug.Assert(!usedRoomVariants.Contains(sideviewBytes));
                 usedRoomVariants.Add(sideviewBytes);
             }
         }

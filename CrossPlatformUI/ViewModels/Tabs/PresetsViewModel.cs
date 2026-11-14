@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 using Avalonia.Controls;
@@ -73,7 +72,6 @@ public sealed class PresetDiffRow : ReactiveObject
     }
 }
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public class PresetsViewModel : ReactiveObject, IActivatableViewModel
 {
     public ViewModelActivator Activator { get; }
@@ -409,6 +407,7 @@ public class PresetsViewModel : ReactiveObject, IActivatableViewModel
         Presets.Add(new(Upstarts2026Week4Preset.Name, Upstarts2026Week4Preset.Preset, Upstarts2026Week4Preset.Description));
         Presets.Add(new(Upstarts2026Week5Preset.Name, Upstarts2026Week5Preset.Preset, Upstarts2026Week5Preset.Description));
         Presets.Add(new(Upstarts2026Week6Preset.Name, Upstarts2026Week6Preset.Preset, Upstarts2026Week6Preset.Description));
+        Presets.Add(new(Sgl2026Preset.Name, Sgl2026Preset.Preset, Sgl2026Preset.Description));
         Presets.Add(new(MaxRandoPreset.Name, MaxRandoPreset.Preset, MaxRandoPreset.Description));
         Presets.Add(new(StandardSwissPreset.Name, StandardSwissPreset.Preset, StandardSwissPreset.Description));
         Presets.Add(new(StandardPreset.Name, StandardPreset.Preset, StandardPreset.Description));

@@ -1,50 +1,53 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:v="clr-namespace:CrossPlatformUI.Views"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
-             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
              xmlns:z="clr-namespace:CrossPlatformUI.Controls"
-             mc:Ignorable="d" d:DesignWidth="940" d:DesignHeight="750"
+             Design.Width="{x:Static ui:MainWindowSize.TabPreviewWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.TabPreviewHeight}"
              x:Class="CrossPlatformUI.Views.Tabs.BiomesView"
              x:DataType="vm:MainViewModel">
-    <ScrollViewer>
-        <Grid RowDefinitions="*, *">
-        <HyperlinkButton
-            Margin="24 7 24 7"
-            HorizontalAlignment="Right"
-            Content="[Wiki: Biomes]"
-            NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Biomes"
-            FontSize="12"
-            Foreground="#4557c4"
-            Cursor="Hand"
-            />
-
-        <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *, *" RowDefinitions="*, *, *, *, *" RowSpacing="8" ColumnSpacing="8">
-            <z:Z2ComboBox Flag="WestSize" Grid.Row="0" Grid.Column="0" />
-            <z:Z2ComboBox Flag="EastSize" Grid.Row="1" Grid.Column="0" />
-            <z:Z2ComboBox Flag="DmSize"   Grid.Row="2" Grid.Column="0" />
-            <z:Z2ComboBox Flag="MazeSize" Grid.Row="3" Grid.Column="0" />
-
-            <z:Z2ComboBox Flag="WestBiome" Grid.Row="0" Grid.Column="1" />
-            <z:Z2ComboBox Flag="EastBiome" Grid.Row="1" Grid.Column="1" />
-            <z:Z2ComboBox Flag="DmBiome"   Grid.Row="2" Grid.Column="1" />
-            <z:Z2ComboBox Flag="MazeBiome" Grid.Row="3" Grid.Column="1" />
-
-            <z:Z2ComboBox Flag="WestClimate" Grid.Row="0" Grid.Column="2" />
-            <z:Z2ComboBox Flag="EastClimate" Grid.Row="1" Grid.Column="2" />
-            <z:Z2ComboBox Flag="DmClimate"   Grid.Row="2" Grid.Column="2" />
-        </Grid>
-
-        <Grid Grid.Row="1" ColumnDefinitions="*, *, *">
-            <StackPanel Grid.Column="0" Margin="0 0">
-                <z:Z2CheckBox Flag="GoodBoots" />
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <v:FlexColumnsPanel Margin="4 16">
+            <StackPanel Margin="0">
+                <DockPanel Margin="0,0,0,-11">
+                    <HyperlinkButton Classes="WikiLink" DockPanel.Dock="Right" Margin="8,12,18,0"
+                                     Content="[Wiki: Biomes]"
+                                     NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Biomes" />
+                    <TextBlock Text="West Hyrule" Classes="SectionHeader" VerticalAlignment="Top" />
+                </DockPanel>
+                <z:Z2ComboBox Flag="WestBiome" />
+                <z:Z2ComboBox Flag="WestSize" />
+                <z:Z2ComboBox Flag="WestClimate" />
             </StackPanel>
 
-            <StackPanel Grid.Column="1" Margin="0 0">
+            <StackPanel Margin="0">
+                <TextBlock Text="East Hyrule" Classes="SectionHeader" Margin="0,12,0,-7" />
+                <z:Z2ComboBox Flag="EastBiome" />
+                <z:Z2ComboBox Flag="EastSize" />
+                <z:Z2ComboBox Flag="EastClimate" />
+            </StackPanel>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Death Mountain" Classes="SectionHeader" Margin="0,12,0,-7" />
+                <z:Z2ComboBox Flag="DmBiome" />
+                <z:Z2ComboBox Flag="DmSize" />
+                <z:Z2ComboBox Flag="DmClimate" />
+            </StackPanel>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Maze Island" Classes="SectionHeader" Margin="0,12,0,-7" />
+                <z:Z2ComboBox Flag="MazeBiome" />
+                <z:Z2ComboBox Flag="MazeSize" />
+            </StackPanel>
+
+            <StackPanel Margin="0">
+                <TextBlock Text="Misc." Classes="SectionHeader" />
+                <z:Z2CheckBox Flag="GoodBoots" />
                 <z:Z2CheckBox Flag="LegacyVanillaShuffledLocations" />
             </StackPanel>
-        </Grid>
-        </Grid>
+        </v:FlexColumnsPanel>
     </ScrollViewer>
 </UserControl>

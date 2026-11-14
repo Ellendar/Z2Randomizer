@@ -518,13 +518,13 @@ HaveFlute := $0789
 HaveCross := $078a
 HaveHammer := $078b
 HaveMagicKey := $078c
-Crystal1Placed := $078d                   ; crystal-placed flags, unused in randomizer
-Crystal2Placed := $078e
-Crystal3Placed := $078f
-Crystal4Placed := $0790
-Crystal5Placed := $0791
-Crystal6Placed := $0792
-Keys := $0793                             ; Current number of Keys
+Palace1Keys := $078d                      ; [Z2] Crystal1Placed; [Z2R] Number of keys for P1
+Palace2Keys := $078e                      ; [Z2] Crystal2Placed
+Palace3Keys := $078f                      ; [Z2] Crystal3Placed
+Palace4Keys := $0790                      ; [Z2] Crystal4Placed
+Palace5Keys := $0791                      ; [Z2] Crystal5Placed
+Palace6Keys := $0792                      ; [Z2] Crystal6Placed
+Keys := $0793                             ; Current number of Keys; [Z2R] Number of keys for GP
 Crystals := $0794                         ; Number of Crystals left
 HaveStabs := $0796                        ; 0x04 = Have Upstab | 0x10 = Have Downstab
 HaveTrophy := $0798                       ; 0x10 = Have Trophy
@@ -533,18 +533,11 @@ HaveBagusNoteAndMedicine := $079a         ; 0x08 = Bagu's Note | 0x40 = Medicine
 HaveWater := $079b                        ; 1 = Have Water
 HaveChild := $079c                        ; 0x20 = Have Child
 HaveBasementAccess := $079d               ; 0x08 = Have New Kasuto Basement access
-; Bitlist of palaces cleared/towns visited/etc for flute warp mode
-FluteWarpFlags := $079e
+FluteWarpFlags := $079e                   ; Bitlist of palaces cleared/towns visited/etc for flute warp mode
 ContinuesUsed := $079f
 
 ; New variables that use free memory
 ProjectileEnemyData := $07c0              ; [Z2R] 6 bytes for Hard Carock projectile type
-
-BackgroundTilesPage1 := $6000
-BackgroundTilesPage2 := $60d0
-BackgroundTilesPage3 := $61a0
-BackgroundTilesPage4 := $6270
-; These are new variables that use free memory
 Z2Noise_SfxLenCounter := $07f5
 Z2Squ2_SfxLenCounter := $07f7
 Z2Squ1_SfxLenCounter := $07f9
@@ -552,10 +545,23 @@ Z2NoiseSoundBuffer := $07fd
 Z2Square2SoundBuffer := $07fe
 Z2Square1SoundBuffer := $07ff
 
+; SRAM
+BackgroundTilesPage1 := $6000
+BackgroundTilesPage2 := $60d0
+BackgroundTilesPage3 := $61a0
+BackgroundTilesPage4 := $6270
+
 SavedDoorExit1ScrollPage := $69aa         ; accessed as $69a5,X with X = 5
 SavedDoorExit1ScrollX := $69b1            ; accessed as $69ac,X with X = 5
 SavedDoorExit2ScrollPage := $69ab         ; used for New Kasuto fireplace
 SavedDoorExit2ScrollX := $69b2
+
+LocationByte0TableRamCopy := $6a00
+LocationByte1TableRamCopy := $6a3f
+LocationByte2TableRamCopy := $6a7e
+LocationByte3TableRamCopy := $6abd
+
+RoomConnectivityRamCopy := $6afc
 
 EnemySizeCodesRamCopy := $6e1d            ; copied from $951d in the current bank
 

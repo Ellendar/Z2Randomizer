@@ -8,8 +8,8 @@
     <MaterialIconsAvaloniaVersion>2.4.1</MaterialIconsAvaloniaVersion>
     <SkiaSharpVersion>2.88.9</SkiaSharpVersion> <!-- Match version used by Avalonia internally -->
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
-    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
     <TrimMode>partial</TrimMode>
 <!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->

@@ -4,6 +4,7 @@
 
 .include "z2r.inc"
 .import SwapCHR
+.import IncKeysForCurrentPalace
 
 ; ElevatorBossFix
 ; ===============
@@ -57,7 +58,7 @@ ElevatorBossFix:
     cpy #8
     bne +
         ; increment number of keys and carry on
-        inc Keys
+        jsr IncKeysForCurrentPalace
         jmp $e797  ; always overwritten by full_item_shuffle anyway
     +
     ; Otherwise continue to $E7BB which is the start of the get item code
@@ -414,6 +415,39 @@ PinCarockSpriteSlot:
     jmp $b20d  ; continue to original jsr
 
 
+; HorizontalBossBars (author initsu)
+; ============================================
+.if HORIZONTAL_BOSS_BARS_GP
+
+; Horizontal HP bar
+HP_X_STEP = $0a
+HP_X_START = $81 + HP_X_STEP * 4
+HP_Y = $d0
+
+;.segment "PRG4"
+;.org $9c53 -- can copy-paste code here if we want horizontal HP bars for all palaces
+
+.segment "PRG5"
+.org $a4f7
+    lda #HP_X_START
+    sta zp_00
+    lda #$70
+    dey
+    bmi @KeepTile70
+        lda #$6e
+    @KeepTile70:
+    sta $02c1,X
+    lda #$01
+    sta $02c2,X
+    lda #HP_Y
+    sta $02c0,X
+    lda zp_00
+    sbc #HP_X_STEP
+    sta zp_00
+    sta $02c3,X
+.assert * = $a518
+.endif
+
 ; BossEnterGoingLeftFix (author initsu)
 ; =====================================
 .segment "PRG4"
@@ -471,9 +505,11 @@ P346RebonackInitRoutine := $af91
     lda #$00
     sta EnemySizeCodesRamCopy+REBO_UNHORSED   ; reset "size code" in case another Rebo has previously been killed in the palace
     sta $0504,x                     ; clear timer (like vanilla)
-    lda #$ac                        ; rebo vanilla X start position
+    lda #$ac                        ; rebo vanilla Y start position
     sta EnemyYPositionLo,x
-    inc EnemyXPositionHi,x          ; push Rebo one page right (off-screen if coming from the left)
+    inc EnemyXPositionHi,x          ; push Rebo one page right
+    lda #$20                        ; rebo vanilla X start position
+    sta EnemyXPositionLo,x
 @Done:
     rts
 FREE_UNTIL $afb3                    ; $afb3 is used in a couple of places as the closest RTS - must keep

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using js65;
 using NLog;
+using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
@@ -44,26 +45,28 @@ public record struct Coord(int X, int Y) : IComparable<Coord>
 [JsonSerializable(typeof(List<Room>))]
 [JsonSerializable(typeof(Room))]
 [JsonSerializable(typeof(Requirements))]
+[JsonSerializable(typeof(ComplexRequirement))]
+[JsonSerializable(typeof(RequirementRoute))]
 [JsonSerializable(typeof(Coord))]
 public partial class RoomSerializationContext : JsonSerializerContext { }
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
-public class Room : IJsonOnDeserialized
+public class Room : IJsonOnDeserialized, IDeterministicHash
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     public Coord coords;
 
-    public const int Group1ItemGetStartAddress = 0x17ba5;
-    public const int Group2ItemGetStartAddress = 0x17bc5;
-    public const int Group3ItemGetStartAddress = 0x17be5;
+    public const int Group1ItemPresenceBitsStartAddress = 0x17ba5;
+    public const int Group2ItemPresenceBitsStartAddress = 0x17bc5;
+    public const int Group3ItemPresenceBitsStartAddress = 0x17be5;
     private const int connectors1 = 0x1072b;
     private const int connectors2 = 0x12208;
     private const int connectors3 = 0x1472b;
 
     [JsonPropertyName("bitmask")]
     [JsonConverter(typeof(HexStringConverter))]
-    public byte[] ItemGetBits { get; set; }
+    public byte[] ItemPresenceBits { get; set; }
 
     public byte Map { get; set; }
 
@@ -153,6 +156,7 @@ public class Room : IJsonOnDeserialized
     [JsonIgnore]
     public Room MergedSecondary { get; set; }
     public string DuplicateGroup { get; set; } = "";
+    public int Priority { get; set; } = 0; // so we can force rooms to be placed for testing
     public List<string> SuppressWarning { get; set; } = [];
     public List<string> Tags { get; set; } = [];
 
@@ -187,7 +191,7 @@ public class Room : IJsonOnDeserialized
         NewEnemies = new byte[Enemies.Length];
         SideView = room.SideView.ToArray();
         MirrorSideView = room.MirrorSideView?.ToArray();
-        ItemGetBits = room.ItemGetBits.ToArray();
+        ItemPresenceBits = room.ItemPresenceBits.ToArray();
         HasItem = room.HasItem;
         HasBoss = room.HasBoss;
         IsBossRoom = room.IsBossRoom;
@@ -259,7 +263,7 @@ public class Room : IJsonOnDeserialized
         a.Word(AsmModule.Symbol(label));
     }
 
-    public int UpdateEnemies(AsmModule a, int enemyAddr)
+    public int UpdateEnemies(AsmModule a, int enemyAddr, bool hardCarock)
     {
         //If we're using vanilla enemies, just clone them to newenemies so the logic can be the same for shuffled vs not
         if (NewEnemies[0] == 0)
@@ -282,9 +286,16 @@ public class Room : IJsonOnDeserialized
             for (var i = 2; i < NewEnemies.Length; i += 2)
             {
                 // Replace any "Rebo Unhorsed" enemies, as that's a generator in P125
-                if ((NewEnemies[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
+                int enemyId = (NewEnemies[i] & 0x3F);
+                if (enemyId == 0x0A && !HasBoss && !HasItem)
                 {
                     NewEnemies[i] = (byte)(0x0F + (NewEnemies[i] & 0xC0));
+                }
+
+                if (hardCarock && enemyId == (int)EnemiesPalace346.CAROCK)
+                {
+                    // move Hard Carock 1 tile to the right
+                    NewEnemies[i - 1] = 0x6C;
                 }
             }
         }
@@ -317,20 +328,20 @@ public class Room : IJsonOnDeserialized
         return NewEnemies.Length;
     }
 
-    public void UpdateItemGetBits(Dictionary<PalaceGrouping, byte[]> palaceItemBits)
+    public void PutItemPresenceBitsIntoFinalTable(Dictionary<PalaceGrouping, byte[]> palaceItemBits)
     {
-        PalaceGrouping palaceGroup = PalaceGroup ?? throw new Exception("Unable to assign ItemGetBits on a room with no palace group");
+        PalaceGrouping palaceGroup = PalaceGroup ?? throw new Exception("Unable to assign ItemPresenceBits on a room with no palace group");
 
         var old = palaceItemBits[palaceGroup][Map / 2];
         if (Map % 2 == 0)
         {
             old = (byte)(old & 0x0F);
-            old = (byte)((ItemGetBits[0] << 4) | old);
+            old = (byte)((ItemPresenceBits[0] << 4) | old);
         }
         else
         {
             old = (byte)(old & 0xF0);
-            old = (byte)((ItemGetBits[0]) | old);
+            old = (byte)((ItemPresenceBits[0]) | old);
         }
         palaceItemBits[palaceGroup][Map / 2] = old;
     }
@@ -415,6 +426,18 @@ public class Room : IJsonOnDeserialized
             edit.Remove(statue);
             SideView = edit.Finalize();
         }
+
+        // for key logic: make sure it understands the boss key is not reachable from the right
+        LinkRequirements = new Requirements(
+            LinkRequirements.IndividualRequirements,
+            LinkRequirements.CompositeRequirements,
+            [
+                .. LinkRequirements.ComplexRequirements,
+                new ComplexRequirement(
+                    RequirementTarget.KEY,
+                    [RequirementType.OUT_OF_LOGIC], [],
+                    [new RequirementRoute([Direction.EAST], null)]),
+            ]);
     }
 
     public void AdjustEntrance(int palaceItemRoomCount, Random r)
@@ -454,6 +477,37 @@ public class Room : IJsonOnDeserialized
     }
 
     public bool HasTag(string tag) => Tags != null && Tags.Contains(tag);
+
+    public int Keys(IReadOnlyCollection<RequirementType> requireables, bool bossesDropKeys, Direction? enterFrom = null)
+    {
+        if (!LinkRequirements.KeyIsAccessible(requireables, enterFrom))
+        {
+            return 0;
+        }
+
+        // probably add this to rooms file for optimization?
+        SideviewEditable<PalaceObject> sv = new(SideView);
+        int keys = sv.Commands
+            .Count(cmd => cmd.IsItem(RandomizerCore.Collectable.KEY) &&
+                          GetItemBit(cmd.Page));
+
+        if (bossesDropKeys && HasBoss)
+        {
+            keys++;
+        }
+
+        return keys;
+    }
+
+    public int LockedDoors()
+    {
+        SideviewEditable<PalaceObject> sv = new(SideView);
+        int doors = sv.Commands
+            .Count(cmd => cmd.IsLockedDoor() &&
+                          GetItemBit(cmd.Page));
+
+        return doors;
+    }
 
     /// Aggregating PalaceNumber matching logic to determine if this room is appropriate for palaceNumber.
     public bool InPoolForPalace(int palaceNumber)
@@ -501,10 +555,6 @@ public class Room : IJsonOnDeserialized
             sb.Append("(Down) ");
         }
         return sb.ToString();
-    }
-    public bool IsTraversable(IReadOnlySet<RequirementType> requireables)
-    {
-        return LinkRequirements.AreSatisfiedBy(requireables);
     }
 
     public string GetDebuggerDisplay()
@@ -773,7 +823,7 @@ public class Room : IJsonOnDeserialized
         mergedRoom.LinkedRoom = null;
         mergedRoom.LinkedRoomName = otherRoom.Name;
 
-        mergedRoom.coords = this.coords;
+        mergedRoom.coords = coords;
 
         return mergedRoom;
     }
@@ -858,14 +908,126 @@ public class Room : IJsonOnDeserialized
         ];
         mirror.SetConnections(mirroredConnections);
 
-        mirror.ItemGetBits = [(byte)(
-             ((ItemGetBits[0] & 0b0001) != 0 ? 0b1000 : 0) |
-             ((ItemGetBits[0] & 0b0010) != 0 ? 0b0100 : 0) |
-             ((ItemGetBits[0] & 0b0100) != 0 ? 0b0010 : 0) |
-             ((ItemGetBits[0] & 0b1000) != 0 ? 0b0001 : 0)
+        mirror.ItemPresenceBits = [(byte)(
+             ((ItemPresenceBits[0] & 0b0001) != 0 ? 0b1000 : 0) |
+             ((ItemPresenceBits[0] & 0b0010) != 0 ? 0b0100 : 0) |
+             ((ItemPresenceBits[0] & 0b0100) != 0 ? 0b0010 : 0) |
+             ((ItemPresenceBits[0] & 0b1000) != 0 ? 0b0001 : 0)
         )];
 
         return mirror;
+    }
+
+    private bool HasComplexKeyRequirement => LinkRequirements.ComplexRequirements
+        .Any(requirement => requirement.Target == RequirementTarget.KEY);
+
+    public bool TryTransmuteMinorItemToKey(Random r)
+    {
+        if (HasComplexKeyRequirement || HasTag("NoKeyTransform"))
+        {
+            return false; // do not create new keys that would inherit requirements
+        }
+
+        SideviewEditable<PalaceObject> sv = new(SideView);
+        var minorItems = sv.Commands
+            .Where(cmd => cmd.IsMinorItem()
+                       && cmd.Extra != RandomizerCore.Collectable.KEY
+                       && GetItemBit(cmd.Page))
+            .ToList();
+        var replacement = minorItems.Sample(r);
+        if (replacement == null)
+        {
+            return false;
+        }
+
+        replacement.Extra = RandomizerCore.Collectable.KEY;
+        SideView = sv.Finalize();
+        return true;
+    }
+
+    public bool TryAddKeyOnFloor()
+    {
+        if (HasComplexKeyRequirement)
+        {
+            return false; // do not create new keys that would inherit requirements
+        }
+
+        SideviewEditable<PalaceObject> sv = new(SideView);
+        var ee = new EnemiesEditable<EnemiesPalace125>(Enemies);
+
+        var doors = sv.Commands.Where(cmd => cmd.IsLockedDoor());
+        var items = sv.Commands.Where(cmd => cmd.IsItem());
+        var strikeForJarEnemies = ee.Enemies.Where(o => o.IsStrikeForJarLike());
+
+        bool ItemPageIsFree(int page)
+        {
+            if (doors.Any(cmd => cmd.Page == page)) { return false; }
+            if (items.Any(cmd => cmd.Page == page)) { return false; }
+            if (strikeForJarEnemies.Any(cmd => cmd.Page == page)) { return false; }
+            return true;
+        }
+
+        bool TryCreateKey(bool[,] solidGrid, int x)
+        {
+            var floor = SolidGridHelper.FindFloor(solidGrid, x, 10, 1, 1);
+            if (floor > 0 && floor < 11)
+            {
+                var newKey = SideviewMapCommand<PalaceObject>.CreateCollectable(x, floor, RandomizerCore.Collectable.KEY);
+                sv.Commands.Add(newKey);
+                SideView = sv.Finalize();
+                return true;
+            }
+            return false;
+        }
+
+        if (HasLeftExit && ItemPageIsFree(0))
+        {
+            var solidGrid = sv.CreateSolidGrid();
+            int x = 5;
+            if (TryCreateKey(solidGrid, x))
+            {
+                SetItemBit(0, true);
+                return true;
+            }
+        }
+
+        if (HasRightExit && sv.PageCount == 3 && ItemPageIsFree(3))
+        {
+            var solidGrid = sv.CreateSolidGrid();
+            int x = 58;
+            if (TryCreateKey(solidGrid, x))
+            {
+                SetItemBit(3, true);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool GetItemBit(int page)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(page, 3);
+        ArgumentOutOfRangeException.ThrowIfNegative(page);
+
+        return (ItemPresenceBits[0] & (0b1000 >> page)) != 0;
+    }
+
+    public void SetItemBit(int page, bool value)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(page, 3);
+        ArgumentOutOfRangeException.ThrowIfNegative(page);
+
+        byte mask = (byte)(0b1000 >> page);
+
+        if (value)
+        {
+            ItemPresenceBits[0] |= mask;
+        }
+        else
+        {
+            ItemPresenceBits[0] &= (byte)~mask;
+        }
     }
 
     public Requirements GetEffectiveRequirements(bool isMario)
@@ -879,6 +1041,43 @@ public class Room : IJsonOnDeserialized
             MarioRequirements = requirements;
         }
         else LinkRequirements = requirements;
+    }
+
+    /// The room's exits as (exit direction, direction the neighbor is entered from, neighbor).
+    public IEnumerable<(Direction ExitTo, Direction EnterFrom, Room Neighbor)> Exits()
+    {
+        if (Left != null) { yield return (Direction.WEST, Direction.EAST, Left); }
+        if (Right != null) { yield return (Direction.EAST, Direction.WEST, Right); }
+        if (Up != null) { yield return (Direction.NORTH, Direction.SOUTH, Up); }
+        if (Down != null) { yield return (Direction.SOUTH, Direction.NORTH, Down); }
+    }
+
+    public IEnumerable<(Direction EnterFrom, Room Left)> PossibleDirections(HashSet<RequirementType> requireables, Direction enterFrom)
+    {
+        foreach (var (exitTo, neighborEnterFrom, neighbor) in Exits())
+        {
+            if (LinkRequirements.AreSatisfiedBy(requireables, RequirementTarget.EXIT, enterFrom: enterFrom, exitTo: exitTo))
+            {
+                yield return (neighborEnterFrom, neighbor);
+            }
+        }
+    }
+
+    /// Exits of a locked-door room that can be used without spending a small key. Only rooms whose
+    /// complex requirements contain a KEY requirement in some capacity have any such exits.
+    public IEnumerable<(Direction EnterFrom, Room Left)> FreeExitsInLockedDoorRoom(Direction enterFrom)
+    {
+        if (!LinkRequirements.ComplexRequirementsContains(RequirementType.KEY))
+        {
+            yield break;
+        }
+        foreach (var (exitTo, neighborEnterFrom, neighbor) in Exits())
+        {
+            if (!LinkRequirements.ExitRequiresKey(enterFrom, exitTo))
+            {
+                yield return (neighborEnterFrom, neighbor);
+            }
+        }
     }
 
     public void UpdateSideviewItem(Collectable collectable)
@@ -922,6 +1121,35 @@ public class Room : IJsonOnDeserialized
             _ => throw new NotImplementedException(),
         };
         return basePtr + Map * 2;
+    }
+
+    public int GetDeterministicHash()
+    {
+        int hash = DeterministicHash.Seed;
+        hash = DeterministicHash.Combine(hash, Name);
+        hash = DeterministicHash.Combine(hash, Author);
+        hash = DeterministicHash.Combine(hash, (int)Group);
+        hash = DeterministicHash.Combine(hash, ItemPresenceBits);
+        hash = DeterministicHash.Combine(hash, Connections);
+        hash = DeterministicHash.Combine(hash, HasDrop);
+        hash = DeterministicHash.Combine(hash, ElevatorScreen);
+        hash = DeterministicHash.Combine(hash, LinkRequirements);
+        hash = DeterministicHash.Combine(hash, MarioRequirements);
+        hash = DeterministicHash.Combine(hash, IsDropZone);
+        hash = DeterministicHash.Combine(hash, HasItem);
+        hash = DeterministicHash.Combine(hash, Enemies);
+        hash = DeterministicHash.Combine(hash, SideView);
+        hash = DeterministicHash.Combine(hash, HasBoss);
+        hash = DeterministicHash.Combine(hash, IsBossRoom);
+        hash = DeterministicHash.Combine(hash, IsThunderBirdRoom);
+        hash = DeterministicHash.Combine(hash, Enabled);
+        hash = DeterministicHash.Combine(hash, IsEntrance);
+        hash = DeterministicHash.Combine(hash, PalaceNumber);
+        hash = DeterministicHash.Combine(hash, LinkedRoomName);
+        hash = DeterministicHash.Combine(hash, IsUpDownReversed);
+        hash = DeterministicHash.Combine(hash, Priority);
+        hash = DeterministicHash.Combine(hash, Tags);
+        return hash;
     }
 }
 

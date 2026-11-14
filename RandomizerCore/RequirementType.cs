@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -11,7 +12,6 @@ public enum RequirementType
     FAIRY,
     UPSTAB,
     DOWNSTAB,
-    KEY,
     DASH,
     GLOVE,
     REFLECT,
@@ -32,16 +32,21 @@ public enum RequirementType
     BOOTS,
     FLUTE,
     HAMMER,
+    KEY,
+    MAGIC_KEY,
     BAGU_LETTER,
     //Mario specific requireables
     TANOOKI,
-    SHIELD
+    SHIELD,
+    OUT_OF_LOGIC
 }
 
 public static class RequirementTypeExtensions
 {
-    public static readonly ReadOnlySet<RequirementType> ALL = [.. Enum.GetValues<RequirementType>()];
-    /// Mirror of Collectable.AsRequirement()
+    public static readonly ReadOnlySet<RequirementType> ALL =
+        [.. Enum.GetValues<RequirementType>().Where(requirement => requirement != RequirementType.OUT_OF_LOGIC)];
+    /// Maps a requireable to the collectable that grants it, where one exists.
+    /// RequirementType.KEY is a locked-door rather than a collectable, so it maps to null.
     public static Collectable? AsCollectable(this RequirementType requirementType)
     {
         return requirementType switch
@@ -50,7 +55,7 @@ public static class RequirementTypeExtensions
             RequirementType.FAIRY => Collectable.FAIRY_SPELL,
             RequirementType.UPSTAB => Collectable.UPSTAB,
             RequirementType.DOWNSTAB => Collectable.DOWNSTAB,
-            RequirementType.KEY => Collectable.MAGIC_KEY,
+            RequirementType.MAGIC_KEY => Collectable.MAGIC_KEY,
             RequirementType.DASH => Collectable.DASH_SPELL,
             RequirementType.GLOVE => Collectable.GLOVE,
             RequirementType.REFLECT => Collectable.REFLECT_SPELL,

@@ -30,20 +30,23 @@ bank7_Remove_All_Sprites = $d24c
 
 ; Remove sprite zero sliver tile. This frees up tile $c5 and one sprite.
 .segment "PRG0"
+
 .org $8cdd  ; old sprite 0 table followed by old SideviewInit
 FREE_UNTIL NewSideviewInit
+    lda #$f8
+    sta $0200
+.assert * = $8cec
 
-.segment "PRG5"
-.org $a7a8
-JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
-
-.segment "PRG7"
-.org $c1a2
-JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
-.org $c212
-JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
+;.segment "PRG5"
+;.org $a7a8
+;JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
 
 .segment "PRG7"
+;.org $c1a2
+;JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
+;.org $c212
+;JSR bank7_Remove_All_Sprites  ; was JSR bank7_Remove_All_Sprites_except_Sprite0
+
 ; Replace the code to wait for sprite 0 with code to set up the scanline IRQ
 .org $d4b2
     jsr SetupScanlineIRQ
@@ -219,6 +222,8 @@ HandleLagFrame:
 ;        bne @loop
     jsr SetupScanlineIRQ
 @HandleAudio:
+
+.if ENABLE_Z2FT
     lda PendingAudioCall
     beq @RunAudio
         ; Audio is currently running on the main thread; signal it to re-run after
@@ -230,6 +235,16 @@ HandleLagFrame:
     bit LagFrameVar
     bvc @TitleScreenSoSkip
     jmp UpdateSound
+
+.else  ; Vanilla Z2 audio
+    ; Skip processing audio during a real lag frame since thats what
+    ; vanilla accomplishes with a hard disabled NMI
+    lda SoftDisableNmi
+    bne @skip
+        jsr UpdateSound
+@skip:
+    rts
+.endif
 
 .segment "PRG7"
 .reloc
@@ -369,9 +384,9 @@ IncStatTimer:
 ; Re-organizing the code because we need RegionNumber earlier and we can save some bytes
 .org $cb78
     ldx LocationNumber
-    lda $6abd,Y
+    lda LocationByte3TableRamCopy,Y
     pha
-    and #$03
+    and #$03                            ; Region mask
     sta RegionNumber
     beq @West
         txa
@@ -396,7 +411,7 @@ IncStatTimer:
     sta PalaceNumber
 
     .assert * = $cba5
-    pla                                 ; pull $6abd,Y
+    pla
 
 ; These values are exported from the randomizer and map from internal palace number
 ; to the "real palace" at this offset.
@@ -758,16 +773,14 @@ UPDATE_REFS SwapPRG @ $C00B $C035 $C1C4 $C33F $C38B $CD5D $CF24
 UPDATE_REFS SwapToSavedPRG @ $C1DB $C24A $C250 $C4D6 $C63C $C645 $CB36 $CF2A $CF3D $CF50
 UPDATE_REFS SwapToSavedPRG @ $CFFD $D127 $D502 $DFD3 $DFDC $DFF0 $DFF9 $E01C $E025 $E071 $E1DE
 UPDATE_REFS SwapToPRG0 @ $C1CA $C1CE $C256 $C350 $C636 $C68B $C9EF $CCFA $D0FD $D121 $D508
-UPDATE_REFS SwapToPRG0 @ $DFD9 $DFE2 $DFF6 $DFFF $E017 $E022 $E02B $E077 $E1E4 $FF4A
+UPDATE_REFS SwapToPRG0 @ $DFD9 $DFE2 $DFF6 $DFFF $E022 $E02B $E077 $E1E4 $FF4A
 
 ; z2ft uses this location
-.if !ENABLE_Z2FT
+.if ENABLE_Z2FT
 
-UPDATE_REFS SwapToSavedPRG @ $E002
+UPDATE_REFS SwapToPRG0 @ $E017
 
 .endif
-
-
 ; Clear a ton of free space out of the fixed bank by banking ganon's laugh sfx
 ; its only used during a scene thats otherwise doing nothing special, so we can
 ; cheese it out using mmc5's ability to bank $e000.

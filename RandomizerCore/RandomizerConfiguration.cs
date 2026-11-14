@@ -6,7 +6,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using NLog;
+using Z2Randomizer.RandomizerCore.Diagnostics;
 using Z2Randomizer.RandomizerCore.Flags;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantDefaultMemberInitializer
@@ -203,6 +205,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private int startingLifeLevel = 1;
 
     [Reactive]
+    private StartingLocation startingLocation = StartingLocation.NORTH_PALACE;
+
+    [Reactive]
     private IndeterminateOptionRate indeterminateOptionRate = IndeterminateOptionRate.HALF;
 
     //Overworld
@@ -355,10 +360,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         return false;
     }
 
+    [Reactive]
+    private RoomPoolOption roomPoolOption = RoomPoolOption.VANILLA;
+
     private bool roomSelectionEnabled()
-    {
-        return palaceStylesAreNotAllVanillaOrShuffled();
-    }
+        => roomPoolOption is RoomPoolOption.USE_CHECKBOXES && palaceStylesAreNotAllVanillaOrShuffled();
 
     private bool palaceStylesAnyMetastyleSelected()
     {
@@ -394,6 +400,14 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
     [Reactive]
     [ConditionallyIncludeInFlags]
+    private KeyLogicOption keyLogic = KeyLogicOption.KEYS_PER_PALACE_SOLVABLE;
+    public bool keyLogicIncluded() => palaceStylesAreNotAllVanilla();
+
+    [Reactive]
+    private bool removeMagicKey = false;
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool blockingRoomsInAnyPalace = false;
     public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanilla();
 
@@ -419,7 +433,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [ConditionallyIncludeInFlags]
     private BossRoomsExitType bossRoomsExitType = BossRoomsExitType.OVERWORLD;
-    public bool bossRoomsExitTypeIncluded() => roomSelectionEnabled();
+    public bool bossRoomsExitTypeIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     [ConditionallyIncludeInFlags]
@@ -534,16 +548,10 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool shuffleLifeRefillAmount = false;
 
     [Reactive]
-    private bool? shuffleSpellLocations = false;
-
-    [Reactive]
     private bool? disableMagicContainerRequirements = false;
 
     [Reactive]
     private bool? randomizeSpellSpellEnemy = false;
-
-    [Reactive]
-    private bool? swapUpAndDownStab = false;
 
     [Reactive]
     // Add [ConditionallyIncludeInFlags] for next minor release.
@@ -622,6 +630,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool randomizeNewKasutoJarRequirements = false;
 
     [Reactive]
+    private bool fastItemPickup = false;
+
+    [Reactive]
     private bool allowImportantItemDuplicates = false;
 
     [Reactive]
@@ -634,7 +645,17 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     private bool? includeSpellsInShuffle = false;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool? shuffleSpellLocations = false;
+    public bool shuffleSpellLocationsIncluded() => includeSpellsInShuffle != true;
+
+    [Reactive]
     private bool? includeSwordTechsInShuffle = false;
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool? swapUpAndDownStab = false;
+    public bool swapUpAndDownStabIncluded() => includeSwordTechsInShuffle != true;
 
     [Reactive]
     private bool? includeQuestItemsInShuffle = false;
@@ -789,6 +810,10 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     [IgnoreInFlags]
     private bool darkenThunderbird = true;
+
+    [Reactive]
+    [IgnoreInFlags]
+    private bool horizontalBossBarsGP = false;
 
     [Reactive]
     [IgnoreInFlags]
@@ -973,15 +998,30 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             Seed = seed
         };
 
+        if (removeMagicKey) { properties.RemoveItems.Add(Collectable.MAGIC_KEY); }
+
         ExportBiomes(properties, r);
 
         //Properties that can affect available minor item replacements
-        do // while (!properties.HasEnoughSpaceToAllocateItems())
+#if Z2R_DIAGNOSTICS
+        long initialAllocationFailures = 0;
+#endif
+        while (true)
         {
             //Start Configuration
             ShuffleStartingCollectables(includeDifficulty ? POSSIBLE_STARTING_ITEMS : POSSIBLE_SHARED_STARTING_ITEMS,
                 startItemsLimit, shuffleStartingItems, properties, r);
             ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, startSpellsLimit, shuffleStartingSpells, properties, r);
+
+            // Give North Palace its chance to roll now. Other Random cases are rolled later.
+            if (startingLocation.IsMetastyle() && r.Next(9) == 0)
+            {
+                properties.StartingLocation = StartingLocation.NORTH_PALACE;
+            }
+            else
+            {
+                properties.StartingLocation = startingLocation;
+            }
 
             List<PalaceStyle> allowedPalaceStyles;
             if (GpStyle.IsMetastyle())
@@ -1070,7 +1110,13 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
             //Not settable yet
             properties.MaxMagicContainers = 8;
-        } while (!properties.HasEnoughSpaceToAllocateItems());
+
+            if (properties.HasEnoughSpaceToAllocateItems())
+                break;
+#if Z2R_DIAGNOSTICS
+            TraceItemAllocationRetry(++initialAllocationFailures, "initial-roll", properties);
+#endif
+        }
 
         //Handle Fire
         Collectable RollLinkedFireSpell()
@@ -1118,13 +1164,13 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         }
 
         ResolveStartingTechniques(properties, r, includeDifficulty);
-        properties.SwapUpAndDownStab = swapUpAndDownStab ?? GetIndeterminateFlagValue(r);
-
+        properties.SwapUpAndDownStab = swapUpAndDownStabIncluded() && (swapUpAndDownStab ?? GetIndeterminateFlagValue(r));
 
         properties.StartLives = ResolveStartingLives(r, includeDifficulty);
         properties.PermanentBeam = permanentBeamSword;
         properties.MarioMode = marioMode;
         properties.UseCommunityText = useCommunityText;
+        properties.StartingLocation = startingLocation;
 
         // If shared difficulty is enabled and we're setting up the shared
         // part of the properties, just set the attributes to basic values
@@ -1224,7 +1270,10 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.Global5050JarDrop = global5050JarDrop ?? GetIndeterminateFlagValue(r);
         properties.ReduceDripperVariance = reduceDripperVariance;
         properties.RemoveTbird = removeTBird;
-        properties.BossItem = randomizeBossItemDrop;
+        // give BossItem rolling vanilla its chance here
+        properties.BossItem = randomizeBossItemDrop
+            ? (r.Next(8) == 0 ? false : randomizeBossItemDrop)
+            : false;
 
         //if all 3 room options are hard false, the seed can't generate. The UI tries to prevent this, but as a safety
         //if we get to this point, use vanilla rooms
@@ -1238,7 +1287,8 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             properties.AllowV4Rooms = includev4_0Rooms ?? GetIndeterminateFlagValue(r);
             properties.AllowV5_0Rooms = includev5_0Rooms ?? GetIndeterminateFlagValue(r);
         }
-
+        properties.RoomPoolOption = roomPoolOption;
+        properties.KeyLogic = keyLogicIncluded() ? keyLogic : KeyLogicOption.FAIRY_OR_MAGICKEY;
         properties.BlockersAnywhere = blockingRoomsInAnyPalaceIncluded() && blockingRoomsInAnyPalace;
         properties.RemoveLongDeadEnds = removeLongDeadEndsIncluded() && removeLongDeadEnds;
         properties.IncludeExpertRooms = includeExpertRoomsIncluded() && includeExpertRooms;
@@ -1328,7 +1378,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.MagicEffectiveness = magicEffectiveness;
         properties.LifeEffectiveness = includeDifficulty ? lifeEffectiveness : LifeEffectiveness.VANILLA;
         properties.ShuffleLifeRefill = shuffleLifeRefillAmount;
-        properties.ShuffleSpellLocations = shuffleSpellLocations ?? GetIndeterminateFlagValue(r);
+        properties.ShuffleSpellLocations = shuffleSpellLocationsIncluded() && (shuffleSpellLocations ?? GetIndeterminateFlagValue(r));
         properties.DisableMagicRecs = disableMagicContainerRequirements ?? GetIndeterminateFlagValue(r);
         properties.AttackCap = includeDifficulty ? attackLevelCap : 8;
         properties.MagicCap = includeDifficulty ? magicLevelCap : 8;
@@ -1340,6 +1390,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.RandomizeSmallItems = shuffleSmallItems;
         properties.ExtraKeys = palacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
         properties.NewKasutoBasementRequirement = randomizeNewKasutoJarRequirements ? r.Next(5, 8) : 7;
+        properties.FastItemPickup = fastItemPickup;
         properties.AllowImportantItemDuplicates = allowImportantItemDuplicates;
         properties.ShufflePbagXp = shufflePBagAmounts ?? GetIndeterminateFlagValue(r);
         properties.IncludeBagusNoteInShuffle = IncludeBagusNoteInShuffle ?? GetIndeterminateFlagValue(r);
@@ -1448,6 +1499,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.ShieldColor = shieldTunic;
         properties.UpAC1 = upAOnController1;
         properties.DarkenThunderbird = darkenThunderbird;
+        properties.HorizontalBossBarsGP = horizontalBossBarsGP;
         properties.RemoveFlashing = removeFlashing;
         //Removed the option to select this for now.
         properties.UseCustomRooms = false;
@@ -1539,15 +1591,35 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         if (rerollPalaceItemRoomCounts)
         {
-            do
+#if Z2R_DIAGNOSTICS
+            long palaceRoomRerollFailures = 0;
+#endif
+            while (true)
             {
                 AssignPalaceItemCounts(properties, r);
+                if (properties.HasEnoughSpaceToAllocateItems()) break;
+#if Z2R_DIAGNOSTICS
+                TraceItemAllocationRetry(++palaceRoomRerollFailures, "palace-room-reroll", properties);
+#endif
             }
-            while (!properties.HasEnoughSpaceToAllocateItems());
         }
 
         return properties;
     }
+
+#if Z2R_DIAGNOSTICS
+    private static void TraceItemAllocationRetry(long attempt, string phase, RandomizerProperties properties)
+    {
+        if (!Diag.IsSample(attempt)) return;
+
+        Diag.Trace("config.item-allocation", $"attempt={attempt} phase={phase} reason=insufficient-item-space "
+            + $"hearts={properties.StartHearts}/{properties.MaxHearts} "
+            + $"magic={properties.StartMagicContainers}/{properties.MaxMagicContainers} "
+            + $"mixItems={properties.MixOverworldPalaceItems} shuffleOverworld={properties.ShuffleOverworldItems} "
+            + $"shufflePalaces={properties.ShufflePalaceItems} pbagCaves={properties.PbagItemShuffle} "
+            + $"palaceItemRooms=[{string.Join(",", properties.PalaceItemRoomCounts)}]");
+    }
+#endif
 
     private void ExportBiomes(RandomizerProperties properties, Random r)
     {
@@ -1773,13 +1845,21 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             }
         }
 
-        if (noDuplicateRoomsByLayout || noDuplicateRoomsByEnemies)
+        if (noDuplicateRoomsByLayoutIncluded() && (noDuplicateRoomsByLayout || noDuplicateRoomsByEnemies))
         {
             // if current palace generation logic changes, this should be updated
             int potentialRoomPools = 0;
-            if (includeVanillaRooms != false) { potentialRoomPools++; }
-            if (includev4_0Rooms != false) { potentialRoomPools++; }
-            if (includev5_0Rooms != false) { potentialRoomPools++; }
+            switch (roomPoolOption)
+            {
+                case RoomPoolOption.USE_CHECKBOXES:
+                    if (includeVanillaRooms != false) { potentialRoomPools++; }
+                    if (includev4_0Rooms != false) { potentialRoomPools++; }
+                    if (includev5_0Rooms != false) { potentialRoomPools++; }
+                    break;
+                default:
+                    potentialRoomPools = RoomPoolConfigs.PotentialRoomPools(roomPoolOption);
+                    break;
+            }
             if (potentialRoomPools < 2)
             {
                 throw new UserFacingException("Incompatible Palace Flags", "Not enough palace rooms in the pool.\n\nUnder the Palaces tab, include more room groups or disable No Duplicate Rooms.");
@@ -1861,7 +1941,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             {
                 break;
             }
-            if (StartsWithCollectable(collectable))
+            if (StartsWithCollectable(collectable) && !properties.RemoveItems.Contains(collectable))
             {
                 startingItems.Add(collectable);
             }
@@ -1875,7 +1955,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
                 {
                     break;
                 }
-                if (!StartsWithCollectable(collectable))
+                if (!StartsWithCollectable(collectable) && !properties.RemoveItems.Contains(collectable))
                 {
                     if (r.Next(4) == 0)
                     {
@@ -2033,7 +2113,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         }
         if (shuffleOverworldItems != false && eastBiome.InItemShuffle())
         {
-            overworldStartMinorItemCount += shuffleStartingItems || startWithMagicKey ? 1 : 0;
+            overworldStartMinorItemCount += shuffleStartingItems || startWithMagicKey || removeMagicKey ? 1 : 0;
         }
 
         int startItemsOverflow = Math.Min(0, palaceStartMinorItemCount + overworldStartMinorItemCount - (shuffleStartingItems ? startItemsLimit.AsInt() : 0));

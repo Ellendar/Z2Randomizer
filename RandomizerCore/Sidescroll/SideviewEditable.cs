@@ -252,6 +252,8 @@ public class SideviewEditable<T> where T : struct, Enum
 
     public void Mirror()
     {
+        int width = PageCount * 16;
+
         List<SideviewMapCommand<T>> floors = FindAll(o => o.IsNewFloor());
         if (floors.Count > 0)
         {
@@ -288,7 +290,7 @@ public class SideviewEditable<T> where T : struct, Enum
 
         foreach (var cmd in Commands)
         {
-            cmd.AbsX = 63 - cmd.AbsX - (cmd.Width - 1);
+            cmd.AbsX = width - 1 - cmd.AbsX - (cmd.Width - 1);
         }
     }
 

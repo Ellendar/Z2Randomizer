@@ -1,11 +1,13 @@
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Z2Randomizer.RandomizerCore.Diagnostics;
 using Z2Randomizer.RandomizerCore.Enemy;
 using static Z2Randomizer.RandomizerCore.Util;
 
@@ -20,6 +22,8 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
     private const byte OUTSIDE_ROOM_EXIT = 0b11111100;
     private readonly SortedDictionary<int, List<Room>> rooms = [];
     internal bool IsValid { get; set; } = false;
+    /// <summary>True when key logic has been solved granted all requireables</summary>
+    internal bool KeyLogicSolved { get; private set; } = false;
 
     public static readonly ReadOnlyCollection<Collectable> SHUFFLABLE_SMALL_ITEMS = [
         Collectable.KEY,
@@ -31,6 +35,20 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         Collectable.RED_JAR,
         Collectable.ONEUP
     ];
+
+    private static readonly TableWeightedRandom<Collectable> SmallItemWeights = new([
+        (Collectable.KEY, 7),
+        (Collectable.BLUE_JAR, 2),
+        (Collectable.RED_JAR, 2),
+        (Collectable.SMALL_BAG, 2),
+        (Collectable.MEDIUM_BAG, 3),
+        (Collectable.LARGE_BAG, 2),
+        (Collectable.XL_BAG, 1),
+        (Collectable.ONEUP, 1),
+    ]);
+
+    private static readonly TableWeightedRandom<Collectable> SmallItemWeightsNoKey =
+        (TableWeightedRandom<Collectable>)SmallItemWeights.Subtract(Collectable.KEY)!;
 
     public List<Room> AllRooms { get; private set; } = [];
 
@@ -105,12 +123,13 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
     private static bool DropsMayBypass(Room bossRoom, bool dropsMayBypassMiniBosses, bool dropsMayBypassFinalBosses, bool tBirdRequired)
         => IsMiniBoss(bossRoom, tBirdRequired) ? dropsMayBypassMiniBosses : dropsMayBypassFinalBosses;
 
-    public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false,
-                                               bool allowMiniBossEnterGoingLeft = false,
-                                               bool allowFinalBossEnterGoingLeft = false,
-                                               bool dropsMayBypassMiniBosses = false,
-                                               bool dropsMayBypassFinalBosses = false,
-                                               bool tBirdRequired = false)
+    public IEnumerable<Room> GetReachableRooms(
+        bool allowBacktracking = false,
+        bool allowMiniBossEnterGoingLeft = false,
+        bool allowFinalBossEnterGoingLeft = false,
+        bool dropsMayBypassMiniBosses = false,
+        bool dropsMayBypassFinalBosses = false,
+        bool tBirdRequired = false)
     {
         if (Entrance == null)
         {
@@ -171,7 +190,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
     public bool IsBossRoomAtLeastMinDistance(int minSteps)
     {
         if (Entrance == null) { throw new Exception("Palace Entrance is missing"); }
-        HashSet<Room> reachedRooms = [];
+        HashSet<Room> reachedRooms = new(ReferenceEqualityComparer.Instance);
         Queue<(Room, int)> roomsToCheck = [];
         roomsToCheck.Enqueue((Entrance, 0));
         while (roomsToCheck.Count > 0)
@@ -198,9 +217,259 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false; // Boss room not found??
     }
 
+    /// Represents a region of the palace that is unlocked so far: the rooms that can be
+    /// reached without spending any more keys, and the locked doors bordering that region.
+    struct AreaBetweenDoors
+    {
+        /// Rooms reachable from the entrance without opening any new locked doors.
+        public HashSet<Room> AccessibleRooms;
+        /// Rooms containing locked doors that border the accessible area, with the direction
+        /// they would be entered from.
+        public List<(Direction EnterFrom, Room Room)> UnopenedDoors;
+        /// Keys the player would currently have on hand (starting keys plus keys found in the
+        /// accessible area so far).
+        public int KeysOnHand;
+    }
+
+    /// <summary>
+    /// Attempts to solve the palace's key logic by adding keys to accessible rooms as needed.
+    /// This expands the unlocked area from the entrance and makes sure that no matter which 
+    /// locked doors the player opens, they can never burn through their keys and not be able
+    /// to open all doors.
+    /// 
+    /// If the palace is not initially solvable, this method will
+    /// attempt to add keys to accessible rooms until either the palace becomes solvable
+    /// or no more keys can be added.
+    /// 
+    /// Sets AccessRequirements and keyLogicSolved to true when successful.
+    /// </summary>
+    /// <returns>True if the palace is solvable (or was made solvable by adding keys)</returns>
+    public bool SolveKeyLogic(IReadOnlyCollection<RequirementType> initialRequireables, bool bossesDropKeys, int startingKeys, bool createKeys, Random? r)
+    {
+        if (createKeys)
+        {
+            // Generators already create distinct Room instances. Key placement only
+            // writes SideView (transmutation/floor placement) and ItemPresenceBits.
+            foreach (Room room in AllRooms)
+            {
+                room.SideView = room.SideView.ToArray();
+                room.ItemPresenceBits = room.ItemPresenceBits.ToArray();
+            }
+        }
+
+        var entrance = AllRooms.First(room => room.IsEntrance);
+        var doorRooms = AllRooms.Where(room => room.LockedDoors() > 0).ToImmutableSortedSet(new RoomReferenceComparer());
+        int doorsTotal = doorRooms.Sum(room => room.LockedDoors());
+        if (doorsTotal == 0)
+        {
+            KeyLogicSolved = true;
+            return true;
+        }
+
+        HashSet<RequirementType> requireables = [.. initialRequireables.Where(req => req != RequirementType.KEY && req != RequirementType.MAGIC_KEY)];
+        HashSet<RequirementType> requireablesIncludingKey = new(requireables) { RequirementType.KEY };
+
+        // Compute the currently unlocked area
+        // Traversal uses Room.PossibleDirections so Requirements are respected.
+        AreaBetweenDoors ComputeArea(HashSet<Room> openedDoors)
+        {
+            AreaBetweenDoors area = new()
+            {
+                AccessibleRooms = new HashSet<Room>(ReferenceEqualityComparer.Instance),
+                UnopenedDoors = [],
+            };
+
+            // A room may be reached from several sides; collect its keys only once,
+            // provided at least one reachable entry gives access to them.
+            var accessibleKeys = new Dictionary<Room, int>(ReferenceEqualityComparer.Instance);
+
+            void RecordAccessibleRoom(Direction enterFrom, Room room, bool doorOpened)
+            {
+                area.AccessibleRooms.Add(room);
+                int keys = room.Keys(doorOpened ? requireablesIncludingKey : requireables, bossesDropKeys, enterFrom);
+                accessibleKeys[room] = Math.Max(accessibleKeys.GetValueOrDefault(room), keys);
+            }
+
+            var pending = new Queue<(Direction EnterFrom, Room Room)>();
+            var visitedLockedDoorEntries = new Dictionary<Room, HashSet<Direction>>(ReferenceEqualityComparer.Instance);
+            var visitedTraversableEntries = new HashSet<(Direction EnterFrom, Room Room)>(new RoomTupleComparer<Direction>());
+
+            bool MarkLockedDoorEntryVisited(Room room, Direction enterFrom)
+            {
+                if (!visitedLockedDoorEntries.TryGetValue(room, out var directions))
+                {
+                    directions = [];
+                    visitedLockedDoorEntries.Add(room, directions);
+                }
+                return directions.Add(enterFrom);
+            }
+
+            void EnqueuePossibleDirections(Direction enterFrom, Room room, bool doorOpened)
+            {
+                foreach (var (nextEnterFrom, nextRoom) in room.PossibleDirections(
+                             doorOpened ? requireablesIncludingKey : requireables,
+                             enterFrom))
+                {
+                    pending.Enqueue((nextEnterFrom, nextRoom));
+                }
+            }
+
+            pending.Enqueue((Direction.WEST, entrance));
+
+            while (pending.Count > 0)
+            {
+                var (enterFrom, room) = pending.Dequeue();
+
+                if (doorRooms.Contains(room))
+                {
+                    if (openedDoors.Contains(room))
+                    {
+                        // The locked door has been paid for, so this room is traversable
+                        var key = (enterFrom, room);
+                        if (visitedTraversableEntries.Add(key))
+                        {
+                            RecordAccessibleRoom(enterFrom, room, doorOpened: true);
+                            EnqueuePossibleDirections(enterFrom, room, doorOpened: true);
+                        }
+
+                        continue;
+                    }
+
+                    if (!MarkLockedDoorEntryVisited(room, enterFrom))
+                    {
+                        continue; // pair has already been explored
+                    }
+
+                    // A locked-door room may not block all of its exits: when its complex
+                    // requirements contain a KEY requirement in some capacity, exits that do not
+                    // require a key can be taken without spending one.
+                    foreach (var (nextEnterFrom, nextRoom) in room.FreeExitsInLockedDoorRoom(enterFrom))
+                    {
+                        pending.Enqueue((nextEnterFrom, nextRoom));
+                    }
+
+                    if (area.UnopenedDoors.All(door => door.Room != room))
+                    {
+                        area.UnopenedDoors.Add((enterFrom, room));
+                    }
+
+                    continue;
+                }
+
+                var traversableKey = (enterFrom, room);
+                if (visitedTraversableEntries.Add(traversableKey))
+                {
+                    RecordAccessibleRoom(enterFrom, room, doorOpened: false);
+                    EnqueuePossibleDirections(enterFrom, room, doorOpened: false);
+                }
+            }
+
+            area.KeysOnHand = startingKeys
+                + accessibleKeys.Values.Sum()
+                - openedDoors.Sum(room => room.LockedDoors());
+
+            return area;
+        }
+
+        // array of 1s for opened doors and 0 for unopened doors
+        byte[] MemoKey(HashSet<Room> openedDoors) => doorRooms
+                .Select(room => (byte)(openedDoors.Contains(room) ? 1 : 0))
+                .ToArray();
+        Dictionary<byte[], bool> memo = new(new StandardByteArrayEqualityComparer());
+
+        bool CheckRecursive(HashSet<Room> openedDoors)
+        {
+            byte[] key = MemoKey(openedDoors);
+            if (memo.TryGetValue(key, out bool cached))
+            {
+                return cached;
+            }
+
+            AreaBetweenDoors area = ComputeArea(openedDoors);
+            if (area.UnopenedDoors.Count == 0)
+            {
+                if (doorRooms.Count > openedDoors.Count)
+                {
+                    // Not every door in the palace is reachable
+                    // Some doors unreachable from the entrance
+                    return false;
+                }
+
+                // All doors are opened
+                memo[key] = true;
+                return true;
+            }
+            else
+            {
+                int keys = area.KeysOnHand;
+                bool openedAny = false;
+                foreach (var (_, doorRoom) in area.UnopenedDoors)
+                {
+                    if (doorRoom.LockedDoors() > keys)
+                    {
+                        continue;
+                    }
+                    openedAny = true;
+                    if (!CheckRecursive(new HashSet<Room>(openedDoors) { doorRoom }))
+                    {
+                         return false;
+                    }
+                }
+                if (openedAny)
+                {
+                    // All doors succeeded
+                    memo[key] = true;
+                    return true;
+                }
+
+                if (!createKeys)
+                {
+                    return false; // all doors could not be opened and we aren't adding keys
+                }
+                Debug.Assert(r != null, "Random should be non-null when createKeys is set");
+                // Try adding keys if we couldn't open all doors
+                // no locked door was affordable, the player cannot open
+                // anything and the key logic is currently unsolvable.
+                // lets try creating a key somewhere in the accessible area
+                List<Room> tryAddKeyRooms = [.. area.AccessibleRooms];
+                tryAddKeyRooms.FisherYatesShuffle(r!);
+
+                // Exhaust transmutation across the accessible area before placing a new key.
+                // After each change, recompute reachability and try transmutation first again.
+                foreach (var room in tryAddKeyRooms.AsEnumerable().Reverse())
+                {
+                    if (room.TryTransmuteMinorItemToKey(r!))
+                    {
+                        return CheckRecursive(openedDoors); // we added a key; re-run the inner function from the top
+                    }
+                }
+
+                foreach (var room in tryAddKeyRooms.AsEnumerable().Reverse())
+                {
+                    if (room.TryAddKeyOnFloor())
+                    {
+                        return CheckRecursive(openedDoors);
+                    }
+                }
+
+                // no key could be created
+                return false;
+            }
+        }
+
+        bool isSolvable = CheckRecursive([]);
+        if (isSolvable)
+        {
+            // don't clear this if it's already verified with all requirements.
+            // the function can still fail later in "ItemGet checking" with less requirements.
+            KeyLogicSolved = true;
+        }
+        return isSolvable;
+    }
+
     public static int RoomDistance(Room room1, Room room2)
     {
-        HashSet<Room> reachedRooms = [];
+        HashSet<Room> reachedRooms = new(ReferenceEqualityComparer.Instance);
         Queue<(Room, int)> roomsToCheck = [];
         roomsToCheck.Enqueue((room1, 0));
         while (roomsToCheck.Count > 0)
@@ -258,11 +527,30 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         return false; // Boss room not found?
     }
 
-    public bool AllReachable(bool allowBacktracking = false,
-                             bool allowMiniBossEnterGoingLeft = false,
-                             bool allowFinalBossEnterGoingLeft = false,
-                             bool dropsMayBypassBosses = false,
-                             bool tBirdRequired = false)
+    public bool AllReachable(
+        RandomizerProperties props,
+        bool allowBacktracking = false,
+        bool allowMiniBossEnterGoingLeft = false,
+        bool allowFinalBossEnterGoingLeft = false)
+    {
+        if (!AllRoomsReachable(
+            allowBacktracking: allowBacktracking,
+            allowMiniBossEnterGoingLeft: allowMiniBossEnterGoingLeft,
+            allowFinalBossEnterGoingLeft: allowFinalBossEnterGoingLeft,
+            dropsMayBypassBosses: props.DropsMayBypassBosses,
+            tBirdRequired: props.RequireTbird))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private bool AllRoomsReachable(
+        bool allowBacktracking = false,
+        bool allowMiniBossEnterGoingLeft = false,
+        bool allowFinalBossEnterGoingLeft = false,
+        bool dropsMayBypassBosses = false,
+        bool tBirdRequired = false)
     {
         var reachableRooms = GetReachableRooms(allowBacktracking: allowBacktracking,
                                                allowMiniBossEnterGoingLeft: allowMiniBossEnterGoingLeft,
@@ -271,19 +559,6 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                                                dropsMayBypassFinalBosses: dropsMayBypassBosses && Number < 7,
                                                tBirdRequired: tBirdRequired);
         return AllRooms.All(i => reachableRooms.Contains(i));
-    }
-
-    public bool AllReachable(
-        RandomizerProperties props,
-        bool allowBacktracking = false,
-        bool allowMiniBossEnterGoingLeft = false,
-        bool allowFinalBossEnterGoingLeft = false)
-    {
-        return AllReachable(allowBacktracking: allowBacktracking,
-                            allowMiniBossEnterGoingLeft: allowMiniBossEnterGoingLeft,
-                            allowFinalBossEnterGoingLeft: allowFinalBossEnterGoingLeft,
-                            dropsMayBypassBosses: props.DropsMayBypassBosses,
-                            tBirdRequired: props.RequireTbird);
     }
 
     /// <summary>
@@ -643,9 +918,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             ROMData.Put(room.ConnectionStartAddress + 2, upByte);
             ROMData.Put(room.ConnectionStartAddress + 3, rightByte);
 
-            //Debug.WriteLine("Wrote Map " + room.Map + "(" + room.PalaceGroup + ") " +
-            //   room.PalaceNumber + " at address " + room.ConnectionStartAddress + " : "
-            //    + Util.ByteArrayToHexString([leftByte, downByte, upByte, rightByte]));
+
         }
     }
 
@@ -984,7 +1257,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
         logger.Debug("Target: " + roomCount + " Rooms: " + rooms);
     }
 
-    public void RandomizeSmallItems(Random r, bool extraKeys)
+    public void RandomizeSmallItems(Random r, bool extraKeys, bool excludeKeys)
     {
         foreach (Room room in AllRooms)
         {
@@ -999,65 +1272,23 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                     if (secondByte == 15 && ypos < 13)
                     {
                         int thirdByte = room.SideView[sideviewIndex++];
-                        if (!SHUFFLABLE_SMALL_ITEMS.Contains((Collectable)thirdByte))
+                        var original = (Collectable)thirdByte;
+                        if (!SHUFFLABLE_SMALL_ITEMS.Contains(original) ||
+                            excludeKeys && original == Collectable.KEY)
                         {
                             continue;
                         }
-                        double d = r.NextDouble();
-                        if (room.PalaceNumber == 7)
+                        Collectable newItem;
+                        if (extraKeys)
                         {
-                            if (d <= 1)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.ONEUP;
-                            }
+                            newItem = Collectable.KEY;
                         }
                         else
                         {
-                            if (extraKeys)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.KEY;
-                            }
-                            //35 Key
-                            //10 BlueJar
-                            //10 RedJar
-                            //10 Small bag
-                            //15 Medium Bag
-                            //10 Large Bag
-                            //5 XL bag
-                            //5 1Up
-                            else if (d <= .35)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.KEY;
-                            }
-                            else if (d <= .45)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.BLUE_JAR;
-                            }
-                            else if (d <= .55)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.RED_JAR;
-                            }
-                            else if (d <= .65)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.SMALL_BAG;
-                            }
-                            else if (d <= .80)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.MEDIUM_BAG;
-                            }
-                            else if (d <= .90)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.LARGE_BAG;
-                            }
-                            else if (d <= .95)
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.XL_BAG;
-                            }
-                            else
-                            {
-                                room.SideView[sideviewIndex - 1] = (int)Collectable.ONEUP;
-                            }
+                            var weights = excludeKeys ? SmallItemWeightsNoKey : SmallItemWeights;
+                            newItem = weights.Next(r);
                         }
+                        room.SideView[sideviewIndex - 1] = (byte)newItem;
                     }
                 }
             }
@@ -1095,7 +1326,7 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                         && i != room);
                     if (duplicateRoom != null)
                     {
-                        Debug.WriteLine("Room# " + room.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.NewEnemies) + ") " +
+                        Diag.Trace("palace.enemies", "Room# " + room.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.NewEnemies) + ") " +
                             " is a duplicate of Room# " + duplicateRoom.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(duplicateRoom.SideView) + "/" + Util.ByteArrayToHexString(duplicateRoom.Enemies) + ")");
                         room.NewEnemies = PalaceEnemyShuffler.Shuffle(room, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
                     }
@@ -1122,10 +1353,15 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
                 HashSet<RequirementType> palaceRequireables = [.. requireables, palaceItemRequirement.Value];
                 requireables = palaceRequireables;
             }
-            else return false;
+            else
+            {
+                Diag.Trace("palace.validation", $"palace={Number} failed check=item-unreachable item={palaceItem}");
+                return false;
+            }
         }
 
-        IEnumerable<Room> unclearableRooms = AllRooms.Where(i => !i.GetEffectiveRequirements(isMario).AreSatisfiedBy(requireables));
+        IEnumerable<Room> unclearableRooms = AllRooms.Where(i => !i.GetEffectiveRequirements(isMario).AreSatisfiedBy(requireables, RequirementTarget.EXIT));
+        Diag.Trace("palace.validation.rooms", $"palace={Number} item={palaceItem} unclearable=[{string.Join(",", unclearableRooms.Select(room => room.Map))}]");
         return !unclearableRooms.Any();
     }
 
@@ -1199,113 +1435,158 @@ public partial class Palace(int number, bool palaceItemsAreShufflable)
             //if the exploration list runs out, we couldn't find the exit, so the drop is isolated.
             if (!found)
             {
-                //Debug.WriteLine(GetLayoutDebug());
                 return true;
             }
         }
-        //Debug.WriteLine(GetLayoutDebug());
         return false;
     }
 
     public bool CanReachAnItemRoom(IReadOnlySet<RequirementType> requireables)
     {
-        List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
-        List<Room> coveredRooms = new();
+        var entrance = AllRooms.First(i => i.IsEntrance);
+        Queue<(Direction, Room)> pendingRooms = new([(Direction.WEST, entrance)]);
+        HashSet<(Direction, Room)> coveredRooms = new(new RoomTupleComparer<Direction>());
 
         while (pendingRooms.Count > 0)
         {
-            Room room = pendingRooms.First();
-            if (ItemRooms.Contains(room))
+            var t = pendingRooms.Dequeue();
+            (Direction enterFrom, Room room) = t;
+            if (coveredRooms.Contains(t))
             {
-                return true;
-            }
-            if (coveredRooms.Contains(room))
-            {
-                pendingRooms.Remove(room);
                 continue;
             }
-            coveredRooms.Add(room);
-            pendingRooms.Remove(room);
-            if (room.Left != null && room.Left.IsTraversable(requireables))
+            if (ItemRooms.Contains(room) && room.LinkRequirements.AreSatisfiedBy(requireables, RequirementTarget.ITEM, enterFrom: enterFrom))
             {
-                pendingRooms.Add(room.Left);
+                Diag.Trace("palace.validation.bfs", $"palace={Number} event=item-room map={room.Map} covered={coveredRooms.Count} requireables=[{string.Join(",", requireables.Order())}]");
+                return true;
             }
-            if (room.Right != null && room.Right.IsTraversable(requireables))
+            coveredRooms.Add(t);
+            foreach (var (exitTo, neighborEnterFrom, neighbor) in room.Exits())
             {
-                pendingRooms.Add(room.Right);
-            }
-            if (room.Up != null && room.Up.IsTraversable(requireables))
-            {
-                pendingRooms.Add(room.Up);
-            }
-            if (room.Down != null && room.Down.IsTraversable(requireables))
-            {
-                pendingRooms.Add(room.Down);
+                if (room.LinkRequirements.AreSatisfiedBy(requireables, RequirementTarget.EXIT, enterFrom: enterFrom, exitTo: exitTo))
+                {
+                    pendingRooms.Enqueue((neighborEnterFrom, neighbor));
+                }
             }
         }
 
+        Diag.Trace("palace.validation.bfs", $"palace={Number} failed check=item-room covered={coveredRooms.Select(state => state.Item2).Distinct(ReferenceEqualityComparer.Instance).Count()}/{AllRooms.Count} states={coveredRooms.Count} itemRooms=[{string.Join(",", ItemRooms.Select(room => room.Map))}] requireables=[{string.Join(",", requireables.Order())}]");
         return false;
     }
 
-    public List<Collectable> GetGettableItems(IReadOnlySet<RequirementType> initialRequireables, bool shufflableItemsOnly)
+#if Z2R_DIAGNOSTICS
+    private long itemBfsCalls;
+    private long itemBfsDequeues;
+#endif
+
+    public List<Collectable> GetGettableItems(RandomizerProperties props, IReadOnlyCollection<RequirementType> initialRequireables, bool shufflableItemsOnly)
     {
+#if Z2R_DIAGNOSTICS
+        long call = ++itemBfsCalls;
+        long dequeues = 0;
+        if (Diag.IsSample(call))
+            Diag.Trace("palace.bfs", $"attempt={call} event=begin palace={Number} shufflableOnly={shufflableItemsOnly} requireables=[{string.Join(",", initialRequireables.Order())}]");
+#endif
         if (shufflableItemsOnly && !PalaceItemsAreShufflable)
         {
+#if Z2R_DIAGNOSTICS
+            Diag.Retry("palace.bfs", call, $"event=skip palace={Number} reason=fixed-items");
+#endif
             return [];
         }
         HashSet<RequirementType> requireables = [.. initialRequireables];
-        List<Room> pendingRooms = [AllRooms.First(i => i.IsEntrance)];
-        List<Room> coveredRooms = [];
-        List<Collectable> previousGettableItems = [];
-        List<Collectable> gettableItems = [];
+        if (props.KeyLogic == KeyLogicOption.KEYS_PER_PALACE_SOLVABLE)
+        {
+            if (props.RequiresSmallKeyValidation(Number))
+            {
+                if (!KeyLogicSolved)
+                {
+                    throw new Exception("Key logic granted all requireables should have been solved at this point");
+                }
+                if (!SolveKeyLogic(initialRequireables, !props.BossItem, 0, false, null))
+                {
+                    return [];
+                }
+            }
+            // Palace is key-solvable; add KEY to requireables.
+            // If BlockersAnywhere is off, P6 location has MAGIC_KEY in AccessRequirements.
+            // GP is not covered by key logic. (Rooms with required locked doors are removed from the pool.)
+            requireables.Add(RequirementType.KEY);
+        }
+        var entrance = AllRooms.First(i => i.IsEntrance);
+        Queue<(Direction, Room)> pendingRooms = new([(Direction.WEST, entrance)]);
+        HashSet<(Direction, Room)> coveredRooms = new(new RoomTupleComparer<Direction>());
+        HashSet<Collectable> previousGettableItems = [];
+        HashSet<Collectable> gettableItems = [];
+
+        HashSet<Room> reachedItemRooms = [];
+        List<Collectable> gettableItemList = [];
 
         do
         {
             previousGettableItems = gettableItems;
             while (pendingRooms.Count > 0)
             {
-                Room room = pendingRooms.First();
-                if (coveredRooms.Contains(room))
+#if Z2R_DIAGNOSTICS
+                dequeues++;
+                itemBfsDequeues++;
+                if ((Diag.IsSample(call) || dequeues >= 1000) && Diag.IsSample(dequeues))
+                    Diag.Trace("palace.bfs.loop", $"palace={Number} call={call} dequeues={dequeues} pending={pendingRooms.Count} covered={coveredRooms.Count}");
+#endif
+                var t = pendingRooms.Dequeue();
+                (Direction enterFrom, Room room) = t;
+                if (coveredRooms.Contains(t))
                 {
-                    pendingRooms.Remove(room);
                     continue;
                 }
-                if (ItemRooms.Contains(room))
+                if (ItemRooms.Contains(room) && room.LinkRequirements.AreSatisfiedBy(requireables, RequirementTarget.ITEM, enterFrom: enterFrom))
                 {
                     if (room.Collectable == null)
                     {
                         throw new Exception("Unable to assess gettability of item room with no item");
                     }
                     Collectable roomCollectable = room.Collectable ?? Collectable.DO_NOT_USE;
-                    gettableItems.Add(roomCollectable);
-                    if (roomCollectable.AsRequirement() != null)
+                    if (reachedItemRooms.Add(room))
                     {
-                        requireables.Add(roomCollectable.AsRequirement() ?? RequirementType.JUMP);
+                        gettableItemList.Add(roomCollectable);
+                    }
+                    if (!gettableItems.Contains(roomCollectable))
+                    {
+                        gettableItems.Add(roomCollectable);
+                        if (roomCollectable.AsRequirement() is { } collectableReq)
+                        {
+                            requireables.Add(collectableReq);
+                        }
                     }
                 }
-                coveredRooms.Add(room);
-                pendingRooms.Remove(room);
-                if (room.Left != null && room.Left.IsTraversable(requireables))
+                coveredRooms.Add(t);
+                foreach (var pair in room.PossibleDirections(requireables, enterFrom))
                 {
-                    pendingRooms.Add(room.Left);
-                }
-                if (room.Right != null && room.Right.IsTraversable(requireables))
-                {
-                    pendingRooms.Add(room.Right);
-                }
-                if (room.Up != null && room.Up.IsTraversable(requireables))
-                {
-                    pendingRooms.Add(room.Up);
-                }
-                if (room.Down != null && room.Down.IsTraversable(requireables))
-                {
-                    pendingRooms.Add(room.Down);
+                    pendingRooms.Enqueue(pair);
                 }
             }
         } while (gettableItems.Count != previousGettableItems.Count);
 
-        return gettableItems;
+#if Z2R_DIAGNOSTICS
+        if (Diag.IsSample(call))
+            Diag.Trace("palace.bfs", $"event=end palace={Number} call={call} dequeues={dequeues} totalDequeues={itemBfsDequeues} "
+                + $"covered={coveredRooms.Select(state => state.Item2).Distinct(ReferenceEqualityComparer.Instance).Count()}/{AllRooms.Count} states={coveredRooms.Count} items=[{string.Join(",", gettableItemList)}] "
+                + $"itemRooms=[{string.Join(",", ItemRooms.Select(room => $"{room.Map}:{room.Collectable}:{reachedItemRooms.Contains(room)}"))}]");
+#endif
+        return gettableItemList;
     }
+
+    // The collectables present in this palace's item rooms, independent of reachability
+    public List<Collectable> GetAllCollectables()
+    {
+        return [.. ItemRooms.Select(room => room.Collectable!.Value)];
+    }
+
+    public List<Collectable> GetShufflableCollectables()
+    {
+        return PalaceItemsAreShufflable ? GetAllCollectables() : [];
+    }
+
     public void SetCollectables(IEnumerable<Collectable> collectables, bool shufflableOnly = false)
     {
         //Shufflable marking NYI for palaces (and probably not needed) so it's NOP for now

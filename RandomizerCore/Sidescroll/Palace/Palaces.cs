@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NLog;
+using Z2Randomizer.RandomizerCore.Diagnostics;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
@@ -54,7 +55,7 @@ public class Palaces
 
     public static Dictionary<RoomExitType, int> itemRoomCounts = [];
 
-    public async Task<List<Palace>> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired, CancellationToken ct)
+    public async Task<List<Palace>> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, RoomPoolSpec? roomPoolConfig, bool raftIsRequired, CancellationToken ct)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
@@ -92,13 +93,34 @@ public class Palaces
             }
             else
             {
-                roomPool = new(palaceRooms, currentPalace, props);
+                switch (props.RoomPoolOption)
+                {
+                    case RoomPoolOption.CUSTOM:
+                        if (roomPoolConfig == null)
+                        {
+                            throw new UserFacingException("Custom Room Pool Issue", "Property enabled but CustomRoomPool.yaml file is not provided.");
+                        }
+                        roomPool = new(palaceRooms, currentPalace, props, roomPoolConfig);
+                        break;
+                    case RoomPoolOption.USE_CHECKBOXES:
+                        roomPool = new(palaceRooms, currentPalace, props);
+                        break;
+                    default:
+                        roomPool = new(palaceRooms, currentPalace, props, RoomPoolConfigs.Get(props.RoomPoolOption));
+                        break;
+                }
             }
             Palace palace;
             int attempts = 0;
             do
             {
+                Diag.Retry("palace.generate", attempts + 1, $"event=begin palace={currentPalace} style={palaceStyle} size={palaceSize}");
                 palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace, attempts++);
+                if (palace.IsValid)
+                {
+                    palace.IsValid = palaceGenerator.AddKeysForKeyLogic(props, palace, true, r);
+                }
+                Diag.Retry("palace.generate", attempts, $"event=end palace={currentPalace} valid={palace.IsValid} rooms={palace.AllRooms.Count}");
             } while (!palace.IsValid);
             palace.BossRoom!.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
             PalaceGenerator.DebugCheckDuplicates(props, palace);
@@ -329,6 +351,7 @@ public class Palaces
         if (palaces.Where(i => i.Number != 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length)) > 0x400
             || palaces.Where(i => i.Number == 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length)) > 0x2A9)
         {
+            Diag.Trace("palace.validation", $"failed check=enemy-data regular={palaces.Where(i => i.Number != 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length))}/1024 gp={palaces.Where(i => i.Number == 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length))}/681");
             return false;
         }
 
@@ -341,12 +364,27 @@ public class Palaces
                     || palace.ItemRooms.Any(i => i == null))
                 || palace.BossRoom == null)
             {
+                Diag.Trace("palace.validation", $"failed check=rooms palace={palace.Number} itemRooms={palace.ItemRooms.Count} expected={(palace.Number < 7 ? props.PalaceItemRoomCounts[palace.Number - 1] : 0)} boss={palace.BossRoom != null}");
                 return false;
             }
         }
-        return CanGetGlove(props, palaces)
-            && CanGetRaft(props, raftIsRequired, palaces[1], palaces[2])
-            && AtLeastOnePalaceCanHaveGlove(props, palaces);
+        if (!CanGetGlove(props, palaces))
+        {
+            Diag.Trace("palace.validation", "failed check=can-get-glove");
+            return false;
+        }
+        if (!CanGetRaft(props, raftIsRequired, palaces[1], palaces[2]))
+        {
+            Diag.Trace("palace.validation", $"failed check=can-get-raft raftRequired={raftIsRequired}");
+            return false;
+        }
+        if (!AtLeastOnePalaceCanHaveGlove(props, palaces))
+        {
+            Diag.Trace("palace.validation", "failed check=glove-candidate");
+            return false;
+        }
+        Diag.Trace("palace.validation", "event=success");
+        return true;
     }
     private static bool AtLeastOnePalaceCanHaveGlove(RandomizerProperties props, List<Palace> palaces)
     {
@@ -383,8 +421,9 @@ public class Palaces
         //as all progression items will eventually shuffle into spots that work
         if (props.ShuffleOverworldItems)
         {
-            requireables = [RequirementType.KEY, .. RequirementTypeExtensions.UpToXContainers(8)];
+            requireables = [.. RequirementTypeExtensions.UpToXContainers(8)];
         }
+        requireables.Add(RequirementType.KEY); // some vanilla rooms have key door requirements now
         //Otherwise if it's vanilla items we can't get the magic key, because we could need glove for boots for flute to get to new kasuto
         requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
         requireables.Add(RequirementType.JUMP);
@@ -432,7 +471,9 @@ public class Palaces
             //Otherwise we can only get the things you can get on the west normally
             else
             {
+                //KEY is a palace's own small key, not an overworld item: see CanGetGlove
                 requireables = [
+                    RequirementType.KEY,
                     props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB,
                     RequirementType.JUMP,
                     RequirementType.FAIRY,

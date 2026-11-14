@@ -46,7 +46,7 @@ class Statistics
         {
             for (int i = 0; i < LIMIT; i++)
             {
-                var randomizer = new Hyrule(createAsm, palaceRooms);
+                var randomizer = new Hyrule(createAsm, palaceRooms, null);
                 int seed = random.Next(1000000000);
                 //int seed = 704113586;
                 config.Seed = seed.ToString();

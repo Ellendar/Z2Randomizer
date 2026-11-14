@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using ReactiveUI;
@@ -8,7 +7,6 @@ using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class SaveNewPresetView : ReactiveUserControl<SaveNewPresetViewModel>
 {
     public SaveNewPresetView()

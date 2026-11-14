@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using ReactiveUI;
 using RUISG = ReactiveUI.SourceGenerators;
@@ -13,7 +12,6 @@ using CrossPlatformUI.ViewModels.Tabs;
 
 namespace CrossPlatformUI.ViewModels;
 
-[RequiresUnreferencedCode("")]
 public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel, IFlagHost
 {
     public string? OutputFilePath { get; set; }
@@ -42,13 +40,13 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
     public SaveNewPresetViewModel SaveNewPresetViewModel { get; set; }
 
     [JsonIgnore]
-    public SpritePreviewViewModel SpritePreviewViewModel { get; }
+    public SpriteCustomizationViewModel SpriteCustomizationViewModel { get; }
 
     [RUISG.Reactive]
-    public partial CustomPixelPoint WindowPosition { get; set; }
+    public partial CustomPixelPoint WindowPosition { get; set; } = null!;
 
     [RUISG.Reactive]
-    public partial CustomSize WindowSize { get; set; }
+    public partial CustomSize WindowSize { get; set; } = null!;
 
     public MainViewModel()
     {
@@ -82,7 +80,7 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
         RemovePresetViewModel = new(this);
         UpdatePresetViewModel = new(this);
         RandomizerViewModel = new(this);
-        SpritePreviewViewModel = new(this);
+        SpriteCustomizationViewModel = new(this);
         SubscribeExtensions.Subscribe(Router.Navigate.Execute(RandomizerViewModel));
 
         GenerateRom = ReactiveCommand.CreateFromObservable(
@@ -100,9 +98,6 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
 
     // Window/Desktop specific data
 
-    private const int DefaultWidth = 900;
-    private const int DefaultHeight = 750;
-
     private CustomPixelPoint windowPosition = new()
     {
         X = 0,
@@ -110,8 +105,8 @@ public partial class MainViewModel : ReactiveObject, IScreen, IActivatableViewMo
     };
     private CustomSize windowSize = new()
     {
-        Width = DefaultWidth,
-        Height = DefaultHeight
+        Width = MainWindowSize.DefaultWidth,
+        Height = MainWindowSize.DefaultHeight
     };
     // public void OnDeserializing()
     // {

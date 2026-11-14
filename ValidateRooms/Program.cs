@@ -262,13 +262,7 @@ void CheckDoorsAndItems<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable
 
     var lockedDoorEnemies = ee.Enemies.Where(o => (int)(object)o.Id == (int)EnemiesShared.LOCKED_DOOR);
     var elevatorEnemies = ee.Enemies.Where(o => (int)(object)o.Id == (int)EnemiesPalaceShared.ELEVATOR);
-    var strikeForJarEnemies = ee.Enemies.Where(o => o.Id switch
-    {
-        EnemiesPalace125.STRIKE_FOR_RED_JAR => true,
-        EnemiesPalace346.STRIKE_FOR_RED_JAR_OR_IRON_KNUCKLE => true,
-        EnemiesGreatPalace.STRIKE_FOR_RED_JAR_OR_FOKKA => true,
-        _ => false,
-    });
+    var strikeForJarEnemies = ee.Enemies.Where(o => o.IsStrikeForJarLike());
 
     if (lockedDoorEnemies.Count() > 0) { Warning(room, "LockedDoorEnemy", "Room uses LockedDoor enemy."); }
     if (elevatorEnemies.Count() > 0) { Warning(room, "ElevatorEnemy", "Room uses Elevator enemy."); }

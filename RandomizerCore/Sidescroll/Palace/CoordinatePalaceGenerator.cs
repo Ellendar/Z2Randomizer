@@ -138,7 +138,6 @@ public abstract class CoordinatePalaceGenerator : PalaceGenerator
         //was not a thing I felt like figuring out.
         //Maybe we use ShuffleRooms()?
         //So for now we suffer lesser performance (but still way better than Reconstructed so do we care?)
-        if (props.RequireTbird) { Debug.Assert(!props.RemoveTbird); }
         if (!AllReachable(props, palace)
             || (palace.Number == 7 && props.RequireTbird && !palace.RequiresThunderbird())
             || (palace.Number == 7 && !palace.IsBossRoomAtLeastMinDistance(props.DarkLinkMinDistance))

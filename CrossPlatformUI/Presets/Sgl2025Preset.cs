@@ -41,12 +41,12 @@ A challenging preset focused on combat, with low XP gains and slightly lower tha
         GpStyle = PalaceStyle.RECONSTRUCTED,
         NormalPalaceLength = PalaceLengthOption.SHORT,
         GpLength = PalaceLengthOption.MEDIUM,
-        Includev4_0Rooms = true,
-        IncludeExpertRooms = true,
+        RoomPoolOption = RoomPoolOption.V4_0,
         RestartAtPalacesOnGameOver = true,
         ChangePalacePallettes = true,
         PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         NoDuplicateRoomsByEnemies = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
         AggressiveTbird = true,
@@ -82,6 +82,7 @@ A challenging preset focused on combat, with low XP gains and slightly lower tha
         MixOverworldAndPalaceItems = true,
 
         PreventSpellItemChains = false,
+        FastItemPickup = true,
 
         //Drops
         StandardizeDrops = true,

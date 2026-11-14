@@ -37,12 +37,12 @@ Tournament preset for the final week of the Upstarts Tournament of 2025.
         NormalPalaceStyle = PalaceStyle.RECONSTRUCTED,
         GpStyle = PalaceStyle.RECONSTRUCTED,
         GpLength = PalaceLengthOption.SHORT,
-        Includev4_0Rooms = true,
-        IncludeExpertRooms = true,
+        RoomPoolOption = RoomPoolOption.V4_0,
         RestartAtPalacesOnGameOver = true,
         ChangePalacePallettes = true,
         PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         NoDuplicateRoomsByEnemies = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
 
@@ -83,6 +83,7 @@ Tournament preset for the final week of the Upstarts Tournament of 2025.
         ShufflePBagAmounts = true,
         RandomizeNewKasutoJarRequirements = true,
         PreventSpellItemChains = false,
+        FastItemPickup = true,
 
         //Drops
         ShuffleItemDropFrequency = true,

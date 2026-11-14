@@ -8,8 +8,8 @@ using Z2Randomizer.RandomizerCore.Flags;
 namespace CrossPlatformUI.Controls;
 
 /// <summary>
-/// Builds the control for a StackPanel holding holding a Z2NumericUpDown
-/// plus it's caption if available.
+/// Builds the control for a StackPanel holding a Z2NumericUpDown plus its
+/// caption, when it has one.
 /// </summary>
 internal static class Z2NumericPanel
 {

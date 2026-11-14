@@ -40,9 +40,7 @@ Tournament preset for the brackets part of the Standard Tournament of 2026.
         NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
         GpStyle = PalaceStyle.RANDOM_WALK,
         GpLength = PalaceLengthOption.SHORT,
-        Includev4_0Rooms = true,
-        Includev5_0Rooms = true,
-        IncludeExpertRooms = true,
+        RoomPoolOption = RoomPoolOption.V5_0,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
         ReduceDripperVariance = true,
@@ -50,6 +48,7 @@ Tournament preset for the brackets part of the Standard Tournament of 2026.
         RandomizeBossItemDrop = true,
         PalaceDropStyle = PalaceDropStyle.ANY_EXIT,
         NoDuplicateRoomsByLayout = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
         PalaceItemRoomCount = PalaceItemRoomCount.RANDOM_INCLUDE_ZERO,
@@ -94,6 +93,7 @@ Tournament preset for the brackets part of the Standard Tournament of 2026.
         ShuffleSmallItems = true,
         RandomizeNewKasutoJarRequirements = true,
         PreventSpellItemChains = false,
+        FastItemPickup = true,
 
         //Drops
         ShuffleItemDropFrequency = true,

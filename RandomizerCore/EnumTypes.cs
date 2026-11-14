@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -102,6 +101,19 @@ public static class StartingTechsExtensions
     }
 }
 
+[DefaultValue(NORTH_PALACE)]
+public enum StartingLocation
+{
+    [Description("North Palace")]
+    NORTH_PALACE,
+    [Description("Regular Palace (West)")]
+    REGULAR_PALACE,
+    [Description("Great Palace (West)")]
+    GREAT_PALACE,
+    [Description("Random (West)"), Metastyle]
+    RANDOM,
+}
+
 [DefaultValue(VANILLA)]
 public enum AttackEffectiveness
 {
@@ -111,6 +123,8 @@ public enum AttackEffectiveness
     LOW,
     [Description("Randomize (Low)"), RandomRangeDouble(Low = .5, High = 1.0)]
     AVERAGE_LOW,
+    [Description("Balanced"),    FixedBytes(3, 3, 4, 6,  8, 12, 16, 18)]
+    BALANCED,
     [Description("Randomize"), RandomRangeDouble(Low = .667, High = 1.5)]
     AVERAGE,
     [Description("Randomize (High)"), RandomRangeDouble(Low = 1.0, High = 1.5)]
@@ -126,12 +140,14 @@ public enum MagicEffectiveness
 {
     [Description("Vanilla")]
     VANILLA,
-    [Description("High Spell Cost"), RandomRangeDouble(Low = 1.5, High = 1.5)]
-    HIGH_COST,
+    //[Description("High Spell Cost"), RandomRangeDouble(Low = 1.5, High = 1.5)]
+    //HIGH_COST,
     [Description("Randomize (High Cost)"), RandomRangeDouble(Low = 1.0, High = 1.5)]
     AVERAGE_HIGH_COST,
     [Description("Randomize"), RandomRangeDouble(Low = .5, High = 1.5)]
     AVERAGE,
+    [Description("Randomize (Controlled)"), RandomRangeDouble(Low = .6, High = 1.4)]
+    AVERAGE_CONTROLLED,
     [Description("Randomize (Low Cost)"), RandomRangeDouble(Low = .5, High = 1.0)]
     AVERAGE_LOW_COST,
     [Description("Low Spell Cost"), RandomRangeDouble(Low = .5, High = .5)]
@@ -184,16 +200,20 @@ public enum EnemyLifeOption
 {
     [Description("Vanilla; (No Randomization)")]
     VANILLA,
+
     [Description("Narrow; [-25% to +25%]"), RandomRangeDouble(Low = 0.75, High = 1.25)]
     NARROW,
     [Description("Medium; [-50% to +50%]"), RandomRangeDouble(Low = 0.5, High = 1.5)]
     MEDIUM,
     [Description("Wide; [-75% to +200%]"), RandomRangeDouble(Low = 0.25, High = 3.0)]
     WIDE,
-    [Description("Medium High; [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
-    MEDIUM_HIGH,
-    [Description("High; [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
+
+    [Description("Slightly High; [-0% to +33%]"), RandomRangeDouble(Low = 1.0, High = 1.33)]
+    SLIGHTLY_HIGH,
+    [Description("High; [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
     HIGH,
+    [Description("Very High; [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
+    VERY_HIGH,
 }
 
 [DefaultValue(ONLY_BOTS)]
@@ -273,6 +293,24 @@ public enum FluteWarpMode
     VISITED_PALACES,
     [Description("Visited Towns")]
     VISITED_TOWNS,
+}
+
+public enum RoomPoolOption
+{
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Upstarts")]
+    V5_0_NO_EXPERT,
+    [Description("Vanilla, v4.0 & v5.0")]
+    V5_0,
+    [Description("Vanilla & v4.0")]
+    V4_0,
+    [Description("SGL 2026")]
+    SGL2026,
+    [Description("Other")]
+    USE_CHECKBOXES,
+    [Description("Custom")]
+    CUSTOM,
 }
 
 [DefaultValue(VANILLA)]
@@ -387,6 +425,28 @@ public enum BossRoomsExitType
     RANDOM_PER_PALACE
 }
 
+[DefaultValue(KEYS_PER_PALACE_SOLVABLE)]
+public enum KeyLogicOption
+{
+    [Description("Keys Per Palace")]
+    KEYS_PER_PALACE_SOLVABLE,
+    [Description("Fairy or Magic Key")]
+    FAIRY_OR_MAGICKEY,
+}
+
+static class KeyLogicOptionExtensions
+{
+    public static bool UsesKeysPerPalace(this KeyLogicOption keyLogic)
+    {
+        return keyLogic switch
+        {
+            KeyLogicOption.KEYS_PER_PALACE_SOLVABLE => true,
+            KeyLogicOption.FAIRY_OR_MAGICKEY => false,
+            _ => throw new NotImplementedException(),
+        };
+    }
+}
+
 [DefaultValue(VANILLA)]
 public enum Biome
 {
@@ -402,6 +462,8 @@ public enum Biome
     CANYON,
     [Description("Dry Canyon"), DefaultWeight(1)]
     DRY_CANYON,
+    [Description("Coastal Islands"), DefaultWeight(2)]
+    COASTAL_ISLANDS,
     [Description("Mountainous"), DefaultWeight(2)]
     MOUNTAINOUS,
     [Description("Volcano"), DefaultWeight(2)]
@@ -420,23 +482,6 @@ public enum Biome
 
 static class BiomeExtensions
 {
-    public static int SeedTerrainLimit(this Biome biome)
-    {
-        return biome switch
-        {
-            Biome.VANILLA => 300,
-            Biome.VANILLA_SHUFFLE => 300,
-            Biome.VANILLALIKE => 300,
-            Biome.ISLANDS => 220,
-            Biome.CANYON => 300,
-            Biome.DRY_CANYON => 300,
-            Biome.MOUNTAINOUS => 250,
-            Biome.CALDERA => 300,
-            Biome.VOLCANO => 300,
-            _ => throw new Exception("Unrecognized Biome in SeedTerrainLimit")
-        };
-    }
-
     public static bool UsesVanillaMap(this Biome biome)
     {
         return biome switch
@@ -462,6 +507,7 @@ static class BiomeExtensions
             Biome.VANILLALIKE => true,
             Biome.ISLANDS => true,
             Biome.CANYON => true,
+            Biome.COASTAL_ISLANDS => true,
             Biome.CALDERA => true,
             Biome.MOUNTAINOUS => true,
             Biome.RANDOM => true,
@@ -481,6 +527,7 @@ static class BiomeExtensions
             Biome.VANILLALIKE => true,
             Biome.ISLANDS => true,
             Biome.CANYON => true,
+            Biome.COASTAL_ISLANDS => true,
             Biome.VOLCANO => true,
             Biome.MOUNTAINOUS => true,
             Biome.RANDOM => true,
@@ -500,6 +547,7 @@ static class BiomeExtensions
             Biome.VANILLALIKE => true,
             Biome.ISLANDS => true,
             Biome.CANYON => true,
+            Biome.COASTAL_ISLANDS => true,
             Biome.CALDERA => true,
             Biome.MOUNTAINOUS => true,
             Biome.RANDOM => true,
@@ -654,23 +702,14 @@ public enum MazeSizeOption
 }
 public static class OverworldSizeExtensions
 {
-    public static OverworldSizeMetaAttribute GetMeta(this OverworldSizeOption size)
-    {
-        var member = typeof(OverworldSizeOption).GetMember(size.ToString()).FirstOrDefault();
-        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
-    }
+    public static OverworldSizeMetaAttribute GetMeta(this OverworldSizeOption size) =>
+        EnumMetadata.GetOverworldSize(typeof(OverworldSizeOption), size.ToString()) ?? new OverworldSizeMetaAttribute();
 
-    public static OverworldSizeMetaAttribute GetMeta(this DmSizeOption size)
-    {
-        var member = typeof(DmSizeOption).GetMember(size.ToString()).FirstOrDefault();
-        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
-    }
+    public static OverworldSizeMetaAttribute GetMeta(this DmSizeOption size) =>
+        EnumMetadata.GetOverworldSize(typeof(DmSizeOption), size.ToString()) ?? new OverworldSizeMetaAttribute();
 
-    public static OverworldSizeMetaAttribute GetMeta(this MazeSizeOption size)
-    {
-        var member = typeof(MazeSizeOption).GetMember(size.ToString()).FirstOrDefault();
-        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
-    }
+    public static OverworldSizeMetaAttribute GetMeta(this MazeSizeOption size) =>
+        EnumMetadata.GetOverworldSize(typeof(MazeSizeOption), size.ToString()) ?? new OverworldSizeMetaAttribute();
 }
 
 [DefaultValue(NO_LIMIT)]
@@ -905,11 +944,8 @@ public enum BeamSprites
 
 public static class BeamSpriteExtensions
 {
-    public static BeamSpriteMetaAttribute GetMeta(this BeamSprites sprite)
-    {
-        var member = typeof(BeamSprites).GetMember(sprite.ToString()).FirstOrDefault();
-        return member?.GetCustomAttribute<BeamSpriteMetaAttribute>() ?? new BeamSpriteMetaAttribute();
-    }
+    public static BeamSpriteMetaAttribute GetMeta(this BeamSprites sprite) =>
+        EnumMetadata.GetBeamSprite(typeof(BeamSprites), sprite.ToString()) ?? new BeamSpriteMetaAttribute();
 }
 
 [DefaultValue(Normal)]
@@ -1019,12 +1055,8 @@ public class StringValueAttribute(string v) : Attribute
 {
     public string Value => v;
 
-    public static string? GetStringValue(Enum value)
-    {
-        var type = value.GetType();
-        var fi = type.GetRuntimeField(value.ToString());
-        return (fi?.GetCustomAttributes(typeof(StringValueAttribute), false).FirstOrDefault() as StringValueAttribute)?.Value;
-    }
+    public static string? GetStringValue(Enum value) =>
+        EnumMetadata.GetStringValue(value.GetType(), value.ToString());
 }
 
 public class MetastyleAttribute : Attribute
@@ -1091,6 +1123,7 @@ public static class Enums
 {
     public static IEnumerable<EnumDescription> StartingTechniquesList { get; } = ToDescriptions<StartingTechs>();
     public static IEnumerable<EnumDescription> StartingLivesList { get; } = ToDescriptions<StartingLives>();
+    public static IEnumerable<EnumDescription> StartingLocationList { get; } = ToDescriptions<StartingLocation>();
     public static IEnumerable<EnumDescription> AttackEffectivenessList { get; } = ToDescriptions<AttackEffectiveness>();
     public static IEnumerable<EnumDescription> MagicEffectivenessList { get; } = ToDescriptions<MagicEffectiveness>();
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
@@ -1106,12 +1139,14 @@ public static class Enums
     public static IEnumerable<EnumDescription> NormalPalaceLengthList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> GpLengthList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountList { get; } = ToDescriptions<PalaceItemRoomCount>();
+    public static IEnumerable<EnumDescription> RoomPoolOptionList { get; } = ToDescriptions<RoomPoolOption>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
         = ToDescriptions<PalaceStyle>(i => i.NormalPalaceStyle());
     public static IEnumerable<EnumDescription> GpStyleList { get; }
         = ToDescriptions<PalaceStyle>(i => i.IsGpStyle());
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();
     public static IEnumerable<EnumDescription> PalaceDropStyleList { get; } = ToDescriptions<PalaceDropStyle>();
+    public static IEnumerable<EnumDescription> KeyLogicList { get; } = ToDescriptions<KeyLogicOption>();
 
     public static IEnumerable<EnumDescription> WestBiomeList { get; } = ToDescriptions<Biome>(i => i.IsWestBiome());
     public static IEnumerable<EnumDescription> EastBiomeList { get; } = ToDescriptions<Biome>(i => i.IsEastBiome());
@@ -1140,43 +1175,29 @@ public static class Enums
     public static IEnumerable<EnumDescription> StartSpellsLimitList => StartItemsLimitList;
 
 
-    public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : Enum
+    public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : struct, Enum
     {
-        if (!typeof(T).IsEnum)
-            throw new ArgumentException($"{nameof(T)} must be an enum type");
-
-        if (filterExpression == null)
+        IEnumerable<T> values = Enum.GetValues<T>();
+        if (filterExpression != null)
         {
-            return Enum.GetValues(typeof(T)).Cast<Enum>().Select(i => i.ToDescription());
+            values = values.Where(filterExpression);
         }
-        return Enum.GetValues(typeof(T)).Cast<T>().Where(filterExpression).Select(i => i.ToDescription());
+        return values.Select(value => value.ToDescription());
     }
 
-    public static object ToDefault(this Type enumType)
-    {
-        var attributes = enumType.GetCustomAttributes(typeof(DefaultValueAttribute), false);
-        if (attributes.Length == 0)
-        {
-            throw new ArgumentException("Generic Type 'T' must have DefaultValueAttribute.");
-        }
-        return Enum.ToObject(enumType, (attributes[0] as DefaultValueAttribute)?.Value!);
-    }
+    public static object ToDefault(this Type enumType) =>
+        EnumMetadata.GetDefault(enumType) ??
+        throw new ArgumentException("Generic Type 'T' must have DefaultValueAttribute.");
 
     public static EnumDescription ToDescription(this Enum self)
     {
-        string description;
         string? info = null;
-
         Type type = self.GetType();
-        string name = Enum.GetName(type, self)!;
-        var field = type.GetField(name);
+        string? name = Enum.GetName(type, self);
+        ArgumentNullException.ThrowIfNull(name);
 
-        var attributes = field?.GetCustomAttributes(typeof(DescriptionAttribute), false);
-        if (attributes?.Length is > 0)
-        {
-            description = (attributes[0] as DescriptionAttribute)?.Description!;
-        }
-        else
+        string? description = EnumMetadata.GetDescription(type, name);
+        if (description == null)
         {
             var ti = CultureInfo.CurrentCulture.TextInfo;
             description = ti.ToTitleCase(ti.ToLower(name.Replace("_", " ")));
@@ -1191,25 +1212,11 @@ public static class Enums
         return new EnumDescription() { Value = self, Description = description, Info = info };
     }
 
-    public static bool IsMetastyle(this Enum self)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return false; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return false; }
-        return fieldInfo.IsDefined(typeof(MetastyleAttribute), inherit: false);
-    }
+    public static bool IsMetastyle<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.IsMetastyle(typeof(T), Enum.GetName(value));
 
-    private static int GetWeight(this Enum self, int fallback=1)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return fallback; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return fallback; }
-        return fieldInfo.GetCustomAttribute<DefaultWeightAttribute>(inherit: false)?.Weight ?? fallback;
-    }
+    private static int GetWeight<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.GetWeight(typeof(T), Enum.GetName(value)) ?? 1;
 
     /// <summary>
     /// Get a list of enum values of a type, not including Metastyles,
@@ -1224,48 +1231,17 @@ public static class Enums
             .ToList();
     }
 
-    public static FixedBytesAttribute? GetFixedBytes(this Enum self)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return null; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return null; }
-        return fieldInfo.GetCustomAttribute<FixedBytesAttribute>(inherit: false);
-    }
+    public static FixedBytesAttribute? GetFixedBytes<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.GetFixedBytes(typeof(T), Enum.GetName(value));
 
-    public static RandomRangeDoubleAttribute? GetRandomRangeDouble(this Enum self)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return null; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return null; }
-        return fieldInfo.GetCustomAttribute<RandomRangeDoubleAttribute>(inherit: false);
-    }
+    public static RandomRangeDoubleAttribute? GetRandomRangeDouble<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.GetRandomRangeDouble(typeof(T), Enum.GetName(value));
 
-    public static RandomRangeIntAttribute? GetRandomRangeInt(this Enum self)
-    {
-        Type type = self.GetType();
-        string? name = Enum.GetName(type, self);
-        if (name == null) { return null; }
-        FieldInfo? fieldInfo = type.GetField(name);
-        if (fieldInfo == null) { return null; }
-        return fieldInfo.GetCustomAttribute<RandomRangeIntAttribute>(inherit: false);
-    }
+    public static RandomRangeIntAttribute? GetRandomRangeInt<T>(this T value) where T : struct, Enum =>
+        EnumMetadata.GetRandomRangeInt(typeof(T), Enum.GetName(value));
 
-    public static string? GetStringValue(Enum value)
-    {
-        string? output = null;
-        Type type = value.GetType();
-        var fi = type.GetField(value.ToString());
-        if (fi?.GetCustomAttributes(typeof(StringValueAttribute),
-                false) is StringValueAttribute[] { Length: > 0 } attrs)
-        {
-            output = attrs[0].Value;
-        }
-        return output;
-    }
+    public static string? GetStringValue(Enum value) =>
+        EnumMetadata.GetStringValue(value.GetType(), value.ToString());
 
     public static T? Parse<T>(string input) where T : struct
     {

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -66,6 +67,7 @@ public class RandomizerProperties
     public int StartingMagicLevel { get; set; }
     public int StartLifeLvl { get; set; }
     public bool SwapUpAndDownStab { get; set; }
+    public StartingLocation StartingLocation { get; set; }
 
     //Overworld
     public bool ShuffleEncounters { get; set; }
@@ -119,7 +121,19 @@ public class RandomizerProperties
     public bool ReduceDripperVariance { get; set; }
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
+    public KeyLogicOption KeyLogic { get; set; }
     public bool BlockersAnywhere { get; set; }
+
+    /// <summary>
+    /// P1-P5 need self-contained small keys. P6 does too with BlockersAnywhere on
+    /// or Magic Key is removed. GP is not covered by key logic.
+    /// </summary>
+    public bool RequiresSmallKeyValidation(int palaceNumber) =>
+        KeyLogic == KeyLogicOption.KEYS_PER_PALACE_SOLVABLE
+        && palaceNumber < 7
+        && (palaceNumber < 6 || BlockersAnywhere || RemoveItems.Contains(Collectable.MAGIC_KEY));
+    //Always false for now; reserved as a future logic setting.
+    public bool LockedDoorsBlockFairy { get; set; } = false;
     public bool RemoveLongDeadEnds { get; set; }
     public bool IncludeExpertRooms { get; set; }
     [NotMapped]
@@ -129,6 +143,7 @@ public class RandomizerProperties
     public bool DropsMayBypassBosses { get; set; }
     public bool NoDuplicateRoomsBySideview { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
+    public RoomPoolOption RoomPoolOption { get; set; }
     public bool AllowVanillaRooms { get; set; }
     public bool AllowV4Rooms { get; set; }
     public bool AllowV5_0Rooms { get; set; }
@@ -184,12 +199,15 @@ public class RandomizerProperties
     public bool PreventSpellItemChains { get; set; }
     public bool RandomizeSmallItems { get; set; }
     public bool ExtraKeys { get; set; }
+    public bool FastItemPickup { get; set; }
     public bool AllowImportantItemDuplicates { get; set; }
     public int NewKasutoBasementRequirement { get; set; }
     //Include PBag caves in item shuffle
     public bool PbagItemShuffle { get; set; }
     public bool StartWithSpellItems { get; set; }
     public bool ShufflePbagXp { get; set; }
+
+    public HashSet<Collectable> RemoveItems { get; set; } = [];
 
     //Drops
     public bool ShuffleItemDropFrequency { get; set; }
@@ -246,6 +264,7 @@ public class RandomizerProperties
     public bool UpAC1 { get; set; }
     public bool RemoveFlashing { get; set; }
     public bool DarkenThunderbird { get; set; }
+    public bool HorizontalBossBarsGP { get; set; }
     public bool UseCustomRooms { get; set; }
     public bool UpdatedHud { get; set; }
     public bool DisableHUDLag { get; set; }
@@ -405,7 +424,7 @@ public class RandomizerProperties
         }
         if (ShuffleOverworldItems && EastBiome.InItemShuffle())
         {
-            overworldMinorItemCount += StartKey ? 1 : 0;
+            overworldMinorItemCount += StartKey || RemoveItems.Contains(Collectable.MAGIC_KEY) ? 1 : 0;
         }
 
         if (IncludeSpellsInShuffle)

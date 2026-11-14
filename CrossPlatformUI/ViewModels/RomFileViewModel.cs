@@ -1,21 +1,26 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using NLog;
+using SD.Tools.BCLExtensions.CollectionsRelated;
 using ReactiveUI;
 using RUISG = ReactiveUI.SourceGenerators;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
-using SD.Tools.BCLExtensions.CollectionsRelated;
+using SubscribeExtensions = ReactiveUI.Primitives.SubscribeExtensions;
+using Avalonia.Platform.Storage;
 using Z2Randomizer.RandomizerCore;
 using CrossPlatformUI.Services;
 
 namespace CrossPlatformUI.ViewModels;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
+public delegate Task RomLoadedHandler(MainViewModel main, IStorageFile file);
+
 public partial class RomFileViewModel : ViewModelBase, IRoutableViewModel
 {
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
     private byte[] romData = [];
     public byte[] RomData
     {
@@ -49,13 +54,19 @@ public partial class RomFileViewModel : ViewModelBase, IRoutableViewModel
     {
         Main = main;
         OpenFileCommand = ReactiveCommand.CreateFromTask(OpenFileInternal);
+        SubscribeExtensions.Subscribe(OpenFileCommand.ThrownExceptions, exception =>
+        {
+            logger.Error(exception, "Unable to load the ROM.");
+            Message = "Unable to load the ROM.";
+        });
         HostScreen = Main;
     }
 
 
     private async Task OpenFileInternal(CancellationToken token)
     {
-        var filesService = App.Current?.Services?.GetService<IFileDialogService>();
+        var services = App.Current?.Services;
+        var filesService = services?.GetService<IFileDialogService>();
         if (filesService is null) throw new NullReferenceException("Missing File Service instance.");
 
         var file = await filesService.OpenFileAsync();
@@ -77,18 +88,9 @@ public partial class RomFileViewModel : ViewModelBase, IRoutableViewModel
                 return;
             }
             RomData = fileData;
-            if (OperatingSystem.IsBrowser())
+            if (services?.GetService<RomLoadedHandler>() is { } onRomLoaded)
             {
-                // Manually save the state 
-                await App.PersistState();
-            }
-            else
-            {
-                // This part crashes if run in the browser build
-                if ((Main.OutputFilePath ?? "") == "")
-                {
-                    Main.OutputFilePath = new Uri(file.Path, ".").LocalPath;
-                }
+                await onRomLoaded(Main, file);
             }
             HostScreen.Router.NavigateBack.Execute().Subscribe();
         }
