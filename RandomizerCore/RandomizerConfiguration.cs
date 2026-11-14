@@ -973,6 +973,8 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
             Seed = seed
         };
 
+        ExportBiomes(properties, r);
+
         //Properties that can affect available minor item replacements
         do // while (!properties.HasEnoughSpaceToAllocateItems())
         {
@@ -1000,7 +1002,6 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
             if (NormalPalaceStyle.IsMetastyle())
             {
-                Debug.Assert(NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE || NormalPalaceStyle == PalaceStyle.RANDOM_ALL);
                 allowedPalaceStyles = [.. Enums.GetShufflableList<PalaceStyle>().Where(i => i.NormalPalaceStyle())];
                 if (!randomStylesAllowVanilla)
                 {
@@ -1017,6 +1018,12 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
                 if (normalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
                 {
                     properties.PalaceStyles[i] = allowedPalaceStyles.Sample(r);
+                }
+                else if (normalPalaceStyle == PalaceStyle.RANDOM_UNIQUE)
+                {
+                    var roll = allowedPalaceStyles.Sample(r);
+                    properties.PalaceStyles[i] = roll;
+                    allowedPalaceStyles.RemoveAll(style => style.IsSimilar(roll));
                 }
                 else if (normalPalaceStyle == PalaceStyle.RANDOM_ALL)
                 {
@@ -1143,112 +1150,11 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.DmSize = dmSize;
         properties.MazeSize = mazeSize;
         properties.BoulderBlockConnections = allowConnectionCavesToBeBlocked;
-        if (westBiome == Biome.RANDOM || westBiome == Biome.RANDOM_NO_VANILLA || westBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
-        {
-            int shuffleLimit = westBiome switch
-            {
-                Biome.RANDOM => 7,
-                Biome.RANDOM_NO_VANILLA => 6,
-                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
-                _ => throw new ImpossibleException()
-            };
-            properties.WestBiome = r.Next(shuffleLimit) switch
-            {
-                0 => Biome.VANILLALIKE,
-                1 => Biome.ISLANDS,
-                2 => r.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
-                3 => Biome.CALDERA,
-                4 => Biome.MOUNTAINOUS,
-                5 => Biome.VANILLA_SHUFFLE,
-                6 => Biome.VANILLA,
-                _ => throw new Exception("Invalid Biome")
-            };
-        }
-        else if (westBiome == Biome.CANYON)
-        {
-            properties.WestBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
-        }
-        else
-        {
-            properties.WestBiome = westBiome;
-        }
-        if (eastBiome == Biome.RANDOM || eastBiome == Biome.RANDOM_NO_VANILLA || eastBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
-        {
-            int shuffleLimit = eastBiome switch
-            {
-                Biome.RANDOM => 7,
-                Biome.RANDOM_NO_VANILLA => 6,
-                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
-                _ => throw new ImpossibleException()
-            };
-            properties.EastBiome = r.Next(shuffleLimit) switch
-            {
-                0 => Biome.VANILLALIKE,
-                1 => Biome.ISLANDS,
-                2 => r.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
-                3 => Biome.VOLCANO,
-                4 => Biome.MOUNTAINOUS,
-                5 => Biome.VANILLA_SHUFFLE,
-                6 => Biome.VANILLA,
-                _ => throw new Exception("Invalid Biome")
-            };
-        }
-        else if (eastBiome == Biome.CANYON)
-        {
-            properties.EastBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
-        }
-        else
-        {
-            properties.EastBiome = eastBiome;
-        }
-        if (dmBiome == Biome.RANDOM || dmBiome == Biome.RANDOM_NO_VANILLA || dmBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
-        {
-            int shuffleLimit = dmBiome switch
-            {
-                Biome.RANDOM => 7,
-                Biome.RANDOM_NO_VANILLA => 6,
-                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
-                _ => throw new ImpossibleException()
-            };
-            properties.DmBiome = r.Next(shuffleLimit) switch
-            {
-                0 => Biome.VANILLALIKE,
-                1 => Biome.ISLANDS,
-                2 => r.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
-                3 => Biome.CALDERA,
-                4 => Biome.MOUNTAINOUS,
-                5 => Biome.VANILLA_SHUFFLE,
-                6 => Biome.VANILLA,
-                _ => throw new Exception("Invalid Biome")
-            };
-        }
-        else if (dmBiome == Biome.CANYON)
-        {
-            properties.DmBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
-        }
-        else
-        {
-            properties.DmBiome = dmBiome;
-        }
-        if (mazeBiome == Biome.RANDOM)
-        {
-            properties.MazeBiome = r.Next(3) switch
-            {
-                0 => Biome.VANILLA,
-                1 => Biome.VANILLA_SHUFFLE,
-                2 => Biome.VANILLALIKE,
-                _ => throw new Exception("Invalid Biome")
-            };
-        }
-        else
-        {
-            properties.MazeBiome = mazeBiome;
-        }
 
         //climates
         if (westClimate == ClimateEnum.RANDOM)
         {
-            List<ClimateEnum> westClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsWestClimate() && !i.IsMetastyle()).ToList();
+            List<ClimateEnum> westClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsWestClimate()).ToList();
             properties.WestClimate = westClimates.Sample(r);
         }
         else
@@ -1258,7 +1164,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         if (eastClimate == ClimateEnum.RANDOM)
         {
-            List<ClimateEnum> eastClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsEastClimate() && !i.IsMetastyle()).ToList();
+            List<ClimateEnum> eastClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsEastClimate()).ToList();
             properties.EastClimate = eastClimates.Sample(r);
         }
         else
@@ -1268,7 +1174,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         if (dmClimate == ClimateEnum.RANDOM)
         {
-            List<ClimateEnum> dmClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsDmClimate() && !i.IsMetastyle()).ToList();
+            List<ClimateEnum> dmClimates = Enums.GetShufflableList<ClimateEnum>().Where(i => i.IsDmClimate()).ToList();
             properties.DmClimate = dmClimates.Sample(r);
         }
         else
@@ -1641,6 +1547,79 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         }
 
         return properties;
+    }
+
+    private void ExportBiomes(RandomizerProperties properties, Random r)
+    {
+        if (westBiome.IsMetastyle())
+        {
+            List<Biome> allowedBiomes = Enums.GetShufflableList<Biome>().Where(i => i.IsWestBiome()).ToList();
+            if (!westBiome.IncludesVanilla()) { allowedBiomes.RemoveAll(biome => biome is Biome.VANILLA); }
+            if (!westBiome.IncludesVanillaShuffle()) { allowedBiomes.RemoveAll(biome => biome is Biome.VANILLA_SHUFFLE); }
+            if (eastBiome is Biome.RANDOM_UNIQUE)
+            {
+                allowedBiomes.RemoveAll(b => eastBiome.IsSimilar(b)); // must not use properties.EastBiome here since that is not yet rolled
+                allowedBiomes.RemoveAll(b => dmBiome.IsSimilar(b)); // these might be meta styles - that's fine to (not) remove
+            }
+            properties.WestBiome = allowedBiomes.Sample(r);
+        }
+        else if (westBiome == Biome.CANYON)
+        {
+            properties.WestBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
+        }
+        else
+        {
+            properties.WestBiome = westBiome;
+        }
+
+        if (eastBiome.IsMetastyle())
+        {
+            List<Biome> allowedBiomes = Enums.GetShufflableList<Biome>().Where(i => i.IsEastBiome()).ToList();
+            if (!eastBiome.IncludesVanilla()) { allowedBiomes.RemoveAll(biome => biome is Biome.VANILLA); }
+            if (!eastBiome.IncludesVanillaShuffle()) { allowedBiomes.RemoveAll(biome => biome is Biome.VANILLA_SHUFFLE); }
+            if (eastBiome is Biome.RANDOM_UNIQUE)
+            {
+                allowedBiomes.RemoveAll(b => properties.WestBiome.IsSimilar(b)); // must be properties.WestBiome as this is post-roll for meta styles
+                allowedBiomes.RemoveAll(b => dmBiome.IsSimilar(b));
+            }
+            properties.EastBiome = allowedBiomes.Sample(r);
+        }
+        else if (eastBiome == Biome.CANYON)
+        {
+            properties.EastBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
+        }
+        else
+        {
+            properties.EastBiome = eastBiome;
+        }
+        if (dmBiome.IsMetastyle())
+        {
+            List<Biome> allowedBiomes = Enums.GetShufflableList<Biome>().Where(i => i.IsDMBiome()).ToList();
+            if (!dmBiome.IncludesVanilla()) { allowedBiomes.RemoveAll(biome => biome is Biome.VANILLA); }
+            if (!dmBiome.IncludesVanillaShuffle()) { allowedBiomes.RemoveAll(biome => biome is Biome.VANILLA_SHUFFLE); }
+            if (eastBiome is Biome.RANDOM_UNIQUE)
+            {
+                allowedBiomes.RemoveAll(b => properties.WestBiome.IsSimilar(b) || properties.EastBiome.IsSimilar(b));
+            }
+            properties.DmBiome = allowedBiomes.Sample(r);
+        }
+        else if (dmBiome == Biome.CANYON)
+        {
+            properties.DmBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
+        }
+        else
+        {
+            properties.DmBiome = dmBiome;
+        }
+        if (mazeBiome == Biome.RANDOM)
+        {
+            List<Biome> allowedBiomes = Enums.GetShufflableList<Biome>().Where(i => i.IsMazeBiome()).ToList();
+            properties.MazeBiome = allowedBiomes.Sample(r);
+        }
+        else
+        {
+            properties.MazeBiome = mazeBiome;
+        }
     }
 
     public void ApplyDifficultyOnlySettings(RandomizerProperties properties, Random r)
