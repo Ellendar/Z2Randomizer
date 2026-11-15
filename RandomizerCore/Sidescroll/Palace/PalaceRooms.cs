@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +14,8 @@ public partial class PalaceRooms
     private readonly Dictionary<string, List<Room>> roomsByTag = new();
     public IReadOnlyList<Room> RoomsByTag(string tag) => roomsByTag.GetValueOrDefault(tag, []);
     private readonly Dictionary<string, Room> roomsByName = new();
+
+    public string Hash { get; init; }
 
     public static readonly string roomsMD5 = "JCa3OsnJhIe/fZ5yrx/+mA==";
 
@@ -51,6 +53,8 @@ public partial class PalaceRooms
 
             roomsByName[room.Name] = room;
         }
+
+        Hash = DeterministicHash.Combine(DeterministicHash.Seed, rooms).ToString("X8").ToLower();
     }
 
     private void AddRoomToTagList(Room room, string tag)
@@ -242,9 +246,9 @@ public partial class PalaceRooms
         return rooms.Where(i => i.IsBossRoom && (palaceNum == null || palaceNum == i.PalaceNumber));
     }
 
-    public Room GetRoomByName(string name)
+    public Room? GetRoomByName(string name)
     {
-        return roomsByName[name];
+        return roomsByName.GetValueOrDefault(name);
     }
 
     public Dictionary<string, Room> LinkedRooms(RoomGroup group, int? palaceNum = null)
@@ -259,8 +263,8 @@ public partial class PalaceRooms
         {
             if (room.Enabled && room.LinkedRoomName != null)
             {
-                linkedRooms.Add(room.LinkedRoomName, GetRoomByName(room.LinkedRoomName));
-                linkedRooms.Add(room.Name, GetRoomByName(room.Name));
+                linkedRooms.Add(room.LinkedRoomName, GetRoomByName(room.LinkedRoomName)!);
+                linkedRooms.Add(room.Name, GetRoomByName(room.Name)!);
             }
         }
         return linkedRooms;

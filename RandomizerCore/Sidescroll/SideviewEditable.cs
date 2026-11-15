@@ -252,6 +252,8 @@ public class SideviewEditable<T> where T : struct, Enum
 
     public void Mirror()
     {
+        int width = PageCount * 16;
+
         List<SideviewMapCommand<T>> floors = FindAll(o => o.IsNewFloor());
         if (floors.Count > 0)
         {
@@ -288,7 +290,7 @@ public class SideviewEditable<T> where T : struct, Enum
 
         foreach (var cmd in Commands)
         {
-            cmd.AbsX = 63 - cmd.AbsX - (cmd.Width - 1);
+            cmd.AbsX = width - 1 - cmd.AbsX - (cmd.Width - 1);
         }
     }
 
@@ -325,30 +327,24 @@ public class SideviewEditable<T> where T : struct, Enum
                 result[x, y] = floor.IsFloorSolidAt(this, y);
             }
         }
+        // Lava replaces the bottom two rows in regular palaces and three in GP.
+        int lavaSurfaceY = typeof(T) == typeof(PalaceObject) ? 11 : 10;
         foreach (var cmd in Commands)
         {
-            if (cmd.IsSolid)
+            bool isLava = cmd.IsLava();
+            if (!cmd.IsSolid && !cmd.IsPit && !isLava)
             {
-                int endX = Math.Min(width, cmd.AbsX + cmd.Width);
-                int endY = Math.Min(height, cmd.Y + cmd.Height);
-                for (var x = cmd.AbsX; x < endX; x++)
-                {
-                    for (int y = cmd.Y; y < endY; y++)
-                    {
-                        result[x, y] = cmd.IsSolidAt(x, y);
-                    }
-                }
+                continue;
             }
-            else if (cmd.IsPit)
+
+            int endX = Math.Min(width, cmd.AbsX + cmd.Width);
+            int startY = isLava ? lavaSurfaceY : cmd.Y;
+            int endY = isLava ? height : Math.Min(height, cmd.Y + cmd.Height);
+            for (int x = cmd.AbsX; x < endX; x++)
             {
-                int endX = Math.Min(width, cmd.AbsX + cmd.Width);
-                int endY = Math.Min(height, cmd.Y + cmd.Height);
-                for (var x = cmd.AbsX; x < endX; x++)
+                for (int y = startY; y < endY; y++)
                 {
-                    for (int y = cmd.Y; y < endY; y++)
-                    {
-                        result[x, y] = false;
-                    }
+                    result[x, y] = cmd.IsSolidAt(x, y);
                 }
             }
         }
@@ -455,79 +451,35 @@ public static class SolidGridHelper
     }
 
     /// <summary>
-    /// Find the best floor y position that has a w x h opening. Optimally
-    /// such that y + h will end on top of the floor.
+    /// Find the top of a w x h opening with a solid tile directly below it.
+    /// Prefer the floor near y, then the lowest supported opening. Return 0 if none fits.
     /// </summary>
     public static int FindFloor(bool[,] solidGrid, int x, int y, int w, int h)
     {
-        Debug.Assert(y < 13);
-        Debug.Assert(solidGrid.GetLength(1) == 13);
+        int height = solidGrid.GetLength(1);
+        Debug.Assert(y >= 0 && y < height);
 
-        var xEnd = Math.Min(x + w, solidGrid.GetLength(0));
+        bool RowIsOpen(int row) => AreaIsOpen(solidGrid, x, row, w, 1);
 
-        bool RowIsOpen(int j)
+        bool HasSupportedOpening(int floorY) =>
+            floorY >= h && floorY < height && !RowIsOpen(floorY)
+            && AreaIsOpen(solidGrid, x, floorY - h, w, h);
+
+        int nearbyFloor = y;
+        while (nearbyFloor < height && RowIsOpen(nearbyFloor))
         {
-            for (int i = x; i < xEnd; i++)
-            {
-                if (solidGrid[i, j])
-                {
-                    return false;
-                }
-            }
-            return true;
+            nearbyFloor++;
+        }
+        if (HasSupportedOpening(nearbyFloor))
+        {
+            return nearbyFloor - h;
         }
 
-        // first try to find a floor close to the original position
-        int consecutiveOpens = 0;
-        int j;
-        // try scanning down
-        for (j = y; j < 13; j++)
+        for (int floorY = height - 1; floorY >= h; floorY--)
         {
-            if (RowIsOpen(j))
+            if (HasSupportedOpening(floorY))
             {
-                consecutiveOpens++;
-            }
-            else
-            {
-                break;
-            }
-        }
-        if (consecutiveOpens >= h)
-        {
-            return j - h;
-        }
-        // try moving up
-        for (j = y - 1; j >= 0; j--)
-        {
-            if (RowIsOpen(j))
-            {
-                consecutiveOpens++;
-                if (consecutiveOpens == h)
-                {
-                    return j;
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        // no luck, instead try to find the lowest floor possible
-        consecutiveOpens = 0;
-        for (j = 12; j >= 0; j--)
-        {
-            if (RowIsOpen(j))
-            {
-                consecutiveOpens++;
-                if (consecutiveOpens == h)
-                {
-                    return j;
-                }
-            }
-            else
-            {
-                consecutiveOpens = 0;
+                return floorY - h;
             }
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -18,7 +17,6 @@ using CrossPlatformUI.ViewModels.Tabs;
 
 namespace CrossPlatformUI.ViewModels;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
     [JsonIgnore]
@@ -32,6 +30,30 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
 
     [RUISG.Reactive]
     public partial bool FlagsValid { get; set; } = true;
+
+    private string customRoomPoolText = "";
+    [JsonIgnore]
+    public string CustomRoomPoolText
+    {
+        get => customRoomPoolText;
+        private set
+        {
+            customRoomPoolText = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
+    private string palaceRoomsText = "";
+    [JsonIgnore]
+    public string PalaceRoomsText
+    {
+        get => palaceRoomsText;
+        private set
+        {
+            palaceRoomsText = value;
+            this.RaisePropertyChanged();
+        }
+    }
 
     private static bool IsFlagStringValid(string flags) => FlagPasteParser.IsValidFlagString(flags);
 
@@ -85,6 +107,9 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
         Main = main;
         HostScreen = Main;
         PresetViewModel = new(Main);
+        SearchViewModel = new(Main);
+        SearchViewModel.SearchStarted += (_, _) => OpenSearch();
+        SearchViewModel.SearchEnded += OnSearchEnded;
         Activator = new ViewModelActivator();
 
         RerollSeed = ReactiveCommand.Create(() =>
@@ -166,7 +191,20 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             }
         });
 
+        _ = InitializeAsync();
+
         this.WhenActivated(OnActivate);
+    }
+
+    public async Task InitializeAsync()
+    {
+        var roomLoaderService = App.Current?.Services?.GetService<RoomLoaderService>();
+
+        var palaceRooms = await roomLoaderService!.GetPalaceRooms();
+        PalaceRoomsText = $"Palace rooms hash: {palaceRooms.Hash}";
+
+        var spec = await roomLoaderService!.GetRoomPoolSpec();
+        CustomRoomPoolText = spec != null ? $"{spec.Name} (Hash: {spec.Hash})" : "No Custom Room Pool Found";
     }
 
     public static async Task<string?> SelectSaveFolder()
@@ -224,7 +262,7 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             .DisposeWith(disposables);
 
         SubscribeExtensions.Subscribe(
-            Main.Config.ObservableForProperty(x => x.Seed),
+            Main.Config.WhenAnyValue(x => x.Seed).Select(_ => RxVoid.Default),
             _ => this.RaisePropertyChanged(nameof(Seed)))
             .DisposeWith(disposables);
 
@@ -232,6 +270,50 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
         // this.ValidationRule(viewModel => viewModel.FlagsValid, this.WhenAnyValue(x => x.FlagsValid), "Invalid Flags");
 
         AddValidationRules(disposables);
+    }
+
+    /// <summary>
+    /// Opens the search results, remembering the tab the user came from.
+    /// </summary>
+    internal void OpenSearch()
+    {
+        if (SearchTabIndex < 0)
+        {
+            return;
+        }
+
+        if (CurrentTabIndex == SearchTabIndex)
+        {
+            return;
+        }
+
+        tabIndexBeforeSearch = CurrentTabIndex;
+        CurrentTabIndex = SearchTabIndex;
+    }
+
+    /// <summary>
+    /// The search box was emptied, so the tabs take over again.
+    /// </summary>
+    private void OnSearchEnded(object? sender, EventArgs e)
+    {
+        if (SearchTabIndex < 0)
+        {
+            return;
+        }
+
+        // The user moved on to another tab while searching; leave them there.
+        if (CurrentTabIndex != SearchTabIndex)
+        {
+            tabIndexBeforeSearch = -1;
+            return;
+        }
+
+        if (tabIndexBeforeSearch >= 0)
+        {
+            CurrentTabIndex = tabIndexBeforeSearch;
+        }
+
+        tabIndexBeforeSearch = -1;
     }
 
     private void AddValidationRules(MultipleDisposable disposables)
@@ -276,33 +358,40 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
             .DisposeWith(disposables);
 
         // If shuffle overworld items is off, turn off pbag cave item shuffle too
-        SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems), x =>
+        SubscribeExtensions.Subscribe(
+            Main.Config.WhenAnyValue(x => x.ShuffleOverworldItems).Select(value => value == false),
+            disabled =>
         {
-            if (x.Value ?? true) return;
+            if (!disabled) return;
             Main.Config.IncludePBagCavesInItemShuffle = false;
         })
             .DisposeWith(disposables);
 
-        // If Palaces can't swap continents 
-        SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.ShuffleEncounters), x =>
+        SubscribeExtensions.Subscribe(
+            Main.Config.WhenAnyValue(x => x.ShuffleEncounters).Select(value => value == false),
+            disabled =>
         {
-            if (x.Value ?? true) return;
+            if (!disabled) return;
             Main.Config.IncludeLavaInEncounterShuffle = false;
             Main.Config.AllowUnsafePathEncounters = false;
         })
             .DisposeWith(disposables);
 
         // If shuffle palaces is off, then don't allow shuffling GP
-        SubscribeExtensions.Subscribe(Main.Config.ObservableForProperty(x => x.PalacesCanSwapContinents), x =>
+        SubscribeExtensions.Subscribe(
+            Main.Config.WhenAnyValue(x => x.PalacesCanSwapContinents).Select(value => value == false),
+            disabled =>
             {
-                if (x.Value ?? true) return;
+                if (!disabled)
+                    return;
                 Main.Config.ShuffleGP = false;
             })
             .DisposeWith(disposables);
 
-        SubscribeExtensions.Subscribe(Main.ObservableForProperty(x => x.ShuffleAllExpState), x =>
+        SubscribeExtensions.Subscribe(Main.WhenAnyValue(x => x.ShuffleAllExpState), x =>
         {
-            if (!x.Value) return;
+            if (!x)
+                return;
             Main.Config.ShuffleAttackExperience = true;
             Main.Config.ShuffleMagicExperience = true;
             Main.Config.ShuffleLifeExperience = true;
@@ -332,6 +421,46 @@ public partial class RandomizerViewModel : ReactiveObject, IRoutableViewModel, I
     [JsonIgnore]
     public MainViewModel Main { get; }
     public PresetsViewModel PresetViewModel { get; }
+
+    /// <summary>
+    /// Searches the flag controls by caption and shows the matches.
+    /// </summary>
+    [JsonIgnore]
+    public SearchViewModel SearchViewModel { get; }
+
+    private int searchTabIndex = -1;
+
+    /// <summary>
+    /// Where the "Search" tab sits in the view's tab strip. The view reports it
+    /// (the tabs are declared in XAML), so reordering them cannot desynchronize
+    /// this.
+    /// </summary>
+    [JsonIgnore]
+    public int SearchTabIndex
+    {
+        get => searchTabIndex;
+        set
+        {
+            if (searchTabIndex == value)
+            {
+                return;
+            }
+
+            searchTabIndex = value;
+
+            // A session that ended on the Search tab has no search to show, so
+            // the app does not come back to it.
+            if (value >= 0 &&
+                !SearchViewModel.HasQuery &&
+                CurrentTabIndex == value)
+            {
+                CurrentTabIndex = 0;
+            }
+        }
+    }
+
+    /// <summary>The tab the user was on before the search took over.</summary>
+    private int tabIndexBeforeSearch = -1;
 
     [JsonIgnore]
     public ReactiveCommand<RxVoid, RxVoid> RerollSeed { get; }

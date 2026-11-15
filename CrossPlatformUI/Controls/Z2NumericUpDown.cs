@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.VisualTree;
 using CrossPlatformUI.Controls.Generated;
 using Z2Randomizer.RandomizerCore.Flags;
 using Material.Styles.Assists;

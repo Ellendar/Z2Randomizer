@@ -38,7 +38,7 @@ jobs:
         echo "User is allowed: $actor"
 
     - name: Checkout codebase
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         ref: ${{ inputs.branch }}
         fetch-depth: 0 # required to push tags
@@ -109,10 +109,10 @@ jobs:
     strategy:
       matrix:
         platform: [
-          { name: Windows-Portable, os: windows-2025-vs2026, arch: x64, type: portable },
-          { name: Windows-Installer, os: windows-2025-vs2026, arch: x64, type: installer },
+          { name: Windows-Portable, os: windows-latest, arch: x64, type: portable },
+          { name: Windows-Installer, os: windows-latest, arch: x64, type: installer },
           { name: Ubuntu, os: ubuntu-latest, arch: x64 },
-          { name: macOS, os: macos-14, arch: arm64 },
+          { name: macOS, os: macos-latest, arch: arm64 },
           { name: Browser, os: ubuntu-latest, arch: wasm, type: browser },
         ]
         dotnet-version: [ '10.0.x' ]
@@ -120,18 +120,21 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
     steps:
       - name: Checkout codebase
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.version }}
           submodules: recursive
 
       - name: Setup dotnet ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v5
+        id: setup-dotnet
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+          cache: true
+          cache-dependency-path: Directory.Packages.props
 
       - name: Build Desktop
-        if: ${{ matrix.platform.type != 'browser' }}
+        if: ${{ matrix.platform.type != 'browser' && matrix.platform.type != 'installer' }}
         run: dotnet publish -c Release -o CrossPlatformUI.Desktop/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
 
       - name: Create portable_mode.txt
@@ -150,13 +153,19 @@ jobs:
         shell: pwsh
         run: |
           dotnet publish -c Release -r win-x64 -o CrossPlatformUI.Desktop/bin/Release/net10.0/publish/win-x64 CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
-          & "C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\IDE\devenv.com" Z2Randomizer.sln /build 'Release|x64' /project Z2RandomizerSetup
+          $devenv = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -find Common7\IDE\devenv.com | Select-Object -First 1
+          if (-not $devenv) { throw "devenv.com not found via vswhere" }
+          & $devenv Z2Randomizer.sln /build 'Release|x64' /project Z2RandomizerSetup
           cd Z2RandomizerSetup/Release
           ren Z2RandomizerSetup.msi Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}.msi
 
       - name: Build Browser
         if: ${{ matrix.platform.type == 'browser' }}
+        env:
+          DOTNET_SDK_VERSION: ${{ steps.setup-dotnet.outputs.dotnet-version }}
         run: |
+          # Use the SDK from setup-dotnet even if the runner has a newer SDK.
+          printf '{"sdk":{"version":"%s","rollForward":"disable"}}\n' "$DOTNET_SDK_VERSION" > global.json
           dotnet workload install wasm-tools
           dotnet publish -c Release CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
@@ -208,7 +217,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout codebase
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.version }}
           fetch-depth: 0 # required to merge tag into main

@@ -2,8 +2,6 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.VisualTree;
-using CrossPlatformUI.Controls.Generated;
 using Z2Randomizer.RandomizerCore.Flags;
 
 namespace CrossPlatformUI.Controls;

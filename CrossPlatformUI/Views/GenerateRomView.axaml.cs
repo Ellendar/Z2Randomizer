@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
 using ReactiveUI.Primitives;
@@ -7,7 +6,6 @@ using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class GenerateRomView : ReactiveUserControl<GenerateRomViewModel>
 {
     public GenerateRomView()

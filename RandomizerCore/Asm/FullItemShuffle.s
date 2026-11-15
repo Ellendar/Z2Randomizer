@@ -206,12 +206,7 @@ TownToItemTable:
     .byte JUMP_SPELL_ITEMLOC
     .byte LIFE_SPELL_ITEMLOC
     .byte FAIRY_SPELL_ITEMLOC
-; For some reason, when dash replaces fire it even replaces the "vanilla" spell
-.if _REPLACE_FIRE_WITH_DASH
-    .byte DASH_SPELL_ITEMLOC
-.else
     .byte FIRE_SPELL_ITEMLOC
-.endif
     .byte REFLECT_SPELL_ITEMLOC
     .byte SPELL_SPELL_ITEMLOC
     .byte THUNDER_SPELL_ITEMLOC
@@ -386,17 +381,9 @@ HandlePBagTimerClear:
     nop
 .reloc
 ExpandedGetItem:
-;    cpy #ITEM_RED_MAGIC_JAR + 1
-;    bcs @NotJar 
-;        
-;@NotJar:
     cpy #ITEM_SHIELD_SPELL
     bcc @NotSpell
-        cpy #ITEM_DASH_SPELL
-        bcc @NotDashSpell
-            ; Dash always replaces fire, so if we get the dash spell load fire instead
-            ldy #ITEM_FIRE_SPELL
-    @NotDashSpell:
+        ; new spell IDs are already converted: Dash as Fire and Tanooki as Jump
         ; flash screen as if you got the spell from a wizard 
         lda #$c0
         sta LinkFlashingTimer
@@ -531,8 +518,8 @@ ItemTileTable:
     .byte $72, $F5 ; Experience Bag - 100 pts
     .byte $72, $F5 ; Experience Bag - 200 pts
     .byte $72, $F5 ; Experience Bag - 500 pts
-    .byte $83, $83 ; Magic Container
-    .byte $81, $81 ; Heart Container
+    .byte $fd, $fd ; Magic Container
+    .byte $d9, $d9 ; Heart Container
     .byte $8A, $F5 ; Blue Jar
     .byte $8A, $F5 ; Red Jar
     .byte $A8, $F5 ; Link Doll
@@ -554,6 +541,7 @@ ItemTileTable:
     .byte $f1, $f1 ; Spell Spell
     .byte $f7, $f9 ; Thunder Spell
     .byte $cf, $92 ; Dash Spell
+.export ItemTileTable
 
 ; In vanilla this table is limited only to the 6 items in $10-$16
 ; We can keep the first $10 items using the original, and just expand the rest

@@ -25,6 +25,16 @@ public class RoomPool
 
     protected static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
 
+    public RoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props, RoomPoolSpec roomPoolSpec)
+    {
+        PalaceStyle palaceStyle = props.PalaceStyles[palaceNumber - 1];
+        var allRooms = GatherRoomsFromSpec(palaceRooms, roomPoolSpec, palaceNumber, palaceStyle);
+        ApplyRoomPoolExclusions(allRooms, roomPoolSpec);
+        GatherLinkedRooms(allRooms, palaceRooms);
+        SplitRooms(allRooms, palaceNumber);
+        FinalizePool(palaceRooms, palaceNumber, props);
+    }
+
     public RoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
         var allRooms = GatherRoomsFromProps(palaceRooms, palaceNumber, props);
@@ -32,6 +42,99 @@ public class RoomPool
         GatherLinkedRooms(allRooms, palaceRooms);
         SplitRooms(allRooms, palaceNumber);
         FinalizePool(palaceRooms, palaceNumber, props);
+    }
+
+    static List<Room> GatherRoomsFromSpec(PalaceRooms palaceRooms, RoomPoolSpec roomPoolSpec, int palaceNumber, PalaceStyle palaceStyle)
+    {
+        var roomList = new List<Room>();
+
+        var groupsOverrides = (roomPoolSpec.Groups ?? [])
+            .Where(o => o.ConditionMatches(palaceNumber, palaceStyle));
+
+        var groupsInclude = (roomPoolSpec.GroupsInclude ?? [])
+            .Except(groupsOverrides.Where(g => !g.Enabled).Select(g => g.Name))
+            .Concat(groupsOverrides.Where(g => g.Enabled).Select(g => g.Name))
+            .Distinct().ToList();
+
+        foreach (var groupString in groupsInclude)
+        {
+            if (!Enum.TryParse(groupString, out RoomGroup group)) { throw new UserFacingException("Custom Room Pool Issue", $"RoomPool spec has unrecognized group: {groupString}"); }
+            AddGroup(roomList, palaceRooms, group);
+        }
+
+        var tagsOverrides = (roomPoolSpec.Tags ?? [])
+            .Where(o => o.ConditionMatches(palaceNumber, palaceStyle));
+
+        var tagsInclude = (roomPoolSpec.TagsInclude ?? [])
+            .Except(tagsOverrides.Where(o => !o.Enabled).Select(o => o.Name))
+            .Concat(tagsOverrides.Where(o => o.Enabled).Select(o => o.Name))
+            .Distinct().ToList();
+
+        foreach (var tag in tagsInclude)
+        {
+            AddTag(roomList, palaceRooms, tag);
+        }
+
+        foreach (var groupOverride in groupsOverrides)
+        {
+            var groupString = groupOverride.Name;
+            if (!Enum.TryParse(groupString, out RoomGroup group)) { throw new UserFacingException("Custom Room Pool Issue", $"RoomPool spec has unrecognized group: {groupString}"); }
+
+            foreach (var roomToOverride in palaceRooms.RoomsByGroup(group))
+            {
+                if (groupOverride.Priority is int priority)
+                {
+                    roomToOverride.Priority = priority;
+                }
+            }
+        }
+
+        foreach (var tagOverride in tagsOverrides)
+        {
+            foreach (var roomToOverride in palaceRooms.RoomsByTag(tagOverride.Name))
+            {
+                if (tagOverride.Priority is int priority)
+                {
+                    roomToOverride.Priority = priority;
+                }
+            }
+        }
+
+        foreach (var roomOverride in roomPoolSpec.Rooms ?? [])
+        {
+            var name = roomOverride.Name;
+            Room? room = palaceRooms.GetRoomByName(name);
+            if (room == null) { throw new UserFacingException("Custom Room Pool Issue", $"Room with name {name} not found."); }
+
+            if (!string.IsNullOrEmpty(roomOverride.Sideview))
+            {
+                room.SideView = Convert.FromHexString(roomOverride.Sideview);
+            }
+
+            if (!string.IsNullOrEmpty(roomOverride.Enemies))
+            {
+                room.Enemies = Convert.FromHexString(roomOverride.Enemies);
+            }
+
+            if (roomOverride.ItemPresenceBits.HasValue)
+            {
+                room.ItemPresenceBits = [(byte)roomOverride.ItemPresenceBits.Value];
+            }
+
+            if (roomOverride.Priority.HasValue)
+            {
+                room.Priority = roomOverride.Priority.Value;
+            }
+
+            room.Enabled = roomOverride.Enabled;
+
+            if (!roomList.Contains(room, ReferenceEqualityComparer.Instance)) // only add if it isn't already added
+            {
+                roomList.Add(room);
+            }
+        }
+
+        return roomList.ToList();
     }
 
     static List<Room> GatherRoomsFromProps(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
@@ -78,6 +181,24 @@ public class RoomPool
             {
                 roomList.Add(room);
             }
+        }
+    }
+
+    private void ApplyRoomPoolExclusions(List<Room> allRooms, RoomPoolSpec roomPoolSpec)
+    {
+        var tagsExclude = (roomPoolSpec.TagsExclude ?? [])
+            .Except((roomPoolSpec.Tags ?? []).Where(t => t.Enabled).Select(t => t.Name))
+            .Concat((roomPoolSpec.Tags ?? []).Where(t => !t.Enabled).Select(t => t.Name))
+            .Distinct().ToList();
+
+        foreach (var tag in tagsExclude)
+        {
+            allRooms.RemoveAll(r => r.HasTag(tag));
+        }
+
+        foreach (var name in roomPoolSpec.RoomsExclude ?? [])
+        {
+            allRooms.RemoveAll(r => r.Name == name);
         }
     }
 
@@ -175,11 +296,23 @@ public class RoomPool
     {
         var palaceBlockers = !props.BlockersAnywhere ? Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1] : Palaces.ALL_PALACE_ALLOWED_BLOCKERS;
         HashSet<RequirementType> allowedBlockers = [.. palaceBlockers];
+        foreach (Collectable removed in props.RemoveItems)
+        {
+            if (removed.AsRequirement() is RequirementType requirement)
+            {
+                Debug.Assert(requirement is not RequirementType.KEY); // Magic Key should be its own RequirementType
+                allowedBlockers.Remove(requirement);
+            }
+        }
         if (!props.ReplaceFireWithDash)
         {
             allowedBlockers.Remove(RequirementType.DASH);
         }
-        RemoveRooms(room => !room.IsTraversable(allowedBlockers));
+        if (props.KeyLogic is KeyLogicOption.KEYS_PER_PALACE_SOLVABLE && palaceNumber == 7)
+        {
+            allowedBlockers.Remove(RequirementType.KEY);
+        }
+        RemoveRooms(room => !room.GetEffectiveRequirements(props.MarioMode).AreSatisfiedBy(allowedBlockers));
     }
 
     void FinalizePool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
@@ -251,7 +384,7 @@ public class RoomPool
 
         DefaultDownBossRoom = palaceRooms.BossRooms(RoomGroup.V4_0)
             .First(i => i.IsBossRoom && i.CategorizeExits() == RoomExitType.DEADEND_EXIT_DOWN
-                     && (palaceNumber >= 6 ? i.PalaceNumber == palaceNumber : i.PalaceNumber == null));
+                      && (palaceNumber >= 6 ? i.PalaceNumber == palaceNumber : i.PalaceNumber == null));
 
         RemoveBlockedRooms(palaceNumber, props);
 

@@ -43,6 +43,13 @@ class RomMap
     public static readonly IReadOnlyDictionary<Continent, int> ContinentLocationBases = Enum.GetValues<Continent>()
         .ToDictionary(c => c, c => ContinentLocationBaseArray[(int)c]);
 
+    // Reserved ROM regions for the randomized overworld maps.
+    public const int WEST_MAP_OFFSET = 0x7480;
+    public const int DM_MAP_OFFSET = 0x7a00;
+    public const int EAST_MAP_OFFSET = 0xb480;
+    public const int MI_MAP_OFFSET = 0xba00;
+    public const int OVERWORLD_MAP_CAPACITY = 1400;
+
     //Overworld data
     public const int overworldYOffset = 0;
     public const int overworldXOffset = 0x3F;
@@ -90,6 +97,7 @@ class RomMap
     public const int NORTH_SOUTH_SEPARATOR_WEST = 0x1cb42;
     public const int NORTH_SOUTH_SEPARATOR_DM = 0x1cb43;
     public const int NORTH_SOUTH_SEPARATOR_EAST = 0x1cb44;
+    public const int HIDDEN_PALACE_SURROUNDING_TERRAIN = 0x1df70;
 
     public static readonly List<int> bossHpAddresses = [
         0x11451, // Horsehead          (regular Palace 125 enemy table)

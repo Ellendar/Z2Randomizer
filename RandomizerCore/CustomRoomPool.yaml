@@ -1,0 +1,44 @@
+# This is an example Custom Room Pool that you can replace with your own
+
+name: Custom Room Pool
+description: Rooms are included according to the rules in the file CustomRoomPool.yaml
+
+groups_include:
+- VANILLA
+- V4_0
+
+groups:
+- name: V5_0
+  condition:
+    not_style: ["Reconstructed"]
+
+tags:
+- name: SGL
+  priority: 1 # for initial testing
+
+- name: HasDrop
+  condition:
+    palace: [7]
+    style: ["Reconstructed"]
+  enabled: false
+
+- name: SegmentedRoom
+  priority: 1
+
+tags_exclude:
+- Easy
+- LongDeadEnd
+
+rooms:
+- name: triforceOfCourage M5
+  itembits: 0b1110  # remove door too close to entrance
+
+- name: triforceOfCourage M18
+  itembits: 0b1110  # remove door too close to entrance
+
+
+rooms_exclude:
+- triforceOfCourage M39
+- triforceOfCourage M51
+- winterSolstice M56
+- aaron jam 4_4 P5_M47

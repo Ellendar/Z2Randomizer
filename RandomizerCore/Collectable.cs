@@ -64,7 +64,8 @@ public static class CollectableExtensions
         };
     }
 
-
+    /// Determines if GettableItemSet will track the item. This does
+    /// not exclude the collectable from being in-logic (MAGIC_CONTAINER).
     public static bool IsItemGetItem(this Collectable collectable)
     {
         return collectable switch
@@ -107,7 +108,7 @@ public static class CollectableExtensions
             Collectable.THUNDER_SPELL => true,
             Collectable.DO_NOT_USE_ANTIFAIRY => false,
             Collectable.TANOOKI => true,
-            _ => throw new Exception("Invalid item type determining itemgets")
+            _ => throw new Exception("Invalid item type determining IsItemGetItem")
         };
     }
     public static string EnglishText(this Collectable collectable)
@@ -274,7 +275,7 @@ public static class CollectableExtensions
             Collectable.FAIRY_SPELL => RequirementType.FAIRY,
             Collectable.UPSTAB => RequirementType.UPSTAB,
             Collectable.DOWNSTAB => RequirementType.DOWNSTAB,
-            Collectable.MAGIC_KEY => RequirementType.KEY,
+            Collectable.MAGIC_KEY => RequirementType.MAGIC_KEY,
             Collectable.DASH_SPELL => RequirementType.DASH,
             Collectable.GLOVE => RequirementType.GLOVE,
             Collectable.REFLECT_SPELL => RequirementType.REFLECT,
@@ -327,6 +328,7 @@ public static class CollectableExtensions
         return collectable switch
         {
             Collectable.DO_NOT_USE or Collectable.DO_NOT_USE_ANTIFAIRY => throw new Exception($"Collectable {collectable} cannot be placed"),
+            Collectable.DASH_SPELL => (byte)Collectable.FIRE_SPELL,
             Collectable.TANOOKI => (byte)Collectable.JUMP_SPELL,
             _ => (byte)collectable
         };

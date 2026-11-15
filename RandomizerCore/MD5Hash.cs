@@ -146,6 +146,8 @@ public static class MD5Hash
 
     public static string ComputeHashString(byte[] input) => string.Join("", ComputeHash(input).Select(o => o.ToString("x2")));
 
+    public static int ComputeHashInt(byte[] input) => BitConverter.ToInt32(ComputeHash(input), 0);
+
     private static readonly int[] S = new int[64]
     {
         7, 12, 17, 22, 7, 12, 17, 22, 7, 12,

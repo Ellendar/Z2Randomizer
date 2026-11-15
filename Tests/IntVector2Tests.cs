@@ -2,7 +2,7 @@ using FluentAssertions;
 using Z2Randomizer.RandomizerCore;
 using Random = Z2Randomizer.RandomizerCore.Random;
 
-namespace Tests;
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class IntVector2Tests

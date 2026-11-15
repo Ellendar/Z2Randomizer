@@ -92,7 +92,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
             }
         }
 
-        if (!palace.AllReachable()
+        if (!palace.AllReachable(props)
             || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
             //Vanilla specifically just does an any exit check because this is just a safety check, it should never trip
             || palace.HasDisallowedDrop(props.BossRoomsExitToPalace[palace.Number - 1], PalaceDropStyle.ANY_EXIT, r))

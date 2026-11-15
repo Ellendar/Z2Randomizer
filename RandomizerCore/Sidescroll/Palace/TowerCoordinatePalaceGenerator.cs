@@ -401,4 +401,12 @@ public class TowerCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGenerato
     {
         return itemRoomSelectionStrategy;
     }
+
+    public override bool AllReachable(RandomizerProperties props, Palace palace)
+    {
+        return palace.AllReachable(
+            props,
+            allowMiniBossEnterGoingLeft: true,
+            allowFinalBossEnterGoingLeft: false); // palace can't continue anyway
+    }
 }

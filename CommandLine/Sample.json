@@ -52,6 +52,7 @@
 "IncludeQuestItemsInShuffle": false,
 "IncludeSpellsInShuffle": false,
 "IncludeSwordTechsInShuffle": false,
+"RoomPoolOption": "USE_CHECKBOXES",
 "Includev4_0Rooms": true,
 "Includev4_4Rooms": false,
 "IncludeVanillaRooms": true,

@@ -24,6 +24,11 @@ public interface IRandom
 public class Random : IRandom
 {
     private ulong _s0, _s1, _s2, _s3;
+#if Z2R_DIAGNOSTICS
+    // Counts core xoshiro draws, including rejection retries and NextBytes chunks.
+    // This receipt is cumulative and deliberately independent of GetState/SetState.
+    internal ulong DrawCount { get; private set; }
+#endif
 
     public Random(long seed)
     {
@@ -73,6 +78,9 @@ public class Random : IRandom
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal ulong NextUInt64()
     {
+#if Z2R_DIAGNOSTICS
+        DrawCount++;
+#endif
         ulong s0 = _s0, s1 = _s1, s2 = _s2, s3 = _s3;
 
         ulong result = BitOperations.RotateLeft(s1 * 5, 7) * 9;

@@ -54,9 +54,7 @@ Very high variance in difficulty. You may start with anything from 1 Heart Conta
         GpStyle = PalaceStyle.RANDOM,
         NormalPalaceLength = PalaceLengthOption.RANDOM,
         GpLength = PalaceLengthOption.RANDOM,
-        Includev4_0Rooms = true,
-        Includev5_0Rooms = true,
-        IncludeExpertRooms = true,
+        RoomPoolOption = RoomPoolOption.V5_0,
         TBirdRequired = false,
         PalacesToCompleteMin = 0,
         RestartAtPalacesOnGameOver = true,
@@ -67,6 +65,7 @@ Very high variance in difficulty. You may start with anything from 1 Heart Conta
         PalaceDropStyle = PalaceDropStyle.ANYTHING_GOES,
         BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,
         NoDuplicateRoomsByLayout = true,
+        KeyLogic = KeyLogicOption.FAIRY_OR_MAGICKEY,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
         PalaceItemRoomCount = PalaceItemRoomCount.RANDOM_INCLUDE_ZERO,
@@ -113,6 +112,7 @@ Very high variance in difficulty. You may start with anything from 1 Heart Conta
         ShufflePBagAmounts = true,
         RandomizeNewKasutoJarRequirements = true,
         PreventSpellItemChains = false,
+        FastItemPickup = true,
 
         //Drops
         ShuffleItemDropFrequency = true,

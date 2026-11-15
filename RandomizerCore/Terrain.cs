@@ -26,7 +26,7 @@ public enum Terrain
 
 static class TerrainExtensions
 {
-    public static bool IsWalkable(this Terrain terrain)
+    public static bool IsWalkable(this Terrain terrain, bool haveBoots)
     {
         return terrain switch
         {
@@ -44,8 +44,8 @@ static class TerrainExtensions
             Terrain.MOUNTAIN => false,
             Terrain.WATER => false,
             Terrain.PREPLACED_WATER => false,
-            Terrain.WALKABLEWATER => true,
-            Terrain.PREPLACED_WATER_WALKABLE => true,
+            Terrain.WALKABLEWATER => haveBoots,
+            Terrain.PREPLACED_WATER_WALKABLE => haveBoots,
             Terrain.ROCK => true,
             Terrain.RIVER_DEVIL => true,
             Terrain.NONE => false,

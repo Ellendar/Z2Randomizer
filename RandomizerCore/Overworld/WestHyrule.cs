@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NLog;
@@ -32,6 +31,7 @@ public sealed class WestHyrule : World
     private Location bridge1;
     private Location bridge2;
     public Location pbagCave;
+    public Location kingsTomb;
 
     private Location jumpCave;
     private Location fairyCave;
@@ -46,75 +46,25 @@ public sealed class WestHyrule : World
     private const int CALDERA_DEAD_ZONE_X = 7;
     private const int CALDERA_DEAD_ZONE_Y = 7;
 
-    private List<(Location, Location)> caveConnections;
-    private static int debug = 0;
+    private List<(Location Left, Location Right)> caveConnections;
 
     private List<Location> lostWoods;
 
-    private readonly SortedDictionary<LocationID, Terrain> terrains = new()
-        {
-            { LocationID.WEST_NORTH_PALACE, Terrain.PALACE},
-            { LocationID.WEST_CAVE_TROPHY, Terrain.CAVE },
-            { LocationID.WEST_MINOR_FOREST_AT_START, Terrain.FOREST},
-            { LocationID.WEST_CAVE_MAGIC_CONTAINER, Terrain.CAVE },
-            { LocationID.WEST_MINOR_FOREST_BY_SARIA, Terrain.FOREST },
-            { LocationID.WEST_GRASS, Terrain.GRASS },
-            { LocationID.WEST_BAGU_WOODS1, Terrain.FOREST },
-            { LocationID.WEST_TRAP_ROAD, Terrain.ROAD },
-            { LocationID.WEST_MINOR_SWAMP1, Terrain.SWAMP },
-            { LocationID.WEST_MINOR_GRAVE1, Terrain.GRAVE },
-            { LocationID.WEST_CAVE_PARAPA_NORTH, Terrain.CAVE },
-            { LocationID.WEST_CAVE_PARAPA_SOUTH, Terrain.CAVE },
-            { LocationID.WEST_CAVE_JUMP_NORTH, Terrain.CAVE },
-            { LocationID.WEST_CAVE_JUMP_SOUTH, Terrain.CAVE },
-            { LocationID.WEST_CAVE_PBAG, Terrain.CAVE },
-            { LocationID.WEST_CAVE_MEDICINE, Terrain.CAVE },
-            { LocationID.WEST_CAVE_HEART_CONTAINER, Terrain.CAVE },
-            { LocationID.WEST_FAIRY_CAVE_DROP, Terrain.GRAVE },
-            { LocationID.WEST_FAIRY_CAVE_EXIT, Terrain.CAVE },
-            { LocationID.WEST_BRIDGE_NORTH_OF_SARIA, Terrain.BRIDGE },
-            { LocationID.WEST_BRIDGE_EAST_OF_SARIA, Terrain.BRIDGE },
-            { LocationID.WEST_BRIDGE_AFTER_DM_WEST, Terrain.BRIDGE },
-            { LocationID.WEST_BRIDGE_AFTER_DM_EAST, Terrain.BRIDGE },
-            { LocationID.WEST_MINOR_FOREST_BY_JUMP_CAVE, Terrain.FOREST },
-            { LocationID.WEST_MINOR_SWAMP2, Terrain.SWAMP },
-            { LocationID.WEST_MINOR_FOREST_EAST_OF_SARIA, Terrain.FOREST },
-            { LocationID.WEST_BAGU_WOODS2, Terrain.FOREST },
-            { LocationID.WEST_BAGU_WOODS3, Terrain.FOREST },
-            { LocationID.WEST_BAGU_WOODS4, Terrain.FOREST },
-            { LocationID.WEST_BAGU_WOODS5, Terrain.FOREST },
-            { LocationID.WEST_MINOR_ROAD, Terrain.ROAD },
-            { LocationID.WEST_MINOR_DESERT, Terrain.DESERT },
-            //{ 0x4658, terrain.bridge }, // Raft to the east
-            //{ 0x4659, terrain.cave }, // Cave to DM
-            //{ 0x465A, terrain.cave }, // Cave from DM
-            { LocationID.WEST_KINGS_TOMB, Terrain.GRAVE }, //44: King's tomb
-            { LocationID.WEST_TOWN_RAURU, Terrain.TOWN },
-            { LocationID.WEST_TOWN_RUTO, Terrain.TOWN },
-            { LocationID.WEST_TOWN_SARIA_SOUTH, Terrain.TOWN },
-            { LocationID.WEST_TOWN_SARIA_NORTH, Terrain.TOWN },
-            { LocationID.WEST_BAGU_HOUSE, Terrain.FOREST },
-            { LocationID.WEST_TOWN_MIDO, Terrain.TOWN },
-            { LocationID.WEST_PALACE1, Terrain.PALACE },
-            { LocationID.WEST_PALACE2, Terrain.PALACE },
-            { LocationID.WEST_PALACE3, Terrain.PALACE }
-    };
 
-    private const int MAP_ADDR = 0x7480;
 
-    public WestHyrule(RandomizerProperties props, Random r, ROM rom) : base(r)
+    public WestHyrule(RandomizerProperties props, Random r, ROM rom) : base(r, RomMap.WEST_MAP_OFFSET)
     {
         isHorizontal = props.WestIsHorizontal;
         List<Location> loadedLocations =
         [
-            .. rom.LoadLocations(LocationID.WEST_NORTH_PALACE, 10, terrains),
-            .. rom.LoadLocations(LocationID.WEST_CAVE_PARAPA_NORTH, 4, terrains),
-            .. rom.LoadLocations(LocationID.WEST_CAVE_PBAG, 3, terrains),
-            .. rom.LoadLocations(LocationID.WEST_FAIRY_CAVE_DROP, 2, terrains),
-            .. rom.LoadLocations(LocationID.WEST_BRIDGE_NORTH_OF_SARIA, 12, terrains),
-            .. rom.LoadLocations(LocationID.WEST_MINOR_DESERT, 1, terrains),
-            .. rom.LoadLocations(LocationID.WEST_KINGS_TOMB, 2, terrains),
-            .. rom.LoadLocations(LocationID.WEST_TOWN_RUTO, 8, terrains),
+            .. rom.LoadLocations(LocationID.WEST_NORTH_PALACE, 10),
+            .. rom.LoadLocations(LocationID.WEST_CAVE_PARAPA_NORTH, 4),
+            .. rom.LoadLocations(LocationID.WEST_CAVE_PBAG, 3),
+            .. rom.LoadLocations(LocationID.WEST_FAIRY_CAVE_DROP, 2),
+            .. rom.LoadLocations(LocationID.WEST_BRIDGE_NORTH_OF_SARIA, 12),
+            .. rom.LoadLocations(LocationID.WEST_MINOR_DESERT, 1),
+            .. rom.LoadLocations(LocationID.WEST_KINGS_TOMB, 2),
+            .. rom.LoadLocations(LocationID.WEST_TOWN_RUTO, 8),
         ];
         loadedLocations.ForEach(AddLocation);
 
@@ -125,6 +75,7 @@ public sealed class WestHyrule : World
         grassTile = GetLocation(LocationID.WEST_GRASS);
         heartContainerCave = GetLocation(LocationID.WEST_CAVE_HEART_CONTAINER); //0x463f
         pbagCave = GetLocation(LocationID.WEST_CAVE_PBAG);
+        kingsTomb = GetLocation(LocationID.WEST_KINGS_TOMB);
 
         //Towns
         bagu = GetLocation(LocationID.WEST_BAGU_HOUSE); //0x4661
@@ -167,7 +118,7 @@ public sealed class WestHyrule : World
         bridge1 = GetLocation(LocationID.WEST_BRIDGE_AFTER_DM_WEST); //0x4644
         bridge2 = GetLocation(LocationID.WEST_BRIDGE_AFTER_DM_EAST); //0x4645
 
-        caveConnections = []; // (left,right)
+        caveConnections = []; // left/right (north/south for vertical calderas)
         caveConnections.Add((parapaCave1, parapaCave2));
         caveConnections.Add((jumpCave, jumpCave2));
 
@@ -221,7 +172,7 @@ public sealed class WestHyrule : World
         ];
 
         continentId = Continent.WEST;
-        baseAddr = RomMap.ContinentLocationBases[continentId];
+        baseAddr = RomMap.WEST_LOCATIONS_BASE;
         VANILLA_MAP_ADDR = 0x506C;
 
         walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
@@ -242,11 +193,14 @@ public sealed class WestHyrule : World
             unimportantLocs.Add(GetLocation(LocationID.WEST_BAGU_WOODS5));
             unimportantLocs.Add(GetLocation(LocationID.WEST_MINOR_ROAD));
             unimportantLocs.Add(GetLocation(LocationID.WEST_MINOR_DESERT));
-            if (props.HelpfulHints == HelpfulHintOption.NONE)
-            {
-                unimportantLocs.Add(GetLocation(LocationID.WEST_KINGS_TOMB));
-            }
         }
+
+        if (props.StartingLocation != StartingLocation.NORTH_PALACE)
+        {
+            // North Palace is useless if we don't start there
+            RemoveLocations([northPalace]);
+        }
+
         biome = props.WestBiome;
         if (biome.UsesVanillaMap() || props.WestSize == OverworldSizeOption.LARGE)
         {
@@ -265,59 +219,8 @@ public sealed class WestHyrule : World
             // caveConnections.Remove((fairyCave, fairyCave2));
         }
 
-        //Climate filtering
-        climate = Climates.Create(continentId, props.WestClimate);
-        climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
-        climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
-        //climate.DisallowTerrain(Terrain.LAVA);
+        climate = Climates.CreateForWorld(continentId, props.WestClimate, biome, props.CanWalkOnWaterWithBoots);
 
-        section = new SortedDictionary<(int, int), string>{
-            { (0x34, 0x17), "north" },
-            { (0x20, 0x1D), "north" },
-            { (0x2A, 0x25), "north" },
-            { (0x3C, 0x10), "north" },
-            { (0x56, 0x14), "mid" },
-            { (0x40, 0x3E), "parapa" },
-            { (0x4D, 0x15), "mid" },
-            { (0x39, 0x3D), "parapa" },
-            { (0x47, 0x08), "mid" },
-            { (0x5C, 0x30), "grave" },
-            { (0x29, 0x30), "parapa" },
-            { (0x2E, 0x37), "north" },
-            { (0x3A, 0x01), "north" },
-            { (0x3E, 0x03), "mid" },
-            { (0x3E, 0x26), "mid" },
-            { (0x45, 0x09), "hammer0" },
-            { (0x3E, 0x36), "hammer" },
-            { (0x60, 0x32), "grave" },
-            { (0x66, 0x3B), "island" },
-            { (0x52, 0x10), "mid" },
-            { (0x57, 0x1A), "mid" },
-            { (0x61, 0x1A), "dmexit" },
-            { (0x61, 0x22), "grave" },
-            { (0x40, 0x07), "mid" },
-            { (0x43, 0x11), "mid" },
-            { (0x57, 0x21), "mid" },
-            { (0x4C, 0x14), "mid" },
-            { (0x4D, 0x11), "mid" },
-            { (0x4E, 0x13), "mid" },
-            { (0x4D, 0x17), "mid" },
-            { (0x44, 0x25), "mid" },
-            { (0x66, 0x26), "grave" },
-            { (0x4D, 0x3D), "grave" },
-            { (0x5F, 0x0A), "lifesouth" },
-            { (0x60, 0x15), "dmexit" },
-            { (0x58, 0x32), "grave" },
-            { (0x36, 0x2E), "north" },
-            { (0x24, 0x02), "north" },
-            { (0x5B, 0x08), "lifesouth" },
-            { (0x59, 0x08), "mid" },
-            { (0x4C, 0x15), "mid" },
-            { (0x4B, 0x3C), "grave" },
-            { (0x20, 0x3E), "parapa" },
-            { (0x40, 0x0B), "mid" },
-            { (0x62, 0x39), "island" }
-        };
         lostWoods = [
             GetLocation(LocationID.WEST_BAGU_WOODS2),
             GetLocation(LocationID.WEST_BAGU_WOODS3),
@@ -325,1105 +228,491 @@ public sealed class WestHyrule : World
             GetLocation(LocationID.WEST_BAGU_WOODS5),
             GetLocation(LocationID.WEST_BAGU_WOODS1)
         ];
-        //SetVanillaCollectables(props.ReplaceFireWithDash);
+    }
+
+    private protected override Action CaptureTerrainScratchState()
+    {
+        var center = (calderaCenterX, calderaCenterY);
+        return () => (calderaCenterX, calderaCenterY) = center;
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
     {
-        foreach (Location location in AllLocations)
-        {
-            location.CanShuffle = true;
-            location.IsPassthrough = location.WasPassthrough;
-            location.ResetCoords(biome.UsesVanillaMap());
-        }
+        using var candidate = BeginTerrainCandidate(rom);
+        PrepareTerraformLocations();
         if (biome.UsesVanillaMap())
         {
-            Debug.Assert(MapRows == 75);
-            Debug.Assert(MapColumns == 64);
-            map = new OverworldMap(rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MapRows, MapColumns));
-            if (biome == Biome.VANILLA_SHUFFLE)
-            {
-                areasByLocation = new SortedDictionary<string, List<Location>>
-                {
-                    { "north", new List<Location>() },
-                    { "mid", new List<Location>() },
-                    { "parapa", new List<Location>() },
-                    { "grave", new List<Location>() },
-                    { "lifesouth", new List<Location>() },
-                    { "island", new List<Location>() },
-                    { "hammer", new List<Location>() },
-                    { "hammer0", new List<Location>() },
-                    { "dmexit", new List<Location>() }
-                };
-                foreach (Location location in AllLocations)
-                {
-                    // section uses tuples with the Y+30 offset
-                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationAt(location.Pos)!);
-                }
-                ChooseConn("parapa", connections, true);
-                ChooseConn("lifesouth", connections, true);
-                ChooseConn("island", connections, true);
-                ChooseConn("dmexit", connections, true);
-
-                ShuffleLocations(AllLocations);
-                if (!props.LegacyVanillaShuffledLocations)
-                {
-                    foreach (Location location in AllLocations)
-                    {
-                        map[location.Y, location.Xpos] = location.TerrainType;
-                    }
-                }
-            }
+            LoadAndShuffleVanillaMap(props, rom);
         }
-        else //Not vanilla
+        else // Generate biome terrain
         {
-            Terrain normalWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
-            Terrain preplacedWater = props.CanWalkOnWaterWithBoots ? Terrain.PREPLACED_WATER_WALKABLE : Terrain.PREPLACED_WATER;
-
-            int bytesWritten = 2000;
-
-            if (props.BagusWoods)
+            var profile = ResolveTerrainProfile(props);
+            if (!TryGenerateTerrainWithinBudget(props, profile, TryGenerateTerrainAttempt))
             {
-                bagu.CanShuffle = false;
-                foreach (Location location in lostWoods)
-                {
-                    location.CanShuffle = false;
-                    unimportantLocs.Remove(location);
-                }
+                return false;
             }
-            while (bytesWritten > MAP_SIZE_BYTES)
+        }
+        if (!TryValidateAndStageMap()) return false;
+        candidate.Commit();
+        return true;
+    }
+
+    /// <summary>Loads vanilla terrain and applies the existing shuffle and repainting rules in order.</summary>
+    private void LoadAndShuffleVanillaMap(RandomizerProperties props, ROM rom)
+    {
+        LoadVanillaTerrain(rom);
+        if (biome == Biome.VANILLA_SHUFFLE)
+        {
+            var areas = VanillaShuffleAreas.GroupLocations(continentId, AllLocations);
+            PlaceVanillaShuffleConnection(areas["parapa"]);
+            PlaceVanillaShuffleConnection(areas["lifesouth"]);
+            PlaceVanillaShuffleConnection(areas["island"]);
+            PlaceVanillaShuffleConnection(areas["dmexit"]);
+
+            ShuffleVanillaLocations(props.LegacyVanillaShuffledLocations);
+        }
+    }
+
+    /// <summary>Initializes map, biome reservations, and terrain for one map-budget attempt.</summary>
+    private Terrain PrepareGeneratedMap(RandomizerProperties props, BiomeTerrainProfile profile)
+    {
+        sariaSouth.ReserveForTerrainGeneration();
+        sariaNorth.ReserveForTerrainGeneration();
+        InitializeGeneratedMap();
+        Terrain riverTerrain = profile.RiverTerrain;
+
+        switch (biome)
+        {
+            case Biome.ISLANDS:
+            case Biome.MOUNTAINOUS:
+                FillMapBorder(profile.MapBorder);
+                DrawTerrainStripes(profile.StripeTerrain, profile.NearEdgeMargin, profile.FarEdgeMargin);
+                break;
+            case Biome.CANYON:
+            case Biome.DRY_CANYON:
+                if (biome == Biome.DRY_CANYON)
+                {
+                    bridge1.Disable();
+                    bridge2.Disable();
+                }
+                DrawCanyon(riverTerrain, profile.Climate, profile.CanyonBankTerrains, profile.IsHorizontal);
+                break;
+            case Biome.COASTAL_ISLANDS:
+                DrawCoastalIslands(profile);
+                break;
+            case Biome.CALDERA:
+                DrawCenterMountain(profile.IsHorizontal);
+                locationAtPalace3.ReserveForTerrainGeneration();
+                break;
+            case Biome.VANILLALIKE:
+                // Keep this biome's unused road encounter out of later crossing placement.
+                GetLocation(LocationID.WEST_TRAP_ROAD).Disable(); // Legacy behavior of no road bubble tiles
+                DrawMountains();
+                DrawRiver(props.CanWalkOnWaterWithBoots);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(biome), biome, "Expected a supported generated West biome.");
+        }
+        return riverTerrain;
+    }
+
+    /// <summary>Places terrain, connectors and blockers, disables unplaced roads/bridges, then measures size.</summary>
+    private bool TryGenerateTerrainAttempt(RandomizerProperties props, BiomeTerrainProfile profile, out int encodedSize)
+    {
+        encodedSize = 0;
+        using var attempt = BeginGeneratedTerrainAttempt(profile);
+        if (props.BagusWoods)
+        {
+            foreach (var location in lostWoods) unimportantLocs.Remove(location);
+        }
+        Terrain riverTerrain = PrepareGeneratedMap(props, profile);
+        var (raftDirection, bridgeDirection) = PrepareConnectorShores(props, profile);
+        if (biome == Biome.CALDERA)
+        {
+            bool g = MakeCaldera(profile.Water);
+            if (!g)
             {
-                AllLocations.ForEach(i => i.CanShuffle = true);
-                Terrain riverTerrain = Terrain.MOUNTAIN;
-                sariaSouth.CanShuffle = false;
-                sariaNorth.CanShuffle = false;
-
-                map = new OverworldMap(MapRows, MapColumns);
-
-                //blank the whole map to start
-                for (int i = 0; i < MapRows; i++)
-                {
-                    for (int j = 0; j < MapColumns; j++)
-                    {
-                        map[i, j] = Terrain.NONE;
-                    }
-                }
-
-                //Biome specifics
-                switch (biome)
-                {
-                    case Biome.ISLANDS:
-                        riverTerrain = preplacedWater;
-
-                        //Fill the edges with water
-                        for (int i = 0; i < MapColumns; i++)
-                        {
-                            map[0, i] = preplacedWater;
-                            map[MapRows - 1, i] = preplacedWater;
-                        }
-                        for (int i = 0; i < MapRows; i++)
-                        {
-                            map[i, 0] = preplacedWater;
-                            map[i, MapColumns - 1] = preplacedWater;
-                        }
-
-
-                        //Stripe 1-3 rows/columns with water to establish rough island borders
-                        int cols = RNG.Next(2, 4);
-                        int rows = RNG.Next(2, 4);
-                        List<int> pickedC = [];
-                        List<int> pickedR = [];
-
-                        while (cols > 0)
-                        {
-                            int col = RNG.Next(10, MapColumns - 11);
-                            if (!pickedC.Contains(col))
-                            {
-                                for (int i = 0; i < MapRows; i++)
-                                {
-                                    if (map[i, col] == Terrain.NONE)
-                                    {
-                                        map[i, col] = preplacedWater;
-                                    }
-                                }
-                                pickedC.Add(col);
-                                cols--;
-                            }
-                        }
-                        while (rows > 0)
-                        {
-                            int row = RNG.Next(10, MapRows - 11);
-                            if (!pickedR.Contains(row))
-                            {
-                                for (int i = 0; i < MapColumns; i++)
-                                {
-                                    if (map[row, i] == Terrain.NONE)
-                                    {
-                                        map[row, i] = preplacedWater;
-                                    }
-                                }
-                                pickedR.Add(row);
-                                rows--;
-                            }
-                        }
-                        sariaSouth.CanShuffle = false;
-                        sariaNorth.CanShuffle = false;
-                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
-                        //Islands specifically seeds preplaced water instead of normally expandable water to make wetlands less insane
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,
-                            Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, preplacedWater };
-
-                        break;
-
-                    case Biome.CANYON:
-                    case Biome.DRY_CANYON:
-                        riverTerrain = preplacedWater;
-                        if (biome == Biome.DRY_CANYON)
-                        {
-                            riverTerrain = Terrain.DESERT;
-                            bridge1.CanShuffle = false;
-                            bridge1.YRaw = 0;
-                            bridge2.CanShuffle = false;
-                            bridge2.YRaw = 0;
-                        }
-                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN];
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
-
-                        DrawCanyon(riverTerrain);
-                        walkableTerrains.Remove(Terrain.MOUNTAIN);
-                        //randomTerrainFilter.Add(Terrain.lava);
-                        break;
-                    case Biome.CALDERA:
-                        DrawCenterMountain();
-                        locationAtPalace3.CanShuffle = false;
-                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
-                        break;
-
-                    case Biome.MOUNTAINOUS:
-                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
-
-                        riverTerrain = Terrain.MOUNTAIN;
-                        for (int i = 0; i < MapColumns; i++)
-                        {
-                            map[0, i] = Terrain.MOUNTAIN;
-                            map[MapRows - 1, i] = Terrain.MOUNTAIN;
-                        }
-
-                        for (int i = 0; i < MapRows; i++)
-                        {
-                            map[i, 0] = Terrain.MOUNTAIN;
-                            map[i, MapColumns - 1] = Terrain.MOUNTAIN;
-                        }
-
-
-                        cols = RNG.Next(2, 4);
-                        rows = RNG.Next(2, 4);
-                        pickedC = [];
-                        pickedR = [];
-
-                        while (cols > 0)
-                        {
-                            int col = RNG.Next(10, MapColumns - 11);
-                            if (!pickedC.Contains(col))
-                            {
-                                for (int i = 0; i < MapRows; i++)
-                                {
-                                    if (map[i, col] == Terrain.NONE)
-                                    {
-                                        map[i, col] = Terrain.MOUNTAIN;
-                                    }
-                                }
-                                pickedC.Add(col);
-                                cols--;
-                            }
-                        }
-
-                        while (rows > 0)
-                        {
-                            int row = RNG.Next(10, MapRows - 11);
-                            if (!pickedR.Contains(row))
-                            {
-                                for (int i = 0; i < MapColumns; i++)
-                                {
-                                    if (map[row, i] == Terrain.NONE)
-                                    {
-                                        map[row, i] = Terrain.MOUNTAIN;
-                                    }
-                                }
-                                pickedR.Add(row);
-                                rows--;
-                            }
-                        }
-                        sariaSouth.CanShuffle = false;
-                        sariaNorth.CanShuffle = false;
-                        break;
-                    default:
-                        walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
-                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, normalWater };
-                        //drawRoad();
-                        DrawMountains();
-                        //drawBridge();
-                        DrawRiver(props.CanWalkOnWaterWithBoots);
-                        break;
-                }
-
-                Direction raftDirection = Direction.EAST;
-                if (props.ContinentConnections != ContinentConnectionType.NORMAL && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                {
-                    raftDirection = (Direction)RNG.Next(4);
-                }
-                else if (biome == Biome.CANYON || biome == Biome.DRY_CANYON || biome == Biome.CALDERA)
-                {
-                    raftDirection = isHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
-                }
-                if (raft != null)
-                {
-                    DrawOcean(raftDirection, preplacedWater);
-                }
-
-
-                Direction bridgeDirection = (Direction)RNG.Next(4);
-                do
-                {
-                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA)
-                    {
-                        bridgeDirection = (Direction)RNG.Next(4);
-                    }
-                    else
-                    {
-                        bridgeDirection = isHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
-                    }
-                } while (bridgeDirection == raftDirection);
-                if (bridge != null)
-                {
-                    DrawOcean(bridgeDirection, preplacedWater);
-                }
-
-                if (biome == Biome.CALDERA)
-                {
-                    bool g = MakeCaldera(normalWater, props.SaneCaves);
-                    if (!g)
-                    {
-                        failedOnMakeCaldera++;
-                        return false;
-                    }
-                }
-
-                if (props.BagusWoods)
-                {
-                    debug++;
-                    bool f = PlaceBagu();
-                    if (!f)
-                    {
-                        failedOnBaguPlacement++;
-                        return false;
-                    }
-                }
-
-                PlaceRandomTerrain(climate);
-
-                bool b = PlaceLocations(riverTerrain, props.SaneCaves);
-                if (!b)
-                {
-                    failedOnPlaceLocations++;
-                    return false;
-                }
-
-                //Debug.WriteLine(GetMapDebug());
-                if (!GrowTerrain(climate))
-                {
-                    return false;
-                }
-
-                //This is ass-backwards. We should be placing the raft (and the seed water associated with it) between
-                //seed terrain and grow. Instead we're just randomly hoping there is water on the edge, and if there isn't
-                //we're regenerating the whole expensive-ass operation. Making this change carries consequences across all
-                //continents so it's a later thing.
-                if (raft != null)
-                {
-                    bool raftSuccess = DrawRaft(raftDirection);
-                    if (!raftSuccess)
-                    {
-                        failedOnRaftPlacement++;
-                        return false;
-                    }
-                }
-
-                if (bridge != null)
-                {
-                    bool bridgeSuccess = DrawBridge(bridgeDirection);
-                    if (!bridgeSuccess)
-                    {
-                        failedOnBridgePlacement++;
-                        return false;
-                    }
-                }
-
-                if (biome == Biome.CALDERA)
-                {
-                    bool f = ConnectIslands(1, true, preplacedWater, false, false, false, false, props.CanWalkOnWaterWithBoots, biome,
-                        calderaCenterX - CALDERA_DEAD_ZONE_X, calderaCenterX + CALDERA_DEAD_ZONE_X,
-                        calderaCenterY - CALDERA_DEAD_ZONE_Y, calderaCenterY + CALDERA_DEAD_ZONE_Y);
-                    if (!f)
-                    {
-                        failedOnIslandConnection++;
-                        return false;
-                    }
-                }
-
-                BlockCaves(props.BoulderBlockConnections, Terrain.ROCK);
-                //Debug.WriteLine(GetMapDebug());
-                PlaceHiddenLocations(props.LessImportantLocationsOption);
-
-                if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
-                {
-                    //Debug.WriteLine(GetMapDebug());
-                    bool f = ConnectIslands(100, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
-                    if (!f)
-                    {
-                        //Debug.WriteLine(GetMapDebug());
-                        failedOnConnectIslands++;
-                        return false;
-                    }
-                }
-                if (biome == Biome.ISLANDS)
-                {
-                    bool f = ConnectIslands(25, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
-                    if (!f)
-                    {
-                        failedOnConnectIslands++;
-                        return false;
-                    }
-                }
-                if (biome == Biome.MOUNTAINOUS)
-                {
-                    walkableTerrains.Add(Terrain.ROAD);
-
-                    bool h = ConnectIslands(15, true, riverTerrain, false, false, false, false, props.CanWalkOnWaterWithBoots, biome);
-                    if (!h)
-                    {
-                        failedOnConnectIslands++;
-                        return false;
-                    }
-                }
-                if (biome == Biome.VANILLALIKE)
-                {
-                    riverTerrain = preplacedWater;
-                    //2 bridges over the mountains
-                    ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, false, props.CanWalkOnWaterWithBoots, biome);
-                    //4 bridges including saria and the double bridge across arbitrary water
-                    bool f = ConnectIslands(4, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
-                    if (!f)
-                    {
-                        failedOnConnectIslands++;
-                        return false;
-                    }
-                }
-
-                foreach (Location location in Locations[Terrain.ROAD])
-                {
-                    if (location.CanShuffle)
-                    {
-                        location.YRaw = 0;
-                        location.CanShuffle = false;
-                    }
-                }
-
-                foreach (Location location in Locations[Terrain.BRIDGE])
-                {
-                    if (location.CanShuffle)
-                    {
-                        location.YRaw = 0;
-                        location.CanShuffle = false;
-                    }
-                }
-
-                //check bytes and adjust
-                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES);
-                logger.Debug("West:" + bytesWritten);
+                failedOnMakeCaldera++;
+                return false;
             }
         }
 
+        if (props.BagusWoods)
+        {
+            bool f = PlaceBagu();
+            if (!f)
+            {
+                failedOnBaguPlacement++;
+                return false;
+            }
+        }
+
+        PlaceRandomTerrain(profile.Climate, profile.SeedTerrains);
+
+        if (!TryPlaceEdgeConnectorCaves(props))
+        {
+            return false;
+        }
+        bool b = PlaceLocations(riverTerrain, props.SaneCaves);
+        if (!b)
+        {
+            failedOnPlaceLocations++;
+            return false;
+        }
+        if (!TryReserveContinentConnectors(profile, raftDirection, bridgeDirection)) return false;
+        if (!GrowTerrain(profile.Climate))
+        {
+            return false;
+        }
+
+        if (!TryFinalizeContinentConnectors()) return false;
+
+        if (!TryConnectGeneratedRegions(props, riverTerrain, profile.PreplacedWater))
+        {
+            return false;
+        }
+
+        foreach (Location location in Locations[Terrain.ROAD])
+        {
+            if (location.CanShuffle)
+            {
+                location.Disable();
+            }
+        }
+
+        foreach (Location location in Locations[Terrain.BRIDGE])
+        {
+            if (location.CanShuffle)
+            {
+                location.Disable();
+            }
+        }
+
+        if (!ValidateEdgeConnectorCaves(props))
+        {
+            return false;
+        }
+
+        //check bytes and adjust
+        encodedSize = EncodeTerrainMap().Length;
+        logger.Debug("West:" + encodedSize);
+
+        return true;
+    }
+
+    /// <summary>Connects biome regions around cave blockers and hidden locations, retaining West's failure counters.</summary>
+    private bool TryConnectGeneratedRegions(RandomizerProperties props, Terrain riverTerrain, Terrain preplacedWater)
+    {
+        if (biome == Biome.CALDERA)
+        {
+            var crossings = PlaceRegionCrossings(new RegionCrossingOptions
+            {
+                MaximumCrossings = 1,
+                CrossingTerrain = preplacedWater,
+                Biome = biome,
+                CanWalkOnWaterWithBoots = props.CanWalkOnWaterWithBoots,
+                Features = CrossingFeatures.Saria,
+                DeadZone = new(
+                    MinimumX: calderaCenterX - CALDERA_DEAD_ZONE_X,
+                    MaximumX: calderaCenterX + CALDERA_DEAD_ZONE_X,
+                    MinimumY: calderaCenterY - CALDERA_DEAD_ZONE_Y,
+                    MaximumY: calderaCenterY + CALDERA_DEAD_ZONE_Y)
+            });
+            if ((crossings.PlacedFeatures & CrossingFeatures.Saria) == 0)
+            {
+                failedOnIslandConnection++;
+                return false;
+            }
+        }
+
+        BlockCaves(props.BoulderBlockConnections, Terrain.ROCK);
+        PlaceHiddenLocations(props.LessImportantLocationsOption);
+
+        int maximumCrossings;
+        Terrain crossingTerrain = riverTerrain;
+        CrossingFeatures features = CrossingFeatures.Saria | CrossingFeatures.LongBridge;
+        switch (biome)
+        {
+            case Biome.CANYON:
+            case Biome.DRY_CANYON:
+                maximumCrossings = 100;
+                break;
+            case Biome.ISLANDS:
+            case Biome.COASTAL_ISLANDS:
+                maximumCrossings = 25;
+                break;
+            case Biome.MOUNTAINOUS:
+                walkableTerrains.Add(Terrain.ROAD);
+                maximumCrossings = 15;
+                features = CrossingFeatures.Saria;
+                break;
+            case Biome.VANILLALIKE:
+                // Mountain passages are optional. The water request determines acceptance.
+                _ = PlaceRegionCrossings(new RegionCrossingOptions
+                {
+                    MaximumCrossings = 2,
+                    CrossingTerrain = Terrain.MOUNTAIN,
+                    Biome = biome,
+                    CanWalkOnWaterWithBoots = props.CanWalkOnWaterWithBoots
+                });
+                maximumCrossings = 4;
+                crossingTerrain = preplacedWater;
+                break;
+            case Biome.CALDERA:
+                return true;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(biome), biome, "Expected a supported generated West biome.");
+        }
+
+        var requiredCrossings = PlaceRegionCrossings(new RegionCrossingOptions
+        {
+            MaximumCrossings = maximumCrossings,
+            CrossingTerrain = crossingTerrain,
+            Biome = biome,
+            CanWalkOnWaterWithBoots = props.CanWalkOnWaterWithBoots,
+            Features = features
+        });
+        if ((requiredCrossings.PlacedFeatures & CrossingFeatures.Saria) == 0
+            || requiredCrossings.Termination == RegionCrossingTermination.LongBridgeEntranceBlocked)
+        {
+            failedOnConnectIslands++;
+            return false;
+        }
+        return true;
+    }
+
+    public override bool ValidateBasicRouting()
+    {
+        if (biome == Biome.ISLANDS || biome == Biome.COASTAL_ISLANDS)
+        {
+            var start = startLocation ?? throw new InvalidOperationException("West Islands needs a starting location before terrain validation.");
+            var targets = RequiredLocations(false, false).Union(GetContinentConnections());
+            // in addition to not allowing boots, we only route from the start location, not all continent connectors
+            return ValidateBasicRouting([start], targets, assumeBoots: false);
+        }
+
+        return base.ValidateBasicRouting();
+    }
+
+    /// <summary>Checks routing before cave repairs, stages terrain and separator, then resets visitation.</summary>
+    private bool TryValidateAndStageMap()
+    {
         if (!ValidateBasicRouting())
         {
+            logger.LogDebug("Terrain routing failed");
             return false;
         }
 
-        if (!ValidateCaves())
-        {
-            return false;
-        }
-        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES);
-        rom.Put(RomMap.NORTH_SOUTH_SEPARATOR_WEST, (byte)(northSouthEncounterSeparator + 30));
+        if (!TryRepairAndValidateCaveExits()) return false;
+        if (!TryStageTerrainMap()) return false;
+        TerrainWrites.Put(RomMap.NORTH_SOUTH_SEPARATOR_WEST, (byte)(northSouthEncounterSeparator + 30));
 
-        visitation = new bool[MapRows, MapColumns];
-        for (int i = 0; i < MapRows; i++)
-        {
-            for (int j = 0; j < MapColumns; j++)
-            {
-                visitation[i, j] = false;
-            }
-        }
+        InitializeVisitation();
 
-        visitation[northPalace.Y, northPalace.Xpos] = true;
         return true;
     }
 
-    public void SetStart()
-    {
-        visitation[northPalace.Y, northPalace.Xpos] = true;
-        northPalace.Reachable = true;
-    }
-
+    /// <summary>Plans Bagu and five distinct woods tiles before publishing any terrain or location changes.</summary>
     private bool PlaceBagu()
     {
-        bagu.CanShuffle = true;
-        lostWoods.ForEach(i => i.CanShuffle = true);
-        int y = RNG.Next(6, MapRows - 7);
-        int x = RNG.Next(6, MapColumns - 7);
-        int tries = 0;
-        while ((map[y, x] != Terrain.NONE || GetLocationByCoordsNoOffset((y, x)) != null) && tries < 1000)
-        {
-            y = RNG.Next(6, MapRows - 7);
-            x = RNG.Next(6, MapColumns - 7);
-        }
-        if (tries >= 1000)
-        {
-            return false;
-        }
-        bagu.Y = y;
-        bagu.Xpos = x;
-        bagu.CanShuffle = false;
-        map[y, x] = Terrain.FOREST;
+        if (!TryPlanBaguPlacement(out var position, out var woodsPositions)) return false;
 
-        int placed = 0;
-        tries = 0;
-        while (placed < 5 && tries < 3000)
-        {
-            int newx = RNG.Next(x - 3, x + 4);
-            int newy = RNG.Next(y - 3, y + 4);
-            while ((map[newy, newx] != Terrain.NONE || GetLocationByCoordsNoOffset((newy, newx)) != null) && tries < 100)
-            {
-                newx = RNG.Next(x - 3, x + 4);
-                newy = RNG.Next(y - 3, y + 4);
-                tries++;
-            }
-            lostWoods[placed].Y = newy;
-            lostWoods[placed].Xpos = newx;
-            map[newy, newx] = Terrain.FOREST;
-            lostWoods[placed].CanShuffle = false;
-            placed++;
-        }
-        if (tries >= 3000 && placed < 3)
-        {
-            return false;
-        }
-        for (int i = placed; i < lostWoods.Count; i++)
-        {
-            lostWoods[placed].YRaw = 0;
-        }
+        bagu.Pos = position;
+        bagu.CanShuffle = false;
+        map[position] = Terrain.FOREST;
+        PlaceBaguWoods(woodsPositions);
         return true;
     }
-    private bool MakeCaldera(Terrain water, bool useSaneCaves)
+
+    /// <summary>Tries at most 1,000 sites, requiring room for all five woods before accepting a site.</summary>
+    /// <remarks>Failure advances RNG but leaves terrain, coordinates and scheduling flags unchanged.</remarks>
+    private bool TryPlanBaguPlacement(out IntVector2 baguPosition, out IntVector2[] woodsPositions)
     {
-        int mapCenterX = MapColumns / 2; // 32
-        int mapCenterY = MapRows / 2; // 37
-        int tries = 0;
-        bool placeable;
-        do
+        baguPosition = IntVector2.ZERO;
+        woodsPositions = [];
+        for (int sample = 0; sample < 1000; sample++)
         {
-            if (isHorizontal)
-            {
-                int minX = mapCenterX - 5;
-                int maxX = mapCenterX + 5;
-                calderaCenterX = RNG.Next(minX, maxX);
-                int minY = Math.Max(7, mapCenterY - 15);
-                int maxY = Math.Min(mapCenterY + 15, MapRows - 8);
-                calderaCenterY = RNG.Next(minY, maxY);
-            }
-            else
-            {
-                int minX = Math.Max(7, mapCenterX - 11);
-                int maxX = Math.Min(mapCenterX + 9, MapColumns - 8);
-                calderaCenterX = RNG.Next(minX, maxX);
-                int minY = mapCenterY - 3;
-                int maxY = mapCenterY + 5;
-                calderaCenterY = RNG.Next(minY, maxY);
-            }
-            placeable = true;
-            for (int i = calderaCenterY - 7; i < calderaCenterY + 8; i++)
-            {
-                for (int j = calderaCenterX - 7; j < calderaCenterX + 8; j++)
-                {
-                    if (map[i, j] != Terrain.MOUNTAIN)
-                    {
-                        placeable = false;
-                        break; // end inner for
-                    }
-                }
-                if (!placeable)
-                {
-                    break; // end outer for
-                }
-            }
-            if (++tries == 1000)
-            {
-                return false;
-            }
-        } while (!placeable);
+            // Retain Y-before-X sampling for the proposed Bagu site.
+            int y = RNG.Next(6, MapRows - 7);
+            var position = new IntVector2(RNG.Next(6, MapColumns - 7), y);
+            if (!IsEmptyBaguTile(position)) continue;
 
-        int startx = calderaCenterX - 5;
-        int starty = calderaCenterY;
-        int deltax = 1;
-        int deltay = 0;
-        if (!isHorizontal)
-        {
-            startx = calderaCenterX;
-            starty = calderaCenterY - 5;
-            deltax = 0;
-            deltay = 1;
+            var availableWoods = FindAvailableBaguWoodsSites(position);
+            if (availableWoods.Count < lostWoods.Count) continue;
+            availableWoods.FisherYatesShuffle(RNG);
+            baguPosition = position;
+            woodsPositions = availableWoods.Take(lostWoods.Count).ToArray();
+            return true;
         }
-        for (int i = 0; i < 10; i++)
-        {
-            int lake = RNG.Next(7, 11);
-            if (i == 0 || i == 9)
+        return false;
+    }
+
+    private bool IsEmptyBaguTile(IntVector2 position) => map[position] == Terrain.NONE && GetLocationAt(position) == null;
+
+    /// <summary>Enumerates distinct unused tiles within three tiles of Bagu, excluding Bagu's own tile.</summary>
+    private List<IntVector2> FindAvailableBaguWoodsSites(IntVector2 baguPosition)
+    {
+        List<IntVector2> positions = [];
+        for (int y = -3; y <= 3; y++)
+            for (int x = -3; x <= 3; x++)
             {
-                lake = RNG.Next(3, 6);
+                var position = baguPosition + new IntVector2(x, y);
+                if (position != baguPosition && IsEmptyBaguTile(position)) positions.Add(position);
             }
-            if (isHorizontal)
-            {
-                for (int j = 0; j < lake / 2; j++)
-                {
-                    map[starty + j, startx] = water;
-                    if (i == 0)
-                    {
-                        map[starty + j, startx - 1] = Terrain.FOREST;
-                    }
-                    if (i == 9)
-                    {
-                        map[starty + j, startx + 1] = Terrain.FOREST;
-                    }
-                }
-                int top = starty + lake / 2;
-                while (map[top, startx - 1] == Terrain.MOUNTAIN)
-                {
-                    map[top, startx - 1] = Terrain.FOREST;
-                    top--;
-                }
-                top = starty + lake / 2;
-                while (map[top, startx - 1] != Terrain.MOUNTAIN)
-                {
-                    map[top, startx] = Terrain.FOREST;
-                    top++;
-                }
+        return positions;
+    }
 
-                for (int j = 0; j < lake - (lake / 2); j++)
-                {
-                    map[starty - j, startx] = water;
-                    if (i == 0)
-                    {
-                        map[starty - j, startx - 1] = Terrain.FOREST;
-                    }
-                    if (i == 9)
-                    {
-                        map[starty - j, startx + 1] = Terrain.FOREST;
-                    }
-                }
-                top = starty - (lake - (lake / 2));
-                while (map[top, startx - 1] == Terrain.MOUNTAIN)
-                {
-                    map[top, startx - 1] = Terrain.FOREST;
-                    top++;
-                }
-                top = starty - (lake - (lake / 2));
-                while (map[top, startx - 1] != Terrain.MOUNTAIN)
-                {
-                    map[top, startx] = Terrain.FOREST;
-                    top--;
-                }
-
-                //map[starty + lake / 2, startx] = terrain.forest;
-                //map[starty - (lake - (lake / 2)), startx] = terrain.forest;
-                if (i == 0)
-                {
-                    map[starty + lake / 2, startx + 1] = Terrain.FOREST;
-                    map[starty - (lake - (lake / 2)), startx - 1] = Terrain.FOREST;
-                }
-                if (i == 9)
-                {
-                    map[starty + lake / 2, startx + 1] = Terrain.FOREST;
-                    map[starty - (lake - (lake / 2)), startx + 1] = Terrain.FOREST;
-                }
-
-            }
-            else
-            {
-                for (int j = 0; j < lake / 2; j++)
-                {
-                    map[starty, startx + j] = water;
-                    if (i == 0)
-                    {
-                        map[starty - 1, startx + j] = Terrain.FOREST;
-                    }
-                    if (i == 9)
-                    {
-                        map[starty + 1, startx + j] = Terrain.FOREST;
-                    }
-                }
-                int top = startx + lake / 2;
-                while (map[starty - 1, top] == Terrain.MOUNTAIN && i != 0)
-                {
-                    map[starty - 1, top] = Terrain.FOREST;
-                    top--;
-                }
-                top = startx + lake / 2;
-                while (map[starty - 1, top] != Terrain.MOUNTAIN && i != 0)
-                {
-                    map[starty, top] = Terrain.FOREST;
-                    top++;
-                }
-
-                for (int j = 0; j < lake - (lake / 2); j++)
-                {
-                    map[starty, startx - j] = water;
-                    if (i == 0)
-                    {
-                        map[starty - 1, startx - j] = Terrain.FOREST;
-                    }
-                    if (i == 9)
-                    {
-                        map[starty + 1, startx - j] = Terrain.FOREST;
-                    }
-                }
-                top = startx - (lake - (lake / 2));
-                while (map[starty - 1, top] == Terrain.MOUNTAIN && i != 0)
-                {
-                    map[starty - 1, top] = Terrain.FOREST;
-                    top++;
-                }
-                top = startx - (lake - (lake / 2));
-                while (map[starty - 1, top] != Terrain.MOUNTAIN && i != 0)
-                {
-                    map[starty, top] = Terrain.FOREST;
-                    top--;
-                }
-                //map[starty, startx + lake / 2] = terrain.forest;
-                //map[starty, startx - (lake - (lake / 2))] = terrain.forest;
-                if (i == 0)
-                {
-                    map[starty - 1, startx + lake / 2] = Terrain.FOREST;
-                    map[starty - 1, startx - (lake - (lake / 2))] = Terrain.FOREST;
-                }
-                if (i == 9)
-                {
-                    map[starty + 1, startx + lake / 2] = Terrain.FOREST;
-                    map[starty + 1, startx - (lake - (lake / 2))] = Terrain.FOREST;
-                }
-            }
-            startx += deltax;
-            starty += deltay;
-        }
-        int caveCount = RNG.Next(2) + 1; // 1 = one-way Caldera, 2 = passthru Caldera
-        Location cave1l, cave1r;
-        Location? cave2l = null, cave2r = null;
-
-        int cavenum1 = RNG.Next(caveConnections.Count);
-        (cave1l, cave1r) = caveConnections[cavenum1];
-        if (cave1l.Y < MapRows && cave1l.Xpos < MapColumns)
+    /// <summary>Publishes the complete, checked woods plan in the existing record order.</summary>
+    private void PlaceBaguWoods(IReadOnlyList<IntVector2> positions)
+    {
+        for (int i = 0; i < lostWoods.Count; i++)
         {
-            map[cave1l.Y, cave1l.Xpos] = Terrain.MOUNTAIN;
+            var woodsLocation = lostWoods[i];
+            woodsLocation.Pos = positions[i];
+            map[positions[i]] = Terrain.FOREST;
+            woodsLocation.CanShuffle = false;
         }
-        if (cave1r.Y < MapRows && cave1r.Xpos < MapColumns)
-        {
-            map[cave1r.Y, cave1r.Xpos] = Terrain.MOUNTAIN;
-        }
+    }
 
-        if (caveCount > 1)
+    private bool MakeCaldera(Terrain water)
+    {
+        if (!TryChooseCalderaCenter()) return false;
+        CalderaTerrain.DrawLake(map, new(calderaCenterX, calderaCenterY), isHorizontal, water, RNG);
+        return TryPlaceCalderaLocations();
+    }
+
+    // West chooses before ordinary location placement and terrain growth, so
+    // the 15x15 mountain check confines the lake to the seeded mountain shape.
+    private bool TryChooseCalderaCenter()
+    {
+        var mapCenter = new IntVector2(MapColumns / 2, MapRows / 2);
+        var minimum = isHorizontal
+            ? new IntVector2(mapCenter.X - 5, Math.Max(7, mapCenter.Y - 15))
+            : new IntVector2(Math.Max(7, mapCenter.X - 11), mapCenter.Y - 3);
+        var maximum = isHorizontal
+            ? new IntVector2(mapCenter.X + 5, Math.Min(mapCenter.Y + 15, MapRows - 8))
+            : new IntVector2(Math.Min(mapCenter.X + 9, MapColumns - 8), mapCenter.Y + 5);
+        bool found = CalderaTerrain.TryChooseCenter(map, RNG, minimum, maximum, out var center);
+        // Keep the last sample as before; candidate rollback restores the prior center on rejection.
+        (calderaCenterX, calderaCenterY) = (center.X, center.Y);
+        return found;
+    }
+
+    private bool TryPlaceCalderaLocations()
+    {
+        // One pair gives the lake a single entrance; two make it a through route.
+        int pairCount = RNG.Next(2) + 1;
+        int primaryIndex = RNG.Next(caveConnections.Count);
+        var primaryPair = caveConnections[primaryIndex];
+        ClearCalderaCavePair(primaryPair);
+
+        (Location Left, Location Right)? secondaryPair = null;
+        if (pairCount == 2)
         {
-            int cavenum2;
+            int secondaryIndex;
             do
             {
-                cavenum2 = RNG.Next(caveConnections.Count);
-            } while (cavenum2 == cavenum1);
-            (cave2l, cave2r) = caveConnections[cavenum2];
-            if (cave2l.Y < MapRows && cave2l.Xpos < MapColumns)
-            {
-                map[cave2l.Y, cave2l.Xpos] = Terrain.MOUNTAIN;
-            }
-            if (cave2r.Y < MapRows && cave2r.Xpos < MapColumns)
-            {
-                map[cave2r.Y, cave2r.Xpos] = Terrain.MOUNTAIN;
-            }
+                secondaryIndex = RNG.Next(caveConnections.Count);
+            } while (secondaryIndex == primaryIndex);
+            secondaryPair = caveConnections[secondaryIndex];
+            ClearCalderaCavePair(secondaryPair.Value);
         }
-        int caveOrientation = RNG.Next(2);
-        if (isHorizontal)
+
+        var outward = isHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
+        if (!TryPlaceCalderaConnection(primaryPair, outward)) return false;
+        if (secondaryPair is { } pair)
         {
-            bool f = HorizontalCave(caveOrientation, calderaCenterX, calderaCenterY, cave1l, cave1r);
-            if (!f)
-            {
-                return false;
-            }
-            cave1l.CanShuffle = false;
-            cave1r.CanShuffle = false;
-            Terrain caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-            map[cave1l.Y, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1l.Y + 1, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1l.Y - 1, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1r.Y, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1r.Y + 1, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1r.Y - 1, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-
-            if (caveCount > 1)
-            {
-                if (cave2l == null || cave2r == null)
-                {
-                    throw new Exception("Failed to find connection caves while constructing caldera");
-                }
-                if (caveOrientation == 0)
-                {
-                    caveOrientation = 1;
-                }
-                else
-                {
-                    caveOrientation = 0;
-                }
-                f = HorizontalCave(caveOrientation, calderaCenterX, calderaCenterY, cave2l, cave2r);
-                if (!f)
-                {
-                    return false;
-                }
-                cave2l.CanShuffle = false;
-                cave2r.CanShuffle = false;
-                caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-                map[cave2l.Y, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2l.Y + 1, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2l.Y - 1, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2r.Y, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2r.Y + 1, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2r.Y - 1, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            }
-
-            if (caveCount == 1)
-            {
-                int delta = -1;
-                if (caveOrientation == 0) //palace goes right
-                {
-                    delta = 1;
-                }
-                int palacex = calderaCenterX;
-                int palacey = RNG.Next(calderaCenterY - 2, calderaCenterY + 3);
-                while (map[palacey, palacex] != Terrain.MOUNTAIN)
-                {
-                    palacex += delta;
-                }
-                map[palacey, palacex] = Terrain.PALACE;
-                locationAtPalace3.Y = palacey;
-                locationAtPalace3.Xpos = palacex;
-                map[palacey, palacex + delta] = Terrain.MOUNTAIN;
-
-            }
-            else
-            {
-                int palaceType = RNG.Next(2);
-                int delta = -1;
-                if (palaceType == 0)
-                {
-                    delta = 1;
-                }
-                int palacex = RNG.Next(calderaCenterX - 2, calderaCenterX + 3);
-                int palacey = calderaCenterY;
-                while (map[palacey, palacex] != Terrain.MOUNTAIN)
-                {
-                    palacey += delta;
-                }
-                map[palacey, palacex] = Terrain.PALACE;
-                locationAtPalace3.Y = palacey;
-                locationAtPalace3.Xpos = palacex;
-                map[palacey + delta, palacex] = Terrain.MOUNTAIN;
-
-            }
-
+            if (!TryPlaceCalderaConnection(pair, outward.Reverse())) return false;
         }
-        else //Vertical
-        {
-            bool f = VerticalCave(caveOrientation, calderaCenterX, calderaCenterY, cave1l, cave1r);
-            if (!f)
-            {
-                return false;
-            }
-            cave1l.CanShuffle = false;
-            cave1r.CanShuffle = false;
-            Terrain caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-
-            map[cave1l.Y - 1, cave1l.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1l.Y - 1, cave1l.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1l.Y - 1, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1r.Y + 1, cave1r.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1r.Y + 1, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1r.Y + 1, cave1r.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-
-            if (caveCount > 1)
-            {
-                if (cave2l == null || cave2r == null)
-                {
-                    throw new Exception("Failed to find connection caves while constructing caldera");
-                }
-                if (caveOrientation == 0)
-                {
-                    caveOrientation = 1;
-                }
-                else
-                {
-                    caveOrientation = 0;
-                }
-                f = VerticalCave(caveOrientation, calderaCenterX, calderaCenterY, cave2l, cave2r);
-                if (!f)
-                {
-                    return false;
-                }
-                cave2l.CanShuffle = false;
-                cave2r.CanShuffle = false;
-                caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-                map[cave2l.Y - 1, cave2l.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2l.Y - 1, cave2l.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2l.Y - 1, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2r.Y + 1, cave2r.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2r.Y + 1, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2r.Y + 1, cave2r.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            }
-
-            if (caveCount == 1)
-            {
-                int delta = -1;
-                if (caveOrientation == 0) //palace goes down
-                {
-                    delta = 1;
-                }
-                int palacex = RNG.Next(calderaCenterX - 2, calderaCenterX + 3);
-                int palacey = calderaCenterY;
-                while (map[palacey, palacex] != Terrain.MOUNTAIN)
-                {
-                    palacey += delta;
-                }
-                map[palacey, palacex] = Terrain.PALACE;
-                locationAtPalace3.Y = palacey;
-                locationAtPalace3.Xpos = palacex;
-                map[palacey + delta, palacex] = Terrain.MOUNTAIN;
-
-
-            }
-            else
-            {
-                int palaceType = RNG.Next(2);
-                int delta = -1;
-                if (palaceType == 0)
-                {
-                    delta = 1;
-                }
-                int palacex = calderaCenterX;
-                int palacey = RNG.Next(calderaCenterY - 2, calderaCenterY + 3);
-                while (map[palacey, palacex] != Terrain.MOUNTAIN)
-                {
-                    palacex += delta;
-                }
-                map[palacey, palacex] = Terrain.PALACE;
-                locationAtPalace3.Y = palacey;
-                locationAtPalace3.Xpos = palacex;
-                map[palacey, palacex + delta] = Terrain.MOUNTAIN;
-
-            }
-        }
+        PlaceCalderaPalace(pairCount, outward);
         return true;
     }
 
-    private void BlockCaves(bool boulderBlockConnections, Terrain blockerTerrain)
+    /// <summary>Clears selected caves' old tiles where they fit the current map dimensions.</summary>
+    private void ClearCalderaCavePair((Location Left, Location Right) pair)
     {
-        int rockNum = RNG.Next(3);
-        List<Location> availableCaves = [.. Locations[Terrain.CAVE]];
-        availableCaves.FisherYatesShuffle(RNG);
-
-        foreach (var cave in availableCaves)
+        foreach (var cave in new[] { pair.Left, pair.Right })
         {
-            if (rockNum == 0) { break; }
-
-            if (!boulderBlockConnections)
-            {
-                bool isConnectorCave = !connections.ContainsKey(cave) && cave != cave1 && cave != cave2;
-                if (isConnectorCave) { continue; }
-            }
-
-            var dir = ValidBlockingCavePosition(cave.Pos);
-            if (dir != null)
-            {
-                PlaceCaveBlocker(cave, dir.Value, blockerTerrain);
-                rockNum--;
-            }
+            if (WithinMapBounds(cave.Pos, 0)) map[cave.Pos] = Terrain.MOUNTAIN;
         }
     }
 
+    /// <summary>Places a passage, reserves its caves and paints forest inside and sampled terrain outside.</summary>
+    private bool TryPlaceCalderaConnection((Location Left, Location Right) pair, Direction outward)
+    {
+        if (!TryPlaceCalderaCavePair(new(calderaCenterX, calderaCenterY), outward, pair)) return false;
+        pair.Left.CanShuffle = false;
+        pair.Right.CanShuffle = false;
+        Terrain exitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
+
+        var axis = isHorizontal ? IntVector2.EAST : IntVector2.SOUTH;
+        bool towardLeft = outward is Direction.WEST or Direction.NORTH;
+        CalderaTerrain.PaintCaveApproach(map, pair.Left.Pos, -axis,
+            towardLeft ? exitTerrain : Terrain.FOREST);
+        CalderaTerrain.PaintCaveApproach(map, pair.Right.Pos, axis,
+            towardLeft ? Terrain.FOREST : exitTerrain);
+        return true;
+    }
+
+    /// <summary>
+    /// Places Palace 3 in the mountain bank opposite a single passage, or on a
+    /// perpendicular bank when passages occupy both ends of the lake.
+    /// </summary>
+    private void PlaceCalderaPalace(int pairCount, Direction primaryOutward)
+    {
+        var center = new IntVector2(calderaCenterX, calderaCenterY);
+        var axis = isHorizontal ? IntVector2.EAST : IntVector2.SOUTH;
+        var across = isHorizontal ? IntVector2.SOUTH : IntVector2.EAST;
+        IntVector2 direction, offsetAxis;
+        if (pairCount == 1)
+        {
+            direction = -primaryOutward.ToIntVector2();
+            offsetAxis = across;
+        }
+        else
+        {
+            direction = RNG.Next(2) == 0 ? across : -across;
+            offsetAxis = axis;
+        }
+        var position = center + RNG.Next(-2, 3) * offsetAxis;
+        while (map[position] != Terrain.MOUNTAIN) position += direction;
+        map[position] = Terrain.PALACE;
+        locationAtPalace3.Pos = position;
+        map[position + direction] = Terrain.MOUNTAIN;
+    }
+
+    /// <summary>Attempts zero to two cave blockers; a partially filled quota is allowed.</summary>
+    private void BlockCaves(bool connectionsCanBeBlocked, Terrain blockerTerrain)
+    {
+        int blockersRemaining = RNG.Next(3);
+        if (blockersRemaining == 0) return;
+        foreach (var cave in GetShuffledCaveBlockerCandidates(connectionsCanBeBlocked))
+        {
+            if (blockersRemaining == 0) break;
+            if (!TryPlaceCaveBlocker(cave, blockerTerrain)) continue;
+            blockersRemaining--;
+        }
+    }
+
+    /// <summary>Seeds West's mountain band before rivers and locations are placed.</summary>
     private void DrawMountains()
     {
-        /*readonly*/ int mountStartY = RNG.Next((int)(MapRows * .30), (int)(MapRows * .56));
-        /*readonly*/ int mountEndY = RNG.Next((int)(MapRows * .30), (int)(MapRows * .56));
-        /*readonly*/ int mountMargin = RNG.Next(2, 8 * MapColumns / 75);
-        /*readonly*/ int mountEndRight = MapColumns - mountMargin;
-        map[mountStartY, 0] = Terrain.MOUNTAIN;
-        bool placedRoad = false;
-
-        int x = 0;
-        int y = mountStartY;
-        int placedRocks = 0;
-        while (x != mountEndRight || y != mountEndY)
+        var start = new IntVector2(0, RNG.Next((int)(MapRows * .30), (int)(MapRows * .56)));
+        int endY = RNG.Next((int)(MapRows * .30), (int)(MapRows * .56));
+        var end = new IntVector2(MapColumns - RNG.Next(2, 8 * MapColumns / 75), endY);
+        map[start] = Terrain.MOUNTAIN;
+        foreach (var position in TerrainLayout.MountainBandInterior(start, end))
         {
-            if (Math.Abs(x - mountEndRight) >= Math.Abs(y - mountEndY))
-            {
-                if (x > mountEndRight && x > 0)
-                {
-                    x--;
-                }
-                else if (x < MapColumns - 1)
-                {
-                    x++;
-                }
-            }
-            else
-            {
-                if (y > mountEndY && y > 0)
-                {
-                    y--;
-                }
-                else if (y < MapRows - 1)
-                {
-                    y++;
-                }
-            }
-            if (x != mountEndRight || y != mountEndY)
-            {
-                if (map[y, x] == Terrain.NONE)
-                {
-                    map[y, x] = Terrain.MOUNTAIN;
-                }
-                else
-                {
-                    if (!placedRoad && map[y, x + 1] != Terrain.ROAD)
-                    {
-                        if (RNG.NextDouble() > .5 && ValidTrapTilePosition(new IntVector2(x, y)) != null)
-                        {
-                            Location roadEnc = GetLocation(LocationID.WEST_TRAP_ROAD);
-                            roadEnc.Xpos = x;
-                            roadEnc.Y = y;
-                            roadEnc.CanShuffle = false;
-                            roadEnc.Reachable = true;
-                            placedRoad = true;
-                        }
-                        else if (placedRocks < 1)
-                        {
-                            Location roadEnc = GetLocation(LocationID.WEST_TRAP_ROAD);
-                            if ((roadEnc.Y != y && roadEnc.Xpos - 1 != x) && (roadEnc.Y + 1 != y && roadEnc.Xpos != x) && (roadEnc.Y - 1 != y && roadEnc.Xpos != x) && (roadEnc.Y != y && roadEnc.Xpos + 1 != x))
-                            {
-                                map[y, x] = Terrain.ROCK;
-                                placedRocks++;
-                            }
-                        }
-                    }
-                    else if (placedRocks < 1)
-                    {
-
-                        map[y, x] = Terrain.ROCK;
-                        placedRocks++;
-                    }
-                }
-            }
+            map[position] = Terrain.MOUNTAIN;
         }
-
-        if (!placedRoad)
-        {
-            Location roadEnc = GetLocation(LocationID.WEST_TRAP_ROAD);
-            roadEnc.Xpos = 0;
-            roadEnc.YRaw = 0;
-            roadEnc.CanShuffle = false;
-        }
-    }
-
-
-    public override void UpdateVisit(IReadOnlySet<RequirementType> requireables)
-    {
-        visitation[northPalace.Y, northPalace.Xpos] = true;
-        base.UpdateVisit(requireables);
     }
 
     protected override List<Location> GetPathingStarts()
     {
         return connections.Keys.Where(i => i.Reachable)
-            .Union(new List<Location>() { northPalace })
+            .Union(startLocation != null ? [startLocation] : [])
             .Union(GetContinentConnections().Where(i => i.Reachable))
             .ToList();
-    }
-
-    /// <summary>
-    /// Determines if all locations on this continent could be reached, assuming you had everything and could reach every entrance.
-    /// If the answer is no, there's no point in bothering with the rest of a world generation.
-    /// </summary>
-    /// <returns></returns>
-    public bool ValidateBasicRouting()
-    {
-        List<Location> unreachedLocations = RequiredLocations(false, false).ToList();
-
-        bool[,] visitedCoordinates = new bool[MapRows, MapColumns];
-        Queue<(int, int)> pendingCoordinates = new();
-        foreach (Location location in GetContinentConnections())
-        {
-            pendingCoordinates.Enqueue((location.Y, location.Xpos));
-        }
-        pendingCoordinates.Enqueue((northPalace.Y, northPalace.Xpos));
-        int y, x;
-        do
-        {
-            (int, int) coordinate = pendingCoordinates.Dequeue();
-            y = coordinate.Item1;
-            x = coordinate.Item2;
-            if (visitedCoordinates[y, x])
-            {
-                continue;
-            }
-            visitedCoordinates[y, x] = true;
-            //if there is a location at this coordinate
-            List<Location> locationsAtCoord = unreachedLocations.Where(location => location.Y == y && location.Xpos == x).ToList();
-            Debug.Assert(locationsAtCoord.Count <= 1);
-            Location? here = unreachedLocations.FirstOrDefault(location => location.Y == y && location.Xpos == x);
-            if (here != null)
-            {
-                //it's reachable
-                unreachedLocations.Remove(here);
-                //if it's a connection cave, add the exit(s) to the pending locations
-                if (connections.ContainsKey(here))
-                {
-                    pendingCoordinates.Enqueue((connections[here].Y, connections[here].Xpos));
-                }
-            }
-
-            //for each adjacent direction, if it's not off the map, and it's potentially walkable terrain, crawl it
-            if (x > 0 && map[y, x - 1].IsWalkable())
-            {
-                pendingCoordinates.Enqueue((y, x - 1));
-            }
-            if (x < MapColumns - 1 && map[y, x + 1].IsWalkable())
-            {
-                pendingCoordinates.Enqueue((y, x + 1));
-            }
-            if (y > 0 && map[y - 1, x].IsWalkable())
-            {
-                pendingCoordinates.Enqueue((y - 1, x));
-            }
-            if (y < MapRows - 1 && map[y + 1, x].IsWalkable())
-            {
-                pendingCoordinates.Enqueue((y + 1, x));
-            }
-        } while (pendingCoordinates.Count > 0);
-
-        return !unreachedLocations.Any();
     }
 
     public override string GetName()
@@ -1435,7 +724,6 @@ public sealed class WestHyrule : World
     {
         HashSet<Location> requiredLocations =
         [
-            northPalace,
             rauru,
             mido,
             ruto,
@@ -1455,39 +743,9 @@ public sealed class WestHyrule : World
             locationAtPalace3,
         ];
 
-        foreach (Location location in connections.Keys)
-        {
-            if (!requiredLocations.Contains(location) && location.YRaw != 0)
-            {
-                requiredLocations.Add(location);
-            }
-        }
+        IncludeEnabledLocalConnections(requiredLocations);
         return requiredLocations.Where(i => i != null);
     }
-
-    /*
-    protected override void SetVanillaCollectables(bool useFire)
-    {
-        locationAtPalace1.VanillaCollectable = Collectable.CANDLE;
-        locationAtPalace2.VanillaCollectable = Collectable.GLOVE;
-        locationAtPalace3.VanillaCollectable = Collectable.RAFT;
-
-        rauru.VanillaCollectable = Collectable.SHIELD_SPELL;
-        ruto.VanillaCollectable = Collectable.JUMP_SPELL;
-        sariaNorth.VanillaCollectable = Collectable.LIFE_SPELL;
-        mido.VanillaCollectable = Collectable.FAIRY_SPELL;
-        midoChurch.VanillaCollectable = Collectable.DOWNSTAB;
-        bagu.VanillaCollectable = Collectable.BAGUS_NOTE;
-        mirrorTable.VanillaCollectable = Collectable.MIRROR;
-
-        grassTile.VanillaCollectable = Collectable.HEART_CONTAINER;
-        pbagCave.VanillaCollectable = Collectable.LARGE_BAG;
-        heartContainerCave.VanillaCollectable = Collectable.HEART_CONTAINER;
-        magicContainerCave.VanillaCollectable = Collectable.MAGIC_CONTAINER;
-        trophyCave.VanillaCollectable = Collectable.TROPHY;
-        medicineCave.VanillaCollectable = Collectable.MEDICINE;
-    }
-    */
 
     public override string GenerateSpoiler()
     {
@@ -1499,47 +757,24 @@ public sealed class WestHyrule : World
         sb.AppendLine("Mido: \n" + mido.Town!.GenerateSpoiler());
         sb.AppendLine("Bagu: \n" + bagu.Town!.GenerateSpoiler());
         sb.AppendLine("Overworld:");
-        sb.AppendLine("\tMagic Container Cave: " + magicContainerCave.GetAllCollectables()[0].EnglishText());
-        sb.AppendLine("\tTrophy Cave: " + trophyCave.GetAllCollectables()[0].EnglishText());
-        sb.AppendLine("\tGrass Tile: " + grassTile.GetAllCollectables()[0].EnglishText());
-        sb.AppendLine("\tHeart Container Cave: " + heartContainerCave.GetAllCollectables()[0].EnglishText());
-        sb.AppendLine("\tPillar Pbag Cave: " + pbagCave.GetAllCollectables()[0].EnglishText());
-        sb.AppendLine("\tMedicine Cave: " + medicineCave.GetAllCollectables()[0].EnglishText());
+        AppendOverworldItemSpoilerLine(sb, magicContainerCave);
+        AppendOverworldItemSpoilerLine(sb, trophyCave);
+        AppendOverworldItemSpoilerLine(sb, grassTile);
+        AppendOverworldItemSpoilerLine(sb, heartContainerCave);
+        AppendOverworldItemSpoilerLine(sb, pbagCave);
+        AppendOverworldItemSpoilerLine(sb, medicineCave);
 
-        List<Collectable> palaceCollectables = locationAtPalace1.GetAllCollectables();
-        sb.Append("\tPalace 1 (" + locationAtPalace1.Palace!.Number + "): ");
-        sb.AppendLine(palaceCollectables.Count == 0 ? "No Items" : string.Join(", ", palaceCollectables.Select(c => c.EnglishText())));
-
-        palaceCollectables = locationAtPalace2.GetAllCollectables();
-        sb.Append("\tPalace 2 (" + locationAtPalace2.Palace!.Number + "): ");
-        sb.AppendLine(palaceCollectables.Count == 0 ? "No Items" : string.Join(", ", palaceCollectables.Select(c => c.EnglishText())));
-
-        palaceCollectables = locationAtPalace3.GetAllCollectables();
-        sb.Append("\tPalace 3 (" + locationAtPalace3.Palace!.Number + "): ");
-        sb.AppendLine(palaceCollectables.Count == 0 ? "No Items" : string.Join(", ", palaceCollectables.Select(c => c.EnglishText())));
+        AppendPalaceSpoilerLine(sb, locationAtPalace1);
+        AppendPalaceSpoilerLine(sb, locationAtPalace2);
+        AppendPalaceSpoilerLine(sb, locationAtPalace3);
 
         sb.AppendLine();
         return sb.ToString();
     }
 
-    protected override void OnUpdateReachableTrigger()
-    {
-    }
-
     public override void DisableDisallowedPassthroughs()
     {
-        foreach (Location location in Locations[Terrain.CAVE])
-        {
-            location.IsPassthrough = false;
-        }
-        foreach (Location location in Locations[Terrain.TOWN])
-        {
-            location.IsPassthrough = false;
-        }
-        foreach (Location location in Locations[Terrain.PALACE])
-        {
-            location.IsPassthrough = false;
-        }
+        base.DisableDisallowedPassthroughs();
         if (raft != null)
         {
             raft.IsPassthrough = false;
@@ -1552,43 +787,28 @@ public sealed class WestHyrule : World
 
     public override void ResetCollectables(RandomizerProperties props)
     {
-        rauru.Town!.GetWizard()!.Collectable = Collectable.SHIELD_SPELL;
-        rauru.Town!.GetWizard()!.CollectableIsShufflable = props.IncludeSpellsInShuffle;
+        ResetTownCollectable(rauru.Town!.GetWizard()!, Collectable.SHIELD_SPELL, props.IncludeSpellsInShuffle);
 
-        ruto.Town!.GetWizard()!.Collectable = props.MarioMode ? Collectable.TANOOKI : Collectable.JUMP_SPELL;
-        ruto.Town!.GetWizard()!.CollectableIsShufflable = props.IncludeSpellsInShuffle;
+        Collectable rutoSpell = props.MarioMode ? Collectable.TANOOKI : Collectable.JUMP_SPELL;
+        ResetTownCollectable(ruto.Town!.GetWizard()!, rutoSpell, props.IncludeSpellsInShuffle);
 
-        sariaNorth.Town!.GetWizard()!.Collectable = Collectable.LIFE_SPELL;
-        sariaNorth.Town!.GetWizard()!.CollectableIsShufflable = props.IncludeSpellsInShuffle;
-        sariaNorth.Town!.GetTownMap(VanillaTownMap.SARIA_TABLE)!.Collectable = Collectable.MIRROR;
-        sariaNorth.Town!.GetTownMap(VanillaTownMap.SARIA_TABLE)!.CollectableIsShufflable = props.IncludeQuestItemsInShuffle;
+        ResetTownCollectable(sariaNorth.Town!.GetWizard()!, Collectable.LIFE_SPELL, props.IncludeSpellsInShuffle);
+        ResetTownCollectable(sariaNorth.Town!.GetTownMap(VanillaTownMap.SARIA_TABLE)!, Collectable.MIRROR, props.IncludeQuestItemsInShuffle);
 
-        mido.Town!.GetWizard()!.Collectable = Collectable.FAIRY_SPELL;
-        mido.Town!.GetWizard()!.CollectableIsShufflable = props.IncludeSpellsInShuffle;
-        mido.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER)!.Collectable = Collectable.DOWNSTAB;
-        mido.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER)!.CollectableIsShufflable = props.IncludeSwordTechsInShuffle;
+        ResetTownCollectable(mido.Town!.GetWizard()!, Collectable.FAIRY_SPELL, props.IncludeSpellsInShuffle);
+        ResetTownCollectable(mido.Town!.GetTownMap(VanillaTownMap.MIDO_TRAINER)!, Collectable.DOWNSTAB, props.IncludeSwordTechsInShuffle);
 
-        bagu.Town!.GetTownMap(VanillaTownMap.BAGU_INDOORS)!.Collectable = Collectable.BAGUS_NOTE;
-        bagu.Town!.GetTownMap(VanillaTownMap.BAGU_INDOORS)!.CollectableIsShufflable = props.IncludeQuestItemsInShuffle;
+        ResetTownCollectable(bagu.Town!.GetTownMap(VanillaTownMap.BAGU_INDOORS)!, Collectable.BAGUS_NOTE, props.IncludeQuestItemsInShuffle);
 
-        trophyCave.SetCollectables([Collectable.TROPHY]);
-        trophyCave.CollectablesAreShufflable = props.ShuffleOverworldItems;
-        medicineCave.SetCollectables([Collectable.MEDICINE]);
-        medicineCave.CollectablesAreShufflable = props.ShuffleOverworldItems;
-        heartContainerCave.SetCollectables([Collectable.HEART_CONTAINER]);
-        heartContainerCave.CollectablesAreShufflable = props.ShuffleOverworldItems;
-        magicContainerCave.SetCollectables([Collectable.MAGIC_CONTAINER]);
-        magicContainerCave.CollectablesAreShufflable = props.ShuffleOverworldItems;
-        pbagCave.SetCollectables([Collectable.LARGE_BAG]);
-        pbagCave.CollectablesAreShufflable = props.ShuffleOverworldItems && props.PbagItemShuffle;
-        grassTile.SetCollectables([Collectable.HEART_CONTAINER]);
-        grassTile.CollectablesAreShufflable = props.ShuffleOverworldItems;
+        ResetOverworldCollectable(trophyCave, Collectable.TROPHY, props.ShuffleOverworldItems);
+        ResetOverworldCollectable(medicineCave, Collectable.MEDICINE, props.ShuffleOverworldItems);
+        ResetOverworldCollectable(heartContainerCave, Collectable.HEART_CONTAINER, props.ShuffleOverworldItems);
+        ResetOverworldCollectable(magicContainerCave, Collectable.MAGIC_CONTAINER, props.ShuffleOverworldItems);
+        ResetOverworldCollectable(pbagCave, Collectable.LARGE_BAG, props.ShuffleOverworldItems && props.PbagItemShuffle);
+        ResetOverworldCollectable(grassTile, Collectable.HEART_CONTAINER, props.ShuffleOverworldItems);
 
-        locationAtPalace1.SetCollectables(locationAtPalace1.Palace!
-            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace1.Palace!.Number - 1]));
-        locationAtPalace2.SetCollectables(locationAtPalace2.Palace!
-            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace2.Palace!.Number - 1]));
-        locationAtPalace3.SetCollectables(locationAtPalace3.Palace!
-            .GetVanillaCollectables(props.PalaceItemRoomCounts[locationAtPalace3.Palace!.Number - 1]));
+        ResetPalaceCollectables(locationAtPalace1, props);
+        ResetPalaceCollectables(locationAtPalace2, props);
+        ResetPalaceCollectables(locationAtPalace3, props);
     }
 }

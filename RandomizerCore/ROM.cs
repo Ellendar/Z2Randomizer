@@ -1878,20 +1878,218 @@ SetDripperHp:
         a.Byt(splitHp);
     }
 
-    public void FixItemPickup(Assembler asm)
+    public void SetStartingLocation(Assembler asm, Location location, List<Palace> palaces)
     {
-        // In Z2R, Link never holds items above his head. So,
-        // we don't set the hold item over head timer ($0x49c), and
-        // we don't set the hold item over head ID ($0x49d).
-        // (If we wanted we could remove all code using these)
+        if (location.ID == LocationID.WEST_NORTH_PALACE)
+        {
+            return; // vanilla starting location
+        }
+
+        int worldNumber = 0;
+        int locationNumber = (int)location.ID - (int)location.Continent * 0x40;
+        int mapNumber = location.Map;
+        int entryPage = location.MapPage;
+        int entryFacing = location.MapPage == 0 ? 0 : 1;
+
+        bool startInTown = false;
+        bool startStandingStill = false;
+        int startPage = 0;
+        int startX = location.ID switch {
+            LocationID.WEST_KINGS_TOMB => 0x78,
+            LocationID.WEST_TOWN_RAURU => 0xa8,
+            LocationID.WEST_TOWN_RUTO => 0xa8,
+            LocationID.WEST_TOWN_SARIA_NORTH => 0xb8,
+            LocationID.WEST_TOWN_MIDO => 0xc0,
+            _ => 0x78,
+        };
+
+        var a = asm.Module();
+        if (location.ID == LocationID.WEST_KINGS_TOMB)
+        {
+            startStandingStill = true;
+            worldNumber = 1;
+        }
+        else if (location.Town != null)
+        {
+            startInTown = true;
+            startStandingStill = true;
+            startPage = 3;
+            entryFacing = 1;
+            worldNumber = location.Continent is Continent.WEST ? 1 : 2;
+            locationNumber--; // Towns seem to lower this by 1 as you enter
+            a.Assign("StartTownNumber", location.GetTownNumber());
+        }
+        else if (location.Palace != null)
+        {
+            worldNumber = location.GetWorld() / 4;
+            int palaceIndex = location.Palace.Number - 1;
+            var root = palaces[palaceIndex].Entrance!;
+            mapNumber = root.Map;
+            a.Assign("StartPalaceNumber", location.Palace.Number);
+        }
+
+        if (startStandingStill)
+        {
+            entryPage = 6; // Special flag to simulate exiting a door at the desired X pos (normally used in the house when exiting New Kasuto fireplace)
+            a.Assign("StartLinkPage", startPage);
+            a.Assign("StartLinkX", startX);
+            a.Assign("StartScrollPage", startPage);
+            a.Assign("PrevScrollPage", (startPage - 1) % 4);
+            a.Assign("NextScrollPage", (startPage + 1) % 4);
+            a.Assign("StartScrollX", 0);
+        }
+
+        a.Set("_START_IN_TOWN", startInTown ? 1 : 0);
+        a.Set("_START_IN_PALACE", location.Palace != null ? 1 : 0);
+        a.Set("_START_STANDING_STILL", startStandingStill ? 1 : 0);
+        a.Assign("StartWorld", worldNumber);
+        a.Assign("StartRegion", (int)location.Continent);
+        a.Assign("StartLocationNumber", locationNumber);
+        a.Assign("StartMapNumber", mapNumber);
+        a.Assign("StartEntryPage", entryPage);
+        a.Assign("StartEntryFacing", entryFacing);
+
+        a.Code(/* lang=s */""""
+.include "z2r.inc"
+.segment "PRG0"
+
+SetStartLocationContinue = $aa20
+.org $aa0b        ; startup_init_begin_game + 3
+    ; A = 0 here
+    sta DoorDepth
+    lda #StartRegion
+    sta RegionNumber
+    lda #StartWorld
+    sta WorldNumber
+    lda #StartMapNumber
+    sta MapNumber
+    jmp SetStartLocationHook
+FREE_UNTIL SetStartLocationContinue
+
+.reloc
+SetStartLocationHook:
+    lda #StartLocationNumber
+    sta LocationNumber
+    lda #StartEntryPage
+    sta EntryPage
+    lda #StartEntryFacing
+    sta EntryFacing
+
+.if _START_IN_TOWN
+    lda #StartTownNumber
+    sta TownNumber
+.endif
+
+.if _START_IN_PALACE
+    lda #StartPalaceNumber
+    sta PalaceNumber
+    lda #StartMapNumber
+    sta temp_room_code
+.endif
+
+.if _START_STANDING_STILL
+    lda #StartLinkPage
+    sta SavedDoorExit2Page
+    lda #StartLinkX
+    sta SavedDoorExit2X
+.endif
+
+    jmp SetStartLocationContinue
+
+
+.if _START_STANDING_STILL
+; On reset, values from $a97f,y are copied to $6957,y
+; We need to set some values here to start in the desired position.
+; (These default values are normally never used.)
+
+; these are accessed in method at $8cec
+.org $a97f + $38  ; will be set to $732 (via $698f)
+    .byt PrevScrollPage
+.org $a97f + $3f  ; will be set to $733 (via $6996)
+    .byt NextScrollPage
+.org $a97f + $46  ; will be set to $734 (via $699d)
+    .byt $0b
+.org $a97f + $4d  ; will be set to $735 (via $69a4)
+    .byt $06
+.org $a97f + $69  ; will be set to $71f && $720 (via $69c0)
+    .byt $00
+.org $a97f + $54  ; will be set to ScrollPage
+    .byt StartScrollPage
+.org $a97f + $5b  ; will be set to ScrollX
+    .byt StartScrollX
+.org $a97f + $62  ; will be set to ScrollPosShadow
+    .byt StartScrollX
+
+; these are accessed in method at $c5f9
+.org $a97f + $2a  ; will be set to $732,$733 (via $6981)
+    .byt PrevScrollPage
+.org $a97f + $31  ; will be set to $734,$735 (via $6988)
+    .byt $0a
+
+.endif
+
+"""");
+    }
+
+    public void FixItemPickup(Assembler asm, bool fastItemPickup)
+    {
+        // Keeping both versions of the patch here, with and without the
+        // item pickup animation.
         //
-        // Instead, we clear out $a8,x to fix the item pickup phantom damage,
+        // We have to clear out $a8,x to fix the item pickup phantom damage,
         // caused by generator code that interprets it as collision data.
         //
         // Also, since 1-ups can drop anywhere, if we're picking up a 1-up
-        // we don't reset the velocity.
+        // we don't reset the velocity (or hoist it).
         var a = asm.Module();
-        a.Code(/* lang=s */"""
+        if (!fastItemPickup)
+        {
+            a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import ItemTileTable
+.segment "PRG7"
+.org $e53b
+SetPostItemPickupVars:
+    lda $af,x                          ; this byte has the item ID we picked up
+    and #$7f                           ; keep bits .xxx xxxx
+    sta $49d
+    cmp #$12                           ; check if item is 1-up
+    beq SetPostItemPickupKeepVelocity  ; skip resetting velocity if 1-up
+        jmp HoistItem
+SetPostItemPickupKeepVelocity:
+    jsr FlagHudUpdate
+    jmp ClearEnemyByte
+FREE_UNTIL $e54f
+
+.reloc
+ClearEnemyByte:
+    lda #$00
+ClearEnemyByteASet:
+    sta $a8,x                          ; clear item/enemy collision byte to prevent phantom damage
+    rts
+
+.org $ed26
+    lda ItemTileTable,y
+.org $ed2c
+    lda ItemTileTable+1,y
+.org $ed54
+    rts
+FREE_UNTIL $ed66
+
+.reloc
+HoistItem:
+    lda #$70
+    sta $49c                           ; set hold item above head timer to 0x70
+    lda #$00
+    sta $70                            ; set Link's X velocity to zero
+    sta $57d                           ; set Link's Y velocity to zero
+    jmp ClearEnemyByteASet
+
+""");
+        }
+        else
+        {
+            a.Code(/* lang=s */"""
 .include "z2r.inc"
 .import FlagHudUpdate
 
@@ -1910,8 +2108,52 @@ SetPostItemPickupKeepVelocity:
     lda #$00
     sta $a8,x                          ; clear item/enemy collision byte to prevent phantom damage
     rts
-
 FREE_UNTIL $e54f
+""");
+        }
+    }
+
+    public void OptimizeOverworldByteDecode(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+
+.segment "PRG0"
+
+UpdateOverworldTilesHorizontalMove := $88e8
+UpdateOverworldTilesVerticalMove := $8bfe
+OverworldRowPointerFetch := $8c48
+
+.org $892d
+    jsr OverworldByteDecode
+
+.org $8c30
+    jsr OverworldByteDecode
+
+; decode the next RLE segment from the row data
+; like vanilla bank7_E001 without the bank swapping.
+; updates zp_02 (terrain) and zp_03 (new column).
+; can now be in PRG0 instead of PRG7
+.segment "PRG0","PRG7"
+.reloc
+OverworldByteDecode:
+    lda (zp_0e),y
+    and #$0f                      ; keep bits .... xxxx
+    sta zp_02
+    lda (zp_0e),y
+    lsr
+    lsr
+    lsr
+    lsr
+    sec
+    adc zp_03
+    sta zp_03                     ; column reached
+    rts
+
+.segment "PRG7"
+.org $e001
+FREE_UNTIL $e01b
 
 """);
     }
@@ -2032,6 +2274,83 @@ Test_Link_Hitbox_Continued:
     rts
 
 """);
+    }
+
+    public void FixSideviewEntryFacing(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+; Make it possible to have 3-page wide rooms by making it so that you enter
+; from the left only when the page is 0. The original code simply used the
+; last bit, meaning entering page 0 and page 2 were both treated as lefts,
+; meaning entering page 2 left you a glitched scroll position.
+
+.include "z2r.inc"
+
+.segment "PRG7"
+
+LoadMapNumberAndPage := $cc97  ; bank7_Get_Area_Code__Enter_Code_and_Direction
+.org $cca9
+    jmp DetermineFacing
+FREE_UNTIL $ccaf
+
+GameMode10_TakeSideExit := $cf4c
+GameMode10_EnterNewSideview := $cfb2
+.org $cfc2
+    and #$03             ; ensure we have A=EntryPage even for drops/elevators (not important, but need to fill the bytes anyway)
+    jsr DetermineFacing
+
+.reloc
+; A=EntryPage; store facing 0 if EntryPage == 0, else 1.
+DetermineFacing:
+    beq @FacingZero
+    lda #$01
+@FacingZero:
+    sta EntryFacing
+    rts
+
+""", "FixSideviewEntryFacing.s");
+    }
+
+    public void FixPassthroughAreaEntryPage(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+; The side a passthrough Location is entered from is based on the direction
+; Link was facing in the overworld. That is wrong for a passthrough whose
+; area only has an overworld exit at one end: entering it from the
+; other direction (or perpendicular to it, e.g. walking on water with the
+; Boots) enters Link into the far end of the room, so walking back out the
+; way he came in leads to the other room instead of the overworld.
+
+.include "z2r.inc"
+
+FinishOverworldEntry := $cbf2
+ContinueForcedRightEntry := $cbfd
+
+.segment "PRG7"
+
+; Vanilla branches here when location byte 3 has the forced-right bit set.
+.org $cbf8  ; lda #$01, sta EntryFacing (5 bytes)
+    jmp UseStoredPassthroughEntryPage
+    FREE_UNTIL ContinueForcedRightEntry
+
+.reloc
+UseStoredPassthroughEntryPage:
+    lda LocationByte3TableRamCopy,y
+    and #$40                           ; passthrough mask
+    bne @KeepStoredPage
+
+    lda #$01
+    sta EntryFacing
+    jmp ContinueForcedRightEntry
+
+@KeepStoredPage:
+    ; With both bits set, retain the page and facing loaded from location byte 2.
+    ; This mode is for edge pages 0 and 3, so the interior-page setup stays bypassed.
+    jmp FinishOverworldEntry
+
+""", "FixPassthroughAreaEntryPage.s");
     }
 
     public void BuffCarrock(Assembler a)
@@ -2178,6 +2497,7 @@ Test_Link_Hitbox_Continued:
         a.Assign("RANDOM_BOSS_ITEM", props.BossItem ? 1 : 0);
         a.Assign("AGGRESSIVE_TBIRD", props.AggressiveTbird ? 1 : 0);
         a.Assign("DARKEN_TBIRD_ROOM", props.DarkenThunderbird ? 1 : 0);
+        a.Assign("HORIZONTAL_BOSS_BARS_GP", props.HorizontalBossBarsGP ? 1 : 0);
         a.Code(Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.Bosses.s"), "Bosses.s");
     }
 
@@ -2434,15 +2754,13 @@ DrawHiddenJarBank5:
         return map;
     }
 
-    public List<Location> LoadLocations(LocationID baseLid, int count, SortedDictionary<LocationID, Terrain> Terrains)
+    public List<Location> LoadLocations(LocationID baseLid, int count)
     {
-        var (continent, locNum) = baseLid.GetIndices();
-        int startAddr = baseLid.GetRomOffset();
         List<Location> locations = [];
         for (int i = 0; i < count; i++)
         {
             LocationID lid = baseLid + i;
-            Terrain terrain = Terrains[lid];
+            Terrain terrain = lid.GetDefaultTerrain();
             var location = LoadLocation(lid, terrain);
             locations.Add(location);
         }
@@ -2556,10 +2874,33 @@ DrawHiddenJarBank5:
         }
     }
 
-    static readonly Dictionary<Terrain, byte[]> hiddenPalaceTiles = new()
+
+    /// <summary>Writes the Flute and Hammer reveal code/tables from the generated East map's hidden locations.</summary>
+    internal void ApplyHiddenLocationPatches(Assembler assembler, IReadOnlyList<HiddenLocation> hiddenLocations,
+        Biome biome, bool vanillaShuffleUsesActualTerrain)
     {
-        // corresponds to ROM locations [0x1df7d, 0x1df82, 0x1df7e, 0x1df83]
-        // and no i don't know why they're in that order
+        if (hiddenLocations.Any(l => l is null || !Enum.IsDefined(l.Trigger)))
+            throw new ArgumentException("Each hidden location must have a Flute or Hammer trigger.", nameof(hiddenLocations));
+        if (hiddenLocations.Select(l => l.Trigger).Distinct().Count() != hiddenLocations.Count)
+            throw new ArgumentException("Only one hidden location per trigger is supported.", nameof(hiddenLocations));
+        foreach (var location in hiddenLocations)
+        {
+            switch (location.Trigger)
+            {
+                case HiddenLocationTrigger.Flute:
+                    UpdateHiddenPalaceSpot(assembler, biome, location, vanillaShuffleUsesActualTerrain, biome.UsesVanillaMap() ? null : location.UnrevealedTerrain);
+                    break;
+                case HiddenLocationTrigger.Hammer:
+                    UpdateKasuto(assembler, biome, location, location.RevealedTerrain, vanillaShuffleUsesActualTerrain);
+                    break;
+            }
+        }
+    }
+
+    // Keep the historical tile order. Palace PPU macros use [0,2] / [1,3];
+    // Kasuto's four immediate loads use [0,1] / [2,3].
+    private static readonly Dictionary<Terrain, byte[]> hiddenLocationTiles = new()
+    {
         [Terrain.PALACE]        = [0x60, 0x61, 0x62, 0x63],
         [Terrain.SWAMP]         = [0x6F, 0x6F, 0x6F, 0x6F],
         [Terrain.LAVA]          = [0x6E, 0x6E, 0x6E, 0x6E],
@@ -2573,149 +2914,131 @@ DrawHiddenJarBank5:
         [Terrain.TOWN]          = [0x5C, 0x5D, 0x5E, 0x5F],
     };
 
-    //This was refactored out of EastHyrule. The signature/timing/structure needs work.
-    public void UpdateHiddenPalaceSpot(Biome biome, Location hiddenPalaceLocation, bool vanillaShuffleUsesActualTerrain)
+    private static void UpdateHiddenPalaceSpot(Assembler assembler, Biome biome, HiddenLocation location,
+        bool vanillaShuffleUsesActualTerrain, Terrain? surroundingTerrain)
     {
+        var a = assembler.Module();
+        a.Assign("PalaceX", (byte)location.Location.Xpos);
+        a.Assign("PalaceY", (byte)location.Location.YRaw);
+        a.Assign("PalaceAreaByte", location.AreaByte);
+        a.Assign("PalaceIndex", (byte)location.LocationIndex);
+        int ppuAddress = 0x2000 + 2 * (32 * (location.Location.YRaw % 15) + location.Location.Xpos % 16)
+            + 2048 * (location.Location.YRaw % 30 / 15);
+        a.Assign("PalacePpuAddress", ppuAddress);
+
         if (!biome.UsesVanillaMap())
         {
-            Put(0x8382, (byte)(hiddenPalaceLocation.YRaw - 2)); // the whistle spot, 2 tiles north of the palace
-            Put(0x8388, (byte)hiddenPalaceLocation.Xpos);
-        }
-        int pos = hiddenPalaceLocation.YRaw;
+            a.Code("""
+.segment "PRG2"
+.org $8371 ; Check_for_Hidden_Palace_spot: whistle spot, two tiles north
+    cmp #(PalaceY - 2)
+.org $8377
+    cmp #PalaceX
 
-        Put(0x1df78, (byte)(pos + (hiddenPalaceLocation.IsExternalWorld ? 0x80 : 0)));
-        Put(0x1df84, 0xff);
-        Put(0x1ccc0, (byte)pos);
-        int connection = hiddenPalaceLocation.MemAddress - 0x862F;
-        Put(0x1df76, (byte)connection);
+""", "hidden_palace_whistle.s");
+        }
+
+        if (surroundingTerrain is { } terrain)
+        {
+            a.Assign("PalaceSurroundingTerrain", (byte)terrain);
+            a.Code("""
+
+.segment "PRG7"
+
+.org $df60 ; terrain that the flute transforms into the revealed entrance
+    .byte PalaceSurroundingTerrain
+    ; byte for revealed tile should be set here? (investigate later)
+    ; not sure why it's not - maybe the PPU bytes in hiddenLocationTile make it unnecessary
+
+""", "hidden_palace_surrounding.s");
+        }
+
+        a.Code("""
+.segment "PRG7"
+OverworldTileTransformTable := $df5e
+
+.org $ccaf ; fallback Y when returning from the hidden palace
+    lda #PalaceY
+
+.org $df66 ; reveal location index table, palace slot
+    .byte PalaceIndex
+.org $df68 ; revealed Area Byte 0; also read by Flute.s
+    .byte PalaceAreaByte
+.org $df6a ; first PPU row address, high byte first
+    .byte .hibyte(PalacePpuAddress), .lobyte(PalacePpuAddress)
+.org $df6f ; second PPU row address
+    .byte .hibyte(PalacePpuAddress + $20), .lobyte(PalacePpuAddress + $20)
+.org $df74 ; end the macro after the two reveal rows
+    .byte $FF
+""", "hidden_palace_location.s");
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
-            Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
-            if (hiddenPalaceTiles.TryGetValue(hiddenPalaceLocation.TerrainType, out var tiles))
+            a.Assign("PalaceTerrain", (byte)location.RevealedTerrain);
+            a.Code("""
+.segment "PRG7"
+.org $df64 ; transform-result terrain table, palace slot
+    .byte PalaceTerrain
+""", "hidden_palace_terrain.s");
+            if (hiddenLocationTiles.TryGetValue(location.RevealedTerrain, out var tiles))
             {
-                Put(0x1df7d, tiles[0]);
-                Put(0x1df82, tiles[1]);
-                Put(0x1df7e, tiles[2]);
-                Put(0x1df83, tiles[3]);
+                for (int i = 0; i < tiles.Length; i++) a.Assign($"PalaceTile{i}", tiles[i]);
+                a.Code("""
+.segment "PRG7"
+.org $df6d ; top reveal row
+    .byte PalaceTile0, PalaceTile2
+.org $df72 ; bottom reveal row
+    .byte PalaceTile1, PalaceTile3
+""", "hidden_palace_tiles.s");
             }
         }
-
-        int ppu_addr1 = 0x2000 + 2 * (32 * (hiddenPalaceLocation.YRaw % 15) + (hiddenPalaceLocation.Xpos % 16)) + 2048 * (hiddenPalaceLocation.YRaw % 30 / 15);
-        int ppu_addr2 = ppu_addr1 + 32;
-        int ppu1low = ppu_addr1 & 0x00ff;
-        int ppu1high = (ppu_addr1 >> 8) & 0xff;
-        int ppu2low = ppu_addr2 & 0x00ff;
-        int ppu2high = (ppu_addr2 >> 8) & 0xff;
-        Put(0x1df7a, (byte)ppu1high);
-        Put(0x1df7b, (byte)ppu1low);
-        Put(0x1df7f, (byte)ppu2high);
-        Put(0x1df80, (byte)ppu2low);
-
     }
 
-    public void UpdateKasuto(Location hiddenKasutoLocation, Biome biome,
-        int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
+    private static void UpdateKasuto(Assembler assembler, Biome biome, HiddenLocation location,
+        Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
     {
-        Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + (hiddenKasutoLocation.IsExternalWorld ? 0x80 : 0)));
-        Put(0x1dfac, (byte)(hiddenKasutoLocation.Y));
-        Put(0x1dfb2, (byte)(hiddenKasutoLocation.Xpos + 1));
-        Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + (hiddenKasutoLocation.EntranceNumber << 6)));
-        Put(0x1ccdb, (byte)hiddenKasutoLocation.YRaw);
-        int connection = hiddenKasutoLocation.MemAddress - baseAddr;
-        Put(0x1df77, (byte)connection);
+        var a = assembler.Module();
+        a.Assign("KasutoX", (byte)location.Location.Xpos);
+        a.Assign("KasutoY", (byte)location.Location.YRaw);
+        a.Assign("KasutoAreaByte", location.AreaByte);
+        a.Assign("KasutoIndex", (byte)location.LocationIndex);
+        a.Assign("KasutoEntryX", (byte)(location.Location.Xpos + (location.Location.EntranceNumber << 6)));
+        a.Code("""
+.segment "PRG7"
+.org $ccc3 ; identify the hidden town's packed entrance X when returning outside
+    lda #KasutoEntryX
+.org $ccca ; restore its Y coordinate
+    lda #KasutoY
+.org $df67 ; reveal location index table, town slot
+    .byte KasutoIndex
+.org $df69 ; revealed Area Byte 0; also read by Flute.s
+    .byte KasutoAreaByte
+.org $df9B ; hammer reveal checks zero-based Y and the following X tile
+    cmp #(KasutoY - 30)
+.org $dfa1
+    cmp #(KasutoX + 1)
+""", "hidden_kasuto_location.s");
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
-            //Terrain t = terrains[hiddenKasutoLocation.MemAddress];
-            Put(0x1df75, (byte)hiddenKasutoTerrain);
-            if (hiddenKasutoTerrain == Terrain.PALACE)
+            a.Assign("KasutoTerrain", (byte)hiddenKasutoTerrain);
+            a.Code("""
+.segment "PRG7"
+.org $df65 ; transform-result terrain table, town slot
+    .byte KasutoTerrain
+""", "hidden_kasuto_terrain.s");
+            if (hiddenLocationTiles.TryGetValue(hiddenKasutoTerrain, out var tiles))
             {
-                Put(0x1dfb6, 0x60);
-                Put(0x1dfbb, 0x61);
-
-                Put(0x1dfc0, 0x62);
-
-                Put(0x1dfc5, 0x63);
-            }
-            else if (hiddenKasutoTerrain == Terrain.SWAMP)
-            {
-                Put(0x1dfb6, 0x6F);
-                Put(0x1dfbb, 0x6F);
-
-                Put(0x1dfc0, 0x6F);
-
-                Put(0x1dfc5, 0x6F);
-            }
-            else if (hiddenKasutoTerrain == Terrain.LAVA || hiddenKasutoTerrain == Terrain.WALKABLEWATER)
-            {
-                Put(0x1dfb6, 0x6E);
-                Put(0x1dfbb, 0x6E);
-
-                Put(0x1dfc0, 0x6E);
-
-                Put(0x1dfc5, 0x6E);
-            }
-            else if (hiddenKasutoTerrain == Terrain.FOREST)
-            {
-                Put(0x1dfb6, 0x68);
-                Put(0x1dfbb, 0x69);
-
-                Put(0x1dfc0, 0x6A);
-
-                Put(0x1dfc5, 0x6B);
-            }
-            else if (hiddenKasutoTerrain == Terrain.GRAVE)
-            {
-                Put(0x1dfb6, 0x70);
-                Put(0x1dfbb, 0x71);
-
-                Put(0x1dfc0, 0x7F);
-
-                Put(0x1dfc5, 0x7F);
-            }
-            else if (hiddenKasutoTerrain == Terrain.ROAD)
-            {
-                Put(0x1dfb6, 0xFE);
-                Put(0x1dfbb, 0xFE);
-
-                Put(0x1dfc0, 0xFE);
-
-                Put(0x1dfc5, 0xFE);
-            }
-            else if (hiddenKasutoTerrain == Terrain.BRIDGE)
-            {
-                Put(0x1dfb6, 0x5A);
-                Put(0x1dfbb, 0x5B);
-
-                Put(0x1dfc0, 0x5A);
-
-                Put(0x1dfc5, 0x5B);
-            }
-            else if (hiddenKasutoTerrain == Terrain.CAVE)
-            {
-                Put(0x1dfb6, 0x72);
-                Put(0x1dfbb, 0x73);
-
-                Put(0x1dfc0, 0x72);
-
-                Put(0x1dfc5, 0x73);
-            }
-            else if (hiddenKasutoTerrain == Terrain.DESERT)
-            {
-                Put(0x1dfb6, 0x6C);
-                Put(0x1dfbb, 0x6C);
-
-                Put(0x1dfc0, 0x6C);
-
-                Put(0x1dfc5, 0x6C);
-            }
-            else if (hiddenKasutoTerrain == Terrain.TOWN)
-            {
-                Put(0x1dfb6, 0x5C);
-                Put(0x1dfbb, 0x5D);
-
-                Put(0x1dfc0, 0x5E);
-
-                Put(0x1dfc5, 0x5F);
+                for (int i = 0; i < tiles.Length; i++) a.Assign($"KasutoTile{i}", tiles[i]);
+                a.Code("""
+.segment "PRG7"
+.org $dfa5 ; tile loads into the two PPU reveal rows
+    lda #KasutoTile0
+.org $dfaa
+    lda #KasutoTile1
+.org $dfaf
+    lda #KasutoTile2
+.org $dfb4
+    lda #KasutoTile3
+""", "hidden_kasuto_tiles.s");
             }
         }
     }

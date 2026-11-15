@@ -1,83 +1,15 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:tabs="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
-             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:gen="clr-namespace:CrossPlatformUI.Controls.Generated"
-             xmlns:z="clr-namespace:CrossPlatformUI.Controls"
-             xmlns:views="clr-namespace:CrossPlatformUI.Views"
-             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:DataType="tabs:SpritePreviewViewModel"
+             Design.Width="{x:Static ui:MainWindowSize.MaxSectionColumnWidth}"
+             x:DataType="tabs:SpriteCustomizationViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.SpritePreviewView">
-    <Grid ColumnDefinitions="340, *">
-        <StackPanel Grid.Column="0" Orientation="Vertical">
-            <ComboBox Name="SelectedSprite" assists:ComboBoxAssist.Label="Character Sprite" Theme="{StaticResource MaterialOutlineComboBox}"
-                      ItemsSource="{Binding Options}"
-                      SelectedItem="{Binding Sprite}">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.CharacterSpriteToolTip}"/></ToolTip.Tip>
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid ColumnDefinitions="32, *">
-                            <Image Grid.Column="0"
-                                   Margin="4 2"
-                                   Width="32"
-                                   Height="64"
-                                   Source="{Binding Preview}"
-                                   RenderOptions.BitmapInterpolationMode="None" />
-                            <TextBlock Grid.Column="1"
-                                       Margin="16 0"
-                                       VerticalAlignment="Center"
-                                       Text="{Binding Name}" />
-                        </Grid>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-
-            <z:Z2CheckBox Flag="ChangeItemSprites" Margin="16" />
-
-            <views:NesColorDropdown Label="Tunic Color"
-                                    SelectedColorIndex="{Binding TunicColor}"
-                                    DefaultColorIndex="{Binding SpriteTunicColor}">
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.TunicColorToolTip}"/></ToolTip.Tip>
-            </views:NesColorDropdown>
-            <views:NesColorDropdown Label="Skin Tone"
-                                    SelectedColorIndex="{Binding SkinTone}"
-                                    DefaultColorIndex="{Binding SpriteSkinTone}">
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.SkinToneToolTip}"/></ToolTip.Tip>
-            </views:NesColorDropdown>
-            <views:NesColorDropdown Label="Tunic Outline"
-                                    SelectedColorIndex="{Binding OutlineColor}"
-                                    DefaultColorIndex="{Binding SpriteOutlineColor}">
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.TunicOutlineColorToolTip}"/></ToolTip.Tip>
-            </views:NesColorDropdown>
-            <views:NesColorDropdown Label="Shield Color"
-                                    SelectedColorIndex="{Binding ShieldColor}"
-                                    DefaultColorIndex="{Binding SpriteShieldColor}">
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShieldColorToolTip}"/></ToolTip.Tip>
-            </views:NesColorDropdown>
-
-            <z:Z2ComboBox Flag="BeamSprite" />
-
-            <Separator Margin="0 8 0 0"/>
-
-            <TextBox
-                Margin="0 8 0 0"
-                UseFloatingPlaceholder="True"
-                PlaceholderText="%g-%s-%h-%f.nes"
-                assists:TextFieldAssist.Label="Output Filename"
-                Text="{Binding OutputFilenameTemplate}"
-            >
-              <ToolTip.Tip><TextBlock Text="%f = flags, %s = seed, %h = hash, %d = date/time, %v = version, %g = game (Z2, Z2M)"/></ToolTip.Tip>
-            </TextBox>
-        </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Vertical">
-            <TextBlock>Sprite Preview</TextBlock>
-            <Image MaxHeight="200"
-                   Source="{Binding Path=Sprite?.Preview}"
-                   RenderOptions.BitmapInterpolationMode="None" />
-            <TextBlock Text="{Binding Sprite?.Credit, FallbackValue='LOAD ROM FOR SPRITES'}" />
-        </StackPanel>
-    </Grid>
+    <StackPanel Orientation="Vertical">
+        <Image MaxHeight="200"
+               Source="{Binding Path=Sprite?.Preview}"
+               RenderOptions.BitmapInterpolationMode="None" />
+        <TextBlock Margin="0,8,0,0" HorizontalAlignment="Center"
+                   Text="{Binding Sprite?.Credit, FallbackValue='LOAD ROM FOR SPRITES'}" />
+    </StackPanel>
 </UserControl>

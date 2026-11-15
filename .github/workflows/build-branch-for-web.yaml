@@ -24,20 +24,26 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
     steps:
       - name: Checkout codebase
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.branch }}
           submodules: recursive
 
       - name: Setup dotnet ${{ matrix.dotnet-version }}
-        uses: actions/setup-dotnet@v5
+        id: setup-dotnet
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
-
+          cache: true
+          cache-dependency-path: Directory.Packages.props
 
       - name: Build Browser
         if: ${{ matrix.platform.type == 'browser' }}
+        env:
+          DOTNET_SDK_VERSION: ${{ steps.setup-dotnet.outputs.dotnet-version }}
         run: |
+          # Use the SDK from setup-dotnet even if the runner has a newer SDK.
+          printf '{"sdk":{"version":"%s","rollForward":"disable"}}\n' "$DOTNET_SDK_VERSION" > global.json
           dotnet workload install wasm-tools
           dotnet publish -c Release CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
@@ -49,4 +55,3 @@ jobs:
           path: |
             CrossPlatformUI.Browser/bin/Release/net10.0-browser/publish
             !**/*.pdb
-

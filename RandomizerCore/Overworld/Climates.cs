@@ -282,6 +282,27 @@ public static class Climates
        ClimateEnum.GREAT_LAKES
    );
 
+    /// <summary>Creates a world-owned climate with the biome's seed limit and continent's water rules.</summary>
+    internal static Climate CreateForWorld(Continent continentId, ClimateEnum climate, Biome biome, bool canWalkOnWaterWithBoots)
+    {
+        var result = Create(continentId, climate);
+        result.SeedTerrainCount = Math.Min(result.SeedTerrainCount, biome.SeedTerrainLimit());
+        switch (continentId)
+        {
+            case Continent.WEST:
+            case Continent.EAST:
+                result.DisallowTerrain(canWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
+                break;
+
+            case Continent.DM:
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(continentId));
+        }
+        return result;
+    }
+
     public static Climate Create(Continent continentId, ClimateEnum climate)
     {
         return climate switch

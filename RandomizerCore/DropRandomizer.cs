@@ -221,7 +221,9 @@ public class DropRandomizer
     {
         if (!props.BossItem) { return; }
 
-        var options = Enum.GetValues<SmallItem>();
+        var options = Enum.GetValues<SmallItem>()
+            .Except([SmallItem.KEY]).ToArray();
+
         BossDrop = options.Sample(r);
     }
 

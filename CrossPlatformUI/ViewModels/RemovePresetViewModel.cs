@@ -1,13 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using ReactiveUI;
 using RUISG = ReactiveUI.SourceGenerators;
-using ReactiveUI.Primitives;
 using RxVoid = ReactiveUI.Primitives.RxVoid;
 
 namespace CrossPlatformUI.ViewModels;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class RemovePresetViewModel : ReactiveObject
 {
     [RUISG.Reactive]

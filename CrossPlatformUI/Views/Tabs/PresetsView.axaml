@@ -1,10 +1,10 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              xmlns:behaviors="clr-namespace:CrossPlatformUI.Behaviors"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+             Design.Width="{x:Static ui:MainWindowSize.TabPreviewWidth}"
+             Design.Height="{x:Static ui:MainWindowSize.TabPreviewHeight}"
              x:Class="CrossPlatformUI.Views.Tabs.PresetsView"
              x:DataType="vmt:PresetsViewModel">
     <UserControl.Styles>
@@ -49,7 +49,7 @@
                        TextWrapping="Wrap"
                        IsVisible="{Binding HasDescription}"/>
 
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 8 0 16">
+            <StackPanel x:Name="PresetButtons" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0 8 0 16">
                 <Button Content="Load Preset" Command="{Binding LoadPreset}"/>
                 <Button Content="Update Preset" Command="{Binding UpdatePreset}"/>
                 <Button Content="Remove Preset" Command="{Binding RemovePreset}"/>
@@ -57,7 +57,8 @@
 
             <Expander Grid.Row="3"
                       Classes="DiffExpander"
-                      VerticalAlignment="Top"
+                      MinWidth="{Binding #PresetButtons.Bounds.Width}"
+                      HorizontalAlignment="Left" VerticalAlignment="Top"
                       IsVisible="{Binding HasDiff}"
                       IsExpanded="{Binding IsDiffExpanded, Mode=TwoWay}"
                       Header="Compare To Current Flags">
@@ -65,7 +66,7 @@
                     <ItemsControl ItemsSource="{Binding DiffRows}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vmt:PresetDiffRow">
-                                <Grid ColumnDefinitions="3*,2*"
+                                <Grid ColumnDefinitions="310,*"
                                       Classes.diffRemoving="{Binding IsRemoving}"
                                       IsHitTestVisible="{Binding !IsRemoving}">
                                     <Interaction.Behaviors>

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -22,8 +21,7 @@ using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 
-[RequiresUnreferencedCode("")]
-public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel, IFlagHost
+public class SpriteCustomizationViewModel : ReactiveObject, IActivatableViewModel, IFlagHost
 {
     private CancellationTokenSource backgroundUpdateTask = new();
 
@@ -54,11 +52,6 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel, IFl
     {
         get => Main.Config.ShieldTunic;
         set { Main.Config.ShieldTunic = value; this.RaisePropertyChanged(); }
-    }
-    public string OutputFilenameTemplate
-    {
-        get => Main.Config.OutputFilenameTemplate;
-        set { Main.Config.OutputFilenameTemplate = value; this.RaisePropertyChanged(); }
     }
 
     private byte spriteTunicColor;
@@ -125,9 +118,9 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel, IFl
 
     [JsonConstructor]
 #pragma warning disable CS8618
-    public SpritePreviewViewModel() {}
+    public SpriteCustomizationViewModel() {}
 #pragma warning restore CS8618
-    public SpritePreviewViewModel(MainViewModel main)
+    public SpriteCustomizationViewModel(MainViewModel main)
     {
         Main = main;
         SpriteName = main.Config.SpriteName;
@@ -151,7 +144,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel, IFl
             .DisposeWith(_disposables);
     }
 
-    ~SpritePreviewViewModel()
+    ~SpriteCustomizationViewModel()
     {
         _disposables.Dispose();
     }

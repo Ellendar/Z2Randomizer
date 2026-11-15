@@ -54,6 +54,7 @@ One safety it provides is that you start with at least 3 hearts.
         RandomStylesAllowVanilla = true,
         NormalPalaceLength = PalaceLengthOption.RANDOM,
         GpLength = PalaceLengthOption.RANDOM,
+        RoomPoolOption = RoomPoolOption.USE_CHECKBOXES,
         IncludeVanillaRooms = null,
         Includev4_0Rooms = null,
         Includev5_0Rooms = null,

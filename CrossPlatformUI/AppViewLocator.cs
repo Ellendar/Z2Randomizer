@@ -1,12 +1,9 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
-using ReactiveUI;
 using CrossPlatformUI.ViewModels;
 using CrossPlatformUI.Views;
 
 namespace CrossPlatformUI;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public class AppViewLocator : IViewLocator
 {
     private IViewFor? FindView(object? viewModel)

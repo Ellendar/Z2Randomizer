@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+﻿using System.Reflection;
 using Newtonsoft.Json;
 using NLog;
 using CrossPlatformUI.Services;
@@ -9,7 +8,6 @@ using Z2Randomizer.RandomizerCore;
 
 namespace Z2Randomizer.CommandLine
 {
-    [RequiresUnreferencedCode("Newtonsoft.Json uses reflection")]
     public class PlayerOptionsService
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();

@@ -96,7 +96,7 @@ HAVE_DOWNSTAB = $10
 MulLoReg = $5205
 MulHiReg = $5206
 
-NewSideviewInit = $8cec
+NewSideviewInit = $8ce7
 ClearNametables = $d266
 JumpEngine = $d385
 EnemyFacingDirection = $DC91

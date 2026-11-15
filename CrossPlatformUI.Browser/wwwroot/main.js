@@ -204,8 +204,13 @@ const PreloadedPalaces = (async function () {
     return fetch("PalaceRooms.json").then((res) => res.text());
 })();
 
+const PreloadedRoomPool = (async function () {
+    return fetch("CustomRoomPool.yaml").then((res) => res.text());
+})();
+
 window.FetchPreloadedSprites = () => PreloadedSprites;
 window.FetchPalaces = () => PreloadedPalaces;
+window.FetchRoomPool = () => PreloadedRoomPool;
 
 window.DownloadBinaryFile = (data, name) => {
     const a = document.createElement('a');

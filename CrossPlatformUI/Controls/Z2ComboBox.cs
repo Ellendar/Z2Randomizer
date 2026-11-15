@@ -6,8 +6,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
 using Avalonia.Styling;
-using Avalonia.VisualTree;
-using CrossPlatformUI.Controls.Generated;
 using Material.Styles.Assists;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Flags;

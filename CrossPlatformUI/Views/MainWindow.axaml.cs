@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using Avalonia;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
@@ -8,7 +7,6 @@ using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
 
-[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class MainWindow : ReactiveWindow<MainViewModel>
 {
     public MainWindow()
