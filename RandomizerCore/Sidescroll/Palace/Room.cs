@@ -991,7 +991,7 @@ public class Room : IJsonOnDeserialized, IDeterministicHash
             }
         }
 
-        if (HasRightExit && sv.PageCount == 3 && ItemPageIsFree(3))
+        if (HasRightExit && sv.PageCount == 4 && ItemPageIsFree(3))
         {
             var solidGrid = sv.CreateSolidGrid();
             int x = 58;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 using Random = Z2Randomizer.RandomizerCore.Random;
 using Z2Randomizer.RandomizerCore.Sidescroll.Palace;
 
@@ -484,6 +485,94 @@ public class KeyLogicTests
         floor.Up = door;
         var palace = MakePalace(floor, jars, door);
         Assert.IsFalse(palace.SolveKeyLogic([RequirementType.GLOVE], bossesDropKeys: false, startingKeys: 0, createKeys: true, r: new Random(0)));
+    }
+
+    [TestMethod]
+    public void FloorKeyInDmInPalacesM15IsPlacedOnTheBridge()
+    {
+        var rooms = new PalaceRooms(Util.ReadAllTextFromFile("PalaceRooms.json"), doValidation: false);
+        var room = rooms.GetRoomByName("dmInPalaces M15");
+        Assert.IsNotNull(room);
+
+        Assert.IsTrue(room.TryAddKeyOnFloor());
+
+        var sideview = new SideviewEditable<PalaceObject>(room.SideView);
+        var key = sideview.Commands.Single(command => command.IsItem(Collectable.KEY));
+        Assert.AreEqual(5, key.AbsX);
+        Assert.AreEqual(8, key.Y);
+        Assert.IsTrue(room.GetItemBit(key.Page));
+    }
+
+    [TestMethod]
+    [DataRow("dmInPalaces M5")]
+    [DataRow("winterSolstice M10")]
+    public void FloorKeysUsePlatformsOnBothSidesOfRoom(string roomName)
+    {
+        var rooms = new PalaceRooms(Util.ReadAllTextFromFile("PalaceRooms.json"), doValidation: false);
+        var room = rooms.GetRoomByName(roomName);
+        Assert.IsNotNull(room);
+
+        Assert.IsTrue(room.TryAddKeyOnFloor(), "Left key placement failed.");
+        Assert.IsTrue(room.TryAddKeyOnFloor(), "Right key placement failed.");
+
+        var sideview = new SideviewEditable<PalaceObject>(room.SideView);
+        var keyPositions = sideview.Commands
+            .Where(command => command.IsItem(Collectable.KEY))
+            .Select(command => (command.AbsX, command.Y))
+            .ToArray();
+
+        CollectionAssert.AreEqual(new[] { (5, 7), (58, 7) }, keyPositions);
+        Assert.AreEqual(2, room.Keys([], bossesDropKeys: false));
+    }
+
+    [TestMethod]
+    public void FloorKeyInVanillaP2M32IsPlacedOnTheRight()
+    {
+        var rooms = new PalaceRooms(Util.ReadAllTextFromFile("PalaceRooms.json"), doValidation: false);
+        var room = rooms.GetRoomByName("Vanilla P2 M32");
+        Assert.IsNotNull(room);
+
+        Assert.IsTrue(room.TryAddKeyOnFloor());
+
+        var sideview = new SideviewEditable<PalaceObject>(room.SideView);
+        var key = sideview.Commands.Single(command => command.IsItem(Collectable.KEY));
+        Assert.AreEqual(58, key.AbsX);
+        Assert.AreEqual(9, key.Y);
+        Assert.IsTrue(room.GetItemBit(3));
+        Assert.IsTrue(sideview.Commands.Any(command => command.Page == 0 && command.IsItem(Collectable.MEDIUM_BAG)));
+    }
+
+    [TestMethod]
+    public void FloorKeyCannotBeAddedInWinterSolstice2M2()
+    {
+        var rooms = new PalaceRooms(Util.ReadAllTextFromFile("PalaceRooms.json"), doValidation: false);
+        var room = rooms.GetRoomByName("winterSolstice 2 M2");
+        Assert.IsNotNull(room);
+        Assert.IsFalse(room.HasLeftExit);
+        Assert.IsTrue(room.HasRightExit);
+
+        var grid = new SideviewEditable<PalaceObject>(room.SideView).CreateSolidGrid();
+        Assert.AreEqual(9, SolidGridHelper.FindFloor(grid, 5, 10, 1, 1));
+        Assert.AreEqual(0, SolidGridHelper.FindFloor(grid, 58, 10, 1, 1));
+
+        byte[] originalSideView = room.SideView.ToArray();
+        byte originalItemBits = room.ItemPresenceBits[0];
+        Assert.IsFalse(room.TryAddKeyOnFloor());
+        CollectionAssert.AreEqual(originalSideView, room.SideView);
+        Assert.AreEqual(originalItemBits, room.ItemPresenceBits[0]);
+    }
+
+    [TestMethod]
+    public void FloorKeyIsNotPlacedOverUnbridgedLava()
+    {
+        var room = MakeKeyPlacementRoom("Lava");
+        room.SideView = Convert.FromHexString("08600308D400F01F");
+        var originalSideView = room.SideView;
+        byte originalItemBits = room.ItemPresenceBits[0];
+
+        Assert.IsFalse(room.TryAddKeyOnFloor());
+        Assert.AreSame(originalSideView, room.SideView);
+        Assert.AreEqual(originalItemBits, room.ItemPresenceBits[0]);
     }
 
     [TestMethod]
