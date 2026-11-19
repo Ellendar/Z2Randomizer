@@ -116,5 +116,5 @@ FREE "PRG1E" [$a000, $c000)
 ; Most of bank 1f is reserved for z2ft
 ; But we have some small gaps we can slide in between the DPCM samples
 FREE "PRG1F" [$fad6, $fb00)
-FREE "PRG1F" [$fc14, $fc40)
+FREE "PRG1F" [$fc15, $fc40)
 FREE "PRG1F" [$fe31, $ffe8)
