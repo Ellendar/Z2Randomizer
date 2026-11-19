@@ -2,6 +2,7 @@
 
 .import SwapPRG, SwapToSavedPRG, SwapToPRG0
 .export UpdateSound
+.import PalaceClearMusicTick
 
 ; Game variables/locations
 UpdateSound = $878c
@@ -25,6 +26,7 @@ UpdateSound = $878c
 	jsr SwapPRG
 
 	jsr UpdateSound
+	jsr PalaceClearMusicTick
 	; clear out the moa fire work around
 	; lda $07fd
 	; and #~$40

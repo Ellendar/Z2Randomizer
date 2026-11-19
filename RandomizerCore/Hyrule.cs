@@ -4036,6 +4036,7 @@ FlagHudUpdate:
             PatchAddress(STX_ABS, 0x6381, 0x6341);
             var asm = engine.Module();
             asm.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.s"), "z2ft.s");
+            asm.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.PalaceClearMusic.s"), "PalaceClearMusic.s");
 
             if (props.MarioMode)
             {

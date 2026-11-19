@@ -588,6 +588,12 @@ RESV TwisterCurrentPalaceSlot
 ; Nonzero if we are changing continents with the warp and need to reload it
 RESV TwisterPendingPalaceLocation
 
+; Palace clear music (custom music only, see PalaceClearMusic.s)
+RESV PalaceClearResumePending ; nonzero = resume the palace theme once the palace clear song ends
+RESV PalaceClearResumeMap     ; MapNumber when the resume was deferred; a map change cancels it
+RESV PalaceClearResumeTimer, 2 ; frames waited, so a looping song can't hold the resume forever
+RESV PalaceClearTailTimer     ; frames since the song ended, so its last note can decay
+
 .ifdef ENABLE_Z2_MARIO
 
 ; New RAM values that aren't from vanilla SMB1 code
