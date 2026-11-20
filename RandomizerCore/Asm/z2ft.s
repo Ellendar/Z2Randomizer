@@ -1,10 +1,7 @@
 .include "z2r.inc"
 
 .import SwapPRG, SwapToSavedPRG, SwapToPRG0
-.export UpdateSound
-
-; Game variables/locations
-UpdateSound = $878c
+.import UpdateSound
 
 .segment "PRG7"
 

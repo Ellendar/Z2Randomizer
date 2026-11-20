@@ -3,3 +3,6 @@
 	url = https://github.com/TheRealQuantam/FtRandoLib
 	branch = main
 	
+[submodule "RandomizerCore/Asm/z2ft"]
+	path = RandomizerCore/Asm/z2ft
+	url = https://github.com/TheRealQuantam/z2ft.git

@@ -526,7 +526,37 @@ public class Hyrule
 
     private Js65ResolvedText? AsmFileResolveTextCallback(IReadOnlyList<string> basePaths, string path)
     {
-        return new Js65ResolvedText(0, Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}"));
+        for (int index = 0; index < basePaths.Count; index++)
+        {
+            var parts = new List<string>();
+            bool valid = true;
+            foreach (string part in $"{basePaths[index]}/{path}".Replace('\\', '/').Split('/'))
+            {
+                if (part is "" or ".") continue;
+                if (part == "..")
+                {
+                    if (parts.Count == 0)
+                    {
+                        valid = false;
+                        break;
+                    }
+                    parts.RemoveAt(parts.Count - 1);
+                }
+                else
+                {
+                    parts.Add(part);
+                }
+            }
+
+            if (!valid) continue;
+            string resource = "Z2Randomizer.RandomizerCore.Asm." + string.Join('.', parts);
+            using var stream = typeof(Hyrule).Assembly.GetManifestResourceStream(resource);
+            if (stream == null) continue;
+            using var reader = new StreamReader(stream);
+            return new Js65ResolvedText(index, reader.ReadToEnd());
+        }
+
+        return null;
     }
 
     private static byte[] ConvertHash(byte[] hash)
@@ -4003,50 +4033,18 @@ FlagHudUpdate:
             rom.UpAController1(engine);
         }
 
-        if (!props.DisableMusic && randomizeMusic)
+        if (randomizeMusic)
         {
-            rom.ApplyIps(
-                Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2rndft.ips"));
-            // really hacky workaround but i don't want to recompile z2ft
-            // z2ft is compiled using an old address for NmiBankShadow8 and NmiBankShadowA so rather than
-            // recompile that, I'm just gonna patch it here...
-            const byte LDA_ABS = 0xAD;
-            const byte STA_ABS = 0x8D;
-            const byte LDX_ABS = 0xAE;
-            const byte STX_ABS = 0x8E;
+            engine.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.js65.inc"), "z2ft/js65.inc");
+            var music = engine.Module();
+            // Doing MMC5 would tell bhop that we want to use the extra MMC5 channels which doesn't work with z2ft
+            music.Assign("MMC", 3);
+            music.Assign("Z2FT_PATCH_ONLY", 1);
+            music.Assign("Z2FT_COMPENSATING_DELAY", props.MarioMode ? 0 : 1);
+            music.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.z2ft.s"), "z2ft/z2ft.s");
 
-            void PatchAddress(byte opcode, int before, int after)
-            {
-                var idx = 0;
-                var needle = new ReadOnlySpan<byte>([opcode, (byte)before, (byte)(before >> 8)]);
-                while (rom.rawdata.AsSpan(idx).IndexOf(needle) is var di and >= 0)
-                {
-                    rom.Put(idx + di, opcode, (byte)after, (byte)(after >> 8));
-                    idx += di + 1;
-                }
-            }
-
-            PatchAddress(LDA_ABS, 0x6380, 0x6340);
-            PatchAddress(LDA_ABS, 0x6381, 0x6341);
-            PatchAddress(STA_ABS, 0x6380, 0x6340);
-            PatchAddress(STA_ABS, 0x6381, 0x6341);
-            PatchAddress(LDX_ABS, 0x6380, 0x6340);
-            PatchAddress(LDX_ABS, 0x6381, 0x6341);
-            PatchAddress(STX_ABS, 0x6380, 0x6340);
-            PatchAddress(STX_ABS, 0x6381, 0x6341);
             var asm = engine.Module();
             asm.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.s"), "z2ft.s");
-
-            if (props.MarioMode)
-            {
-                // There is a patch in z2ft to reduce offscreen enemy checking overhead
-                // but for the randomizer, it counters out its own lag reduction by adding
-                // additional forced lag to counterbalance the lag it removed.
-                // For z2mario, there's just so much more stuff going on, and people don't
-                // have the same expectations for the game, so this will "unpatch" the
-                // extra lag routine, so that it uses the lag reduction code.
-                rom.Put(0x1ffec, 0xb4, 0xf2);
-            }
         }
 
         UpdateMovingNpcDialog(engine, CustomTexts.BuildMovingNpcDialogPool(props));
