@@ -98,7 +98,7 @@ BossLandedInCutscene:
   rts
 
 .segment "PRG5"
-.org $988e
+.org $9897 ; avoid patching $988e as z2ft uses that
   jsr RunBoss
   jmp $9a77
 FREE_UNTIL $9a0f
