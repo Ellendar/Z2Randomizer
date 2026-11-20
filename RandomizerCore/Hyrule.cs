@@ -526,7 +526,37 @@ public class Hyrule
 
     private Js65ResolvedText? AsmFileResolveTextCallback(IReadOnlyList<string> basePaths, string path)
     {
-        return new Js65ResolvedText(0, Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}"));
+        for (int index = 0; index < basePaths.Count; index++)
+        {
+            var parts = new List<string>();
+            bool valid = true;
+            foreach (string part in $"{basePaths[index]}/{path}".Replace('\\', '/').Split('/'))
+            {
+                if (part is "" or ".") continue;
+                if (part == "..")
+                {
+                    if (parts.Count == 0)
+                    {
+                        valid = false;
+                        break;
+                    }
+                    parts.RemoveAt(parts.Count - 1);
+                }
+                else
+                {
+                    parts.Add(part);
+                }
+            }
+
+            if (!valid) continue;
+            string resource = "Z2Randomizer.RandomizerCore.Asm." + string.Join('.', parts);
+            using var stream = typeof(Hyrule).Assembly.GetManifestResourceStream(resource);
+            if (stream == null) continue;
+            using var reader = new StreamReader(stream);
+            return new Js65ResolvedText(index, reader.ReadToEnd());
+        }
+
+        return null;
     }
 
     private static byte[] ConvertHash(byte[] hash)
